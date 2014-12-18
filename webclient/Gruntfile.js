@@ -8,9 +8,36 @@ module.exports = function (grunt) {
           separator: ';'
         },
         files: {
-          '../public/js/<%= pkg.name %>-vendor-<%= pkg.version %>.min.js': ['vendor/js/angular.min.js', 'vendor/js/*.js'],
-          '../public/js/<%= pkg.name %>-login-<%= pkg.version %>.js': ['loginapp/login.js', 'app/common/*.js', '!app/common/*.spec.js'],
-          '../public/js/<%= pkg.name %>-app-<%= pkg.version %>.js': ['app/app.js', 'app/**/*.js', '!app/**/*.spec.js']
+
+          // vendor js //
+          '../public/js/<%= pkg.name %>-vendor-<%= pkg.version %>.min.js':[
+            'bower_components/angular/angular.min.js',
+            'bower_components/angular-bootstrap/ui-bootstrap.min.js',
+            'bower_components/angular-loading-bar/build/loading-bar.min.js'
+          ],
+
+          // main application js //
+          '../public/js/<%= pkg.name %>-app-<%= pkg.version %>.js': [
+            'app/app.js',
+            'app/**/*.js',
+            '!app/**/*.spec.js'
+          ],
+
+          // login application js //
+          '../public/js/<%= pkg.name %>-login-<%= pkg.version %>.js': [
+            'loginapp/login.js',
+            'app/common/*.js',
+            '!app/common/*.spec.js'
+          ],
+        }
+      },
+      css: {
+        files:{
+          '../public/css/<%= pkg.name %>.css': [
+            'bower_components/bootstrap/dist/css/bootstrap.min.css',
+            'bower_components/angular-loading-bar/build/loading-bar.min.css',
+            'app/**/*.css'
+          ]
         }
       }
     },
@@ -22,8 +49,8 @@ module.exports = function (grunt) {
       },
       js: {
         files: {
-          '../public/js/<%= pkg.name %>-app-<%= pkg.version %>.min.js': ['public/<%= pkg.name %>-app-<%= pkg.version %>.js'],
-          '../public/js/<%= pkg.name %>-login-<%= pkg.version %>.min.js': ['public/<%= pkg.name %>-login-<%= pkg.version %>.js']
+          '../public/js/<%= pkg.name %>-app-<%= pkg.version %>.min.js': ['../public/js/<%= pkg.name %>-app-<%= pkg.version %>.js'],
+          '../public/js/<%= pkg.name %>-login-<%= pkg.version %>.min.js': ['../public/js/<%= pkg.name %>-login-<%= pkg.version %>.js']
         }
       }
     },
@@ -78,9 +105,9 @@ module.exports = function (grunt) {
     ngtemplates: {
       'app': {
         src: 'app/**/*.html',
-        dest: 'public/ggil-portal-templates-<%= pkg.version %>.js',
+        dest: '../public/js/<%= pkg.name %>-templates-<%= pkg.version %>.js',
         options:{
-          module: 'ggil-portal-app',
+          module: 'everycent',
           htmlmin:{
             collapseWhitespace:             true,
             removeAttributeQuotes:          true,
@@ -114,10 +141,10 @@ module.exports = function (grunt) {
       html: {
         //files: ['less/*.less'],
         //tasks: ['less:style'],
-        files: ['*.html', 'app/*.html', 'app/**/*.html', 'loginapp/**/*.html'],
+        files: ['../public/*.html', '*.html', 'app/*.html', 'app/**/*.html', 'loginapp/**/*.html'],
         tasks:['ngtemplates'],
         options: {
-          livereload: true,
+          livereload: true
         }
       }
       //,
