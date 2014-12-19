@@ -21,8 +21,8 @@ gem 'tzinfo-data'
 
 # Use unicorn as the app server
 # gem 'unicorn'
-gem 'eventmachine'
-gem 'thin'
+#gem 'eventmachine'
+#gem 'thin'
 
 # Deploy with Capistrano
 # gem 'capistrano', :group => :development
