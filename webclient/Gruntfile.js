@@ -12,6 +12,7 @@ module.exports = function (grunt) {
           // vendor js //
           '../public/js/<%= pkg.name %>-vendor-<%= pkg.version %>.min.js':[
             'bower_components/angular/angular.min.js',
+            'bower_components/angular-ui-router/release/angular-ui-router.min.js',
             'bower_components/angular-bootstrap/ui-bootstrap.min.js',
             'bower_components/angular-loading-bar/build/loading-bar.min.js'
           ],
@@ -124,7 +125,7 @@ module.exports = function (grunt) {
       js: {
         //files: ['javascript/*.js'],
         //tasks: ['concat:js', 'uglify:js'],
-        files: ['app/*.js', 'app/**/*.js'],
+        files: ['app/*.js', 'app/**/*.js', 'loginapp/**/*.js'],
         tasks: ['concat:js', 'uglify:js'],
         options: {
           livereload: true,
@@ -132,8 +133,8 @@ module.exports = function (grunt) {
       },
       css: {
         //files: ['less/*.less'],
-        //tasks: ['less:style'],
-        files: ['assets/*.css', 'assets/**/*.css'],
+        files: ['app/**/*.css', 'loginapp/**/*.css'],
+        tasks: ['concat:css'],
         options: {
           livereload: true,
         }
@@ -141,7 +142,7 @@ module.exports = function (grunt) {
       html: {
         //files: ['less/*.less'],
         //tasks: ['less:style'],
-        files: ['../public/*.html', '*.html', 'app/*.html', 'app/**/*.html', 'loginapp/**/*.html'],
+        files: ['../public/*.html', 'app/**/*.html', 'loginapp/**/*.html'],
         tasks:['ngtemplates'],
         options: {
           livereload: true

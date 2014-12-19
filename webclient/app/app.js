@@ -4,7 +4,10 @@
 
   // Module definitions
   angular.module('everycent.common', []);
-  angular.module('everycent', ['everycent.common']);
+  angular.module('everycent', [
+    'ui.router',
+    'everycent.common'
+    ]);
 
   angular
     .module('everycent')

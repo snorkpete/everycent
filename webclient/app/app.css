@@ -1,0 +1,65 @@
+
+/* angular-bootstrap fixes for cursors */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:hover{
+  background-color:#375574;
+  font-weight:bold;
+}
+
+div#display-window{
+  border-radius: 10px;
+  background: #e0e4ea;
+}
+
+div.container h2{
+  font-size: 36px;
+  color: rgb(198, 21, 76);
+}
+
+#message-display a, .login-details a, a.link{
+  cursor: pointer;
+}
+
+.panel-heading{
+  font-weight: bold;
+}
+
+div#main-display{
+  margin-top: 50px;
+}
+
+
+/* ----------------------- */
+/* message display styling */
+/* ----------------------- */
+div#message-display{
+  margin-top:15px;
+}
+/* --------------------------- */
+/* end message display styling */
+/* --------------------------- */
+
+
+/*FOOTER
+-----------------------------------------------------*/
+footer {
+  padding: 50px 0;
+}
+footer,
+footer .container h5 a,
+footer .container ul li a {
+}
+footer h5 {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+footer p,
+footer nav ul li a {
+  font-family: 'IntervalLight';
+  font-size: 11px;
+}
+.footer-nav ul li {
+  float: left;
+  margin-right: 25px;
+}
