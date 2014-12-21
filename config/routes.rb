@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :bank_accounts, except: [:new, :edit]
+  resources :institutions, except: [:new, :edit]
   mount_devise_token_auth_for 'User', at: '/auth'
   resources :users, except: [:new, :edit]
   # The priority is based upon order of creation: first created -> highest priority.

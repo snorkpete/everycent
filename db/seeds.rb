@@ -5,3 +5,12 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+#
+
+# Create the institutions
+Institution.create name:'Scotia Bank'
+Institution.create name:'Unit Trust'
+Institution.create name:'Republic Bank'
+Institution.create name:'RBTT'
+Institution.create name:'First Citizens Bank'
+Institution.create name:'Guardian Asset Management'
