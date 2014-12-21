@@ -7,7 +7,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('app/institutions/list.html',
-    "<ul><li>Scotia</li><li>Scotia</li><li>Scotia</li></ul>"
+    "<ul ng-repeat=\"institution in vm.institutions\"><li>{{ institution.name }}</li></ul>"
   );
 
 }]);

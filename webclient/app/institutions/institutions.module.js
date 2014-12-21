@@ -12,7 +12,7 @@
       .state('institutions', {
         url: '/institutions',
         templateUrl: 'app/institutions/list.html',
-        controller: [function(){ }]
+        controller: 'InstitutionsCtrl as vm'
       })
     ;
   }
