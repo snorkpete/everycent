@@ -1,7 +1,7 @@
 class InstitutionsController < ApplicationController
   before_action :set_institution, only: [:show, :edit, :update, :destroy]
 
-  respond_to :html
+  #respond_to :html
 
   def index
     @institutions = Institution.all

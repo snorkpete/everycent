@@ -1,8 +1,6 @@
 class BankAccountsController < ApplicationController
   before_action :set_bank_account, only: [:show, :edit, :update, :destroy]
 
-  respond_to :html
-
   def index
     @bank_accounts = BankAccount.all
     respond_with(@bank_accounts)
