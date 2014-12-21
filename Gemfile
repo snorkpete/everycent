@@ -11,6 +11,8 @@ gem 'spring', :group => :development
 gem 'sqlite3'
 
 gem 'tzinfo-data'
+gem 'omniauth'
+gem 'devise_token_auth'
 
 
 # To use ActiveModel has_secure_password
