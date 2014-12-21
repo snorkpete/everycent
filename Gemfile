@@ -10,10 +10,16 @@ gem 'spring', :group => :development
 
 gem 'sqlite3'
 
+# fix for time 
 gem 'tzinfo-data'
+
+# authentication - omniauth is a dependency of devise_token_auth
 gem 'omniauth'
 gem 'devise_token_auth'
 
+# json api building
+gem 'active_model_serializers'
+#gem 'responders'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'

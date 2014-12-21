@@ -20,6 +20,8 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.1)
+    active_model_serializers (0.9.2)
+      activemodel (>= 3.2)
     activejob (4.2.0.rc3)
       activesupport (= 4.2.0.rc3)
       globalid (>= 0.3.0)
@@ -38,6 +40,7 @@ GEM
       tzinfo (~> 1.1)
     arel (6.0.0)
     bcrypt (3.1.9-x64-mingw32)
+    bcrypt (3.1.9-x86-mingw32)
     builder (3.2.2)
     devise (3.4.1)
       bcrypt (~> 3.0)
@@ -132,6 +135,7 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
+  active_model_serializers
   devise_token_auth
   omniauth
   rails (= 4.2.0.rc3)
