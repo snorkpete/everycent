@@ -37,10 +37,22 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     arel (6.0.0)
+    bcrypt (3.1.9-x64-mingw32)
     builder (3.2.2)
+    devise (3.4.1)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 3.2.6, < 5)
+      responders
+      thread_safe (~> 0.1)
+      warden (~> 1.2.3)
+    devise_token_auth (0.1.30)
+      devise (~> 3.3)
+      rails (~> 4.1)
     erubis (2.7.0)
     globalid (0.3.0)
       activesupport (>= 4.1.0)
+    hashie (3.3.2)
     hike (1.2.3)
     i18n (0.7.0.beta1)
     json (1.8.1)
@@ -56,6 +68,10 @@ GEM
       mini_portile (~> 0.6.0)
     nokogiri (1.6.5-x86-mingw32)
       mini_portile (~> 0.6.0)
+    omniauth (1.2.2)
+      hashie (>= 1.2, < 4)
+      rack (~> 1.0)
+    orm_adapter (0.5.0)
     rack (1.6.0.beta2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -87,6 +103,8 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
+    responders (2.0.2)
+      railties (>= 4.2.0.alpha, < 5)
     spring (1.2.0)
     sprockets (2.12.3)
       hike (~> 1.2)
@@ -106,12 +124,16 @@ GEM
       thread_safe (~> 0.1)
     tzinfo-data (1.2014.10)
       tzinfo (>= 1.0.0)
+    warden (1.2.3)
+      rack (>= 1.0)
 
 PLATFORMS
   x64-mingw32
   x86-mingw32
 
 DEPENDENCIES
+  devise_token_auth
+  omniauth
   rails (= 4.2.0.rc3)
   rails-api
   spring
