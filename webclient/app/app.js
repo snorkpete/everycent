@@ -6,7 +6,8 @@
   angular.module('everycent.common', []);
   angular.module('everycent', [
     'ui.router',
-    'everycent.common'
+    'everycent.common',
+    'everycent.institutions'
     ]);
 
   angular

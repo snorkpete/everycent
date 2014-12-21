@@ -5,4 +5,9 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
     "<h2>Welcome to EveryCent!!!</h2>"
   );
 
+
+  $templateCache.put('app/institutions/list.html',
+    "<ul><li>Scotia</li><li>Scotia</li><li>Scotia</li></ul>"
+  );
+
 }]);

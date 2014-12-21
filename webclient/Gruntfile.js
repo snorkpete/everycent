@@ -19,6 +19,7 @@ module.exports = function (grunt) {
 
           // main application js //
           '../public/js/<%= pkg.name %>-app-<%= pkg.version %>.js': [
+            'app/**/*.module.js',
             'app/app.js',
             'app/**/*.js',
             '!app/**/*.spec.js'
