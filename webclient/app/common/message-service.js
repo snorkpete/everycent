@@ -1,9 +1,5 @@
 
 (function(){
-  angular.module('everycent.common', []);
-})();
-;
-(function(){
   angular
     .module('everycent.common', [])
     .factory('MessageService', MessageService);

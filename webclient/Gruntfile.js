@@ -12,6 +12,9 @@ module.exports = function (grunt) {
           // vendor js //
           '../public/js/<%= pkg.name %>-vendor-<%= pkg.version %>.min.js':[
             'bower_components/angular/angular.min.js',
+            'bower_components/angular-cookies/angular-cookies.min.js',
+            'bower_components/angular-cookie/angular-cookie.min.js',
+            'bower_components/ng-token-auth/dist/ng-token-auth.min.js',
             'bower_components/angular-ui-router/release/angular-ui-router.min.js',
             'bower_components/angular-bootstrap/ui-bootstrap.min.js',
             'bower_components/angular-loading-bar/build/loading-bar.min.js'

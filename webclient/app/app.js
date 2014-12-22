@@ -3,20 +3,32 @@
   'use strict';
 
   // Module definitions
-  angular.module('everycent.common', []);
   angular.module('everycent', [
     'ui.router',
+    'ngCookies',
+    'ng-token-auth',
     'everycent.common',
+    'everycent.security',
     'everycent.institutions'
     ]);
 
   angular
     .module('everycent')
+    .config(AppConfig)
     .controller('MainCtrl', MainCtrl);
 
-  MainCtrl.$inject = [];
+  AppConfig.$inject = ['$authProvider'];
+  function AppConfig($authProvider){
+    $authProvider.configure({
+      apiUrl: ''
+    });
+  }
 
-  function MainCtrl(){
+  MainCtrl.$inject = ['MessageService'];
+  function MainCtrl(MessageService){
+    var main = this;
+
+    main.ui = MessageService.data;
   }
 })();
 

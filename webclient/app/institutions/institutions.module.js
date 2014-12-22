@@ -12,7 +12,12 @@
       .state('institutions', {
         url: '/institutions',
         templateUrl: 'app/institutions/list.html',
-        controller: 'InstitutionsCtrl as vm'
+        controller: 'InstitutionsCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
       })
     ;
   }

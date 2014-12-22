@@ -10,7 +10,7 @@
     <link href="css/everycent.css" rel="stylesheet">
 </head>
 <body>
-    <div class="full-window" ng-controller="MainCtrl" ng-cloak>
+    <div class="full-window" ng-controller="MainCtrl as main" ng-cloak>
         <nav class="navbar navbar-fixed-top" role="navigation">
             <div class="container">
                 <!-- Brand and toggle get grouped for better mobile display -->
@@ -44,11 +44,11 @@
         <div id="main-display" >
             <div id="display-window" class="container">
                 <div>
-                    <div class="region-display label label-danger pull-right">{{ ui.regionDisplay }}</div>
+                    <div class="region-display label label-danger pull-right">{{ main.ui.regionDisplay }}</div>
                     &nbsp;
                 </div>
-                <div id="message-display" class="alert alert-danger" ng-show="ui.message">
-                    {{ ui.message }} <a ng-show="ui.showLoginLink" ng-click="logout()">Log in.</a>
+                <div id="message-display" class="alert alert-danger" ng-show="main.ui.message">
+                    {{ main.ui.message }} <a ng-show="main.ui.showLoginLink" ng-click="logout()">Log in.</a>
                 </div>
                 <div ui-view></div>
             </div>
