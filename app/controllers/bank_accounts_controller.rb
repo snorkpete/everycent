@@ -3,16 +3,16 @@ class BankAccountsController < ApplicationController
 
   def index
     @bank_accounts = BankAccount.all
-    respond_with(@bank_accounts)
+    respond_with(@bank_accounts, BankAccountSerializer)
   end
 
   def show
-    respond_with(@bank_account)
+    respond_with(@bank_account, BankAccountSerializer)
   end
 
   def new
     @bank_account = BankAccount.new
-    respond_with(@bank_account)
+    respond_with(@bank_account, BankAccountSerializer)
   end
 
   def edit
@@ -21,17 +21,17 @@ class BankAccountsController < ApplicationController
   def create
     @bank_account = BankAccount.new(bank_account_params)
     @bank_account.save
-    respond_with(@bank_account)
+    respond_with(@bank_account, BankAccountSerializer)
   end
 
   def update
     @bank_account.update(bank_account_params)
-    respond_with(@bank_account)
+    respond_with(@bank_account, BankAccountSerializer)
   end
 
   def destroy
     @bank_account.destroy
-    respond_with(@bank_account)
+    respond_with(@bank_account, BankAccountSerializer)
   end
 
   private
