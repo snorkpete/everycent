@@ -21,7 +21,7 @@ gem 'devise_token_auth'
 # json api building
 gem 'active_model_serializers'
 #gem 'responders'
-
+gem 'responders', '~> 2.0'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 

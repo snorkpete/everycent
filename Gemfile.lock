@@ -144,6 +144,7 @@ DEPENDENCIES
   omniauth
   rails (= 4.2.0.rc3)
   rails-api
+  responders (~> 2.0)
   spring
   sqlite3
   tzinfo-data
