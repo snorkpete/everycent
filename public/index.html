@@ -47,9 +47,7 @@
                     <div class="region-display label label-danger pull-right">{{ main.ui.regionDisplay }}</div>
                     &nbsp;
                 </div>
-                <div id="message-display" class="alert alert-danger" ng-show="main.ui.message">
-                    {{ main.ui.message }} <a ng-show="main.ui.showLoginLink" ng-click="logout()">Log in.</a>
-                </div>
+                <ec-message></ec-message>
                 <div ui-view></div>
             </div>
         </div>
