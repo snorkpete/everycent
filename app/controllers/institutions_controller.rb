@@ -5,16 +5,16 @@ class InstitutionsController < ApplicationController
 
   def index
     @institutions = Institution.all
-    respond_with(@institutions)
+    respond_with(@institutions, InstitutionSerializer)
   end
 
   def show
-    respond_with(@institution)
+    respond_with(@institution, InstitutionSerializer)
   end
 
   def new
     @institution = Institution.new
-    respond_with(@institution)
+    respond_with(@institution, InstitutionSerializer)
   end
 
   def edit
@@ -23,17 +23,17 @@ class InstitutionsController < ApplicationController
   def create
     @institution = Institution.new(institution_params)
     @institution.save
-    respond_with(@institution)
+    respond_with(@institution, InstitutionSerializer)
   end
 
   def update
     @institution.update(institution_params)
-    respond_with(@institution)
+    respond_with(@institution, InstitutionSerializer)
   end
 
   def destroy
     @institution.destroy
-    respond_with(@institution)
+    respond_with(@institution, InstitutionSerializer)
   end
 
   private
