@@ -2,3 +2,8 @@
 <ul ng-repeat="institution in vm.institutions">
   <li>{{ institution.name }}</li>
 </ul>
+
+<ec-message>Heelo</ec-message>
+<button ng-click="vm.testMessage('success')">Test Messages</button>
+<button ng-click="vm.testMessage('warning')">Test Messages</button>
+<button ng-click="vm.testMessage('error')">Test Messages</button>

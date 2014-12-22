@@ -1,13 +1,18 @@
 angular.module('everycent').run(['$templateCache', function($templateCache) {
   'use strict';
 
+  $templateCache.put('app/common/ec-message-directive.html',
+    "<div><div class=\"message alert alert-success\" ng-show=vm.ui.message>{{ vm.ui.message }}</div><div class=\"message alert alert-danger\" ng-show=vm.ui.errorMessage><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=true></span> {{ vm.ui.errorMessage }}</div><div class=\"message alert alert-warning\" ng-show=vm.ui.warningMessage>{{ vm.ui.warningMessage }}</div></div>"
+  );
+
+
   $templateCache.put('app/home/home.html',
     "<h2>Welcome to EveryCent!!!</h2>"
   );
 
 
   $templateCache.put('app/institutions/list.html',
-    "<ul ng-repeat=\"institution in vm.institutions\"><li>{{ institution.name }}</li></ul>"
+    "<ul ng-repeat=\"institution in vm.institutions\"><li>{{ institution.name }}</li></ul><ec-message>Heelo</ec-message><button ng-click=\"vm.testMessage('success')\">Test Messages</button> <button ng-click=\"vm.testMessage('warning')\">Test Messages</button> <button ng-click=\"vm.testMessage('error')\">Test Messages</button>"
   );
 
 

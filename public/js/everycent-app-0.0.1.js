@@ -119,7 +119,33 @@
 ;
 (function(){
   angular
-    .module('everycent.common', [])
+    .module('everycent.common')
+    .directive('ecMessage', ecMessage);
+
+  function ecMessage(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/common/ec-message-directive.html',
+      scope: {},
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    }
+
+    return directive;
+  }
+
+  controller.$inject = ['MessageService'];
+  function controller(MessageService){
+    var vm = this;
+
+    vm.ui = MessageService.getMessageData();
+  }
+})();
+;
+(function(){
+  angular
+    .module('everycent.common')
     .factory('MessageService', MessageService);
 
   MessageService.$inject = [];
@@ -127,24 +153,66 @@
   function MessageService(){
     var data = {};
     var service = {
-      data: data
+      getMessageData: getMessageData,
+      setMessage: setMessage,
+      setErrorMessage: setErrorMessage,
+      setWarningMessage: setWarningMessage,
+      clearMessage: clearMessage
     }
 
     return service;
+
+    function getMessageData(){
+      return data;
+    }
+
+    function setMessage(message){
+      clearMessage();
+      data.message = message;
+    }
+
+    function setErrorMessage(message){
+      clearMessage();
+      data.errorMessage = message;
+    }
+
+    function setWarningMessage(message){
+      clearMessage();
+      data.warningMessage = message;
+    }
+
+    function clearMessage(){
+      data.message = '';
+      data.errorMessage = '';
+      data.warningMessage = '';
+    }
   }
 })();
 ;
 (function(){
+  'use strict';
+
   angular
     .module('everycent.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
-  InstitutionsCtrl.$inject = ['$http'];
+  InstitutionsCtrl.$inject = ['$http', 'MessageService'];
 
-  function InstitutionsCtrl($http){
+  function InstitutionsCtrl($http, MessageService){
     var vm = this;
 
     vm.institutions = [ 'Scotia', 'Rbc', 'other'];
+    vm.testMessage = function(message){
+      if(message === 'success'){
+        MessageService.setMessage(message);
+      }
+      if(message === 'warning'){
+        MessageService.setWarningMessage(message);
+      }
+      if(message === 'error'){
+        MessageService.setErrorMessage(message);
+      }
+    }
 
     $http.get('/institutions').then(function(response){
       vm.institutions = response.data;
@@ -166,17 +234,19 @@
       vm.signIn = signIn;
 
       function signIn(params){
-        console.log(params);
         $auth.submitLogin(params).then(function(response){
-            // handle success
-            MessageService.data.message = '';
+
+            MessageService.setMessage('Logged in successfully.');
             $state.go('institutions');
 
-        }).catch(function(response){
-            MessageService.data.message = 'Invalid login';
+          }).catch(function(response){
+
+            MessageService.setErrorMessage('Invalid login');
             if(response.data && response.data.errors){
-              MessageService.data.message = response.data.errors[0];
+              MessageService.setErrorMessage(response.data.errors[0]);
             }
+
+            return true; // handled the error, so return true
         });
       }
 

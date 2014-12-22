@@ -1,0 +1,13 @@
+
+<div>
+  <div class="message alert alert-success" ng-show="vm.ui.message">
+      {{ vm.ui.message }} 
+  </div>
+  <div class="message alert alert-danger" ng-show="vm.ui.errorMessage">
+     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      {{ vm.ui.errorMessage }} 
+  </div>
+  <div class="message alert alert-warning" ng-show="vm.ui.warningMessage">
+      {{ vm.ui.warningMessage }} 
+  </div>
+</div>

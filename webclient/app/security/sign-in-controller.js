@@ -13,17 +13,19 @@
       vm.signIn = signIn;
 
       function signIn(params){
-        console.log(params);
         $auth.submitLogin(params).then(function(response){
-            // handle success
-            MessageService.data.message = '';
+
+            MessageService.setMessage('Logged in successfully.');
             $state.go('institutions');
 
-        }).catch(function(response){
-            MessageService.data.message = 'Invalid login';
+          }).catch(function(response){
+
+            MessageService.setErrorMessage('Invalid login');
             if(response.data && response.data.errors){
-              MessageService.data.message = response.data.errors[0];
+              MessageService.setErrorMessage(response.data.errors[0]);
             }
+
+            return true; // handled the error, so return true
         });
       }
 
