@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     concat: {
       js: {
         options: {
-          separator: ';'
+          separator: grunt.util.linefeed + ';' + grunt.util.linefeed
         },
         files: {
 
