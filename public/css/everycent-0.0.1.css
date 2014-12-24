@@ -22,6 +22,10 @@ body{
   background-color: #72A887;
 }
 
+.pointer{
+  cursor: pointer;
+}
+
 
 /*-----------------------------------------------------*/
 /*FOOTER                                               */
