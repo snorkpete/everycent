@@ -9,6 +9,7 @@
     'ngCookies',
     'ng-token-auth',
     'everycent.common',
+    'everycent.menu',
     'everycent.security',
     'everycent.institutions'
     ]);
@@ -30,6 +31,10 @@
     var main = this;
 
     main.ui = MessageService.data;
+    main.currentPage = 'institutions';
+    main.user = {
+      name: 'Kion Stephen'
+    };
   }
 })();
 
