@@ -1,16 +1,21 @@
 
 <div class="row">
     <div class="col-xs-12">
-        <h2>Current Institutions</h2>
+        <h2>Banking Institutions</h2>
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12">
-        <ol>
-            <li ng-repeat="institution in vm.institutions">
-                {{ institution.name }}
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="institution in vm.institutions">
+            {{ $index + 1 }}. {{ institution.name }}
+
+                <span ng-click="vm.deleteInstitution(institution)"
+                      class="text-danger pull-right pointer">
+                    <ec-icon type="remove"></ec-icon>
+                </span>
             </li>
-        </ol>
+        </ul>
     </div>
 </div>
 

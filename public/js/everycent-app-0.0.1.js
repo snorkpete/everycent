@@ -180,6 +180,34 @@
 ;
 
 (function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .directive('ecIcon', ecIcon);
+
+  function ecIcon(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/common/ec-icon-directive.html',
+      scope: {
+        type: '@'
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    }
+    return directive;
+
+    function controller(){
+      var vm = this;
+    }
+  }
+})();
+
+;
+
+(function(){
   angular
     .module('everycent.common')
     .directive('ecMessage', ecMessage);
@@ -208,6 +236,8 @@
 ;
 
 (function(){
+  'use strict';
+
   angular
     .module('everycent.common')
     .directive('ecPanel', ecPanel);
@@ -287,23 +317,76 @@
   'use strict';
 
   angular
+    .module('everycent.common')
+    .factory('ModalService', ModalService);
+
+  ModalService.$inject = ['$modal', '$document'];
+  function ModalService($modal, $document){
+    var service = {
+      show: show
+    };
+    return service;
+
+    function show(options){
+      var modalInstance = $modal.open({
+        templateUrl: 'app/common/modal.html',
+        backdrop:'static',
+        controller: modalController,
+        controllerAs: 'vm'
+      });
+
+      return modalInstance.result;
+
+      function modalController(){
+        var vm = this;
+        vm.options = options;
+        modalFix();
+
+        vm.options.confirm = function(){
+          modalInstance.close('ok');
+        }
+
+        vm.options.cancel = function(){
+          modalInstance.dismiss('cancel');
+        }
+      }
+    }
+
+    /** TODO: this is a temporary fix for a bootstrap 3.1.1 issue
+     * Should be removed once that issue is fixed */
+    function modalFix(){
+      setTimeout(function(){
+        angular.element($document[0].querySelectorAll('div.modal-backdrop'))
+             .css('height','1000px');
+            }, 100);
+    }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
     .module('everycent.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
-  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService'];
+  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService', 'ModalService'];
 
-  function InstitutionsCtrl(MessageService, InstitutionsService){
+  function InstitutionsCtrl(MessageService, InstitutionsService, ModalService){
     var vm = this;
     vm.institutions = [];
     vm.addInstitution = addInstitution;
+    vm.deleteInstitution = deleteInstitution;
 
     activate();
 
     function activate(){
-      loadInstitutions();
+      refreshInstitutionList();
     }
 
-    function loadInstitutions(){
+    function refreshInstitutionList(){
       InstitutionsService.getInstitutions().then(function(institutions){
         vm.institutions = institutions;
       });
@@ -311,9 +394,32 @@
 
     function addInstitution(institution){
       InstitutionsService.addInstitution(institution).then(function(response){
-        loadInstitutions();
+        refreshInstitutionList();
         MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
       });
+    }
+
+    function deleteInstitution(institution){
+      var modalOptions = {
+        headerText: 'Delete this institution?',
+        bodyText: 'Are you sure you want to delete this institution?',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel'
+      }
+
+      ModalService.show(modalOptions).then(function(){
+
+        institution.remove().then(function(){
+          refreshInstitutionList();
+          MessageService.setMessage('Institution deleted.');
+        }).catch(function(){
+          MessageService.setErrorMessage('Error deleting.');
+        });
+
+      },function(){
+        MessageService.setErrorMessage('Delete cancelled.'); // cancel clicked
+      });
+
     }
   }
 })();
