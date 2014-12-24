@@ -1,5 +1,7 @@
 
 (function(){
+  'use strict';
+
   angular
     .module('everycent.common')
     .directive('ecPanel', ecPanel);
