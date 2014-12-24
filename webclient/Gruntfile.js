@@ -168,11 +168,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-angular-templates');
 
-  grunt.registerTask('watching', [ 'watch' ]);
-
   // Task for rebuilding all files
   grunt.registerTask('build', ['concat:js','uglify:js','ngtemplates','concat:css' ]);
-  //grunt.registerTask('concat', [ 'concat' ]);
 
-  grunt.registerTask('default', ['watching']);
+  grunt.registerTask('buildThenWatch', ['build', 'watch']);
+  grunt.registerTask('default', ['buildThenWatch']);
 };

@@ -2,7 +2,9 @@
 (function(){
   angular.module('everycent.common', []);
 })();
+
 ;
+
 (function(){
   angular
     .module('everycent.institutions', ['everycent.common'])
@@ -26,7 +28,16 @@
     ;
   }
 })();
+
 ;
+
+(function(){
+  angular.module('everycent.menu', ['everycent.common']);
+
+})();
+
+;
+
 (function(){
   angular
     .module('everycent.security', ['everycent.common'])
@@ -45,16 +56,20 @@
     ;
   }
 })();
+
 ;
+
 (function(){
   'use strict';
 
   // Module definitions
   angular.module('everycent', [
+    'ui.bootstrap',
     'ui.router',
     'ngCookies',
     'ng-token-auth',
     'everycent.common',
+    'everycent.menu',
     'everycent.security',
     'everycent.institutions'
     ]);
@@ -76,10 +91,16 @@
     var main = this;
 
     main.ui = MessageService.data;
+    main.currentPage = 'institutions';
+    main.user = {
+      name: 'Kion Stephen'
+    };
   }
 })();
 
-;;
+
+;
+;
 (function(){
   'use strict';
 
@@ -116,7 +137,9 @@
   }
 
 })();
+
 ;
+
 (function(){
   angular
     .module('everycent.common')
@@ -142,7 +165,9 @@
     vm.ui = MessageService.getMessageData();
   }
 })();
+
 ;
+
 (function(){
   angular
     .module('everycent.common')
@@ -188,7 +213,9 @@
     }
   }
 })();
+
 ;
+
 (function(){
   'use strict';
 
@@ -196,30 +223,106 @@
     .module('everycent.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
-  InstitutionsCtrl.$inject = ['$http', 'MessageService'];
+  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService'];
 
-  function InstitutionsCtrl($http, MessageService){
+  function InstitutionsCtrl(MessageService, InstitutionsService){
     var vm = this;
+    vm.institutions = [];
+    vm.addInstitution = addInstitution;
 
-    vm.institutions = [ 'Scotia', 'Rbc', 'other'];
-    vm.testMessage = function(message){
-      if(message === 'success'){
-        MessageService.setMessage(message);
-      }
-      if(message === 'warning'){
-        MessageService.setWarningMessage(message);
-      }
-      if(message === 'error'){
-        MessageService.setErrorMessage(message);
-      }
+    activate();
+
+    function activate(){
+      loadInstitutions();
     }
 
-    $http.get('/institutions').then(function(response){
-      vm.institutions = response.data;
-    });
+    function loadInstitutions(){
+      InstitutionsService.getInstitutions().then(function(data){
+        vm.institutions = data;
+      });
+    }
+
+    function addInstitution(institution){
+      InstitutionsService.addInstitution(institution);
+      MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
+    }
   }
 })();
-;(function(){
+
+;
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.institutions')
+    .factory('InstitutionsService', InstitutionsService);
+
+    InstitutionsService.$inject = ['$http'];
+    function InstitutionsService($http){
+      var service = {
+        getInstitutions: getInstitutions,
+        addInstitution: addInstitution
+      }
+
+      return service;
+
+      function getInstitutions(){
+        return $http.get('/institutions').then(function(response){
+          return response.data;
+        });
+      }
+
+      function addInstitution(institution){
+        alert('test');
+      }
+
+    }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.menu')
+    .directive('ecNavbar', ecNavbar);
+
+  function ecNavbar(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/menu/ec-navbar-directive.html',
+      scope: {
+        userName: '=',
+        currentPage: '='
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    }
+
+    return directive;
+  }
+
+  controller.$inject = ['MessageService', '$state'];
+  function controller(MessageService, $state){
+    var vm = this;
+
+    vm.goToPage = goToPage;
+    vm.logout = logout;
+
+    function goToPage(page){
+      $state.go(page);
+      vm.currentPage = page;
+      MessageService.clearMessage();
+    }
+
+    function logout(){
+      MessageService.setErrorMessage('Logout not yet implemented.');
+    }
+  }
+})();
+
+;
+(function(){
   'use strict';
 
   angular

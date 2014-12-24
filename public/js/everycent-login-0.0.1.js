@@ -2,7 +2,9 @@
 (function(){
   angular.module('everycent.common', []);
 })();
+
 ;
+
 (function(){
   angular
     .module('everycent.common')
@@ -28,7 +30,9 @@
     vm.ui = MessageService.getMessageData();
   }
 })();
+
 ;
+
 (function(){
   angular
     .module('everycent.common')
