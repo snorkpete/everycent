@@ -20,14 +20,16 @@
     }
 
     function loadInstitutions(){
-      InstitutionsService.getInstitutions().then(function(data){
-        vm.institutions = data;
+      InstitutionsService.getInstitutions().then(function(institutions){
+        vm.institutions = institutions;
       });
     }
 
     function addInstitution(institution){
-      InstitutionsService.addInstitution(institution);
-      MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
+      InstitutionsService.addInstitution(institution).then(function(response){
+        loadInstitutions();
+        MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
+      });
     }
   }
 })();

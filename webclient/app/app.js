@@ -8,6 +8,7 @@
     'ui.router',
     'ngCookies',
     'ng-token-auth',
+    'restangular',
     'everycent.common',
     'everycent.menu',
     'everycent.security',

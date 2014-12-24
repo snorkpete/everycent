@@ -5,7 +5,7 @@ class InstitutionsController < ApplicationController
   respond_to :json
 
   def index
-    @institutions = Institution.all
+    @institutions = Institution.all.order(:name)
     respond_with(@institutions, InstitutionSerializer)
   end
 

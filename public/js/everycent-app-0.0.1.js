@@ -68,6 +68,7 @@
     'ui.router',
     'ngCookies',
     'ng-token-auth',
+    'restangular',
     'everycent.common',
     'everycent.menu',
     'everycent.security',
@@ -303,14 +304,16 @@
     }
 
     function loadInstitutions(){
-      InstitutionsService.getInstitutions().then(function(data){
-        vm.institutions = data;
+      InstitutionsService.getInstitutions().then(function(institutions){
+        vm.institutions = institutions;
       });
     }
 
     function addInstitution(institution){
-      InstitutionsService.addInstitution(institution);
-      MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
+      InstitutionsService.addInstitution(institution).then(function(response){
+        loadInstitutions();
+        MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
+      });
     }
   }
 })();
@@ -323,23 +326,25 @@
     .module('everycent.institutions')
     .factory('InstitutionsService', InstitutionsService);
 
-    InstitutionsService.$inject = ['$http'];
-    function InstitutionsService($http){
+    InstitutionsService.$inject = ['$http', 'Restangular'];
+    function InstitutionsService($http, Restangular){
       var service = {
         getInstitutions: getInstitutions,
         addInstitution: addInstitution
       }
 
+      var baseAll = Restangular.all('institutions');
       return service;
 
       function getInstitutions(){
-        return $http.get('/institutions').then(function(response){
-          return response.data;
-        });
+        //return $http.get('/institutions').then(function(response){
+        //  return response.data;
+        //});
+        return baseAll.getList();//.then(function(
       }
 
       function addInstitution(institution){
-        alert('test');
+        return baseAll.post(institution);
       }
 
     }
