@@ -6,26 +6,28 @@
     .module('everycent.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
-  InstitutionsCtrl.$inject = ['$http', 'MessageService'];
+  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService'];
 
-  function InstitutionsCtrl($http, MessageService){
+  function InstitutionsCtrl(MessageService, InstitutionsService){
     var vm = this;
+    vm.institutions = [];
+    vm.addInstitution = addInstitution;
 
-    vm.institutions = [ 'Scotia', 'Rbc', 'other'];
-    vm.testMessage = function(message){
-      if(message === 'success'){
-        MessageService.setMessage(message);
-      }
-      if(message === 'warning'){
-        MessageService.setWarningMessage(message);
-      }
-      if(message === 'error'){
-        MessageService.setErrorMessage(message);
-      }
+    activate();
+
+    function activate(){
+      loadInstitutions();
     }
 
-    $http.get('/institutions').then(function(response){
-      vm.institutions = response.data;
-    });
+    function loadInstitutions(){
+      InstitutionsService.getInstitutions().then(function(data){
+        vm.institutions = data;
+      });
+    }
+
+    function addInstitution(institution){
+      InstitutionsService.addInstitution(institution);
+      MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
+    }
   }
 })();

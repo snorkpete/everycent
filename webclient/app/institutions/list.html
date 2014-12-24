@@ -1,9 +1,28 @@
 
-<ul ng-repeat="institution in vm.institutions">
-  <li>{{ institution.name }}</li>
-</ul>
+<md-toolbar class="md-teal-theme">
+    <div class="md-toolbar-tools">
+        <h3>Institutions</h3>
+    </div>
+</md-toolbar>
+<md-content>
+    <md-list>
+        <md-item ng-repeat="institution in vm.institutions">
+            <div class="md-tile-content">
+                {{ institution.name }}
+            </div>
+        </md-item>
+    </md-list>
 
-<ec-message>Heelo</ec-message>
-<button ng-click="vm.testMessage('success')">Test Messages</button>
-<button ng-click="vm.testMessage('warning')">Test Messages</button>
-<button ng-click="vm.testMessage('error')">Test Messages</button>
+    <md-card>
+        <h4> Add an Institution </h4>
+        <form class="basic-form" ng-submit="vm.addInstitution(institution)">
+            <div class="row">
+                <md-text-float label="Institution Name" ng-model="institution.name"> </md-text-float>
+            </div>
+            <div class="row">
+              <md-button type="submit" class="md-raised md-primary">Add Institution</md-button>
+            </div>
+        </form>
+    </md-card>
+    
+</md-content>
