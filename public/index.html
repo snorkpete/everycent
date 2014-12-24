@@ -12,45 +12,10 @@
 </head>
 <body>
     <div class="full-window" ng-controller="MainCtrl as main" ng-cloak>
-        <nav class="navbar navbar-fixed-top" role="navigation">
-            <div class="container">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#"> </a>
-                </div>
-
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div collapse="navCollapsed" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><p class="navbar-text">Hi, <strong>{{user.name}}</strong></p></li>
-                        <li class="dropdown" ng-class="{active: menu.currentPage=='actions'}" >
-                        <a class="dropdown-toggle">Actions <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a ng-click="goToChangePassword()">Change password</a></li>
-                            <li><a ng-click="logout()">Log Out</a></li>
-                        </ul>
-                        </li>
-                    </ul>
-                    <ul id="main-menu" class="nav navbar-nav" ng-include="getMenu()"> </ul>
-                </div><!-- /.navbar-collapse -->
-
-            </div><!-- /.container-fluid -->
-        </nav>
-        <div id="main-display" >
-            <div id="display-window" class="container">
-                <div>
-                    <div class="region-display label label-danger pull-right">{{ main.ui.regionDisplay }}</div>
-                    &nbsp;
-                </div>
-                <ec-message></ec-message>
-                <div ui-view></div>
-            </div>
+        <ec-navbar user-name="main.user.name" current-page="main.currentPage"></ec-navbar>
+        <div class="main-display container">
+            <ec-message></ec-message>
+            <div ui-view></div>
         </div>
     </div>
 
