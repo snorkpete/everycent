@@ -131,8 +131,6 @@ module.exports = function (grunt) {
     },
     watch: {
       js: {
-        //files: ['javascript/*.js'],
-        //tasks: ['concat:js', 'uglify:js'],
         files: ['app/*.js', 'app/**/*.js', 'loginapp/**/*.js'],
         tasks: ['concat:js', 'uglify:js'],
         options: {
@@ -140,7 +138,6 @@ module.exports = function (grunt) {
         }
       },
       css: {
-        //files: ['less/*.less'],
         files: ['app/**/*.css', 'loginapp/**/*.css'],
         tasks: ['concat:css'],
         options: {
@@ -148,8 +145,6 @@ module.exports = function (grunt) {
         }
       },
       html: {
-        //files: ['less/*.less'],
-        //tasks: ['less:style'],
         files: ['../public/*.html', 'app/**/*.html', 'loginapp/**/*.html'],
         tasks:['ngtemplates'],
         options: {
@@ -174,6 +169,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-angular-templates');
 
   grunt.registerTask('watching', [ 'watch' ]);
+
+  // Task for rebuilding all files
+  grunt.registerTask('build', ['concat:js','uglify:js','ngtemplates','concat:css' ]);
   //grunt.registerTask('concat', [ 'concat' ]);
 
   grunt.registerTask('default', ['watching']);
