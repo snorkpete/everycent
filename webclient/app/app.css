@@ -2,14 +2,10 @@
 /* angular-bootstrap fixes for cursors */
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
-.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.active>a:hover{
-  background-color:#375574;
-  font-weight:bold;
-}
-
-div#display-window{
+div.main-display{
   border-radius: 10px;
   background: #e0e4ea;
+  margin-top: 65px;
 }
 
 div.container h2{
@@ -17,35 +13,27 @@ div.container h2{
   color: rgb(198, 21, 76);
 }
 
-#message-display a, .login-details a, a.link{
-  cursor: pointer;
-}
 
 .panel-heading{
   font-weight: bold;
 }
 
-div#main-display{
-  margin-top: 50px;
+body{
+  background-color: #a6a6cc;
 }
 
 
-/* ----------------------- */
-/* message display styling */
-/* ----------------------- */
-div#message-display{
-  margin-top:15px;
-}
-/* --------------------------- */
-/* end message display styling */
-/* --------------------------- */
-
-
-/*FOOTER
------------------------------------------------------*/
+/*-----------------------------------------------------*/
+/*FOOTER                                               */
+/*-----------------------------------------------------*/
 footer {
-  padding: 50px 0;
+  margin-top: 30px;
 }
+
+.footer-container{
+  border-top: 2px solid black;
+}
+
 footer,
 footer .container h5 a,
 footer .container ul li a {
