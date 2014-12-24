@@ -38,9 +38,13 @@ module.exports = function (grunt) {
       },
       css: {
         files:{
-          '../public/css/<%= pkg.name %>.css': [
-            'bower_components/bootstrap/dist/css/bootstrap.min.css',
-            'bower_components/angular-loading-bar/build/loading-bar.min.css',
+          '../public/css/<%= pkg.name %>-vendor-<%= pkg.version %>.css': [
+            'bower_components/angular-material/angular-material.min.css',
+            'bower_components/angular-material/themes/teal-theme.css',
+            //'bower_components/bootstrap/dist/css/bootstrap.min.css',
+            'bower_components/angular-loading-bar/build/loading-bar.min.css'
+          ],
+          '../public/css/<%= pkg.name %>-<%= pkg.version %>.css': [
             'app/**/*.css'
           ]
         }
