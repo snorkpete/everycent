@@ -1,8 +1,18 @@
 angular.module('everycent').run(['$templateCache', function($templateCache) {
   'use strict';
 
+  $templateCache.put('app/common/ec-form-field-directive.html',
+    "<div class=form-group><label class=\"col-xs-{{ vm.labelWidth }} control-label\">{{ vm.label }}</label><div class=\"col-xs-{{ vm.fieldWidth }}\"><input type=\"{{ vm.type }}\" ng-model=vm.model class=form-control ng-required=vm.isRequired placeholder=\"{{ vm.placeholder }}\"></div></div>"
+  );
+
+
   $templateCache.put('app/common/ec-message-directive.html',
     "<div class=message-container><div class=\"message alert alert-success\" ng-show=vm.ui.message>{{ vm.ui.message }}</div><div class=\"message alert alert-danger\" ng-show=vm.ui.errorMessage><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=true></span> {{ vm.ui.errorMessage }}</div><div class=\"message alert alert-warning\" ng-show=vm.ui.warningMessage>{{ vm.ui.warningMessage }}</div></div>"
+  );
+
+
+  $templateCache.put('app/common/ec-panel-directive.html',
+    "<div class=\"panel panel-{{ vm.type }}\"><div class=panel-heading>{{ vm.title }}</div><div class=panel-body ng-transclude></div></div>"
   );
 
 
@@ -12,7 +22,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('app/institutions/list.html',
-    "<md-toolbar class=md-teal-theme><div class=md-toolbar-tools><h3>Institutions</h3></div></md-toolbar><md-content><md-list><md-item ng-repeat=\"institution in vm.institutions\"><div class=md-tile-content>{{ institution.name }}</div></md-item></md-list><md-card><h4>Add an Institution</h4><form class=basic-form ng-submit=vm.addInstitution(institution)><div class=row><md-text-float label=\"Institution Name\" ng-model=institution.name></md-text-float></div><div class=row><md-button type=submit class=\"md-raised md-primary\">Add Institution</md-button></div></form></md-card></md-content>"
+    "<div class=row><div class=col-xs-12><h2>Current Institutions</h2></div></div><div class=row><div class=col-xs-12><ol><li ng-repeat=\"institution in vm.institutions\">{{ institution.name }}</li></ol></div></div><div class=row><div class=col-xs-12><form class=form-horizontal ng-submit=vm.addInstitution(vm.institution)><ec-panel type=primary title=\"Add an Institution\"><ec-form-field label=Name label-width=2 field-width=6 placeholder=\"Institution's name\" type=text ng-required=true ng-model=vm.institution.name></ec-form-field><div class=form-group><div class=\"col-xs-offset-2 col-xs-6\"><button type=submit class=\"btn btn-primary\">Add Institution</button></div></div></ec-panel></form></div></div>"
   );
 
 

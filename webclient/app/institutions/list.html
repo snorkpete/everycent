@@ -1,28 +1,37 @@
 
-<md-toolbar class="md-teal-theme">
-    <div class="md-toolbar-tools">
-        <h3>Institutions</h3>
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Current Institutions</h2>
     </div>
-</md-toolbar>
-<md-content>
-    <md-list>
-        <md-item ng-repeat="institution in vm.institutions">
-            <div class="md-tile-content">
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <ol>
+            <li ng-repeat="institution in vm.institutions">
                 {{ institution.name }}
-            </div>
-        </md-item>
-    </md-list>
+            </li>
+        </ol>
+    </div>
+</div>
 
-    <md-card>
-        <h4> Add an Institution </h4>
-        <form class="basic-form" ng-submit="vm.addInstitution(institution)">
-            <div class="row">
-                <md-text-float label="Institution Name" ng-model="institution.name"> </md-text-float>
-            </div>
-            <div class="row">
-              <md-button type="submit" class="md-raised md-primary">Add Institution</md-button>
-            </div>
+<div class="row">
+    <div class="col-xs-12">
+        <form class="form-horizontal" ng-submit="vm.addInstitution(vm.institution)">
+            <ec-panel type="primary" title="Add an Institution">
+                <ec-form-field label="Name" label-width="2"
+                               field-width="6"
+                               placeholder="Institution's name"
+                               type="text"
+                               ng-required="true"
+                               ng-model="vm.institution.name">
+                </ec-form-field>
+
+                <div class="form-group">
+                    <div class="col-xs-offset-2 col-xs-6">
+                      <button type="submit" class="btn btn-primary">Add Institution</button>
+                    </div>
+                </div>
+            </ec-panel>
         </form>
-    </md-card>
-    
-</md-content>
+    </div>
+</div>

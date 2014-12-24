@@ -1,0 +1,11 @@
+
+<div class="form-group">
+    <label class="col-xs-{{ vm.labelWidth }} control-label">{{ vm.label }}</label>
+    <div class="col-xs-{{ vm.fieldWidth }}">
+        <input type="{{ vm.type }}" 
+            ng-model="vm.model" 
+            class="form-control" 
+            ng-required="vm.isRequired"
+            placeholder="{{ vm.placeholder }}">
+    </div>
+</div>
