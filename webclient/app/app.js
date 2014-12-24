@@ -4,6 +4,7 @@
 
   // Module definitions
   angular.module('everycent', [
+    'ui.bootstrap',
     'ui.router',
     'ngCookies',
     'ng-token-auth',
