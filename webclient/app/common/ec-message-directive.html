@@ -2,12 +2,24 @@
 <div class="message-container">
   <div class="message alert alert-success" ng-show="vm.ui.message">
       {{ vm.ui.message }} 
+        <span ng-click="vm.remove()"
+              class="pull-right pointer">
+            <ec-icon type="remove"></ec-icon>
+        </span>
   </div>
   <div class="message alert alert-danger" ng-show="vm.ui.errorMessage">
      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
       {{ vm.ui.errorMessage }} 
+        <span ng-click="vm.remove()"
+              class="pull-right pointer">
+            <ec-icon type="remove"></ec-icon>
+        </span>
   </div>
   <div class="message alert alert-warning" ng-show="vm.ui.warningMessage">
       {{ vm.ui.warningMessage }} 
+        <span ng-click="vm.remove()"
+              class="pull-right pointer">
+            <ec-icon type="remove"></ec-icon>
+        </span>
   </div>
 </div>

@@ -22,5 +22,6 @@
     var vm = this;
 
     vm.ui = MessageService.getMessageData();
+    vm.remove = MessageService.clearMessage;
   }
 })();
