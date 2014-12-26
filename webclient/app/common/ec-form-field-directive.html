@@ -1,11 +1,13 @@
 
-<div class="form-group">
+<div class="form-group" ng-class="{'has-error': vm.error.server }">
     <label class="col-xs-{{ vm.labelWidth }} control-label">{{ vm.label }}</label>
     <div class="col-xs-{{ vm.fieldWidth }}">
         <input type="{{ vm.type }}" 
+            name="vm.fieldName"
             ng-model="vm.model" 
             class="form-control" 
             ng-required="vm.isRequired"
             placeholder="{{ vm.placeholder }}">
+            <p class="help-block">{{ vm.error.server }}</p>
     </div>
 </div>

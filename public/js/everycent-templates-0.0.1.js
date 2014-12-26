@@ -2,7 +2,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('app/common/ec-form-field-directive.html',
-    "<div class=form-group><label class=\"col-xs-{{ vm.labelWidth }} control-label\">{{ vm.label }}</label><div class=\"col-xs-{{ vm.fieldWidth }}\"><input type=\"{{ vm.type }}\" ng-model=vm.model class=form-control ng-required=vm.isRequired placeholder=\"{{ vm.placeholder }}\"></div></div>"
+    "<div class=form-group ng-class=\"{'has-error': vm.error.server }\"><label class=\"col-xs-{{ vm.labelWidth }} control-label\">{{ vm.label }}</label><div class=\"col-xs-{{ vm.fieldWidth }}\"><input type=\"{{ vm.type }}\" name=vm.fieldName ng-model=vm.model class=form-control ng-required=vm.isRequired placeholder=\"{{ vm.placeholder }}\"><p class=help-block>{{ vm.error.server }}</p></div></div>"
   );
 
 
@@ -32,7 +32,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('app/institutions/list.html',
-    "<div class=row><div class=col-xs-12><h2>Banking Institutions</h2></div></div><div class=row><div class=col-xs-12><ul class=list-group><li class=list-group-item ng-repeat=\"institution in vm.institutions\">{{ $index + 1 }}. {{ institution.name }} <span ng-click=vm.deleteInstitution(institution) class=\"text-danger pull-right pointer\"><ec-icon type=remove></ec-icon></span></li></ul></div></div><div class=row><div class=col-xs-12><form class=form-horizontal ng-submit=vm.addInstitution(vm.institution)><ec-panel type=primary title=\"Add an Institution\"><ec-form-field label=Name label-width=2 field-width=6 placeholder=\"Institution's name\" type=text ng-required=true ng-model=vm.institution.name></ec-form-field><div class=form-group><div class=\"col-xs-offset-2 col-xs-6\"><button type=submit class=\"btn btn-primary\">Add Institution</button></div></div></ec-panel></form></div></div>"
+    "<div class=row><div class=col-xs-12><h2>Banking Institutions</h2></div></div><div class=row><div class=col-xs-12><ul class=list-group><li class=list-group-item ng-repeat=\"institution in vm.institutions\">{{ $index + 1 }}. {{ institution.name }} <span ng-click=vm.deleteInstitution(institution) class=\"text-danger pull-right pointer\"><ec-icon type=remove></ec-icon></span></li></ul></div></div><div class=row><div class=col-xs-12><form class=form-horizontal novalidate name=vm.institutionForm ng-submit=\"vm.addInstitution(vm.institution, vm.institutionForm)\"><ec-panel type=primary title=\"Add an Institution\"><ec-form-field label=Name label-width=2 name=name error=vm.institutionForm.name.$error field-width=6 placeholder=\"Institution's name\" type=text ng-required=true ng-model=vm.institution.name></ec-form-field><div class=form-group><div class=\"col-xs-offset-2 col-xs-6\"><button type=submit class=\"btn btn-primary\">Add Institution</button></div></div></ec-panel></form></div></div>"
   );
 
 

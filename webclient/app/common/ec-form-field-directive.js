@@ -19,7 +19,9 @@
         isRequired: '=ngRequired',
         // Accept the ngModel attribute and bind it to scope.model
         // then, we can use ng model in the input element in the directive template
-        model:'=ngModel'
+        model:'=ngModel',
+        error:'=',
+        name:'=fieldName'
       },
       controller: controller,
       controllerAs: 'vm',

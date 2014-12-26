@@ -21,9 +21,14 @@
 
 <div class="row">
     <div class="col-xs-12">
-        <form class="form-horizontal" ng-submit="vm.addInstitution(vm.institution)">
+        <form class="form-horizontal" novalidate
+            name="vm.institutionForm"
+            ng-submit="vm.addInstitution(vm.institution, vm.institutionForm)">
             <ec-panel type="primary" title="Add an Institution">
+
                 <ec-form-field label="Name" label-width="2"
+                               name="name"
+                               error="vm.institutionForm.name.$error"
                                field-width="6"
                                placeholder="Institution's name"
                                type="text"
