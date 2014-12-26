@@ -7,6 +7,12 @@ class ApplicationController < ActionController::Base
 
   ##respond_to :json
   def respond_with(object, serializer=nil)
+
+    if object.respond_to?('invalid?') and object.invalid?
+      render json: object.errors, status: 422
+      return
+    end
+
     case
     when serializer.nil?
       render json: object
