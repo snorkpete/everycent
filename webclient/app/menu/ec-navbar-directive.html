@@ -17,14 +17,23 @@
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <div collapse="navCollapsed" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <div collapse="navCollapsed" class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li><p class="navbar-text">Hi, <strong>{{vm.userName}}</strong></p></li>
                 <li><a ng-click="vm.logout()">Log Out</a></li>
             </ul>
-            <ul id="main-menu" class="nav navbar-nav">
-                <li ng-class="{ active: vm.currentPage === 'institutions' }">
-                    <a ng-click="vm.goToPage('institutions')">Institutions</a>
+            <ul class="main-menu nav navbar-nav">
+                <li class="dropdown" ng-class="{ active: vm.currentPage === 'institutions', open: setupOpen }">
+                  <a class="dropdown-toggle"
+                          data-toggle="dropdown" role="button"
+                          ng-init="setupOpen = false"
+                          ng-click="setupOpen = !setupOpen"
+                          aria-expanded="false">
+                       Setup <span class="caret"></span>
+                   </a>
+                   <ul class="dropdown-menu" role="menu">
+                        <li> <a ng-click="vm.goToPage('institutions');setupOpen = false;">Institutions</a> </li>
+                   </ul>
                 </li>
             </ul>
         </div><!-- /.navbar-collapse -->
