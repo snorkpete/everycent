@@ -22,11 +22,13 @@
     .config(AppConfig)
     .controller('MainCtrl', MainCtrl);
 
-  AppConfig.$inject = ['$authProvider'];
-  function AppConfig($authProvider){
+  AppConfig.$inject = ['$authProvider', '$compileProvider'];
+  function AppConfig($authProvider, $compileProvider){
     $authProvider.configure({
       apiUrl: ''
     });
+
+    $compileProvider.debugInfoEnabled(false);
   }
 
   MainCtrl.$inject = ['MessageService'];
