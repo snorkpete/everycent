@@ -26,6 +26,11 @@ body{
   cursor: pointer;
 }
 
+.pointer:hover{
+  font-weight: bold;
+  font-size:1.1em;
+}
+
 /* change color of loading bar */
 #loading-bar .bar {
   background-color: red;
