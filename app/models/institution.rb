@@ -14,4 +14,14 @@ class Institution < ActiveRecord::Base
                         case_sensitive: false ,
                         message: 'Institution already exists.'
                     }
+
+  before_save :fix_name
+
+  protected
+
+  def fix_name
+    return if self.name.nil?
+
+    self.name = name.titleize
+  end
 end
