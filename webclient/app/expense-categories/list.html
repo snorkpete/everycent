@@ -1,0 +1,111 @@
+
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Expense Categories / Allocations</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width: 60%;">Expense Category</th>
+                    <th style="width: 30%;">Percentage Of Income {{}}</th>
+                    <th style="width: 10%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="category in vm.expenseCategories" ng-class="{ danger: category.deleted }">
+                <td>
+                    <span ng-hide="vm.isEditMode">
+                        {{ category.name }}
+                    </span>
+                    <span ng-show="vm.isEditMode">
+                        <input type="text" ng-model="category.name">
+                    </span>
+                </td>
+                <td>
+                    <span ng-hide="vm.isEditMode">
+                        {{ category.percentage }}
+                    </span>
+                    <span ng-show="vm.isEditMode">
+                        <input type="number" ng-model="category.percentage">
+                    </span>
+                </td>
+                <td>
+                  <span ng-show="vm.isEditMode">
+                      <span ng-hide="category.deleted"
+                            ng-click="vm.markForDeletion(category, true)"
+                            class="text-danger pull-right pointer">
+                          <ec-icon type="trash"></ec-icon>
+                      </span>
+                      <span ng-show="category.deleted"
+                            ng-click="vm.markForDeletion(category, false)"
+                            class="text-success pull-right pointer">
+                          <ec-icon type="refresh"></ec-icon>
+                      </span>
+                  </span>
+                </td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <th>
+                    <span ng-class="{ 'text-danger': vm.percentageTotal() > 100, 'text-warning': vm.percentageTotal() < 100, 'text-success': vm.percentageTotal() === 100 }">
+                    {{ vm.percentageTotal() }}
+                    </span>
+                    <span ng-show="vm.percentageTotal() < 100">
+                        <span class="label label-warning">
+                            {{ 100 - vm.percentageTotal() }}% unallocated.
+                        </span>
+                        &nbsp;
+                        <span class="label label-warning">
+                            Total should be 100%.
+                        </span>
+                    </span>
+                    <span ng-show="vm.percentageTotal() > 100">
+                        <span class="label label-danger">
+                            Over-allocated by {{ vm.percentageTotal() - 100 }}%.
+                        </span>
+                        &nbsp;
+                        <span class="label label-danger">
+                            Total should not exceed 100%
+                        </span>
+                    </span>
+                </th>
+                <th></th>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{{ vm.test() }}
+
+<div class="row">
+    <div class="col-xs-2" ng-hide="vm.isEditMode">
+        <button class="btn btn-primary"
+                ng-click="vm.switchToEditMode()">
+            Make Changes
+        </button>
+    </div>
+    <div class="col-xs-2" ng-show="vm.isEditMode">
+        <button class="btn btn-default"
+                ng-click="vm.newExpenseCategory()">
+            New Expense Category
+        </button>
+    </div>
+    <div class="col-xs-2" ng-show="vm.isEditMode">
+        <button class="btn btn-primary"
+                ng-click="vm.saveChanges()">
+            Save Changes
+        </button>
+    </div>
+    <div class="col-xs-2" ng-show="vm.isEditMode">
+        <button class="btn btn-danger"
+                ng-click="vm.cancelEdit()">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<br/>
+

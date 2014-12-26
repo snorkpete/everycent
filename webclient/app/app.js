@@ -14,7 +14,8 @@
     'everycent.common',
     'everycent.menu',
     'everycent.security',
-    'everycent.institutions'
+    'everycent.institutions',
+    'everycent.expense-categories'
     ]);
 
   angular
