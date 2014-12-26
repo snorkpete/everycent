@@ -13,14 +13,6 @@ class InstitutionsController < ApplicationController
     respond_with(@institution, InstitutionSerializer)
   end
 
-  def new
-    @institution = Institution.new
-    respond_with(@institution, InstitutionSerializer)
-  end
-
-  def edit
-  end
-
   def create
     @institution = Institution.new(institution_params)
     @institution.save
