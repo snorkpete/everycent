@@ -14,6 +14,9 @@
     vm.institution = {};
     vm.institutions = [];
     vm.addInstitution = addInstitution;
+    vm.selectInstitutionForUpdate = selectInstitutionForUpdate;
+    vm.updateInstitution = updateInstitution;
+    vm.cancelEdit = cancelEdit;
     vm.deleteInstitution = deleteInstitution;
 
     activate();
@@ -40,6 +43,33 @@
         MessageService.setErrorMessage('Institution not saved.');
         return false;
       });
+    }
+
+    function selectInstitutionForUpdate(institution){
+      vm.institution = institution;
+      StateService.goToState('institutions.edit');
+    }
+
+    function updateInstitution(institution, form){
+      institution.save().then(function(response){
+        refreshInstitutionList();
+        MessageService.setMessage('Institution "' + institution.name + '" updated successfully.');
+        // TODO:  hack - need to find a better way of clearing the name
+        FormService.resetForm(institution, form, ['name']);
+        vm.institution = {};
+        StateService.goToState('institutions');
+
+      }, function(errorResponse){
+        FormService.setErrors(form, errorResponse.data);
+        MessageService.setErrorMessage('Institution not updated.');
+        return false;
+      });
+    }
+
+    function cancelEdit(){
+      vm.institution = {};
+      refreshInstitutionList();
+      StateService.goToState('institutions');
     }
 
     function deleteInstitution(institution){

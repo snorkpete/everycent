@@ -23,6 +23,10 @@
         url: '/institutions/new',
         templateUrl: 'app/institutions/new.html'
       })
+      .state('institutions.edit', {
+        url: '/institutions/edit',
+        templateUrl: 'app/institutions/edit.html'
+      })
     ;
   }
 })();

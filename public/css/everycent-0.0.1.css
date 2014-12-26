@@ -26,6 +26,10 @@ body{
   cursor: pointer;
 }
 
+/* change color of loading bar */
+#loading-bar .bar {
+  background-color: red;
+}
 
 /*-----------------------------------------------------*/
 /*FOOTER                                               */

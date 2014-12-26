@@ -12,8 +12,18 @@
 
                 <span ng-click="vm.deleteInstitution(institution)"
                       class="text-danger pull-right pointer">
-                    <ec-icon type="remove"></ec-icon>
+                    <ec-icon type="trash"></ec-icon>
                 </span>
+
+
+                <span ng-click="vm.selectInstitutionForUpdate(institution)"
+                      class="text-warning pull-right pointer">
+                    <ec-icon type="edit"></ec-icon>
+                    &nbsp;
+                    Edit
+                    &nbsp; &nbsp; &nbsp;
+                </span>
+
             </li>
         </ul>
     </div>

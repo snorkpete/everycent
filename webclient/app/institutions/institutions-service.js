@@ -22,6 +22,5 @@
       function addInstitution(institution){
         return baseAll.post(institution);
       }
-
     }
 })();
