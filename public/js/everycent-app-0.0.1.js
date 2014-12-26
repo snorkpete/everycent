@@ -25,6 +25,10 @@
           }]
         }
       })
+      .state('institutions.new', {
+        url: '/institutions/new',
+        templateUrl: 'app/institutions/new.html'
+      })
     ;
   }
 })();
@@ -232,6 +236,7 @@
     var vm = this;
 
     vm.ui = MessageService.getMessageData();
+    vm.remove = MessageService.clearMessage;
   }
 })();
 
@@ -272,12 +277,13 @@
 
   angular
     .module('everycent.common')
-    .factory('ErrorService', ErrorService);
+    .factory('FormService', FormService);
 
-  ErrorService.$inject = [];
-  function ErrorService(){
+  FormService.$inject = [];
+  function FormService(){
     var service = {
-      setErrors: setErrors
+      setErrors: setErrors,
+      resetForm: resetForm
     };
     return service;
 
@@ -286,6 +292,23 @@
       // -----------------------------------------------------------
       Object.keys(errorData).forEach(function(field){
         form[field].$error.server = errorData[field][0];
+      });
+    }
+
+    /**
+     *  Clear the model and reset the errors
+     *  for each field listed in fields
+     */
+    function resetForm(model, form, fields){
+      fields.forEach(function(field){
+
+        // reset the model's value
+        model[field] = '';
+
+        // reset the form's error status
+        if(form[field]){
+          form[field].$error = {};
+        }
       });
     }
 
@@ -398,13 +421,46 @@
   'use strict';
 
   angular
+    .module('everycent.common')
+    .factory('StateService', StateService);
+
+  StateService.$inject = ['$state'];
+  function StateService($state){
+    var service = {
+      goToState: goToState,
+      is: is
+    };
+    return service;
+
+    function goToState(state, params){
+      if(params){
+        $state.go(state, params);
+      }else{
+        $state.go(state);
+      }
+    }
+
+    function is(state){
+      return $state.is(state);
+    }
+
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
     .module('everycent.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
-  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService', 'ModalService', 'ErrorService'];
+  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService', 'ModalService', 'FormService', 'StateService'];
 
-  function InstitutionsCtrl(MessageService, InstitutionsService, ModalService, ErrorService){
+  function InstitutionsCtrl(MessageService, InstitutionsService, ModalService, FormService, StateService){
     var vm = this;
+    vm.state = StateService; // page state handler
     vm.institution = {};
     vm.institutions = [];
     vm.addInstitution = addInstitution;
@@ -424,13 +480,13 @@
 
     function addInstitution(institution, form){
       InstitutionsService.addInstitution(institution).then(function(response){
-        // TODO:  hack - need to find a better way of clearing the name
         refreshInstitutionList();
         MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
-        institution.name = '';
+        // TODO:  hack - need to find a better way of clearing the name
+        FormService.resetForm(institution, form, ['name']);
 
       }, function(errorResponse){
-        ErrorService.setErrors(form, errorResponse.data);
+        FormService.setErrors(form, errorResponse.data);
         MessageService.setErrorMessage('Institution not saved.');
         return false;
       });
@@ -449,6 +505,7 @@
         institution.remove().then(function(){
           refreshInstitutionList();
           MessageService.setMessage('Institution deleted.');
+
         }).catch(function(){
           MessageService.setErrorMessage('Error deleting.');
         });
@@ -480,10 +537,7 @@
       return service;
 
       function getInstitutions(){
-        //return $http.get('/institutions').then(function(response){
-        //  return response.data;
-        //});
-        return baseAll.getList();//.then(function(
+        return baseAll.getList();
       }
 
       function addInstitution(institution){

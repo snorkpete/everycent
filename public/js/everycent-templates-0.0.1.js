@@ -12,7 +12,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('app/common/ec-message-directive.html',
-    "<div class=message-container><div class=\"message alert alert-success\" ng-show=vm.ui.message>{{ vm.ui.message }}</div><div class=\"message alert alert-danger\" ng-show=vm.ui.errorMessage><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=true></span> {{ vm.ui.errorMessage }}</div><div class=\"message alert alert-warning\" ng-show=vm.ui.warningMessage>{{ vm.ui.warningMessage }}</div></div>"
+    "<div class=message-container><div class=\"message alert alert-success\" ng-show=vm.ui.message>{{ vm.ui.message }} <span ng-click=vm.remove() class=\"pull-right pointer\"><ec-icon type=remove></ec-icon></span></div><div class=\"message alert alert-danger\" ng-show=vm.ui.errorMessage><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=true></span> {{ vm.ui.errorMessage }} <span ng-click=vm.remove() class=\"pull-right pointer\"><ec-icon type=remove></ec-icon></span></div><div class=\"message alert alert-warning\" ng-show=vm.ui.warningMessage>{{ vm.ui.warningMessage }} <span ng-click=vm.remove() class=\"pull-right pointer\"><ec-icon type=remove></ec-icon></span></div></div>"
   );
 
 
@@ -32,7 +32,12 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('app/institutions/list.html',
-    "<div class=row><div class=col-xs-12><h2>Banking Institutions</h2></div></div><div class=row><div class=col-xs-12><ul class=list-group><li class=list-group-item ng-repeat=\"institution in vm.institutions\">{{ $index + 1 }}. {{ institution.name }} <span ng-click=vm.deleteInstitution(institution) class=\"text-danger pull-right pointer\"><ec-icon type=remove></ec-icon></span></li></ul></div></div><div class=row><div class=col-xs-12><form class=form-horizontal novalidate name=vm.institutionForm ng-submit=\"vm.addInstitution(vm.institution, vm.institutionForm)\"><ec-panel type=primary title=\"Add an Institution\"><ec-form-field label=Name label-width=2 name=name error=vm.institutionForm.name.$error field-width=6 placeholder=\"Institution's name\" type=text ng-required=true ng-model=vm.institution.name></ec-form-field><div class=form-group><div class=\"col-xs-offset-2 col-xs-6\"><button type=submit class=\"btn btn-primary\">Add Institution</button></div></div></ec-panel></form></div></div>"
+    "<div class=row><div class=col-xs-12><h2>Banking Institutions</h2></div></div><div class=row><div class=col-xs-12><ul class=list-group><li class=list-group-item ng-repeat=\"institution in vm.institutions\">{{ $index + 1 }}. {{ institution.name }} <span ng-click=vm.deleteInstitution(institution) class=\"text-danger pull-right pointer\"><ec-icon type=remove></ec-icon></span></li></ul></div></div><div class=row><div class=col-xs-1 ng-show=\"vm.state.is('institutions')\"><button class=\"btn btn-primary\" ng-click=\"vm.state.goToState('institutions.new')\">Add New Institution</button></div><div class=col-xs-1 ng-show=\"vm.state.is('institutions.new')\"><button class=\"btn btn-default\" ng-click=\"vm.state.goToState('institutions')\">Cancel</button></div></div><br><ui-view></ui-view>"
+  );
+
+
+  $templateCache.put('app/institutions/new.html',
+    "<div class=row><div class=col-xs-12><form class=form-horizontal novalidate name=vm.institutionForm ng-submit=\"vm.addInstitution(vm.institution, vm.institutionForm)\"><ec-panel type=primary title=\"Add an Institution\"><ec-form-field label=Name label-width=2 name=name error=vm.institutionForm.name.$error field-width=6 placeholder=\"Institution's name\" type=text ng-required=true ng-model=vm.institution.name></ec-form-field><div class=form-group><div class=\"col-xs-offset-2 col-xs-6\"><button type=submit class=\"btn btn-primary\">Add Institution</button></div></div></ec-panel></form></div></div>"
   );
 
 

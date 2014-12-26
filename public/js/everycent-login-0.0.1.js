@@ -96,6 +96,7 @@
     var vm = this;
 
     vm.ui = MessageService.getMessageData();
+    vm.remove = MessageService.clearMessage;
   }
 })();
 
@@ -136,12 +137,13 @@
 
   angular
     .module('everycent.common')
-    .factory('ErrorService', ErrorService);
+    .factory('FormService', FormService);
 
-  ErrorService.$inject = [];
-  function ErrorService(){
+  FormService.$inject = [];
+  function FormService(){
     var service = {
-      setErrors: setErrors
+      setErrors: setErrors,
+      resetForm: resetForm
     };
     return service;
 
@@ -150,6 +152,23 @@
       // -----------------------------------------------------------
       Object.keys(errorData).forEach(function(field){
         form[field].$error.server = errorData[field][0];
+      });
+    }
+
+    /**
+     *  Clear the model and reset the errors
+     *  for each field listed in fields
+     */
+    function resetForm(model, form, fields){
+      fields.forEach(function(field){
+
+        // reset the model's value
+        model[field] = '';
+
+        // reset the form's error status
+        if(form[field]){
+          form[field].$error = {};
+        }
       });
     }
 
@@ -253,5 +272,37 @@
              .css('height','1000px');
             }, 100);
     }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .factory('StateService', StateService);
+
+  StateService.$inject = ['$state'];
+  function StateService($state){
+    var service = {
+      goToState: goToState,
+      is: is
+    };
+    return service;
+
+    function goToState(state, params){
+      if(params){
+        $state.go(state, params);
+      }else{
+        $state.go(state);
+      }
+    }
+
+    function is(state){
+      return $state.is(state);
+    }
+
   }
 })();

@@ -19,6 +19,10 @@
           }]
         }
       })
+      .state('institutions.new', {
+        url: '/institutions/new',
+        templateUrl: 'app/institutions/new.html'
+      })
     ;
   }
 })();

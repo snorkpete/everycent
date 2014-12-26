@@ -16,10 +16,7 @@
       return service;
 
       function getInstitutions(){
-        //return $http.get('/institutions').then(function(response){
-        //  return response.data;
-        //});
-        return baseAll.getList();//.then(function(
+        return baseAll.getList();
       }
 
       function addInstitution(institution){

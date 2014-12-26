@@ -6,10 +6,11 @@
     .module('everycent.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
-  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService', 'ModalService', 'ErrorService'];
+  InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService', 'ModalService', 'FormService', 'StateService'];
 
-  function InstitutionsCtrl(MessageService, InstitutionsService, ModalService, ErrorService){
+  function InstitutionsCtrl(MessageService, InstitutionsService, ModalService, FormService, StateService){
     var vm = this;
+    vm.state = StateService; // page state handler
     vm.institution = {};
     vm.institutions = [];
     vm.addInstitution = addInstitution;
@@ -29,13 +30,13 @@
 
     function addInstitution(institution, form){
       InstitutionsService.addInstitution(institution).then(function(response){
-        // TODO:  hack - need to find a better way of clearing the name
         refreshInstitutionList();
         MessageService.setMessage('Institution "' + institution.name + '" added successfully.');
-        institution.name = '';
+        // TODO:  hack - need to find a better way of clearing the name
+        FormService.resetForm(institution, form, ['name']);
 
       }, function(errorResponse){
-        ErrorService.setErrors(form, errorResponse.data);
+        FormService.setErrors(form, errorResponse.data);
         MessageService.setErrorMessage('Institution not saved.');
         return false;
       });
@@ -54,6 +55,7 @@
         institution.remove().then(function(){
           refreshInstitutionList();
           MessageService.setMessage('Institution deleted.');
+
         }).catch(function(){
           MessageService.setErrorMessage('Error deleting.');
         });
