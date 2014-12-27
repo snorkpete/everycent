@@ -1,0 +1,18 @@
+<div class="row">
+    <div class="col-xs-12">
+        <form class="form-horizontal" novalidate
+            name="vm.bankAccountForm"
+            ng-submit="vm.addBankAccount(vm.bankAccount, vm.bankAccountForm)">
+            <ec-panel type="primary" title="Add an Bank Account">
+
+                <ng-include src="'app/bank-accounts/form.html'"></ng-include>
+
+                <div class="form-group">
+                    <div class="col-xs-offset-2 col-xs-6">
+                      <button type="submit" class="btn btn-primary">Add Bank Account</button>
+                    </div>
+                </div>
+            </ec-panel>
+        </form>
+    </div>
+</div>

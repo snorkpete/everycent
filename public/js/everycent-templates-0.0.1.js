@@ -6,6 +6,26 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('app/bank-accounts/edit.html',
+    "<div class=row><div class=col-xs-12><form class=form-horizontal novalidate name=vm.bankAccountForm ng-submit=\"vm.updateBankAccount(vm.bankAccount, vm.bankAccountForm)\"><ec-panel type=primary title=\"Edit Bank Account\"><ng-include src=\"'app/bank-accounts/form.html'\"></ng-include><div class=form-group><div class=\"col-xs-offset-2 col-xs-2\"><button type=submit class=\"btn btn-primary\">Update Bank Account</button></div><div class=col-xs-2><button type=button class=\"btn btn-danger\" ng-click=vm.cancelEdit()>Cancel</button></div></div></ec-panel></form></div></div>"
+  );
+
+
+  $templateCache.put('app/bank-accounts/form.html',
+    "<ec-form-field label=Name label-width=2 name=name error=vm.bankAccountForm.name.$error field-width=6 placeholder=\"Bank Account's name\" type=text ng-required=true ng-model=vm.bankAccount.name></ec-form-field><ec-form-field label=\"Account Type\" label-width=2 name=account_type error=vm.bankAccountForm.account_type.$error field-width=6 placeholder=\"Money Market Fund, Savings, Checking etc\" type=text ng-required=true ng-model=vm.bankAccount.account_type></ec-form-field><ec-form-field label=\"Account No\" label-width=2 name=account_no error=vm.bankAccountForm.account_no.$error field-width=6 placeholder=\"Official Account #\" type=text ng-required=true ng-model=vm.bankAccount.account_no></ec-form-field><ec-form-field label=\"Opening Balance\" label-width=2 name=opening_balance error=vm.bankAccountForm.opening_balance.$error field-width=6 placeholder=\"Balance when you started budget\" type=number ng-required=true ng-model=vm.bankAccount.opening_balance></ec-form-field>"
+  );
+
+
+  $templateCache.put('app/bank-accounts/list.html',
+    "<div class=row><div class=col-xs-12><h2>Bank Accounts</h2></div></div><div class=row><div class=col-xs-12><table class=\"table table-bordered clear-background\"><thead><tr class=heading><th>Name</th><th>Account Type</th><th>Account #</th><th>Opening Balance</th><th>Actions</th></tr></thead><tbody><tr ng-repeat=\"bankAccount in vm.bankAccounts\"><td>{{ bankAccount.name }}</td><td>{{ bankAccount.account_type }}</td><td>{{ bankAccount.account_no }}</td><td>{{ bankAccount.opening_balance }}</td><td><span ng-click=vm.deleteBankAccount(bankAccount) class=\"text-danger pull-right pointer\"><ec-icon type=trash></ec-icon></span> <span ng-click=vm.selectBankAccountForUpdate(bankAccount) class=\"text-warning pull-right pointer\"><ec-icon type=edit></ec-icon>&nbsp; Edit &nbsp; &nbsp; &nbsp;</span></td></tr></tbody></table></div></div><div class=row><div class=col-xs-1 ng-show=\"vm.state.is('bank-accounts')\"><button class=\"btn btn-primary\" ng-click=\"vm.state.goToState('bank-accounts.new')\">Add New Bank Account</button></div><div class=col-xs-1 ng-show=\"vm.state.is('bank-accounts.new')\"><button class=\"btn btn-default\" ng-click=\"vm.state.goToState('bank-accounts')\">Cancel</button></div></div><br><ui-view></ui-view>"
+  );
+
+
+  $templateCache.put('app/bank-accounts/new.html',
+    "<div class=row><div class=col-xs-12><form class=form-horizontal novalidate name=vm.bankAccountForm ng-submit=\"vm.addBankAccount(vm.bankAccount, vm.bankAccountForm)\"><ec-panel type=primary title=\"Add an Bank Account\"><ng-include src=\"'app/bank-accounts/form.html'\"></ng-include><div class=form-group><div class=\"col-xs-offset-2 col-xs-6\"><button type=submit class=\"btn btn-primary\">Add Bank Account</button></div></div></ec-panel></form></div></div>"
+  );
+
+
   $templateCache.put('app/common/ec-form-field-directive.html',
     "<div class=form-group ng-class=\"{'has-error': vm.error.server }\"><label class=\"col-xs-{{ vm.labelWidth }} control-label\">{{ vm.label }}</label><div class=\"col-xs-{{ vm.fieldWidth }}\"><input type=\"{{ vm.type }}\" name=vm.fieldName ng-model=vm.model class=form-control ng-required=vm.isRequired placeholder=\"{{ vm.placeholder }}\"><p class=help-block>{{ vm.error.server }}</p></div></div>"
   );
@@ -52,7 +72,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('app/menu/ec-navbar-directive.html',
-    "<nav class=\"navbar navbar-fixed-top navbar-inverse\" role=navigation><div class=container><div class=navbar-header><button ng-init=\"navCollapsed = true\" ng-click=\"navCollapsed = !navCollapsed\" type=button class=navbar-toggle><span class=sr-only>Toggle navigation</span> <span class=icon-bar></span> <span class=icon-bar></span> <span class=icon-bar></span></button> <a class=navbar-brand ng-click=\"vm.goToPage('home')\">EveryCent</a></div><div collapse=navCollapsed class=\"collapse navbar-collapse\"><ul class=\"nav navbar-nav navbar-right\"><li><p class=navbar-text>Hi, <strong>{{vm.userName}}</strong></p></li><li><a ng-click=vm.logout()>Log Out</a></li></ul><ul class=\"main-menu nav navbar-nav\"><li class=dropdown ng-class=\"{ active: vm.currentPage === 'institutions', open: setupOpen }\"><a class=dropdown-toggle data-toggle=dropdown role=button ng-init=\"setupOpen = false\" ng-click=\"setupOpen = !setupOpen\" aria-expanded=false>Setup <span class=caret></span></a><ul class=dropdown-menu role=menu><li><a ng-click=\"vm.goToPage('institutions');setupOpen = false;\">Institutions</a></li><li><a ng-click=\"vm.goToPage('allocation-categories');setupOpen = false;\">Allocation Categories</a></li></ul></li></ul></div></div></nav>"
+    "<nav class=\"navbar navbar-fixed-top navbar-inverse\" role=navigation><div class=container><div class=navbar-header><button ng-init=\"navCollapsed = true\" ng-click=\"navCollapsed = !navCollapsed\" type=button class=navbar-toggle><span class=sr-only>Toggle navigation</span> <span class=icon-bar></span> <span class=icon-bar></span> <span class=icon-bar></span></button> <a class=navbar-brand ng-click=\"vm.goToPage('home')\">EveryCent</a></div><div collapse=navCollapsed class=\"collapse navbar-collapse\"><ul class=\"nav navbar-nav navbar-right\"><li><p class=navbar-text>Hi, <strong>{{vm.userName}}</strong></p></li><li><a ng-click=vm.logout()>Log Out</a></li></ul><ul class=\"main-menu nav navbar-nav\"><li class=dropdown ng-class=\"{ active: vm.currentPage === 'institutions', open: setupOpen }\"><a class=dropdown-toggle data-toggle=dropdown role=button ng-init=\"setupOpen = false\" ng-click=\"setupOpen = !setupOpen\" aria-expanded=false>Setup <span class=caret></span></a><ul class=dropdown-menu role=menu><li><a ng-click=\"vm.goToPage('institutions');setupOpen = false;\">Institutions</a></li><li><a ng-click=\"vm.goToPage('bank-accounts');setupOpen = false;\">Bank Accounts</a></li><li><a ng-click=\"vm.goToPage('allocation-categories');setupOpen = false;\">Allocation Categories</a></li></ul></li></ul></div></div></nav>"
   );
 
 

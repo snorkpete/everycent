@@ -1,0 +1,40 @@
+
+<ec-form-field label="Name" label-width="2"
+               name="name"
+               error="vm.bankAccountForm.name.$error"
+               field-width="6"
+               placeholder="Bank Account's name"
+               type="text"
+               ng-required="true"
+               ng-model="vm.bankAccount.name">
+</ec-form-field>
+
+<ec-form-field label="Account Type" label-width="2"
+               name="account_type"
+               error="vm.bankAccountForm.account_type.$error"
+               field-width="6"
+               placeholder="Money Market Fund, Savings, Checking etc"
+               type="text"
+               ng-required="true"
+               ng-model="vm.bankAccount.account_type">
+</ec-form-field>
+
+<ec-form-field label="Account No" label-width="2"
+               name="account_no"
+               error="vm.bankAccountForm.account_no.$error"
+               field-width="6"
+               placeholder="Official Account #"
+               type="text"
+               ng-required="true"
+               ng-model="vm.bankAccount.account_no">
+</ec-form-field>
+
+<ec-form-field label="Opening Balance" label-width="2"
+               name="opening_balance"
+               error="vm.bankAccountForm.opening_balance.$error"
+               field-width="6"
+               placeholder="Balance when you started budget"
+               type="number"
+               ng-required="true"
+               ng-model="vm.bankAccount.opening_balance">
+</ec-form-field>

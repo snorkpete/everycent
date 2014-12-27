@@ -15,6 +15,7 @@
     'everycent.menu',
     'everycent.security',
     'everycent.institutions',
+    'everycent.bank-accounts',
     'everycent.allocation-categories'
     ]);
 
