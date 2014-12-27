@@ -1,8 +1,8 @@
-class ExpenseCategory < ActiveRecord::Base
+class AllocationCategory < ActiveRecord::Base
   validates :name,  presence: true,
                     uniqueness: {
                         case_sensitive: false ,
-                        message: 'Expense Category already exists.'
+                        message: 'Allocation Category already exists.'
                     }
 
   before_save :fix_name

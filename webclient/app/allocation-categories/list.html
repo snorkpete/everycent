@@ -1,7 +1,9 @@
 
 <div class="row">
     <div class="col-xs-12">
-        <h2>Expense Categories / Allocations</h2>
+        <h2>
+            Allocation Categories <small>Expenses, Savings, Debt etc</small>
+        </h2>
     </div>
 </div>
 <div class="row">
@@ -9,13 +11,14 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th style="width: 60%;">Expense Category</th>
-                    <th style="width: 30%;">Percentage Of Income {{}}</th>
-                    <th style="width: 10%;">Actions</th>
+                    <th style="width: 40%;">Allocation Category</th>
+                    <th style="width: 10%;" class="text-right">% Of Income</th>
+                    <th style="width: 40%;"></th>
+                    <th style="width: 10%;"></th>
                 </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="category in vm.expenseCategories" ng-class="{ danger: category.deleted }">
+            <tr ng-repeat="category in vm.allocationCategories" ng-class="{ danger: category.deleted }">
                 <td>
                     <span ng-hide="vm.isEditMode">
                         {{ category.name }}
@@ -24,14 +27,15 @@
                         <input type="text" ng-model="category.name">
                     </span>
                 </td>
-                <td>
+                <td class="text-right">
                     <span ng-hide="vm.isEditMode">
                         {{ category.percentage }}
                     </span>
                     <span ng-show="vm.isEditMode">
-                        <input type="number" ng-model="category.percentage">
+                        <input type="number" ng-model="category.percentage" class="text-right">
                     </span>
                 </td>
+                <td></td>
                 <td>
                   <span ng-show="vm.isEditMode">
                       <span ng-hide="category.deleted"
@@ -47,12 +51,14 @@
                   </span>
                 </td>
             </tr>
-            <tr>
+            <tr class="total">
                 <th>Total</th>
-                <th>
+                <th class="text-right">
                     <span ng-class="{ 'text-danger': vm.percentageTotal() > 100, 'text-warning': vm.percentageTotal() < 100, 'text-success': vm.percentageTotal() === 100 }">
                     {{ vm.percentageTotal() }}
                     </span>
+                </th>
+                <th>
                     <span ng-show="vm.percentageTotal() < 100">
                         <span class="label label-warning">
                             {{ 100 - vm.percentageTotal() }}% unallocated.
@@ -78,7 +84,6 @@
         </table>
     </div>
 </div>
-{{ vm.test() }}
 
 <div class="row">
     <div class="col-xs-2" ng-hide="vm.isEditMode">
@@ -87,23 +92,25 @@
             Make Changes
         </button>
     </div>
-    <div class="col-xs-2" ng-show="vm.isEditMode">
-        <button class="btn btn-default"
-                ng-click="vm.newExpenseCategory()">
-            New Expense Category
-        </button>
-    </div>
-    <div class="col-xs-2" ng-show="vm.isEditMode">
+    <div class="col-xs-3" ng-show="vm.isEditMode">
         <button class="btn btn-primary"
-                ng-click="vm.saveChanges()">
-            Save Changes
+                ng-click="vm.newAllocationCategory()">
+            New Allocation Category
         </button>
     </div>
-    <div class="col-xs-2" ng-show="vm.isEditMode">
-        <button class="btn btn-danger"
-                ng-click="vm.cancelEdit()">
-            Cancel
-        </button>
+    <div class="col-xs-9">
+        <div class="pull-right" ng-show="vm.isEditMode">
+            <button class="btn btn-success"
+                    ng-click="vm.saveChanges()">
+                Save Changes
+            </button>
+            &nbsp;
+            &nbsp;
+            <button class="btn btn-danger"
+                    ng-click="vm.cancelEdit()">
+                Cancel
+            </button>
+        </div>
     </div>
 </div>
 
