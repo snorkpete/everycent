@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :recurring_incomes, except: [:new, :edit]
   resources :allocation_categories, except: [:new, :edit]
   resources :bank_accounts, except: [:new, :edit]
   resources :institutions, except: [:new, :edit]

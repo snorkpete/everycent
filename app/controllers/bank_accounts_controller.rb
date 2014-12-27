@@ -40,6 +40,6 @@ class BankAccountsController < ApplicationController
     end
 
     def bank_account_params
-      params.require(:bank_account).permit(:nickname, :type, :account_no, :user_id, :institution_id, :opening_balance, :current_balance)
+      params.fetch(:bank_account, {}).permit(:name, :account_type, :account_no, :user_id, :institution_id, :opening_balance)
     end
 end

@@ -38,6 +38,10 @@ body{
   font-size: 1.1em;
 }
 
+.clear-background{
+  background-color: white;
+}
+
 .pointer:hover{
   font-weight: bold;
   font-size:1.1em;
