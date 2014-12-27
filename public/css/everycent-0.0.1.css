@@ -26,6 +26,12 @@ body{
   cursor: pointer;
 }
 
+.heading{
+  border-bottom: 3px solid black;
+  font-weight:bold;
+  font-size: 1.1em;
+}
+
 .total{
   border-top: 2px solid black;
   font-weight:bold;
