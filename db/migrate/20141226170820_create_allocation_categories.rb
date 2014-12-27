@@ -1,6 +1,6 @@
-class CreateExpenseCategories < ActiveRecord::Migration
+class CreateAllocationCategories < ActiveRecord::Migration
   def change
-    create_table :expense_categories do |t|
+    create_table :allocation_categories do |t|
       t.string :name
       t.integer :percentage
 

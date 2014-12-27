@@ -26,6 +26,12 @@ body{
   cursor: pointer;
 }
 
+.total{
+  border-top: 2px solid black;
+  font-weight:bold;
+  font-size: 1.1em;
+}
+
 .pointer:hover{
   font-weight: bold;
   font-size:1.1em;

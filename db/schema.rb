@@ -13,6 +13,13 @@
 
 ActiveRecord::Schema.define(version: 20141226170820) do
 
+  create_table "allocation_categories", force: true do |t|
+    t.string   "name"
+    t.integer  "percentage"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bank_accounts", force: true do |t|
     t.string   "nickname"
     t.string   "type"
@@ -23,13 +30,6 @@ ActiveRecord::Schema.define(version: 20141226170820) do
     t.integer  "current_balance"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
-  end
-
-  create_table "expense_categories", force: true do |t|
-    t.string   "name"
-    t.integer  "percentage"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "institutions", force: true do |t|

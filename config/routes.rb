@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :expense_categories, except: [:new, :edit]
+  resources :allocation_categories, except: [:new, :edit]
   resources :bank_accounts, except: [:new, :edit]
   resources :institutions, except: [:new, :edit]
   mount_devise_token_auth_for 'User', at: '/auth'
