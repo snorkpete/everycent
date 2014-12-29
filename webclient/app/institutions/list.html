@@ -8,7 +8,7 @@
     <div class="col-xs-12">
         <ul class="list-group">
             <li class="list-group-item" ng-repeat="institution in vm.institutions">
-            {{ $index + 1 }}. {{ institution.name }}
+            {{ $index + 1 }}. {{ institution.name }} <em>(id: {{ institution.id }})</em>
 
                 <span ng-click="vm.deleteInstitution(institution)"
                       class="text-danger pull-right pointer">

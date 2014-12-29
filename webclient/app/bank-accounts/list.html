@@ -10,26 +10,22 @@
         <thead>
             <tr class="heading">
                 <th>Name</th>
+                <th>Institution</th>
                 <th>Account Type</th>
                 <th>Account #</th>
+                <th>Owner</th>
                 <th>Opening Balance</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="bankAccount in vm.bankAccounts">
-                <td>
-                    {{ bankAccount.name }}
-                </td>
-                <td>
-                    {{ bankAccount.account_type }}
-                </td>
-                <td>
-                    {{ bankAccount.account_no }}
-                </td>
-                <td>
-                    {{ bankAccount.opening_balance }}
-                </td>
+                <td> {{ bankAccount.name }} </td>
+                <td> {{ bankAccount.institution.name }} </td>
+                <td> {{ bankAccount.account_type }} </td>
+                <td> {{ bankAccount.account_no }} </td>
+                <td> {{ bankAccount.user.first_name + ' ' + bankAccount.user.last_name }} </td>
+                <td> {{ bankAccount.opening_balance }} </td>
     
                 <td>
                     <span ng-click="vm.deleteBankAccount(bankAccount)"

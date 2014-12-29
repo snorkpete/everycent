@@ -30,10 +30,12 @@
 
 class User < ActiveRecord::Base
   include DeviseTokenAuth::Concerns::User
-  
+
   # do not require email confirmation for new users
   before_create :skip_confirmation!
   before_validation :generate_uid
+
+  has_many :bank_accounts
 
   protected
   def generate_uid

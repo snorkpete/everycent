@@ -19,6 +19,26 @@
                ng-model="vm.bankAccount.account_type">
 </ec-form-field>
 
+<ec-form-field label="Account Owner" label-width="2"
+               name="user_id"
+               error="vm.bankAccountForm.user_id.$error"
+               field-width="6"
+               type="select"
+               model-type="user"
+               ng-required="true"
+               ng-model="vm.bankAccount.user_id">
+</ec-form-field>
+
+<ec-form-field label="Institution" label-width="2"
+               name="institution_id"
+               error="vm.bankAccountForm.institution_id.$error"
+               field-width="6"
+               type="select"
+               model-type="institution"
+               ng-required="true"
+               ng-model="vm.bankAccount.institution_id">
+</ec-form-field>
+
 <ec-form-field label="Account No" label-width="2"
                name="account_no"
                error="vm.bankAccountForm.account_no.$error"

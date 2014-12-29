@@ -19,6 +19,15 @@
     vm.cancelEdit = cancelEdit;
     vm.deleteBankAccount = deleteBankAccount;
 
+    vm.lookup = {
+      institutions: [ 
+        { id: 5, name: 'Scotia' },
+        { id: 8, name: 'RBTT' },
+        { id: 7, name: 'Republic' },
+        { id: 6, name: 'Unit Trust' }
+      ]
+    };
+
     activate();
 
     function activate(){
@@ -56,7 +65,7 @@
         refreshBankAccountList();
         MessageService.setMessage('Bank Account "' + bankAccount.name + '" updated successfully.');
         // TODO:  hack - need to find a better way of clearing the name
-        FormService.resetForm(bankAccount, form, ['name']);
+        FormService.resetForm(bankAccount, form, ['name', 'account_type', 'institution_id', 'account_no', 'opening_balance' ]);
         vm.bankAccount = {};
         StateService.goToState('bank-accounts');
 
