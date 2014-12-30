@@ -24,7 +24,7 @@
                error="vm.bankAccountForm.user_id.$error"
                field-width="6"
                type="select"
-               model-type="user"
+               list-of="users"
                ng-required="true"
                ng-model="vm.bankAccount.user_id">
 </ec-form-field>
@@ -34,7 +34,7 @@
                error="vm.bankAccountForm.institution_id.$error"
                field-width="6"
                type="select"
-               model-type="institution"
+               list-of="institutions"
                ng-required="true"
                ng-model="vm.bankAccount.institution_id">
 </ec-form-field>

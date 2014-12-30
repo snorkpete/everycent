@@ -22,7 +22,7 @@
         labelWidth:'@',
         fieldWidth:'@',
         placeholder:'@',
-        modelType:'@',
+        listOf:'@',
         isRequired: '=ngRequired',
         // Accept the ngModel attribute and bind it to scope.model
         // then, we can use ng model in the input element in the directive template
@@ -35,24 +35,20 @@
       bindToController: true
     }
     return directive;
-    function controller(){
-      var vm = this;
+  }
 
-      vm.labelWidth = 2;
-      vm.fieldWidth = 10;
-      vm.lookup = {
-        institutions: [ 
-          { id: 5, name: 'Scotia' },
-          { id: 8, name: 'RBTT' },
-          { id: 7, name: 'Republic' },
-          { id: 6, name: 'Unit Trust' }
-        ],
-        users:[
-          { id: 3, name: 'Kion Stephen' },
-          { id: 4, name: 'Patrice Stephen' }
-        ]
-      };
 
+  controller.$inject = ['LookupService'];
+  function controller(LookupService){
+    var vm = this;
+
+    vm.labelWidth = 2;
+    vm.fieldWidth = 10;
+
+    if(vm.type === 'select'){
+      LookupService.refreshList(vm.listOf).then(function(items){
+        vm.items = items;
+      });
     }
   }
 })();
@@ -186,6 +182,28 @@
       });
     }
 
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .factory('LookupService', LookupService);
+
+  LookupService.$inject = ['Restangular'];
+  function LookupService(Restangular){
+    var service = {
+      refreshList: refreshList
+    };
+    return service;
+
+    function refreshList(list){
+      return Restangular.all(list).getList();
+    }
   }
 })();
 

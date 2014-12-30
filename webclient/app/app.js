@@ -30,7 +30,7 @@
       apiUrl: ''
     });
 
-    $compileProvider.debugInfoEnabled(false);
+    //$compileProvider.debugInfoEnabled(false);
   }
 
   MainCtrl.$inject = ['MessageService'];

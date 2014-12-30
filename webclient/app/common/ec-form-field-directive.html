@@ -8,7 +8,7 @@
                 name="vm.fieldName"
                 ng-model="vm.model"
                 ng-required="vm.isRequired"
-                ng-options="{{vm.modelType}}.id as {{vm.modelType}}.name for {{vm.modelType}} in vm.lookup.{{vm.modelType}}s"
+                ng-options="item.id as item.name for item in vm.items"
                 class="form-control">
         </select>
 
