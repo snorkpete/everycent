@@ -18,4 +18,15 @@ class BankAccount < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :institution
+
+  validates :name,  presence: true
+
+  before_save :fix_name
+
+  protected
+
+  def fix_name
+    return if self.name.nil?
+    self.name = name.titleize
+  end
 end
