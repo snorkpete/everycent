@@ -3,7 +3,7 @@
   'use strict';
 
   angular
-    .module('everycent.institutions')
+    .module('everycent.setup.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
   InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService', 'ModalService', 'FormService', 'StateService'];

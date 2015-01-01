@@ -3,7 +3,7 @@
   'use strict';
 
   angular
-    .module('everycent.bank-accounts')
+    .module('everycent.setup.bank-accounts')
     .controller('BankAccountsCtrl', BankAccountsCtrl);
 
   BankAccountsCtrl.$inject = ['MessageService', 'BankAccountsService', 'ModalService', 'FormService', 'StateService'];
@@ -18,16 +18,6 @@
     vm.updateBankAccount = updateBankAccount;
     vm.cancelEdit = cancelEdit;
     vm.deleteBankAccount = deleteBankAccount;
-
-    vm.lookup = {
-      institutions: [ 
-        { id: 5, name: 'Scotia' },
-        { id: 8, name: 'RBTT' },
-        { id: 7, name: 'Republic' },
-        { id: 6, name: 'Unit Trust' }
-      ]
-    };
-
     activate();
 
     function activate(){

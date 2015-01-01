@@ -3,7 +3,7 @@
   'use strict';
 
   angular
-    .module('everycent.allocation-categories')
+    .module('everycent.setup.allocation-categories')
     .controller('AllocationCategoriesCtrl', AllocationCategoriesCtrl);
 
   AllocationCategoriesCtrl.$inject = ['MessageService', 'AllocationCategoriesService', 'ModalService', 'FormService', 'StateService'];

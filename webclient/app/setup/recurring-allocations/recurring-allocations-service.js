@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('everycent.recurring-allocations')
+    .module('everycent.setup.recurring-allocations')
     .factory('RecurringAllocationsService', RecurringAllocationsService);
 
     RecurringAllocationsService.$inject = ['$http', 'Restangular'];

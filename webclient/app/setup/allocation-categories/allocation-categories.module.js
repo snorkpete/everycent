@@ -1,7 +1,7 @@
 
 (function(){
   angular
-    .module('everycent.allocation-categories', ['everycent.common'])
+    .module('everycent.setup.allocation-categories', ['everycent.common'])
     .config(RouteConfiguration);
 
   RouteConfiguration.$inject = ['$stateProvider'];
@@ -11,7 +11,7 @@
     $stateProvider
       .state('allocation-categories', {
         url: '/allocation-categories',
-        templateUrl: 'app/allocation-categories/list.html',
+        templateUrl: 'app/setup/allocation-categories/list.html',
         controller: 'AllocationCategoriesCtrl as vm',
         resolve:{
           auth: ['$auth', function($auth){

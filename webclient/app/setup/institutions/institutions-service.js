@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('everycent.institutions')
+    .module('everycent.setup.institutions')
     .factory('InstitutionsService', InstitutionsService);
 
     InstitutionsService.$inject = ['$http', 'Restangular'];

@@ -1,7 +1,7 @@
 
 (function(){
   angular
-    .module('everycent.recurring-allocations', ['everycent.common'])
+    .module('everycent.setup.recurring-allocations', ['everycent.common'])
     .config(RouteConfiguration);
 
   RouteConfiguration.$inject = ['$stateProvider'];
@@ -11,7 +11,7 @@
     $stateProvider
       .state('recurring-allocations', {
         url: '/recurring-allocations',
-        templateUrl: 'app/recurring-allocations/list.html',
+        templateUrl: 'app/setup/recurring-allocations/list.html',
         controller: 'RecurringAllocationsCtrl as vm',
         resolve:{
           auth: ['$auth', function($auth){
@@ -21,11 +21,11 @@
       })
       .state('recurring-allocations.new', {
         url: '/recurring-allocations/new',
-        templateUrl: 'app/recurring-allocations/new.html'
+        templateUrl: 'app/setup/recurring-allocations/new.html'
       })
       .state('recurring-allocations.edit', {
         url: '/recurring-allocations/edit',
-        templateUrl: 'app/recurring-allocations/edit.html'
+        templateUrl: 'app/setup/recurring-allocations/edit.html'
       })
     ;
   }

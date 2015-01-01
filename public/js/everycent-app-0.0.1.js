@@ -1,100 +1,6 @@
 
 (function(){
-  angular
-    .module('everycent.allocation-categories', ['everycent.common'])
-    .config(RouteConfiguration);
-
-  RouteConfiguration.$inject = ['$stateProvider'];
-
-  function RouteConfiguration($stateProvider){
-
-    $stateProvider
-      .state('allocation-categories', {
-        url: '/allocation-categories',
-        templateUrl: 'app/allocation-categories/list.html',
-        controller: 'AllocationCategoriesCtrl as vm',
-        resolve:{
-          auth: ['$auth', function($auth){
-            return $auth.validateUser();
-          }]
-        }
-      })
-    ;
-  }
-})();
-
-;
-
-(function(){
-  angular
-    .module('everycent.bank-accounts', ['everycent.common'])
-    .config(RouteConfiguration);
-
-  RouteConfiguration.$inject = ['$stateProvider'];
-
-  function RouteConfiguration($stateProvider){
-
-    $stateProvider
-      .state('bank-accounts', {
-        url: '/bank-accounts',
-        templateUrl: 'app/bank-accounts/list.html',
-        controller: 'BankAccountsCtrl as vm',
-        resolve:{
-          auth: ['$auth', function($auth){
-            return $auth.validateUser();
-          }]
-        }
-      })
-      .state('bank-accounts.new', {
-        url: '/bank-accounts/new',
-        templateUrl: 'app/bank-accounts/new.html'
-      })
-      .state('bank-accounts.edit', {
-        url: '/bank-accounts/edit',
-        templateUrl: 'app/bank-accounts/edit.html'
-      })
-    ;
-  }
-})();
-
-;
-
-(function(){
   angular.module('everycent.common', []);
-})();
-
-;
-
-(function(){
-  angular
-    .module('everycent.institutions', ['everycent.common'])
-    .config(RouteConfiguration);
-
-  RouteConfiguration.$inject = ['$stateProvider'];
-
-  function RouteConfiguration($stateProvider){
-
-    $stateProvider
-      .state('institutions', {
-        url: '/institutions',
-        templateUrl: 'app/institutions/list.html',
-        controller: 'InstitutionsCtrl as vm',
-        resolve:{
-          auth: ['$auth', function($auth){
-            return $auth.validateUser();
-          }]
-        }
-      })
-      .state('institutions.new', {
-        url: '/institutions/new',
-        templateUrl: 'app/institutions/new.html'
-      })
-      .state('institutions.edit', {
-        url: '/institutions/edit',
-        templateUrl: 'app/institutions/edit.html'
-      })
-    ;
-  }
 })();
 
 ;
@@ -102,74 +8,6 @@
 (function(){
   angular.module('everycent.menu', ['everycent.common']);
 
-})();
-
-;
-
-(function(){
-  angular
-    .module('everycent.recurring-allocations', ['everycent.common'])
-    .config(RouteConfiguration);
-
-  RouteConfiguration.$inject = ['$stateProvider'];
-
-  function RouteConfiguration($stateProvider){
-
-    $stateProvider
-      .state('recurring-allocations', {
-        url: '/recurring-allocations',
-        templateUrl: 'app/recurring-allocations/list.html',
-        controller: 'RecurringAllocationsCtrl as vm',
-        resolve:{
-          auth: ['$auth', function($auth){
-            return $auth.validateUser();
-          }]
-        }
-      })
-      .state('recurring-allocations.new', {
-        url: '/recurring-allocations/new',
-        templateUrl: 'app/recurring-allocations/new.html'
-      })
-      .state('recurring-allocations.edit', {
-        url: '/recurring-allocations/edit',
-        templateUrl: 'app/recurring-allocations/edit.html'
-      })
-    ;
-  }
-})();
-
-;
-
-(function(){
-  angular
-    .module('everycent.recurring-incomes', ['everycent.common'])
-    .config(RouteConfiguration);
-
-  RouteConfiguration.$inject = ['$stateProvider'];
-
-  function RouteConfiguration($stateProvider){
-
-    $stateProvider
-      .state('recurring-incomes', {
-        url: '/recurring-incomes',
-        templateUrl: 'app/recurring-incomes/list.html',
-        controller: 'RecurringIncomesCtrl as vm',
-        resolve:{
-          auth: ['$auth', function($auth){
-            return $auth.validateUser();
-          }]
-        }
-      })
-      .state('recurring-incomes.new', {
-        url: '/recurring-incomes/new',
-        templateUrl: 'app/recurring-incomes/new.html'
-      })
-      .state('recurring-incomes.edit', {
-        url: '/recurring-incomes/edit',
-        templateUrl: 'app/recurring-incomes/edit.html'
-      })
-    ;
-  }
 })();
 
 ;
@@ -196,6 +34,168 @@
 ;
 
 (function(){
+  angular
+    .module('everycent.setup.allocation-categories', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('allocation-categories', {
+        url: '/allocation-categories',
+        templateUrl: 'app/setup/allocation-categories/list.html',
+        controller: 'AllocationCategoriesCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.setup.bank-accounts', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('bank-accounts', {
+        url: '/bank-accounts',
+        templateUrl: 'app/setup/bank-accounts/list.html',
+        controller: 'BankAccountsCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+      .state('bank-accounts.new', {
+        url: '/bank-accounts/new',
+        templateUrl: 'app/setup/bank-accounts/new.html'
+      })
+      .state('bank-accounts.edit', {
+        url: '/bank-accounts/edit',
+        templateUrl: 'app/setup/bank-accounts/edit.html'
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.setup.institutions', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('institutions', {
+        url: '/institutions',
+        templateUrl: 'app/setup/institutions/list.html',
+        controller: 'InstitutionsCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+      .state('institutions.new', {
+        url: '/institutions/new',
+        templateUrl: 'app/setup/institutions/new.html'
+      })
+      .state('institutions.edit', {
+        url: '/institutions/edit',
+        templateUrl: 'app/setup/institutions/edit.html'
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.setup.recurring-allocations', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('recurring-allocations', {
+        url: '/recurring-allocations',
+        templateUrl: 'app/setup/recurring-allocations/list.html',
+        controller: 'RecurringAllocationsCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+      .state('recurring-allocations.new', {
+        url: '/recurring-allocations/new',
+        templateUrl: 'app/setup/recurring-allocations/new.html'
+      })
+      .state('recurring-allocations.edit', {
+        url: '/recurring-allocations/edit',
+        templateUrl: 'app/setup/recurring-allocations/edit.html'
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.setup.recurring-incomes', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('recurring-incomes', {
+        url: '/recurring-incomes',
+        templateUrl: 'app/setup/recurring-incomes/list.html',
+        controller: 'RecurringIncomesCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+      .state('recurring-incomes.new', {
+        url: '/recurring-incomes/new',
+        templateUrl: 'app/setup/recurring-incomes/new.html'
+      })
+      .state('recurring-incomes.edit', {
+        url: '/recurring-incomes/edit',
+        templateUrl: 'app/setup/recurring-incomes/edit.html'
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
   'use strict';
 
   // Module definitions
@@ -210,11 +210,11 @@
     'everycent.common',
     'everycent.menu',
     'everycent.security',
-    'everycent.institutions',
-    'everycent.bank-accounts',
-    'everycent.recurring-incomes',
-    'everycent.recurring-allocations',
-    'everycent.allocation-categories'
+    'everycent.setup.institutions',
+    'everycent.setup.bank-accounts',
+    'everycent.setup.recurring-incomes',
+    'everycent.setup.recurring-allocations',
+    'everycent.setup.allocation-categories'
     ]);
 
   angular
@@ -243,122 +243,6 @@
   }
 })();
 
-
-;
-
-(function(){
-  'use strict';
-
-  angular
-    .module('everycent.allocation-categories')
-    .controller('AllocationCategoriesCtrl', AllocationCategoriesCtrl);
-
-  AllocationCategoriesCtrl.$inject = ['MessageService', 'AllocationCategoriesService', 'ModalService', 'FormService', 'StateService'];
-
-  function AllocationCategoriesCtrl(MessageService, AllocationCategoriesService, ModalService, FormService, StateService){
-    var vm = this;
-    vm.state = StateService; // page state handler
-    vm.isEditMode = false;
-    vm.allocationCategories = [];
-
-    vm.switchToEditMode = switchToEditMode;
-    vm.cancelEdit = cancelEdit;
-    vm.newAllocationCategory = newAllocationCategory;
-    vm.saveChanges = saveChanges;
-    vm.markForDeletion = markForDeletion;
-    vm.percentageTotal = percentageTotal;
-
-    activate();
-
-    function activate(){
-      refreshAllocationCategoryList();
-    }
-
-    function refreshAllocationCategoryList(){
-      return AllocationCategoriesService.getAllocationCategories().then(function(categories){
-        vm.allocationCategories = categories;
-      });
-    }
-
-    function switchToEditMode(){
-      vm.isEditMode = true;
-    }
-
-    function cancelEdit(){
-      refreshAllocationCategoryList();
-      vm.isEditMode = false;
-    }
-
-    function newAllocationCategory(){
-      var newCategory = AllocationCategoriesService.newCategory();
-      vm.allocationCategories.push(newCategory);
-    }
-
-    function saveChanges(){
-      vm.allocationCategories.forEach(function(category){
-        if(category.deleted){
-          category.remove();
-        }else{
-          category.save();
-        }
-      });
-
-      refreshAllocationCategoryList().finally(function(){
-        MessageService.setMessage('Changes saved.');
-        vm.isEditMode = false;
-      });
-    }
-
-    function markForDeletion(category, isDeleted){
-      category.deleted = isDeleted;
-    }
-
-
-    function percentageTotal(){
-      //return 200;
-
-      return _.reduce(vm.allocationCategories, function(sum, category){
-        if(category.deleted){
-          return sum;
-        }else{
-          return sum + category.percentage;
-        }
-      }, 0);
-    }
-  }
-})();
-
-;
-(function(){
-  'use strict';
-
-  angular
-    .module('everycent.allocation-categories')
-    .factory('AllocationCategoriesService', AllocationCategoriesService);
-
-    AllocationCategoriesService.$inject = ['$http', 'Restangular'];
-    function AllocationCategoriesService($http, Restangular){
-      var service = {
-        getAllocationCategories: getAllocationCategories,
-        newCategory: newCategory
-      };
-
-      var baseAll = Restangular.all('allocation_categories');
-      return service;
-
-      function getAllocationCategories(){
-        return baseAll.getList();
-      }
-
-      function newCategory(){
-        var newCategory = {
-          name: '',
-          percentage: 0
-        };
-        return Restangular.restangularizeElement('', newCategory, 'allocation_categories');
-      }
-    }
-})();
 
 ;
 ;
@@ -397,145 +281,6 @@
     $urlRouterProvider.otherwise('/');
   }
 
-})();
-
-;
-
-(function(){
-  'use strict';
-
-  angular
-    .module('everycent.bank-accounts')
-    .controller('BankAccountsCtrl', BankAccountsCtrl);
-
-  BankAccountsCtrl.$inject = ['MessageService', 'BankAccountsService', 'ModalService', 'FormService', 'StateService'];
-
-  function BankAccountsCtrl(MessageService, BankAccountsService, ModalService, FormService, StateService){
-    var vm = this;
-    vm.state = StateService; // page state handler
-    vm.bankAccount = {};
-    vm.bankAccounts = [];
-    vm.addBankAccount = addBankAccount;
-    vm.selectBankAccountForUpdate = selectBankAccountForUpdate;
-    vm.updateBankAccount = updateBankAccount;
-    vm.cancelEdit = cancelEdit;
-    vm.deleteBankAccount = deleteBankAccount;
-
-    vm.lookup = {
-      institutions: [ 
-        { id: 5, name: 'Scotia' },
-        { id: 8, name: 'RBTT' },
-        { id: 7, name: 'Republic' },
-        { id: 6, name: 'Unit Trust' }
-      ]
-    };
-
-    activate();
-
-    function activate(){
-      refreshBankAccountList();
-    }
-
-    function refreshBankAccountList(){
-      BankAccountsService.getBankAccounts().then(function(bankAccounts){
-        vm.bankAccounts = bankAccounts;
-      });
-    }
-
-    function addBankAccount(bankAccount, form){
-      BankAccountsService.addBankAccount(bankAccount).then(function(response){
-        refreshBankAccountList();
-        MessageService.setMessage('Bank Account "' + bankAccount.name + '" added successfully.');
-        // TODO:  hack - need to find a better way of clearing the name
-        FormService.resetForm(bankAccount, form, 
-          ['name', 'account_type', 'account_no', 'opening_balance']);
-
-      }, function(errorResponse){
-        FormService.setErrors(form, errorResponse.data);
-        MessageService.setErrorMessage('Bank Account not saved.');
-        return false;
-      });
-    }
-
-    function selectBankAccountForUpdate(bankAccount){
-      vm.bankAccount = bankAccount;
-      StateService.goToState('bank-accounts.edit');
-    }
-
-    function updateBankAccount(bankAccount, form){
-      bankAccount.save().then(function(response){
-        refreshBankAccountList();
-        MessageService.setMessage('Bank Account "' + bankAccount.name + '" updated successfully.');
-        // TODO:  hack - need to find a better way of clearing the name
-        FormService.resetForm(bankAccount, form, ['name', 'account_type', 'institution_id', 'account_no', 'opening_balance' ]);
-        vm.bankAccount = {};
-        StateService.goToState('bank-accounts');
-
-      }, function(errorResponse){
-        FormService.setErrors(form, errorResponse.data);
-        MessageService.setErrorMessage('Bank Account not updated.');
-        return false;
-      });
-    }
-
-    function cancelEdit(){
-      vm.bankAccount = {};
-      refreshBankAccountList();
-      StateService.goToState('bank-accounts');
-    }
-
-    function deleteBankAccount(bankAccount){
-      var modalOptions = {
-        headerText: 'Delete this Bank Account?',
-        bodyText: 'Are you sure you want to delete the Bank Account: ' + bankAccount.name+ '?',
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel'
-      }
-
-      ModalService.show(modalOptions).then(function(){
-
-        bankAccount.remove().then(function(){
-          refreshBankAccountList();
-          MessageService.setMessage('Bank Account deleted.');
-
-        }).catch(function(){
-          MessageService.setErrorMessage('Error deleting.');
-        });
-
-      },function(){
-        MessageService.setErrorMessage('Delete cancelled.'); // cancel clicked
-      });
-
-    }
-  }
-})();
-
-;
-(function(){
-  'use strict';
-
-  angular
-    .module('everycent.bank-accounts')
-    .factory('BankAccountsService', BankAccountsService);
-
-    BankAccountsService.$inject = ['$http', 'Restangular'];
-    function BankAccountsService($http, Restangular){
-      var service = {
-        getBankAccounts: getBankAccounts,
-        addBankAccount: addBankAccount
-      }
-
-      var baseAll = Restangular.all('bank_accounts');
-      return service;
-
-      function getBankAccounts(){
-        return baseAll.getList();
-      }
-
-      function addBankAccount(bankAccount){
-        return baseAll.post(bankAccount);
-      }
-    }
 })();
 
 ;
@@ -877,10 +622,332 @@
 ;
 
 (function(){
+  angular
+    .module('everycent.menu')
+    .directive('ecNavbar', ecNavbar);
+
+  function ecNavbar(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/menu/ec-navbar-directive.html',
+      scope: {
+        userName: '=',
+        currentPage: '='
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    }
+
+    return directive;
+  }
+
+  controller.$inject = ['MessageService', '$state'];
+  function controller(MessageService, $state){
+    var vm = this;
+
+    vm.goToPage = goToPage;
+    vm.logout = logout;
+
+    function goToPage(page){
+      $state.go(page);
+      vm.currentPage = page;
+      MessageService.clearMessage();
+    }
+
+    function logout(){
+      MessageService.setErrorMessage('Logout not yet implemented.');
+    }
+  }
+})();
+
+;
+(function(){
   'use strict';
 
   angular
-    .module('everycent.institutions')
+    .module('everycent.security')
+    .controller('SignInCtrl', SignInCtrl);
+
+    SignInCtrl.$inject = ['$auth', '$state', 'MessageService'];
+
+    function SignInCtrl($auth, $state, MessageService){
+      var vm = this;
+
+      vm.signIn = signIn;
+
+      function signIn(params){
+        $auth.submitLogin(params).then(function(response){
+
+            MessageService.setMessage('Logged in successfully.');
+            $state.go('institutions');
+
+          }).catch(function(response){
+
+            MessageService.setErrorMessage('Invalid login');
+            if(response.data && response.data.errors){
+              MessageService.setErrorMessage(response.data.errors[0]);
+            }
+
+            return true; // handled the error, so return true
+        });
+      }
+
+    }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.setup.allocation-categories')
+    .controller('AllocationCategoriesCtrl', AllocationCategoriesCtrl);
+
+  AllocationCategoriesCtrl.$inject = ['MessageService', 'AllocationCategoriesService', 'ModalService', 'FormService', 'StateService'];
+
+  function AllocationCategoriesCtrl(MessageService, AllocationCategoriesService, ModalService, FormService, StateService){
+    var vm = this;
+    vm.state = StateService; // page state handler
+    vm.isEditMode = false;
+    vm.allocationCategories = [];
+
+    vm.switchToEditMode = switchToEditMode;
+    vm.cancelEdit = cancelEdit;
+    vm.newAllocationCategory = newAllocationCategory;
+    vm.saveChanges = saveChanges;
+    vm.markForDeletion = markForDeletion;
+    vm.percentageTotal = percentageTotal;
+
+    activate();
+
+    function activate(){
+      refreshAllocationCategoryList();
+    }
+
+    function refreshAllocationCategoryList(){
+      return AllocationCategoriesService.getAllocationCategories().then(function(categories){
+        vm.allocationCategories = categories;
+      });
+    }
+
+    function switchToEditMode(){
+      vm.isEditMode = true;
+    }
+
+    function cancelEdit(){
+      refreshAllocationCategoryList();
+      vm.isEditMode = false;
+    }
+
+    function newAllocationCategory(){
+      var newCategory = AllocationCategoriesService.newCategory();
+      vm.allocationCategories.push(newCategory);
+    }
+
+    function saveChanges(){
+      vm.allocationCategories.forEach(function(category){
+        if(category.deleted){
+          category.remove();
+        }else{
+          category.save();
+        }
+      });
+
+      refreshAllocationCategoryList().finally(function(){
+        MessageService.setMessage('Changes saved.');
+        vm.isEditMode = false;
+      });
+    }
+
+    function markForDeletion(category, isDeleted){
+      category.deleted = isDeleted;
+    }
+
+
+    function percentageTotal(){
+      //return 200;
+
+      return _.reduce(vm.allocationCategories, function(sum, category){
+        if(category.deleted){
+          return sum;
+        }else{
+          return sum + category.percentage;
+        }
+      }, 0);
+    }
+  }
+})();
+
+;
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.setup.allocation-categories')
+    .factory('AllocationCategoriesService', AllocationCategoriesService);
+
+    AllocationCategoriesService.$inject = ['$http', 'Restangular'];
+    function AllocationCategoriesService($http, Restangular){
+      var service = {
+        getAllocationCategories: getAllocationCategories,
+        newCategory: newCategory
+      };
+
+      var baseAll = Restangular.all('allocation_categories');
+      return service;
+
+      function getAllocationCategories(){
+        return baseAll.getList();
+      }
+
+      function newCategory(){
+        var newCategory = {
+          name: '',
+          percentage: 0
+        };
+        return Restangular.restangularizeElement('', newCategory, 'allocation_categories');
+      }
+    }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.setup.bank-accounts')
+    .controller('BankAccountsCtrl', BankAccountsCtrl);
+
+  BankAccountsCtrl.$inject = ['MessageService', 'BankAccountsService', 'ModalService', 'FormService', 'StateService'];
+
+  function BankAccountsCtrl(MessageService, BankAccountsService, ModalService, FormService, StateService){
+    var vm = this;
+    vm.state = StateService; // page state handler
+    vm.bankAccount = {};
+    vm.bankAccounts = [];
+    vm.addBankAccount = addBankAccount;
+    vm.selectBankAccountForUpdate = selectBankAccountForUpdate;
+    vm.updateBankAccount = updateBankAccount;
+    vm.cancelEdit = cancelEdit;
+    vm.deleteBankAccount = deleteBankAccount;
+    activate();
+
+    function activate(){
+      refreshBankAccountList();
+    }
+
+    function refreshBankAccountList(){
+      BankAccountsService.getBankAccounts().then(function(bankAccounts){
+        vm.bankAccounts = bankAccounts;
+      });
+    }
+
+    function addBankAccount(bankAccount, form){
+      BankAccountsService.addBankAccount(bankAccount).then(function(response){
+        refreshBankAccountList();
+        MessageService.setMessage('Bank Account "' + bankAccount.name + '" added successfully.');
+        // TODO:  hack - need to find a better way of clearing the name
+        FormService.resetForm(bankAccount, form, 
+          ['name', 'account_type', 'account_no', 'opening_balance']);
+
+      }, function(errorResponse){
+        FormService.setErrors(form, errorResponse.data);
+        MessageService.setErrorMessage('Bank Account not saved.');
+        return false;
+      });
+    }
+
+    function selectBankAccountForUpdate(bankAccount){
+      vm.bankAccount = bankAccount;
+      StateService.goToState('bank-accounts.edit');
+    }
+
+    function updateBankAccount(bankAccount, form){
+      bankAccount.save().then(function(response){
+        refreshBankAccountList();
+        MessageService.setMessage('Bank Account "' + bankAccount.name + '" updated successfully.');
+        // TODO:  hack - need to find a better way of clearing the name
+        FormService.resetForm(bankAccount, form, ['name', 'account_type', 'institution_id', 'account_no', 'opening_balance' ]);
+        vm.bankAccount = {};
+        StateService.goToState('bank-accounts');
+
+      }, function(errorResponse){
+        FormService.setErrors(form, errorResponse.data);
+        MessageService.setErrorMessage('Bank Account not updated.');
+        return false;
+      });
+    }
+
+    function cancelEdit(){
+      vm.bankAccount = {};
+      refreshBankAccountList();
+      StateService.goToState('bank-accounts');
+    }
+
+    function deleteBankAccount(bankAccount){
+      var modalOptions = {
+        headerText: 'Delete this Bank Account?',
+        bodyText: 'Are you sure you want to delete the Bank Account: ' + bankAccount.name+ '?',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel'
+      }
+
+      ModalService.show(modalOptions).then(function(){
+
+        bankAccount.remove().then(function(){
+          refreshBankAccountList();
+          MessageService.setMessage('Bank Account deleted.');
+
+        }).catch(function(){
+          MessageService.setErrorMessage('Error deleting.');
+        });
+
+      },function(){
+        MessageService.setErrorMessage('Delete cancelled.'); // cancel clicked
+      });
+
+    }
+  }
+})();
+
+;
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.setup.bank-accounts')
+    .factory('BankAccountsService', BankAccountsService);
+
+    BankAccountsService.$inject = ['$http', 'Restangular'];
+    function BankAccountsService($http, Restangular){
+      var service = {
+        getBankAccounts: getBankAccounts,
+        addBankAccount: addBankAccount
+      }
+
+      var baseAll = Restangular.all('bank_accounts');
+      return service;
+
+      function getBankAccounts(){
+        return baseAll.getList();
+      }
+
+      function addBankAccount(bankAccount){
+        return baseAll.post(bankAccount);
+      }
+    }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.setup.institutions')
     .controller('InstitutionsCtrl', InstitutionsCtrl);
 
   InstitutionsCtrl.$inject = ['MessageService', 'InstitutionsService', 'ModalService', 'FormService', 'StateService'];
@@ -980,7 +1047,7 @@
   'use strict';
 
   angular
-    .module('everycent.institutions')
+    .module('everycent.setup.institutions')
     .factory('InstitutionsService', InstitutionsService);
 
     InstitutionsService.$inject = ['$http', 'Restangular'];
@@ -1006,52 +1073,10 @@
 ;
 
 (function(){
-  angular
-    .module('everycent.menu')
-    .directive('ecNavbar', ecNavbar);
-
-  function ecNavbar(){
-    var directive = {
-      restrict:'E',
-      templateUrl: 'app/menu/ec-navbar-directive.html',
-      scope: {
-        userName: '=',
-        currentPage: '='
-      },
-      controller: controller,
-      controllerAs: 'vm',
-      bindToController: true
-    }
-
-    return directive;
-  }
-
-  controller.$inject = ['MessageService', '$state'];
-  function controller(MessageService, $state){
-    var vm = this;
-
-    vm.goToPage = goToPage;
-    vm.logout = logout;
-
-    function goToPage(page){
-      $state.go(page);
-      vm.currentPage = page;
-      MessageService.clearMessage();
-    }
-
-    function logout(){
-      MessageService.setErrorMessage('Logout not yet implemented.');
-    }
-  }
-})();
-
-;
-
-(function(){
   'use strict';
 
   angular
-    .module('everycent.recurring-allocations')
+    .module('everycent.setup.recurring-allocations')
     .controller('RecurringAllocationsCtrl', RecurringAllocationsCtrl);
 
   RecurringAllocationsCtrl.$inject = ['MessageService', 'RecurringAllocationsService', 'ModalService', 'FormService', 'StateService'];
@@ -1152,7 +1177,7 @@
   'use strict';
 
   angular
-    .module('everycent.recurring-allocations')
+    .module('everycent.setup.recurring-allocations')
     .factory('RecurringAllocationsService', RecurringAllocationsService);
 
     RecurringAllocationsService.$inject = ['$http', 'Restangular'];
@@ -1181,7 +1206,7 @@
   'use strict';
 
   angular
-    .module('everycent.recurring-incomes')
+    .module('everycent.setup.recurring-incomes')
     .controller('RecurringIncomesCtrl', RecurringIncomesCtrl);
 
   RecurringIncomesCtrl.$inject = ['MessageService', 'RecurringIncomesService', 'ModalService', 'FormService', 'StateService'];
@@ -1282,7 +1307,7 @@
   'use strict';
 
   angular
-    .module('everycent.recurring-incomes')
+    .module('everycent.setup.recurring-incomes')
     .factory('RecurringIncomesService', RecurringIncomesService);
 
     RecurringIncomesService.$inject = ['$http', 'Restangular'];
@@ -1302,40 +1327,5 @@
       function addRecurringIncome(recurringIncome){
         return baseAll.post(recurringIncome);
       }
-    }
-})();
-
-;
-(function(){
-  'use strict';
-
-  angular
-    .module('everycent.security')
-    .controller('SignInCtrl', SignInCtrl);
-
-    SignInCtrl.$inject = ['$auth', '$state', 'MessageService'];
-
-    function SignInCtrl($auth, $state, MessageService){
-      var vm = this;
-
-      vm.signIn = signIn;
-
-      function signIn(params){
-        $auth.submitLogin(params).then(function(response){
-
-            MessageService.setMessage('Logged in successfully.');
-            $state.go('institutions');
-
-          }).catch(function(response){
-
-            MessageService.setErrorMessage('Invalid login');
-            if(response.data && response.data.errors){
-              MessageService.setErrorMessage(response.data.errors[0]);
-            }
-
-            return true; // handled the error, so return true
-        });
-      }
-
     }
 })();

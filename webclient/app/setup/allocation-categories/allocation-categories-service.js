@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('everycent.allocation-categories')
+    .module('everycent.setup.allocation-categories')
     .factory('AllocationCategoriesService', AllocationCategoriesService);
 
     AllocationCategoriesService.$inject = ['$http', 'Restangular'];

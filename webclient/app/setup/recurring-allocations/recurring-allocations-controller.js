@@ -3,7 +3,7 @@
   'use strict';
 
   angular
-    .module('everycent.recurring-allocations')
+    .module('everycent.setup.recurring-allocations')
     .controller('RecurringAllocationsCtrl', RecurringAllocationsCtrl);
 
   RecurringAllocationsCtrl.$inject = ['MessageService', 'RecurringAllocationsService', 'ModalService', 'FormService', 'StateService'];

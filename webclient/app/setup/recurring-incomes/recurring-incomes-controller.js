@@ -3,7 +3,7 @@
   'use strict';
 
   angular
-    .module('everycent.recurring-incomes')
+    .module('everycent.setup.recurring-incomes')
     .controller('RecurringIncomesCtrl', RecurringIncomesCtrl);
 
   RecurringIncomesCtrl.$inject = ['MessageService', 'RecurringIncomesService', 'ModalService', 'FormService', 'StateService'];

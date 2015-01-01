@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('everycent.bank-accounts')
+    .module('everycent.setup.bank-accounts')
     .factory('BankAccountsService', BankAccountsService);
 
     BankAccountsService.$inject = ['$http', 'Restangular'];

@@ -1,7 +1,7 @@
 
 (function(){
   angular
-    .module('everycent.bank-accounts', ['everycent.common'])
+    .module('everycent.setup.bank-accounts', ['everycent.common'])
     .config(RouteConfiguration);
 
   RouteConfiguration.$inject = ['$stateProvider'];
@@ -11,7 +11,7 @@
     $stateProvider
       .state('bank-accounts', {
         url: '/bank-accounts',
-        templateUrl: 'app/bank-accounts/list.html',
+        templateUrl: 'app/setup/bank-accounts/list.html',
         controller: 'BankAccountsCtrl as vm',
         resolve:{
           auth: ['$auth', function($auth){
@@ -21,11 +21,11 @@
       })
       .state('bank-accounts.new', {
         url: '/bank-accounts/new',
-        templateUrl: 'app/bank-accounts/new.html'
+        templateUrl: 'app/setup/bank-accounts/new.html'
       })
       .state('bank-accounts.edit', {
         url: '/bank-accounts/edit',
-        templateUrl: 'app/bank-accounts/edit.html'
+        templateUrl: 'app/setup/bank-accounts/edit.html'
       })
     ;
   }

@@ -14,11 +14,11 @@
     'everycent.common',
     'everycent.menu',
     'everycent.security',
-    'everycent.institutions',
-    'everycent.bank-accounts',
-    'everycent.recurring-incomes',
-    'everycent.recurring-allocations',
-    'everycent.allocation-categories'
+    'everycent.setup.institutions',
+    'everycent.setup.bank-accounts',
+    'everycent.setup.recurring-incomes',
+    'everycent.setup.recurring-allocations',
+    'everycent.setup.allocation-categories'
     ]);
 
   angular

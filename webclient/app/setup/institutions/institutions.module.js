@@ -1,7 +1,7 @@
 
 (function(){
   angular
-    .module('everycent.institutions', ['everycent.common'])
+    .module('everycent.setup.institutions', ['everycent.common'])
     .config(RouteConfiguration);
 
   RouteConfiguration.$inject = ['$stateProvider'];
@@ -11,7 +11,7 @@
     $stateProvider
       .state('institutions', {
         url: '/institutions',
-        templateUrl: 'app/institutions/list.html',
+        templateUrl: 'app/setup/institutions/list.html',
         controller: 'InstitutionsCtrl as vm',
         resolve:{
           auth: ['$auth', function($auth){
@@ -21,11 +21,11 @@
       })
       .state('institutions.new', {
         url: '/institutions/new',
-        templateUrl: 'app/institutions/new.html'
+        templateUrl: 'app/setup/institutions/new.html'
       })
       .state('institutions.edit', {
         url: '/institutions/edit',
-        templateUrl: 'app/institutions/edit.html'
+        templateUrl: 'app/setup/institutions/edit.html'
       })
     ;
   }

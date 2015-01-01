@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('everycent.recurring-incomes')
+    .module('everycent.setup.recurring-incomes')
     .factory('RecurringIncomesService', RecurringIncomesService);
 
     RecurringIncomesService.$inject = ['$http', 'Restangular'];
