@@ -1,0 +1,65 @@
+
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Recurring Incomes</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table table-bordered clear-background rounded">
+        <thead>
+            <tr class="heading">
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Frequency</th>
+                <th>Bank Account</th>
+                <th>Owner</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="recurringIncome in vm.recurringIncomes">
+                <td> {{ recurringIncome.name }} </td>
+                <td> {{ recurringIncome.amount }} </td>
+                <td> {{ recurringIncome.frequency }} </td>
+                <td> {{ recurringIncome.bank_account.name }} </td>
+                <td> {{ recurringIncome.user_id.name }} </td>
+                <td>
+                    <span ng-click="vm.deleteRecurringIncome(recurringIncome)"
+                          class="text-danger pull-right pointer">
+                        <ec-icon type="trash"></ec-icon>
+                    </span>
+
+                    <span ng-click="vm.selectRecurringIncomeForUpdate(recurringIncome)"
+                          class="text-warning pull-right pointer">
+                        <ec-icon type="edit"></ec-icon>
+                        &nbsp;
+                        Edit
+                        &nbsp; &nbsp; &nbsp;
+                    </span>
+                </td>
+
+            </tr>
+        </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-1" ng-show="vm.state.is('recurring-incomes')">
+        <button class="btn btn-primary"
+                ng-click="vm.state.goToState('recurring-incomes.new')">
+            Add New Recurring Income
+        </button>
+    </div>
+    <div class="col-xs-1" ng-show="vm.state.is('recurring-incomes.new')">
+        <button class="btn btn-default"
+                ng-click="vm.state.goToState('recurring-incomes')">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<br/>
+
+<ui-view></ui-view>

@@ -1,0 +1,29 @@
+
+<ec-form-field label="Name" label-width="2"
+               name="name"
+               error="vm.recurringIncomeForm.name.$error"
+               field-width="6"
+               placeholder="eg. Kion's Salary, Pat's Su-su payment etc"
+               type="text"
+               ng-required="true"
+               ng-model="vm.recurringIncome.name">
+</ec-form-field>
+
+<ec-form-field label="Amount" label-width="2"
+               name="amount"
+               error="vm.recurringIncomeForm.amount.$error"
+               field-width="6"
+               type="number"
+               ng-required="true"
+               ng-model="vm.recurringIncome.amount">
+</ec-form-field>
+
+<ec-form-field label="Bank Account" label-width="2"
+               name="bank_account_id"
+               error="vm.recurringIncomeForm.bank_account_id.$error"
+               field-width="6"
+               type="select"
+               list-of="bank_accounts"
+               ng-required="true"
+               ng-model="vm.recurringIncome.bank_account_id">
+</ec-form-field>

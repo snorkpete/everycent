@@ -1,8 +1,9 @@
 
 <div class="form-group" ng-class="{'has-error': vm.error.server }">
     <label class="col-xs-{{ vm.labelWidth }} control-label">{{ vm.label }}</label>
-    <div ng-switch on="vm.type" class="col-xs-{{ vm.fieldWidth }}">
+    <div class="col-xs-{{ vm.fieldWidth }}">
 
+        <ng-switch on="vm.type">
         <!-- use a select element if type='select' -->
         <select ng-switch-when="select"
                 name="vm.fieldName"
