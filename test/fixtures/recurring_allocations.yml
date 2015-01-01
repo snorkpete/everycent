@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  amount: 1
+  allocation_category_id: 1
+  frequency: MyString
+  is_standing_order: false
+  bank_account_id: 1
+
+two:
+  name: MyString
+  amount: 1
+  allocation_category_id: 1
+  frequency: MyString
+  is_standing_order: false
+  bank_account_id: 1

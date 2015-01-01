@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141227050757) do
+ActiveRecord::Schema.define(version: 20150101131859) do
 
   create_table "allocation_categories", force: true do |t|
     t.string   "name"
@@ -36,6 +36,18 @@ ActiveRecord::Schema.define(version: 20141227050757) do
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "recurring_allocations", force: true do |t|
+    t.string   "name",                                       null: false
+    t.integer  "amount"
+    t.integer  "allocation_category_id"
+    t.string   "frequency",              default: "monthly"
+    t.string   "allocation_type",        default: "expense"
+    t.boolean  "is_standing_order"
+    t.integer  "bank_account_id"
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
   end
 
   create_table "recurring_incomes", force: true do |t|
