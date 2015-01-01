@@ -17,6 +17,7 @@
     'everycent.institutions',
     'everycent.bank-accounts',
     'everycent.recurring-incomes',
+    'everycent.recurring-allocations',
     'everycent.allocation-categories'
     ]);
 

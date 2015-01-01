@@ -1,0 +1,70 @@
+
+<ec-form-field label="Name" label-width="2"
+               name="name"
+               error="vm.recurringAllocationForm.name.$error"
+               field-width="6"
+               placeholder="eg. rent, Aidan's savings, food etc"
+               type="text"
+               ng-required="true"
+               ng-model="vm.recurringAllocation.name">
+</ec-form-field>
+
+<ec-form-field label="Amount" label-width="2"
+               name="amount"
+               error="vm.recurringAllocationForm.amount.$error"
+               field-width="6"
+               type="number"
+               ng-required="true"
+               ng-model="vm.recurringAllocation.amount">
+</ec-form-field>
+
+<div class="form-group" ng-class="{'has-error': vm.recurringAllocationForm.allocation_type.$error.server }">
+    <label class="col-xs-2 control-label">Type</label>
+    <div class="col-xs-6">
+
+        <select name="allocation_type"
+                ng-model="vm.recurringAllocation.allocation_type"
+                class="form-control">
+                <option value="expense" selected>Expense</option>
+                <option value="savings">Savings</option>
+                <option value="sinking fund">Sinking Fund</option>
+        </select>
+
+        <p class="help-block">{{ vm.recurringAllocationForm.allocation_type.$error.server }}</p>
+    </div>
+</div>
+
+<ec-form-field label="Category" label-width="2"
+               name="allocation_category_id"
+               error="vm.recurringAllocationForm.allocation_category_id.$error"
+               field-width="6"
+               type="select"
+               list-of="allocation_categories"
+               ng-required="true"
+               ng-model="vm.recurringAllocation.allocation_category_id">
+</ec-form-field>
+
+<div class="form-group" ng-class="{'has-error': vm.recurringAllocationForm.is_standing_error.$error.server }">
+    <div class="col-sm-offset-2 col-xs-10">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox"
+                       name="is_standing_order"
+                       ng-model="vm.recurringAllocation.is_standing_order">
+                Standing Order?
+            </label>
+        </div>
+    </div>
+    <p class="help-block">{{ vm.recurringAllocationForm.is_standing_order.$error.server }}</p>
+</div>
+
+<ec-form-field ng-show="vm.recurringAllocation.is_standing_order"
+               label="Bank Account" label-width="2"
+               name="bank_account_id"
+               error="vm.recurringAllocationForm.bank_account_id.$error"
+               field-width="6"
+               type="select"
+               list-of="bank_accounts"
+               ng-required="true"
+               ng-model="vm.recurringAllocation.bank_account_id">
+</ec-form-field>

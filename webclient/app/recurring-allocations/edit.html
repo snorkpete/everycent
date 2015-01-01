@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="col-xs-12">
+        <form class="form-horizontal" novalidate
+            name="vm.recurringAllocationForm"
+            ng-submit="vm.updateRecurringAllocation(vm.recurringAllocation, vm.recurringAllocationForm)">
+            <ec-panel type="primary" title="Edit Recurring Allocation">
+
+              <ng-include src="'app/recurring-allocations/form.html'"></ng-include>
+
+                <div class="form-group">
+                    <div class="col-xs-offset-2 col-xs-3">
+                      <button type="submit" class="btn btn-primary">Update Recurring Allocation</button>
+                    </div>
+                    <div class="col-xs-2">
+                      <button type="button" class="btn btn-danger" ng-click="vm.cancelEdit()">Cancel</button>
+                    </div>
+                </div>
+            </ec-panel>
+        </form>
+    </div>
+</div>
