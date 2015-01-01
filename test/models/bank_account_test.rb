@@ -3,8 +3,8 @@
 # Table name: bank_accounts
 #
 #  id              :integer          not null, primary key
-#  nickname        :string
-#  type            :string
+#  name            :string
+#  account_type    :string
 #  account_no      :string
 #  user_id         :integer
 #  institution_id  :integer
