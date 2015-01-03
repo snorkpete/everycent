@@ -35,17 +35,20 @@ describe Budget, :type => :model do
 
     describe "incomes" do
       before :each do
-        kion_income = create(:recurring_income, name: "Kion's Salary", amount: 1500000)
-        pat_income = create(:recurring_income, name: "Pat's Salary", amount: 2000000)
-        aidan_income = create(:recurring_income, name: "Dad's Donation", amount: 40000)
+        kion_income = create(:recurring_income, name: "Kion's Salary", amount: 15_000_00)
+        pat_income = create(:recurring_income, name: "Pat's Salary", amount: 20_000_00)
+        aidan_income = create(:recurring_income, name: "Dad's Donation", amount: 400_00)
+        @budget = create(:budget, start_date: '2015-01-23')
       end
 
       it 'is a list of incomes based on the current recurring incomes' do
-        @budget = create(:budget, start_date: '2015-01-23')
         expect(@budget.incomes.size).to eq(3)
+        expect(@budget.incomes.first.name).to eq "Kion's Salary"
       end
 
-      it 'has a total income equal to the the sum of all the incomes'
+      it 'has a total income equal to the the sum of all the incomes' do
+        expect(@budget.total_income).to eq(35_400_00)
+      end
     end
 
     it 'has a list of allocations'

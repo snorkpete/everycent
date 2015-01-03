@@ -7,6 +7,10 @@ class Budget < ActiveRecord::Base
   before_create :determine_dependent_fields
   after_create :add_associated_data
 
+  def total_income
+    incomes.sum(:amount)
+  end
+
   protected
 
   def determine_dependent_fields
