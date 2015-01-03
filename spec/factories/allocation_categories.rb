@@ -11,6 +11,6 @@
 
 FactoryGirl.define do
   factory :allocation_category do
-    name 'Debt'
+    name { Faker::Name.name }
   end
 end

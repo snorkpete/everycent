@@ -9,9 +9,11 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+
 class Budget < ActiveRecord::Base
 
   has_many :incomes
+  has_many :allocations
 
   validates :start_date, presence: true
 
@@ -22,6 +24,15 @@ class Budget < ActiveRecord::Base
     incomes.sum(:amount)
   end
 
+  def total_allocation
+    allocations.sum(:amount)
+  end
+
+  def in_balance?
+    total_income == total_allocation
+  end
+
+
   protected
 
   def determine_dependent_fields
@@ -31,6 +42,7 @@ class Budget < ActiveRecord::Base
 
   def add_associated_data
     add_incomes
+    add_allocations
   end
 
   # end date is always one day before the current day in the next month
@@ -44,9 +56,14 @@ class Budget < ActiveRecord::Base
   end
 
   def add_incomes
-    
     RecurringIncome.all.each do |recurring_income|
       self.incomes << recurring_income.to_income
+    end
+  end
+
+  def add_allocations
+    RecurringAllocation.all.each do |recurring_allocation|
+      self.allocations << recurring_allocation.to_allocation
     end
   end
 
