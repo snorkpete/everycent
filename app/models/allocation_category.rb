@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: allocation_categories
+#
+#  id         :integer          not null, primary key
+#  name       :string
+#  percentage :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class AllocationCategory < ActiveRecord::Base
   has_many :recurring_allocations
 
