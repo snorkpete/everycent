@@ -11,13 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150101131859) do
+ActiveRecord::Schema.define(version: 20150103033219) do
 
   create_table "allocation_categories", force: true do |t|
     t.string   "name"
     t.integer  "percentage"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "allocations", force: true do |t|
+    t.string   "name"
+    t.integer  "amount"
+    t.integer  "budget_id"
+    t.integer  "allocation_category_id"
+    t.string   "allocation_type"
+    t.integer  "is_standing_order"
+    t.integer  "bank_account_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "bank_accounts", force: true do |t|
@@ -28,6 +40,23 @@ ActiveRecord::Schema.define(version: 20150101131859) do
     t.integer  "institution_id"
     t.integer  "opening_balance"
     t.integer  "current_balance"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
+
+  create_table "budgets", force: true do |t|
+    t.string   "name"
+    t.date     "start_date"
+    t.date     "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "incomes", force: true do |t|
+    t.string   "name"
+    t.integer  "amount"
+    t.integer  "budget_id"
+    t.integer  "bank_account_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end

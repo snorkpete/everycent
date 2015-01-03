@@ -12,11 +12,14 @@
 #
 
 class RecurringIncome < ActiveRecord::Base
+  belongs_to :bank_account
   validates :name, presence: true
 
   before_save :fix_name
 
-  belongs_to :bank_account
+  def to_income
+    Income.new(name: name, amount: amount, bank_account_id: bank_account_id)
+  end
 
   protected
 
