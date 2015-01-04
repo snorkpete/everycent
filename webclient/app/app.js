@@ -18,8 +18,9 @@
     'everycent.setup.bank-accounts',
     'everycent.setup.recurring-incomes',
     'everycent.setup.recurring-allocations',
-    'everycent.setup.allocation-categories'
-    ]);
+    'everycent.setup.allocation-categories',
+    'everycent.budgets'
+  ]);
 
   angular
     .module('everycent')

@@ -12,4 +12,8 @@
 #
 
 class Income < ActiveRecord::Base
+
+  belongs_to :budget
+  belongs_to :bank_account
+
 end

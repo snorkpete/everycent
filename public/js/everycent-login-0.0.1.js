@@ -316,11 +316,12 @@
     .module('everycent.common')
     .factory('StateService', StateService);
 
-  StateService.$inject = ['$state'];
-  function StateService($state){
+  StateService.$inject = ['$state', '$stateParams', 'MessageService'];
+  function StateService($state, $stateParams, MessageService){
     var service = {
       goToState: goToState,
-      is: is
+      is: is,
+      getParam: getParam
     };
     return service;
 
@@ -330,10 +331,16 @@
       }else{
         $state.go(state);
       }
+
+      MessageService.clearMessage();
     }
 
     function is(state){
       return $state.is(state);
+    }
+
+    function getParam(param){
+      return $stateParams[param];
     }
 
   }

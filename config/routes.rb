@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+
+  resources :budgets, except: [:new, :edit]
+
   resources :recurring_allocations, except: [:new, :edit]
   resources :recurring_incomes, except: [:new, :edit]
   resources :allocation_categories, except: [:new, :edit]
@@ -6,6 +9,7 @@ Rails.application.routes.draw do
   resources :institutions, except: [:new, :edit]
   mount_devise_token_auth_for 'User', at: '/auth'
   resources :users, except: [:new, :edit]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

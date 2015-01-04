@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
       render json: ActiveModel::ArraySerializer.new(object, each_serializer: serializer)
 
     else
-     render json: serializer.new(object)
+     render json: serializer.new(object, root: false)
    end
   end
 

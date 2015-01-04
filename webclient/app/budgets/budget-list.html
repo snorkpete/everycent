@@ -1,0 +1,56 @@
+
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Budgets</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table table-bordered clear-background rounded">
+        <thead>
+            <tr class="heading">
+                <th>Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="budget in vm.budgets">
+                <td> {{ budget.name }} </td>
+                <td> {{ budget.start_date }} </td>
+                <td> {{ budget.end_date }} </td>
+                <td>
+                    <span ng-click="vm.selectBudgetForUpdate(budget)"
+                          class="text-warning pull-right pointer">
+                        <ec-icon type="edit"></ec-icon>
+                        &nbsp;
+                        Edit
+                        &nbsp; &nbsp; &nbsp;
+                    </span>
+                </td>
+
+            </tr>
+        </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-1" ng-show="vm.state.is('budgets')">
+        <button class="btn btn-primary"
+                ng-click="vm.state.goToState('budgets.new')">
+            Create New Budget
+        </button>
+    </div>
+    <div class="col-xs-1" ng-show="vm.state.is('budgets.new')">
+        <button class="btn btn-default"
+                ng-click="vm.state.goToState('budgets')">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<br/>
+
+<ui-view></ui-view>

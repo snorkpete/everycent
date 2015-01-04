@@ -20,21 +20,33 @@
     return directive;
   }
 
-  controller.$inject = ['MessageService', '$state'];
-  function controller(MessageService, $state){
+  controller.$inject = ['MessageService', '$state', 'StateService'];
+  function controller(MessageService, $state, StateService){
     var vm = this;
 
-    vm.goToPage = goToPage;
+    vm.state = StateService;
     vm.logout = logout;
-
-    function goToPage(page){
-      $state.go(page);
-      vm.currentPage = page;
-      MessageService.clearMessage();
-    }
+    vm.isActive = isActive;
 
     function logout(){
       MessageService.setErrorMessage('Logout not yet implemented.');
+    }
+
+    function isActive(menuOption){
+      if(menuOption === 'setup'){
+        var result = false;
+        var setupMenuOptions = ['institutions', 'bank-accounts', 'recurring-incomes',
+                                'recurring-allocations', 'allocation-categories'];
+        setupMenuOptions.forEach(function(option){
+
+          if(StateService.is(option)){
+            result = true;
+          }
+        });
+        return result;
+      }else{
+        return StateService.is(menuOption);
+      }
     }
   }
 })();

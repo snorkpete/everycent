@@ -1,5 +1,45 @@
 
 (function(){
+  angular
+    .module('everycent.budgets', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('budgets', {
+        url: '/budgets',
+        templateUrl: 'app/budgets/budget-list.html',
+        controller: 'BudgetsCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+      .state('budgets.new', {
+        url: '/budgets.new',
+        templateUrl: 'app/budgets/budget-new.html'
+      })
+      .state('budgets-edit', {
+        url: '/budgets/:budget_id/edit',
+        templateUrl: 'app/budgets/budget-edit.html',
+        controller: 'BudgetEditorCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
   angular.module('everycent.common', []);
 })();
 
@@ -214,8 +254,9 @@
     'everycent.setup.bank-accounts',
     'everycent.setup.recurring-incomes',
     'everycent.setup.recurring-allocations',
-    'everycent.setup.allocation-categories'
-    ]);
+    'everycent.setup.allocation-categories',
+    'everycent.budgets'
+  ]);
 
   angular
     .module('everycent')
@@ -281,6 +322,116 @@
     $urlRouterProvider.otherwise('/');
   }
 
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.budgets')
+    .controller('BudgetEditorCtrl', BudgetsCtrl);
+
+  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService'];
+
+  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService){
+    var vm = this;
+    vm.state = StateService; // page state handler
+    vm.budget = {};
+
+    activate();
+
+    function activate(){
+      BudgetsService.getBudget(StateService.getParam('budget_id')).then(function(budget){
+        vm.budget = budget;
+      });
+    }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.budgets')
+    .controller('BudgetsCtrl', BudgetsCtrl);
+
+  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService'];
+
+  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService){
+    var vm = this;
+    vm.state = StateService; // page state handler
+    vm.budgets = [];
+    vm.addBudget = addBudget;
+    vm.selectBudgetForUpdate = selectBudgetForUpdate;
+
+    activate();
+
+    function activate(){
+      refreshBudgetList();
+    }
+
+    function refreshBudgetList(){
+      BudgetsService.getBudgets().then(function(budgets){
+        vm.budgets = budgets;
+      });
+    }
+
+    function addBudget(budget, form){
+      BudgetsService.addBudget(budget).then(function(response){
+        refreshBudgetList();
+        MessageService.setMessage('Budget "' + budget.name + '" added successfully.');
+        // TODO:  hack - need to find a better way of clearing the name
+        FormService.resetForm(budget, form, ['start_date']);
+
+      }, function(errorResponse){
+        FormService.setErrors(form, errorResponse.data);
+        MessageService.setErrorMessage('Budget not saved.');
+        return false;
+      });
+    }
+
+    function selectBudgetForUpdate(budget){
+      vm.state.goToState('budgets-edit', { budget_id: budget.id });
+    }
+
+  }
+})();
+
+;
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.budgets')
+    .factory('BudgetsService', BudgetsService);
+
+    BudgetsService.$inject = ['$http', 'Restangular'];
+    function BudgetsService($http, Restangular){
+      var service = {
+        getBudgets: getBudgets,
+        getBudget: getBudget,
+        addBudget: addBudget
+      }
+
+      var baseAll = Restangular.all('budgets');
+      return service;
+
+      function getBudgets(){
+        return baseAll.getList();
+      }
+      
+      function getBudget(budgetId){
+        return Restangular.one('budgets', budgetId).get();
+      }
+
+      function addBudget(budget){
+        return baseAll.post(budget);
+      }
+    }
 })();
 
 ;
@@ -596,11 +747,12 @@
     .module('everycent.common')
     .factory('StateService', StateService);
 
-  StateService.$inject = ['$state'];
-  function StateService($state){
+  StateService.$inject = ['$state', '$stateParams', 'MessageService'];
+  function StateService($state, $stateParams, MessageService){
     var service = {
       goToState: goToState,
-      is: is
+      is: is,
+      getParam: getParam
     };
     return service;
 
@@ -610,10 +762,16 @@
       }else{
         $state.go(state);
       }
+
+      MessageService.clearMessage();
     }
 
     function is(state){
       return $state.is(state);
+    }
+
+    function getParam(param){
+      return $stateParams[param];
     }
 
   }
@@ -642,21 +800,33 @@
     return directive;
   }
 
-  controller.$inject = ['MessageService', '$state'];
-  function controller(MessageService, $state){
+  controller.$inject = ['MessageService', '$state', 'StateService'];
+  function controller(MessageService, $state, StateService){
     var vm = this;
 
-    vm.goToPage = goToPage;
+    vm.state = StateService;
     vm.logout = logout;
-
-    function goToPage(page){
-      $state.go(page);
-      vm.currentPage = page;
-      MessageService.clearMessage();
-    }
+    vm.isActive = isActive;
 
     function logout(){
       MessageService.setErrorMessage('Logout not yet implemented.');
+    }
+
+    function isActive(menuOption){
+      if(menuOption === 'setup'){
+        var result = false;
+        var setupMenuOptions = ['institutions', 'bank-accounts', 'recurring-incomes',
+                                'recurring-allocations', 'allocation-categories'];
+        setupMenuOptions.forEach(function(option){
+
+          if(StateService.is(option)){
+            result = true;
+          }
+        });
+        return result;
+      }else{
+        return StateService.is(menuOption);
+      }
     }
   }
 })();

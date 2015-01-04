@@ -23,7 +23,7 @@
                 <li><a ng-click="vm.logout()">Log Out</a></li>
             </ul>
             <ul class="main-menu nav navbar-nav">
-                <li class="dropdown" ng-class="{ active: vm.currentPage === 'institutions', open: setupOpen }">
+                <li class="dropdown" ng-class="{ active: vm.isActive('setup'), open: setupOpen }">
                   <a class="dropdown-toggle"
                           data-toggle="dropdown" role="button"
                           ng-init="setupOpen = false"
@@ -32,12 +32,15 @@
                        Setup <span class="caret"></span>
                    </a>
                    <ul class="dropdown-menu" role="menu">
-                        <li> <a ng-click="vm.goToPage('institutions');setupOpen = false;">Institutions</a> </li>
-                        <li> <a ng-click="vm.goToPage('bank-accounts');setupOpen = false;">Bank Accounts</a> </li>
-                        <li> <a ng-click="vm.goToPage('recurring-incomes');setupOpen = false;">Recurring Incomes</a> </li>
-                        <li> <a ng-click="vm.goToPage('recurring-allocations');setupOpen = false;">Recurring Allocations</a> </li>
-                        <li> <a ng-click="vm.goToPage('allocation-categories');setupOpen = false;">Allocation Categories</a> </li>
+                        <li> <a ng-click="vm.state.goToState('institutions');setupOpen = false;">Institutions</a> </li>
+                        <li> <a ng-click="vm.state.goToState('bank-accounts');setupOpen = false;">Bank Accounts</a> </li>
+                        <li> <a ng-click="vm.state.goToState('recurring-incomes');setupOpen = false;">Recurring Incomes</a> </li>
+                        <li> <a ng-click="vm.state.goToState('recurring-allocations');setupOpen = false;">Recurring Allocations</a> </li>
+                        <li> <a ng-click="vm.state.goToState('allocation-categories');setupOpen = false;">Allocation Categories</a> </li>
                    </ul>
+                   <li ng-class="{ active: vm.isActive('budgets')}">
+                       <a ng-click="vm.state.goToState('budgets');">Budgets</a>
+                   </li>
                 </li>
             </ul>
         </div><!-- /.navbar-collapse -->
