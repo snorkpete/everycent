@@ -15,4 +15,9 @@
 #
 
 class Allocation < ActiveRecord::Base
+
+  belongs_to :budget
+  belongs_to :allocation_category
+  belongs_to :bank_account
+
 end
