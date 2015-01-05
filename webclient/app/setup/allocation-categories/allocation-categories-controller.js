@@ -6,11 +6,13 @@
     .module('everycent.setup.allocation-categories')
     .controller('AllocationCategoriesCtrl', AllocationCategoriesCtrl);
 
-  AllocationCategoriesCtrl.$inject = ['MessageService', 'AllocationCategoriesService', 'ModalService', 'FormService', 'StateService'];
+  AllocationCategoriesCtrl.$inject = ['UtilService', 'MessageService', 'AllocationCategoriesService', 'ModalService', 'FormService', 'StateService'];
 
-  function AllocationCategoriesCtrl(MessageService, AllocationCategoriesService, ModalService, FormService, StateService){
+  function AllocationCategoriesCtrl(UtilService, MessageService, AllocationCategoriesService, ModalService, FormService, StateService){
     var vm = this;
     vm.state = StateService; // page state handler
+    vm.util = UtilService;
+
     vm.isEditMode = false;
     vm.allocationCategories = [];
 
@@ -68,15 +70,7 @@
 
 
     function percentageTotal(){
-      //return 200;
-
-      return _.reduce(vm.allocationCategories, function(sum, category){
-        if(category.deleted){
-          return sum;
-        }else{
-          return sum + category.percentage;
-        }
-      }, 0);
+      return UtilService.total(vm.allocationCategories, 'percentage');
     }
   }
 })();

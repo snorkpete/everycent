@@ -10,7 +10,8 @@
       var service = {
         getBudgets: getBudgets,
         getBudget: getBudget,
-        addBudget: addBudget
+        addBudget: addBudget,
+        addNewIncome: addNewIncome
       }
 
       var baseAll = Restangular.all('budgets');
@@ -26,6 +27,17 @@
 
       function addBudget(budget){
         return baseAll.post(budget);
+      }
+
+      function addNewIncome(budget){
+        var newIncome = {
+          id: '',
+          name: '',
+          amount: '',
+          budget_id: budget.id,
+          bank_account_id: ''
+        };
+        budget.incomes.push(newIncome);
       }
     }
 })();

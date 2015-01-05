@@ -2,7 +2,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('app/budgets/budget-edit.html',
-    "<div class=row><div class=col-xs-12><h2>Setup Budget:<small>{{ vm.budget.name }}</small></h2></div></div><ec-income-list-editor incomes=vm.budget.incomes></ec-income-list-editor><ec-allocation-list-editor allocations=vm.budget.allocations></ec-allocation-list-editor><div class=row><div class=col-xs-9><div><button class=\"btn btn-primary\" ng-click=vm.saveChanges()>Save Changes</button> &nbsp; &nbsp; <button class=\"btn btn-danger\" ng-click=vm.cancelEdit()>Cancel</button></div></div></div><br>"
+    "<div class=row><div class=col-xs-12><h2>{{ vm.budget.name }} <small>Setup Budget</small></h2></div></div><ec-income-list-editor budget=vm.budget></ec-income-list-editor><ec-allocation-list-editor allocations=vm.budget></ec-allocation-list-editor><div class=row><div class=col-xs-9><div><button class=\"btn btn-success\" ng-click=vm.saveChanges()>Save Changes</button> &nbsp; &nbsp; <button class=\"btn btn-danger\" ng-click=vm.cancelEdit()>Cancel</button></div></div></div><br>"
   );
 
 
@@ -13,6 +13,11 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('app/budgets/budget-new.html',
     "<div class=row><div class=col-xs-12><form class=form-horizontal novalidate name=vm.budgetForm ng-submit=\"vm.addBudget(vm.budget, vm.budgetForm)\"><ec-panel type=primary title=\"Add New Budget\"><ec-form-field label=Name label-width=2 name=start_date error=vm.budgetForm.start_date.$error field-width=6 placeholder=\"Starting date of the budget\" type=date ng-required=true ng-model=vm.budget.start_date></ec-form-field><div class=form-group><div class=\"col-xs-offset-2 col-xs-6\"><button type=submit class=\"btn btn-primary\">Add New Budget</button></div></div></ec-panel></form></div></div>"
+  );
+
+
+  $templateCache.put('app/budgets/ec-income-list-editor-directive.html',
+    "<div class=row><div class=col-xs-12><ec-panel title=Incomes type=primary><table class=\"table table-bordered rounded\"><thead><tr class=heading><th>Name</th><th>Bank Account</th><th>Amount</th><th>Actions</th></tr></thead><tbody><tr ng-repeat=\"income in vm.budget.incomes\" ng-class=\"{ danger: income.deleted }\"><td><input ng-show=vm.isEditMode ng-model=\"income.name\"> <span ng-hide=vm.isEditMode ng-bind=income.name></span></td><td><select ng-show=vm.isEditMode ng-model=income.bank_account_id ng-options=\"bankAccount.id as bankAccount.name for bankAccount in vm.bankAccounts\"></select><span ng-hide=vm.isEditMode ng-bind=income.bank_account.name></span></td><td><input type=number ng-show=vm.isEditMode ng-model=\"income.amount\"> <span ng-hide=vm.isEditMode ng-bind=income.amount></span></td><td><span ng-hide=income.deleted ng-click=\"vm.markForDeletion(income, true)\" class=\"text-danger pull-right pointer\"><ec-icon type=trash></ec-icon></span> <span ng-show=income.deleted ng-click=\"vm.markForDeletion(income, false)\" class=\"text-success pull-right pointer\"><ec-icon type=refresh></ec-icon></span></td></tr></tbody><tfoot><tr class=total><th>Total</th><th></th><th>{{ vm.util.total(vm.budget.incomes, 'amount') }}</th><th></th></tr></tfoot></table><div class=row><div class=col-xs-2 ng-hide=vm.isEditMode><button class=\"btn btn-primary\" ng-click=vm.switchToEditMode()>Make Changes</button></div><div class=col-xs-3 ng-show=vm.isEditMode><button class=\"btn btn-primary\" ng-click=vm.addNewIncome()>Add Income</button></div><div class=col-xs-9><div class=pull-right ng-show=vm.isEditMode><button class=\"btn btn-success\" ng-click=vm.switchToViewMode()>Back to View Mode</button> &nbsp; &nbsp; <button class=\"btn btn-danger\" ng-click=vm.cancelEdit()>Cancel</button></div></div></div></ec-panel></div></div><br>"
   );
 
 

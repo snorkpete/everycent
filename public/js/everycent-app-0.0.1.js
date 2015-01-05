@@ -414,7 +414,8 @@
       var service = {
         getBudgets: getBudgets,
         getBudget: getBudget,
-        addBudget: addBudget
+        addBudget: addBudget,
+        addNewIncome: addNewIncome
       }
 
       var baseAll = Restangular.all('budgets');
@@ -431,7 +432,87 @@
       function addBudget(budget){
         return baseAll.post(budget);
       }
+
+      function addNewIncome(budget){
+        var newIncome = {
+          id: '',
+          name: '',
+          amount: '',
+          budget_id: budget.id,
+          bank_account_id: ''
+        };
+        budget.incomes.push(newIncome);
+      }
     }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.budgets')
+    .directive('ecIncomeListEditor', ecIncomeListEditor);
+
+  function ecIncomeListEditor(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/budgets/ec-income-list-editor-directive.html',
+      scope: {
+        budget: '='
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    }
+
+    return directive;
+  }
+
+  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService'];
+  function controller(UtilService, LookupService, StateService, BudgetsService){
+    var vm = this;
+    vm.isEditMode = false;
+
+    vm.state = StateService;
+    vm.util = UtilService;
+
+    vm.addNewIncome = addNewIncome;
+    vm.markForDeletion = markForDeletion;
+    vm.switchToEditMode = switchToEditMode;
+    vm.switchToViewMode = switchToViewMode;
+    vm.cancelEdit = cancelEdit;
+
+    activate();
+
+    function activate(){
+      LookupService.refreshList('bank_accounts').then(function(bankAccounts){
+        vm.bankAccounts = bankAccounts;
+      });
+    }
+
+    function addNewIncome(){
+      BudgetsService.addNewIncome(vm.budget);
+    }
+
+    function markForDeletion(income, isDeleted){
+      income.deleted = isDeleted;
+    }
+
+    function switchToEditMode(){
+      vm.originalIncomes = angular.copy(vm.budget.incomes);
+      vm.isEditMode = true;
+    }
+
+    function switchToViewMode(){
+      vm.isEditMode = false;
+    }
+
+    function cancelEdit(){
+      vm.budget.incomes = vm.originalIncomes;
+      vm.isEditMode = false;
+    }
+
+  }
 })();
 
 ;
@@ -780,6 +861,34 @@
 ;
 
 (function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .factory('UtilService', UtilService);
+
+  UtilService.$inject = [];
+  function UtilService(){
+    var service = {
+      total: total
+    };
+    return service;
+
+    function total(items, fieldToSum){
+      return _.reduce(items, function(sum, item){
+        if(item.deleted){
+          return sum;
+        }else{
+          return sum + item[fieldToSum];
+        }
+      }, 0);
+    }
+  }
+})();
+
+;
+
+(function(){
   angular
     .module('everycent.menu')
     .directive('ecNavbar', ecNavbar);
@@ -875,11 +984,13 @@
     .module('everycent.setup.allocation-categories')
     .controller('AllocationCategoriesCtrl', AllocationCategoriesCtrl);
 
-  AllocationCategoriesCtrl.$inject = ['MessageService', 'AllocationCategoriesService', 'ModalService', 'FormService', 'StateService'];
+  AllocationCategoriesCtrl.$inject = ['UtilService', 'MessageService', 'AllocationCategoriesService', 'ModalService', 'FormService', 'StateService'];
 
-  function AllocationCategoriesCtrl(MessageService, AllocationCategoriesService, ModalService, FormService, StateService){
+  function AllocationCategoriesCtrl(UtilService, MessageService, AllocationCategoriesService, ModalService, FormService, StateService){
     var vm = this;
     vm.state = StateService; // page state handler
+    vm.util = UtilService;
+
     vm.isEditMode = false;
     vm.allocationCategories = [];
 
@@ -937,15 +1048,7 @@
 
 
     function percentageTotal(){
-      //return 200;
-
-      return _.reduce(vm.allocationCategories, function(sum, category){
-        if(category.deleted){
-          return sum;
-        }else{
-          return sum + category.percentage;
-        }
-      }, 0);
+      return UtilService.total(vm.allocationCategories, 'percentage');
     }
   }
 })();
