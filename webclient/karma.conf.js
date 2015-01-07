@@ -15,11 +15,16 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'vendor/js/angular.min.js',
-      'vendor/js_test/angular-mocks.js',
-      'vendor/js/*.js',
-      'app/app.js',
-      'app/router.js',
+       '../public/js/everycent-vendor-*.min.js',
+       'bower_components/angular-mocks/angular-mocks.js',
+       '../public/js/everycent-app-*.js',
+       '../public/js/everycent-templates-*.js',
+      'test/unit/**/*.spec.js'
+      //'vendor/js/angular.min.js',
+      //'vendor/js_test/angular-mocks.js',
+      //'vendor/js/*.js',
+      //'app/app.js',
+      //'app/router.js',
       //'app/common/telephone_filter.js',
       // TODO: no clue why using app/**/* doesn't work - stuff somehow doesn't load
       //'app/**/*.js',
@@ -36,21 +41,22 @@ module.exports = function(config) {
       //'app/**/*.jst',
       //'test/unit/lier/common/blank_if_zero_filter.spec.js'
       //'test/unit/lier/common/blank_if_zero_filter.spec.js'
-      'test/unit/**/*.spec.js'
+      //'test/unit/**/*.spec.js'
       //'app/**/*.spec.js'
     ],
 
 
     // list of files to exclude
     exclude: [
-      'test/e2e/**/*.js'
+      'test/e2e/**/*.js',
+       '../public/js/everycent-app-*.min.js'
     ],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '**/*.html': ['ng-html2js']
+      //'**/*.html': ['ng-html2js']
     },
 
     //ngHtml2JsPreprocessor: {
