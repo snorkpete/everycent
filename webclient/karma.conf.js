@@ -7,7 +7,6 @@ module.exports = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
@@ -20,31 +19,7 @@ module.exports = function(config) {
        '../public/js/everycent-app-*.js',
        '../public/js/everycent-templates-*.js',
       'test/unit/**/*.spec.js'
-      //'vendor/js/angular.min.js',
-      //'vendor/js_test/angular-mocks.js',
-      //'vendor/js/*.js',
-      //'app/app.js',
-      //'app/router.js',
-      //'app/common/telephone_filter.js',
-      // TODO: no clue why using app/**/* doesn't work - stuff somehow doesn't load
-      //'app/**/*.js',
-      //'app/common/*.js',
-      //'app/claim/*.js',
-      //'app/claim_notification/*.js',
-      //'app/client/*.js',
-      //'app/policy/*.js',
-      //'app/quote/*.js',
-      //'app/security/*.js',
-      //'app/**/*.html',
-      //'app/common/blank_if_zero_filter.js',
-      //'app/**/*.(!spec).js',
-      //'app/**/*.jst',
-      //'test/unit/lier/common/blank_if_zero_filter.spec.js'
-      //'test/unit/lier/common/blank_if_zero_filter.spec.js'
-      //'test/unit/**/*.spec.js'
-      //'app/**/*.spec.js'
     ],
-
 
     // list of files to exclude
     exclude: [
@@ -69,7 +44,7 @@ module.exports = function(config) {
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     //reporters: ['progress', 'growl'],
-    reporters: ['progress', 'growl'],
+    reporters: ['dots', 'progress', 'growl'],
 
 
     // web server port
@@ -92,6 +67,7 @@ module.exports = function(config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['Chrome'],
+    //browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode

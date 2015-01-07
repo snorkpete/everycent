@@ -80,6 +80,8 @@ module.exports = function (grunt) {
     karma: {
       unit: {
         configFile: 'karma.conf.js',
+        autoWatch: false,
+        singleRun: false,
         background: true
       }
     },
@@ -165,7 +167,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   //grunt.loadNpmTasks('grunt-contrib-less');
-  //grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-karma');
   //grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
@@ -173,7 +175,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-angular-templates');
 
   // Task for rebuilding all files
-  grunt.registerTask('build', ['concat:js','uglify:js','ngtemplates','concat:css' ]);
+  grunt.registerTask('build', ['concat:js','uglify:js','ngtemplates','concat:css']);
 
   grunt.registerTask('buildThenWatch', ['build', 'watch']);
   grunt.registerTask('default', ['buildThenWatch']);
