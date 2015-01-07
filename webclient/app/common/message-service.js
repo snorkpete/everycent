@@ -1,4 +1,5 @@
 
+var x = 200;
 (function(){
   angular
     .module('everycent.common')

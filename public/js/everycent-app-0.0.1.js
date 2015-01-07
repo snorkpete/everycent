@@ -286,7 +286,7 @@
 
 
 ;
-;
+
 (function(){
   'use strict';
 
@@ -299,7 +299,7 @@
   function RouteConfiguration($stateProvider, $urlRouterProvider){
     $stateProvider
       .state('home', {
-        url: '/', 
+        url: '/',
         templateUrl: 'app/home/home.html',
         controller: [function(){ }]
       })
@@ -416,7 +416,7 @@
         getBudget: getBudget,
         addBudget: addBudget,
         addNewIncome: addNewIncome
-      }
+      };
 
       var baseAll = Restangular.all('budgets');
       return service;
@@ -424,7 +424,7 @@
       function getBudgets(){
         return baseAll.getList();
       }
-      
+
       function getBudget(budgetId){
         return Restangular.one('budgets', budgetId).get();
       }
@@ -463,7 +463,7 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
 
     return directive;
   }
@@ -721,6 +721,7 @@
 
 ;
 
+var x = 200;
 (function(){
   angular
     .module('everycent.common')

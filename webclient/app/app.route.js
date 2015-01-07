@@ -1,4 +1,4 @@
-;
+
 (function(){
   'use strict';
 
@@ -11,7 +11,7 @@
   function RouteConfiguration($stateProvider, $urlRouterProvider){
     $stateProvider
       .state('home', {
-        url: '/', 
+        url: '/',
         templateUrl: 'app/home/home.html',
         controller: [function(){ }]
       })

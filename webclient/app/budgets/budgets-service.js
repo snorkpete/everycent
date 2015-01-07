@@ -12,7 +12,7 @@
         getBudget: getBudget,
         addBudget: addBudget,
         addNewIncome: addNewIncome
-      }
+      };
 
       var baseAll = Restangular.all('budgets');
       return service;
@@ -20,7 +20,7 @@
       function getBudgets(){
         return baseAll.getList();
       }
-      
+
       function getBudget(budgetId){
         return Restangular.one('budgets', budgetId).get();
       }

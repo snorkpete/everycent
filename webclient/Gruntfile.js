@@ -1,7 +1,15 @@
 module.exports = function (grunt) {
 
   grunt.initConfig({
-  pkg: grunt.file.readJSON('package.json'),
+    pkg: grunt.file.readJSON('package.json'),
+    jshint: {
+      options: {
+        reporter: require('jshint-stylish')
+      },
+      foo: {
+        src: 'app/**/*.js'
+      }
+    },
     concat: {
       js: {
         options: {
@@ -138,7 +146,7 @@ module.exports = function (grunt) {
     watch: {
       js: {
         files: ['app/*.js', 'app/**/*.js', 'loginapp/**/*.js'],
-        tasks: ['concat:js', 'uglify:js'],
+        tasks: ['concat:js', 'uglify:js', 'jshint'],
         options: {
           livereload: true,
         }
@@ -164,17 +172,20 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  //grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-karma');
-  //grunt.loadNpmTasks('grunt-protractor-runner');
-  grunt.loadNpmTasks('grunt-contrib-watch');
+  //grunt.loadNpmTasks('grunt-contrib-concat');
+  //grunt.loadNpmTasks('grunt-contrib-uglify');
+  ////grunt.loadNpmTasks('grunt-contrib-less');
+  //grunt.loadNpmTasks('grunt-karma');
+  ////grunt.loadNpmTasks('grunt-protractor-runner');
+  //grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.loadNpmTasks('grunt-contrib-htmlmin');
-  grunt.loadNpmTasks('grunt-angular-templates');
+  //grunt.loadNpmTasks('grunt-contrib-htmlmin');
+  //grunt.loadNpmTasks('grunt-angular-templates');
+
+  require('load-grunt-tasks')(grunt);
 
   // Task for rebuilding all files
+  //grunt.registerTask('build', ['concat:js','uglify:js','ngtemplates','concat:css', 'jshint']);
   grunt.registerTask('build', ['concat:js','uglify:js','ngtemplates','concat:css']);
 
   grunt.registerTask('buildThenWatch', ['build', 'watch']);
