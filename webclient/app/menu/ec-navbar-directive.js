@@ -19,10 +19,12 @@
   controller.$inject = ['MessageService', 'UserService', 'StateService', '$auth'];
   function controller(MessageService, UserService, StateService, $auth){
     var vm = this;
-    vm.state = StateService;
     vm.user = UserService.getUser();
     vm.signOut = signOut;
     vm.isActive = isActive;
+    vm.go = go;
+    vm.navMenuOpen = false;
+    vm.setupOpen = false;
 
     function signOut(){
       //TODO: possibly wrap this stuff into an authentication service
@@ -51,6 +53,12 @@
       }else{
         return StateService.is(menuOption);
       }
+    }
+
+    function go(state, params){
+      StateService.go(state, params);
+      vm.navMenuOpen = false;
+      vm.setupOpen = false;
     }
   }
 })();
