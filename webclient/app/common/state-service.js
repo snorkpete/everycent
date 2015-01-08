@@ -9,7 +9,7 @@
   StateService.$inject = ['$state', '$stateParams', 'MessageService'];
   function StateService($state, $stateParams, MessageService){
     var service = {
-      goToState: goToState, 
+      goToState: goToState,
       go: go,
       is: is,
       getParam: getParam

@@ -270,8 +270,13 @@
     //$compileProvider.debugInfoEnabled(false);
   }
 
-  AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService'];
-  function AuthenticationSetup($rootScope, $timeout, $location, MessageService){
+  AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService', 'UserService'];
+  function AuthenticationSetup($rootScope, $timeout, $location, MessageService, UserService){
+
+    // TODO: this happens on every request - need to only happen on the first request
+    $rootScope.$on('auth:validation-success', function(ev, userConfig){
+      UserService.setupUser(userConfig);
+    });
 
     // when trying to access resources with an invalid authentication token
     // --------------------------------------------------------------------
@@ -292,11 +297,6 @@
     var main = this;
 
     main.ui = MessageService.data;
-    main.currentPage = 'institutions';
-    //TODO convert this to a UserService that gets set up when a user signs in
-    main.user = {
-      name: 'Kion Stephen'
-    };
   }
 })();
 
@@ -853,7 +853,7 @@ var x = 200;
   StateService.$inject = ['$state', '$stateParams', 'MessageService'];
   function StateService($state, $stateParams, MessageService){
     var service = {
-      goToState: goToState, 
+      goToState: goToState,
       go: go,
       is: is,
       getParam: getParam
@@ -875,6 +875,44 @@ var x = 200;
 
     function getParam(param){
       return $stateParams[param];
+    }
+
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .factory('UserService', UserService);
+
+  UserService.$inject = [];
+  function UserService(){
+    var data = {
+      user: {}
+    };
+    var service = {
+      getUser: getUser,
+      setupUser: setupUser,
+      clear: clear
+    };
+    return service;
+
+    function getUser(){
+      return data.user;
+    }
+
+    function setupUser(userDetails){
+      data.user.name = userDetails.first_name + ' ' + userDetails.last_name;
+      data.user.email = userDetails.email;
+    }
+
+    function clear(){
+      data.user.name = '';
+      data.user.email = '';
     }
 
   }
@@ -919,10 +957,6 @@ var x = 200;
     var directive = {
       restrict:'E',
       templateUrl: 'app/menu/ec-navbar-directive.html',
-      scope: {
-        userName: '=',
-        currentPage: '='
-      },
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
@@ -931,17 +965,19 @@ var x = 200;
     return directive;
   }
 
-  controller.$inject = ['MessageService', 'StateService', '$auth'];
-  function controller(MessageService, StateService, $auth){
+  controller.$inject = ['MessageService', 'UserService', 'StateService', '$auth'];
+  function controller(MessageService, UserService, StateService, $auth){
     var vm = this;
-
     vm.state = StateService;
+    vm.user = UserService.getUser();
     vm.signOut = signOut;
     vm.isActive = isActive;
 
     function signOut(){
+      //TODO: possibly wrap this stuff into an authentication service
       $auth.signOut()
         .then(function(response){
+          UserService.clear();
           return StateService.go('sign_in');
         })
         .then(function(response){
@@ -976,9 +1012,9 @@ var x = 200;
     .module('everycent.security')
     .controller('SignInCtrl', SignInCtrl);
 
-    SignInCtrl.$inject = ['$auth', '$state', 'MessageService'];
+    SignInCtrl.$inject = ['$auth', '$state', 'UserService', 'MessageService'];
 
-    function SignInCtrl($auth, $state, MessageService){
+    function SignInCtrl($auth, $state, UserService, MessageService){
       var vm = this;
 
       vm.signIn = signIn;
@@ -986,13 +1022,14 @@ var x = 200;
       function signIn(params){
         $auth.submitLogin(params).then(function(response){
 
-            MessageService.setMessage('Logged in successfully.');
-            $state.go('home');
+          UserService.setupUser(response);
+          MessageService.setMessage('Logged in successfully.');
+          $state.go('home');
 
-          }).catch(function(response){
+        }).catch(function(response){
 
-            MessageService.setErrorMessage('Email or password is incorrect.');
-            return true; // handled the error, so return true
+          MessageService.setErrorMessage('Email or password is incorrect.');
+          return true; // handled the error, so return true
         });
       }
 

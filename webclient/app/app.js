@@ -34,8 +34,13 @@
     //$compileProvider.debugInfoEnabled(false);
   }
 
-  AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService'];
-  function AuthenticationSetup($rootScope, $timeout, $location, MessageService){
+  AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService', 'UserService'];
+  function AuthenticationSetup($rootScope, $timeout, $location, MessageService, UserService){
+
+    // TODO: this happens on every request - need to only happen on the first request
+    $rootScope.$on('auth:validation-success', function(ev, userConfig){
+      UserService.setupUser(userConfig);
+    });
 
     // when trying to access resources with an invalid authentication token
     // --------------------------------------------------------------------
@@ -56,11 +61,6 @@
     var main = this;
 
     main.ui = MessageService.data;
-    main.currentPage = 'institutions';
-    //TODO convert this to a UserService that gets set up when a user signs in
-    main.user = {
-      name: 'Kion Stephen'
-    };
   }
 })();
 

@@ -8,10 +8,6 @@
     var directive = {
       restrict:'E',
       templateUrl: 'app/menu/ec-navbar-directive.html',
-      scope: {
-        userName: '=',
-        currentPage: '='
-      },
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
@@ -20,17 +16,19 @@
     return directive;
   }
 
-  controller.$inject = ['MessageService', 'StateService', '$auth'];
-  function controller(MessageService, StateService, $auth){
+  controller.$inject = ['MessageService', 'UserService', 'StateService', '$auth'];
+  function controller(MessageService, UserService, StateService, $auth){
     var vm = this;
-
     vm.state = StateService;
+    vm.user = UserService.getUser();
     vm.signOut = signOut;
     vm.isActive = isActive;
 
     function signOut(){
+      //TODO: possibly wrap this stuff into an authentication service
       $auth.signOut()
         .then(function(response){
+          UserService.clear();
           return StateService.go('sign_in');
         })
         .then(function(response){
