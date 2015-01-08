@@ -12,7 +12,7 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
 
     return directive;
   }

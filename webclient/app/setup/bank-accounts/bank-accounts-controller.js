@@ -78,7 +78,7 @@
         bodyText: 'Are you sure you want to delete the Bank Account: ' + bankAccount.name+ '?',
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel'
-      }
+      };
 
       ModalService.show(modalOptions).then(function(){
 

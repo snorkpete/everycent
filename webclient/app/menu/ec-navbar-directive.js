@@ -11,7 +11,7 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
 
     return directive;
   }
@@ -33,7 +33,7 @@
         })
         .then(function(response){
           MessageService.setMessage('Successfully signed out.');
-        })
+        });
     }
 
     function isActive(menuOption){

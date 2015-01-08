@@ -10,7 +10,7 @@
       var service = {
         getRecurringAllocations: getRecurringAllocations,
         addRecurringAllocation: addRecurringAllocation
-      }
+      };
 
       var baseAll = Restangular.all('recurring_allocations');
       return service;

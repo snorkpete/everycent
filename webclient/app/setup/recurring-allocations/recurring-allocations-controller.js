@@ -79,7 +79,7 @@
         bodyText: 'Are you sure you want to delete the Recurring Allocation: ' + recurringAllocation.name+ '?',
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel'
-      }
+      };
 
       ModalService.show(modalOptions).then(function(){
 

@@ -24,17 +24,18 @@
       return modalInstance.result;
 
       function modalController(){
+        /* jshint validthis: true */
         var vm = this;
         vm.options = options;
         modalFix();
 
         vm.options.confirm = function(){
           modalInstance.close('ok');
-        }
+        };
 
         vm.options.cancel = function(){
           modalInstance.dismiss('cancel');
-        }
+        };
       }
     }
 

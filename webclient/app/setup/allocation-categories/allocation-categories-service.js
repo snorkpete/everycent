@@ -20,11 +20,11 @@
       }
 
       function newCategory(){
-        var newCategory = {
+        var newCategoryObj = {
           name: '',
           percentage: 0
         };
-        return Restangular.restangularizeElement('', newCategory, 'allocation_categories');
+        return Restangular.restangularizeElement('', newCategoryObj, 'allocation_categories');
       }
     }
 })();

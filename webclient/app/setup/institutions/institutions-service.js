@@ -10,7 +10,7 @@
       var service = {
         getInstitutions: getInstitutions,
         addInstitution: addInstitution
-      }
+      };
 
       var baseAll = Restangular.all('institutions');
       return service;

@@ -51,7 +51,6 @@
 })();
 
 ;
-
 (function(){
   angular
     .module('everycent.security', ['everycent.common'])
@@ -66,7 +65,7 @@
         url: '/sign_in',
         templateUrl: 'app/security/sign-in.html',
         controller: 'SignInCtrl as vm'
-      });
+      })
     ;
   }
 })();
@@ -573,6 +572,7 @@
 
   controller.$inject = ['LookupService'];
   function controller(LookupService){
+    /* jshint validthis: true */
     var vm = this;
 
     vm.labelWidth = 2;
@@ -605,10 +605,11 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
     return directive;
 
     function controller(){
+      /* jshint validthis: true */
       var vm = this;
     }
   }
@@ -629,7 +630,7 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
 
     return directive;
   }
@@ -664,9 +665,11 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
     return directive;
+
     function controller(){
+      /* jshint validthis: true */
       var vm = this;
       vm.type = 'default';
     }
@@ -758,7 +761,7 @@ var x = 200;
       setErrorMessage: setErrorMessage,
       setWarningMessage: setWarningMessage,
       clearMessage: clearMessage
-    }
+    };
 
     return service;
 
@@ -816,17 +819,18 @@ var x = 200;
       return modalInstance.result;
 
       function modalController(){
+        /* jshint validthis: true */
         var vm = this;
         vm.options = options;
         modalFix();
 
         vm.options.confirm = function(){
           modalInstance.close('ok');
-        }
+        };
 
         vm.options.cancel = function(){
           modalInstance.dismiss('cancel');
-        }
+        };
       }
     }
 
@@ -960,7 +964,7 @@ var x = 200;
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
 
     return directive;
   }
@@ -982,7 +986,7 @@ var x = 200;
         })
         .then(function(response){
           MessageService.setMessage('Successfully signed out.');
-        })
+        });
     }
 
     function isActive(menuOption){
@@ -1137,11 +1141,11 @@ var x = 200;
       }
 
       function newCategory(){
-        var newCategory = {
+        var newCategoryObj = {
           name: '',
           percentage: 0
         };
-        return Restangular.restangularizeElement('', newCategory, 'allocation_categories');
+        return Restangular.restangularizeElement('', newCategoryObj, 'allocation_categories');
       }
     }
 })();
@@ -1227,7 +1231,7 @@ var x = 200;
         bodyText: 'Are you sure you want to delete the Bank Account: ' + bankAccount.name+ '?',
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel'
-      }
+      };
 
       ModalService.show(modalOptions).then(function(){
 
@@ -1260,7 +1264,7 @@ var x = 200;
       var service = {
         getBankAccounts: getBankAccounts,
         addBankAccount: addBankAccount
-      }
+      };
 
       var baseAll = Restangular.all('bank_accounts');
       return service;
@@ -1356,7 +1360,7 @@ var x = 200;
         bodyText: 'Are you sure you want to delete the institution: ' + institution.name+ '?',
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel'
-      }
+      };
 
       ModalService.show(modalOptions).then(function(){
 
@@ -1389,7 +1393,7 @@ var x = 200;
       var service = {
         getInstitutions: getInstitutions,
         addInstitution: addInstitution
-      }
+      };
 
       var baseAll = Restangular.all('institutions');
       return service;
@@ -1486,7 +1490,7 @@ var x = 200;
         bodyText: 'Are you sure you want to delete the Recurring Allocation: ' + recurringAllocation.name+ '?',
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel'
-      }
+      };
 
       ModalService.show(modalOptions).then(function(){
 
@@ -1519,7 +1523,7 @@ var x = 200;
       var service = {
         getRecurringAllocations: getRecurringAllocations,
         addRecurringAllocation: addRecurringAllocation
-      }
+      };
 
       var baseAll = Restangular.all('recurring_allocations');
       return service;
@@ -1616,7 +1620,7 @@ var x = 200;
         bodyText: 'Are you sure you want to delete the Recurring Income: ' + recurringIncome.name+ '?',
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel'
-      }
+      };
 
       ModalService.show(modalOptions).then(function(){
 
@@ -1649,7 +1653,7 @@ var x = 200;
       var service = {
         getRecurringIncomes: getRecurringIncomes,
         addRecurringIncome: addRecurringIncome
-      }
+      };
 
       var baseAll = Restangular.all('recurring_incomes');
       return service;

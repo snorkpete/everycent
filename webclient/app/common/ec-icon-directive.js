@@ -16,10 +16,11 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
     return directive;
 
     function controller(){
+      /* jshint validthis: true */
       var vm = this;
     }
   }

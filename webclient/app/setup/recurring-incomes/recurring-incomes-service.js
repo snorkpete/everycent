@@ -10,7 +10,7 @@
       var service = {
         getRecurringIncomes: getRecurringIncomes,
         addRecurringIncome: addRecurringIncome
-      }
+      };
 
       var baseAll = Restangular.all('recurring_incomes');
       return service;

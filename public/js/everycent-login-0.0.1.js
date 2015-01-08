@@ -40,6 +40,7 @@
 
   controller.$inject = ['LookupService'];
   function controller(LookupService){
+    /* jshint validthis: true */
     var vm = this;
 
     vm.labelWidth = 2;
@@ -72,10 +73,11 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
     return directive;
 
     function controller(){
+      /* jshint validthis: true */
       var vm = this;
     }
   }
@@ -96,7 +98,7 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
 
     return directive;
   }
@@ -131,9 +133,11 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
     return directive;
+
     function controller(){
+      /* jshint validthis: true */
       var vm = this;
       vm.type = 'default';
     }
@@ -225,7 +229,7 @@ var x = 200;
       setErrorMessage: setErrorMessage,
       setWarningMessage: setWarningMessage,
       clearMessage: clearMessage
-    }
+    };
 
     return service;
 
@@ -283,17 +287,18 @@ var x = 200;
       return modalInstance.result;
 
       function modalController(){
+        /* jshint validthis: true */
         var vm = this;
         vm.options = options;
         modalFix();
 
         vm.options.confirm = function(){
           modalInstance.close('ok');
-        }
+        };
 
         vm.options.cancel = function(){
           modalInstance.dismiss('cancel');
-        }
+        };
       }
     }
 

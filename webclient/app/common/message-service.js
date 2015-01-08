@@ -15,7 +15,7 @@ var x = 200;
       setErrorMessage: setErrorMessage,
       setWarningMessage: setWarningMessage,
       clearMessage: clearMessage
-    }
+    };
 
     return service;
 

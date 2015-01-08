@@ -10,7 +10,7 @@
       var service = {
         getBankAccounts: getBankAccounts,
         addBankAccount: addBankAccount
-      }
+      };
 
       var baseAll = Restangular.all('bank_accounts');
       return service;

@@ -34,6 +34,7 @@
 
   controller.$inject = ['LookupService'];
   function controller(LookupService){
+    /* jshint validthis: true */
     var vm = this;
 
     vm.labelWidth = 2;
