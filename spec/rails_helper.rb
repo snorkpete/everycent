@@ -24,6 +24,14 @@ require 'rspec/rails'
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.maintain_test_schema!
 
+
+module AuthHelper
+  def auth_request(user)
+    sign_in user
+    request.headers.merge!(user.create_new_auth_token)
+  end
+end
+
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   #config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -50,4 +58,5 @@ RSpec.configure do |config|
 
   # include factory girl syntax methods to simplify calls to factories
   config.include FactoryGirl::Syntax::Methods
+  config.include AuthHelper
 end
