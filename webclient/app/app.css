@@ -51,6 +51,21 @@ body{
   font-size:1.1em;
 }
 
+/* Global animations */
+.animate.ng-enter, .ng-move{
+	-webkit-animation: fadeInLeft .5s;
+	-moz-animation: fadeIn .5s;
+	-o-animation: fadeIn .5s;
+	animation: fadeIn 1.5s;
+}
+
+.animated.ng-leave{
+	-webkit-animation: fadeOut .5s;
+	-moz-animation: fadeOut .5s;
+	-o-animation: fadeOut .5s;
+	animation: fadeOut .5s;
+}
+
 /* change color of loading bar */
 #loading-bar .bar {
   background-color: red;

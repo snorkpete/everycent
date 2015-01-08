@@ -54,6 +54,7 @@ module.exports = function (grunt) {
             //'bower_components/angular-material/angular-material.min.css',
             //'bower_components/angular-material/themes/teal-theme.css',
             'bower_components/bootstrap/dist/css/bootstrap.min.css',
+            'bower_components/animate.css/animate.min.css',
             'bower_components/angular-loading-bar/build/loading-bar.min.css'
           ],
           '../public/css/<%= pkg.name %>-<%= pkg.version %>.css': [
@@ -171,16 +172,6 @@ module.exports = function (grunt) {
       //}
     }
   });
-
-  //grunt.loadNpmTasks('grunt-contrib-concat');
-  //grunt.loadNpmTasks('grunt-contrib-uglify');
-  ////grunt.loadNpmTasks('grunt-contrib-less');
-  //grunt.loadNpmTasks('grunt-karma');
-  ////grunt.loadNpmTasks('grunt-protractor-runner');
-  //grunt.loadNpmTasks('grunt-contrib-watch');
-
-  //grunt.loadNpmTasks('grunt-contrib-htmlmin');
-  //grunt.loadNpmTasks('grunt-angular-templates');
 
   require('load-grunt-tasks')(grunt);
 
