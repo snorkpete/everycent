@@ -16,15 +16,11 @@
         $auth.submitLogin(params).then(function(response){
 
             MessageService.setMessage('Logged in successfully.');
-            $state.go('institutions');
+            $state.go('home');
 
           }).catch(function(response){
 
-            MessageService.setErrorMessage('Invalid login');
-            if(response.data && response.data.errors){
-              MessageService.setErrorMessage(response.data.errors[0]);
-            }
-
+            MessageService.setErrorMessage('Email or password is incorrect.');
             return true; // handled the error, so return true
         });
       }

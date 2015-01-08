@@ -6,9 +6,19 @@
     .module('everycent')
     .config(RouteConfiguration);
 
-  RouteConfiguration.$inject = ['$stateProvider', '$urlRouterProvider'];
+  RouteConfiguration.$inject = ['$authProvider', '$stateProvider', '$urlRouterProvider'];
 
-  function RouteConfiguration($stateProvider, $urlRouterProvider){
+  function RouteConfiguration($authProvider, $stateProvider, $urlRouterProvider){
+
+    // Configure the auth provider
+    // ---------------------------
+
+    $authProvider.configure({
+      apiUrl: ''
+    });
+
+    // Configure the global routes
+    // ---------------------------
     $stateProvider
       .state('home', {
         url: '/',
@@ -22,11 +32,6 @@
             return $auth.validateUser();
           }]
         }
-      })
-      .state('all.institutions', {
-        url: '/institutions',
-        templateUrl: 'app/institutions/list.html',
-        controller: 'InstitutionsCtrl as vm'
       })
     ;
 

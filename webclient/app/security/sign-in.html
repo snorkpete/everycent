@@ -1,13 +1,22 @@
-<form ng-submit="vm.signIn(vm.loginForm)" role="form">
-  <div class="form-group">
-    <label>email</label>
-    <input type="email" name="email" ng-model="vm.loginForm.email" required="required" class="form-control"/>
-  </div>
+<br/>
+<h2>EveryCent <small> the zero-based budget manager</small></h2>
 
-  <div class="form-group">
-    <label>password</label>
-    <input type="password" name="password" ng-model="vm.loginForm.password" required="required" class="form-control"/>
-  </div>
+<br/>
+<br/>
+<ec-panel title="Sign In" type="primary">
+    <form ng-submit="vm.signIn(vm.loginForm)" role="form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="email" ng-model="vm.loginForm.email" required="required" class="form-control"/>
+      </div>
 
-  <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
-</form>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" ng-model="vm.loginForm.password" required="required" class="form-control"/>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
+    </form>
+</ec-panel>
+
+<br/>

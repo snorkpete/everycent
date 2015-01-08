@@ -1,5 +1,5 @@
 
-<nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+<nav ng-hide="vm.isActive('sign_in')" class="navbar navbar-fixed-top navbar-inverse" role="navigation">
     <div class="container">
 
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -20,7 +20,7 @@
         <div collapse="navCollapsed" class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li><p class="navbar-text">Hi, <strong>{{vm.userName}}</strong></p></li>
-                <li><a ng-click="vm.logout()">Log Out</a></li>
+                <li><a ng-click="vm.signOut()">Sign Out</a></li>
             </ul>
             <ul class="main-menu nav navbar-nav">
                 <li class="dropdown" ng-class="{ active: vm.isActive('setup'), open: setupOpen }">
@@ -32,14 +32,14 @@
                        Setup <span class="caret"></span>
                    </a>
                    <ul class="dropdown-menu" role="menu">
-                        <li> <a ng-click="vm.state.goToState('institutions');setupOpen = false;">Institutions</a> </li>
-                        <li> <a ng-click="vm.state.goToState('bank-accounts');setupOpen = false;">Bank Accounts</a> </li>
-                        <li> <a ng-click="vm.state.goToState('recurring-incomes');setupOpen = false;">Recurring Incomes</a> </li>
-                        <li> <a ng-click="vm.state.goToState('recurring-allocations');setupOpen = false;">Recurring Allocations</a> </li>
-                        <li> <a ng-click="vm.state.goToState('allocation-categories');setupOpen = false;">Allocation Categories</a> </li>
+                        <li> <a ng-click="vm.state.go('institutions');setupOpen = false;">Institutions</a> </li>
+                        <li> <a ng-click="vm.state.go('bank-accounts');setupOpen = false;">Bank Accounts</a> </li>
+                        <li> <a ng-click="vm.state.go('recurring-incomes');setupOpen = false;">Recurring Incomes</a> </li>
+                        <li> <a ng-click="vm.state.go('recurring-allocations');setupOpen = false;">Recurring Allocations</a> </li>
+                        <li> <a ng-click="vm.state.go('allocation-categories');setupOpen = false;">Allocation Categories</a> </li>
                    </ul>
                    <li ng-class="{ active: vm.isActive('budgets')}">
-                       <a ng-click="vm.state.goToState('budgets');">Budgets</a>
+                       <a ng-click="vm.state.go('budgets');">Budgets</a>
                    </li>
                 </li>
             </ul>

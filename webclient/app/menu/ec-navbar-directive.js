@@ -20,16 +20,22 @@
     return directive;
   }
 
-  controller.$inject = ['MessageService', '$state', 'StateService'];
-  function controller(MessageService, $state, StateService){
+  controller.$inject = ['MessageService', 'StateService', '$auth'];
+  function controller(MessageService, StateService, $auth){
     var vm = this;
 
     vm.state = StateService;
-    vm.logout = logout;
+    vm.signOut = signOut;
     vm.isActive = isActive;
 
-    function logout(){
-      MessageService.setErrorMessage('Logout not yet implemented.');
+    function signOut(){
+      $auth.signOut()
+        .then(function(response){
+          return StateService.go('sign_in');
+        })
+        .then(function(response){
+          MessageService.setMessage('Successfully signed out.');
+        })
     }
 
     function isActive(menuOption){

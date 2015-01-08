@@ -261,15 +261,30 @@
   angular
     .module('everycent')
     .config(AppConfig)
+    .run(AuthenticationSetup)
     .controller('MainCtrl', MainCtrl);
 
   AppConfig.$inject = ['$authProvider', '$compileProvider'];
   function AppConfig($authProvider, $compileProvider){
-    $authProvider.configure({
-      apiUrl: ''
-    });
 
     //$compileProvider.debugInfoEnabled(false);
+  }
+
+  AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService'];
+  function AuthenticationSetup($rootScope, $timeout, $location, MessageService){
+
+    // when trying to access resources with an invalid authentication token
+    // --------------------------------------------------------------------
+    $rootScope.$on('auth:invalid', function(ev, reason){
+
+      // TODO: there's some sort of timing issue going on,
+      // so, we'll bypass the problem temporarily by using timeout
+      // ---------------------------------------------------------
+      $timeout(function(){
+        $location.path('/sign_in');
+        MessageService.setErrorMessage('You have been signed out. Please sign in again.');
+      }, 500);
+    });
   }
 
   MainCtrl.$inject = ['MessageService'];
@@ -278,6 +293,7 @@
 
     main.ui = MessageService.data;
     main.currentPage = 'institutions';
+    //TODO convert this to a UserService that gets set up when a user signs in
     main.user = {
       name: 'Kion Stephen'
     };
@@ -294,9 +310,19 @@
     .module('everycent')
     .config(RouteConfiguration);
 
-  RouteConfiguration.$inject = ['$stateProvider', '$urlRouterProvider'];
+  RouteConfiguration.$inject = ['$authProvider', '$stateProvider', '$urlRouterProvider'];
 
-  function RouteConfiguration($stateProvider, $urlRouterProvider){
+  function RouteConfiguration($authProvider, $stateProvider, $urlRouterProvider){
+
+    // Configure the auth provider
+    // ---------------------------
+
+    $authProvider.configure({
+      apiUrl: ''
+    });
+
+    // Configure the global routes
+    // ---------------------------
     $stateProvider
       .state('home', {
         url: '/',
@@ -310,11 +336,6 @@
             return $auth.validateUser();
           }]
         }
-      })
-      .state('all.institutions', {
-        url: '/institutions',
-        templateUrl: 'app/institutions/list.html',
-        controller: 'InstitutionsCtrl as vm'
       })
     ;
 
@@ -545,7 +566,7 @@
       controller: controller,
       controllerAs: 'vm',
       bindToController: true
-    }
+    };
     return directive;
   }
 
@@ -832,20 +853,20 @@ var x = 200;
   StateService.$inject = ['$state', '$stateParams', 'MessageService'];
   function StateService($state, $stateParams, MessageService){
     var service = {
-      goToState: goToState,
+      goToState: goToState, 
+      go: go,
       is: is,
       getParam: getParam
     };
     return service;
 
     function goToState(state, params){
-      if(params){
-        $state.go(state, params);
-      }else{
-        $state.go(state);
-      }
-
       MessageService.clearMessage();
+      return $state.go(state, params);
+    }
+
+    function go(state, params){
+      return goToState(state, params);
     }
 
     function is(state){
@@ -910,16 +931,22 @@ var x = 200;
     return directive;
   }
 
-  controller.$inject = ['MessageService', '$state', 'StateService'];
-  function controller(MessageService, $state, StateService){
+  controller.$inject = ['MessageService', 'StateService', '$auth'];
+  function controller(MessageService, StateService, $auth){
     var vm = this;
 
     vm.state = StateService;
-    vm.logout = logout;
+    vm.signOut = signOut;
     vm.isActive = isActive;
 
-    function logout(){
-      MessageService.setErrorMessage('Logout not yet implemented.');
+    function signOut(){
+      $auth.signOut()
+        .then(function(response){
+          return StateService.go('sign_in');
+        })
+        .then(function(response){
+          MessageService.setMessage('Successfully signed out.');
+        })
     }
 
     function isActive(menuOption){
@@ -960,15 +987,11 @@ var x = 200;
         $auth.submitLogin(params).then(function(response){
 
             MessageService.setMessage('Logged in successfully.');
-            $state.go('institutions');
+            $state.go('home');
 
           }).catch(function(response){
 
-            MessageService.setErrorMessage('Invalid login');
-            if(response.data && response.data.errors){
-              MessageService.setErrorMessage(response.data.errors[0]);
-            }
-
+            MessageService.setErrorMessage('Email or password is incorrect.');
             return true; // handled the error, so return true
         });
       }
