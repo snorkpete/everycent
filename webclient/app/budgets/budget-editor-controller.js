@@ -12,12 +12,28 @@
     var vm = this;
     vm.state = StateService; // page state handler
     vm.budget = {};
+    vm.saveChanges = saveChanges;
 
     activate();
 
     function activate(){
-      BudgetsService.getBudget(StateService.getParam('budget_id')).then(function(budget){
+      loadBudget();
+    }
+
+    function loadBudget(){
+      return BudgetsService.getBudget(StateService.getParam('budget_id')).then(function(budget){
         vm.budget = budget;
+      });
+    }
+
+    function saveChanges(budget){
+      BudgetsService.save(budget).then(function(response){
+        MessageService.setMessage('Budget saved.');
+        loadBudget();
+
+      }, function(error){
+
+        MessageService.setErrorMessage('Budget not saved.');
       });
     }
   }

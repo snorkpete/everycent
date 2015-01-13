@@ -359,12 +359,28 @@
     var vm = this;
     vm.state = StateService; // page state handler
     vm.budget = {};
+    vm.saveChanges = saveChanges;
 
     activate();
 
     function activate(){
-      BudgetsService.getBudget(StateService.getParam('budget_id')).then(function(budget){
+      loadBudget();
+    }
+
+    function loadBudget(){
+      return BudgetsService.getBudget(StateService.getParam('budget_id')).then(function(budget){
         vm.budget = budget;
+      });
+    }
+
+    function saveChanges(budget){
+      BudgetsService.save(budget).then(function(response){
+        MessageService.setMessage('Budget saved.');
+        loadBudget();
+
+      }, function(error){
+
+        MessageService.setErrorMessage('Budget not saved.');
       });
     }
   }
@@ -435,10 +451,12 @@
         getBudgets: getBudgets,
         getBudget: getBudget,
         addBudget: addBudget,
-        addNewIncome: addNewIncome
+        addNewIncome: addNewIncome,
+        save: save
       };
 
       var baseAll = Restangular.all('budgets');
+      var incomeBase = Restangular.all('incomes');
       return service;
 
       function getBudgets(){
@@ -462,6 +480,27 @@
           bank_account_id: ''
         };
         budget.incomes.push(newIncome);
+      }
+
+      function save(budget){
+        return budget.save();
+
+        // need to do different saves depending on if the income is new, deleted or existing
+        budget.incomes.forEach(function(income){
+
+          // existing income - save it
+          if(income.id > 0){
+            income.save();
+
+          // deleted income - remove it
+          }else if(income.deleted){
+            income.remove();
+
+          // new income - add it
+          }else{
+            incomeBase.post(income);
+          }
+        });
       }
     }
 })();

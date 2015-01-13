@@ -13,20 +13,20 @@
             </thead>
             <tbody>
                 <tr ng-repeat="income in vm.budget.incomes" ng-class="{ danger: income.deleted }">
-                    <td> 
-                        <input type="text" ng-show="vm.isEditMode" ng-model="income.name" /> 
-                        <span ng-hide="vm.isEditMode" ng-bind="income.name">
+                    <td>
+                        <input type="text" ng-show="vm.isEditMode" ng-model="income.name" />
+                        <span ng-hide="vm.isEditMode" ng-bind="income.name"></span>
                     </td>
-                    <td> 
+                    <td>
                         <select ng-show="vm.isEditMode"
-                                ng-model="income.bank_account_id"
+                                ng-model="income.bank_account.id"
                                 ng-options="bankAccount.id as bankAccount.name for bankAccount in vm.bankAccounts">
                         </select>
-                        <span ng-hide="vm.isEditMode" ng-bind="income.bank_account.name">
+                        <span ng-hide="vm.isEditMode" ng-bind="income.bank_account.name"></span>
                     </td>
-                    <td> 
-                        <input type="number" ng-show="vm.isEditMode" ng-model="income.amount" /> 
-                        <span ng-hide="vm.isEditMode" ng-bind="income.amount">
+                    <td>
+                        <input type="number" ng-show="vm.isEditMode" ng-model="income.amount" />
+                        <span ng-hide="vm.isEditMode" ng-bind="income.amount"></span>
                     </td>
                     <td>
                         <span ng-hide="income.deleted"
@@ -40,7 +40,7 @@
                             <ec-icon type="refresh"></ec-icon>
                         </span>
                     </td>
-    
+
                 </tr>
             </tbody>
             <tfoot>
