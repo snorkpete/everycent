@@ -44,23 +44,6 @@
 
       function save(budget){
         return budget.save();
-
-        // need to do different saves depending on if the income is new, deleted or existing
-        budget.incomes.forEach(function(income){
-
-          // existing income - save it
-          if(income.id > 0){
-            income.save();
-
-          // deleted income - remove it
-          }else if(income.deleted){
-            income.remove();
-
-          // new income - add it
-          }else{
-            incomeBase.post(income);
-          }
-        });
       }
     }
 })();

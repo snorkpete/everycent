@@ -484,23 +484,6 @@
 
       function save(budget){
         return budget.save();
-
-        // need to do different saves depending on if the income is new, deleted or existing
-        budget.incomes.forEach(function(income){
-
-          // existing income - save it
-          if(income.id > 0){
-            income.save();
-
-          // deleted income - remove it
-          }else if(income.deleted){
-            income.remove();
-
-          // new income - add it
-          }else{
-            incomeBase.post(income);
-          }
-        });
       }
     }
 })();
@@ -527,12 +510,13 @@
     return directive;
   }
 
-  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService'];
-  function controller(UtilService, LookupService, StateService, BudgetsService){
+  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService'];
+  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService){
     var vm = this;
     vm.isEditMode = false;
 
     vm.state = StateService;
+    vm.ref = ReferenceService;
     vm.util = UtilService;
 
     vm.addNewIncome = addNewIncome;
@@ -882,6 +866,29 @@ var x = 200;
             }, 100);
     }
   }
+})();
+
+;
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .factory('ReferenceService', ReferenceService);
+
+    ReferenceService.$inject = [];
+    function ReferenceService(){
+      var service = {
+        updateReferenceId: updateReferenceId
+      };
+
+      return service;
+
+      function updateReferenceId(model, referenceName){
+        model[referenceName + '_id'] = model[referenceName].id;
+      }
+
+    }
 })();
 
 ;

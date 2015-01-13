@@ -19,8 +19,9 @@
                     </td>
                     <td>
                         <select ng-show="vm.isEditMode"
-                                ng-model="income.bank_account.id"
-                                ng-options="bankAccount.id as bankAccount.name for bankAccount in vm.bankAccounts">
+                                ng-model="income.bank_account"
+                                ng-change="vm.ref.updateReferenceId(income, 'bank_account')"
+                                ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
                         </select>
                         <span ng-hide="vm.isEditMode" ng-bind="income.bank_account.name"></span>
                     </td>

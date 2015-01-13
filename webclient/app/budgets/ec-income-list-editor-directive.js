@@ -19,12 +19,13 @@
     return directive;
   }
 
-  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService'];
-  function controller(UtilService, LookupService, StateService, BudgetsService){
+  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService'];
+  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService){
     var vm = this;
     vm.isEditMode = false;
 
     vm.state = StateService;
+    vm.ref = ReferenceService;
     vm.util = UtilService;
 
     vm.addNewIncome = addNewIncome;
