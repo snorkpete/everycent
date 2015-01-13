@@ -1,4 +1,7 @@
 class BudgetsController < ApplicationController
+  include ParameterExtraction
+
+  before_action :authenticate_user!
   before_action :set_budget, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -18,6 +21,12 @@ class BudgetsController < ApplicationController
 
   def update
     @budget.update(budget_params)
+
+    income_params = extract_income_params(params)
+    new_incomes = Income.update_from_params(income_params)
+    @budget.incomes = new_incomes
+    @budget.save
+
     respond_with(@budget, BudgetSerializer)
   end
 
@@ -32,6 +41,6 @@ class BudgetsController < ApplicationController
     end
 
     def budget_params
-      params.fetch(:budget, {}).permit(:start_date)
+      params.fetch(:budget, {}).permit(:start_date, { incomes: [:name, :amount, :bank_account] } )
     end
 end

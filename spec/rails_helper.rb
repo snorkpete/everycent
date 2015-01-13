@@ -58,5 +58,8 @@ RSpec.configure do |config|
 
   # include factory girl syntax methods to simplify calls to factories
   config.include FactoryGirl::Syntax::Methods
+
+  # authentication helper methods
+  config.include Devise::TestHelpers, type: :controller
   config.include AuthHelper
 end
