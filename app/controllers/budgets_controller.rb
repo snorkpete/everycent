@@ -25,6 +25,11 @@ class BudgetsController < ApplicationController
     income_params = extract_income_params(params)
     new_incomes = Income.update_from_params(income_params)
     @budget.incomes = new_incomes
+
+    allocation_params = extract_allocation_params(params)
+    new_allocations = Allocation.update_from_params(allocation_params)
+    @budget.allocations = new_allocations
+
     @budget.save
 
     respond_with(@budget, BudgetSerializer)

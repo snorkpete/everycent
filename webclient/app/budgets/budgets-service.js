@@ -12,11 +12,11 @@
         getBudget: getBudget,
         addBudget: addBudget,
         addNewIncome: addNewIncome,
+        addNewAllocation: addNewAllocation,
         save: save
       };
 
       var baseAll = Restangular.all('budgets');
-      var incomeBase = Restangular.all('incomes');
       return service;
 
       function getBudgets(){
@@ -42,6 +42,16 @@
         budget.incomes.push(newIncome);
       }
 
+      function addNewAllocation(budget){
+        var newAllocation = {
+          id: '',
+          name: '',
+          amount: '',
+          budget_id: budget.id,
+          bank_account_id: ''
+        };
+        budget.allocations.push(newAllocation);
+      }
       function save(budget){
         return budget.save();
       }

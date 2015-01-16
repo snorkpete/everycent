@@ -11,4 +11,11 @@ module ParameterExtraction
     new_params = ActionController::Parameters.new(input_params)
     new_params.permit(:incomes => [:id, :name, :amount, :bank_account, :bank_account_id, :budget_id, :deleted]).require(:incomes)
   end
+
+  def extract_allocation_params(input_params)
+    new_params = ActionController::Parameters.new(input_params)
+    new_params.permit(:allocations => [
+      :id, :name, :amount, :budget_id, :allocation_category_id, :allocation_type, :is_standing_order,
+      :bank_account_id, :budget_id, :deleted]).require(:allocations)
+  end
 end
