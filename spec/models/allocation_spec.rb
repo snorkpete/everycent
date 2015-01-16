@@ -17,5 +17,50 @@
 require 'rails_helper'
 
 RSpec.describe Allocation, :type => :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe "#update_from_params" do
+    before :each do
+      @budget = create(:budget)
+      @first  = @budget.allocations.create(attributes_for(:allocation))
+      @second = @budget.allocations.create(attributes_for(:allocation))
+      @third  = @budget.allocations.create(attributes_for(:allocation))
+
+      @single_params = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1,
+                        "allocation_category_id" => 1, "allocation_type" => "expense" }]
+
+      @two_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id,
+                      "bank_account_id"=>1, "allocation_category_id" => 1, "allocation_type" => "expense" },
+                    {"id"=>"", "name"=>"Groceries", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"",
+                     "allocation_category_id" => 1, "allocation_type" => "expense" },
+      ]
+
+      @deleted_params = [{"id"=>@first.id, "name"=>"Renting", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1,
+                         "allocation_category"=>nil, "bank_account"=>nil },
+                         {"id"=>"", "name"=>"Groceries", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"2",
+                         "allocation_category"=>nil, "bank_account"=>nil },
+                         {"id"=>@third.id, "name"=>"deleted", "amount"=>30000, "budget_id"=>@budget.id, 
+                          "bank_account_id"=>"1", "deleted"=>true}
+      ]
+
+    end
+
+    it "returns a list of allocations" do
+      expect(Allocation.update_from_params(@single_params).size).to eq 1
+      expect(Allocation.update_from_params(@two_params).size).to eq 2
+    end
+
+    it "excludes deleted allocations from the list" do
+      expect(Allocation.update_from_params(@deleted_params).size).to eq 2
+    end
+
+    it "deletes the deleted allocations from the database" do
+      Allocation.update_from_params(@deleted_params)
+      expect(Allocation.where(id: @third.id).count).to eq 0
+    end
+
+    it "updates the attributes of the first allocation" do
+      allocations = Allocation.update_from_params(@single_params)
+      expect(allocations[0].name).to eq "Rent"
+    end
+
+  end
 end
