@@ -27,6 +27,7 @@ class RecurringAllocation < ActiveRecord::Base
     Allocation.new(name: name,
                    amount: amount,
                    allocation_type: allocation_type,
+                   allocation_category_id: allocation_category_id,
                    bank_account_id: bank_account_id,
                    is_standing_order: is_standing_order)
   end
