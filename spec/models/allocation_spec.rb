@@ -30,6 +30,11 @@ RSpec.describe Allocation, :type => :model do
       @params_with_standing_order = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700,
                                       "budget_id"=>@budget.id, "bank_account_id"=>1, "is_standing_order" =>true,
                                       "allocation_category_id" => 1, "allocation_type" => "expense" }]
+
+      @params_wihout_standing_order = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700,
+                                      "budget_id"=>@budget.id, "bank_account_id"=>1, "is_standing_order" =>false,
+                                      "allocation_category_id" => 1, "allocation_type" => "expense" }]
+
       @two_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id,
                       "bank_account_id"=>1, "allocation_category_id" => 1, "allocation_type" => "expense" },
                     {"id"=>"", "name"=>"Groceries", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"",
@@ -69,5 +74,12 @@ RSpec.describe Allocation, :type => :model do
       allocations = Allocation.update_from_params(@params_with_standing_order)
       expect(allocations[0].is_standing_order?).to eq true
     end
+
+    it "does not update the bank account if not a standing order" do
+      allocations = Allocation.update_from_params(@params_wihout_standing_order)
+      expect(allocations[0].is_standing_order?).to eq false
+      expect(allocations[0].bank_account_id).to eq nil
+    end
+
   end
 end
