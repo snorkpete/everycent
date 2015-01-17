@@ -5,7 +5,8 @@ describe RecurringAllocation, :type => :model do
   describe '#to_allocation' do
     before :each do
       @recurring_allocation = create(:recurring_allocation, 
-                                name: 'Aidan Savings', 
+                                name: 'Aidan Savings',
+                                allocation_category_id: 2,
                                 allocation_type: 'savings',
                                 amount: 800_00,
                                 is_standing_order: true,
@@ -24,6 +25,10 @@ describe RecurringAllocation, :type => :model do
 
     it 'copies the name to the new allocation' do
       expect(@allocation.name).to eq 'Aidan Savings'
+    end
+
+    it 'copies the allocation category to the new allocation' do
+      expect(@allocation.allocation_category_id).to eq 2
     end
 
     it 'copies the amount to the new allocation' do
