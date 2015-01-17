@@ -17,8 +17,8 @@ describe RecurringIncome, :type => :model do
 
   describe '#to_income' do
     before :each do
-      @recurring_income = create(:recurring_income, 
-                                name: 'Salary', 
+      @recurring_income = build(:recurring_income,
+                                name: 'Salary',
                                 amount: 1570000,
                                 bank_account_id: 1)
 

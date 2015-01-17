@@ -4,7 +4,7 @@ describe RecurringAllocation, :type => :model do
 
   describe '#to_allocation' do
     before :each do
-      @recurring_allocation = create(:recurring_allocation, 
+      @recurring_allocation = build(:recurring_allocation,
                                 name: 'Aidan Savings',
                                 allocation_category_id: 2,
                                 allocation_type: 'savings',
