@@ -20,6 +20,9 @@ class Allocation < ActiveRecord::Base
   belongs_to :allocation_category
   belongs_to :bank_account
 
+  before_save :fix_name
+  before_save :clear_bank_account_if_not_standing_order
+
   def self.update_from_params(params)
     result = []
 
@@ -50,5 +53,15 @@ class Allocation < ActiveRecord::Base
 
     allocation.update(param.except(:deleted))
     allocation
+  end
+
+  protected
+  def fix_name
+    return if self.name.nil?
+    self.name = name.titleize
+  end
+
+  def clear_bank_account_if_not_standing_order
+    self.bank_account_id = nil unless is_standing_order?
   end
 end
