@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150103033219) do
+ActiveRecord::Schema.define(version: 20150117143233) do
 
   create_table "allocation_categories", force: true do |t|
     t.string   "name"
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 20150103033219) do
     t.integer  "budget_id"
     t.integer  "allocation_category_id"
     t.string   "allocation_type"
-    t.integer  "is_standing_order"
+    t.boolean  "is_standing_order"
     t.integer  "bank_account_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
