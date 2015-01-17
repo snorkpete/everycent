@@ -24,7 +24,7 @@
     function link(scope, element, attrs, ngModel){
 
       ngModel.$formatters.push(function(modelValue){
-        return ecToDollarsFilter(modelValue);
+        return modelValue / 100;
       });
 
       ngModel.$parsers.push(function(viewValue){

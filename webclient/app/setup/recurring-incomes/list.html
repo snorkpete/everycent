@@ -20,7 +20,7 @@
         <tbody>
             <tr ng-repeat="recurringIncome in vm.recurringIncomes">
                 <td> {{ recurringIncome.name }} </td>
-                <td> {{ recurringIncome.amount }} </td>
+                <td> {{ recurringIncome.amount | ecToDollars }} </td>
                 <td> {{ recurringIncome.frequency }} </td>
                 <td> {{ recurringIncome.bank_account.name }} </td>
                 <td> {{ recurringIncome.user_id.name }} </td>

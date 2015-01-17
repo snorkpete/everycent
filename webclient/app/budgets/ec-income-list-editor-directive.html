@@ -26,8 +26,8 @@
                         <span ng-hide="vm.isEditMode" ng-bind="income.bank_account.name"></span>
                     </td>
                     <td>
-                        <input type="number" ng-show="vm.isEditMode" ng-model="income.amount" />
-                        <span ng-hide="vm.isEditMode" ng-bind="income.amount"></span>
+                        <input type="number" ng-show="vm.isEditMode" ng-model="income.amount" ec-as-dollars />
+                        <span ng-hide="vm.isEditMode" ng-bind="income.amount | ecToDollars"></span>
                     </td>
                     <td>
                         <span ng-hide="income.deleted"
@@ -48,7 +48,7 @@
                 <tr class="total">
                     <th>Total</th>
                     <th></th>
-                    <th>{{ vm.util.total(vm.budget.incomes, 'amount') }}</th>
+                    <th>{{ vm.util.total(vm.budget.incomes, 'amount') | ecToDollars }}</th>
                     <th></th>
                 </tr>
             </tfoot>

@@ -13,6 +13,17 @@
                 class="form-control">
         </select>
 
+        <!-- use a number element with conversion to dollars element if type='dollars' -->
+        <input ng-switch-when="dollars"
+               type="number"
+               name="vm.fieldName"
+               ng-model="vm.model"
+               class="form-control"
+               ec-as-dollars
+               ng-required="vm.isRequired"
+               placeholder="{{ vm.placeholder }}">
+        </input>
+
         <!-- otherwise use a normal input element -->
         <input ng-switch-default
                type="{{ vm.type }}"

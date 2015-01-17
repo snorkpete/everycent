@@ -22,7 +22,7 @@
         <tbody>
             <tr ng-repeat="recurringAllocation in vm.recurringAllocations">
                 <td> {{ recurringAllocation.name }} </td>
-                <td> {{ recurringAllocation.amount }} </td>
+                <td> {{ recurringAllocation.amount | ecToDollars }} </td>
                 <td> {{ recurringAllocation.allocation_type }} </td>
                 <td> {{ recurringAllocation.allocation_category.name }} </td>
                 <td> {{ recurringAllocation.frequency }} </td>

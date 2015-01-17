@@ -7,6 +7,7 @@
                     <th>Name</th>
                     <th>Category</th>
                     <th>Amount</th>
+                    <th>Standing Order?</th>
                     <th>Bank Account</th>
                     <th>Actions</th>
                 </tr>
@@ -26,16 +27,22 @@
                         <span ng-hide="vm.isEditMode" ng-bind="allocation.allocation_category.name"></span>
                     </td>
                     <td>
-                        <input type="number" ng-show="vm.isEditMode" ng-model="allocation.amount" />
-                        <span ng-hide="vm.isEditMode" ng-bind="allocation.amount"></span>
+                        <input type="number" ng-show="vm.isEditMode" ng-model="allocation.amount" ec-as-dollars />
+                        <span ng-hide="vm.isEditMode" ng-bind="allocation.amount | ecToDollars "></span>
                     </td>
                     <td>
-                        <select ng-show="vm.isEditMode"
-                                ng-model="allocation.bank_account"
-                                ng-change="vm.ref.updateReferenceId(allocation, 'bank_account')"
-                                ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
-                        </select>
-                        <span ng-hide="vm.isEditMode" ng-bind="allocation.bank_account.name"></span>
+                        <input type="checkbox" ng-show="vm.isEditMode" ng-model="allocation.is_standing_order" />
+                        <span ng-hide="vm.isEditMode" ng-bind="allocation.is_standing_order ? 'Yes' : 'No'"></span>
+                    </td>
+                    <td>
+                        <span ng-show="allocation.is_standing_order">
+                            <select ng-show="vm.isEditMode"
+                                    ng-model="allocation.bank_account"
+                                    ng-change="vm.ref.updateReferenceId(allocation, 'bank_account')"
+                                    ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
+                            </select>
+                            <span ng-hide="vm.isEditMode" ng-bind="allocation.bank_account.name"></span>
+                        </span>
                     </td>
                     <td>
                         <span ng-hide="allocation.deleted"
@@ -56,7 +63,7 @@
                 <tr class="total">
                     <th>Total</th>
                     <th></th>
-                    <th>{{ vm.util.total(vm.budget.allocations, 'amount') }}</th>
+                    <th>{{ vm.util.total(vm.budget.allocations, 'amount') | ecToDollars }}</th>
                     <th></th>
                     <th></th>
                 </tr>

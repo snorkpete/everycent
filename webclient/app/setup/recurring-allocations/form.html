@@ -13,7 +13,7 @@
                name="amount"
                error="vm.recurringAllocationForm.amount.$error"
                field-width="6"
-               type="number"
+               type="dollars"
                ng-required="true"
                ng-model="vm.recurringAllocation.amount">
 </ec-form-field>
@@ -50,7 +50,7 @@
             <label>
                 <input type="checkbox"
                        name="is_standing_order"
-                       ng-model="vm.recurringAllocation.is_standing_order">
+                       ng-model="vm.recurringAllocation.is_standing_order" />
                 Standing Order?
             </label>
         </div>
