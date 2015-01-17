@@ -27,6 +27,9 @@ RSpec.describe Allocation, :type => :model do
       @single_params = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1,
                         "allocation_category_id" => 1, "allocation_type" => "expense" }]
 
+      @params_with_standing_order = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700,
+                                      "budget_id"=>@budget.id, "bank_account_id"=>1, "is_standing_order" =>true,
+                                      "allocation_category_id" => 1, "allocation_type" => "expense" }]
       @two_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id,
                       "bank_account_id"=>1, "allocation_category_id" => 1, "allocation_type" => "expense" },
                     {"id"=>"", "name"=>"Groceries", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"",
@@ -62,5 +65,9 @@ RSpec.describe Allocation, :type => :model do
       expect(allocations[0].name).to eq "Rent"
     end
 
+    it "updates the standing order of the first allocation" do
+      allocations = Allocation.update_from_params(@params_with_standing_order)
+      expect(allocations[0].is_standing_order?).to eq true
+    end
   end
 end
