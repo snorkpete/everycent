@@ -6,17 +6,26 @@
             <thead>
                 <tr class="heading">
                     <th>Name</th>
-                    <th>Bank Account</th>
                     <th class="text-right">Amount</th>
+                    <th>Bank Account</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="income in vm.budget.incomes" ng-class="{ danger: income.deleted }">
+                    <!-- name -->
                     <td>
                         <input type="text" ng-show="vm.isEditMode" ng-model="income.name" />
                         <span ng-hide="vm.isEditMode" ng-bind="income.name"></span>
                     </td>
+
+                    <!-- amount -->
+                    <td class="text-right">
+                        <input type="number" ng-show="vm.isEditMode" ng-model="income.amount" ec-as-dollars />
+                        <span ng-hide="vm.isEditMode" ng-bind="income.amount | ecToDollars"></span>
+                    </td>
+
+                    <!-- bank account -->
                     <td>
                         <select ng-show="vm.isEditMode"
                                 ng-model="income.bank_account"
@@ -25,10 +34,8 @@
                         </select>
                         <span ng-hide="vm.isEditMode" ng-bind="income.bank_account.name"></span>
                     </td>
-                    <td class="text-right">
-                        <input type="number" ng-show="vm.isEditMode" ng-model="income.amount" ec-as-dollars />
-                        <span ng-hide="vm.isEditMode" ng-bind="income.amount | ecToDollars"></span>
-                    </td>
+
+                    <!-- actions -->
                     <td>
                         <span ng-hide="income.deleted"
                               ng-click="vm.markForDeletion(income, true)"
