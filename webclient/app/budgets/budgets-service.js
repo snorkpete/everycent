@@ -5,14 +5,15 @@
     .module('everycent.budgets')
     .factory('BudgetsService', BudgetsService);
 
-    BudgetsService.$inject = ['$http', 'Restangular'];
-    function BudgetsService($http, Restangular){
+    BudgetsService.$inject = ['$http', 'Restangular', 'filterFilter'];
+    function BudgetsService($http, Restangular, filterFilter){
       var service = {
         getBudgets: getBudgets,
         getBudget: getBudget,
         addBudget: addBudget,
         addNewIncome: addNewIncome,
         addNewAllocation: addNewAllocation,
+        groupAllocationsByCategory: groupAllocationsByCategory,
         save: save
       };
 
@@ -51,7 +52,16 @@
           bank_account_id: ''
         };
         budget.allocations.push(newAllocation);
+        return newAllocation;
       }
+
+      function groupAllocationsByCategory(allocations, allocationCategories){
+        allocationCategories.forEach(function(category){
+          category.allocations = filterFilter(allocations, { allocation_category_id: category.id });
+        });
+        return allocationCategories;
+      }
+
       function save(budget){
         return budget.save();
       }

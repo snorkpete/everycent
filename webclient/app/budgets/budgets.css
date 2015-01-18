@@ -1,0 +1,20 @@
+.category-heading{
+  font-size: 1.2em;
+  font-weight: bold;
+  border-top: 2px solid blue;
+}
+
+table.table>tbody>tr.category-heading>td{
+  padding-top: 25px;
+}
+
+.category-detail{
+}
+
+.category-summary{
+  font-weight: bold;
+}
+
+.category-action{
+  border-bottom: 2px solid blue;
+}

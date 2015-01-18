@@ -5,65 +5,41 @@
             <thead>
                 <tr class="heading">
                     <th>Name</th>
-                    <th>Category</th>
-                    <th>Amount</th>
-                    <th>Standing Order?</th>
+                    <th ng-show="">Category</th>
+                    <th class="text-right">Amount</th>
+                    <th class="text-right">Standing Order?</th>
                     <th>Bank Account</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr ng-repeat="allocation in vm.budget.allocations" ng-class="{ danger: allocation.deleted }">
-                    <td>
-                        <input type="text" ng-show="vm.isEditMode" ng-model="allocation.name" />
-                        <span ng-hide="vm.isEditMode" ng-bind="allocation.name"></span>
-                    </td>
-                    <td>
-                        <select ng-show="vm.isEditMode"
-                                ng-model="allocation.allocation_category"
-                                ng-change="vm.ref.updateReferenceId(allocation, 'allocation_category')"
-                                ng-options="category.name for category in vm.allocationCategories track by category.id">
-                        </select>
-                        <span ng-hide="vm.isEditMode" ng-bind="allocation.allocation_category.name"></span>
-                    </td>
-                    <td>
-                        <input type="number" ng-show="vm.isEditMode" ng-model="allocation.amount" ec-as-dollars />
-                        <span ng-hide="vm.isEditMode" ng-bind="allocation.amount | ecToDollars "></span>
-                    </td>
-                    <td>
-                        <input type="checkbox" ng-show="vm.isEditMode" ng-model="allocation.is_standing_order" />
-                        <span ng-hide="vm.isEditMode" ng-bind="allocation.is_standing_order ? 'Yes' : 'No'"></span>
-                    </td>
-                    <td>
-                        <span ng-show="allocation.is_standing_order">
-                            <select ng-show="vm.isEditMode"
-                                    ng-model="allocation.bank_account"
-                                    ng-change="vm.ref.updateReferenceId(allocation, 'bank_account')"
-                                    ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
-                            </select>
-                            <span ng-hide="vm.isEditMode" ng-bind="allocation.bank_account.name"></span>
-                        </span>
-                    </td>
-                    <td>
-                        <span ng-hide="allocation.deleted"
-                              ng-click="vm.markForDeletion(allocation, true)"
-                              class="text-danger pull-right pointer">
-                            <ec-icon type="trash"></ec-icon>
-                        </span>
-                        <span ng-show="allocation.deleted"
-                              ng-click="vm.markForDeletion(allocation, false)"
-                              class="text-success pull-right pointer">
-                            <ec-icon type="refresh"></ec-icon>
-                        </span>
-                    </td>
-
-                </tr>
-            </tbody>
+                <tbody>
+                    <tr class="category-heading" ng-repeat-start="category in vm.groupedAllocationCategories">
+                        <td>{{ category.name }}</td>
+                        <td ng-show=""></td>
+                        <td class="text-right">{{ vm.util.total(category.allocations, 'amount') | ecToDollars }}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="category-detail" ec-allocation-list-row
+                        ng-repeat="allocation in category.allocations"
+                        allocation="allocation"
+                        is-edit-mode="vm.isEditMode">
+                    </tr>
+                    <tr class="category-action" ng-repeat-end>
+                        <td colspan="6" ng-show="vm.isEditMode">
+                            <button class="btn btn-default" ng-click="vm.addNewAllocationInCategory(category)">
+                                Add {{category.name}} Allocation
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
             <tfoot>
                 <tr class="total">
                     <th>Total</th>
+                    <th ng-show=""></th>
+                    <th class="text-right">{{ vm.util.total(vm.budget.allocations, 'amount') | ecToDollars }}</th>
                     <th></th>
-                    <th>{{ vm.util.total(vm.budget.allocations, 'amount') | ecToDollars }}</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -75,12 +51,6 @@
                     <button class="btn btn-primary"
                             ng-click="vm.switchToEditMode()">
                         Make Changes
-                    </button>
-                </div>
-                <div class="col-xs-3" ng-show="vm.isEditMode">
-                    <button class="btn btn-primary"
-                            ng-click="vm.addNewAllocation()">
-                        Add Allocation
                     </button>
                 </div>
                 <div class="col-xs-9">

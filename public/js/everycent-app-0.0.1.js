@@ -445,14 +445,15 @@
     .module('everycent.budgets')
     .factory('BudgetsService', BudgetsService);
 
-    BudgetsService.$inject = ['$http', 'Restangular'];
-    function BudgetsService($http, Restangular){
+    BudgetsService.$inject = ['$http', 'Restangular', 'filterFilter'];
+    function BudgetsService($http, Restangular, filterFilter){
       var service = {
         getBudgets: getBudgets,
         getBudget: getBudget,
         addBudget: addBudget,
         addNewIncome: addNewIncome,
         addNewAllocation: addNewAllocation,
+        groupAllocationsByCategory: groupAllocationsByCategory,
         save: save
       };
 
@@ -491,7 +492,16 @@
           bank_account_id: ''
         };
         budget.allocations.push(newAllocation);
+        return newAllocation;
       }
+
+      function groupAllocationsByCategory(allocations, allocationCategories){
+        allocationCategories.forEach(function(category){
+          category.allocations = filterFilter(allocations, { allocation_category_id: category.id });
+        });
+        return allocationCategories;
+      }
+
       function save(budget){
         return budget.save();
       }
@@ -530,6 +540,7 @@
     vm.util = UtilService;
 
     vm.addNewAllocation = addNewAllocation;
+    vm.addNewAllocationInCategory = addNewAllocationInCategory;
     vm.markForDeletion = markForDeletion;
     vm.switchToEditMode = switchToEditMode;
     vm.switchToViewMode = switchToViewMode;
@@ -544,11 +555,19 @@
 
       LookupService.refreshList('allocation_categories').then(function(allocationCategories){
         vm.allocationCategories = allocationCategories;
+        vm.groupedAllocationCategories = BudgetsService.groupAllocationsByCategory(vm.budget.allocations, vm.allocationCategories);
       });
     }
 
     function addNewAllocation(){
       BudgetsService.addNewAllocation(vm.budget);
+    }
+
+    function addNewAllocationInCategory(category){
+      var newAllocation = BudgetsService.addNewAllocation(vm.budget);
+      //newAllocation.allocation_category = category;
+      newAllocation.allocation_category_id = category.id;
+      category.allocations.push(newAllocation);
     }
 
     function markForDeletion(allocation, isDeleted){
@@ -569,6 +588,55 @@
       vm.isEditMode = false;
     }
 
+  }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.budgets')
+    .directive('ecAllocationListRow', ecAllocationListRow);
+
+  function ecAllocationListRow(){
+    var directive = {
+      restrict:'AE',
+      replace: true,
+      templateUrl: 'app/budgets/ec-allocation-list-row-directive.html',
+      scope: {
+        allocation: '=',
+        isEditMode: '='
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    };
+
+    return directive;
+  }
+
+  controller.$inject = ['LookupService', 'ReferenceService'];
+  function controller(LookupService, ReferenceService){
+    var vm = this;
+
+    vm.ref = ReferenceService;
+    vm.markForDeletion = markForDeletion;
+
+    activate();
+
+    function activate(){
+      LookupService.refreshList('bank_accounts').then(function(bankAccounts){
+        vm.bankAccounts = bankAccounts;
+      });
+
+      LookupService.refreshList('allocation_categories').then(function(allocationCategories){
+        vm.allocationCategories = allocationCategories;
+      });
+    }
+
+    function markForDeletion(allocation, isDeleted){
+      allocation.deleted = isDeleted;
+    }
   }
 })();
 

@@ -1,0 +1,56 @@
+<tr ng-class="{ danger: vm.allocation.deleted }">
+    <!-- name -->
+    <td>
+        <input type="text" ng-show="vm.isEditMode" ng-model="vm.allocation.name" />
+        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.name"></span>
+    </td>
+
+    <!-- category -->
+    <td ng-show="">
+        <select ng-show="vm.isEditMode"
+                ng-model="vm.allocation.allocation_category"
+                ng-change="vm.ref.updateReferenceId(vm.allocation, 'allocation_category')"
+                ng-options="category.name for category in vm.allocationCategories track by category.id">
+        </select>
+        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.allocation_category.name"></span>
+    </td>
+
+    <!-- amount -->
+    <td class="text-right">
+        <input type="number" ng-show="vm.isEditMode" ng-model="vm.allocation.amount" ec-as-dollars />
+        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.amount | ecToDollars "></span>
+    </td>
+
+    <!-- standing order -->
+    <td class="text-right">
+        <input type="checkbox" ng-show="vm.isEditMode" ng-model="vm.allocation.is_standing_order" />
+        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.is_standing_order ? 'Yes' : 'No'"></span>
+    </td>
+
+    <!-- bank account -->
+    <td>
+        <span ng-show="vm.allocation.is_standing_order">
+            <select ng-show="vm.isEditMode"
+                    ng-model="vm.allocation.bank_account"
+                    ng-change="vm.ref.updateReferenceId(vm.allocation, 'bank_account')"
+                    ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
+            </select>
+            <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.bank_account.name"></span>
+        </span>
+    </td>
+
+    <!-- actions -->
+    <td>
+        <span ng-hide="vm.allocation.deleted"
+              ng-click="vm.markForDeletion(vm.allocation, true)"
+              class="text-danger pull-right pointer">
+            <ec-icon type="trash"></ec-icon>
+        </span>
+        <span ng-show="vm.allocation.deleted"
+              ng-click="vm.markForDeletion(vm.allocation, false)"
+              class="text-success pull-right pointer">
+            <ec-icon type="refresh"></ec-icon>
+        </span>
+    </td>
+
+</tr>

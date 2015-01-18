@@ -29,6 +29,7 @@
     vm.util = UtilService;
 
     vm.addNewAllocation = addNewAllocation;
+    vm.addNewAllocationInCategory = addNewAllocationInCategory;
     vm.markForDeletion = markForDeletion;
     vm.switchToEditMode = switchToEditMode;
     vm.switchToViewMode = switchToViewMode;
@@ -43,11 +44,19 @@
 
       LookupService.refreshList('allocation_categories').then(function(allocationCategories){
         vm.allocationCategories = allocationCategories;
+        vm.groupedAllocationCategories = BudgetsService.groupAllocationsByCategory(vm.budget.allocations, vm.allocationCategories);
       });
     }
 
     function addNewAllocation(){
       BudgetsService.addNewAllocation(vm.budget);
+    }
+
+    function addNewAllocationInCategory(category){
+      var newAllocation = BudgetsService.addNewAllocation(vm.budget);
+      //newAllocation.allocation_category = category;
+      newAllocation.allocation_category_id = category.id;
+      category.allocations.push(newAllocation);
     }
 
     function markForDeletion(allocation, isDeleted){
