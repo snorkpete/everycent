@@ -18,11 +18,11 @@
                         <td ng-show=""></td>
                         <td class="text-right">{{ vm.actualTotalForCategory(category) | ecToDollars }}</td>
                         <td class="text-right">
-                            <span class="label label-success">
+                            <span class="label label-info">
                                 Recommended: {{ vm.recommendedTotalForCategory(category) | ecToDollars }}
                             </span>
                             <br/>
-                            <span class="label label-danger">
+                            <span class="label" ng-class="{ 'label-default': vm.unallocatedTotalForCategory(category) >= 0, 'label-danger': vm.unallocatedTotalForCategory(category) < 0 }">
                                 Unallocated: {{ vm.unallocatedTotalForCategory(category) | ecToDollars }}
                             </span>
                         </td>
@@ -36,7 +36,7 @@
                     </tr>
                     <tr class="category-action" ng-repeat-end>
                         <td colspan="6" ng-show="vm.isEditMode">
-                            <button class="btn btn-default" ng-click="vm.addNewAllocationInCategory(category)">
+                            <button class="btn btn-primary" ng-click="vm.addNewAllocationInCategory(category)">
                                 Add {{category.name}} Allocation
                             </button>
                         </td>
@@ -57,28 +57,30 @@
             <table class="table table-bordered rounded">
                 <tbody>
                   <tr>
-                      <td class="text-right">Total Discretionary Amount</td>
+                      <th class="text-right">Total Discretionary Amount</th>
                       <td class="text-right">{{ vm.totalDiscretionaryAmount() | ecToDollars }}</td>
                   </tr>
                   <tr>
-                      <td class="text-right"> Pat's Amount</td>
+                      <th class="text-right"> Pat's Amount</th>
                       <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
                   </tr>
                   <tr>
-                      <td class="text-right">Kion's Amount</td>
+                      <th class="text-right">Kion's Amount</th>
                       <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
                   </tr>
                 </tbody>
             </table>
 
             <div class="row">
-                <div class="col-xs-2" ng-hide="vm.isEditMode">
-                    <button class="btn btn-primary"
-                            ng-click="vm.switchToEditMode()">
-                        Make Changes
-                    </button>
+                <div class="col-xs-2">
+                    <span ng-hide="vm.isEditMode">
+                        <button class="btn btn-primary"
+                                ng-click="vm.switchToEditMode()">
+                            Make Changes
+                        </button>
+                    </span>
                 </div>
-                <div class="col-xs-9">
+                <div class="col-xs-10">
                     <div class="pull-right" ng-show="vm.isEditMode">
                         <button class="btn btn-success"
                                 ng-click="vm.switchToViewMode()">
