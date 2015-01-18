@@ -111,6 +111,11 @@ table.table>tbody>tr.category-heading>td{
 }
 
 .category-detail{
+
+}
+
+table.table>tbody>tr.category-detail td{
+  padding-left: 25px;
 }
 
 .category-summary{
