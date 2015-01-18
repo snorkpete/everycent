@@ -16,8 +16,16 @@
                     <tr class="category-heading" ng-repeat-start="category in vm.groupedAllocationCategories">
                         <td>{{ category.name }}</td>
                         <td ng-show=""></td>
-                        <td class="text-right">{{ vm.util.total(category.allocations, 'amount') | ecToDollars }}</td>
-                        <td></td>
+                        <td class="text-right">{{ vm.actualTotalForCategory(category) | ecToDollars }}</td>
+                        <td class="text-right">
+                            <span class="label label-success">
+                                Recommended: {{ vm.recommendedTotalForCategory(category) | ecToDollars }}
+                            </span>
+                            <br/>
+                            <span class="label label-danger">
+                                Unallocated: {{ vm.unallocatedTotalForCategory(category) | ecToDollars }}
+                            </span>
+                        </td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -44,6 +52,23 @@
                     <th></th>
                 </tr>
             </tfoot>
+            </table>
+            
+            <table class="table table-bordered rounded">
+                <tbody>
+                  <tr>
+                      <td class="text-right">Total Discretionary Amount</td>
+                      <td class="text-right">{{ vm.totalDiscretionaryAmount() | ecToDollars }}</td>
+                  </tr>
+                  <tr>
+                      <td class="text-right"> Pat's Amount</td>
+                      <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
+                  </tr>
+                  <tr>
+                      <td class="text-right">Kion's Amount</td>
+                      <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
+                  </tr>
+                </tbody>
             </table>
 
             <div class="row">

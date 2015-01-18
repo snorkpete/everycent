@@ -546,6 +546,12 @@
     vm.switchToViewMode = switchToViewMode;
     vm.cancelEdit = cancelEdit;
 
+    vm.actualTotalForCategory = actualTotalForCategory;
+    vm.recommendedTotalForCategory = recommendedTotalForCategory;
+    vm.unallocatedTotalForCategory = unallocatedTotalForCategory;
+
+    vm.totalDiscretionaryAmount = totalDiscretionaryAmount;
+
     activate();
 
     function activate(){
@@ -588,6 +594,22 @@
       vm.isEditMode = false;
     }
 
+    function actualTotalForCategory(category){
+      return vm.util.total(category.allocations, 'amount');
+    }
+
+    function recommendedTotalForCategory(category){
+      var totalIncome = vm.util.total(vm.budget.incomes, 'amount');
+      return totalIncome * (category.percentage / 100);
+    }
+
+    function unallocatedTotalForCategory(category){
+      return recommendedTotalForCategory(category) - actualTotalForCategory(category);
+    }
+
+    function totalDiscretionaryAmount(){
+      return vm.util.total(vm.budget.incomes, 'amount') - vm.util.total(vm.budget.allocations, 'amount');
+    }
   }
 })();
 
