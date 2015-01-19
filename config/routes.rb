@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :transactions, except: [:new, :edit]
+  resources :payees, except: [:new, :edit]
   resources :budgets, except: [:new, :edit]
 
   resources :recurring_allocations, except: [:new, :edit]
