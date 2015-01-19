@@ -1,4 +1,5 @@
 class RecurringIncomesController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_recurring_income, only: [:show, :edit, :update, :destroy]
 
   def index
