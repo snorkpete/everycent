@@ -235,6 +235,32 @@
 ;
 
 (function(){
+  angular
+    .module('everycent.transactions', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('transactions', {
+        url: '/transactions',
+        templateUrl: 'app/transactions/transaction-list.html',
+        controller: 'TransactionsCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
   'use strict';
 
   // Module definitions
@@ -254,7 +280,8 @@
     'everycent.setup.recurring-incomes',
     'everycent.setup.recurring-allocations',
     'everycent.setup.allocation-categories',
-    'everycent.budgets'
+    'everycent.budgets',
+    'everycent.transactions'
   ]);
 
   angular
@@ -1941,5 +1968,51 @@ var x = 200;
       function addRecurringIncome(recurringIncome){
         return baseAll.post(recurringIncome);
       }
+    }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.transactions')
+    .controller('TransactionsCtrl', TransactionsCtrl);
+
+  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'ModalService', 'FormService'];
+
+  function TransactionsCtrl(MessageService, TransactionsService, ModalService, FormService){
+    var vm = this;
+    activate();
+
+    function activate(){
+      //refreshTransactionList();
+    }
+
+    function refreshTransactionList(){
+      TransactionsService.getTransactions().then(function(transactions){
+        vm.transactions = transactions;
+      });
+    }
+  }
+})();
+
+;
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.transactions')
+    .factory('TransactionsService', TransactionsService);
+
+    TransactionsService.$inject = ['$http', 'Restangular', 'filterFilter'];
+    function TransactionsService($http, Restangular, filterFilter){
+      var service = {
+      };
+
+      var baseAll = Restangular.all('transactions');
+      return service;
+
     }
 })();

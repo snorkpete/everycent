@@ -19,7 +19,8 @@
     'everycent.setup.recurring-incomes',
     'everycent.setup.recurring-allocations',
     'everycent.setup.allocation-categories',
-    'everycent.budgets'
+    'everycent.budgets',
+    'everycent.transactions'
   ]);
 
   angular
