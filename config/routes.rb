@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
 
-  resources :transactions, except: [:new, :edit]
+  resources :transactions, except: [:new, :edit] do
+    collection do
+      put 'update_all'
+    end
+  end
   resources :payees, except: [:new, :edit]
   resources :budgets, except: [:new, :edit]
 
