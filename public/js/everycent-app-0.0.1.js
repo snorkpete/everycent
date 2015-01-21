@@ -766,6 +766,33 @@
 
   angular
     .module('everycent.common')
+    .directive('ecAsDate', ecAsDate);
+
+  ecAsDate.$inject = [];
+  function ecAsDate(){
+    var directive = {
+      restrict:'A',
+      require:'ngModel',
+      link: link
+    };
+    return directive;
+
+    function link(scope, element, attrs, ngModel){
+
+      ngModel.$formatters.push(function(modelValue){
+        return new Date(modelValue);
+      });
+    }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
     .directive('ecAsDollars', ecAsDollars);
 
   ecAsDollars.$inject = ['ecToDollarsFilter'];
@@ -1980,20 +2007,65 @@ var x = 200;
     .module('everycent.transactions')
     .controller('TransactionsCtrl', TransactionsCtrl);
 
-  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'ModalService', 'FormService'];
+  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'LookupService', 'ReferenceService'];
 
-  function TransactionsCtrl(MessageService, TransactionsService, ModalService, FormService){
+  function TransactionsCtrl(MessageService, TransactionsService, LookupService, ReferenceService){
     var vm = this;
+    vm.ref = ReferenceService;
+    vm.search = {};
+    vm.refreshTransactions = refreshTransactions;
+    vm.addTransaction = addTransaction;
+    vm.editTransaction = editTransaction;
+    vm.finishEdit = finishEdit;
+    vm.saveChanges = saveChanges;
+    vm.cancelEdit = cancelEdit;
+    vm.markForDeletion = markForDeletion;
+
     activate();
 
     function activate(){
-      //refreshTransactionList();
+      LookupService.refreshList('payees').then(function(payees){
+        vm.payees = payees;
+      });
+      refreshTransactions(vm.search);
     }
 
-    function refreshTransactionList(){
-      TransactionsService.getTransactions().then(function(transactions){
+    function addTransaction(){
+      //var newTransaction = TransactionsService.newTransaction();
+      vm.transactions.push({ isEditMode: true });
+    }
+
+    function editTransaction(transaction){
+      transaction.isEditMode = true;
+    }
+
+    function finishEdit(transaction){
+      transaction.isEditMode = false;
+    }
+
+    function markForDeletion(transaction, isDeleted){
+      transaction.deleted = isDeleted;
+    }
+
+    function refreshTransactions(searchOptions){
+      TransactionsService.getTransactions(searchOptions).then(function(transactions){
         vm.transactions = transactions;
+        vm.originalTransactions = transactions;
       });
+    }
+
+    function saveChanges(){
+      TransactionsService.save(vm.transactions, vm.search).then(function(){
+        refreshTransactions(vm.search);
+        MessageService.setMessage('Transaction changes saved.');
+
+      }).catch(function(){
+        MessageService.setErrorMessage('Changes NOT saved.');
+      });
+    }
+
+    function cancelEdit(){
+      vm.transactions = vm.originalTransactions;
     }
   }
 })();
@@ -2009,10 +2081,34 @@ var x = 200;
     TransactionsService.$inject = ['$http', 'Restangular', 'filterFilter'];
     function TransactionsService($http, Restangular, filterFilter){
       var service = {
+        getTransactions: getTransactions,
+        save: save
       };
 
       var baseAll = Restangular.all('transactions');
       return service;
+
+      function getTransactions(params){
+        return baseAll.getList(params);
+      }
+
+      function save(transactions, searchOptions){
+
+        // remove deleted transactions first
+        var undeletedTransactions = [];
+        transactions.forEach(function(transaction){
+          if(!transaction.deleted){
+            undeletedTransactions.push(transaction);
+          }
+        });
+
+        var params = {
+          budget_id: searchOptions.budget_id,
+          bank_account_id: searchOptions.bank_account_id,
+          transactions: undeletedTransactions
+        };
+        return baseAll.post(params);
+      }
 
     }
 })();

@@ -8,7 +8,7 @@
 <div class="row">
     <div class="col-xs-12">
         <form class="form-horizontal" novalidate name="vm.searchForm"
-            ng-submit="vm.refreshTransactions(vm.searchForm)">
+            ng-submit="vm.refreshTransactions(vm.search)">
             <ec-panel type="primary" title="Select Transactions to View">
 
                 <ec-form-field label="Bank Account" label-width="2"
@@ -56,22 +56,23 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="transaction in vm.transactions">
+            <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted }">
+
                 <!-- transaction date -->
                 <td>
-                    <input ng-show="transaction.isEditMode" type="date" ng-model="transaction.transaction_date" ></input>
+                    <input ng-show="transaction.isEditMode" type="date" ng-model="transaction.transaction_date" ec-as-date></input>
                     <span ng-hide="transaction.isEditMode" ng-bind="transaction.transaction_date"></span>
                 </td>
 
                 <!-- bank_ref -->
                 <td>
-                    <input ng-show="transaction.isEditMode" type="date" ng-model="transaction.bank_ref" ></input>
+                    <input ng-show="transaction.isEditMode" type="text" ng-model="transaction.bank_ref" ></input>
                     <span ng-hide="transaction.isEditMode" ng-bind="transaction.bank_ref"></span>
                 </td>
 
                 <!-- description -->
                 <td>
-                    <input ng-show="transaction.isEditMode" type="date" ng-model="transaction.description" ></input>
+                    <input ng-show="transaction.isEditMode" type="text" ng-model="transaction.description" ></input>
                     <span ng-hide="transaction.isEditMode" ng-bind="transaction.description"></span>
                 </td>
 
@@ -98,12 +99,34 @@
                 </td>
 
                 <td>
-                    <span ng-show="" ng-click="vm.editTransaction(transaction)"
+                    <span ng-hide="transaction.isEditMode" ng-click="vm.editTransaction(transaction)"
                           class="text-warning pull-right pointer">
                         <ec-icon type="edit"></ec-icon>
                         &nbsp;
                         Edit
                         &nbsp; &nbsp; &nbsp;
+                    </span>
+
+                    <span ng-show="transaction.isEditMode">
+
+                        <span ng-hide="vm.allocation.deleted"
+                              ng-click="vm.markForDeletion(transaction, true)"
+                              class="text-danger pull-right pointer">
+                            <ec-icon type="trash"></ec-icon>
+                        </span>
+                        <span ng-show="vm.allocation.deleted"
+                              ng-click="vm.markForDeletion(transaction, false)"
+                              class="text-success pull-right pointer">
+                            <ec-icon type="refresh"></ec-icon>
+                        </span>
+
+                        <span ng-click="vm.finishEdit(transaction)"
+                              class="text-warning pull-right pointer">
+                            <ec-icon type="thumbs-up"></ec-icon>
+                            &nbsp;
+                            Done
+                            &nbsp; &nbsp; &nbsp;
+                        </span>
                     </span>
                 </td>
 

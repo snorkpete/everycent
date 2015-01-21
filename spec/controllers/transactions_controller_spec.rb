@@ -28,21 +28,13 @@ RSpec.describe TransactionsController, :type => :controller do
     before :each do
       user = create(:user)
       auth_request(user)
-
-      create(:transaction, transaction_date: '2015-01-10')
-      create(:transaction, transaction_date: '2015-01-11')
-      create(:transaction, transaction_date: '2015-01-12')
-      create(:transaction, transaction_date: '2015-01-13')
     end
 
-    it 'excludes transactions before the start date' do
-      get :index, start_date: '2015-01-11', end_date: '2015-01-12'
-      expect(assigns(:transactions).size).to eq 2
-    end
-
-    it 'excludes transactions after the end date' do
-      get :index, start_date: '2015-01-10', end_date: '2015-01-12'
-      expect(assigns(:transactions).size).to eq 3
+    it 'gets its list of transactions from Transaction.for_budget_and_bank' do
+      #params are always strings
+      params = { budget_id: '4', bank_account_id: '10' }
+      expect(Transaction).to receive(:for_budget_and_bank).with('4', '10')
+      get :index, params
     end
   end
 
