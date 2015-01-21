@@ -33,7 +33,7 @@ RSpec.describe TransactionsController, :type => :controller do
     it 'gets its list of transactions from Transaction.for_budget_and_bank' do
       #params are always strings
       params = { budget_id: '4', bank_account_id: '10' }
-      expect(Transaction).to receive(:for_budget_and_bank).with('4', '10')
+      expect(Transaction).to receive(:for_budget_and_bank).with('4', '10').and_return(Transaction.none)
       get :index, params
     end
   end
