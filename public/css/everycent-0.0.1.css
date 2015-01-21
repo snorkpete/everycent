@@ -54,9 +54,9 @@ body{
 /* Global animations */
 .animate.ng-enter, .ng-move{
 	-webkit-animation: fadeInLeft .5s;
-	-moz-animation: fadeIn .5s;
-	-o-animation: fadeIn .5s;
-	animation: fadeIn 1.5s;
+	-moz-animation: fadeInLeft .5s;
+	-o-animation: fadeInLeft .5s;
+	animation: fadeInLeft .5s;
 }
 
 .animated.ng-leave{
@@ -65,6 +65,21 @@ body{
 	-o-animation: fadeOut .5s;
 	animation: fadeOut .5s;
 }
+
+.animate-down.ng-enter, .animate-down.ng-hide-remove{
+	-webkit-animation: fadeInDown .5s;
+	-moz-animation: fadeInDown .5s;
+	-o-animation: fadeInDown .5s;
+	animation: fadeInDown .5s;
+}
+
+.animate-down.ng-leave, .animate-down.ng-hide-add{
+	-webkit-animation: fadeOutUp .5s;
+	-moz-animation: fadeOutUp .5s;
+	-o-animation: fadeOutUp .5s;
+	animation: fadeOutUp .5s;
+}
+
 
 /* change color of loading bar */
 #loading-bar .bar {
@@ -100,6 +115,7 @@ footer nav ul li a {
   margin-right: 25px;
 }
 
+/* budgets.css */
 .category-heading{
   font-size: 1.2em;
   font-weight: bold;
@@ -130,4 +146,11 @@ table.table>tbody>tr.category-detail td{
 div.message-container{
   margin-top: 15px;
   font-weight: bold;
+}
+
+
+/* Transactions.css */
+.transaction-list{
+  max-height: 500px;
+  overflow-y: scroll;
 }

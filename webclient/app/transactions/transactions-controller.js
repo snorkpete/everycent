@@ -12,6 +12,7 @@
     var vm = this;
     vm.ref = ReferenceService;
     vm.search = {};
+    vm.transactions = [];
     vm.refreshTransactions = refreshTransactions;
     vm.addTransaction = addTransaction;
     vm.editTransaction = editTransaction;
@@ -49,7 +50,7 @@
     function refreshTransactions(searchOptions){
       TransactionsService.getTransactions(searchOptions).then(function(transactions){
         vm.transactions = transactions;
-        vm.originalTransactions = transactions;
+        vm.originalTransactions = angular.copy(transactions);
       });
     }
 
