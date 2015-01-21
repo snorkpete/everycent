@@ -766,6 +766,37 @@
 
   angular
     .module('everycent.common')
+    .factory('DateService', DateService);
+
+  function DateService(){
+    var service = {
+      convertFromBankDateFormat: convertFromBankDateFormat
+    };
+
+    return service;
+
+    function convertFromBankDateFormat(dateInBankDateFormat){
+      if(!dateInBankDateFormat || !dateInBankDateFormat.match){
+        return '';
+      }
+
+      var dateParts = dateInBankDateFormat.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if(dateParts.length != 4){
+        return '';
+      }
+
+      return '' + dateParts[3] + '/' + dateParts[1] + '/' + dateParts[2];
+    }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
     .directive('ecAsDate', ecAsDate);
 
   ecAsDate.$inject = [];
@@ -2039,7 +2070,8 @@ var x = 200;
     }
 
     function convertToTransactions(input){
-      vm.transactions = TransactionsService.convertToTransactions(input);
+      var newTransactions = TransactionsService.convertToTransactions(input);
+      vm.transactions = vm.transactions.concat(newTransactions);
     }
   }
 })();
@@ -2059,7 +2091,6 @@ var x = 200;
     var vm = this;
     vm.ref = ReferenceService;
     vm.search = {};
-    vm.transactions = [];
     vm.refreshTransactions = refreshTransactions;
     vm.addTransaction = addTransaction;
     vm.editTransaction = editTransaction;
@@ -2097,7 +2128,7 @@ var x = 200;
     function refreshTransactions(searchOptions){
       TransactionsService.getTransactions(searchOptions).then(function(transactions){
         vm.transactions = transactions;
-        vm.originalTransactions = angular.copy(transactions);
+        vm.originalTransactions = transactions;
       });
     }
 
@@ -2125,8 +2156,8 @@ var x = 200;
     .module('everycent.transactions')
     .factory('TransactionsService', TransactionsService);
 
-    TransactionsService.$inject = ['$http', 'Restangular', 'filterFilter'];
-    function TransactionsService($http, Restangular, filterFilter){
+    TransactionsService.$inject = ['$http', 'Restangular', 'DateService'];
+    function TransactionsService($http, Restangular, DateService){
       var service = {
         getTransactions: getTransactions,
         save: save,
@@ -2174,7 +2205,6 @@ var x = 200;
           transactionList.push(transaction);
         });
 
-        console.log(transactionList);
         return transactionList;
       }
 
@@ -2192,7 +2222,7 @@ var x = 200;
 
         // get the transaction date and bank ref from the front
         // ----------------------------------------------------
-        transaction.transaction_date = lineDataCopy.shift();
+        transaction.transaction_date = new Date(DateService.convertFromBankDateFormat(lineDataCopy.shift()));
         transaction.ref = lineDataCopy.shift();
 
         // get the balance, deposit amount and withdrawal amount from the end of the array

@@ -38,7 +38,8 @@
     }
 
     function convertToTransactions(input){
-      vm.transactions = TransactionsService.convertToTransactions(input);
+      var newTransactions = TransactionsService.convertToTransactions(input);
+      vm.transactions = vm.transactions.concat(newTransactions);
     }
   }
 })();

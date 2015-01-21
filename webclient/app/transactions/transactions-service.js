@@ -5,8 +5,8 @@
     .module('everycent.transactions')
     .factory('TransactionsService', TransactionsService);
 
-    TransactionsService.$inject = ['$http', 'Restangular', 'filterFilter'];
-    function TransactionsService($http, Restangular, filterFilter){
+    TransactionsService.$inject = ['$http', 'Restangular', 'DateService'];
+    function TransactionsService($http, Restangular, DateService){
       var service = {
         getTransactions: getTransactions,
         save: save,
@@ -54,7 +54,6 @@
           transactionList.push(transaction);
         });
 
-        console.log(transactionList);
         return transactionList;
       }
 
@@ -72,7 +71,7 @@
 
         // get the transaction date and bank ref from the front
         // ----------------------------------------------------
-        transaction.transaction_date = lineDataCopy.shift();
+        transaction.transaction_date = new Date(DateService.convertFromBankDateFormat(lineDataCopy.shift()));
         transaction.ref = lineDataCopy.shift();
 
         // get the balance, deposit amount and withdrawal amount from the end of the array

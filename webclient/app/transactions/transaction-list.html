@@ -64,7 +64,7 @@
                     <!-- transaction date -->
                     <td>
                         <input ng-show="transaction.isEditMode" type="date" ng-model="transaction.transaction_date" ec-as-date></input>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.transaction_date"></span>
+                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.transaction_date | date:'fullDate'"></span>
                     </td>
 
                     <!-- bank_ref -->
