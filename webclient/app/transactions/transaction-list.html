@@ -52,9 +52,10 @@
                     <th style="width:20%;">Date</th>
                     <th style="width: 5%;">Ref#</th>
                     <th style="width:25%;">Description</th>
-                    <th style="width:20%;">Payee</th>
-                    <th style="width:10%;">Withdrawn</th>
-                    <th style="width:10%;">Deposited</th>
+                    <th style="width:15%;">Payee</th>
+                    <th style="width:15%;">Allocation</th>
+                    <th style="width:5%;">Withdrawn</th>
+                    <th style="width:5%;">Deposited</th>
                     <th style="width:10%;"></th>
                 </tr>
             </thead>
@@ -69,9 +70,10 @@
                     <th style="width:20%;"></th>
                     <th style="width: 5%;"></th>
                     <th style="width:25%;"></th>
-                    <th style="width:20%;"></th>
-                    <th style="width:10%;"></th>
-                    <th style="width:10%;"></th>
+                    <th style="width:15%;"></th>
+                    <th style="width:15%;"></th>
+                    <th style="width:5%;"></th>
+                    <th style="width:5%;"></th>
                     <th style="width:10%;"></th>
                 </tr>
             </thead>
@@ -104,6 +106,16 @@
                                 ng-options="payee.name for payee in vm.payees track by payee.id">
                         </select>
                         <span ng-hide="transaction.isEditMode" ng-bind="transaction.payee.name"></span>
+                    </td>
+
+                    <!-- allocation -->
+                    <td>
+                        <select ng-show="transaction.isEditMode"
+                                ng-model="transaction.allocation_id"
+                                ng-change="vm.ref.updateReferenceId(transaction, 'allocation')"
+                                ng-options="allocation.name group by allocation.allocation_category for allocation in vm.allocations track by allocation.id">
+                        </select>
+                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.allocation.name"></span>
                     </td>
 
                     <!-- withdrawal amount -->

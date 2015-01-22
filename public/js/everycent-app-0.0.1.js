@@ -2091,6 +2091,7 @@ var x = 200;
     var vm = this;
     vm.ref = ReferenceService;
     vm.search = {};
+    vm.search = { budget_id: 1, bank_account_id: 1};
     vm.refreshTransactions = refreshTransactions;
     vm.addTransaction = addTransaction;
     vm.editTransaction = editTransaction;
@@ -2126,7 +2127,7 @@ var x = 200;
     }
 
     function refreshTransactions(searchOptions){
-      TransactionsService.getTransactions(searchOptions).then(function(transactions){
+      return TransactionsService.getTransactions(searchOptions).then(function(transactions){
         vm.transactions = transactions;
         vm.originalTransactions = transactions;
       });
