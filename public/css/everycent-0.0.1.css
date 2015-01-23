@@ -13,6 +13,14 @@ div.container h2{
   color: rgb(198, 21, 76);
 }
 
+table.fixed-layout{
+  table-layout: fixed;
+}
+
+table.fixed-layout td input,
+table.fixed-layout td select{
+  width: 100%;
+}
 
 .panel-heading{
   font-weight: bold;
