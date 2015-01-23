@@ -29,15 +29,6 @@
       }
 
       function save(transactions, searchOptions){
-
-        // remove deleted transactions first
-        //var undeletedTransactions = [];
-        //transactions.forEach(function(transaction){
-        //  if(!transaction.deleted){
-        //    undeletedTransactions.push(transaction);
-        //  }
-        //});
-
         var undeletedTransactions = transactions.filter(function(transaction){
           return !transaction.deleted;
         });

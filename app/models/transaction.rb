@@ -38,7 +38,10 @@ class Transaction < ActiveRecord::Base
     # re-add the transactions that are being sent
     params[:transactions].each do |transaction_params|
       transaction_params[:bank_account_id] = params[:bank_account_id]
-      Transaction.create(transaction_params.except(:id))
+      Transaction.create(transaction_params.except(:id, :payeeName, :payeeCode))
+
+
+      Payee.update_from_params(transaction_params.slice(:payeeName, :payeeCode, :allocation_id))
     end
 
     #send back the fixed list of transactions

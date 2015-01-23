@@ -84,12 +84,11 @@
 
                     <!-- payee -->
                     <td>
-                        <select ng-show="vm.isEditMode"
-                                ng-model="transaction.payee"
-                                ng-change="vm.ref.updateReferenceId(transaction, 'payee')"
-                                ng-options="payee.name for payee in vm.payees track by payee.id">
-                        </select>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.payee.name"></span>
+                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.payeeName" ></input>
+                        <span ng-hide="vm.isEditMode">
+                           <span ng-show="transaction.payeeName"
+                                 ng-bind="transaction.payeeName + ' (' + transaction.payeeCode + ')'"></span>
+                        </span>
                     </td>
 
                     <!-- allocation -->

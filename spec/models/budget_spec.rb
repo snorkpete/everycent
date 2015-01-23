@@ -22,7 +22,6 @@ describe Budget, :type => :model do
     @budget = build(:budget, start_date: nil)
     expect(@budget).not_to be_valid
   end
-  
 
   describe 'on creation' do
     before :each do
@@ -34,10 +33,10 @@ describe Budget, :type => :model do
     end
 
     it 'determines its name from the start date' do
-      expect(@budget.name).to eq('Jan 01 - Jan 31, 2015') 
+      expect(@budget.name).to eq('Jan 01 - Jan 31, 2015')
 
       new_budget = create(:budget, start_date: '2015-01-23')
-      expect(new_budget.name).to eq('Jan 23 - Feb 22, 2015') 
+      expect(new_budget.name).to eq('Jan 23 - Feb 22, 2015')
     end
 
     describe "incomes" do
@@ -85,7 +84,7 @@ describe Budget, :type => :model do
       kion_income = create(:recurring_income, name: "Kion's Salary", amount: 15_000_00)
       pat_income = create(:recurring_income, name: "Pat's Salary", amount: 20_000_00)
       aidan_income = create(:recurring_income, name: "Dad's Donation", amount: 400_00)
-      
+
       rent = create(:recurring_allocation, name: "Rent", amount: 2_200_00)
       food = create(:recurring_allocation, name: "Food", amount: 2_000_00)
       savings = create(:recurring_allocation, name: "Savings", amount: 1_400_00)
@@ -100,15 +99,12 @@ describe Budget, :type => :model do
       it '#in_balance? is false' do
         expect(@budget).not_to be_in_balance
       end
-
-      it 'knows how much it is under allocated by' 
     end
 
     context "when in balance" do
       it '#in_balance? is true' do
         @budget = create(:budget, start_date: '2015-01-23')
       end
-      it 'knows how much it is over or under allocated by'
     end
   end
 end
