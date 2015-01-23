@@ -13,8 +13,8 @@
     };
     return service;
 
-    function refreshList(list){
-      return Restangular.all(list).getList();
+    function refreshList(list, params){
+      return Restangular.all(list).getList(params);
     }
   }
 })();
