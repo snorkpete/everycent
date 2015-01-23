@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150119185023) do
+ActiveRecord::Schema.define(version: 20150123181857) do
 
   create_table "allocation_categories", force: true do |t|
     t.string   "name"
@@ -69,7 +69,7 @@ ActiveRecord::Schema.define(version: 20150119185023) do
 
   create_table "payees", force: true do |t|
     t.string   "name"
-    t.string   "bank_ref"
+    t.string   "code"
     t.string   "default_allocation_name"
     t.string   "status"
     t.datetime "created_at",              null: false
