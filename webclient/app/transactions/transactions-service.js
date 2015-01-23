@@ -8,6 +8,7 @@
     TransactionsService.$inject = ['$http', 'Restangular', 'DateService'];
     function TransactionsService($http, Restangular, DateService){
       var service = {
+        newTransaction: newTransaction,
         getTransactions: getTransactions,
         save: save,
         convertToTransactions: convertToTransactions
@@ -15,6 +16,13 @@
 
       var baseAll = Restangular.all('transactions');
       return service;
+
+      function newTransaction(){
+        return {
+          withdrawal_amount: 0,
+          deposit_amount: 0
+        };
+      }
 
       function getTransactions(params){
         return baseAll.getList(params);

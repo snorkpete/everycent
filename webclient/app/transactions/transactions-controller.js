@@ -14,9 +14,9 @@
     vm.search = {};
     vm.search = { budget_id: 1, bank_account_id: 1};
     vm.refreshTransactions = refreshTransactions;
+    vm.refreshAllocations = refreshAllocations;
+    vm.switchToEditMode = switchToEditMode;
     vm.addTransaction = addTransaction;
-    vm.editTransaction = editTransaction;
-    vm.finishEdit = finishEdit;
     vm.saveChanges = saveChanges;
     vm.cancelEdit = cancelEdit;
     vm.markForDeletion = markForDeletion;
@@ -24,23 +24,22 @@
     activate();
 
     function activate(){
-      LookupService.refreshList('payees').then(function(payees){
-        vm.payees = payees;
-      });
       refreshTransactions(vm.search);
     }
 
+    function refreshAllocations(){
+      return LookupService.refreshList('allocations', {budget_id: vm.search.budget_id}).then(function(allocations){
+        vm.allocations = allocations;
+      });
+    }
+
+    function switchToEditMode(){
+      vm.isEditMode = true;
+    }
+
     function addTransaction(){
-      //var newTransaction = TransactionsService.newTransaction();
-      vm.transactions.push({ isEditMode: true });
-    }
-
-    function editTransaction(transaction){
-      transaction.isEditMode = true;
-    }
-
-    function finishEdit(transaction){
-      transaction.isEditMode = false;
+      newTransaction = TransactionsService.newTransaction();
+      vm.transactions.push(newTransaction);
     }
 
     function markForDeletion(transaction, isDeleted){
@@ -48,6 +47,7 @@
     }
 
     function refreshTransactions(searchOptions){
+      refreshAllocations();
       return TransactionsService.getTransactions(searchOptions).then(function(transactions){
         vm.transactions = transactions;
         vm.originalTransactions = transactions;
@@ -56,16 +56,20 @@
 
     function saveChanges(){
       TransactionsService.save(vm.transactions, vm.search).then(function(){
-        refreshTransactions(vm.search);
+        return refreshTransactions(vm.search);
+      })
+      .then(function(){
         MessageService.setMessage('Transaction changes saved.');
-
-      }).catch(function(){
+        vm.isEditMode = false;
+      })
+      .catch(function(){
         MessageService.setErrorMessage('Changes NOT saved.');
       });
     }
 
     function cancelEdit(){
       vm.transactions = vm.originalTransactions;
+      vm.isEditMode = false;
     }
   }
 })();

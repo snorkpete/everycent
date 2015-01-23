@@ -21,6 +21,7 @@
         // Accept the ngModel attribute and bind it to scope.model
         // then, we can use ng model in the input element in the directive template
         model:'=ngModel',
+        change:'&ngChange',
         error:'=',
         name:'=fieldName'
       },

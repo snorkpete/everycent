@@ -27,6 +27,7 @@
                                field-width="6"
                                type="select"
                                list-of="budgets"
+                               ng-change="refreshAllocations()"
                                ng-required="true"
                                ng-model="vm.search.budget_id">
                 </ec-form-field>
@@ -46,17 +47,17 @@
 <div class="row">
     <div class="col-xs-12">
         <div style="max-height:400px; overflow-y:scroll;">
-            <table class="table table-bordered clear-background rounded">
+            <table class="table table-bordered clear-background rounded fixed-layout">
             <thead>
                 <tr class="heading">
-                    <th style="width:13%;">Date</th>
+                    <th style="width:15%;">Date</th>
                     <th style="width: 5%;">Ref#</th>
                     <th style="width:25%;">Description</th>
                     <th style="width:15%;">Payee</th>
                     <th style="width:15%;">Allocation</th>
                     <th style="width:10%;">Withdrawn</th>
                     <th style="width:10%;">Deposited</th>
-                    <th style="width: 7%;"></th>
+                    <th style="width: 5%;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -64,83 +65,70 @@
 
                     <!-- transaction date -->
                     <td>
-                        <input ng-show="transaction.isEditMode" type="date" ng-model="transaction.transaction_date" ec-as-date></input>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.transaction_date | date:'fullDate'"></span>
+                        <input ng-show="vm.isEditMode" type="date" ng-model="transaction.transaction_date" ec-as-date></input>
+                        <span ng-hide="vm.isEditMode"
+                              ng-bind="transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
                     </td>
 
                     <!-- bank_ref -->
                     <td>
-                        <input ng-show="transaction.isEditMode" type="text" ng-model="transaction.bank_ref" ></input>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.bank_ref"></span>
+                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.bank_ref" ></input>
+                        <span ng-hide="vm.isEditMode" ng-bind="transaction.bank_ref"></span>
                     </td>
 
                     <!-- description -->
                     <td>
-                        <input ng-show="transaction.isEditMode" type="text" ng-model="transaction.description" ></input>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.description"></span>
+                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.description" ></input>
+                        <span ng-hide="vm.isEditMode" ng-bind="transaction.description"></span>
                     </td>
 
                     <!-- payee -->
                     <td>
-                        <select ng-show="transaction.isEditMode"
-                                ng-model="transaction.payee_id"
+                        <select ng-show="vm.isEditMode"
+                                ng-model="transaction.payee"
                                 ng-change="vm.ref.updateReferenceId(transaction, 'payee')"
                                 ng-options="payee.name for payee in vm.payees track by payee.id">
                         </select>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.payee.name"></span>
+                        <span ng-hide="vm.isEditMode" ng-bind="transaction.payee.name"></span>
                     </td>
 
                     <!-- allocation -->
                     <td>
-                        <select ng-show="transaction.isEditMode"
-                                ng-model="transaction.allocation_id"
+                        <select ng-show="vm.isEditMode"
+                                ng-model="transaction.allocation"
                                 ng-change="vm.ref.updateReferenceId(transaction, 'allocation')"
-                                ng-options="allocation.name group by allocation.allocation_category for allocation in vm.allocations track by allocation.id">
+                                ng-options="allocation.name group by allocation.allocation_category.name for allocation in vm.allocations track by allocation.id">
                         </select>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.allocation.name"></span>
+                        <span ng-hide="vm.isEditMode" ng-bind="transaction.allocation.name"></span>
                     </td>
 
                     <!-- withdrawal amount -->
                     <td class="text-right">
-                        <input ng-show="transaction.isEditMode" type="number" ng-model="transaction.withdrawal_amount" ec-as-dollars></input>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.withdrawal_amount | ecToDollars"></span>
+                        <input ng-show="vm.isEditMode" type="number" ng-model="transaction.withdrawal_amount" ec-as-dollars></input>
+                        <span ng-hide="vm.isEditMode" ng-bind="transaction.withdrawal_amount | ecToDollars"></span>
                     </td>
 
                     <!-- deposit amount -->
                     <td class="text-right">
-                        <input ng-show="transaction.isEditMode" type="number" ng-model="transaction.deposit_amount" ec-as-dollars></input>
-                        <span ng-hide="transaction.isEditMode" ng-bind="transaction.deposit_amount | ecToDollars"></span>
+                        <input ng-show="vm.isEditMode" type="number" ng-model="transaction.deposit_amount" ec-as-dollars></input>
+                        <span ng-hide="vm.isEditMode" ng-bind="transaction.deposit_amount | ecToDollars"></span>
                     </td>
 
                     <td>
-                        <span ng-hide="transaction.isEditMode" ng-click="vm.editTransaction(transaction)"
-                              class="text-warning pull-right pointer">
-                            <ec-icon type="edit"></ec-icon>
-                            &nbsp;
-                            Edit
-                            &nbsp; &nbsp; &nbsp;
-                        </span>
-
-                        <span ng-show="transaction.isEditMode">
+                        <span ng-show="vm.isEditMode">
 
                             <span ng-hide="vm.allocation.deleted"
                                   ng-click="vm.markForDeletion(transaction, true)"
                                   class="text-danger pull-right pointer">
                                 <ec-icon type="trash"></ec-icon>
                             </span>
+
                             <span ng-show="vm.allocation.deleted"
                                   ng-click="vm.markForDeletion(transaction, false)"
                                   class="text-success pull-right pointer">
                                 <ec-icon type="refresh"></ec-icon>
                             </span>
 
-                            <span ng-click="vm.finishEdit(transaction)"
-                                  class="text-warning pull-right pointer">
-                                <ec-icon type="thumbs-up"></ec-icon>
-                                &nbsp;
-                                Done
-                                &nbsp; &nbsp; &nbsp;
-                            </span>
                         </span>
                     </td>
 
@@ -153,18 +141,21 @@
 
 <br/>
 <div class="row">
-    <div class="col-xs-1">
-        <button class="btn btn-primary"
+    <div class="col-xs-2">
+        <button ng-hide="vm.isEditMode"
+                class="btn btn-primary"
+                ng-click="vm.switchToEditMode()">
+            Make Changes
+        </button>
+
+        <button ng-show="vm.isEditMode"
+                class="btn btn-primary"
                 ng-click="vm.addTransaction()">
             Add Transaction
         </button>
     </div>
-</div>
-
-<br/>
-<div class="row">
-    <div class="col-xs-12">
-        <span class="pull-right">
+    <div class="col-xs-10">
+        <span ng-show="vm.isEditMode" class="pull-right">
             <button class="btn btn-success"
                     ng-click="vm.saveChanges()">
                 Save Changes

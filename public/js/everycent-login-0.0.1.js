@@ -117,6 +117,7 @@
         // Accept the ngModel attribute and bind it to scope.model
         // then, we can use ng model in the input element in the directive template
         model:'=ngModel',
+        change:'&ngChange',
         error:'=',
         name:'=fieldName'
       },
@@ -311,8 +312,8 @@
     };
     return service;
 
-    function refreshList(list){
-      return Restangular.all(list).getList();
+    function refreshList(list, params){
+      return Restangular.all(list).getList(params);
     }
   }
 })();
@@ -325,9 +326,9 @@ var x = 200;
     .module('everycent.common')
     .factory('MessageService', MessageService);
 
-  MessageService.$inject = [];
+  MessageService.$inject = ['toastr'];
 
-  function MessageService(){
+  function MessageService(toastr){
     var data = {};
     var service = {
       getMessageData: getMessageData,
@@ -346,16 +347,19 @@ var x = 200;
     function setMessage(message){
       clearMessage();
       data.message = message;
+      toastr.success(message);
     }
 
     function setErrorMessage(message){
       clearMessage();
       data.errorMessage = message;
+      toastr.error(message);
     }
 
     function setWarningMessage(message){
       clearMessage();
       data.warningMessage = message;
+      toastr.warning(message);
     }
 
     function clearMessage(){

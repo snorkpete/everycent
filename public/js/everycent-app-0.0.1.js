@@ -271,6 +271,7 @@
     'ngAnimate',
     'ng-token-auth',
     'restangular',
+    'toastr',
     'angular-loading-bar',
     'everycent.common',
     'everycent.menu',
@@ -873,6 +874,7 @@
         // Accept the ngModel attribute and bind it to scope.model
         // then, we can use ng model in the input element in the directive template
         model:'=ngModel',
+        change:'&ngChange',
         error:'=',
         name:'=fieldName'
       },
@@ -1067,8 +1069,8 @@
     };
     return service;
 
-    function refreshList(list){
-      return Restangular.all(list).getList();
+    function refreshList(list, params){
+      return Restangular.all(list).getList(params);
     }
   }
 })();
@@ -1081,9 +1083,9 @@ var x = 200;
     .module('everycent.common')
     .factory('MessageService', MessageService);
 
-  MessageService.$inject = [];
+  MessageService.$inject = ['toastr'];
 
-  function MessageService(){
+  function MessageService(toastr){
     var data = {};
     var service = {
       getMessageData: getMessageData,
@@ -1102,16 +1104,19 @@ var x = 200;
     function setMessage(message){
       clearMessage();
       data.message = message;
+      toastr.success(message);
     }
 
     function setErrorMessage(message){
       clearMessage();
       data.errorMessage = message;
+      toastr.error(message);
     }
 
     function setWarningMessage(message){
       clearMessage();
       data.warningMessage = message;
+      toastr.warning(message);
     }
 
     function clearMessage(){
@@ -2093,9 +2098,9 @@ var x = 200;
     vm.search = {};
     vm.search = { budget_id: 1, bank_account_id: 1};
     vm.refreshTransactions = refreshTransactions;
+    vm.refreshAllocations = refreshAllocations;
+    vm.switchToEditMode = switchToEditMode;
     vm.addTransaction = addTransaction;
-    vm.editTransaction = editTransaction;
-    vm.finishEdit = finishEdit;
     vm.saveChanges = saveChanges;
     vm.cancelEdit = cancelEdit;
     vm.markForDeletion = markForDeletion;
@@ -2103,23 +2108,22 @@ var x = 200;
     activate();
 
     function activate(){
-      LookupService.refreshList('payees').then(function(payees){
-        vm.payees = payees;
-      });
       refreshTransactions(vm.search);
     }
 
+    function refreshAllocations(){
+      return LookupService.refreshList('allocations', {budget_id: vm.search.budget_id}).then(function(allocations){
+        vm.allocations = allocations;
+      });
+    }
+
+    function switchToEditMode(){
+      vm.isEditMode = true;
+    }
+
     function addTransaction(){
-      //var newTransaction = TransactionsService.newTransaction();
-      vm.transactions.push({ isEditMode: true });
-    }
-
-    function editTransaction(transaction){
-      transaction.isEditMode = true;
-    }
-
-    function finishEdit(transaction){
-      transaction.isEditMode = false;
+      newTransaction = TransactionsService.newTransaction();
+      vm.transactions.push(newTransaction);
     }
 
     function markForDeletion(transaction, isDeleted){
@@ -2127,6 +2131,7 @@ var x = 200;
     }
 
     function refreshTransactions(searchOptions){
+      refreshAllocations();
       return TransactionsService.getTransactions(searchOptions).then(function(transactions){
         vm.transactions = transactions;
         vm.originalTransactions = transactions;
@@ -2135,16 +2140,20 @@ var x = 200;
 
     function saveChanges(){
       TransactionsService.save(vm.transactions, vm.search).then(function(){
-        refreshTransactions(vm.search);
+        return refreshTransactions(vm.search);
+      })
+      .then(function(){
         MessageService.setMessage('Transaction changes saved.');
-
-      }).catch(function(){
+        vm.isEditMode = false;
+      })
+      .catch(function(){
         MessageService.setErrorMessage('Changes NOT saved.');
       });
     }
 
     function cancelEdit(){
       vm.transactions = vm.originalTransactions;
+      vm.isEditMode = false;
     }
   }
 })();
@@ -2160,6 +2169,7 @@ var x = 200;
     TransactionsService.$inject = ['$http', 'Restangular', 'DateService'];
     function TransactionsService($http, Restangular, DateService){
       var service = {
+        newTransaction: newTransaction,
         getTransactions: getTransactions,
         save: save,
         convertToTransactions: convertToTransactions
@@ -2167,6 +2177,13 @@ var x = 200;
 
       var baseAll = Restangular.all('transactions');
       return service;
+
+      function newTransaction(){
+        return {
+          withdrawal_amount: 0,
+          deposit_amount: 0
+        };
+      }
 
       function getTransactions(params){
         return baseAll.getList(params);
