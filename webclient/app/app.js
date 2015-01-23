@@ -10,6 +10,7 @@
     'ngAnimate',
     'ng-token-auth',
     'restangular',
+    'toastr',
     'angular-loading-bar',
     'everycent.common',
     'everycent.menu',

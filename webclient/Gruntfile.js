@@ -29,6 +29,7 @@ module.exports = function (grunt) {
             'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
             'bower_components/lodash/dist/lodash.min.js',
             'bower_components/restangular/dist/restangular.min.js',
+            'bower_components/angular-toastr/dist/angular-toastr.min.js',
             'bower_components/angular-loading-bar/build/loading-bar.min.js'
           ],
 
@@ -55,6 +56,7 @@ module.exports = function (grunt) {
             //'bower_components/angular-material/themes/teal-theme.css',
             'bower_components/bootstrap/dist/css/bootstrap.min.css',
             'bower_components/animate.css/animate.min.css',
+            'bower_components/angular-toastr/dist/angular-toastr.min.css',
             'bower_components/angular-loading-bar/build/loading-bar.min.css'
           ],
           '../public/css/<%= pkg.name %>-<%= pkg.version %>.css': [
