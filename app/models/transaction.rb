@@ -1,5 +1,8 @@
 class Transaction < ActiveRecord::Base
 
+  belongs_to :allocation
+  belongs_to :bank_account
+
   def self.for_budget_and_bank(budget_id, bank_account_id)
 
     # find the budget
