@@ -8,7 +8,7 @@
 #  budget_id              :integer
 #  allocation_category_id :integer
 #  allocation_type        :string
-#  is_standing_order      :integer
+#  is_standing_order      :boolean
 #  bank_account_id        :integer
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
