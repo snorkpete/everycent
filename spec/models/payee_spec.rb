@@ -14,5 +14,50 @@
 require 'rails_helper'
 
 RSpec.describe Payee, :type => :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe '.update_from_params' do
+    before :each do
+        @allocation = create(:allocation, name: 'Rent')
+        @params = { payeeName:'first payee', payeeCode:'100', allocation_id: @allocation.id }
+    end
+
+    context "when payeeCode doesn't exist" do
+      it "saves a new payee" do
+        Payee.update_from_params(@params)
+        expect(Payee.where(name: 'first payee').size).to eq 1
+      end
+
+      it "sets the default allocation name to the name of the allocation" do
+        payee = Payee.update_from_params(@params)
+        expect(payee.default_allocation_name).to eq 'Rent'
+
+      end
+    end
+
+    context "when payeeCode already exists" do
+      before :each do
+        @payee = create(:payee, code: '100')
+      end
+
+      it "does not create a new payee" do
+        payee = Payee.update_from_params(@params)
+        expect(Payee.count).to eq 1
+      end
+
+      it "updates the payee default allocation name with the name of the allocation" do
+
+        payee = Payee.update_from_params(@params)
+        payee.reload
+        expect(payee.default_allocation_name).to eq 'Rent'
+      end
+
+      it "does nothing if the allocation doesn't exist" do
+        invalid_params = { payeeName:'first payee', payeeCode:'300', allocation_id: 20 }
+        payee = create(:payee, default_allocation_name: 'Car expenses', code: '300')
+        payee = Payee.update_from_params(invalid_params)
+        payee.reload
+        expect(payee.default_allocation_name).to eq 'Car expenses'
+      end
+
+    end
+  end
 end

@@ -30,10 +30,10 @@ RSpec.describe Transaction, :type => :model do
         bank_account_id: @bank_account.id,
         transactions: [
           { id: 5, description: 'first', transaction_date: '2015-01-15',
-            withdrawal_amount: 500, deposit_amount:0, payee_id: 3, allocation_id: 5 },
+            withdrawal_amount: 500, deposit_amount:0, payeeName:'first payee', payeeCode:'100', allocation_id: 5 },
 
           { id: 5, description: 'second', transaction_date: '2015-01-09',
-            withdrawal_amount: 0, deposit_amount: 1000, payee_id: 3, allocation_id: 5 }
+            withdrawal_amount: 0, deposit_amount: 1000, payeeName:'second payee', payeeCode:'300', allocation_id: 5 }
         ]
       }
     end
@@ -61,6 +61,12 @@ RSpec.describe Transaction, :type => :model do
 
       expect(Transaction.all.size).to eq 4
       expect(transactions.size).to eq 2
+    end
+
+    it "calls the Payee#update_from_params method" do
+      expect(Payee).to receive(:update_from_params).with({ payeeName:'first payee', payeeCode:'100', allocation_id: 5}).once
+      expect(Payee).to receive(:update_from_params).with({ payeeName:'second payee', payeeCode:'300', allocation_id: 5}).once
+      transactions = Transaction.update_with_params(@params)
     end
   end
 

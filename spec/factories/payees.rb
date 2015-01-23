@@ -13,10 +13,10 @@
 
 FactoryGirl.define do
   factory :payee do
-    name "MyString"
-bank_ref "MyString"
-default_allocation_name "MyString"
-status "MyString"
+    name "Massy Stores"
+    code "100"
+    default_allocation_name "Groceries"
+    status "active"
   end
 
 end
