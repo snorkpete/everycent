@@ -2,12 +2,12 @@
 (function(){
   angular
     .module('everycent.transactions')
-    .directive('ecTransactionLoader', ecTransactionLoader);
+    .directive('ecTransactionImporter', ecTransactionImporter);
 
-  function ecTransactionLoader(){
+  function ecTransactionImporter(){
     var directive = {
       restrict:'E',
-      templateUrl: 'app/transactions/ec-transaction-loader-directive.html',
+      templateUrl: 'app/transactions/ec-transaction-importer-directive.html',
       controller: controller,
       controllerAs: 'vm',
       bindToController: true,
@@ -29,17 +29,19 @@
 
     function startImport(){
       vm.showForm = true;
+      vm.input = '';
       vm.originalTransactions = angular.copy(vm.transactions);
     }
 
     function cancelImport(){
       vm.showForm = false;
-      vm.transactions = vm.originalTransactions;
+      vm.input = '';
     }
 
     function convertToTransactions(input){
       var newTransactions = TransactionsService.convertToTransactions(input);
       vm.transactions = vm.transactions.concat(newTransactions);
+      vm.showForm = false;
     }
   }
 })();
