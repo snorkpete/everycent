@@ -2137,6 +2137,36 @@ var x = 200;
 ;
 
 (function(){
+  angular
+    .module('everycent.transactions')
+    .directive('ecTransactionSearchForm', ecTransactionSearchForm);
+
+  function ecTransactionSearchForm(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/transactions/ec-transaction-search-form-directive.html',
+      scope: {
+        search: '=searchOptions',
+        onSubmit: '&'
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    };
+
+    return directive;
+  }
+
+  controller.$inject = ['MessageService'];
+  function controller(MessageService){
+    var vm = this;
+
+  }
+})();
+
+;
+
+(function(){
   'use strict';
 
   angular
@@ -2161,7 +2191,7 @@ var x = 200;
     activate();
 
     function activate(){
-      refreshTransactions(vm.search);
+      refreshTransactions();
     }
 
     function refreshAllocations(){
@@ -2183,9 +2213,9 @@ var x = 200;
       transaction.deleted = isDeleted;
     }
 
-    function refreshTransactions(searchOptions){
+    function refreshTransactions(){
       refreshAllocations();
-      return TransactionsService.getTransactions(searchOptions).then(function(transactions){
+      return TransactionsService.getTransactions(vm.search).then(function(transactions){
         vm.transactions = transactions;
         vm.originalTransactions = transactions;
       });
@@ -2193,7 +2223,7 @@ var x = 200;
 
     function saveChanges(){
       TransactionsService.save(vm.transactions, vm.search).then(function(){
-        return refreshTransactions(vm.search);
+        return refreshTransactions();
       })
       .then(function(){
         MessageService.setMessage('Transaction changes saved.');

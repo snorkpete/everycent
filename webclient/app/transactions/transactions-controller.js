@@ -24,7 +24,7 @@
     activate();
 
     function activate(){
-      refreshTransactions(vm.search);
+      refreshTransactions();
     }
 
     function refreshAllocations(){
@@ -46,9 +46,9 @@
       transaction.deleted = isDeleted;
     }
 
-    function refreshTransactions(searchOptions){
+    function refreshTransactions(){
       refreshAllocations();
-      return TransactionsService.getTransactions(searchOptions).then(function(transactions){
+      return TransactionsService.getTransactions(vm.search).then(function(transactions){
         vm.transactions = transactions;
         vm.originalTransactions = transactions;
       });
@@ -56,7 +56,7 @@
 
     function saveChanges(){
       TransactionsService.save(vm.transactions, vm.search).then(function(){
-        return refreshTransactions(vm.search);
+        return refreshTransactions();
       })
       .then(function(){
         MessageService.setMessage('Transaction changes saved.');

@@ -1,0 +1,35 @@
+<form class="form-horizontal" novalidate name="vm.searchForm"
+    ng-submit="vm.onSubmit()">
+    <ec-panel type="primary" title="Select Transactions to View">
+
+        <div class="form-group">
+            <label class="col-xs-2 control-label">Bank Account</label>
+            <div class="col-xs-6">
+
+                <select ng-model="vm.search.bank_account"
+                        ng-change="vm.ref.updateReferenceId(vm.search.bank_account, 'bank_account')"
+                        ng-options="bank_account.name for bank_account in vm.bank_accounts track by bank_account.id"
+                        class="form-control">
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-2 control-label">Budget</label>
+            <div class="col-xs-6">
+
+                <select ng-model="vm.search.budget"
+                        ng-change="vm.ref.updateReferenceId(vm.search.budget, 'budget')"
+                        ng-options="budget.name for budget in vm.budget track by budget.id"
+                        class="form-control">
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-xs-offset-2 col-xs-2">
+              <button type="submit" class="btn btn-primary">Refresh</button>
+            </div>
+        </div>
+    </ec-panel>
+</form>

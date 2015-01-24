@@ -6,39 +6,15 @@
 </div>
 
 <div class="row">
-    <div class="col-xs-12">
-        <form class="form-horizontal" novalidate name="vm.searchForm"
-            ng-submit="vm.refreshTransactions(vm.search)">
-            <ec-panel type="primary" title="Select Transactions to View">
-
-                <ec-form-field label="Bank Account" label-width="2"
-                               name="bank_account_id"
-                               error="vm.searchForm.bank_account_id.$error"
-                               field-width="6"
-                               type="select"
-                               list-of="bank_accounts"
-                               ng-required="true"
-                               ng-model="vm.search.bank_account_id">
-                </ec-form-field>
-
-                <ec-form-field label="Budget" label-width="2"
-                               name="budget_id"
-                               error="vm.searchForm.budget_id.$error"
-                               field-width="6"
-                               type="select"
-                               list-of="budgets"
-                               ng-change="refreshAllocations()"
-                               ng-required="true"
-                               ng-model="vm.search.budget_id">
-                </ec-form-field>
-
-                <div class="form-group">
-                    <div class="col-xs-offset-2 col-xs-2">
-                      <button type="submit" class="btn btn-primary">Refresh</button>
-                    </div>
-                </div>
-            </ec-panel>
-        </form>
+    <div class="col-xs-6">
+        <ec-transaction-search-form search-options="vm.search"
+                                    on-submit="vm.refreshTransactions();">
+        </ec-transaction-search-form>
+    </div>
+    <div class="col-xs-6">
+        <ec-transaction-summary bank_account:"vm.search.bank_account"
+                                transactions="vm.transactions">
+        </ec-transaction-summary>
     </div>
 </div>
 
