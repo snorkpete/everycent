@@ -37,11 +37,39 @@
                     <th style="width:25%;">Description</th>
                     <th style="width:15%;">Payee</th>
                     <th style="width:15%;">Allocation</th>
-                    <th style="width:10%;">Withdrawn</th>
-                    <th style="width:10%;">Deposited</th>
+                    <th style="width:10%;" class="text-right">Withdrawn</th>
+                    <th style="width:10%;" class="text-right">Deposited</th>
                     <th style="width: 5%;"></th>
                 </tr>
             </thead>
+            <tfoot>
+                <tr class="total">
+                    <th></th>
+                    <th></th>
+                    <th>Total</th>
+                    <th></th>
+                    <th></th>
+                    <th class="text-right"> {{ vm.util.total(vm.transactions, 'withdrawal_amount') | ecToDollars }}</th>
+                    <th class="text-right"> {{ vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}</th>
+                    <th>
+                        <span ng-show="vm.isEditMode">
+
+                            <span ng-hide="vm.transactions.deleted"
+                                  ng-click="vm.markAllForDeletion(vm.transactions, true)"
+                                  class="text-danger pull-right pointer">
+                                <ec-icon type="trash"></ec-icon>
+                            </span>
+
+                            <span ng-show="vm.transactions.deleted"
+                                  ng-click="vm.markAllForDeletion(vm.transactions, false)"
+                                  class="text-success pull-right pointer">
+                                <ec-icon type="refresh"></ec-icon>
+                            </span>
+
+                        </span>
+                    </th>
+                </tr>
+            </tfoot>
             <tbody>
                 <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted }">
 
@@ -98,13 +126,13 @@
                     <td>
                         <span ng-show="vm.isEditMode">
 
-                            <span ng-hide="vm.allocation.deleted"
+                            <span ng-hide="transaction.deleted"
                                   ng-click="vm.markForDeletion(transaction, true)"
                                   class="text-danger pull-right pointer">
                                 <ec-icon type="trash"></ec-icon>
                             </span>
 
-                            <span ng-show="vm.allocation.deleted"
+                            <span ng-show="transaction.deleted"
                                   ng-click="vm.markForDeletion(transaction, false)"
                                   class="text-success pull-right pointer">
                                 <ec-icon type="refresh"></ec-icon>

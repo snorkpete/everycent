@@ -20,6 +20,7 @@
     vm.saveChanges = saveChanges;
     vm.cancelEdit = cancelEdit;
     vm.markForDeletion = markForDeletion;
+    vm.markAllForDeletion = markAllForDeletion;
 
     activate();
 
@@ -44,6 +45,13 @@
 
     function markForDeletion(transaction, isDeleted){
       transaction.deleted = isDeleted;
+    }
+
+    function markAllForDeletion(transactions, isDeleted){
+      transactions.forEach(function(transaction){
+        transaction.deleted = isDeleted;
+      });
+      transactions.deleted = isDeleted;
     }
 
     function refreshTransactions(){
