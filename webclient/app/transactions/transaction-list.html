@@ -18,7 +18,13 @@
     </div>
 </div>
 
-<ec-transaction-importer transactions="vm.transactions"></ec-transaction-importer>
+<div ng-show="vm.isEditMode">
+    <ec-transaction-importer transactions="vm.transactions"
+                             start-date="vm.search.budget.start_date"
+                             end-date="vm.search.budget.end_date"
+    >
+    </ec-transaction-importer>
+</div>
 
 <div class="row">
     <div class="col-xs-12">

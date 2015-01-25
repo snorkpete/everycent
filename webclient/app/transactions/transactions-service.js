@@ -41,7 +41,7 @@
         return baseAll.post(params);
       }
 
-      function convertToTransactions(input){
+      function convertToTransactions(input, startDate, endDate){
         var transactionList =[];
         var lines = _combineFieldsIntoLines(_convertInputToFieldList(input));
 
@@ -49,14 +49,14 @@
         lines.shift();
 
         lines.forEach(function(lineData){
-          var transaction = _createTransactionFromLineData(lineData);
+          var transaction = _createTransactionFromLineData(lineData, startDate, endDate);
           transactionList.push(transaction);
         });
 
         return transactionList;
       }
 
-      function _createTransactionFromLineData(lineData){
+      function _createTransactionFromLineData(lineData, startDate, endDate){
         //
         // line data is an array representing one transaction from the bank
         // That format is
@@ -101,6 +101,13 @@
           transaction.description = lineDataCopy.join(' ');
         }
 
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+
+        // confirm that the transaction date is within the period
+        if(transaction.transaction_date < start || transaction.transaction_date > end){
+          transaction.deleted = true;
+        }
         return transaction;
       }
 
