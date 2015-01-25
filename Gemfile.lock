@@ -51,6 +51,7 @@ GEM
     childprocess (0.5.5)
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.0)
+    daemon_controller (1.2.0)
     database_cleaner (1.3.0)
     devise (3.4.1)
       bcrypt (~> 3.0)
@@ -102,6 +103,7 @@ GEM
     hashie (3.3.2)
     hike (1.2.3)
     hitimes (1.2.2)
+    hitimes (1.2.2-x86-mingw32)
     i18n (0.7.0.beta1)
     json (1.8.1)
     launchy (2.4.3)
@@ -129,6 +131,12 @@ GEM
       hashie (>= 1.2, < 4)
       rack (~> 1.0)
     orm_adapter (0.5.0)
+    passenger (4.0.58)
+      daemon_controller (>= 1.2.0)
+      rack
+      rake (>= 0.8.1)
+    pg (0.18.1-x64-mingw32)
+    pg (0.18.1-x86-mingw32)
     pry (0.10.1-x64-mingw32)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -248,6 +256,8 @@ DEPENDENCIES
   guard-spork
   launchy
   omniauth
+  passenger
+  pg
   rails (= 4.2.0.rc3)
   rails-api
   responders (~> 2.0)
