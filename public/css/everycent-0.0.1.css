@@ -43,7 +43,16 @@ body{
 .total{
   border-top: 2px solid black;
   font-weight:bold;
-  font-size: 1.1em;
+  font-size: 1.2em;
+}
+
+.positive{
+  color: green;
+}
+
+.negative{
+  color: red;
+  font-weight: bold;
 }
 
 .clear-background{
@@ -52,6 +61,14 @@ body{
 
 .rounded{
   border-radius: 10px;
+}
+
+.bigger{
+  font-size: 1.1em;
+}
+
+.smaller{
+  font-size: 0.8em;
 }
 
 .pointer:hover{

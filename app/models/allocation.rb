@@ -20,6 +20,8 @@ class Allocation < ActiveRecord::Base
   belongs_to :allocation_category
   belongs_to :bank_account
 
+  has_many :transactions
+
   before_save :fix_name
   before_save :clear_bank_account_if_not_standing_order
 
@@ -53,6 +55,14 @@ class Allocation < ActiveRecord::Base
 
     allocation.update(param.except(:deleted))
     allocation
+  end
+
+  def spent
+    transactions.sum('withdrawal_amount - deposit_amount')
+  end
+
+  def remaining
+    amount - spent
   end
 
   protected
