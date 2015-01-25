@@ -9,7 +9,7 @@ gem 'rails-api'
 gem 'annotate', :group => :development
 
 
-gem 'sqlite3'
+gem 'sqlite3', :group => :development
 gem 'pg', :group => :production
 
 # fix for time
