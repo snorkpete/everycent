@@ -862,7 +862,7 @@
   function ecBindingCount(){
     var directive = {
       restrict:'E',
-      template: '<button class="btn btn-info" ng-click="vm.updateBindingCount()">{{ vm.total }} bindings.</button>',
+      template: '<button class="btn btn-info btn-xs" ng-click="vm.updateBindingCount()">{{ vm.total }} bindings.</button>',
       scope: {
       },
       controller: controller,
@@ -1391,7 +1391,7 @@ var x = 200;
     function signOut(){
       //TODO: possibly wrap this stuff into an authentication service
       $auth.signOut()
-        .then(function(response){
+        .finally(function(response){
           UserService.clear();
           return StateService.go('sign_in');
         })
@@ -2100,7 +2100,9 @@ var x = 200;
       controllerAs: 'vm',
       bindToController: true,
       scope: {
-        transactions: '='
+        transactions: '=',
+        startDate:'=',
+        endDate:'='
       }
     };
 
@@ -2127,7 +2129,7 @@ var x = 200;
     }
 
     function convertToTransactions(input){
-      var newTransactions = TransactionsService.convertToTransactions(input);
+      var newTransactions = TransactionsService.convertToTransactions(input, vm.startDate, vm.endDate);
       vm.transactions = vm.transactions.concat(newTransactions);
       vm.showForm = false;
     }
@@ -2157,10 +2159,91 @@ var x = 200;
     return directive;
   }
 
-  controller.$inject = ['MessageService'];
-  function controller(MessageService){
+  controller.$inject = ['LookupService', 'ReferenceService', '$q'];
+  function controller(LookupService, ReferenceService, $q){
+    var vm = this;
+    vm.ref = ReferenceService;
+
+    activate();
+
+    function activate(){
+      var accountPromise =LookupService.refreshList('bank_accounts').then(function(items){
+        vm.bank_accounts = items;
+      });
+
+      var budgetPromise =LookupService.refreshList('budgets').then(function(items){
+        vm.budgets = items;
+      });
+
+      //TODO to remove
+      $q.all([accountPromise, budgetPromise]).then(function(){
+        vm.search.bank_account = vm.bank_accounts[0];
+        vm.search.bank_account_id = vm.bank_accounts[0].id;
+        vm.search.budget = vm.budgets[0];
+        vm.search.budget_id = vm.budgets[0].id;
+        vm.onSubmit();
+      });
+    }
+  }
+})();
+
+;
+
+(function(){
+  angular
+    .module('everycent.transactions')
+    .directive('ecTransactionSummary', ecTransactionSummary);
+
+  function ecTransactionSummary(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/transactions/ec-transaction-summary-directive.html',
+      scope: {
+        bankAccount: '=',
+        transactions: '='
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    };
+
+    return directive;
+  }
+
+  controller.$inject = ['UtilService'];
+  function controller(UtilService){
     var vm = this;
 
+    vm.lastBankBalance = lastBankBalance;
+    vm.transactionTotal = transactionTotal;
+    vm.newBankBalance = newBankBalance;
+
+    function lastBankBalance(){
+      if(!vm.bankAccount){
+        return 0;
+      }
+      return vm.bankAccount.opening_balance;
+    }
+
+    function transactionTotal(){
+      if(!vm.transactions){
+        return 0;
+      }
+
+      var totalWithdrawals = 0;
+      var totalDeposits = 0;
+
+      vm.transactions.forEach(function(transaction){
+        totalWithdrawals += transaction.withdrawal_amount;
+        totalDeposits += transaction.deposit_amount;
+      });
+
+      return totalDeposits - totalWithdrawals;
+    }
+
+    function newBankBalance(){
+      return lastBankBalance() + transactionTotal();
+    }
   }
 })();
 
@@ -2173,13 +2256,14 @@ var x = 200;
     .module('everycent.transactions')
     .controller('TransactionsCtrl', TransactionsCtrl);
 
-  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'LookupService', 'ReferenceService'];
+  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'LookupService', 'ReferenceService', 'UtilService'];
 
-  function TransactionsCtrl(MessageService, TransactionsService, LookupService, ReferenceService){
+  function TransactionsCtrl(MessageService, TransactionsService, LookupService, ReferenceService, UtilService){
     var vm = this;
     vm.ref = ReferenceService;
+    vm.util = UtilService;
     vm.search = {};
-    vm.search = { budget_id: 1, bank_account_id: 1};
+
     vm.refreshTransactions = refreshTransactions;
     vm.refreshAllocations = refreshAllocations;
     vm.switchToEditMode = switchToEditMode;
@@ -2187,6 +2271,7 @@ var x = 200;
     vm.saveChanges = saveChanges;
     vm.cancelEdit = cancelEdit;
     vm.markForDeletion = markForDeletion;
+    vm.markAllForDeletion = markAllForDeletion;
 
     activate();
 
@@ -2213,9 +2298,21 @@ var x = 200;
       transaction.deleted = isDeleted;
     }
 
+    function markAllForDeletion(transactions, isDeleted){
+      transactions.forEach(function(transaction){
+        transaction.deleted = isDeleted;
+      });
+      transactions.deleted = isDeleted;
+    }
+
     function refreshTransactions(){
       refreshAllocations();
-      return TransactionsService.getTransactions(vm.search).then(function(transactions){
+
+      var params = {
+        bank_account_id: vm.search.bank_account_id,
+        budget_id: vm.search.budget_id
+      };
+      return TransactionsService.getTransactions(params).then(function(transactions){
         vm.transactions = transactions;
         vm.originalTransactions = transactions;
       });
@@ -2285,7 +2382,7 @@ var x = 200;
         return baseAll.post(params);
       }
 
-      function convertToTransactions(input){
+      function convertToTransactions(input, startDate, endDate){
         var transactionList =[];
         var lines = _combineFieldsIntoLines(_convertInputToFieldList(input));
 
@@ -2293,14 +2390,14 @@ var x = 200;
         lines.shift();
 
         lines.forEach(function(lineData){
-          var transaction = _createTransactionFromLineData(lineData);
+          var transaction = _createTransactionFromLineData(lineData, startDate, endDate);
           transactionList.push(transaction);
         });
 
         return transactionList;
       }
 
-      function _createTransactionFromLineData(lineData){
+      function _createTransactionFromLineData(lineData, startDate, endDate){
         //
         // line data is an array representing one transaction from the bank
         // That format is
@@ -2345,6 +2442,13 @@ var x = 200;
           transaction.description = lineDataCopy.join(' ');
         }
 
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+
+        // confirm that the transaction date is within the period
+        if(transaction.transaction_date < start || transaction.transaction_date > end){
+          transaction.deleted = true;
+        }
         return transaction;
       }
 

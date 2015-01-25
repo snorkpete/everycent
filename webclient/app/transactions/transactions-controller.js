@@ -6,13 +6,14 @@
     .module('everycent.transactions')
     .controller('TransactionsCtrl', TransactionsCtrl);
 
-  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'LookupService', 'ReferenceService'];
+  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'LookupService', 'ReferenceService', 'UtilService'];
 
-  function TransactionsCtrl(MessageService, TransactionsService, LookupService, ReferenceService){
+  function TransactionsCtrl(MessageService, TransactionsService, LookupService, ReferenceService, UtilService){
     var vm = this;
     vm.ref = ReferenceService;
+    vm.util = UtilService;
     vm.search = {};
-    vm.search = { budget_id: 1, bank_account_id: 1};
+
     vm.refreshTransactions = refreshTransactions;
     vm.refreshAllocations = refreshAllocations;
     vm.switchToEditMode = switchToEditMode;

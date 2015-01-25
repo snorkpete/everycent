@@ -20,21 +20,30 @@
     return directive;
   }
 
-  controller.$inject = ['MessageService'];
-  function controller(MessageService){
+  controller.$inject = ['LookupService', 'ReferenceService', '$q'];
+  function controller(LookupService, ReferenceService, $q){
     var vm = this;
+    vm.ref = ReferenceService;
 
     activate();
 
     function activate(){
-      LookupService.refreshList('bank_accounts').then(function(items){
+      var accountPromise =LookupService.refreshList('bank_accounts').then(function(items){
         vm.bank_accounts = items;
       });
 
-      LookupService.refreshList('budgets').then(function(items){
+      var budgetPromise =LookupService.refreshList('budgets').then(function(items){
         vm.budgets = items;
       });
-    }
 
+      //TODO to remove
+      $q.all([accountPromise, budgetPromise]).then(function(){
+        vm.search.bank_account = vm.bank_accounts[0];
+        vm.search.bank_account_id = vm.bank_accounts[0].id;
+        vm.search.budget = vm.budgets[0];
+        vm.search.budget_id = vm.budgets[0].id;
+        vm.onSubmit();
+      });
+    }
   }
 })();

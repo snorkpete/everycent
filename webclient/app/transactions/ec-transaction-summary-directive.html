@@ -1,0 +1,20 @@
+<ec-panel type="primary" title="Transaction Summary">
+    <table class="table table-bordered clear-background rounded fixed-layout">
+        <thead>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Last Bank Balance</th>
+                <td class="text-right">{{ vm.lastBankBalance() | ecToDollars }}</td>
+            </tr>
+            <tr>
+                <th>Transaction Total</th>
+                <td class="text-right">{{ vm.transactionTotal() | ecToDollars }}</td>
+            </tr>
+            <tr>
+                <th>New Bank Balance</th>
+                <td class="text-right">{{ vm.newBankBalance() | ecToDollars }}</td>
+            </tr>
+        </tbody>
+    </table>
+</ec-panel>
