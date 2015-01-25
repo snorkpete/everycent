@@ -4,6 +4,11 @@ class ApplicationController < ActionController::Base
   include ActionController::ImplicitRender
   include ActionController::Serialization
 
+  force_ssl if: :ssl_configured?
+
+  def ssl_configured?
+    Rails.env.production?
+  end
 
   ##respond_to :json
   def respond_with(object, serializer=nil)
