@@ -48,7 +48,12 @@
 
     function refreshTransactions(){
       refreshAllocations();
-      return TransactionsService.getTransactions(vm.search).then(function(transactions){
+
+      var params = {
+        bank_account_id: vm.search.bank_account_id,
+        budget_id: vm.search.budget_id
+      };
+      return TransactionsService.getTransactions(params).then(function(transactions){
         vm.transactions = transactions;
         vm.originalTransactions = transactions;
       });
