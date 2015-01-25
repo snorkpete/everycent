@@ -29,7 +29,7 @@
     function signOut(){
       //TODO: possibly wrap this stuff into an authentication service
       $auth.signOut()
-        .then(function(response){
+        .finally(function(response){
           UserService.clear();
           return StateService.go('sign_in');
         })
