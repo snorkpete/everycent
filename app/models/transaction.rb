@@ -36,12 +36,14 @@ class Transaction < ActiveRecord::Base
     Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id]).delete_all
 
     # re-add the transactions that are being sent
-    params[:transactions].each do |transaction_params|
-      transaction_params[:bank_account_id] = params[:bank_account_id]
-      Transaction.create(transaction_params.except(:id, :payeeName, :payeeCode))
+    if params[:transactions]
+      params[:transactions].each do |transaction_params|
+        transaction_params[:bank_account_id] = params[:bank_account_id]
+        Transaction.create(transaction_params.except(:id, :payeeName, :payeeCode))
 
 
-      Payee.update_from_params(transaction_params.slice(:payeeName, :payeeCode, :allocation_id))
+        Payee.update_from_params(transaction_params.slice(:payeeName, :payeeCode, :allocation_id))
+      end
     end
 
     #send back the fixed list of transactions
