@@ -10,6 +10,7 @@ gem 'annotate', :group => :development
 
 
 gem 'sqlite3'
+gem 'pg', :group => :production
 
 # fix for time
 gem 'tzinfo-data'
@@ -22,6 +23,9 @@ gem 'devise_token_auth'
 gem 'active_model_serializers'
 gem 'responders', '~> 2.0'
 
+
+# web server
+gem 'passenger'
 
 group :development, :test do
   gem 'guard-spork'
