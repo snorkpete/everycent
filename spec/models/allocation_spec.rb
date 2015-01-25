@@ -17,7 +17,7 @@
 require 'rails_helper'
 
 RSpec.describe Allocation, :type => :model do
-  describe "#update_from_params" do
+  describe "::update_from_params" do
     before :each do
       @budget = create(:budget)
       @first  = @budget.allocations.create(attributes_for(:allocation))
@@ -81,5 +81,23 @@ RSpec.describe Allocation, :type => :model do
       expect(allocations[0].bank_account_id).to eq nil
     end
 
+  end
+
+  describe "#spent" do
+    before :each do
+      @allocation = create(:allocation, amount: 1000)
+      create(:transaction, allocation_id: @allocation.id, withdrawal_amount: 500, deposit_amount: 0)
+      create(:transaction, allocation_id: @allocation.id, withdrawal_amount: 100, deposit_amount: 0)
+
+    end
+
+    it "sums the transactions against that allocation" do
+      expect(@allocation.spent).to eq 600
+    end
+
+    it "properly handles deposits when summing" do
+      create(:transaction, allocation_id: @allocation.id, withdrawal_amount: 0, deposit_amount: 200)
+      expect(@allocation.spent).to eq 400
+    end
   end
 end

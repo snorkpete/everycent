@@ -575,6 +575,8 @@
     vm.cancelEdit = cancelEdit;
 
     vm.actualTotalForCategory = actualTotalForCategory;
+    vm.actualSpentForCategory = actualSpentForCategory;
+    vm.actualRemainingForCategory = actualRemainingForCategory;
     vm.recommendedTotalForCategory = recommendedTotalForCategory;
     vm.unallocatedTotalForCategory = unallocatedTotalForCategory;
 
@@ -624,6 +626,14 @@
 
     function actualTotalForCategory(category){
       return vm.util.total(category.allocations, 'amount');
+    }
+
+    function actualSpentForCategory(category){
+      return vm.util.total(category.allocations, 'spent');
+    }
+
+    function actualRemainingForCategory(category){
+      return actualTotalForCategory(category) - actualSpentForCategory(category);
     }
 
     function recommendedTotalForCategory(category){
@@ -787,6 +797,77 @@
       }
 
       return '' + dateParts[3] + '/' + dateParts[1] + '/' + dateParts[2];
+    }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .directive('ecAmountFormatted', ecAmountFormatted);
+
+  ecAmountFormatted.$inject = [];
+  function ecAmountFormatted(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/common/ec-amount-formatted-directive.html',
+      scope: {
+        amount: '='
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    };
+    return directive;
+
+    function controller(){
+      /* jshint validthis: true */
+      var vm = this;
+    }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .directive('ecAmountLabel', ecAmountLabel);
+
+  ecAmountLabel.$inject = [];
+  function ecAmountLabel(){
+    var directive = {
+      restrict:'E',
+      templateUrl: 'app/common/ec-amount-label-directive.html',
+      scope: {
+        type: '@',
+        label: '@',
+        amount: '='
+      },
+      controller: controller,
+      controllerAs: 'vm',
+      bindToController: true
+    };
+    return directive;
+
+    function controller(){
+      /* jshint validthis: true */
+      var vm = this;
+      vm.labelClasses = labelClasses;
+
+      function labelClasses(){
+        var result = {};
+        result['label-' + vm.type] = vm.amount >= 0;
+        result['label-danger'] = vm.amount < 0;
+
+        return result;
+      }
     }
   }
 })();

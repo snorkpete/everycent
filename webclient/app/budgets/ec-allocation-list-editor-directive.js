@@ -36,6 +36,8 @@
     vm.cancelEdit = cancelEdit;
 
     vm.actualTotalForCategory = actualTotalForCategory;
+    vm.actualSpentForCategory = actualSpentForCategory;
+    vm.actualRemainingForCategory = actualRemainingForCategory;
     vm.recommendedTotalForCategory = recommendedTotalForCategory;
     vm.unallocatedTotalForCategory = unallocatedTotalForCategory;
 
@@ -85,6 +87,14 @@
 
     function actualTotalForCategory(category){
       return vm.util.total(category.allocations, 'amount');
+    }
+
+    function actualSpentForCategory(category){
+      return vm.util.total(category.allocations, 'spent');
+    }
+
+    function actualRemainingForCategory(category){
+      return actualTotalForCategory(category) - actualSpentForCategory(category);
     }
 
     function recommendedTotalForCategory(category){

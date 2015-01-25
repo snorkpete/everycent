@@ -21,14 +21,22 @@
         <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.amount | ecToDollars "></span>
     </td>
 
-    <!-- standing order -->
+    <!-- spent -->
     <td class="text-right">
-        <input type="checkbox" ng-show="vm.isEditMode" ng-model="vm.allocation.is_standing_order" />
-        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.is_standing_order ? 'Yes' : 'No'"></span>
+        <ec-amount-formatted amount="vm.allocation.spent"> </ec-amount-formatted>
     </td>
 
-    <!-- bank account -->
+    <!-- remaining -->
+    <td class="text-right">
+        <ec-amount-formatted amount="vm.allocation.amount - vm.allocation.spent"> </ec-amount-formatted>
+    </td>
+
+    <!-- standing order & bank account -->
     <td>
+        <input type="checkbox" ng-show="vm.isEditMode" ng-model="vm.allocation.is_standing_order" />
+        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.is_standing_order ? 'Yes' : 'No'"></span>
+        &nbsp; &nbsp;
+
         <span ng-show="vm.allocation.is_standing_order">
             <select ng-show="vm.isEditMode"
                     ng-model="vm.allocation.bank_account"

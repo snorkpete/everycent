@@ -1,57 +1,83 @@
 <div class="row">
     <div class="col-xs-12">
         <ec-panel title="Allocations" type="primary">
-            <table class="table table-bordered rounded">
+            <table class="table table-bordered rounded fixed-layout">
             <thead>
                 <tr class="heading">
-                    <th>Name</th>
-                    <th ng-show="">Category</th>
-                    <th class="text-right">Amount</th>
-                    <th class="text-right">Standing Order?</th>
-                    <th>Bank Account</th>
-                    <th>Actions</th>
+                    <th style="width:25%;">Name</th>
+                    <th style="width:15%;" class="text-right">Amount</th>
+                    <th style="width:15%;" class="text-right">Spent</th>
+                    <th style="width:15%;" class="text-right">Remaining</th>
+                    <th style="width:25%;">Bank Account for Standing Order</th>
+                    <th style="width:5%;"></th>
                 </tr>
             </thead>
-                <tbody>
-                    <tr class="category-heading" ng-repeat-start="category in vm.groupedAllocationCategories">
-                        <td>{{ category.name }}</td>
-                        <td ng-show=""></td>
-                        <td class="text-right">{{ vm.actualTotalForCategory(category) | ecToDollars }}</td>
-                        <td class="text-right">
-                            <span class="label label-info">
-                                Recommended: {{ vm.recommendedTotalForCategory(category) | ecToDollars }}
-                            </span>
-                            <br/>
-                            <span class="label" ng-class="{ 'label-default': vm.unallocatedTotalForCategory(category) >= 0, 'label-danger': vm.unallocatedTotalForCategory(category) < 0 }">
-                                Unallocated: {{ vm.unallocatedTotalForCategory(category) | ecToDollars }}
-                            </span>
-                        </td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="category-detail" ec-allocation-list-row
-                        ng-repeat="allocation in category.allocations"
-                        allocation="allocation"
-                        is-edit-mode="vm.isEditMode">
-                    </tr>
-                    <tr class="category-action" ng-repeat-end>
-                        <td colspan="6" ng-show="vm.isEditMode">
-                            <button class="btn btn-primary" ng-click="vm.addNewAllocationInCategory(category)">
-                                Add {{category.name}} Allocation
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
             <tfoot>
                 <tr class="total">
-                    <th>Total</th>
-                    <th ng-show=""></th>
+                    <th>
+                      Total
+                        <span class="pull-right">
+                          <ec-amount-label label="Unallocated"
+                                            type="default"
+                                           amount="vm.totalDiscretionaryAmount()">
+                          </ec-amount-label>
+                        </span>
+                    </th>
                     <th class="text-right">{{ vm.util.total(vm.budget.allocations, 'amount') | ecToDollars }}</th>
-                    <th></th>
+                    <th class="text-right">
+                    </th>
                     <th></th>
                     <th></th>
                 </tr>
             </tfoot>
+            <tbody>
+            <!-- ng-repeat-start -->
+                <tr class="category-heading" ng-repeat-start="category in vm.groupedAllocationCategories">
+                    <td>
+                      <span>
+                        {{ category.name }}
+                      </span>
+                      <span class="pull-right text-right">
+                          <ec-amount-label label="Recommended"
+                                           type="info"
+                                           amount="vm.recommendedTotalForCategory(category)">
+                          </ec-amount-label>
+
+                          <br/>
+                          <ec-amount-label label="Unallocated"
+                                            type="default"
+                                           amount="vm.unallocatedTotalForCategory(category)">
+                          </ec-amount-label>
+                      </span>
+                    </td>
+                    <td class="text-right">
+                      {{ vm.actualTotalForCategory(category) | ecToDollars }}
+                    </td>
+                    <td class="text-right">
+                        <ec-amount-formatted amount="vm.actualSpentForCategory(category)"></ec-amount-formatted>
+                    </td>
+                    <td class="text-right">
+                        <ec-amount-formatted amount="vm.actualRemainingForCategory(category)"></ec-amount-formatted>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+
+                <tr class="category-detail" ec-allocation-list-row
+                    ng-repeat="allocation in category.allocations"
+                    allocation="allocation"
+                    is-edit-mode="vm.isEditMode">
+                </tr>
+
+                <tr class="category-action" ng-repeat-end>
+                    <td colspan="6" ng-show="vm.isEditMode">
+                        <button class="btn btn-primary" ng-click="vm.addNewAllocationInCategory(category)">
+                            Add {{category.name}} Allocation
+                        </button>
+                    </td>
+                </tr>
+                <!-- ng-repeat-end -->
+            </tbody>
             </table>
 
             <table class="table table-bordered rounded">
