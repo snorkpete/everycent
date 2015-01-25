@@ -9,7 +9,7 @@
   function ecBindingCount(){
     var directive = {
       restrict:'E',
-      template: '<button class="btn btn-info" ng-click="vm.updateBindingCount()">{{ vm.total }} bindings.</button>',
+      template: '<button class="btn btn-info btn-xs" ng-click="vm.updateBindingCount()">{{ vm.total }} bindings.</button>',
       scope: {
       },
       controller: controller,
