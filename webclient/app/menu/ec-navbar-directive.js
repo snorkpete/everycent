@@ -16,8 +16,8 @@
     return directive;
   }
 
-  controller.$inject = ['MessageService', 'UserService', 'StateService', '$auth'];
-  function controller(MessageService, UserService, StateService, $auth){
+  controller.$inject = ['MessageService', 'UserService', 'StateService', '$auth', 'LookupService'];
+  function controller(MessageService, UserService, StateService, $auth, LookupService){
     var vm = this;
     vm.user = UserService.getUser();
     vm.signOut = signOut;
@@ -59,6 +59,7 @@
       StateService.go(state, params);
       vm.navMenuOpen = false;
       vm.setupOpen = false;
+      LookupService.clear();
     }
   }
 })();

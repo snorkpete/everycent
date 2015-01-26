@@ -6,9 +6,9 @@
     .module('everycent.budgets')
     .controller('BudgetEditorCtrl', BudgetsCtrl);
 
-  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService', '$rootScope'];
+  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'StateService', '$rootScope'];
 
-  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService, $rootScope){
+  function BudgetsCtrl(MessageService, BudgetsService, StateService, $rootScope){
     var vm = this;
     vm.state = StateService; // page state handler
     vm.budget = {};

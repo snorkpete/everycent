@@ -57,7 +57,9 @@
 
       function groupAllocationsByCategory(allocations, allocationCategories){
         allocationCategories.forEach(function(category){
-          category.allocations = filterFilter(allocations, { allocation_category_id: category.id });
+          category.allocations = filterFilter(allocations, function(allocation, index){
+            return allocation.allocation_category_id === category.id;
+          });
         });
         return allocationCategories;
       }

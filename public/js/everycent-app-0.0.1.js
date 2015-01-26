@@ -381,9 +381,9 @@
     .module('everycent.budgets')
     .controller('BudgetEditorCtrl', BudgetsCtrl);
 
-  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService', '$rootScope'];
+  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'StateService', '$rootScope'];
 
-  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService, $rootScope){
+  function BudgetsCtrl(MessageService, BudgetsService, StateService, $rootScope){
     var vm = this;
     vm.state = StateService; // page state handler
     vm.budget = {};
@@ -526,7 +526,9 @@
 
       function groupAllocationsByCategory(allocations, allocationCategories){
         allocationCategories.forEach(function(category){
-          category.allocations = filterFilter(allocations, { allocation_category_id: category.id });
+          category.allocations = filterFilter(allocations, function(allocation, index){
+            return allocation.allocation_category_id === category.id;
+          });
         });
         return allocationCategories;
       }
@@ -1197,15 +1199,33 @@
     .module('everycent.common')
     .factory('LookupService', LookupService);
 
-  LookupService.$inject = ['Restangular'];
-  function LookupService(Restangular){
+  LookupService.$inject = ['Restangular', '$q'];
+  function LookupService(Restangular, $q){
+    var dataCache = { };
+    var promiseCache = { };
+
     var service = {
+      clear: clear,
       refreshList: refreshList
     };
     return service;
 
-    function refreshList(list, params){
-      return Restangular.all(list).getList(params);
+    function refreshList(list, params, ignoreCache){
+      return $q.when(dataCache[list] || promiseCache[list] || _refreshFromServer(list, params));
+
+      function _refreshFromServer(list, params){
+        promiseCache[list] = Restangular.all(list).getList(params).then(function(listValues){
+          dataCache[list] = listValues;
+          return listValues;
+        });
+
+        return promiseCache[list];
+      }
+    }
+
+    function clear(){
+      dataCache = {};
+      promiseCache = {};
     }
   }
 })();
@@ -1462,8 +1482,8 @@ var x = 200;
     return directive;
   }
 
-  controller.$inject = ['MessageService', 'UserService', 'StateService', '$auth'];
-  function controller(MessageService, UserService, StateService, $auth){
+  controller.$inject = ['MessageService', 'UserService', 'StateService', '$auth', 'LookupService'];
+  function controller(MessageService, UserService, StateService, $auth, LookupService){
     var vm = this;
     vm.user = UserService.getUser();
     vm.signOut = signOut;
@@ -1505,6 +1525,7 @@ var x = 200;
       StateService.go(state, params);
       vm.navMenuOpen = false;
       vm.setupOpen = false;
+      LookupService.clear();
     }
   }
 })();
