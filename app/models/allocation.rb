@@ -67,8 +67,8 @@ class Allocation < ActiveRecord::Base
 
   protected
   def fix_name
-    return if self.name.nil?
-    self.name = name.titleize
+    #return if self.name.nil?
+    #self.name = name.titleize
   end
 
   def clear_bank_account_if_not_standing_order
