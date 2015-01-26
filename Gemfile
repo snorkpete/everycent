@@ -10,8 +10,12 @@ gem 'rails-api'
 gem 'annotate', :group => :development
 
 
-gem 'sqlite3', :group => :development
-gem 'pg', :group => :production
+#gem 'sqlite3', :group => :development
+group :development, :production do
+  gem 'pg'
+end
+#gem 'pg', :group => :production
+#gem 'pg', :group => :development
 
 # fix for time
 gem 'tzinfo-data'
