@@ -25,7 +25,7 @@
                 <td> {{ bankAccount.account_type }} </td>
                 <td> {{ bankAccount.account_no }} </td>
                 <td> {{ bankAccount.user.first_name + ' ' + bankAccount.user.last_name }} </td>
-                <td> {{ bankAccount.opening_balance }} </td>
+                <td class="text-right"> {{ bankAccount.opening_balance | ecToDollars }} </td>
                 <td>
                     <span ng-click="vm.deleteBankAccount(bankAccount)"
                           class="text-danger pull-right pointer">

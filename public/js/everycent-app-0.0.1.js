@@ -381,9 +381,9 @@
     .module('everycent.budgets')
     .controller('BudgetEditorCtrl', BudgetsCtrl);
 
-  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService'];
+  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService', '$rootScope'];
 
-  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService){
+  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService, $rootScope){
     var vm = this;
     vm.state = StateService; // page state handler
     vm.budget = {};
@@ -398,6 +398,7 @@
     function loadBudget(){
       return BudgetsService.getBudget(StateService.getParam('budget_id')).then(function(budget){
         vm.budget = budget;
+        $rootScope.$broadcast('budget.loaded');
       });
     }
 
@@ -558,8 +559,8 @@
     return directive;
   }
 
-  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService'];
-  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService){
+  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService', '$rootScope'];
+  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService, $rootScope){
     var vm = this;
     vm.isEditMode = false;
 
@@ -589,9 +590,11 @@
         vm.bankAccounts = bankAccounts;
       });
 
-      LookupService.refreshList('allocation_categories').then(function(allocationCategories){
-        vm.allocationCategories = allocationCategories;
-        vm.groupedAllocationCategories = BudgetsService.groupAllocationsByCategory(vm.budget.allocations, vm.allocationCategories);
+      $rootScope.$on('budget.loaded', function(){
+        LookupService.refreshList('allocation_categories').then(function(allocationCategories){
+          vm.allocationCategories = allocationCategories;
+          vm.groupedAllocationCategories = BudgetsService.groupAllocationsByCategory(vm.budget.allocations, vm.allocationCategories);
+        });
       });
     }
 
@@ -2371,7 +2374,7 @@ var x = 200;
     }
 
     function addTransaction(){
-      newTransaction = TransactionsService.newTransaction();
+      var newTransaction = TransactionsService.newTransaction();
       vm.transactions.push(newTransaction);
     }
 
