@@ -19,8 +19,8 @@
     return directive;
   }
 
-  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService'];
-  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService){
+  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService', '$rootScope'];
+  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService, $rootScope){
     var vm = this;
     vm.isEditMode = false;
 
@@ -50,9 +50,11 @@
         vm.bankAccounts = bankAccounts;
       });
 
-      LookupService.refreshList('allocation_categories').then(function(allocationCategories){
-        vm.allocationCategories = allocationCategories;
-        vm.groupedAllocationCategories = BudgetsService.groupAllocationsByCategory(vm.budget.allocations, vm.allocationCategories);
+      $rootScope.$on('budget.loaded', function(){
+        LookupService.refreshList('allocation_categories').then(function(allocationCategories){
+          vm.allocationCategories = allocationCategories;
+          vm.groupedAllocationCategories = BudgetsService.groupAllocationsByCategory(vm.budget.allocations, vm.allocationCategories);
+        });
       });
     }
 

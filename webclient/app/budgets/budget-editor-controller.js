@@ -6,9 +6,9 @@
     .module('everycent.budgets')
     .controller('BudgetEditorCtrl', BudgetsCtrl);
 
-  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService'];
+  BudgetsCtrl.$inject = ['MessageService', 'BudgetsService', 'ModalService', 'FormService', 'StateService', '$rootScope'];
 
-  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService){
+  function BudgetsCtrl(MessageService, BudgetsService, ModalService, FormService, StateService, $rootScope){
     var vm = this;
     vm.state = StateService; // page state handler
     vm.budget = {};
@@ -23,6 +23,7 @@
     function loadBudget(){
       return BudgetsService.getBudget(StateService.getParam('budget_id')).then(function(budget){
         vm.budget = budget;
+        $rootScope.$broadcast('budget.loaded');
       });
     }
 
