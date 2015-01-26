@@ -40,7 +40,7 @@
     }
 
     function addTransaction(){
-      newTransaction = TransactionsService.newTransaction();
+      var newTransaction = TransactionsService.newTransaction();
       vm.transactions.push(newTransaction);
     }
 
