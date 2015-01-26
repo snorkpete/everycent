@@ -20,8 +20,8 @@ class Institution < ActiveRecord::Base
   protected
 
   def fix_name
-    return if self.name.nil?
+    #return if self.name.nil?
 
-    self.name = name.titleize
+    #self.name = name.titleize
   end
 end

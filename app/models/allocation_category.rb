@@ -23,7 +23,7 @@ class AllocationCategory < ActiveRecord::Base
   protected
 
   def fix_name
-    return if self.name.nil?
-    self.name = name.titleize
+    #return if self.name.nil?
+    #self.name = name.titleize
   end
 end
