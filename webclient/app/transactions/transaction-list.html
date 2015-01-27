@@ -113,13 +113,13 @@
 
                     <!-- withdrawal amount -->
                     <td class="text-right">
-                        <input ng-show="vm.isEditMode" type="number" ng-model="transaction.withdrawal_amount" ec-as-dollars></input>
+                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.withdrawal_amount" ec-as-dollars></input>
                         <span ng-hide="vm.isEditMode" ng-bind="transaction.withdrawal_amount | ecToDollars"></span>
                     </td>
 
                     <!-- deposit amount -->
                     <td class="text-right">
-                        <input ng-show="vm.isEditMode" type="number" ng-model="transaction.deposit_amount" ec-as-dollars></input>
+                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.deposit_amount" ec-as-dollars></input>
                         <span ng-hide="vm.isEditMode" ng-bind="transaction.deposit_amount | ecToDollars"></span>
                     </td>
 

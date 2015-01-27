@@ -16,13 +16,13 @@ describe('ecAsDollarsDirective', function(){
     it("displays the value as dollars", function(){
       scope.amount = 100;
       scope.$digest();
-      expect(element.val()).toEqual('1');
+      expect(element.val()).toEqual('1.00');
     });
 
     it("displays the value as dollars and cents", function(){
       scope.amount = 340;
       scope.$digest();
-      expect(element.val()).toEqual('3.4');
+      expect(element.val()).toEqual('3.40');
     });
   });
 

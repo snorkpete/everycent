@@ -21,7 +21,7 @@
 
                     <!-- amount -->
                     <td class="text-right">
-                        <input type="number" ng-show="vm.isEditMode" ng-model="income.amount" ec-as-dollars />
+                        <input type="text" ng-show="vm.isEditMode" ng-model="income.amount" ec-as-dollars />
                         <span ng-hide="vm.isEditMode" ng-bind="income.amount | ecToDollars"></span>
                     </td>
 
