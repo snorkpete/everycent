@@ -295,6 +295,7 @@
   function AppConfig($authProvider, $compileProvider){
 
     //$compileProvider.debugInfoEnabled(false);
+    //$compileProvider.useApplyAsync(true);
   }
 
   AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService', 'UserService'];
