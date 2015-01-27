@@ -18,6 +18,11 @@
     return service;
 
     function refreshList(list, params, ignoreCache){
+      //TODO: to fix so that we cache based on params
+      if(ignoreCache){
+        return Restangular.all(list).getList(params);
+      }
+
       return $q.when(dataCache[list] || promiseCache[list] || _refreshFromServer(list, params));
 
       function _refreshFromServer(list, params){

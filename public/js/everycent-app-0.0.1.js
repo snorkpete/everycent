@@ -1219,6 +1219,11 @@
     return service;
 
     function refreshList(list, params, ignoreCache){
+      //TODO: to fix so that we cache based on params
+      if(ignoreCache){
+        return Restangular.all(list).getList(params);
+      }
+
       return $q.when(dataCache[list] || promiseCache[list] || _refreshFromServer(list, params));
 
       function _refreshFromServer(list, params){
@@ -2393,7 +2398,8 @@ var x = 200;
     }
 
     function refreshAllocations(){
-      return LookupService.refreshList('allocations', {budget_id: vm.search.budget_id}).then(function(allocations){
+      LookupService.clear();
+      return LookupService.refreshList('allocations', {budget_id: vm.search.budget_id}, true).then(function(allocations){
         vm.allocations = allocations;
       });
     }

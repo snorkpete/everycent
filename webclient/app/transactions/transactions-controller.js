@@ -30,7 +30,8 @@
     }
 
     function refreshAllocations(){
-      return LookupService.refreshList('allocations', {budget_id: vm.search.budget_id}).then(function(allocations){
+      LookupService.clear();
+      return LookupService.refreshList('allocations', {budget_id: vm.search.budget_id}, true).then(function(allocations){
         vm.allocations = allocations;
       });
     }
