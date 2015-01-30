@@ -26,6 +26,7 @@
     </ec-transaction-importer>
 </div>
 
+<form class="form-horizontal" novalidate name="vm.transactionsForm">
 <div class="row">
     <div class="col-xs-12">
         <div style="max-height:400px; overflow-y:scroll;">
@@ -74,8 +75,17 @@
                 <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted }">
 
                     <!-- transaction date -->
-                    <td>
-                        <input ng-show="vm.isEditMode" type="date" ng-model="transaction.transaction_date" ec-as-date></input>
+                    <td ng-class="{'danger': !transaction.transaction_date}">
+                        <input ng-show="vm.isEditMode"
+                            name="transaction_date[{{$index}}]"
+                            min="{{vm.search.budget.start_date}}"
+                            max="{{vm.search.budget.end_date}}"
+                            type="date"
+                            ng-model="transaction.transaction_date"
+                            ng-required="{{!transaction.deleted}}"
+                            ec-as-date>
+                        </input>
+                        <span style="positive:relative; top:20px;" ng-hide="transaction.transaction_date" class=".help-block">Transaction date {{ transaction.transaction_date }} (transaction.deleted)outside the budget period (start: {{vm.search.budget.start_date}} to end: {{vm.search.budget.end_date}}</span>
                         <span ng-hide="vm.isEditMode"
                               ng-bind="transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
                     </td>
@@ -147,6 +157,7 @@
         </div>
     </div>
 </div>
+</form>
 
 <br/>
 <div class="row">
@@ -165,6 +176,9 @@
     </div>
     <div class="col-xs-10">
         <span ng-show="vm.isEditMode" class="pull-right">
+                    <!-->
+                        ng-disabled="vm.transactionsForm.$invalid"
+                    -->
             <button class="btn btn-success"
                     ng-click="vm.saveChanges()">
                 Save Changes

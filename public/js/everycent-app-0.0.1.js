@@ -291,11 +291,11 @@
     .run(AuthenticationSetup)
     .controller('MainCtrl', MainCtrl);
 
-  AppConfig.$inject = ['$authProvider', '$compileProvider'];
-  function AppConfig($authProvider, $compileProvider){
+  AppConfig.$inject = ['$authProvider', '$compileProvider', '$httpProvider'];
+  function AppConfig($authProvider, $compileProvider, $httpProvider){
 
     //$compileProvider.debugInfoEnabled(false);
-    //$compileProvider.useApplyAsync(true);
+    $httpProvider.useApplyAsync(true);
   }
 
   AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService', 'UserService'];
