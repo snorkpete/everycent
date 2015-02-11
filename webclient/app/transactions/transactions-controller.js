@@ -22,6 +22,7 @@
     vm.cancelEdit = cancelEdit;
     vm.markForDeletion = markForDeletion;
     vm.markAllForDeletion = markAllForDeletion;
+    vm.checkTransactionDate = checkTransactionDate;
 
     activate();
 
@@ -46,12 +47,20 @@
     }
 
     function markForDeletion(transaction, isDeleted){
+      var transactionDate = new Date(transaction.transaction_date);
+      var startDate = new Date(vm.search.budget.start_date);
+      var endDate = new Date(vm.search.budget.end_date);
+      if(!isDeleted && (transactionDate < startDate || transactionDate > endDate)){
+
+        MessageService.setErrorMessage('Transaction date not in budget range.');
+        return;
+      }
       transaction.deleted = isDeleted;
     }
 
     function markAllForDeletion(transactions, isDeleted){
       transactions.forEach(function(transaction){
-        transaction.deleted = isDeleted;
+        markForDeletion(transaction, isDeleted);
       });
       transactions.deleted = isDeleted;
     }
@@ -85,6 +94,15 @@
     function cancelEdit(){
       vm.transactions = vm.originalTransactions;
       vm.isEditMode = false;
+    }
+
+    function checkTransactionDate(transaction, budget){
+      var transactionDate = new Date(transaction.transaction_date);
+      var startDate = new Date(vm.search.budget.start_date);
+      var endDate = new Date(vm.search.budget.end_date);
+
+      transaction.transaction_date_invalid = (transactionDate < startDate && transactionDate > endDate);
+      transaction.deleted = transaction.transaction_date_invalid;
     }
   }
 })();

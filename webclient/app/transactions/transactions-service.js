@@ -29,14 +29,18 @@
       }
 
       function save(transactions, searchOptions){
-        var undeletedTransactions = transactions.filter(function(transaction){
-          return !transaction.deleted;
+        var startDate = new Date(searchOptions.budget.start_date);
+        var endDate = new Date(searchOptions.budget.end_date);
+
+        var validTransactions = transactions.filter(function(transaction){
+          var transactionDate = new Date(transaction.transaction_date);
+          return !transaction.deleted && transactionDate >= startDate && transactionDate <= endDate;
         });
 
         var params = {
           budget_id: searchOptions.budget_id,
           bank_account_id: searchOptions.bank_account_id,
-          transactions: undeletedTransactions
+          transactions: validTransactions
         };
         return baseAll.post(params);
       }
@@ -112,7 +116,8 @@
       }
 
       function _extractNumber(dollarString){
-        var match = dollarString.match(/[$]([-0-9.]*)/);
+        var withoutCommas = dollarString.replace(/,/g, '');
+        var match = withoutCommas.match(/[$]([-0-9.,]*)/);
         if(match && match[1]){
           return Number(match[1]);
         }else{

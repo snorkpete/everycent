@@ -901,6 +901,9 @@
       ngModel.$formatters.push(function(modelValue){
         return new Date(modelValue);
       });
+      ngModel.$parsers.push(function(modelValue){
+        return new Date(modelValue);
+      });
     }
   }
 })();
@@ -1151,6 +1154,49 @@
     return function(input){
       return (input / 100).toFixed(2);
     };
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.common')
+    .directive('ecValidateWithinBudget', ecValidateWithinBudget);
+
+  ecValidateWithinBudget.$inject = [];
+  function ecValidateWithinBudget(){
+    var directive = {
+      restrict:'A',
+      require:'ngModel',
+      link: link,
+      scope:{
+        budget: '=',
+        transaction: '='
+      }
+    };
+    return directive;
+
+    function link(scope, element, attrs, ngModel){
+
+      // do nothing if we dont have scope and transaction to work with
+      if(!scope.budget || !scope.transaction){
+        return;
+      }
+
+      ngModel.$validators.withinBudget = function(modelValue){
+
+        // don't validate if the transaction is deleted
+        // --------------------------------------------
+        if(scope.transaction.deleted){
+          return true;
+        }
+
+        return modelValue >= scope.budget.start_date && modelValue <= scope.budget.end_date;
+      };
+    }
   }
 })();
 
@@ -2391,6 +2437,7 @@ var x = 200;
     vm.cancelEdit = cancelEdit;
     vm.markForDeletion = markForDeletion;
     vm.markAllForDeletion = markAllForDeletion;
+    vm.checkTransactionDate = checkTransactionDate;
 
     activate();
 
@@ -2415,12 +2462,20 @@ var x = 200;
     }
 
     function markForDeletion(transaction, isDeleted){
+      var transactionDate = new Date(transaction.transaction_date);
+      var startDate = new Date(vm.search.budget.start_date);
+      var endDate = new Date(vm.search.budget.end_date);
+      if(!isDeleted && (transactionDate < startDate || transactionDate > endDate)){
+
+        MessageService.setErrorMessage('Transaction date not in budget range.');
+        return;
+      }
       transaction.deleted = isDeleted;
     }
 
     function markAllForDeletion(transactions, isDeleted){
       transactions.forEach(function(transaction){
-        transaction.deleted = isDeleted;
+        markForDeletion(transaction, isDeleted);
       });
       transactions.deleted = isDeleted;
     }
@@ -2454,6 +2509,15 @@ var x = 200;
     function cancelEdit(){
       vm.transactions = vm.originalTransactions;
       vm.isEditMode = false;
+    }
+
+    function checkTransactionDate(transaction, budget){
+      var transactionDate = new Date(transaction.transaction_date);
+      var startDate = new Date(vm.search.budget.start_date);
+      var endDate = new Date(vm.search.budget.end_date);
+
+      transaction.transaction_date_invalid = (transactionDate < startDate && transactionDate > endDate);
+      transaction.deleted = transaction.transaction_date_invalid;
     }
   }
 })();
@@ -2490,14 +2554,18 @@ var x = 200;
       }
 
       function save(transactions, searchOptions){
-        var undeletedTransactions = transactions.filter(function(transaction){
-          return !transaction.deleted;
+        var startDate = new Date(searchOptions.budget.start_date);
+        var endDate = new Date(searchOptions.budget.end_date);
+
+        var validTransactions = transactions.filter(function(transaction){
+          var transactionDate = new Date(transaction.transaction_date);
+          return !transaction.deleted && transactionDate >= startDate && transactionDate <= endDate;
         });
 
         var params = {
           budget_id: searchOptions.budget_id,
           bank_account_id: searchOptions.bank_account_id,
-          transactions: undeletedTransactions
+          transactions: validTransactions
         };
         return baseAll.post(params);
       }
@@ -2573,7 +2641,8 @@ var x = 200;
       }
 
       function _extractNumber(dollarString){
-        var match = dollarString.match(/[$]([-0-9.]*)/);
+        var withoutCommas = dollarString.replace(/,/g, '');
+        var match = withoutCommas.match(/[$]([-0-9.,]*)/);
         if(match && match[1]){
           return Number(match[1]);
         }else{

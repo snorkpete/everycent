@@ -20,6 +20,9 @@
       ngModel.$formatters.push(function(modelValue){
         return new Date(modelValue);
       });
+      ngModel.$parsers.push(function(modelValue){
+        return new Date(modelValue);
+      });
     }
   }
 })();

@@ -75,17 +75,18 @@
                 <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted }">
 
                     <!-- transaction date -->
-                    <td ng-class="{'danger': !transaction.transaction_date}">
+                    <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">
                         <input ng-show="vm.isEditMode"
                             name="transaction_date[{{$index}}]"
-                            min="{{vm.search.budget.start_date}}"
-                            max="{{vm.search.budget.end_date}}"
                             type="date"
                             ng-model="transaction.transaction_date"
-                            ng-required="{{!transaction.deleted}}"
+                            ng-change="vm.checkTransactionDate(transaction, vm.search.budget)"
+                            ng-required="!transaction.deleted"
                             ec-as-date>
                         </input>
-                        <span style="positive:relative; top:20px;" ng-hide="transaction.transaction_date" class=".help-block">Transaction date {{ transaction.transaction_date }} (transaction.deleted)outside the budget period (start: {{vm.search.budget.start_date}} to end: {{vm.search.budget.end_date}}</span>
+                        <span style="positive:relative; top:20px;" ng-show="transaction.transaction_date_invalid" class=".help-block">
+                            Transaction date outside the budget period
+                        </span>
                         <span ng-hide="vm.isEditMode"
                               ng-bind="transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
                     </td>
@@ -176,10 +177,8 @@
     </div>
     <div class="col-xs-10">
         <span ng-show="vm.isEditMode" class="pull-right">
-                    <!-->
-                        ng-disabled="vm.transactionsForm.$invalid"
-                    -->
             <button class="btn btn-success"
+                    ng-disabled="vm.transactionsForm.$invalid"
                     ng-click="vm.saveChanges()">
                 Save Changes
             </button>
