@@ -41,15 +41,15 @@ describe BudgetsController do
       auth_request(@user)
 
       @budget = create(:budget)
-      @budget.incomes.create(attributes_for(:income))
-      @budget.allocations.create(attributes_for(:allocation))
-      @budget.allocations.create(attributes_for(:allocation))
+      @income = @budget.incomes.create(attributes_for(:income))
+      @first_allocation = @budget.allocations.create(attributes_for(:allocation))
+      @second_allocation = @budget.allocations.create(attributes_for(:allocation))
       #@budget.incomes.create(attributes_for(:income))
       #@budget.incomes.create(attributes_for(:income))
 
-      @params = {"id"=>"1", "name"=>"Jan 04 - Feb 03, 2015", "start_date"=>"2015-01-04", "end_date"=>"2015-02-03",
+      @params = {"id"=>@budget.id.to_s, "name"=>"Jan 04 - Feb 03, 2015", "start_date"=>"2015-01-04", "end_date"=>"2015-02-03",
                  "incomes"=>[
-                   {"id"=>1, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>1,
+                   {"id"=>@income.id.to_s, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id,
                     "bank_account_id"=>1,
                     "bank_account"=>{"id"=>1, "name"=>"Kion's Savings' Account",
                                      "account_type"=>"Savings", "account_no"=>"1101001",
@@ -60,21 +60,21 @@ describe BudgetsController do
                                      "institution"=>{"id"=>9, "name"=>"First Citizens Bank"}}}
                   ],
                   "allocations"=>[
-                    {"id"=>1, "name"=>"Rent", "amount"=>200000, "budget_id"=>1,
+                    {"id"=>@first_allocation.id, "name"=>"Rent", "amount"=>200000, "budget_id"=>@budget.id,
                      "allocation_category_id"=>nil, "allocation_type"=>"savings", "is_standing_order"=>0,
                      "bank_account_id"=>nil, "allocation_category"=>nil, "bank_account"=>nil
                   }, {
-                    "id"=>2, "name"=>"Groceries", "amount"=>220000, "budget_id"=>1,
+                    "id"=>@second_allocation.id, "name"=>"Groceries", "amount"=>220000, "budget_id"=>@budget.id,
                     "allocation_category_id"=>nil, "allocation_type"=>"expense", "is_standing_order"=>nil,
                     "bank_account_id"=>nil, "allocation_category"=>nil, "bank_account"=>nil
                   }],
                   "budget"=>{"id"=>"1", "name"=>"Jan 04 - Feb 03, 2015",
                              "start_date"=>"2015-01-04", "end_date"=>"2015-02-03"}}
 
-      @two_params ={"id"=>"1", "name"=>"Jan 04 - Feb 03, 2015",
+      @two_params ={"id"=>@budget.id.to_s, "name"=>"Jan 04 - Feb 03, 2015",
                     "start_date"=>"2015-01-04", "end_date"=>"2015-02-03",
                     "incomes"=>[{
-                      "id"=>1, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>1,
+                      "id"=>@income.id.to_s, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id,
                       "bank_account_id"=>1,
                       "bank_account"=>{"id"=>1, "name"=>"Kion's Savings' Account",
                                        "account_type"=>"Savings", "account_no"=>"1101001",
@@ -85,7 +85,7 @@ describe BudgetsController do
                                        },
                                        "institution"=>{ "id"=>9, "name"=>"First Citizens Bank"}
                     }}, {
-                      "id"=>"", "name"=>"Pat's Salary", "amount"=>22000, "budget_id"=>1, "bank_account_id"=>"",
+                      "id"=>"", "name"=>"Pat's Salary", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"",
                       "bank_account"=>{"id"=>2, "name"=>"Patrice's Main Account",
                                        "account_type"=>"Checking", "account_no"=>"110233", "user_id"=>4,
                                        "institution_id"=>5, "opening_balance"=>4000,
@@ -97,20 +97,20 @@ describe BudgetsController do
                                       "fromServer"=>true, "parentResource"=>nil, "restangularCollection"=>false}
                     }],
                     "allocations"=>[
-                      { "id"=>1, "name"=>"Rent", "amount"=>200000, "budget_id"=>1, "allocation_category_id"=>nil,
+                      { "id"=>@first_allocation.id, "name"=>"Rent", "amount"=>200000, "budget_id"=>@budget.id, "allocation_category_id"=>nil,
                         "allocation_type"=>"savings", "is_standing_order"=>0, "bank_account_id"=>nil,
                         "allocation_category"=>nil, "bank_account"=>nil},
-                      {"id"=>2, "name"=>"Groceries", "amount"=>220000, "budget_id"=>1, "allocation_category_id"=>nil,
+                      {"id"=>@second_allocation.id, "name"=>"Groceries", "amount"=>220000, "budget_id"=>@budget.id, "allocation_category_id"=>nil,
                        "allocation_type"=>"expense", "is_standing_order"=>nil, "bank_account_id"=>nil,
                        "allocation_category"=>nil, "bank_account"=>nil}
                     ],
-                    "budget"=>{"id"=>1, "name"=>"Jan 04 - Feb 03, 2015",
+                    "budget"=>{"id"=>@budget.id, "name"=>"Jan 04 - Feb 03, 2015",
                                "start_date"=>"2015-01-04", "end_date"=>"2015-02-03"}}
 
-      @deleted_params = {"id"=>"1", "name"=>"Jan 04 - Feb 03, 2015",
+      @deleted_params = {"id"=>@budget.id.to_s, "name"=>"Jan 04 - Feb 03, 2015",
                          "start_date"=>"2015-01-04", "end_date"=>"2015-02-03",
                          "incomes"=>[
-                           {"id"=>1, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>1,
+                           {"id"=>@income.id.to_s, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id,
                             "bank_account_id"=>1,
                             "bank_account"=>{
                               "id"=>1, "name"=>"Kion's Savings' Account", "account_type"=>"Savings",
@@ -121,7 +121,7 @@ describe BudgetsController do
                               },
                               "institution"=>{"id"=>9, "name"=>"First Citizens Bank"}
                             }},
-                           {"id"=>"", "name"=>"Pat's Salary", "amount"=>22000, "budget_id"=>1,
+                           {"id"=>"", "name"=>"Pat's Salary", "amount"=>22000, "budget_id"=>@budget.id,
                             "bank_account_id"=>"",
                             "bank_account"=>{
                               "id"=>2, "name"=>"Patrice's Main Account", "account_type"=>"Checking",
@@ -134,7 +134,7 @@ describe BudgetsController do
                               "route"=>"bank_accounts", "reqParams"=>nil, "fromServer"=>true, "parentResource"=>nil,
                               "restangularCollection"=>false
                             }},
-                            {"id"=>"", "name"=>"deleted", "amount"=>30000, "budget_id"=>1, "bank_account_id"=>"",
+                            {"id"=>"", "name"=>"deleted", "amount"=>30000, "budget_id"=>@budget.id, "bank_account_id"=>"",
                              "bank_account"=>{
                               "id"=>1, "name"=>"Kion's Savings' Account", "account_type"=>"Savings",
                               "account_no"=>"1101001", "user_id"=>3, "institution_id"=>9, "opening_balance"=>3000,
@@ -149,11 +149,11 @@ describe BudgetsController do
                             }
                          ],
                          "allocations"=>[
-                           {"id"=>1, "name"=>"Rent", "amount"=>200000, "budget_id"=>1, "allocation_category_id"=>nil,
+                           {"id"=>@first_allocation.id, "name"=>"Rent", "amount"=>200000, "budget_id"=>@budget.id, "allocation_category_id"=>nil,
                             "allocation_type"=>"savings", "is_standing_order"=>0, "bank_account_id"=>nil,
                             "allocation_category"=>nil, "bank_account"=>nil
                            }, {
-                             "id"=>2, "name"=>"Groceries", "amount"=>220000, "budget_id"=>1,
+                             "id"=>@second_allocation.id, "name"=>"Groceries", "amount"=>220000, "budget_id"=>@budget.id,
                              "allocation_category_id"=>nil, "allocation_type"=>"expense", "is_standing_order"=>nil,
                              "bank_account_id"=>nil, "allocation_category"=>nil, "bank_account"=>nil, "deleted" => true
                            }],
