@@ -28,10 +28,21 @@ class Budget < ActiveRecord::Base
     allocations.sum(:amount)
   end
 
-  def in_balance?
-    total_income == total_allocation
-  end
+  def copy
+    Budget.skip_callback :create, :after, :add_associated_data
+    new_budget = Budget.create(start_date: self.start_date.next_month)
+    Budget.set_callback :create, :after, :add_associated_data
 
+    incomes.each do |income|
+      new_budget.incomes << income.dup
+    end
+
+    allocations.each do |allocation|
+      new_budget.allocations << allocation.dup
+    end
+
+    new_budget
+  end
 
   protected
 
@@ -66,5 +77,4 @@ class Budget < ActiveRecord::Base
       self.allocations << recurring_allocation.to_allocation
     end
   end
-
 end
