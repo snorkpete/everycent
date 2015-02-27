@@ -62,7 +62,7 @@ describe Budget, :type => :model do
         rent = create(:recurring_allocation, name: "Rent", amount: 2_200_00)
         food = create(:recurring_allocation, name: "Food", amount: 2_000_00)
         savings = create(:recurring_allocation, name: "Savings", amount: 1_400_00)
-        dept = create(:recurring_allocation, name: "Dept", amount: 6_400_00)
+        debt = create(:recurring_allocation, name: "Debt", amount: 6_400_00)
 
         @budget = create(:budget, start_date: '2015-01-23')
       end
@@ -79,32 +79,46 @@ describe Budget, :type => :model do
   end
 
 
-  describe "balancing" do
+  describe "#copy" do
     before :each do
-      kion_income = create(:recurring_income, name: "Kion's Salary", amount: 15_000_00)
-      pat_income = create(:recurring_income, name: "Pat's Salary", amount: 20_000_00)
-      aidan_income = create(:recurring_income, name: "Dad's Donation", amount: 400_00)
+      @kion_income = create(:recurring_income, name: "Kion's Salary", amount: 15_000_00)
+      @pat_income = create(:recurring_income, name: "Pat's Salary", amount: 20_000_00)
+      @savings = create(:recurring_allocation, name: "Savings", amount: 1_400_00)
+      @debt = create(:recurring_allocation, name: "Debt", amount: 6_400_00)
 
-      rent = create(:recurring_allocation, name: "Rent", amount: 2_200_00)
-      food = create(:recurring_allocation, name: "Food", amount: 2_000_00)
-      savings = create(:recurring_allocation, name: "Savings", amount: 1_400_00)
-      dept = create(:recurring_allocation, name: "Dept", amount: 6_400_00)
+      @budget = create(:budget, start_date: '2015-01-23')
+
+      @aidan_income = create(:recurring_income, name: "Dad's Donation", amount: 400_00)
+      @rent = create(:recurring_allocation, name: "Rent", amount: 2_200_00)
+      @food = create(:recurring_allocation, name: "Food", amount: 2_000_00)
+
+      @new_budget = @budget.copy
     end
 
-    context "when out of balance" do
-      before :each do
-        @budget = create(:budget, start_date: '2015-01-23')
-      end
-
-      it '#in_balance? is false' do
-        expect(@budget).not_to be_in_balance
-      end
+    it "creates a new persisted budget" do
+      expect(@new_budget).to be_instance_of(Budget)
+      expect(@new_budget).to be_persisted
     end
 
-    context "when in balance" do
-      it '#in_balance? is true' do
-        @budget = create(:budget, start_date: '2015-01-23')
-      end
+    it "returns a budget with start date one month later" do
+      expect(@new_budget.start_date).to eq(Date.parse('2015-02-23'))
     end
+
+    it "only copies incomes from budget (ignores recurring incomes)" do
+      expect(@new_budget.incomes.size).to eq 2
+    end
+
+    it "correctly copies the incomes" do
+      expect(@new_budget.incomes.first.name).to eq "Kion's Salary"
+    end
+
+    it "only copies allocations from budget (ignores recurring allocations)" do
+      expect(@new_budget.allocations.size).to eq 2
+    end
+
+    it "correctly copies the allocations" do
+      expect(@new_budget.allocations.second.name).to eq "Debt"
+    end
+
   end
 end
