@@ -1,6 +1,6 @@
 {
   "name": "everycent",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Everycent Zero Based Budget Manager",
   "main": "server.js",
   "repository": {
@@ -25,9 +25,17 @@
     "grunt-karma": "^0.9.0",
     "karma-phantomjs-launcher": "^0.1.4",
     "load-grunt-tasks": "^2.0.0",
-    "jshint-stylish": "^1.0.0",
+    "jshint-stylish": "^1.0.1",
     "grunt-contrib-jshint": "^0.10.0",
-    "jshint": "^2.5.11"
+    "jshint": "^2.5.11",
+    "gulp": "^3.8.11",
+    "gulp-jshint": "^1.9.2",
+    "gulp-uglifyjs": "^0.6.0",
+    "gulp-concat": "^2.5.2",
+    "gulp-concat-css": "^2.1.1",
+    "gulp-htmlmin": "^1.1.1",
+    "gulp-livereload": "^3.8.0",
+    "gulp-ng-templates": "0.0.5"
   },
   "engines": {
     "node": "0.10.x"
