@@ -7,7 +7,11 @@ gem 'rails', '4.2.0.rc3'
 gem 'rails-api'
 
 #gem 'spring', :group => :development
-gem 'annotate', :group => :development
+group :development do
+  gem 'annotate'
+  gem 'lol_dba'
+  gem 'meta_request'
+end
 
 
 #gem 'sqlite3', :group => :development
