@@ -2,7 +2,9 @@ class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id]).order(:transaction_date)
+    @transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
+                               .includes(:allocation, { bank_account: :institution })
+                               .order(:transaction_date)
     respond_with(@transactions, TransactionSerializer)
   end
 

@@ -2,7 +2,7 @@ class RecurringAllocationsController < ApplicationController
   before_action :set_recurring_allocation, only: [:show, :edit, :update, :destroy]
 
   def index
-    @recurring_allocations = RecurringAllocation.all
+    @recurring_allocations = RecurringAllocation.includes(:allocation_category).all
     respond_with(@recurring_allocations, RecurringAllocationSerializer)
   end
 

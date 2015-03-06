@@ -58,7 +58,11 @@ class Allocation < ActiveRecord::Base
   end
 
   def spent
-    transactions.sum('withdrawal_amount - deposit_amount')
+    #transactions.sum('withdrawal_amount - deposit_amount')
+    transactions.to_a.sum do |transaction|
+      transaction.withdrawal_amount - transaction.deposit_amount
+    end
+    #(:withdrawal_amount) - transactions.sum(:deposit_amount)
   end
 
   def remaining

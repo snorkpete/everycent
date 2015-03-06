@@ -5,7 +5,8 @@ class BudgetsController < ApplicationController
   before_action :set_budget, only: [:show, :edit, :update, :destroy]
 
   def index
-    @budgets = Budget.all
+    #@budgets = Budget.includes(:incomes, { allocations: [:allocation_category, :transactions] }).all
+    @budgets = preloaded.all.order(start_date: :desc)
     respond_with(@budgets, BudgetSerializer)
   end
 
@@ -42,7 +43,14 @@ class BudgetsController < ApplicationController
 
   private
     def set_budget
-      @budget = Budget.find(params[:id])
+      @budget = preloaded.find(params[:id])
+    end
+
+    def preloaded
+      Budget.includes({ incomes: :bank_account },
+                      { allocations: [:bank_account,
+                                      :allocation_category,
+                                      :transactions] })
     end
 
     def budget_params
