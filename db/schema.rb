@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150123181857) do
+ActiveRecord::Schema.define(version: 20150306170549) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,10 @@ ActiveRecord::Schema.define(version: 20150123181857) do
     t.datetime "updated_at",             null: false
   end
 
+  add_index "allocations", ["allocation_category_id"], name: "index_allocations_on_allocation_category_id", using: :btree
+  add_index "allocations", ["bank_account_id"], name: "index_allocations_on_bank_account_id", using: :btree
+  add_index "allocations", ["budget_id"], name: "index_allocations_on_budget_id", using: :btree
+
   create_table "bank_accounts", force: true do |t|
     t.string   "name"
     t.string   "account_type"
@@ -47,6 +51,9 @@ ActiveRecord::Schema.define(version: 20150123181857) do
     t.datetime "updated_at",      null: false
   end
 
+  add_index "bank_accounts", ["institution_id"], name: "index_bank_accounts_on_institution_id", using: :btree
+  add_index "bank_accounts", ["user_id"], name: "index_bank_accounts_on_user_id", using: :btree
+
   create_table "budgets", force: true do |t|
     t.string   "name"
     t.date     "start_date"
@@ -54,6 +61,8 @@ ActiveRecord::Schema.define(version: 20150123181857) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_index "budgets", ["start_date"], name: "index_budgets_on_start_date", using: :btree
 
   create_table "incomes", force: true do |t|
     t.string   "name"
@@ -63,6 +72,9 @@ ActiveRecord::Schema.define(version: 20150123181857) do
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end
+
+  add_index "incomes", ["bank_account_id"], name: "index_incomes_on_bank_account_id", using: :btree
+  add_index "incomes", ["budget_id"], name: "index_incomes_on_budget_id", using: :btree
 
   create_table "institutions", force: true do |t|
     t.string   "name"
@@ -91,6 +103,9 @@ ActiveRecord::Schema.define(version: 20150123181857) do
     t.datetime "updated_at",                                 null: false
   end
 
+  add_index "recurring_allocations", ["allocation_category_id"], name: "index_recurring_allocations_on_allocation_category_id", using: :btree
+  add_index "recurring_allocations", ["bank_account_id"], name: "index_recurring_allocations_on_bank_account_id", using: :btree
+
   create_table "recurring_incomes", force: true do |t|
     t.string   "name"
     t.integer  "amount"
@@ -99,6 +114,8 @@ ActiveRecord::Schema.define(version: 20150123181857) do
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
   end
+
+  add_index "recurring_incomes", ["bank_account_id"], name: "index_recurring_incomes_on_bank_account_id", using: :btree
 
   create_table "transactions", force: true do |t|
     t.string   "description"
@@ -112,6 +129,10 @@ ActiveRecord::Schema.define(version: 20150123181857) do
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
   end
+
+  add_index "transactions", ["allocation_id"], name: "index_transactions_on_allocation_id", using: :btree
+  add_index "transactions", ["bank_account_id"], name: "index_transactions_on_bank_account_id", using: :btree
+  add_index "transactions", ["transaction_date"], name: "index_transactions_on_transaction_date", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "provider",                            null: false
