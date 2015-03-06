@@ -3,7 +3,7 @@ class RecurringIncomesController < ApplicationController
   before_action :set_recurring_income, only: [:show, :edit, :update, :destroy]
 
   def index
-    @recurring_incomes = RecurringIncome.all
+    @recurring_incomes = RecurringIncome.includes(bank_account: :institution).all
     respond_with(@recurring_incomes, RecurringIncomeSerializer)
   end
 
