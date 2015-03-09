@@ -6,7 +6,11 @@ Rails.application.routes.draw do
     end
   end
   resources :payees, except: [:new, :edit]
-  resources :budgets, except: [:new, :edit]
+  resources :budgets, except: [:new, :edit] do
+    member do
+      put 'copy'
+    end
+  end
 
   resources :allocations, only: [:index]
 

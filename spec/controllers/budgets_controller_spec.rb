@@ -197,4 +197,16 @@ describe BudgetsController do
       end
     end
   end
+
+  describe "#copy" do
+    it "calls Budget.copy with the id" do
+      pending "not working - Budget.copy not being called"
+      expect(Budget).to receive(:copy)
+      post :copy, id: 5
+    end
+
+    it "returns the results of Budget.copy" do
+    end
+
+  end
 end

@@ -28,6 +28,11 @@ class Budget < ActiveRecord::Base
     allocations.sum(:amount)
   end
 
+  def self.copy(budget_id)
+    budget_to_copy = Budget.find(budget_id)
+    budget_to_copy.copy
+  end
+
   def copy
     Budget.skip_callback :create, :after, :add_associated_data
     new_budget = Budget.create(start_date: self.start_date.next_month)
