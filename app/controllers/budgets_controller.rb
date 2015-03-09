@@ -20,6 +20,11 @@ class BudgetsController < ApplicationController
     respond_with(@budget, BudgetSerializer)
   end
 
+  def copy
+    result = Budget.copy(params[:id])
+    respond_with(result, BudgetSerializer)
+  end
+
   def update
     @budget.update(budget_params)
 

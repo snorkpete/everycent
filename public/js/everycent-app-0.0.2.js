@@ -433,6 +433,7 @@
     vm.budgets = [];
     vm.addBudget = addBudget;
     vm.selectBudgetForUpdate = selectBudgetForUpdate;
+    vm.copyBudget = copyBudget;
 
     activate();
 
@@ -464,6 +465,25 @@
       vm.state.goToState('budgets-edit', { budget_id: budget.id });
     }
 
+    function copyBudget(budget){
+      var modalOptions = {
+        headerText: 'Copy this budget',
+        bodyText: 'Are you sure you want to copy the budget: ' + budget.name+ '?',
+        confirmButtonText: 'Copy',
+        cancelButtonText: 'Cancel'
+      };
+
+      ModalService.show(modalOptions).then(function(){
+
+        BudgetsService.copyBudget(budget).then(function(response){
+          refreshBudgetList();
+          MessageService.setMessage('Budget copied.'); // cancel clicked
+        });
+      }, function(){
+        MessageService.setErrorMessage('Copy cancelled.'); // cancel clicked
+      });
+    }
+
   }
 })();
 
@@ -481,6 +501,7 @@
         getBudgets: getBudgets,
         getBudget: getBudget,
         addBudget: addBudget,
+        copyBudget: copyBudget,
         addNewIncome: addNewIncome,
         addNewAllocation: addNewAllocation,
         groupAllocationsByCategory: groupAllocationsByCategory,
@@ -500,6 +521,10 @@
 
       function addBudget(budget){
         return baseAll.post(budget);
+      }
+
+      function copyBudget(budget){
+        return budget.customPUT(null, 'copy');
       }
 
       function addNewIncome(budget){
