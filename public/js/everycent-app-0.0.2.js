@@ -2595,7 +2595,7 @@ var x = 200;
         return baseAll.post(params);
       }
 
-      function convertToTransactions(input, startDate, endDate){
+      function convertToTransactions(input, startDate, endDate, noBalance){
         var transactionList =[];
         var lines = _combineFieldsIntoLines(_convertInputToFieldList(input));
 
@@ -2603,14 +2603,14 @@ var x = 200;
         lines.shift();
 
         lines.forEach(function(lineData){
-          var transaction = _createTransactionFromLineData(lineData, startDate, endDate);
+          var transaction = _createTransactionFromLineData(lineData, startDate, endDate, noBalance);
           transactionList.push(transaction);
         });
 
         return transactionList;
       }
 
-      function _createTransactionFromLineData(lineData, startDate, endDate){
+      function _createTransactionFromLineData(lineData, startDate, endDate, noBalance){
         //
         // line data is an array representing one transaction from the bank
         // That format is
@@ -2627,9 +2627,12 @@ var x = 200;
         transaction.transaction_date = new Date(DateService.convertFromBankDateFormat(lineDataCopy.shift()));
         transaction.ref = lineDataCopy.shift();
 
-        // get the balance, deposit amount and withdrawal amount from the end of the array
-        // -------------------------------------------------------------------------------
-        transaction.balance = lineDataCopy.pop();
+        if(!noBalance){
+          transaction.balance = lineDataCopy.pop();
+        }
+
+        // get deposit amount and withdrawal amount from the end of the array
+        // ------------------------------------------------------------------
         transaction.deposit_amount = _extractNumber(lineDataCopy.pop()) * 100;  //convert to cents
         transaction.withdrawal_amount= _extractNumber(lineDataCopy.pop()) * 100;  //convert to cents
 
@@ -2647,12 +2650,12 @@ var x = 200;
           var payeeCode = payeeDetailsArray[1];
           var payeeName = payeeDetailsArray[2];
 
-          transaction.description = lineDataCopy[0] + ' ' + payeeName;
+          transaction.description = (lineDataCopy[0] + ' ' + payeeName).trim();
           transaction.payeeName = payeeName;
           transaction.payeeCode = payeeCode;
 
         }else{
-          transaction.description = lineDataCopy.join(' ');
+          transaction.description = lineDataCopy.join(' ').trim();
         }
 
         var start = new Date(startDate);
