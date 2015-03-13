@@ -61,7 +61,6 @@
       }
 
       function _createTransactionFromLineData(lineData, startDate, endDate, noBalance){
-        //
         // line data is an array representing one transaction from the bank
         // That format is
         // ['date', 'ref', 2-4 lines of description, amount withdrawn, amount deposited, balance]
@@ -148,7 +147,7 @@
           currentLine.push(item);
 
         });
-
+        lines.push(currentLine);
         return lines;
       }
 

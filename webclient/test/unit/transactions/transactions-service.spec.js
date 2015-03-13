@@ -23,13 +23,12 @@ describe('TransactionsService', function(){
       beforeEach(function(){
       });
 
-      it('returns a transaction list with one transaction', function(){
+      fit('returns a transaction list with one transaction', function(){
         var input = '01/23/2015		\n' +
                     'POS FEE (DEBIT)\n' +
                     '0010092 SAMANTHA SINGH\n' +
                     'PORT OF SPAINTT\n' +
-                    '$0.75 TTD	\n' +
-                    '01/23/2015';
+                    '$0.75 TTD	\n';
         var result = TransactionsService.convertToTransactions(input, startDate, endDate, true);
         expect(result.length).toEqual(1);
         expect(result[0].transaction_date).toEqual(new Date('01/23/2015'));
