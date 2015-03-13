@@ -39,14 +39,7 @@ module.exports = function (grunt) {
             'app/app.js',
             'app/**/*.js',
             '!app/**/*.spec.js'
-          ],
-
-          // login application js //
-          '../public/js/<%= pkg.name %>-login-<%= pkg.version %>.js': [
-            'loginapp/login.js',
-            'app/common/*.js',
-            '!app/common/*.spec.js'
-          ],
+          ]
         }
       },
       css: {
@@ -73,8 +66,7 @@ module.exports = function (grunt) {
       },
       js: {
         files: {
-          '../public/js/<%= pkg.name %>-app-<%= pkg.version %>.min.js': ['../public/js/<%= pkg.name %>-app-<%= pkg.version %>.js'],
-          '../public/js/<%= pkg.name %>-login-<%= pkg.version %>.min.js': ['../public/js/<%= pkg.name %>-login-<%= pkg.version %>.js']
+          '../public/js/<%= pkg.name %>-app-<%= pkg.version %>.min.js': ['../public/js/<%= pkg.name %>-app-<%= pkg.version %>.js']
         }
       }
     },
@@ -148,21 +140,21 @@ module.exports = function (grunt) {
     },
     watch: {
       js: {
-        files: ['app/*.js', 'app/**/*.js', 'loginapp/**/*.js'],
+        files: ['app/**/*.js'],
         tasks: ['concat:js', 'uglify:js', 'jshint'],
         options: {
           livereload: true,
         }
       },
       css: {
-        files: ['app/**/*.css', 'loginapp/**/*.css'],
+        files: ['app/**/*.css'],
         tasks: ['concat:css'],
         options: {
           livereload: true,
         }
       },
       html: {
-        files: ['../public/*.html', 'app/**/*.html', 'loginapp/**/*.html'],
+        files: ['../public/*.html', 'app/**/*.html'],
         tasks:['ngtemplates'],
         options: {
           livereload: true
