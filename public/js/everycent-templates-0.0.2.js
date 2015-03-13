@@ -164,7 +164,7 @@ angular.module('everycent').run(['$templateCache', function($templateCache) {
   $templateCache.put('app/transactions/ec-transaction-importer-directive.html',
     "<div class=row><div class=col-xs-2 ng-hide=vm.showForm><button class=\"btn btn-primary\" ng-click=vm.startImport()>Import from Bank</button></div></div><div class=\"row animate-down\" ng-show=vm.showForm><form class=form-horizontal novalidate name=vm.form ng-submit=vm.convertToTransactions(vm.input)><div class=form-group><label class=\"col-xs-2 control-label\">Input from Bank</label><div class=col-xs-6><textarea ng-model=vm.input name=input rows=5 cols=80 class=form-control placeholder=\"Copy your transactions from your bank into here.\">\r" +
     "\n" +
-    "                </textarea><p class=help-block>{{ vm.form.name.error.server }}</p></div></div><div class=form-group><div class=\"col-xs-offset-2 col-xs-2\"><button type=submit class=\"btn btn-primary\">Import Transactions</button></div><div class=col-xs-2 ng-show=vm.showForm><button class=\"btn btn-danger\" ng-click=vm.cancelImport()>Cancel Import</button></div></div></form></div><br>"
+    "                </textarea><p class=help-block>{{ vm.form.name.error.server }}</p></div></div><div class=form-group><label class=\"col-xs-2 control-label\">Does input exclude balances?</label><div class=col-xs-6><input type=checkbox ng-model=\"vm.excludeBalances\"></div></div><div class=form-group><div class=\"col-xs-offset-2 col-xs-2\"><button type=submit class=\"btn btn-primary\">Import Transactions</button></div><div class=col-xs-2 ng-show=vm.showForm><button class=\"btn btn-danger\" ng-click=vm.cancelImport()>Cancel Import</button></div></div></form></div><br>"
   );
 
 
