@@ -41,7 +41,7 @@
     }
 
     function convertToTransactions(input){
-      var newTransactions = TransactionsService.convertToTransactions(input, vm.startDate, vm.endDate);
+      var newTransactions = TransactionsService.convertToTransactions(input, vm.startDate, vm.endDate, vm.excludeBalances);
       vm.transactions = vm.transactions.concat(newTransactions);
       vm.showForm = false;
     }
