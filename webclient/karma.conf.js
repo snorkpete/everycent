@@ -2,6 +2,7 @@
 // Generated on Thu May 29 2014 11:52:18 GMT-0400 (SA Western Standard Time)
 
 module.exports = function(config) {
+  var pkg =require('./package.json');
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -14,17 +15,17 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-       '../public/js/everycent-vendor-*.min.js',
+       '../public/js/everycent-vendor-' + pkg.version + '.min.js',
        'bower_components/angular-mocks/angular-mocks.js',
-       '../public/js/everycent-app-*.js',
-       '../public/js/everycent-templates-*.js',
+       '../public/js/everycent-app-' + pkg.version + '.js',
+       '../public/js/everycent-templates-' + pkg.version + '.js',
       'test/unit/**/*.spec.js'
     ],
 
     // list of files to exclude
     exclude: [
-      'test/e2e/**/*.js',
-       '../public/js/everycent-app-*.min.js'
+      //'test/e2e/**/*.js',
+       //'../public/js/everycent-app-*.min.js'
     ],
 
 

@@ -88,14 +88,14 @@ module.exports = function (grunt) {
 
     // Running unit tests
     // ------------------
-    karma: {
-      unit: {
-        configFile: 'karma.conf.js',
-        autoWatch: false,
-        singleRun: false,
-        background: true
-      }
-    },
+    //karma: {
+    //  unit: {
+    //    configFile: 'karma.conf.js',
+    //    autoWatch: false,
+    //    singleRun: false,
+    //    background: true
+    //  }
+    //},
 
     // Running end to end tests
     // ------------------------
