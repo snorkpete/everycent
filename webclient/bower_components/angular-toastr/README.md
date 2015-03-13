@@ -8,10 +8,6 @@
 
 The goal is to provide the same API than the original one but without jQuery and using all the angular power.
 
-## Todo
-
-There is an [issue](https://github.com/Foxandxss/angular-toastr/issues/1) with a list of all the stuff I want to do next.
-
 ## Demo
 
 [Demo](http://foxandxss.github.io/angular-toastr/)
@@ -22,7 +18,7 @@ Grab the latest [release](https://github.com/Foxandxss/angular-toastr/releases) 
 
 ```html
 <link rel="stylesheet" type="text/css" href="angular-toastr.css" />
-<script type="text/javascript" src="angular-toastr.js"></script>
+<script type="text/javascript" src="angular-toastr.tpls.js"></script>
 ```
 
 If you want animations, don't forget to add `angular-animate`.
@@ -30,10 +26,14 @@ If you want animations, don't forget to add `angular-animate`.
 Then add `toastr` to your modules dependencies:
 
 ```javascript
-angular.module('app', ['toastr'])
+angular.module('app', ['ngAnimate', 'toastr'])
 ```
 
-`bower/npm/...` packages coming soon. (Bower will come next version, I did it wrong and it needs an update to download the changes (jeezz...)
+You can also install `angular-toastr` from bower:
+
+```
+$ bower install angular-toastr
+```
 
 ## Usage
 
@@ -93,6 +93,16 @@ app.controller('foo', function($scope, toastr) {
 
 ![No Title](http://i.imgur.com/GnwWFo4.png)
 
+#### Closing toasts programmatically:
+
+```javascript
+app.controller('foo', function($scope, toastr) {
+  toastr.clear([toast]);
+});
+```
+
+If no toast is passed in, all toasts will be closed.
+
 ### Toastr customization
 
 You can customize the entire library like:
@@ -100,7 +110,7 @@ You can customize the entire library like:
 ```javascript
 app.config(function(toastrConfig) {
   angular.extend(toastrConfig, {
-    allowHtml: true,
+    allowHtml: false,
     closeButton: false,
     closeHtml: '<button>&times;</button>',
     containerId: 'toast-container',
@@ -111,9 +121,14 @@ app.config(function(toastrConfig) {
       success: 'toast-success',
       warning: 'toast-warning'
     },
+    maxOpened: 0,
     messageClass: 'toast-message',
+    newestOnTop: true,
+    onHidden: null,
+    onShown: null,
     positionClass: 'toast-top-right',
     tapToDismiss: true,
+    target: 'body',
     timeOut: 5000,
     titleClass: 'toast-title',
     toastClass: 'toast'
@@ -125,13 +140,18 @@ Those are the default values, you can pick what you need from it and override wi
 
 * **allowHtml**: Your toast can use custom HTML here (See [Issue 3](https://github.com/Foxandxss/angular-toastr/issues/3))
 * **closeButton**: Whether to display an "X" close button on the toast.
-* **closeButton**: Html element to be used as a close button.
+* **closeHtml**: Html element to be used as a close button.
 * **containerId**: The name of the container where you want to append your toasts (the container will be created for you).
 * **extendedTimeOut**: The timeout after you hover a toast.
 * **iconClasses**: The default type classes for the different toasts.
+* **maxOpened**: Maximum number of toasts displayed at once.
 * **messageClass**: The class for the toast's message.
+* **newestOnTop**: Add new toasts on top of the old one. Put on false to put them on the bottom.
+* **onHidden**: A callback function called when a toast gets hidden.
+* **onShown**: A callback function called when a toast is shown.
 * **positionClass**: The position where the toasts are added.
 * **tapToDismiss**: Whether the toast should be dismissed when it is clicked.
+* **target**: The element to put the toastr container.
 * **timeOut**: The timeout before the toasts disappear.
 * **titleClass**: The class for the toast's title.
 * **toastClass**: Base class for toasts.
@@ -196,11 +216,14 @@ See how we passed a third parameter to the `toast`.
 
 There you can override:
 
+* **allowHtml**: Whether to allow HTML or not in a concrete toast.
 * **closeButton**: Putting a close button on the toast.
 * **closeHtml**: If you need to override how the close button looks like.
 * **extendedTimeout**: The timeout after you hover it.
 * **iconClass**: For the type class you want to use for the toast.
 * **messageClass**: If you want to modify the message look.
+* **onHidden**: Function to call when the toast gets hidden.
+* **onShown**: Function to call when the toast is shown.
 * **tapToDismiss**: If you want a concrete toast to toggle the close on click.
 * **timeOut**: For that concrete toast timeout.
 * **titleClass**: To override the title class of the toast.
@@ -208,7 +231,9 @@ There you can override:
 
 ### Toast template
 
-You can also override the toast template. To do that, put a template on your template cache like:
+If you want to use the built-in template, you can use the `angular-toastr.tpls.js` file.
+
+If you decide that you don't want to use the built-in one, you can always use `angular-toastr.js` file and then providing your own template like this:
 
 ```javascript
 angular.module('yourApp').run(['$templateCache', function($templateCache) {
@@ -226,8 +251,9 @@ The important part here is to have a key named `templates/toastr/toastr.html`. T
 If you want to build from master, you need to:
 
 ```
-$ npm install -g grunt-cli
-$ grunt && grunt prod
+$ npm install -g gulp
+$ npm install
+$ gulp production
 ```
 
 Grab the compressed files under `/dist` and the dev files at `/gen`.
@@ -239,17 +265,21 @@ For contributing in this project, you need to create a pull request containing b
 To create a proper patch I suggest:
 
 ```
-$ npm install -g grunt-cli testem
-$ grunt watch
+$ npm install -g gulp testem
+$ gulp
 ```
 
-And in another terminal:
+And in another terminal / tab:
 
 ```
 $ testem -f config/testem.json
 ```
 
 Then you can see if you have your new tests pass.
+
+Try to avoid generating the `/dist` files on a patch because sometimes they don't want to merge nicely and it is a pain to merge by hand.
+
+----------
 
 ## Credits
 
