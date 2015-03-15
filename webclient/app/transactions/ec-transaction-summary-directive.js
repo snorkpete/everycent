@@ -32,7 +32,7 @@
       if(!vm.bankAccount){
         return 0;
       }
-      return vm.bankAccount.opening_balance;
+      return vm.bankAccount.current_balance;
     }
 
     function transactionTotal(){

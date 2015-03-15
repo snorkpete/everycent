@@ -25,7 +25,15 @@
                           class="text-warning pull-right pointer">
                         <ec-icon type="edit"></ec-icon>
                         &nbsp;
-                        Edit
+                        View
+                        &nbsp; &nbsp; &nbsp;
+                    </span>
+                    <span ng-click="vm.closeBudget(budget)"
+                          ng-show="budget.status==='open'"
+                          class="text-warning pull-right pointer">
+                        <ec-icon type="edit"></ec-icon>
+                        &nbsp;
+                        Close
                         &nbsp; &nbsp; &nbsp;
                     </span>
                     <span ng-click="vm.copyBudget(budget)"

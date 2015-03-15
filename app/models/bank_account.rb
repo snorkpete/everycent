@@ -23,6 +23,19 @@ class BankAccount < ActiveRecord::Base
 
   before_save :fix_name
 
+  def update_balance(budget_id)
+    total_transaction_amount = 0
+
+    transactions = Transaction.for_budget_and_bank(budget_id, self.id).to_a
+    transactions.each do |transaction|
+      total_transaction_amount += transaction.deposit_amount
+      total_transaction_amount -= transaction.withdrawal_amount
+    end
+
+    self.current_balance += total_transaction_amount
+    save
+  end
+
   protected
 
   def fix_name

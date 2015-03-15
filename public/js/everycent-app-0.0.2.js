@@ -434,6 +434,7 @@
     vm.addBudget = addBudget;
     vm.selectBudgetForUpdate = selectBudgetForUpdate;
     vm.copyBudget = copyBudget;
+    vm.closeBudget = closeBudget;
 
     activate();
 
@@ -484,6 +485,28 @@
       });
     }
 
+    function closeBudget(budget){
+      var message ='Are you sure you want to close the budget: ' + budget.name+ '?' +
+         '\n This action is not reversible. '; 
+
+      var modalOptions = {
+        headerText: 'Close this budget',
+        bodyText: message,
+        confirmButtonText: 'Close',
+        cancelButtonText: 'Cancel'
+      };
+
+      ModalService.show(modalOptions).then(function(){
+
+        BudgetsService.closeBudget(budget).then(function(response){
+          refreshBudgetList();
+          MessageService.setMessage('Budget closed.');
+        });
+      }, function(){
+        MessageService.setErrorMessage('Close cancelled.'); // cancel clicked
+      });
+    }
+
   }
 })();
 
@@ -502,6 +525,7 @@
         getBudget: getBudget,
         addBudget: addBudget,
         copyBudget: copyBudget,
+        closeBudget: closeBudget,
         addNewIncome: addNewIncome,
         addNewAllocation: addNewAllocation,
         groupAllocationsByCategory: groupAllocationsByCategory,
@@ -525,6 +549,10 @@
 
       function copyBudget(budget){
         return budget.customPUT(null, 'copy');
+      }
+
+      function closeBudget(budget){
+        return budget.customPUT(null, 'close');
       }
 
       function addNewIncome(budget){
@@ -2435,7 +2463,7 @@ var x = 200;
       if(!vm.bankAccount){
         return 0;
       }
-      return vm.bankAccount.opening_balance;
+      return vm.bankAccount.current_balance;
     }
 
     function transactionTotal(){

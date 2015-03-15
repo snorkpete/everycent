@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resources :budgets, except: [:new, :edit] do
     member do
       put 'copy'
+      put 'close'
     end
   end
 

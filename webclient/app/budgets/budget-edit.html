@@ -15,7 +15,7 @@
 <ec-income-list-editor budget="vm.budget"></ec-income-list-editor>
 <ec-allocation-list-editor budget="vm.budget"></ec-allocation-list-editor>
 
-<div class="row">
+<div class="row" ng-show="vm.budget.status==='open'">
     <div class="col-xs-9">
         <div class="">
             <button class="btn btn-success"

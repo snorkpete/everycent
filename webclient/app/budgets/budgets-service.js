@@ -12,6 +12,7 @@
         getBudget: getBudget,
         addBudget: addBudget,
         copyBudget: copyBudget,
+        closeBudget: closeBudget,
         addNewIncome: addNewIncome,
         addNewAllocation: addNewAllocation,
         groupAllocationsByCategory: groupAllocationsByCategory,
@@ -35,6 +36,10 @@
 
       function copyBudget(budget){
         return budget.customPUT(null, 'copy');
+      }
+
+      function closeBudget(budget){
+        return budget.customPUT(null, 'close');
       }
 
       function addNewIncome(budget){

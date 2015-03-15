@@ -15,6 +15,7 @@
     vm.addBudget = addBudget;
     vm.selectBudgetForUpdate = selectBudgetForUpdate;
     vm.copyBudget = copyBudget;
+    vm.closeBudget = closeBudget;
 
     activate();
 
@@ -62,6 +63,28 @@
         });
       }, function(){
         MessageService.setErrorMessage('Copy cancelled.'); // cancel clicked
+      });
+    }
+
+    function closeBudget(budget){
+      var message ='Are you sure you want to close the budget: ' + budget.name+ '?' +
+         '\n This action is not reversible. '; 
+
+      var modalOptions = {
+        headerText: 'Close this budget',
+        bodyText: message,
+        confirmButtonText: 'Close',
+        cancelButtonText: 'Cancel'
+      };
+
+      ModalService.show(modalOptions).then(function(){
+
+        BudgetsService.closeBudget(budget).then(function(response){
+          refreshBudgetList();
+          MessageService.setMessage('Budget closed.');
+        });
+      }, function(){
+        MessageService.setErrorMessage('Close cancelled.'); // cancel clicked
       });
     }
 
