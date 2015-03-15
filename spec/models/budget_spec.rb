@@ -8,6 +8,7 @@
 #  end_date   :date
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  status     :string           default("open")
 #
 
 require 'rails_helper'

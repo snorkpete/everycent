@@ -25,6 +25,11 @@ class BudgetsController < ApplicationController
     respond_with(result, BudgetSerializer)
   end
 
+  def close
+    result = Budget.close(params[:id])
+    respond_with(result, BudgetSerializer)
+  end
+
   def update
     @budget.update(budget_params)
 

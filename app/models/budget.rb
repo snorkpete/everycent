@@ -8,6 +8,7 @@
 #  end_date   :date
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  status     :string           default("open")
 #
 
 class Budget < ActiveRecord::Base
@@ -47,6 +48,20 @@ class Budget < ActiveRecord::Base
     end
 
     new_budget
+  end
+
+  def self.close(budget_id)
+    budget = Budget.find(budget_id)
+    budget.close
+  end
+
+  def close
+    BankAccount.all.each do |bank_account|
+      bank_account.update_balance(self.id)
+    end
+    self.status = 'closed'
+    save
+    self
   end
 
   protected
