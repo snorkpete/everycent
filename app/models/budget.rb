@@ -57,7 +57,7 @@ class Budget < ActiveRecord::Base
 
   def close
     BankAccount.all.each do |bank_account|
-      bank_account.update_balance(self.id)
+      bank_account.update_balance(self.id, self.end_date)
     end
     self.status = 'closed'
     save

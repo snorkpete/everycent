@@ -1,0 +1,33 @@
+
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Bank Accounts</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table table-bordered clear-background rounded">
+        <thead>
+            <tr class="heading">
+                <th>Name</th>
+                <th>Institution</th>
+                <th>Account Type</th>
+                <th>Balance At Budget Start</th>
+                <th>Expected Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="bankAccount in vm.bankAccounts">
+                <td> {{ bankAccount.name }} </td>
+                <td> {{ bankAccount.institution.name }} </td>
+                <td> {{ bankAccount.account_type }} </td>
+                <td class="text-right"> {{ bankAccount.current_balance | ecToDollars }} </td>
+                <td class="text-right"> {{ bankAccount.expected_new_balance | ecToDollars }} </td>
+
+            </tr>
+        </tbody>
+        </table>
+    </div>
+</div>
+<br/>
+

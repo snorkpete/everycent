@@ -1,6 +1,32 @@
 
 (function(){
   angular
+    .module('everycent.account-statuses', ['everycent.common'])
+    .config(RouteConfiguration);
+
+  RouteConfiguration.$inject = ['$stateProvider'];
+
+  function RouteConfiguration($stateProvider){
+
+    $stateProvider
+      .state('account-statuses', {
+        url: '/account-statuses',
+        templateUrl: 'app/account-statuses/account-statuses-list.html',
+        controller: 'AccountStatusesCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
+    ;
+  }
+})();
+
+;
+
+(function(){
+  angular
     .module('everycent.budgets', ['everycent.common'])
     .config(RouteConfiguration);
 
@@ -282,7 +308,8 @@
     'everycent.setup.recurring-allocations',
     'everycent.setup.allocation-categories',
     'everycent.budgets',
-    'everycent.transactions'
+    'everycent.transactions',
+    'everycent.account-statuses'
   ]);
 
   angular
@@ -328,6 +355,61 @@
   }
 })();
 
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.account-statuses')
+    .controller('AccountStatusesCtrl', AccountStatusesCtrl);
+
+  AccountStatusesCtrl.$inject = ['AccountStatusesService', 'StateService'];
+
+  function AccountStatusesCtrl(AccountStatusesService, StateService){
+    var vm = this;
+    vm.state = StateService; // page state handler
+    vm.bankAccount = {};
+    vm.bankAccounts = [];
+    vm.refresh = refreshBankAccountList;
+    activate();
+
+    function activate(){
+      refreshBankAccountList();
+    }
+
+    function refreshBankAccountList(){
+      AccountStatusesService.getAccountStatuses().then(function(bankAccounts){
+        vm.bankAccounts = bankAccounts;
+      });
+    }
+  }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.account-statuses')
+    .factory('AccountStatusesService', AccountStatusesService);
+
+    AccountStatusesService.$inject = ['$http', 'Restangular'];
+    function AccountStatusesService($http, Restangular){
+      var service = {
+        getAccountStatuses: getAccountStatuses
+      };
+
+      var baseAll = Restangular.all('account_statuses');
+      return service;
+
+      function getAccountStatuses(){
+        return baseAll.getList();
+      }
+    }
+})();
 
 ;
 
@@ -1652,7 +1734,14 @@ var x = 200;
           }
         });
         return result;
-      }else{
+      }
+      // TODO: messy way of handling this - need a more scalable solution
+      else if(menuOption === 'budgets'){
+        return StateService.is('budgets') ||
+          StateService.is('budgets-edit') ||
+          StateService.is('budgets.new');
+      }
+      else{
         return StateService.is(menuOption);
       }
     }
@@ -2322,6 +2411,30 @@ var x = 200;
 
       function addRecurringIncome(recurringIncome){
         return baseAll.post(recurringIncome);
+      }
+    }
+})();
+
+;
+
+(function(){
+  'use strict';
+
+  angular
+    .module('everycent.transactions')
+    .factory('AccountStatusesService', AccountStatusesService);
+
+    AccountStatusesService.$inject = ['$http', 'Restangular'];
+    function AccountStatusesService($http, Restangular){
+      var service = {
+        getAccountStatuses: getAccountStatuses
+      };
+
+      var baseAll = Restangular.all('account_statuses');
+      return service;
+
+      function getAccountStatuses(){
+        return baseAll.getList();
       }
     }
 })();
