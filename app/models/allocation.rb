@@ -58,11 +58,14 @@ class Allocation < ActiveRecord::Base
   end
 
   def spent
-    #transactions.sum('withdrawal_amount - deposit_amount')
+    # TODO: to follow up on why summing in the db causes n+1 queries
+    # transactions.sum('withdrawal_amount - deposit_amount')
+    #
+    # Need to sum in Ruby because summing in the db causes N+1 query issue,
+    # and :includes does not resolve it
     transactions.to_a.sum do |transaction|
       transaction.withdrawal_amount - transaction.deposit_amount
     end
-    #(:withdrawal_amount) - transactions.sum(:deposit_amount)
   end
 
   def remaining
