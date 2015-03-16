@@ -50,7 +50,14 @@
           }
         });
         return result;
-      }else{
+      }
+      // TODO: messy way of handling this - need a more scalable solution
+      else if(menuOption === 'budgets'){
+        return StateService.is('budgets') ||
+          StateService.is('budgets-edit') ||
+          StateService.is('budgets.new');
+      }
+      else{
         return StateService.is(menuOption);
       }
     }
