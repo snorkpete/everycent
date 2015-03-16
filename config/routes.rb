@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   end
 
   resources :allocations, only: [:index]
+  resources :account_statuses, only: [:index]
 
   resources :recurring_allocations, except: [:new, :edit]
   resources :recurring_incomes, except: [:new, :edit]

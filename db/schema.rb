@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150315194134) do
+ActiveRecord::Schema.define(version: 20150316002355) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 20150315194134) do
     t.integer  "current_balance"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.date     "closing_date"
   end
 
   add_index "bank_accounts", ["institution_id"], name: "index_bank_accounts_on_institution_id", using: :btree
