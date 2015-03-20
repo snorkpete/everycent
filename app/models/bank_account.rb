@@ -46,7 +46,7 @@ class BankAccount < ActiveRecord::Base
       transaction.deposit_amount - transaction.withdrawal_amount
     end
 
-    current_balance + new_transaction_total
+    current_balance.to_i + new_transaction_total
   end
 
   protected
