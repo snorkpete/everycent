@@ -5,7 +5,7 @@ var uglify = require('gulp-uglifyjs');
 var concat = require('gulp-concat');
 var concatCss = require('gulp-concat-css');
 var htmlmin = require('gulp-htmlmin');
-var ngTemplates = require('gulp-ng-templates');
+var templateCache = require('gulp-angular-templatecache');
 var livereload = require('gulp-livereload');
 //var runSequence = require('run-sequence');
 
@@ -29,7 +29,7 @@ function ecUglify(src, type){
             //.pipe(uglify(result, {
             //    outSourceMap: true
             //  }))
-            .pipe(concat(result))
+            .pipe(concat(result, {newLine: ';'}))
             .pipe(gulp.dest('../public/js'))
             .pipe(livereload())
   ;
@@ -37,9 +37,10 @@ function ecUglify(src, type){
 
 gulp.task('js:app', function(){
   var src = [
-    'app/**/*.module.js',
+    //'app/**/*.module.js',
     'app/app.js',
-    'app/**/*.js',
+    'app/app.route.js',
+    //'app/**/*.js',
     '!app/**/*.spec.js'
   ];
   return ecUglify(src, 'app');
@@ -105,8 +106,9 @@ gulp.task('css:app', function(){
 gulp.task('html', function(){
   return gulp.src('app/**/*.html')
             .pipe(htmlmin({collapseWhitespace:true}))
-            .pipe(ngTemplates({
+            .pipe(templateCache({
                     filename: compiledFileName('templates', '.js'),
+                    root: 'app/',
                     module: pkg.name
             }))
             .pipe(gulp.dest('../public/js'))
