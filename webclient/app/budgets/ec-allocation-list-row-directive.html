@@ -23,7 +23,7 @@
 
     <!-- spent -->
     <td class="text-right">
-        <ec-amount-formatted amount="vm.allocation.spent"> </ec-amount-formatted>
+        {{ vm.allocation.spent | ecToDollars }}
     </td>
 
     <!-- remaining -->

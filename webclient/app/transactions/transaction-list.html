@@ -34,7 +34,6 @@
             <thead>
                 <tr class="heading">
                     <th style="width:15%;">Date</th>
-                    <th style="width: 5%;">Ref#</th>
                     <th style="width:25%;">Description</th>
                     <th style="width:15%;">Payee</th>
                     <th style="width:15%;">Allocation</th>
@@ -89,12 +88,6 @@
                         </span>
                         <span ng-hide="vm.isEditMode"
                               ng-bind="transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
-                    </td>
-
-                    <!-- bank_ref -->
-                    <td>
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.bank_ref" ></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.bank_ref"></span>
                     </td>
 
                     <!-- description -->

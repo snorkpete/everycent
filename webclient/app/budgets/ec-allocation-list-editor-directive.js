@@ -42,6 +42,7 @@
     vm.unallocatedTotalForCategory = unallocatedTotalForCategory;
 
     vm.totalDiscretionaryAmount = totalDiscretionaryAmount;
+    vm.totalRemaining = totalRemaining;
 
     activate();
 
@@ -110,6 +111,10 @@
 
     function totalDiscretionaryAmount(){
       return vm.util.total(vm.budget.incomes, 'amount') - vm.util.total(vm.budget.allocations, 'amount');
+    }
+
+    function totalRemaining(){
+      return vm.util.total(vm.budget.allocations, 'amount') - vm.util.total(vm.budget.allocations, 'spent');
     }
   }
 })();

@@ -23,10 +23,15 @@
                           </ec-amount-label>
                         </span>
                     </th>
-                    <th class="text-right">{{ vm.util.total(vm.budget.allocations, 'amount') | ecToDollars }}</th>
                     <th class="text-right">
+                        {{ vm.util.total(vm.budget.allocations, 'amount') | ecToDollars }}
                     </th>
-                    <th></th>
+                    <th class="text-right">
+                        {{ vm.util.total(vm.budget.allocations, 'spent') }}
+                    </th>
+                    <th class="text-right">
+                        <ec-amount-formatted amount="vm.totalRemaining()"></ec-amount-formatted>
+                    </th>
                     <th></th>
                 </tr>
             </tfoot>
@@ -37,24 +42,12 @@
                       <span>
                         {{ category.name }}
                       </span>
-                      <span class="pull-right text-right">
-                          <ec-amount-label label="Recommended"
-                                           type="info"
-                                           amount="vm.recommendedTotalForCategory(category)">
-                          </ec-amount-label>
-
-                          <br/>
-                          <ec-amount-label label="Unallocated"
-                                            type="default"
-                                           amount="vm.unallocatedTotalForCategory(category)">
-                          </ec-amount-label>
-                      </span>
                     </td>
                     <td class="text-right">
                       {{ vm.actualTotalForCategory(category) | ecToDollars }}
                     </td>
                     <td class="text-right">
-                        <ec-amount-formatted amount="vm.actualSpentForCategory(category)"></ec-amount-formatted>
+                        {{ vm.actualSpentForCategory(category) | ecToDollars }}
                     </td>
                     <td class="text-right">
                         <ec-amount-formatted amount="vm.actualRemainingForCategory(category)"></ec-amount-formatted>
