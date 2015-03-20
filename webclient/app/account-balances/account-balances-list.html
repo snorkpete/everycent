@@ -13,7 +13,7 @@
                 <th>Institution</th>
                 <th>Account Type</th>
                 <th>Balance At Budget Start</th>
-                <th>Expected Balance</th>
+                <th>Current Balance</th>
             </tr>
         </thead>
         <tbody>
@@ -21,8 +21,8 @@
                 <td> {{ bankAccount.name }} </td>
                 <td> {{ bankAccount.institution.name }} </td>
                 <td> {{ bankAccount.account_type }} </td>
+                <td class="text-right"> {{ bankAccount.closing_balance | ecToDollars }} </td>
                 <td class="text-right"> {{ bankAccount.current_balance | ecToDollars }} </td>
-                <td class="text-right"> {{ bankAccount.expected_new_balance | ecToDollars }} </td>
 
             </tr>
         </tbody>

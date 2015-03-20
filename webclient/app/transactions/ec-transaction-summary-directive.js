@@ -26,13 +26,13 @@
 
     vm.lastBankBalance = lastBankBalance;
     vm.transactionTotal = transactionTotal;
-    vm.newBankBalance = newBankBalance;
+    vm.currentBankBalance = currentBankBalance;
 
     function lastBankBalance(){
       if(!vm.bankAccount){
         return 0;
       }
-      return vm.bankAccount.current_balance;
+      return vm.bankAccount.closing_balance;
     }
 
     function transactionTotal(){
@@ -51,7 +51,7 @@
       return totalDeposits - totalWithdrawals;
     }
 
-    function newBankBalance(){
+    function currentBankBalance(){
       return lastBankBalance() + transactionTotal();
     }
   }
