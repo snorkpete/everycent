@@ -60,6 +60,7 @@ gulp.task('js:vendor', function(){
     'bower_components/lodash/dist/lodash.min.js',
     'bower_components/restangular/dist/restangular.min.js',
     'bower_components/angular-toastr/dist/angular-toastr.min.js',
+    'bower_components/angular-toastr/dist/angular-toastr.tpls.min.js',
     'bower_components/angular-loading-bar/build/loading-bar.min.js'
   ];
   return ecUglify(src, 'vendor');
