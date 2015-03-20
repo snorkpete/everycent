@@ -21,7 +21,8 @@
     'everycent.setup.recurring-allocations',
     'everycent.setup.allocation-categories',
     'everycent.budgets',
-    'everycent.transactions'
+    'everycent.transactions',
+    'everycent.account-balances'
   ]);
 
   angular

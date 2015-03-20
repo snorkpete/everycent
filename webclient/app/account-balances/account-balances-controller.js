@@ -3,12 +3,12 @@
   'use strict';
 
   angular
-    .module('everycent.account-statuses')
-    .controller('AccountStatusesCtrl', AccountStatusesCtrl);
+    .module('everycent.account-balances')
+    .controller('AccountBalancesCtrl', AccountBalancesCtrl);
 
-  AccountStatusesCtrl.$inject = ['AccountStatusesService', 'StateService'];
+  AccountBalancesCtrl.$inject = ['AccountBalancesService', 'StateService'];
 
-  function AccountStatusesCtrl(AccountStatusesService, StateService){
+  function AccountBalancesCtrl(AccountBalancesService, StateService){
     var vm = this;
     vm.state = StateService; // page state handler
     vm.bankAccount = {};
@@ -21,7 +21,7 @@
     }
 
     function refreshBankAccountList(){
-      AccountStatusesService.getAccountStatuses().then(function(bankAccounts){
+      AccountBalancesService.getAccountBalances().then(function(bankAccounts){
         vm.bankAccounts = bankAccounts;
       });
     }

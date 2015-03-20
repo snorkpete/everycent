@@ -1,0 +1,4 @@
+/log/*
+/tmp/*
+/webclient/bower_components/*
+/webclient/node_modules/*

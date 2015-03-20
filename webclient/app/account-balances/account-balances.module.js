@@ -1,7 +1,7 @@
 
 (function(){
   angular
-    .module('everycent.account-statuses', ['everycent.common'])
+    .module('everycent.account-balances', ['everycent.common'])
     .config(RouteConfiguration);
 
   RouteConfiguration.$inject = ['$stateProvider'];
@@ -9,10 +9,10 @@
   function RouteConfiguration($stateProvider){
 
     $stateProvider
-      .state('account-statuses', {
-        url: '/account-statuses',
-        templateUrl: 'app/account-statuses/account-statuses-list.html',
-        controller: 'AccountStatusesCtrl as vm',
+      .state('account-balances', {
+        url: '/account-balances',
+        templateUrl: 'app/account-balances/account-balances-list.html',
+        controller: 'AccountBalancesCtrl as vm',
         resolve:{
           auth: ['$auth', function($auth){
             return $auth.validateUser();
