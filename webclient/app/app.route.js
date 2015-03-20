@@ -6,18 +6,15 @@
     .module('everycent')
     .config(RouteConfiguration);
 
-  //RouteConfiguration.$inject = ['$authProvider', '$stateProvider', '$urlRouterProvider'];
-  RouteConfiguration.$inject = ['$stateProvider', '$urlRouterProvider'];
-
-  //function RouteConfiguration($authProvider, $stateProvider, $urlRouterProvider){
-  function RouteConfiguration( $stateProvider, $urlRouterProvider){
+  RouteConfiguration.$inject = ['$authProvider', '$stateProvider', '$urlRouterProvider'];
+  function RouteConfiguration($authProvider, $stateProvider, $urlRouterProvider){
 
     // Configure the auth provider
     // ---------------------------
 
-    //$authProvider.configure({
-    //  apiUrl: ''
-    //});
+    $authProvider.configure({
+      apiUrl: ''
+    });
 
     // Configure the global routes
     // ---------------------------
@@ -27,14 +24,14 @@
         templateUrl: 'app/home/home.html',
         controller: [function(){ }]
       })
-      //.state('all', {
-      //  abstract: true,
-      //  resolve: {
-      //    auth: ['$auth',function($auth){
-      //      return $auth.validateUser();
-      //    }]
-      //  }
-      //})
+      .state('all', {
+        abstract: true,
+        resolve: {
+          auth: ['$auth',function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
     ;
 
     // if none of the above match, then redirect to the 'home' state

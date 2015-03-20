@@ -37,10 +37,10 @@ function ecUglify(src, type){
 
 gulp.task('js:app', function(){
   var src = [
-    //'app/**/*.module.js',
+    'app/**/*.module.js',
     'app/app.js',
     'app/app.route.js',
-    //'app/**/*.js',
+    'app/**/*.js',
     '!app/**/*.spec.js'
   ];
   return ecUglify(src, 'app');
