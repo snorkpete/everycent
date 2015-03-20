@@ -35,7 +35,6 @@
     "gulp-concat-css": "^2.1.1",
     "gulp-htmlmin": "^1.1.1",
     "gulp-livereload": "^3.8.0",
-    "gulp-ng-templates": "0.0.5",
     "gulp-angular-templatecache": "^1.5.0"
   },
   "engines": {
