@@ -9,7 +9,7 @@
 #  user_id         :integer
 #  institution_id  :integer
 #  opening_balance :integer
-#  current_balance :integer
+#  closing_balance :integer
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #
@@ -34,19 +34,19 @@ class BankAccount < ActiveRecord::Base
       total_transaction_amount -= transaction.withdrawal_amount
     end
 
-    self.current_balance += total_transaction_amount
+    self.closing_balance += total_transaction_amount
     self.closing_date = closing_date
     save
   end
 
-  def expected_new_balance
+  def current_balance
     transaction_list = transactions.where('transaction_date > ?', closing_date).to_a
 
     new_transaction_total = transaction_list.sum do |transaction|
       transaction.deposit_amount - transaction.withdrawal_amount
     end
 
-    current_balance.to_i + new_transaction_total
+    closing_balance.to_i + new_transaction_total
   end
 
   protected
