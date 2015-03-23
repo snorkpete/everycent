@@ -34,8 +34,14 @@
   AppConfig.$inject = ['$authProvider', '$compileProvider', '$httpProvider'];
   function AppConfig($authProvider, $compileProvider, $httpProvider){
 
-    //$compileProvider.debugInfoEnabled(false);
     $httpProvider.useApplyAsync(true);
+
+    // Do not add debugging info to the DOM
+    $compileProvider.debugInfoEnabled(false);
+
+    // If you wish to debug this app,
+    // then, in the console call:
+    // angular.reloadWithDebugInfo();
   }
 
   AuthenticationSetup.$inject = ['$rootScope', '$timeout', '$location', 'MessageService', 'UserService'];
