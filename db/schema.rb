@@ -16,14 +16,14 @@ ActiveRecord::Schema.define(version: 20150320184122) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "allocation_categories", force: true do |t|
+  create_table "allocation_categories", force: :cascade do |t|
     t.string   "name"
     t.integer  "percentage"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "allocations", force: true do |t|
+  create_table "allocations", force: :cascade do |t|
     t.string   "name"
     t.integer  "amount"
     t.integer  "budget_id"
@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 20150320184122) do
   add_index "allocations", ["bank_account_id"], name: "index_allocations_on_bank_account_id", using: :btree
   add_index "allocations", ["budget_id"], name: "index_allocations_on_budget_id", using: :btree
 
-  create_table "bank_accounts", force: true do |t|
+  create_table "bank_accounts", force: :cascade do |t|
     t.string   "name"
     t.string   "account_type"
     t.string   "account_no"
@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 20150320184122) do
   add_index "bank_accounts", ["institution_id"], name: "index_bank_accounts_on_institution_id", using: :btree
   add_index "bank_accounts", ["user_id"], name: "index_bank_accounts_on_user_id", using: :btree
 
-  create_table "budgets", force: true do |t|
+  create_table "budgets", force: :cascade do |t|
     t.string   "name"
     t.date     "start_date"
     t.date     "end_date"
@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(version: 20150320184122) do
 
   add_index "budgets", ["start_date"], name: "index_budgets_on_start_date", using: :btree
 
-  create_table "incomes", force: true do |t|
+  create_table "incomes", force: :cascade do |t|
     t.string   "name"
     t.integer  "amount"
     t.integer  "budget_id"
@@ -78,13 +78,13 @@ ActiveRecord::Schema.define(version: 20150320184122) do
   add_index "incomes", ["bank_account_id"], name: "index_incomes_on_bank_account_id", using: :btree
   add_index "incomes", ["budget_id"], name: "index_incomes_on_budget_id", using: :btree
 
-  create_table "institutions", force: true do |t|
+  create_table "institutions", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "payees", force: true do |t|
+  create_table "payees", force: :cascade do |t|
     t.string   "name"
     t.string   "code"
     t.string   "default_allocation_name"
@@ -93,7 +93,7 @@ ActiveRecord::Schema.define(version: 20150320184122) do
     t.datetime "updated_at",              null: false
   end
 
-  create_table "recurring_allocations", force: true do |t|
+  create_table "recurring_allocations", force: :cascade do |t|
     t.string   "name",                                       null: false
     t.integer  "amount"
     t.integer  "allocation_category_id"
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 20150320184122) do
   add_index "recurring_allocations", ["allocation_category_id"], name: "index_recurring_allocations_on_allocation_category_id", using: :btree
   add_index "recurring_allocations", ["bank_account_id"], name: "index_recurring_allocations_on_bank_account_id", using: :btree
 
-  create_table "recurring_incomes", force: true do |t|
+  create_table "recurring_incomes", force: :cascade do |t|
     t.string   "name"
     t.integer  "amount"
     t.string   "frequency",       default: "monthly"
@@ -119,7 +119,7 @@ ActiveRecord::Schema.define(version: 20150320184122) do
 
   add_index "recurring_incomes", ["bank_account_id"], name: "index_recurring_incomes_on_bank_account_id", using: :btree
 
-  create_table "transactions", force: true do |t|
+  create_table "transactions", force: :cascade do |t|
     t.string   "description"
     t.string   "bank_ref"
     t.integer  "bank_account_id"
@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 20150320184122) do
   add_index "transactions", ["bank_account_id"], name: "index_transactions_on_bank_account_id", using: :btree
   add_index "transactions", ["transaction_date"], name: "index_transactions_on_transaction_date", using: :btree
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.string   "provider",                            null: false
     t.string   "uid",                    default: "", null: false
     t.string   "encrypted_password",     default: "", null: false
