@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby '2.2.1'
 
 
-gem 'rails', '4.2.0.rc3'
+gem 'rails', '~> 4.2'
 gem 'puma'
 
 gem 'rails-api'
@@ -31,7 +31,7 @@ gem 'devise_token_auth'
 
 # json api building
 gem 'active_model_serializers'
-gem 'responders', '~> 2.0'
+gem 'responders'
 
 
 # web server
