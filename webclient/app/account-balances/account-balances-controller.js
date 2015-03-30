@@ -10,9 +10,6 @@
 
   function AccountBalancesCtrl(AccountBalancesService, UtilService, StateService, filterFilter){
     var vm = this;
-    vm.util = UtilService;
-    vm.state = StateService; // page state handler
-    vm.bankAccount = {};
     vm.bankAccounts = [];
     vm.refresh = refreshBankAccountList;
     vm.netWorth = netWorth;

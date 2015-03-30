@@ -1,0 +1,44 @@
+<table class="table table-bordered clear-background rounded">
+    <thead>
+        <tr class="heading">
+            <th>Name</th>
+            <th>Institution</th>
+            <th>Account Type</th>
+            <th>Category</th>
+            <th>
+                Balance At: <em>{{ vm.bankAccounts[0].closing_date | date:'MMM dd' }}</em>
+
+            </th>
+            <th>Balance At: <em>{{ vm.bankAccounts[0].next_closing_date | date:'MMM dd' }}</em>
+            </th>
+            <th>Current Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="bankAccount in vm.bankAccounts">
+            <td> {{ bankAccount.name }} </td>
+            <td> {{ bankAccount.institution.name }} </td>
+            <td> {{ bankAccount.account_type }} </td>
+            <td> {{ bankAccount.account_category }} </td>
+            <td class="text-right"> {{ bankAccount.closing_balance | ecToDollars }} </td>
+            <td class="text-right"> {{ bankAccount.expected_closing_balance | ecToDollars }} </td>
+            <td class="text-right"> {{ bankAccount.current_balance | ecToDollars }} </td>
+
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr class="total">
+            <th class="text-right" colspan="4">Total</th>
+            <th class="text-right">
+                {{ vm.util.total(vm.bankAccounts, 'closing_balance') | ecToDollars }}
+            </th>
+            <th class="text-right">
+                {{ vm.util.total(vm.bankAccounts, 'expected_closing_balance') | ecToDollars }}
+            </th>
+            <th class="text-right">
+                {{ vm.util.total(vm.bankAccounts, 'current_balance') | ecToDollars }}
+            </th>
+        </tr>
+    </tfoot>
+</table>
+
