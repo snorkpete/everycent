@@ -27,7 +27,7 @@
                         {{ vm.util.total(vm.budget.allocations, 'amount') | ecToDollars }}
                     </th>
                     <th class="text-right">
-                        {{ vm.util.total(vm.budget.allocations, 'spent') }}
+                        {{ vm.util.total(vm.budget.allocations, 'spent') | ecToDollars }}
                     </th>
                     <th class="text-right">
                         <ec-amount-formatted amount="vm.totalRemaining()"></ec-amount-formatted>
