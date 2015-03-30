@@ -14,13 +14,8 @@ group :development do
   gem 'meta_request'
 end
 
-
-#gem 'sqlite3', :group => :development
-group :development, :production do
-  gem 'pg'
-end
-#gem 'pg', :group => :production
-#gem 'pg', :group => :development
+# database gem
+gem 'pg'
 
 # fix for time
 gem 'tzinfo-data'
