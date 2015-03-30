@@ -23,6 +23,12 @@
 
     <!-- spent -->
     <td class="text-right">
+        <div class="pull-left text-info pointer" title="Show Transactions">
+            <ec-icon
+                type="question-sign"
+                ng-click="vm.showTransactions(vm.allocation)">
+            </ec-icon>
+        </div>
         {{ vm.allocation.spent | ecToDollars }}
     </td>
 
