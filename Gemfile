@@ -6,7 +6,6 @@ gem 'puma'
 
 gem 'rails-api'
 
-#gem 'spring', :group => :development
 group :development do
   gem 'annotate'
   gem 'lol_dba'
@@ -32,10 +31,12 @@ gem 'rails_12factor'
 gem 'newrelic_rpm'
 
 group :development, :test do
-  gem 'guard-spork'
+  gem 'spring'
+  gem 'spring-commands-rspec'
+  #gem 'spring-watcher-listen'
+
   gem 'guard-bundler'
   gem 'guard-rails'
-  gem 'spork-rails'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'guard-rspec'
