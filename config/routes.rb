@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resources :transactions, except: [:new, :edit] do
     collection do
       put 'update_all'
+      get 'by_allocation'
     end
   end
   resources :payees, except: [:new, :edit]

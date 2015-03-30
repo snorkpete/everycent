@@ -8,6 +8,11 @@ class TransactionsController < ApplicationController
     respond_with(@transactions, TransactionSerializer)
   end
 
+  def by_allocation
+    @transactions = Transaction.by_allocation(params[:allocation_id])
+    respond_with(@transactions, TransactionSerializer)
+  end
+
   def create
     @transactions = Transaction.update_with_params(transaction_params)
     respond_with(@transactions, TransactionSerializer)

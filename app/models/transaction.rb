@@ -30,6 +30,10 @@ class Transaction < ActiveRecord::Base
                .where('transaction_date >= ? and transaction_date <= ?',budget.start_date, budget.end_date)
   end
 
+  def self.by_allocation(allocation_id)
+    Transaction.where('allocation_id = ?', allocation_id)
+  end
+
   def self.update_with_params(params)
 
     # remove the existing transactions in the period
