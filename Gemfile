@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 ruby '2.2.1'
-#ruby '2.1.5'
-
 
 gem 'rails', '~> 4.2'
 gem 'puma'
@@ -29,18 +27,14 @@ gem 'devise_token_auth'
 gem 'active_model_serializers'
 gem 'responders'
 
-
-# web server
-#gem 'passenger'
-
 #for heroku
 gem 'rails_12factor'
+gem 'newrelic_rpm'
 
 group :development, :test do
   gem 'guard-spork'
   gem 'guard-bundler'
   gem 'guard-rails'
-  #gem 'guard-rspec'
   gem 'spork-rails'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
