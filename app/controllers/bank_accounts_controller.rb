@@ -2,7 +2,7 @@ class BankAccountsController < ApplicationController
   before_action :set_bank_account, only: [:show, :edit, :update, :destroy]
 
   def index
-    @bank_accounts = BankAccount.includes(:institution, :user).all
+    @bank_accounts = BankAccount.includes(:institution, :user).order(:account_category, :name).all
     respond_with(@bank_accounts, BankAccountSerializer)
   end
 
@@ -40,6 +40,6 @@ class BankAccountsController < ApplicationController
     end
 
     def bank_account_params
-      params.fetch(:bank_account, {}).permit(:name, :account_type, :account_no, :user_id, :institution_id, :opening_balance)
+      params.fetch(:bank_account, {}).permit(:name, :account_type, :account_no, :user_id, :institution_id, :opening_balance, :account_category)
     end
 end

@@ -13,6 +13,12 @@ div.container h2{
   color: rgb(198, 21, 76);
 }
 
+p.net-worth{
+  font-size: 14px;
+  border-top: 2px solid black;
+  color: rgb(198, 21, 76);
+}
+
 table.fixed-layout{
   table-layout: fixed;
 }

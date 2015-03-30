@@ -19,6 +19,21 @@
                ng-model="vm.bankAccount.account_type">
 </ec-form-field>
 
+<div class="form-group" ng-class="{'has-error': vm.bankAccountForm.account_category.$error.server }">
+    <label class="col-xs-2 control-label">Category</label>
+    <div class="col-xs-6">
+
+        <select name="account_category"
+                ng-model="vm.bankAccount.account_category"
+                class="form-control">
+                <option value="asset">Asset</option>
+                <option value="liability">Liability</option>
+        </select>
+
+        <p class="help-block">{{ vm.bankAccountForm.account_category.$error.server }}</p>
+    </div>
+</div>
+
 <ec-form-field label="Account Owner" label-width="2"
                name="user_id"
                error="vm.bankAccountForm.user_id.$error"
