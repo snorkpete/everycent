@@ -49,6 +49,22 @@ class BankAccount < ActiveRecord::Base
     closing_balance.to_i + new_transaction_total
   end
 
+  def expected_closing_balance
+    next_budget_to_close = Budget.where(status: 'open').order(:start_date).first
+    return 0 if next_budget_to_close.nil?
+
+    expected_end_date = next_budget_to_close.end_date
+
+    transaction_list = transactions.where('transaction_date > ? and transaction_date <= ?',
+                                          closing_date, expected_end_date).to_a
+
+    new_transaction_total = transaction_list.sum do |transaction|
+      transaction.deposit_amount - transaction.withdrawal_amount
+    end
+
+    closing_balance.to_i + new_transaction_total
+  end
+
   protected
 
   def fix_name

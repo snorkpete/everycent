@@ -16,7 +16,8 @@
                             <th>Institution</th>
                             <th>Account Type</th>
                             <th>Category</th>
-                            <th>Balance At Budget Start</th>
+                            <th>Budget Start Balance</th>
+                            <th>Budget End Balance</th>
                             <th>Current Balance</th>
                         </tr>
                     </thead>
@@ -27,6 +28,7 @@
                             <td> {{ bankAccount.account_type }} </td>
                             <td> {{ bankAccount.account_category }} </td>
                             <td class="text-right"> {{ bankAccount.closing_balance | ecToDollars }} </td>
+                            <td class="text-right"> {{ bankAccount.expected_closing_balance | ecToDollars }} </td>
                             <td class="text-right"> {{ bankAccount.current_balance | ecToDollars }} </td>
 
                         </tr>
@@ -36,6 +38,9 @@
                             <th class="text-right" colspan="4">Total</th>
                             <th class="text-right">
                                 {{ vm.util.total(vm.assetAccounts, 'closing_balance') | ecToDollars }}
+                            </th>
+                            <th class="text-right">
+                                {{ vm.util.total(vm.assetAccounts, 'expected_closing_balance') | ecToDollars }}
                             </th>
                             <th class="text-right">
                                 {{ vm.util.total(vm.assetAccounts, 'current_balance') | ecToDollars }}
@@ -59,7 +64,8 @@
                             <th>Institution</th>
                             <th>Account Type</th>
                             <th>Category</th>
-                            <th>Balance At Budget Start</th>
+                            <th>Budget Start Balance</th>
+                            <th>Budget End Balance</th>
                             <th>Current Balance</th>
                         </tr>
                     </thead>
@@ -70,6 +76,7 @@
                             <td> {{ bankAccount.account_type }} </td>
                             <td> {{ bankAccount.account_category }} </td>
                             <td class="text-right"> {{ bankAccount.closing_balance | ecToDollars }} </td>
+                            <td class="text-right"> {{ bankAccount.expected_closing_balance | ecToDollars }} </td>
                             <td class="text-right"> {{ bankAccount.current_balance | ecToDollars }} </td>
 
                         </tr>
@@ -79,6 +86,9 @@
                             <th class="text-right" colspan="4">Total</th>
                             <th class="text-right">
                                 {{ vm.util.total(vm.liabilityAccounts, 'closing_balance') | ecToDollars }}
+                            </th>
+                            <th class="text-right">
+                                {{ vm.util.total(vm.liabilityAccounts, 'expected_closing_balance') | ecToDollars }}
                             </th>
                             <th class="text-right">
                                 {{ vm.util.total(vm.liabilityAccounts, 'current_balance') | ecToDollars }}
