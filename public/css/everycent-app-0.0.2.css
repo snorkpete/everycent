@@ -151,6 +151,15 @@ footer nav ul li a {
   float: left;
   margin-right: 25px;
 }
+
+/* FIX 
+ */
+
+.modal-backdrop {
+  bottom: 0;
+  /* some fixes appear to use this, too: */
+  position: fixed;
+}
 /* budgets.css */
 
 .category-heading {

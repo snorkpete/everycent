@@ -5,13 +5,15 @@
     .module('everycent.transactions')
     .factory('TransactionsService', TransactionsService);
 
-    TransactionsService.$inject = ['$http', 'Restangular', 'DateService'];
-    function TransactionsService($http, Restangular, DateService){
+    TransactionsService.$inject = ['$http', 'Restangular', 'DateService', '$modal', '$document'];
+    function TransactionsService($http, Restangular, DateService, $modal, $document){
       var service = {
         newTransaction: newTransaction,
         getTransactions: getTransactions,
+        transactionsFor: transactionsFor,
         save: save,
-        convertToTransactions: convertToTransactions
+        convertToTransactions: convertToTransactions,
+        showTransactionList: showTransactionList
       };
 
       var baseAll = Restangular.all('transactions');
@@ -26,6 +28,10 @@
 
       function getTransactions(params){
         return baseAll.getList(params);
+      }
+
+      function transactionsFor(allocationId){
+        return baseAll.customGET('by_allocation', { allocation_id: allocationId });
       }
 
       function save(transactions, searchOptions){
@@ -160,5 +166,59 @@
       function _isDate(data) {
         return new RegExp("\\d\\d\\/\\d\\d\\/\\d\\d\\d\\d").test(data);
       }
+
+      function showTransactionList(transactions, allocation){
+        allocation = allocation || {};
+        var allocationName = allocation.name || '';
+        var template = '<div class="modal-header">' +
+                       '     <h3>Transactions for : ' + allocationName + '</h3>' +
+                       ' </div>' +
+                       ' <div class="modal-body">' +
+                       '    <ec-allocation-transaction-list transactions="vm.transactions">' +
+                       '    </ec-allocation-transaction-list>' +
+                       ' </div>' +
+                       ' <div class="modal-footer">' +
+                       '     <button class="btn btn-primary" ' +
+                       '           ng-click="vm.options.confirm();">' +
+                       '           Close' +
+                       '     </button>' +
+                       ' </div>';
+
+        var modalInstance = $modal.open({
+          template: template,
+          backdrop:'static',
+          controller: modalController,
+          controllerAs: 'vm'
+        });
+
+        return modalInstance.result;
+
+        function modalController(){
+          /* jshint validthis: true */
+          var vm = this;
+          vm.options = {};
+          vm.transactions = transactions;
+          modalFix();
+
+          vm.options.confirm = function(){
+            modalInstance.close('ok');
+          };
+
+          vm.options.cancel = function(){
+            modalInstance.dismiss('cancel');
+          };
+        }
+
+        /** TODO: this is a temporary fix for a bootstrap 3.1.1 issue
+         * Should be removed once that issue is fixed */
+        function modalFix(){
+          setTimeout(function(){
+            angular.element($document[0].querySelectorAll('div.modal-backdrop'))
+                 .css('height','1000px');
+                }, 100);
+        }
+
+      }
     }
+
 })();

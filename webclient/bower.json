@@ -31,5 +31,8 @@
     "angular-mocks": "1.4.x",
     "ng-token-auth": "~0.0.24",
     "restangular": "1.4.x"
+  },
+  "resolutions": {
+    "angular": "1.4.x"
   }
 }

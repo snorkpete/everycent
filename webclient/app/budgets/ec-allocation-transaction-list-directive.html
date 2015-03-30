@@ -1,0 +1,68 @@
+
+<div class="row">
+    <div class="col-xs-12">
+        <div style="max-height:400px; overflow-y:scroll;">
+            <table class="table table-bordered clear-background rounded fixed-layout">
+                <thead>
+                    <tr class="heading">
+                        <th style="width:15%;">Date</th>
+                        <th style="width:25%;">Description</th>
+                        <th style="width:15%;">Payee</th>
+                        <th style="width:10%;" class="text-right">WithD.</th>
+                        <th style="width:10%;" class="text-right">Dep.</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr class="total">
+                        <th></th>
+                        <th>Total</th>
+                        <th></th>
+                        <th class="text-right"> {{ vm.util.total(vm.transactions, 'withdrawal_amount') | ecToDollars }}</th>
+                        <th class="text-right"> {{ vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}</th>
+                    </tr>
+                    <tr class="total">
+                        <th></th>
+                        <th>Summary</th>
+                        <th colspan="3" class="text-right">
+                            {{ vm.util.total(vm.transactions, 'withdrawal_amount') - 
+                               vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}
+                        </th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <tr ng-repeat="transaction in vm.transactions">
+
+                        <!-- transaction date -->
+                        <td>
+                            {{ transaction.transaction_date | date:'EEE dd MMM, yy' }}
+                        </td>
+
+                        <!-- description -->
+                        <td>
+                            {{ transaction.description }}
+                        </td>
+
+                        <!-- payee -->
+                        <td>
+                            {{ transaction.payeeName }} 
+                            {{ transaction.payeeName + ' (' + transaction.payeeCode + ')' }}
+                        </td>
+
+                        <!-- withdrawal amount -->
+                        <td class="text-right">
+                            {{ transaction.withdrawal_amount | ecToDollars }}
+                        </td>
+
+                        <!-- deposit amount -->
+                        <td class="text-right">
+                            {{ transaction.deposit_amount | ecToDollars }}
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+

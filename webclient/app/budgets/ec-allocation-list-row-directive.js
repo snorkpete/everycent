@@ -21,12 +21,14 @@
     return directive;
   }
 
-  controller.$inject = ['LookupService', 'ReferenceService'];
-  function controller(LookupService, ReferenceService){
+  controller.$inject = ['LookupService', 'ReferenceService', 'TransactionsService'];
+  function controller(LookupService, ReferenceService, TransactionsService){
     var vm = this;
 
+    vm.transactions = [];
     vm.ref = ReferenceService;
     vm.markForDeletion = markForDeletion;
+    vm.showTransactions = showTransactions;
 
     activate();
 
@@ -42,6 +44,12 @@
 
     function markForDeletion(allocation, isDeleted){
       allocation.deleted = isDeleted;
+    }
+
+    function showTransactions(allocation){
+      TransactionsService.transactionsFor(allocation.id).then(function(transactions){
+        TransactionsService.showTransactionList(transactions, allocation);
+      });
     }
   }
 })();
