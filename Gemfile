@@ -32,6 +32,9 @@ gem 'responders'
 # web server
 gem 'passenger'
 
+#for heroku
+gem 'rails_12factor'
+
 group :development, :test do
   gem 'guard-spork'
   gem 'guard-bundler'
