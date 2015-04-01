@@ -23,7 +23,8 @@
         return '';
       }
 
-      return '' + dateParts[3] + '/' + dateParts[1] + '/' + dateParts[2];
+      //return '' + dateParts[3] + '/' + dateParts[1] + '/' + dateParts[2];
+      return '' + dateParts[3] + '-' + dateParts[1] + '-' + dateParts[2] + 'T10:00:00-04:00';
     }
   }
 })();
