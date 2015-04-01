@@ -9,7 +9,7 @@
           ng-submit="vm.convertToTransactions(vm.input)">
 
         <div class="form-group">
-            <label class="col-xs-2 control-label">Input from Bank</label>
+            <label class="col-xs-3 control-label">Input from Bank</label>
             <div class="col-xs-6">
                 <textarea ng-model="vm.input"
                           name="input"
@@ -21,14 +21,25 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="col-xs-2 control-label">Does input exclude balances?</label>
+            <label class="col-xs-3 control-label">Does input exclude balances?</label>
             <div class="col-xs-6">
                 <input type="checkbox" ng-model="vm.excludeBalances" />
             </div>
         </div>
 
         <div class="form-group">
-            <div class="col-xs-offset-2 col-xs-2">
+            <label class="col-xs-3 control-label">What type of transactions?</label>
+            <div class="col-xs-6">
+                <select ng-model="vm.importType">
+                    <option value="bank-account">Bank Account</option>
+                    <option value="bank-account-without-totals">Bank Account Without Totals</option>
+                    <option value="credit-card">Credit Card</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-xs-offset-3 col-xs-2">
               <button type="submit" class="btn btn-primary">Import Transactions</button>
             </div>
             <div class="col-xs-2" ng-show="vm.showForm">

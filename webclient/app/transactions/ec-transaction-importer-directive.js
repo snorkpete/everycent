@@ -21,9 +21,10 @@
     return directive;
   }
 
-  controller.$inject = ['TransactionsService'];
-  function controller(TransactionsService){
+  controller.$inject = ['TransactionImporterService'];
+  function controller(TransactionImporterService){
     var vm = this;
+    vm.importType = 'bank-account';
     vm.showForm = false;
     vm.startImport = startImport;
     vm.cancelImport = cancelImport;
@@ -41,7 +42,7 @@
     }
 
     function convertToTransactions(input){
-      var newTransactions = TransactionsService.convertToTransactions(input, vm.startDate, vm.endDate, vm.excludeBalances);
+      var newTransactions = TransactionImporterService.convertToTransactions(input, vm.startDate, vm.endDate, vm.importType);
       vm.transactions = vm.transactions.concat(newTransactions);
       vm.showForm = false;
     }
