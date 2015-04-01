@@ -18,8 +18,11 @@
     function link(scope, element, attrs, ngModel){
 
       ngModel.$formatters.push(function(modelValue){
-        return new Date(modelValue);
+        // convert the date value to a timezone specific version
+        var newModelValue = modelValue + 'T10:00:00-0400';
+        return new Date(newModelValue);
       });
+
       ngModel.$parsers.push(function(modelValue){
         return new Date(modelValue);
       });
