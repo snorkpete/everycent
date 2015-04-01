@@ -14,6 +14,11 @@
       return service;
 
       function convertToTransactions(input, startDate, endDate, importType){
+
+        if(importType === 'credit-card'){
+          return _convertFromCreditCardData(input, startDate, endDate);
+        }
+
         var transactionList =[];
         var lines = _combineFieldsIntoLines(_convertInputToFieldList(input));
 
@@ -29,6 +34,7 @@
       }
 
       function _createTransactionFromLineData(lineData, startDate, endDate, importType){
+
         // line data is an array representing one transaction from the bank
         // That format is
         // ['date', 'ref', 2-4 lines of description, amount withdrawn, amount deposited, balance]
@@ -133,6 +139,44 @@
         return new RegExp("\\d\\d\\/\\d\\d\\/\\d\\d\\d\\d").test(data);
       }
 
+      function _convertFromCreditCardData(input, startDate, endDate){
+
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+        var transactionList =[];
+        var fields = _convertInputToFieldList(input);
+
+        var transaction = {};
+        for(var i=0; i < fields.length; i += 3){
+          transaction = {};
+          var dateText = DateService.convertFromBankDateFormat(fields[i]);
+          transaction.transaction_date = new Date(dateText);
+          transaction.description = fields[i+1];
+          transaction.amount = fields[i+2];
+
+          if(transaction.amount && transaction.amount.substring(0,2) === 'CR'){
+            transaction.deposit_amount = _extractNumber(transaction.amount.substring(2)) * 100;
+            transaction.withdrawal_amount = 0;
+          }else{
+            transaction.withdrawal_amount = _extractNumber(transaction.amount) * 100;
+            transaction.deposit_amount = 0;
+          }
+
+          // confirm that the transaction date is within the period
+          if(transaction.transaction_date < start || transaction.transaction_date > end){
+            transaction.deleted = true;
+          }
+
+          // also remove any transactions with 0 amounts
+          if(transaction.withdrawal_amount === 0 && transaction.deposit_amount === 0){
+            transaction.deleted = true;
+          }
+
+          transactionList.push(transaction);
+        }
+
+        return transactionList;
+      }
     }
 
 })();
