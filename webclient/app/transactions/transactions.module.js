@@ -10,7 +10,8 @@
 
     $stateProvider
       .state('transactions', {
-        url: '/transactions',
+        url: '/transactions?bank_account&budget',
+        reloadOnSearch: false,
         templateUrl: 'app/transactions/transaction-list.html',
         controller: 'TransactionsCtrl as vm',
         resolve:{

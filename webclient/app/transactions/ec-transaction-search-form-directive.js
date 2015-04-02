@@ -20,10 +20,12 @@
     return directive;
   }
 
-  controller.$inject = ['LookupService', 'ReferenceService', '$q'];
-  function controller(LookupService, ReferenceService, $q){
+  controller.$inject = ['LookupService', 'ReferenceService', '$q', 'StateService', '$location'];
+  function controller(LookupService, ReferenceService, $q, StateService, $location){
     var vm = this;
     vm.ref = ReferenceService;
+
+    vm.onParamChange = onParamChange;
 
     activate();
 
@@ -38,12 +40,54 @@
 
       //TODO to remove
       $q.all([accountPromise, budgetPromise]).then(function(){
-        vm.search.bank_account = vm.bank_accounts[0];
-        vm.search.bank_account_id = vm.bank_accounts[0].id;
-        vm.search.budget = vm.budgets[0];
-        vm.search.budget_id = vm.budgets[0].id;
+        setInitialSearchParams();
         vm.onSubmit();
       });
+    }
+
+    function setInitialSearchParams(){
+
+      var initialBankAccount = getInitialBankAccount();
+      vm.search.bank_account = initialBankAccount;
+      vm.search.bank_account_id = initialBankAccount.id;
+
+      var initialBudget = getInitialBudget();
+      vm.search.budget = initialBudget;
+      vm.search.budget_id = initialBudget.id;
+    }
+
+    function getInitialBankAccount(){
+      var searchParamsBankAccount = vm.bank_accounts.filter(function(account){
+        return Number(account.id) === Number(StateService.getParam('bank_account'));
+      })[0];
+
+      if(searchParamsBankAccount){
+        return searchParamsBankAccount;
+      }else{
+        return vm.bank_accounts[0];
+      }
+    }
+
+    function getInitialBudget(){
+      var searchParamsBudget = vm.budgets.filter(function(budget){
+        return Number(budget.id) === Number(StateService.getParam('budget'));
+      })[0];
+
+      if(searchParamsBudget){
+        return searchParamsBudget;
+      }else{
+        return vm.budgets[0];
+      }
+    }
+
+    function onParamChange(param){
+      vm.ref.updateReferenceId(vm.search, param);
+
+      // IMPORTANT: note that this bypasses $stateParams,
+      // so when doing this, the state params will NOT be up to date
+      // unless the user refreshes their browser
+      $location.search({budget: vm.search.budget_id, bank_account: vm.search.bank_account_id});
+      vm.onSubmit();
     }
   }
 })();

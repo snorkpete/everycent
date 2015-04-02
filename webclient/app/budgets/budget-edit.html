@@ -8,9 +8,14 @@
     </div>
 </div>
 
-<div class="pull-right">
-    <button class="btn btn-default" ng-click="vm.state.go('budgets')">&laquo; Back</button>
+<div class="row">
+    <div class="col-xs-12 text-right">
+        <button class="btn btn-default" ng-click="vm.state.go('budgets')">&laquo; Back to Budget List</button>
+        &nbsp;
+        <button class="btn btn-default" ng-click="vm.state.go('transactions', {budget:vm.budget.id})">View Transactions</button>
+    </div>
 </div>
+<br/>
 
 <ec-income-list-editor budget="vm.budget"></ec-income-list-editor>
 <ec-allocation-list-editor budget="vm.budget"></ec-allocation-list-editor>

@@ -6,9 +6,9 @@
     .module('everycent.transactions')
     .controller('TransactionsCtrl', TransactionsCtrl);
 
-  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'LookupService', 'ReferenceService', 'UtilService'];
+  TransactionsCtrl.$inject = ['MessageService', 'TransactionsService', 'LookupService', 'ReferenceService', 'UtilService', 'StateService'];
 
-  function TransactionsCtrl(MessageService, TransactionsService, LookupService, ReferenceService, UtilService){
+  function TransactionsCtrl(MessageService, TransactionsService, LookupService, ReferenceService, UtilService, StateService){
     var vm = this;
     vm.ref = ReferenceService;
     vm.util = UtilService;
@@ -23,11 +23,11 @@
     vm.markForDeletion = markForDeletion;
     vm.markAllForDeletion = markAllForDeletion;
     vm.checkTransactionDate = checkTransactionDate;
+    vm.goToBudget = goToBudget;
 
     activate();
 
     function activate(){
-      refreshTransactions();
     }
 
     function refreshAllocations(){
@@ -103,6 +103,10 @@
 
       transaction.transaction_date_invalid = (transactionDate < startDate && transactionDate > endDate);
       transaction.deleted = transaction.transaction_date_invalid;
+    }
+
+    function goToBudget(){
+      StateService.go('budgets-edit', {budget_id: vm.search.budget_id});
     }
   }
 })();
