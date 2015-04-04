@@ -1,22 +1,22 @@
 
-describe('TransactionsService', function(){
-  var TransactionsService;
+describe('TransactionImporterService', function(){
+  var TransactionImporterService;
 
   beforeEach(module('everycent'));
-  beforeEach(inject(function(_TransactionsService_){
-    TransactionsService = _TransactionsService_;
+  beforeEach(inject(function(_TransactionImporterService_){
+    TransactionImporterService = _TransactionImporterService_;
   }));
 
   describe('#convertToTransactions', function(){
     var input, startDate, endDate;
     beforeEach(function(){
       input = '';
-      startDate = new Date('2015/01/23');
-      endDate = new Date('2015/01/23');
+      startDate = new Date('2015-01-23T10:00:00-04:00');
+      endDate = new Date('2015-01-23T10:00:00-04:00');
     });
 
     it('returns an empty list by default', function(){
-      expect(TransactionsService.convertToTransactions(input, startDate, endDate)).toEqual([]);
+      expect(TransactionImporterService.convertToTransactions(input, startDate, endDate)).toEqual([]);
     });
 
     describe('when handling a normal POS transaction', function(){
@@ -29,9 +29,9 @@ describe('TransactionsService', function(){
                     '0010092 SAMANTHA SINGH\n' +
                     'PORT OF SPAINTT\n' +
                     '$0.75 TTD	\n';
-        var result = TransactionsService.convertToTransactions(input, startDate, endDate, true);
+        var result = TransactionImporterService.convertToTransactions(input, startDate, endDate, 'bank-account');
         expect(result.length).toEqual(1);
-        expect(result[0].transaction_date).toEqual(new Date('01/23/2015'));
+        expect(result[0].transaction_date).toEqual(new Date('2015-01-23T10:00:00-04:00'));
         expect(result[0].withdrawal_amount).toEqual(75);
         expect(result[0].deposit_amount).toEqual(0);
         expect(result[0].description).toEqual('SAMANTHA SINGH');
@@ -44,7 +44,7 @@ describe('TransactionsService', function(){
                     'POS T\n' +
                     '$4.00 TTD		\n' +
                     '02/23/2015	\n';
-        var result = TransactionsService.convertToTransactions(input, startDate, endDate, false);
+        var result = TransactionImporterService.convertToTransactions(input, startDate, endDate, false);
         expect(result.length).toEqual(1);
         expect(result[0].transaction_date).toEqual(new Date('02/23/2015'));
         expect(result[0].withdrawal_amount).toEqual(400);
