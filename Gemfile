@@ -27,8 +27,10 @@ gem 'active_model_serializers'
 gem 'responders'
 
 #for heroku
-gem 'rails_12factor'
-gem 'newrelic_rpm'
+group :production do
+  gem 'rails_12factor'
+  gem 'newrelic_rpm'
+end
 
 group :development, :test do
   gem 'spring'
