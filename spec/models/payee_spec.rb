@@ -81,5 +81,26 @@ RSpec.describe Payee, :type => :model do
       end
 
     end
+
+    context "when allocation is 'Bank Charges'" do
+      before do
+        @bank_charges = create(:allocation, name: 'Bank Charges')
+        @payee = create(:payee, code: '100', default_allocation_name: 'Original Allocation Name')
+
+        @existing_payee_params = { payee_name: @payee.name, payee_code: @payee.code, allocation_id: @bank_charges.id }
+        @new_payee_params = { payee_name:'first payee', payee_code:'200', allocation_id: @bank_charges.id }
+      end
+
+      it "does not create a new Payee" do
+        Payee.update_from_params(@new_payee_params)
+        expect(Payee.count).to eq 1
+      end
+
+      it "does not update an existing Payee" do
+        Payee.update_from_params(@existing_payee_params)
+        @payee = Payee.first
+        expect(@payee.default_allocation_name).to eq 'Original Allocation Name'
+      end
+    end
   end
 end
