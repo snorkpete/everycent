@@ -59,5 +59,27 @@ RSpec.describe Payee, :type => :model do
       end
 
     end
+
+    context "when .update_from_params called multiple times" do
+      before do
+        @food = create(:allocation, name: 'Food')
+        @bank_charges = create(:allocation, name: 'Bank Charges')
+        @first_params = { payeeName:'first payee', payeeCode:'100', allocation_id: @bank_charges.id }
+        @second_params = { payeeName:'first payee', payeeCode:'100', allocation_id: @food.id }
+
+        @first_payee  = Payee.update_from_params(@first_params)
+        @second_payee = Payee.update_from_params(@second_params)
+      end
+
+      it "creates only one payee" do
+        expect(Payee.count).to eq 1
+      end
+
+      it "has the default allocation name of the last parameters" do
+        payee = Payee.first
+        expect(payee.default_allocation_name).to eq('Food')
+      end
+
+    end
   end
 end
