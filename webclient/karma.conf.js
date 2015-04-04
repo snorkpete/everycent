@@ -17,7 +17,7 @@ module.exports = function(config) {
     files: [
        '../public/js/everycent-vendor-' + pkg.version + '.min.js',
        'bower_components/angular-mocks/angular-mocks.js',
-       '../public/js/everycent-app-' + pkg.version + '.js',
+       '../public/js/everycent-app-' + pkg.version + '.min.js',
        '../public/js/everycent-templates-' + pkg.version + '.js',
       'test/unit/**/*.spec.js'
     ],
