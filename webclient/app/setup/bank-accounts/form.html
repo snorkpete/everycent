@@ -73,3 +73,17 @@
                ng-required="true"
                ng-model="vm.bankAccount.opening_balance">
 </ec-form-field>
+
+<div class="form-group" ng-class="{'has-error': vm.bankAccountForm.allow_default_allocations.$error.server }">
+    <div class="col-sm-offset-2 col-xs-10">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox"
+                       name="allow_default_allocations"
+                       ng-model="vm.bankAccount.allow_default_allocations" />
+                Default Allocations?
+            </label>
+        </div>
+    </div>
+    <p class="help-block">{{ vm.bankAccountForm.allow_default_allocations.$error.server }}</p>
+</div>
