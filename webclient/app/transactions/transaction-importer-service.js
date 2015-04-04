@@ -65,19 +65,22 @@
 
         // transactions with payees are of the format
         //  1. description
-        //  2. payee code + name
-        //  3. payee location
+        //  2. payee name
+        //  3. payee code + card number
         //  eg:
-        //  POS PURCHASE
-        //  0754942 SUPERPHARM
-        //  MARAVAL TT
-        if(_isPayee(lineDataCopy[2])){
+        // POS PURCHASE
+        // MASSY STORES MARAVAL TT
+        // 0328970 6018100031708790
 
-          var payeeDetailsArray = lineDataCopy[2].match(/^(\d{7}) (.*)/);
+        // however, there is an extra blank line in the array
+        // which should be ignored
+        if(_isPayee(lineDataCopy[3])){
+
+          var payeeDetailsArray = lineDataCopy[3].match(/^(\d{7}) (.*)/);
           var payeeCode = payeeDetailsArray[1];
-          var payeeName = payeeDetailsArray[2];
+          var payeeName = lineDataCopy[2];
 
-          transaction.description = (lineDataCopy[0] + ' ' + payeeName).trim();
+          transaction.description = payeeName;
           transaction.payeeName = payeeName;
           transaction.payeeCode = payeeCode;
 
@@ -129,8 +132,8 @@
         return lines;
       }
 
-      // Payee Lines are identified by 7 digit number then a description
-      //  eg. 0004334 K.F.C
+      // Payee Lines are identified by 7 digit number then a card number
+      //  eg. 0004334 6012222233223
       function _isPayee(data){
         return /^\d{7} /.test(data);
       }
