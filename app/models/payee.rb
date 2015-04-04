@@ -15,8 +15,8 @@ class Payee < ActiveRecord::Base
 
   def self.update_from_params(params)
     allocation_name = Allocation.where(id: params[:allocation_id]).pluck(:name).first
-    existing_payee = Payee.where(code: params[:payeeCode]).first
 
+    existing_payee = Payee.where(code: params[:payee_code]).first
     if existing_payee
 
       if allocation_name.nil?

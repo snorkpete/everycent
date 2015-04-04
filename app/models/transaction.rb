@@ -44,8 +44,8 @@ class Transaction < ActiveRecord::Base
       params[:transactions].each do |transaction_params|
         transaction_params[:bank_account_id] = params[:bank_account_id]
 
-        Transaction.create(transaction_params.except(:id, :payeeName, :payeeCode))
-        Payee.update_from_params(transaction_params.slice(:payeeName, :payeeCode, :allocation_id))
+        Transaction.create(transaction_params.except(:id))
+        Payee.update_from_params(transaction_params.slice(:payee_name, :payee_code, :allocation_id))
       end
     end
 
