@@ -103,10 +103,10 @@
 
                     <!-- payee -->
                     <td>
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.payeeName" ></input>
+                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.payee_name" ></input>
                         <span ng-hide="vm.isEditMode">
-                           <span ng-show="transaction.payeeName"
-                                 ng-bind="transaction.payeeName + ' (' + transaction.payeeCode + ')'"></span>
+                           <span ng-show="transaction.payee_code"
+                                 ng-bind="transaction.payee_name + ' (' + transaction.payee_code + ')'"></span>
                         </span>
                     </td>
 

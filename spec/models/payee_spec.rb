@@ -17,10 +17,10 @@ RSpec.describe Payee, :type => :model do
   describe '.update_from_params' do
     before :each do
         @allocation = create(:allocation, name: 'Rent')
-        @params = { payeeName:'first payee', payeeCode:'100', allocation_id: @allocation.id }
+        @params = { payee_name:'first payee', payee_code:'100', allocation_id: @allocation.id }
     end
 
-    context "when payeeCode doesn't exist" do
+    context "when payee_code doesn't exist" do
       it "saves a new payee" do
         Payee.update_from_params(@params)
         expect(Payee.where(name: 'first payee').size).to eq 1
@@ -33,7 +33,7 @@ RSpec.describe Payee, :type => :model do
       end
     end
 
-    context "when payeeCode already exists" do
+    context "when payee_code already exists" do
       before :each do
         @payee = create(:payee, code: '100')
       end
@@ -51,7 +51,7 @@ RSpec.describe Payee, :type => :model do
       end
 
       it "does nothing if the allocation doesn't exist" do
-        invalid_params = { payeeName:'first payee', payeeCode:'300', allocation_id: 20 }
+        invalid_params = { payee_name:'first payee', payee_code:'300', allocation_id: 20 }
         payee = create(:payee, default_allocation_name: 'Car expenses', code: '300')
         payee = Payee.update_from_params(invalid_params)
         payee.reload
@@ -63,9 +63,9 @@ RSpec.describe Payee, :type => :model do
     context "when .update_from_params called multiple times" do
       before do
         @food = create(:allocation, name: 'Food')
-        @bank_charges = create(:allocation, name: 'Bank Charges')
-        @first_params = { payeeName:'first payee', payeeCode:'100', allocation_id: @bank_charges.id }
-        @second_params = { payeeName:'first payee', payeeCode:'100', allocation_id: @food.id }
+        @rent = create(:allocation, name: 'Rent')
+        @first_params = { payee_name:'first payee', payee_code:'100', allocation_id: @rent.id }
+        @second_params = { payee_name:'first payee', payee_code:'100', allocation_id: @food.id }
 
         @first_payee  = Payee.update_from_params(@first_params)
         @second_payee = Payee.update_from_params(@second_params)
@@ -75,7 +75,7 @@ RSpec.describe Payee, :type => :model do
         expect(Payee.count).to eq 1
       end
 
-      it "has the default allocation name of the last parameters" do
+      it "has the default allocation name of the last call" do
         payee = Payee.first
         expect(payee.default_allocation_name).to eq('Food')
       end

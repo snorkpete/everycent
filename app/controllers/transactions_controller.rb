@@ -27,7 +27,7 @@ class TransactionsController < ApplicationController
   def transaction_params
     params.permit(:budget_id, :bank_account_id, :transactions => [
       :id, :description, :bank_ref, :bank_account_id, :transaction_date,
-      :withdrawal_amount, :deposit_amount, :payee_id, :payeeCode, :payeeName,
+      :withdrawal_amount, :deposit_amount, :payee_id, :payee_code, :payee_name,
       :allocation_id])
   end
 end

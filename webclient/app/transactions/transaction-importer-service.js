@@ -81,8 +81,8 @@
           var payeeName = lineDataCopy[2];
 
           transaction.description = payeeName;
-          transaction.payeeName = payeeName;
-          transaction.payeeCode = payeeCode;
+          transaction.payee_name = payeeName;
+          transaction.payee_code = payeeCode;
 
         }else{
           transaction.description = lineDataCopy.join(' ').trim();

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150330172011) do
+ActiveRecord::Schema.define(version: 20150404043727) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,6 +132,8 @@ ActiveRecord::Schema.define(version: 20150330172011) do
     t.integer  "allocation_id"
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
+    t.string   "payee_code"
+    t.string   "payee_name"
   end
 
   add_index "transactions", ["allocation_id"], name: "index_transactions_on_allocation_id", using: :btree
