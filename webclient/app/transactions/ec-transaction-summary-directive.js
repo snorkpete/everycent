@@ -44,8 +44,10 @@
       var totalDeposits = 0;
 
       vm.transactions.forEach(function(transaction){
-        totalWithdrawals += transaction.withdrawal_amount;
-        totalDeposits += transaction.deposit_amount;
+        if(!transaction.deleted){
+          totalWithdrawals += transaction.withdrawal_amount;
+          totalDeposits += transaction.deposit_amount;
+        }
       });
 
       return totalDeposits - totalWithdrawals;
