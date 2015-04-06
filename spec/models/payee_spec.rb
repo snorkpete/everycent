@@ -39,8 +39,9 @@ RSpec.describe Payee, :type => :model do
       end
 
       it "does not create a new payee" do
-        payee = Payee.update_from_params(@params)
-        expect(Payee.count).to eq 1
+        #payee = Payee.update_from_params(@params)
+        expect{Payee.update_from_params(@params)}.not_to change { Payee.count }
+        #expect(Payee.count).to eq 1
       end
 
       it "updates the payee default allocation name with the name of the allocation" do
@@ -72,11 +73,11 @@ RSpec.describe Payee, :type => :model do
       end
 
       it "creates only one payee" do
-        expect(Payee.count).to eq 1
+        expect(Payee.where(code: @first_params[:payee_code]).count).to eq 1
       end
 
       it "has the default allocation name of the last call" do
-        payee = Payee.first
+        payee = Payee.where(code: @first_params[:payee_code]).first
         expect(payee.default_allocation_name).to eq('Food')
       end
 
@@ -92,13 +93,14 @@ RSpec.describe Payee, :type => :model do
       end
 
       it "does not create a new Payee" do
-        Payee.update_from_params(@new_payee_params)
-        expect(Payee.count).to eq 1
+        #Payee.update_from_params(@new_payee_params)
+        #expect(Payee.count).to eq 1
+        expect{Payee.update_from_params(@new_payee_params)}.not_to change { Payee.count }
       end
 
       it "does not update an existing Payee" do
         Payee.update_from_params(@existing_payee_params)
-        @payee = Payee.first
+        @payee = Payee.where(code: @payee.code).first
         expect(@payee.default_allocation_name).to eq 'Original Allocation Name'
       end
     end
