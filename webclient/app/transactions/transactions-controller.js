@@ -24,6 +24,7 @@
     vm.markAllForDeletion = markAllForDeletion;
     vm.checkTransactionDate = checkTransactionDate;
     vm.goToBudget = goToBudget;
+    vm.defaultAllocations = defaultAllocations;
 
     activate();
 
@@ -110,6 +111,40 @@
 
     function goToBudget(){
       StateService.go('budgets-edit', {budget_id: vm.search.budget_id});
+    }
+
+    function defaultAllocations(){
+      var transactions = vm.transactions;
+      var payeeCodes = vm.transactions.map(function(transaction){
+
+        // use the bank charges payee for the $0.75 and $4.00 fees
+        if(transaction.withdrawal_amount == 75 || transaction.withdrawal_amount == 400){
+          return { code: 'BANKCHARGES' };
+        }
+        return { code: transaction.payee_code };
+      });
+
+      TransactionsService.getDefaultAllocations(vm.search.budget_id, payeeCodes).then(function(defaultAllocations){
+        // first convert the allocations to a hash
+        var allocationMap = {};
+        vm.allocations.forEach(function(allocation){
+          allocationMap[allocation.id] = allocation;
+        });
+
+        var startDate = new Date(vm.search.budget.start_date);
+        var endDate = new Date(vm.search.budget.end_date);
+        var validTransactions = vm.transactions.filter(function(transaction){
+          var transactionDate = new Date(transaction.transaction_date);
+          return !transaction.deleted && transactionDate >= startDate && transactionDate <= endDate;
+        });
+
+        for(var i=0; i < vm.transactions.length; i++){
+          var allocationId = defaultAllocations[i].allocation_id;
+          validTransactions[i].allocation = allocationMap[allocationId];
+          validTransactions[i].allocation_id = allocationId;
+        }
+
+      });
     }
   }
 })();

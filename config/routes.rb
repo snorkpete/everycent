@@ -15,6 +15,12 @@ Rails.application.routes.draw do
   end
 
   resources :allocations, only: [:index]
+  resources :default_allocations, only: [:index] do
+    collection do
+      post 'retrieve'
+    end
+  end
+
   resources :account_balances, only: [:index]
 
   resources :recurring_allocations, except: [:new, :edit]

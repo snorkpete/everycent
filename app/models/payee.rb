@@ -42,4 +42,38 @@ class Payee < ActiveRecord::Base
       status: 'active'
     })
   end
+
+
+  DefaultAllocation = Struct.new(:payee_code, :allocation_id) do
+    # necessary for active_model_serializers to work
+   alias :read_attribute_for_serialization :send
+  end
+
+  def self.default_allocations(budget_id, transaction_params)
+
+    all_payee_codes = transaction_params.map { |param| param[:code] }
+    available_payees = Payee.where(code: all_payee_codes).to_a
+
+    all_allocation_names = available_payees.map { |payee| payee.default_allocation_name }
+    available_allocations = Allocation.where(budget_id: budget_id, name: all_allocation_names).to_a
+
+    transaction_params.map do |param|
+      payee_with_code = available_payees.find { |payee| payee.code == param[:code] }
+
+      if payee_with_code.nil?
+        DefaultAllocation.new('', 0)
+      else
+        allocation_with_name = available_allocations.find do |allocation|
+          allocation.name == payee_with_code.default_allocation_name
+        end
+
+        if allocation_with_name.nil?
+          DefaultAllocation.new('', 0)
+        else
+          DefaultAllocation.new( param[:code], allocation_with_name.id )
+        end
+      end
+    end
+
+  end
 end

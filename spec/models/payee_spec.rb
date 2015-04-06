@@ -103,4 +103,67 @@ RSpec.describe Payee, :type => :model do
       end
     end
   end
+
+  describe ".default_allocations" do
+    before do
+      @budget = create(:budget)
+      @eating_out = create(:allocation, name: 'Eating Out', budget: @budget)
+      @kfc = create(:payee, code: '1000', default_allocation_name: 'Eating Out')
+    end
+
+    context "when no transactions provided" do
+      it "returns an empty array" do
+        results = Payee.default_allocations(@budget.id, [])
+        expect(results).to eq []
+      end
+    end
+
+    it "finds the allocation (by name) that matches that payee code" do
+      params = [{ code: @kfc.code }]
+      results = Payee.default_allocations(@budget.id, params)
+      expect(results.size).to eq 1
+      #expect(results).to eq @eating_out.id
+      expect(results[0].allocation_id).to eq @eating_out.id
+    end
+
+    it "ignores case in its search" do
+      pending "not yet implemented"
+      @rent = create(:allocation, name: 'rent', budget: @budget)
+      @mom = create(:payee, code: '7', default_allocation_name: 'REnt')
+      results = Payee.default_allocations(@budget.id, [{ code: @mom.code }])
+      expect(results[0].allocation_id).to eq @mom.id
+    end
+
+    it "excludes allocations from other budgets" do
+      @second_budget = create(:budget)
+      @seond_eating_out = create(:allocation, name: 'Eating Out', budget: @second_budget)
+
+      params = [{ code: @kfc.code }]
+      results = Payee.default_allocations(@second_budget.id, params)
+      expect(results[0].allocation_id).to eq @seond_eating_out.id
+    end
+
+    it "returns blanks if payee code doesn't exist" do
+      params = [{ code: 'UNKNOWN' }]
+      results = Payee.default_allocations(@budget.id, params)
+      expect(results.size).to eq(1)
+      expect(results[0].allocation_id).to eq 0
+    end
+
+    it "returns blanks if payee code is blank (not passed)" do
+      params = [{ }]
+      results = Payee.default_allocations(@budget.id, params)
+      expect(results.size).to eq(1)
+      expect(results[0].allocation_id).to eq 0
+    end
+
+    it "handles multiple payee codes" do
+      @rent = create(:allocation, name: 'Rent', budget: @budget)
+      @mom = create(:payee, code: '7', default_allocation_name: 'Rent')
+      params = [{ code: @mom.code }, { code: @kfc.code }]
+      results = Payee.default_allocations(@budget.id, params)
+      expect(results[0].allocation_id).to eq @rent.id
+      expect(results[1].allocation_id).to eq @eating_out.id
+    end
+  end
 end

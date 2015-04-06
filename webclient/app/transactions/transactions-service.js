@@ -5,14 +5,15 @@
     .module('everycent.transactions')
     .factory('TransactionsService', TransactionsService);
 
-    TransactionsService.$inject = ['$http', 'Restangular', 'DateService', '$modal', '$document'];
-    function TransactionsService($http, Restangular, DateService, $modal, $document){
+    TransactionsService.$inject = ['Restangular', 'DateService', '$modal', '$document'];
+    function TransactionsService(Restangular, DateService, $modal, $document){
       var service = {
         newTransaction: newTransaction,
         getTransactions: getTransactions,
         transactionsFor: transactionsFor,
         save: save,
-        showTransactionList: showTransactionList
+        showTransactionList: showTransactionList,
+        getDefaultAllocations: getDefaultAllocations
       };
 
       var baseAll = Restangular.all('transactions');
@@ -48,6 +49,14 @@
           transactions: validTransactions
         };
         return baseAll.post(params);
+      }
+
+      function getDefaultAllocations(budgetId, payeeCodes){
+        var params = {
+          budget_id: budgetId,
+          transactions: payeeCodes
+        };
+        return Restangular.all('default_allocations').customPOST(params, 'retrieve');
       }
 
       function showTransactionList(transactions, allocation){

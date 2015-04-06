@@ -160,7 +160,7 @@
 
 <br/>
 <div class="row">
-    <div class="col-xs-2">
+    <div class="col-xs-4">
         <button ng-hide="vm.isEditMode"
                 class="btn btn-primary"
                 ng-click="vm.switchToEditMode()">
@@ -172,8 +172,14 @@
                 ng-click="vm.addTransaction()">
             Add Transaction
         </button>
+        &nbsp;
+        <button ng-show="vm.isEditMode && vm.search.bank_account.allow_default_allocations"
+                class="btn btn-info"
+                ng-click="vm.defaultAllocations()">
+            Default Allocations
+        </button>
     </div>
-    <div class="col-xs-10">
+    <div class="col-xs-8">
         <span ng-show="vm.isEditMode" class="pull-right">
             <button class="btn btn-success"
                     ng-disabled="vm.transactionsForm.$invalid"
