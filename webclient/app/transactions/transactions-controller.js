@@ -37,7 +37,7 @@
         vm.allocations = allocations;
 
         // add a blank allocation at the top of the list
-        vm.allocations.unshift({ id: 0, name: '(none)' })
+        vm.allocations.unshift({ id: 0, name: '(none)' });
       });
     }
 
@@ -114,8 +114,8 @@
     }
 
     function defaultAllocations(){
-      var transactions = vm.transactions;
-      var payeeCodes = vm.transactions.map(function(transaction){
+      var transactions = TransactionsService.getValidTransactions(vm.transactions, vm.search);
+      var payeeCodes = transactions.map(function(transaction){
 
         // use the bank charges payee for the $0.75 and $4.00 fees
         if(transaction.withdrawal_amount == 75 || transaction.withdrawal_amount == 400){
@@ -126,22 +126,21 @@
 
       TransactionsService.getDefaultAllocations(vm.search.budget_id, payeeCodes).then(function(defaultAllocations){
         // first convert the allocations to a hash
+        // ---------------------------------------
         var allocationMap = {};
         vm.allocations.forEach(function(allocation){
           allocationMap[allocation.id] = allocation;
         });
 
-        var startDate = new Date(vm.search.budget.start_date);
-        var endDate = new Date(vm.search.budget.end_date);
-        var validTransactions = vm.transactions.filter(function(transaction){
-          var transactionDate = new Date(transaction.transaction_date);
-          return !transaction.deleted && transactionDate >= startDate && transactionDate <= endDate;
-        });
-
-        for(var i=0; i < vm.transactions.length; i++){
-          var allocationId = defaultAllocations[i].allocation_id;
-          validTransactions[i].allocation = allocationMap[allocationId];
-          validTransactions[i].allocation_id = allocationId;
+        // then assign each allocation & allocation id based on the default allocations
+        // but only assign the allocation if its currently unassigned
+        // ----------------------------------------------------------------------------
+        for(var i=0; i < transactions.length; i++){
+          if(!transactions[i].allocation || transactions[i].allocation_id === 0){
+            var allocationId = defaultAllocations[i].allocation_id;
+            transactions[i].allocation = allocationMap[allocationId];
+            transactions[i].allocation_id = allocationId;
+          }
         }
 
       });

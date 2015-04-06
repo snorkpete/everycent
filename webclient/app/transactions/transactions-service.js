@@ -13,6 +13,7 @@
         transactionsFor: transactionsFor,
         save: save,
         showTransactionList: showTransactionList,
+        getValidTransactions: getValidTransactions,
         getDefaultAllocations: getDefaultAllocations
       };
 
@@ -35,20 +36,24 @@
       }
 
       function save(transactions, searchOptions){
-        var startDate = new Date(searchOptions.budget.start_date);
-        var endDate = new Date(searchOptions.budget.end_date);
 
-        var validTransactions = transactions.filter(function(transaction){
-          var transactionDate = new Date(transaction.transaction_date);
-          return !transaction.deleted && transactionDate >= startDate && transactionDate <= endDate;
-        });
-
+        var validTransactions = getValidTransactions(transactions, searchOptions);
         var params = {
           budget_id: searchOptions.budget_id,
           bank_account_id: searchOptions.bank_account_id,
           transactions: validTransactions
         };
         return baseAll.post(params);
+      }
+
+      function getValidTransactions(transactions, searchOptions){
+        var startDate = new Date(searchOptions.budget.start_date);
+        var endDate = new Date(searchOptions.budget.end_date);
+
+        return transactions.filter(function(transaction){
+          var transactionDate = new Date(transaction.transaction_date);
+          return !transaction.deleted && transactionDate >= startDate && transactionDate <= endDate;
+        });
       }
 
       function getDefaultAllocations(budgetId, payeeCodes){
