@@ -22,7 +22,12 @@
       .state('home', {
         url: '/',
         templateUrl: 'app/home/home.html',
-        controller: [function(){ }]
+        controller: [function(){ }],
+        resolve: {
+          auth: ['$auth',function($auth){
+            return $auth.validateUser();
+          }]
+        }
       })
       .state('all', {
         abstract: true,
