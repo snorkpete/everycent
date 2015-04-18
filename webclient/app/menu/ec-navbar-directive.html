@@ -36,6 +36,9 @@
                         <li> <a ng-click="vm.go('allocation-categories');">Allocation Categories</a> </li>
                         <li> <a ng-click="vm.go('recurring-allocations');">Recurring Allocations</a> </li>
                    </ul>
+                   <li ng-class="{ active: vm.isActive('budgets.current')}">
+                       <a ng-click="vm.go('budgets.current');">Current Budget</a>
+                   </li>
                    <li ng-class="{ active: vm.isActive('budgets')}">
                        <a ng-click="vm.go('budgets');">Budgets</a>
                    </li>

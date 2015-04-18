@@ -12,6 +12,10 @@ Rails.application.routes.draw do
       put 'copy'
       put 'close'
     end
+
+    collection do
+      get 'current'
+    end
   end
 
   resources :allocations, only: [:index]

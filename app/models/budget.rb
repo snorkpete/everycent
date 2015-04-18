@@ -29,6 +29,10 @@ class Budget < ActiveRecord::Base
     allocations.sum(:amount)
   end
 
+  def self.current
+    self.where(status:'open').order(:start_date).first
+  end
+
   def self.copy(budget_id)
     budget_to_copy = Budget.find(budget_id)
     budget_to_copy.copy

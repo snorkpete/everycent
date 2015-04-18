@@ -19,8 +19,23 @@
           }]
         }
       })
+      .state('budgets.current', {
+        controller: ['current', 'StateService', function(current, StateService){
+          StateService.go('budgets-edit', { budget_id: current });
+        }],
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }],
+          current:['$auth', '$http', function($auth, $http){
+             return $http({method: 'GET', url: '/budgets/current'}).then(function (response){
+               return response.data.budget_id;
+             });
+          }]
+        }
+      })
       .state('budgets.new', {
-        url: '/budgets.new',
+        url: '/budgets/new',
         templateUrl: 'app/budgets/budget-new.html'
       })
       .state('budgets-edit', {

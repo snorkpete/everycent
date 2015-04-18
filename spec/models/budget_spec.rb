@@ -122,4 +122,19 @@ describe Budget, :type => :model do
     end
 
   end
+
+  describe ".current" do
+    before do
+      @closed = create(:budget, status: 'closed', start_date: '2015-01-01')
+      @open = create(:budget, status: 'open', start_date: '2015-02-01')
+    end
+    it "returns the latest open budget" do
+      expect(Budget.current.id).to eq(@open.id)
+    end
+
+    it "finds the earliest open budet if multiple ones are open" do
+      @later_open = create(:budget, status: 'open', start_date: '2015-03-01')
+      expect(Budget.current.id).to eq(@open.id)
+    end
+  end
 end
