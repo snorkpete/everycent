@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150406043002) do
+ActiveRecord::Schema.define(version: 20150418145518) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -123,6 +123,13 @@ ActiveRecord::Schema.define(version: 20150406043002) do
   end
 
   add_index "recurring_incomes", ["bank_account_id"], name: "index_recurring_incomes_on_bank_account_id", using: :btree
+
+  create_table "settings", force: :cascade do |t|
+    t.integer  "primary_budget_account_id"
+    t.string   "bank_charges_allocation_name"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
 
   create_table "transactions", force: :cascade do |t|
     t.string   "description"
