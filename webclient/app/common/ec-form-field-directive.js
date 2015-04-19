@@ -22,6 +22,7 @@
         // then, we can use ng model in the input element in the directive template
         model:'=ngModel',
         change:'&ngChange',
+        readonly:'&ngReadonly',
         error:'=',
         name:'=fieldName'
       },

@@ -20,6 +20,7 @@
     'everycent.setup.recurring-incomes',
     'everycent.setup.recurring-allocations',
     'everycent.setup.allocation-categories',
+    'everycent.setup.settings',
     'everycent.budgets',
     'everycent.transactions',
     'everycent.account-balances'

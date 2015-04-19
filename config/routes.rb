@@ -18,6 +18,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :settings, only: [:index, :create]
+
   resources :allocations, only: [:index]
   resources :default_allocations, only: [:index] do
     collection do
