@@ -42,7 +42,7 @@
       if(menuOption === 'setup'){
         var result = false;
         var setupMenuOptions = ['institutions', 'bank-accounts', 'recurring-incomes',
-                                'recurring-allocations', 'allocation-categories'];
+                                'recurring-allocations', 'allocation-categories', 'settings'];
         setupMenuOptions.forEach(function(option){
 
           if(StateService.is(option)){
