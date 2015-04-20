@@ -17,6 +17,9 @@
       return _.reduce(items, function(sum, item){
         if(item.deleted){
           return sum;
+        }
+        if(!item[fieldToSum]){
+          return sum;
         }else{
           return sum + item[fieldToSum];
         }
