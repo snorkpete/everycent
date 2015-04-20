@@ -21,3 +21,6 @@
 
 # ignore the npm-debug log
 *.log
+
+# ignore the machine-specific vagrant directory
+.vagrant/*
