@@ -10,6 +10,7 @@
       var service = {
         getBudgets: getBudgets,
         getBudget: getBudget,
+        getCurrentBudget: getCurrentBudget,
         addBudget: addBudget,
         copyBudget: copyBudget,
         closeBudget: closeBudget,
@@ -28,6 +29,14 @@
 
       function getBudget(budgetId){
         return Restangular.one('budgets', budgetId).get();
+      }
+
+      function getCurrentBudget(){
+         return $http({method: 'GET', url: '/budgets/current'}).then(function (response){
+           return response.data.budget_id;
+         }).then(function(currentBudgetId){
+           return getBudget(currentBudgetId);
+         });
       }
 
       function addBudget(budget){

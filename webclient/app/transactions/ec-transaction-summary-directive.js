@@ -10,7 +10,8 @@
       templateUrl: 'app/transactions/ec-transaction-summary-directive.html',
       scope: {
         bankAccount: '=',
-        transactions: '='
+        transactions: '=',
+        allocations: '='
       },
       controller: controller,
       controllerAs: 'vm',
@@ -20,13 +21,26 @@
     return directive;
   }
 
-  controller.$inject = ['UtilService'];
-  function controller(UtilService){
+  controller.$inject = ['SettingsService', 'UtilService'];
+  function controller(SettingsService, UtilService){
     var vm = this;
+
+    vm.util = UtilService;
 
     vm.lastBankBalance = lastBankBalance;
     vm.transactionTotal = transactionTotal;
     vm.currentBankBalance = currentBankBalance;
+
+    vm.showBudgetBalance = showBudgetBalance;
+    vm.budgetBalance = budgetBalance;
+
+    activate();
+
+    function activate(){
+      SettingsService.getSettings().then(function(settings){
+        vm.primary_budget_account_id = settings.primary_budget_account_id;
+      });
+    }
 
     function lastBankBalance(){
       if(!vm.bankAccount){
@@ -55,6 +69,17 @@
 
     function currentBankBalance(){
       return lastBankBalance() + transactionTotal();
+    }
+
+    function showBudgetBalance(){
+      if(!vm.bankAccount){
+        return false;
+      }
+      return vm.bankAccount.id === vm.primary_budget_account_id;
+    }
+
+    function budgetBalance(){
+      return vm.util.total(vm.allocations, 'amount') - vm.util.total(vm.allocations, 'spent');
     }
   }
 })();
