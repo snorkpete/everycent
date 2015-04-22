@@ -11,13 +11,17 @@
                 <th>Transaction Total</th>
                 <td class="text-right">{{ vm.transactionTotal() | ecToDollars }}</td>
             </tr>
-            <tr>
+            <tr class="total">
                 <th>Current Bank Balance</th>
                 <td class="text-right">{{ vm.currentBankBalance() | ecToDollars }}</td>
             </tr>
             <tr ng-if="vm.showBudgetBalance()">
-                <th>Remaining in Budget</th>
-                <td class="text-right">{{ vm.budgetBalance() | ecToDollars }}</td>
+                <th>Last Budget Balance</th>
+                <td class="text-right">{{ vm.lastBudgetBalance() | ecToDollars }}</td>
+            </tr>
+            <tr ng-if="vm.showBudgetBalance()" class="total">
+                <th>Budget Difference</th>
+                <td class="text-right"><ec-amount-formatted amount="vm.budgetDifference()"></ec-amount-formatted></td>
             </tr>
         </tbody>
     </table>

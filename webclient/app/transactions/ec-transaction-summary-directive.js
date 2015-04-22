@@ -32,7 +32,9 @@
     vm.currentBankBalance = currentBankBalance;
 
     vm.showBudgetBalance = showBudgetBalance;
-    vm.budgetBalance = budgetBalance;
+    vm.lastBudgetBalance = lastBudgetBalance;
+    vm.currentBudgetBalance = currentBudgetBalance;
+    vm.budgetDifference = budgetDifference;
 
     activate();
 
@@ -78,8 +80,34 @@
       return vm.bankAccount.id === vm.primary_budget_account_id;
     }
 
-    function budgetBalance(){
+    function lastBudgetBalance(){
       return vm.util.total(vm.allocations, 'amount') - vm.util.total(vm.allocations, 'spent');
+    }
+
+    function currentBudgetBalance(){
+
+      // todo: temporarily don't use any logic to determine what's currently being edited
+      return lastBudgetBalance();
+
+      if(!vm.transactions){
+        return 0;
+      }
+
+      var totalWithdrawals = 0;
+      var totalDeposits = 0;
+
+      vm.transactions.forEach(function(transaction){
+        if(!transaction.deleted && transaction.allocation_id >= 0){
+          totalWithdrawals += transaction.withdrawal_amount;
+          totalDeposits += transaction.deposit_amount;
+        }
+      });
+
+      return totalDeposits - totalWithdrawals;
+    }
+
+    function budgetDifference(){
+      return currentBankBalance() - currentBudgetBalance();
     }
   }
 })();
