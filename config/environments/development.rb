@@ -6,6 +6,9 @@ Rails.application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
+  # disable the logging to a file
+  config.logger = ActiveSupport::Logger.new(nil)
+
   # Do not eager load code on boot.
   config.eager_load = false
 
