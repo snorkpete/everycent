@@ -13,7 +13,9 @@
             </tr>
             <tr class="total">
                 <th>Current Bank Balance</th>
-                <td class="text-right">{{ vm.currentBankBalance() | ecToDollars }}</td>
+                <td class="text-right">
+                    <ec-amount-formatted amount="vm.currentBankBalance()"></ec-amount-formatted>
+                </td>
             </tr>
             <tr ng-if="vm.showBudgetBalance()">
                 <th>Last Budget Balance</th>
