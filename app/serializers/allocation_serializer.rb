@@ -18,7 +18,7 @@ class AllocationSerializer < ActiveModel::Serializer
   attributes :id, :name, :amount, :budget_id, :spent,
              :allocation_category_id,
              :allocation_type, :is_standing_order,
-             :bank_account_id
+             :bank_account_id, :comment
 
   has_one :allocation_category
   has_one :bank_account
