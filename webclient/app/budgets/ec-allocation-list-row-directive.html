@@ -37,20 +37,10 @@
         <ec-amount-formatted amount="vm.allocation.amount - vm.allocation.spent"> </ec-amount-formatted>
     </td>
 
-    <!-- standing order & bank account -->
+    <!-- comment -->
     <td>
-        <input type="checkbox" ng-show="vm.isEditMode" ng-model="vm.allocation.is_standing_order" />
-        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.is_standing_order ? 'Yes' : 'No'"></span>
-        &nbsp; &nbsp;
-
-        <span ng-show="vm.allocation.is_standing_order">
-            <select ng-show="vm.isEditMode"
-                    ng-model="vm.allocation.bank_account"
-                    ng-change="vm.ref.updateReferenceId(vm.allocation, 'bank_account')"
-                    ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
-            </select>
-            <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.bank_account.name"></span>
-        </span>
+        <input type="text" ng-show="vm.isEditMode" ng-model="vm.allocation.comment" />
+        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.comment"></span>
     </td>
 
     <!-- actions -->

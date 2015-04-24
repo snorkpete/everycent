@@ -5,10 +5,11 @@
             <table class="table table-bordered rounded">
             <thead>
                 <tr class="heading">
-                    <th>Name</th>
-                    <th class="text-right">Amount</th>
-                    <th>Bank Account</th>
-                    <th>Actions</th>
+                    <th style="width:25%;">Name</th>
+                    <th style="width:15%;" class="text-right">Amount</th>
+                    <th style="width:15%;">Bank Account</th>
+                    <th style="width:40%;">Comment</th>
+                    <th style="width:5%;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -35,6 +36,12 @@
                         <span ng-hide="vm.isEditMode" ng-bind="income.bank_account.name"></span>
                     </td>
 
+                    <!-- comment -->
+                    <td>
+                        <input type="text" ng-show="vm.isEditMode" ng-model="income.comment" />
+                        <span ng-hide="vm.isEditMode" ng-bind="income.comment"></span>
+                    </td>
+
                     <!-- actions -->
                     <td>
                         <span ng-hide="income.deleted"
@@ -55,6 +62,7 @@
                 <tr class="total">
                     <th>Total</th>
                     <th class="text-right">{{ vm.util.total(vm.budget.incomes, 'amount') | ecToDollars }}</th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
