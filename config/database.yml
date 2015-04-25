@@ -14,9 +14,9 @@
 #  database: db/developMent.sqlite3
 default: &default
   adapter: postgresql
-  username: postgres
-  password: password
-  host: hw12455
+  username: kion
+  password:
+  host: localhost
   encoding: UTF8
   pool: 5
   timeout: 5000
