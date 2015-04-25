@@ -166,6 +166,10 @@ footer nav ul li a {
   /* some fixes appear to use this, too: */
   position: fixed;
 }
+div.message-container {
+  margin-top: 15px;
+  font-weight: bold;
+}
 /* budgets.css */
 
 .category-heading {
@@ -190,10 +194,6 @@ table.table>tbody>tr.category-detail td {
 
 .category-action {
   border-bottom: 2px solid blue;
-}
-div.message-container {
-  margin-top: 15px;
-  font-weight: bold;
 }
 /* Transactions.css */
 
