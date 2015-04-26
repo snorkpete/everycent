@@ -53,16 +53,22 @@
 </div>
 
 <div class="row">
-    <div class="col-xs-1" ng-show="vm.state.is('budgets')">
+    <div class="col-xs-2" ng-show="vm.state.is('budgets')">
         <button class="btn btn-primary"
                 ng-click="vm.state.goToState('budgets.new')">
             Create New Budget
         </button>
     </div>
-    <div class="col-xs-1" ng-show="vm.state.is('budgets.new')">
+    <div class="col-xs-2" ng-show="vm.state.is('budgets.new')">
         <button class="btn btn-default"
                 ng-click="vm.state.goToState('budgets')">
             Cancel
+        </button>
+    </div>
+    <div class="col-xs-2" ng-show="vm.state.is('budgets.new')">
+        <button class="btn btn-warning"
+                ng-click="vm.reopenLastBudget()">
+            Reopen Last Budget
         </button>
     </div>
 </div>

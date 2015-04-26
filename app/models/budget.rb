@@ -68,6 +68,26 @@ class Budget < ActiveRecord::Base
     self
   end
 
+  def self.reopen_last_budget
+
+    # reopen the last budget
+    budget = Budget.where(status: 'closed').order(start_date: :desc).first
+    budget.status = 'open'
+    budget.save
+
+    # reset the bank account balances
+    BankAccount.all.each do |bank_account|
+
+      transactions_before_budget = bank_account.transactions.where('transaction_date < ?', budget.start_date)
+      bank_account.closing_balance = transactions_before_budget.sum('deposit_amount - withdrawal_amount') +
+                                     bank_account.opening_balance
+      bank_account.closing_date = budget.start_date.yesterday
+      bank_account.save
+    end
+
+    budget
+  end
+
   protected
 
   def determine_dependent_fields

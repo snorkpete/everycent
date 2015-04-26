@@ -35,6 +35,11 @@ class BudgetsController < ApplicationController
     respond_with(result, BudgetSerializer)
   end
 
+  def reopen_last_budget
+    result = Budget.reopen_last_budget
+    respond_with(result, BudgetSerializer)
+  end
+
   def update
     @budget.update(budget_params)
 

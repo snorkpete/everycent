@@ -16,6 +16,7 @@
     vm.selectBudgetForUpdate = selectBudgetForUpdate;
     vm.copyBudget = copyBudget;
     vm.closeBudget = closeBudget;
+    vm.reopenLastBudget = reopenLastBudget;
 
     activate();
 
@@ -68,7 +69,7 @@
 
     function closeBudget(budget){
       var message ='Are you sure you want to close the budget: ' + budget.name+ '?' +
-         '\n This action is not reversible. '; 
+         '\n Ensure that all the bank account balances are correct before continuing.';
 
       var modalOptions = {
         headerText: 'Close this budget',
@@ -85,6 +86,27 @@
         });
       }, function(){
         MessageService.setErrorMessage('Close cancelled.'); // cancel clicked
+      });
+    }
+
+    function reopenLastBudget(){
+      var message ='Are you sure you want to reopen the last budget?';
+
+      var modalOptions = {
+        headerText: 'Reopen Last Budget',
+        bodyText: message,
+        confirmButtonText: 'Reopen Last Budget',
+        cancelButtonText: 'Cancel'
+      };
+
+      ModalService.show(modalOptions).then(function(){
+
+        BudgetsService.reopenLastBudget().then(function(response){
+          refreshBudgetList();
+          MessageService.setMessage('Last Budget reopened.');
+        });
+      }, function(){
+        MessageService.setErrorMessage('Reopen request cancelled.'); // cancel clicked
       });
     }
 

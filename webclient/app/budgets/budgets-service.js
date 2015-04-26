@@ -14,6 +14,7 @@
         addBudget: addBudget,
         copyBudget: copyBudget,
         closeBudget: closeBudget,
+        reopenLastBudget: reopenLastBudget,
         addNewIncome: addNewIncome,
         addNewAllocation: addNewAllocation,
         groupAllocationsByCategory: groupAllocationsByCategory,
@@ -49,6 +50,10 @@
 
       function closeBudget(budget){
         return budget.customPUT(null, 'close');
+      }
+
+      function reopenLastBudget(){
+        return baseAll.customPOST({}, 'reopen_last_budget');
       }
 
       function addNewIncome(budget){
