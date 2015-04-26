@@ -15,6 +15,7 @@ Rails.application.routes.draw do
 
     collection do
       get 'current'
+      post 'reopen_last_budget'
     end
   end
 
