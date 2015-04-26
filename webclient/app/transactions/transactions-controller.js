@@ -136,11 +136,26 @@
         // but only assign the allocation if its currently unassigned
         // ----------------------------------------------------------------------------
         for(var i=0; i < transactions.length; i++){
-          if(!transactions[i].allocation || transactions[i].allocation_id === 0){
-            var allocationId = defaultAllocations[i].allocation_id;
-            transactions[i].allocation = allocationMap[allocationId];
-            transactions[i].allocation_id = allocationId;
+
+          // skip if there's already a valid allocation
+          // ------------------------------------------
+          if(transactions[i].allocation_id > 0){
+            continue;
           }
+
+          // TODO: disabled - don't want this behaviour
+          // skip if the user already selected allocation_name=(none)
+          // --------------------------------------------------------
+          //if(transactions[i].allocation &&
+          //   transactions[i].allocation.name === '(none)'){
+          //  continue;
+          //}
+
+          // assign the allocation
+          // ---------------------
+          var allocationId = defaultAllocations[i].allocation_id;
+          transactions[i].allocation = allocationMap[allocationId];
+          transactions[i].allocation_id = allocationId;
         }
 
       });
