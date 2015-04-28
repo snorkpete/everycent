@@ -2,9 +2,9 @@
     <thead>
         <tr class="heading">
             <th>Name</th>
-            <th>Institution</th>
-            <th>Account Type</th>
-            <th>Category</th>
+            <th class="hidden-xs">Institution</th>
+            <th class="hidden-xs">Account Type</th>
+            <th class="hidden-xs">Category</th>
             <th>
                 Balance At: <em>{{ vm.bankAccounts[0].closing_date | date:'MMM dd' }}</em>
 
@@ -17,9 +17,9 @@
     <tbody>
         <tr ng-repeat="bankAccount in vm.bankAccounts">
             <td> {{ bankAccount.name }} </td>
-            <td> {{ bankAccount.institution.name }} </td>
-            <td> {{ bankAccount.account_type }} </td>
-            <td> {{ bankAccount.account_category }} </td>
+            <td class="hidden-xs"> {{ bankAccount.institution.name }} </td>
+            <td class="hidden-xs"> {{ bankAccount.account_type }} </td>
+            <td class="hidden-xs"> {{ bankAccount.account_category }} </td>
             <td class="text-right"> {{ bankAccount.closing_balance | ecToDollars }} </td>
             <td class="text-right"> {{ bankAccount.expected_closing_balance | ecToDollars }} </td>
             <td class="text-right"> {{ bankAccount.current_balance | ecToDollars }} </td>
@@ -28,7 +28,8 @@
     </tbody>
     <tfoot>
         <tr class="total">
-            <th class="text-right" colspan="4">Total</th>
+            <th class="hidden-xs text-right" colspan="4">Total</th>
+            <th class="visible-xs text-right">Total</th>
             <th class="text-right">
                 {{ vm.util.total(vm.bankAccounts, 'closing_balance') | ecToDollars }}
             </th>

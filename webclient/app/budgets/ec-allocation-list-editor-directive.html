@@ -8,7 +8,7 @@
                     <th style="width:15%;" class="text-right">Amount</th>
                     <th style="width:15%;" class="text-right">Spent</th>
                     <th style="width:15%;" class="text-right">Remaining</th>
-                    <th style="width:25%;">Comment</th>
+                    <th style="width:25%;" class="hidden-xs">Comment</th>
                     <th style="width:5%;"></th>
                 </tr>
             </thead>
@@ -32,7 +32,7 @@
                     <th class="text-right">
                         <ec-amount-formatted amount="vm.totalRemaining()"></ec-amount-formatted>
                     </th>
-                    <th></th>
+                    <th class="hidden-xs"></th>
                     <th></th>
                 </tr>
             </tfoot>
@@ -53,7 +53,7 @@
                     <td class="text-right">
                         <ec-amount-formatted amount="vm.actualRemainingForCategory(category)"></ec-amount-formatted>
                     </td>
-                    <td></td>
+                    <td class="hidden-xs"></td>
                     <td></td>
                 </tr>
 
