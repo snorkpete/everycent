@@ -22,10 +22,15 @@ class BankAccount < ActiveRecord::Base
   belongs_to :institution
 
   has_many :transactions
+  has_many :sub_accounts
 
   validates :name,  presence: true
 
   before_save :fix_name
+
+  def self.sink_funds
+    self.where(is_sink_fund: true)
+  end
 
   def update_balance(budget_id, closing_date)
     total_transaction_amount = 0

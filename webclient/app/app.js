@@ -23,7 +23,8 @@
     'everycent.setup.settings',
     'everycent.budgets',
     'everycent.transactions',
-    'everycent.account-balances'
+    'everycent.account-balances',
+    'everycent.sink-funds'
   ]);
 
   angular
