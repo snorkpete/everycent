@@ -49,12 +49,13 @@ ActiveRecord::Schema.define(version: 20150429155937) do
     t.integer  "institution_id"
     t.integer  "opening_balance"
     t.integer  "closing_balance"
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
     t.date     "closing_date"
-    t.string   "account_category",          default: "asset"
-    t.boolean  "allow_default_allocations", default: false
-    t.boolean  "is_sink_fund",              default: false
+    t.string   "account_category",           default: "asset"
+    t.boolean  "allow_default_allocations",  default: false
+    t.boolean  "is_sink_fund",               default: false
+    t.integer  "default_sub_account_amount", default: 0
   end
 
   add_index "bank_accounts", ["institution_id"], name: "index_bank_accounts_on_institution_id", using: :btree

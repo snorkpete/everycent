@@ -8,8 +8,12 @@ class CreateSubAccounts < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    # also add the sink funcd flag to bank accounts
+    # add the sink fund indicator to bank accounts,
+    # as well as a field to store the default sub account amount
+    # This field stores any amount that isn't otherwise allocated to a sub account
     add_column :bank_accounts, :is_sink_fund, :boolean, default: false
-    BankAccount.update_all is_sink_fund: false
+    add_column :bank_accounts, :default_sub_account_amount, :integer, default: 0
+
+    BankAccount.update_all is_sink_fund: false, default_sub_account_amount: 0
   end
 end
