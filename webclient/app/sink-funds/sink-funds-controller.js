@@ -13,10 +13,19 @@
     vm.ref = ReferenceService;
     vm.util = UtilService;
     vm.search = {};
+    vm.sinkFunds = [];
+    vm.refreshSinkFunds = refreshSinkFunds;
 
     activate();
 
     function activate(){
+      refreshSinkFunds();
+    }
+
+    function refreshSinkFunds(){
+      SinkFundsService.getSinkFunds().then(function(sinkFunds){
+        vm.sinkFunds = sinkFunds;
+      });
     }
 
   }

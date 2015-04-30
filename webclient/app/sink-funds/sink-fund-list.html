@@ -8,180 +8,72 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-6">
-        <ec-sink-fund-search-form search-options="vm.search"
-                                  on-submit="vm.refreshSinkFunds();">
-        </ec-sink-fund-search-form>
-    </div>
-    <div class="col-sm-6">
-        <ec-sink-fund-summary bank_account="vm.search.bank_account">
-        </ec-sink-fund-summary>
-    </div>
-</div>
+<table class="table table-bordered clear-background rounded">
+    <thead>
+        <tr>
+            <th colspan="1" class="visible-xs"></th>
+            <th colspan="4" class="hidden-xs"></th>
+            <th colspan="3" class="text-center">Balances</th>
+            <th></th>
+        </tr>
+        <tr class="heading">
+            <th>Name</th>
+            <th class="hidden-xs">Institution</th>
+            <th class="hidden-xs">Account Type</th>
+            <th class="hidden-xs">Category</th>
+            <th>Default Sub Account</th>
+            <th>Other Sub Accounts</th>
+            <th>Total</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="sinkFund in vm.sinkFunds">
+            <td> {{ sinkFund.name }} </td>
+            <td class="hidden-xs"> {{ sinkFund.institution.name }} </td>
+            <td class="hidden-xs"> {{ sinkFund.account_type }} </td>
+            <td class="hidden-xs"> {{ sinkFund.account_category }} </td>
+            <td class="text-right"> {{ sinkFund.default_sub_account_balance | ecToDollars }} </td>
+            <td class="text-right"> {{ sinkFund.other_sub_accounts_balance | ecToDollars }} </td>
+            <td class="text-right"> {{ sinkFund.current_balance | ecToDollars }} </td>
+            <td>
+                <span ng-click="vm.selectSinkFundForUpdate(sinkFund)"
+                      class="text-warning pull-right pointer">
+                    <ec-icon type="edit" tooltip="Edit"></ec-icon>
+                    &nbsp;
+                    &nbsp; &nbsp;
+                </span>
+            </td>
 
-<form class="form-horizontal" novalidate name="vm.transactionsForm">
-<div class="row">
-    <div class="col-xs-12">
-        <div style="max-height:400px; overflow-y:scroll;">
-            <table class="table table-bordered clear-background rounded fixed-layout">
-            <thead>
-                <tr class="heading">
-                    <th style="width:15%;">Date</th>
-                    <th style="width:25%;">Description</th>
-                    <th style="width:15%;" class="hidden-xs">Payee</th>
-                    <th style="width:15%;">Allocation</th>
-                    <th style="width:10%;" class="text-right">Withdrawn</th>
-                    <th style="width:10%;" class="text-right">Deposited</th>
-                    <th style="width: 5%;"></th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr class="total">
-                    <th></th>
-                    <th>Total</th>
-                    <th class="hidden-xs"></th>
-                    <th></th>
-                    <th class="text-right"> {{ vm.util.total(vm.transactions, 'withdrawal_amount') | ecToDollars }}</th>
-                    <th class="text-right"> {{ vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}</th>
-                    <th>
-                        <span ng-show="vm.isEditMode">
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr class="total">
+            <th class="hidden-xs text-right" colspan="4">Total</th>
+            <th class="visible-xs text-right">Total</th>
+            <th class="text-right">
+                {{ vm.util.total(vm.sinkFunds, 'default_sub_account_balance') | ecToDollars }}
+            </th>
+            <th class="text-right">
+                {{ vm.util.total(vm.sinkFunds, 'other_sub_accounts_balance') | ecToDollars }}
+            </th>
+            <th class="text-right">
+                {{ vm.util.total(vm.sinkFunds, 'current_balance') | ecToDollars }}
+            </th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
 
-                            <span ng-hide="vm.transactions.deleted"
-                                  ng-click="vm.markAllForDeletion(vm.transactions, true)"
-                                  class="text-danger pull-right pointer">
-                                <ec-icon type="trash"></ec-icon>
-                            </span>
-
-                            <span ng-show="vm.transactions.deleted"
-                                  ng-click="vm.markAllForDeletion(vm.transactions, false)"
-                                  class="text-success pull-right pointer">
-                                <ec-icon type="refresh"></ec-icon>
-                            </span>
-
-                        </span>
-                    </th>
-                </tr>
-            </tfoot>
-            <tbody>
-                <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted }">
-
-                    <!-- transaction date -->
-                    <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">
-                        <input ng-show="vm.isEditMode"
-                            name="transaction_date[{{$index}}]"
-                            type="date"
-                            ng-model="transaction.transaction_date"
-                            ng-change="vm.checkTransactionDate(transaction, vm.search.budget)"
-                            ng-required="!transaction.deleted"
-                            ec-as-date>
-                        </input>
-                        <span style="positive:relative; top:20px;" ng-show="transaction.transaction_date_invalid" class=".help-block">
-                            Transaction date outside the budget period
-                        </span>
-                        <span ng-hide="vm.isEditMode"
-                              ng-bind="transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
-                    </td>
-
-                    <!-- description -->
-                    <td>
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.description" ></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.description"></span>
-                    </td>
-
-                    <!-- payee -->
-                    <td class="hidden-xs">
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.payee_name" ></input>
-                        <span ng-hide="vm.isEditMode">
-                           <span ng-show="transaction.payee_code"
-                                 ng-bind="transaction.payee_name + ' (' + transaction.payee_code + ')'"></span>
-                        </span>
-                    </td>
-
-                    <!-- allocation -->
-                    <td>
-                        <select ng-show="vm.isEditMode"
-                                ng-model="transaction.allocation"
-                                ng-change="vm.ref.updateReferenceId(transaction, 'allocation')"
-                                ng-options="allocation.name group by allocation.allocation_category.name for allocation in vm.allocations track by allocation.id">
-                        </select>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.allocation.name"></span>
-                    </td>
-
-                    <!-- withdrawal amount -->
-                    <td class="text-right">
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.withdrawal_amount" ec-as-dollars></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.withdrawal_amount | ecToDollars"></span>
-                    </td>
-
-                    <!-- deposit amount -->
-                    <td class="text-right">
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.deposit_amount" ec-as-dollars></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.deposit_amount | ecToDollars"></span>
-                    </td>
-
-                    <td>
-                        <span ng-show="vm.isEditMode">
-
-                            <span ng-hide="transaction.deleted"
-                                  ng-click="vm.markForDeletion(transaction, true)"
-                                  class="text-danger pull-right pointer">
-                                <ec-icon type="trash"></ec-icon>
-                            </span>
-
-                            <span ng-show="transaction.deleted"
-                                  ng-click="vm.markForDeletion(transaction, false)"
-                                  class="text-success pull-right pointer">
-                                <ec-icon type="refresh"></ec-icon>
-                            </span>
-
-                        </span>
-                    </td>
-
-                </tr>
-            </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-</form>
 
 <br/>
 <div class="row">
-    <div class="col-xs-4">
+    <div class="col-xs-1">
         <button ng-hide="vm.isEditMode"
                 class="btn btn-primary"
-                ng-click="vm.switchToEditMode()">
-            Make Changes
+                ng-click="vm.refreshSinkFunds()">
+            Refresh
         </button>
-
-        <button ng-show="vm.isEditMode"
-                class="btn btn-primary"
-                ng-click="vm.addTransaction()">
-            Add Transaction
-        </button>
-        &nbsp;
-        <button ng-show="vm.isEditMode && vm.search.bank_account.allow_default_allocations"
-                class="btn btn-info"
-                ng-click="vm.defaultAllocations()">
-            Default Allocations
-        </button>
-    </div>
-    <div class="col-xs-8">
-        <span ng-show="vm.isEditMode" class="pull-right">
-            <button class="btn btn-success"
-                    ng-disabled="vm.transactionsForm.$invalid"
-                    ng-click="vm.saveChanges()">
-                Save Changes
-            </button>
-
-            &nbsp; &nbsp; &nbsp;
-
-            <button class="btn btn-danger"
-                    ng-click="vm.cancelEdit()">
-                Cancel
-            </button>
-        </span>
     </div>
 </div>
 

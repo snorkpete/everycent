@@ -10,8 +10,7 @@
 
     $stateProvider
       .state('sink-funds', {
-        url: '/sink-funds?bank_account',
-        reloadOnSearch: false,
+        url: '/sink-funds',
         templateUrl: 'app/sink-funds/sink-fund-list.html',
         controller: 'SinkFundsCtrl as vm',
         resolve:{

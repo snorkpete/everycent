@@ -56,6 +56,10 @@ class BankAccount < ActiveRecord::Base
     closing_balance.to_i + new_transaction_total
   end
 
+  def sub_account_balance
+    sub_accounts.sum(:amount)
+  end
+
   def expected_closing_balance
     transaction_list = transactions.where('transaction_date > ? and transaction_date <= ?',
                                           closing_date, next_closing_date).to_a

@@ -12,7 +12,7 @@
         save: save
       };
 
-      var baseAll = Restangular.all('sink-funds');
+      var baseAll = Restangular.all('sink_funds');
       return service;
 
       function getSinkFunds(params){
