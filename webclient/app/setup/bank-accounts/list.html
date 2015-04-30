@@ -15,6 +15,7 @@
                 <th>Category</th>
                 <th>Account #</th>
                 <th>Default Allocations?</th>
+                <th>Is Sink Fund?</th>
                 <th>Opening Balance</th>
                 <th>Actions</th>
             </tr>
@@ -23,23 +24,23 @@
             <tr ng-repeat="bankAccount in vm.bankAccounts">
                 <td> {{ bankAccount.name }} </td>
                 <td> {{ bankAccount.institution.name }} </td>
-                <td> {{ bankAccount.account_type }} </td>
+                <td title="test"> {{ bankAccount.account_type }} </td>
                 <td> {{ bankAccount.account_category }} </td>
                 <td> {{ bankAccount.account_no }} </td>
                 <td class="text-center"> {{ bankAccount.allow_default_allocations ? 'Yes' : 'No' }} </td>
+                <td class="text-center"> {{ bankAccount.is_sink_fund ? 'Yes' : 'No' }} </td>
                 <td class="text-right"> {{ bankAccount.opening_balance | ecToDollars }} </td>
                 <td>
                     <span ng-click="vm.deleteBankAccount(bankAccount)"
                           class="text-danger pull-right pointer">
-                        <ec-icon type="trash"></ec-icon>
+                        <ec-icon type="trash" tooltip="Delete"></ec-icon>
                     </span>
 
                     <span ng-click="vm.selectBankAccountForUpdate(bankAccount)"
                           class="text-warning pull-right pointer">
-                        <ec-icon type="edit"></ec-icon>
+                        <ec-icon type="edit" tooltip="Edit"></ec-icon>
                         &nbsp;
-                        Edit
-                        &nbsp; &nbsp; &nbsp;
+                        &nbsp; &nbsp;
                     </span>
                 </td>
 
