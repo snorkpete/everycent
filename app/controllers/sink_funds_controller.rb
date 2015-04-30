@@ -17,6 +17,6 @@ class SinkFundsController < ApplicationController
     end
 
     def sink_fund_params
-      params.fetch(:sink_fund, {}).permit({ sub_accounts: [:name, :amount, :bank_account] )
+      params.fetch(:sink_fund, {}).permit({ sub_accounts: [:name, :amount, :bank_account] })
     end
 end
