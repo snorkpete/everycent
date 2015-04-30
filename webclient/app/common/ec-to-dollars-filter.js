@@ -8,7 +8,7 @@
 
   function ecToDollars(){
     return function(input){
-      return (input / 100).toFixed(2);
+      return isNaN(input) ? (0).toFixed(2) : (input / 100).toFixed(2);
     };
   }
 })();
