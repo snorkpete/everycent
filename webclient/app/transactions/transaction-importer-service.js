@@ -49,8 +49,7 @@
         // ----------------------------------------------------
         var rawData = lineDataCopy.shift();
         var dateText = DateService.convertFromBankDateFormat(rawData);
-        transaction.transaction_date = new Date(dateText);
-        //transaction.transaction_date = new Date(DateService.convertFromBankDateFormat(lineDataCopy.shift()));
+        transaction.transaction_date = DateService.toDate(dateText);
         transaction.ref = lineDataCopy.shift();
 
         // the account balance column is only present for plain bank accounts
@@ -88,8 +87,8 @@
           transaction.description = lineDataCopy.join(' ').trim();
         }
 
-        var start = new Date(startDate);
-        var end = new Date(endDate);
+        var start = DateService.toDate(startDate);
+        var end = DateService.toDate(endDate);
 
         // confirm that the transaction date is within the period
         if(transaction.transaction_date < start || transaction.transaction_date > end){
@@ -144,8 +143,8 @@
 
       function _convertFromCreditCardData(input, startDate, endDate){
 
-        var start = new Date(startDate);
-        var end = new Date(endDate);
+        var start = DateService.toDate(startDate);
+        var end = DateService.toDate(endDate);
         var transactionList =[];
         var fields = _convertInputToFieldList(input);
 
@@ -153,7 +152,7 @@
         for(var i=0; i < fields.length; i += 3){
           transaction = {};
           var dateText = DateService.convertFromBankDateFormat(fields[i]);
-          transaction.transaction_date = new Date(dateText);
+          transaction.transaction_date = DateService.toDate(dateText);
           transaction.description = fields[i+1];
           transaction.amount = fields[i+2];
 

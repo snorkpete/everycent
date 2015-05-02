@@ -47,11 +47,11 @@
       }
 
       function getValidTransactions(transactions, searchOptions){
-        var startDate = new Date(searchOptions.budget.start_date);
-        var endDate = new Date(searchOptions.budget.end_date);
+        var startDate = DateService.toDate(searchOptions.budget.start_date);
+        var endDate = DateService.toDate(searchOptions.budget.end_date);
 
         return transactions.filter(function(transaction){
-          var transactionDate = new Date(transaction.transaction_date);
+          var transactionDate = DateService.toDate(transaction.transaction_date);
           return !transaction.deleted && transactionDate >= startDate && transactionDate <= endDate;
         });
       }
