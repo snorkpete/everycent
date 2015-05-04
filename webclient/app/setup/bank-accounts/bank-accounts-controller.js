@@ -6,9 +6,9 @@
     .module('everycent.setup.bank-accounts')
     .controller('BankAccountsCtrl', BankAccountsCtrl);
 
-  BankAccountsCtrl.$inject = ['MessageService', 'BankAccountsService', 'ModalService', 'FormService', 'StateService'];
+  BankAccountsCtrl.$inject = ['MessageService', 'BankAccountsService', 'ModalService', 'FormService', 'StateService', '$document'];
 
-  function BankAccountsCtrl(MessageService, BankAccountsService, ModalService, FormService, StateService){
+  function BankAccountsCtrl(MessageService, BankAccountsService, ModalService, FormService, StateService, $document){
     var vm = this;
     vm.state = StateService; // page state handler
     vm.bankAccount = {};
@@ -35,7 +35,7 @@
         refreshBankAccountList();
         MessageService.setMessage('Bank Account "' + bankAccount.name + '" added successfully.');
         // TODO:  hack - need to find a better way of clearing the name
-        FormService.resetForm(bankAccount, form, 
+        FormService.resetForm(bankAccount, form,
           ['name', 'account_type', 'account_no', 'opening_balance']);
 
       }, function(errorResponse){
@@ -47,7 +47,13 @@
 
     function selectBankAccountForUpdate(bankAccount){
       vm.bankAccount = bankAccount;
-      StateService.goToState('bank-accounts.edit');
+      StateService.goToState('bank-accounts.edit').then(function(){
+        var duScrollDuration = 500;
+        var duScrollOffset = 30;
+        //var element = angular.element(document.getElementById('bank-account-form'));
+        var element = $document.find('ui-view');
+        $document.scrollTo(element, duScrollOffset, duScrollDuration);
+      });
     }
 
     function updateBankAccount(bankAccount, form){

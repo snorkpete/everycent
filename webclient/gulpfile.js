@@ -61,7 +61,8 @@ gulp.task('js:vendor', function(){
     'bower_components/restangular/dist/restangular.min.js',
     'bower_components/angular-toastr/dist/angular-toastr.min.js',
     'bower_components/angular-toastr/dist/angular-toastr.tpls.min.js',
-    'bower_components/angular-loading-bar/build/loading-bar.min.js'
+    'bower_components/angular-loading-bar/build/loading-bar.min.js',
+    'bower_components/angular-scroll/angular-scroll.min.js'
   ];
   return ecUglify(src, 'vendor');
 });
