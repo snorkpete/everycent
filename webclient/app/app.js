@@ -12,6 +12,7 @@
     'restangular',
     'toastr',
     'angular-loading-bar',
+    'duScroll',
     'everycent.common',
     'everycent.menu',
     'everycent.security',

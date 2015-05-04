@@ -19,6 +19,10 @@
           }]
         }
       })
+      .state('sink-funds.edit', {
+        url: '/sink-funds/edit/:sink_fund_id',
+        templateUrl: 'app/sink-funds/sink-fund-edit.html'
+      })
     ;
   }
 })();
