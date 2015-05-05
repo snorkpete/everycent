@@ -28,10 +28,6 @@ class BankAccount < ActiveRecord::Base
 
   before_save :fix_name
 
-  def self.sink_funds
-    self.where(is_sink_fund: true)
-  end
-
   def update_balance(budget_id, closing_date)
     total_transaction_amount = 0
 
@@ -77,6 +73,40 @@ class BankAccount < ActiveRecord::Base
 
     next_budget_to_close.end_date
   end
+
+  ### Sink Fund related functions
+  ### TODO: possibly move these into their own concern/module
+  def self.sink_funds
+    self.where(is_sink_fund: true)
+  end
+
+  def self.update_sink_fund(input_params)
+    params = ActionController::Parameters.new(input_params)
+    params = params.permit(:sink_fund => [:id, {sub_accounts: [:name, :amount, :comment] }]).require(:sink_fund)
+
+    sink_fund = BankAccount.find(params[:id])
+
+    updated_sub_accounts = params[:sub_accounts].map do |sub_account_params|
+      SubAccount.new(sub_account_params)
+    end
+
+    validate do
+      if updated_sub_accounts.sum(&:amount) > sink_fund.current_balance
+        sink_fund.errors.add(:base, "Sub account balance exceeds current balance")
+      end
+    end
+
+    if sink_fund.valid?
+      sink_fund.sub_accounts = updated_sub_accounts
+    end
+    sink_fund
+  end
+
+  #validate :sub_account_total_less_than_current_balance
+
+  #def sub_account_total_less_than_current_balance
+  #  if
+  #end
 
   protected
 
