@@ -19,15 +19,8 @@
         return baseAll.getList(params);
       }
 
-      function save(sinkFunds, searchOptions){
-
-        var params = {
-          bank_account_id: searchOptions.bank_account_id,
-          sinkFunds: sinkFunds
-        };
-        return baseAll.post(params);
+      function save(sinkFund, searchOptions){
+        return sinkFund.save();
       }
-
     }
-
 })();

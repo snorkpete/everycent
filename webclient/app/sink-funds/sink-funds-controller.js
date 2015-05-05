@@ -16,6 +16,7 @@
     vm.search = {};
     vm.sinkFund = {};
     vm.sinkFunds = [];
+    vm.switchToEditMode = switchToEditMode;
     vm.refreshSinkFunds = refreshSinkFunds;
     vm.selectSinkFundForUpdate = selectSinkFundForUpdate;
     vm.addNewSubAccount = addNewSubAccount;
@@ -23,6 +24,7 @@
     vm.saveChanges = saveChanges;
     vm.cancelEdit = cancelEdit;
     vm.unassignedBalance = unassignedBalance;
+    vm.canSave = canSave;
 
     activate();
 
@@ -42,6 +44,7 @@
 
         vm.sinkFund = selectedSinkFund;
       }
+      vm.sinkFund.sub_accounts = vm.sinkFund.sub_accounts || [];
     }
 
     function refreshSinkFunds(){
@@ -56,7 +59,16 @@
     }
 
     function saveChanges(){
-      MessageService.setMessage('to implement');
+      SinkFundsService.save(vm.sinkFund).then(function(){
+        refreshSinkFunds().then(function(){
+          _setInitialSinkFund();
+          MessageService.setMessage('Sink fund saved.');
+        });
+      },
+      // error handler
+      function(){
+        MessageService.setErrorMessage('Sink fund NOT saved.');
+      });
     }
 
     function cancelEdit(){
@@ -66,7 +78,7 @@
     }
 
     function addNewSubAccount(){
-      vm.sinkFunds.push({});
+      vm.sinkFund.sub_accounts.push({ amount: 0 });
     }
 
     function switchToEditMode(){
@@ -78,7 +90,11 @@
     }
 
     function unassignedBalance(){
-      return vm.sinkFund.current_balance - vm.util.total(vm.sinkFund.subAccounts, 'amount');
+      return vm.sinkFund.current_balance - vm.util.total(vm.sinkFund.sub_accounts, 'amount');
+    }
+
+    function canSave(){
+      return unassignedBalance() >= 0;
     }
   }
 })();

@@ -18,7 +18,7 @@
         <tr class="total">
             <th> Total </th>
             <th class="text-right">
-                {{ vm.util.total(vm.sinkFund.subAccounts, 'amount') | ecToDollars }}
+                {{ vm.util.total(vm.sinkFund.sub_accounts, 'amount') | ecToDollars }}
             </th>
             <th class="text-right">
                 Unassigned: &nbsp; &nbsp; <ec-amount-formatted amount="vm.unassignedBalance()"></ec-amount-formatted>
@@ -27,15 +27,18 @@
         </tr>
     </tfoot>
     <tbody>
-        <tr ng-repeat="subAccount in vm.sinkFund.subAccounts">
+        <tr ng-repeat="subAccount in vm.sinkFund.sub_accounts">
             <td>
-              <span> {{ subAccount.name }} </span>
+                <span ng-hide="vm.isEditMode" ng-bind="subAccount.name"> </span>
+                <input type="text" ng-show="vm.isEditMode" ng-model="subAccount.name" name="name"></input>
             </td>
             <td class="text-right">
-              <span> {{ subAccount.amount }} </span>
+                <span ng-hide="vm.isEditMode" ng-bind="subAccount.amount | ecToDollars"></span>
+                <input type="text" ng-show="vm.isEditMode" ng-model="subAccount.amount" ec-as-dollars></input>
             </td>
             <td>
-                <span> {{ subAccount.comment }} </span>
+                <span ng-hide="vm.isEditMode" ng-bind="subAccount.comment"></span>
+                <input type="text" ng-show="vm.isEditMode" ng-model="subAccount.comment"></input>
             </td>
             <td></td>
         </tr>
@@ -51,9 +54,18 @@
 
 
     <div class="row">
+        <div class="col-xs-2">
+            <span ng-hide="vm.isEditMode">
+                <button class="btn btn-primary"
+                        ng-click="vm.switchToEditMode()">
+                    Make Changes
+                </button>
+            </span>
+        </div>
         <div class="col-xs-10">
             <div class="pull-right" ng-show="vm.isEditMode">
                 <button class="btn btn-success"
+                        ng-disabled="!vm.canSave()"
                         ng-click="vm.saveChanges()">
                     Save Changes
                 </button>
