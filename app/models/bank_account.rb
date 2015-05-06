@@ -81,32 +81,27 @@ class BankAccount < ActiveRecord::Base
   end
 
   def self.update_sink_fund(input_params)
-    params = ActionController::Parameters.new(input_params)
-    params = params.permit(:sink_fund => [:id, {sub_accounts: [:name, :amount, :comment] }]).require(:sink_fund)
+    params = extract_sink_fund_params(input_params)
 
     sink_fund = BankAccount.find(params[:id])
+    new_sub_accounts = SubAccount.create_list_from_params(params[:sub_accounts])
 
-    updated_sub_accounts = params[:sub_accounts].map do |sub_account_params|
-      SubAccount.new(sub_account_params)
-    end
+    validate { sink_fund.check_sub_account_balance_against_current_balance(new_sub_accounts) }
+    sink_fund.sub_accounts = new_sub_accounts if sink_fund.valid?
 
-    validate do
-      if updated_sub_accounts.sum(&:amount) > sink_fund.current_balance
-        sink_fund.errors.add(:base, "Sub account balance exceeds current balance")
-      end
-    end
-
-    if sink_fund.valid?
-      sink_fund.sub_accounts = updated_sub_accounts
-    end
     sink_fund
   end
 
-  #validate :sub_account_total_less_than_current_balance
+  def self.extract_sink_fund_params(input_params)
+    params = ActionController::Parameters.new(input_params)
+    params.permit(:sink_fund => [:id, {sub_accounts: [:name, :amount, :comment] }]).require(:sink_fund)
+  end
 
-  #def sub_account_total_less_than_current_balance
-  #  if
-  #end
+  def check_sub_account_balance_against_current_balance(new_sub_accounts)
+    if new_sub_accounts.sum(&:amount) > current_balance
+      errors.add(:base, "Sub account balance exceeds current balance")
+    end
+  end
 
   protected
 

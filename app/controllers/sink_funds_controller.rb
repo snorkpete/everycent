@@ -7,7 +7,7 @@ class SinkFundsController < ApplicationController
   end
 
   def update
-    @sink_fund = BankAccount.update_sink_fund(sink_fund_params)
+    @sink_fund = BankAccount.update_sink_fund(params)
     respond_with(@sink_fund, SinkFundSerializer)
   end
 
