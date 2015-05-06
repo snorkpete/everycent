@@ -63,6 +63,7 @@
         refreshSinkFunds().then(function(){
           _setInitialSinkFund();
           MessageService.setMessage('Sink fund saved.');
+          switchToViewMode();
         });
       },
       // error handler
@@ -72,13 +73,19 @@
     }
 
     function cancelEdit(){
-      StateService.go('sink-funds').then(function(){
+      refreshSinkFunds().then(function(){
+        _setInitialSinkFund();
         MessageService.setErrorMessage('Edit cancelled.');
+        switchToViewMode();
       });
     }
 
     function addNewSubAccount(){
       vm.sinkFund.sub_accounts.push({ amount: 0 });
+    }
+
+    function switchToViewMode(){
+      vm.isEditMode = false;
     }
 
     function switchToEditMode(){

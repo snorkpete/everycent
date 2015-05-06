@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150429155937) do
+ActiveRecord::Schema.define(version: 20150506144246) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -141,6 +141,7 @@ ActiveRecord::Schema.define(version: 20150429155937) do
     t.integer  "amount"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.string   "comment"
   end
 
   add_index "sub_accounts", ["bank_account_id"], name: "index_sub_accounts_on_bank_account_id", using: :btree
