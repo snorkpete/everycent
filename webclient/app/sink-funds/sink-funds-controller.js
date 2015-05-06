@@ -11,6 +11,7 @@
   function SinkFundsCtrl(MessageService, SinkFundsService, LookupService, ReferenceService, UtilService, StateService){
     var vm = this;
     vm.ref = ReferenceService;
+    vm.state = StateService;
     vm.util = UtilService;
     vm.isEditMode = false;
     vm.search = {};
