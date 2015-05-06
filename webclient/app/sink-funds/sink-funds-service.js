@@ -20,6 +20,10 @@
       }
 
       function save(sinkFund, searchOptions){
+        var validSubAccounts = sinkFund.sub_accounts.filter(function(subAccount){
+          return !subAccount.deleted;
+        });
+        sinkFund.sub_accounts = validSubAccounts;
         return sinkFund.save();
       }
     }
