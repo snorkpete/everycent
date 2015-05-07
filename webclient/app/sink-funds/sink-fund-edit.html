@@ -4,6 +4,7 @@
     </div>
 </div>
 
+
 <ec-panel title="Edit Sub Accounts for: {{ vm.sinkFund.name }}" type="primary">
     <table class="table table-bordered rounded fixed-layout">
     <thead>
@@ -27,6 +28,18 @@
         </tr>
     </tfoot>
     <tbody>
+        <tr>
+            <td>
+                <strong> Unassigned Money </strong>
+            </td>
+            <td class="text-right">
+                <strong><ec-amount-formatted amount="vm.unassignedBalance()"></ec-amount-formatted></strong>
+            </td>
+            <td>
+                <strong><em> Money not assigned to any sub account</em></strong>
+            </td>
+            <td></td>
+        </tr>
         <tr ng-repeat="subAccount in vm.sinkFund.sub_accounts" ng-class="{ danger: subAccount.deleted }" >
             <td>
                 <span ng-hide="vm.isEditMode" ng-bind="subAccount.name"> </span>
