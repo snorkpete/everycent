@@ -113,4 +113,17 @@ RSpec.describe Transaction, :type => :model do
       expect(transactions.size).to eq 0
     end
   end
+
+  describe "when Against Sink Funds" do
+    it "updates the sink fund sub account balances" do
+    end
+
+    context "if transaction deleted" do
+      it "updates the sink fund sub account balances"
+    end
+
+    context "when transaction changed" do
+      it "updates the sink fun sub account balances with new amount"
+    end
+  end
 end
