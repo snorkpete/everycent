@@ -18,11 +18,11 @@
                 </td>
             </tr>
             <tr ng-if="vm.showBudgetBalance()">
-                <th>Last Budget Balance</th>
+                <th>Current Budget Balance</th>
                 <td class="text-right">{{ vm.lastBudgetBalance() | ecToDollars }}</td>
             </tr>
             <tr ng-if="vm.showBudgetBalance()" class="total">
-                <th>Budget Difference</th>
+                <th>Difference (Bank vs Budget)</th>
                 <td class="text-right"><ec-amount-formatted amount="vm.budgetDifference()"></ec-amount-formatted></td>
             </tr>
         </tbody>
