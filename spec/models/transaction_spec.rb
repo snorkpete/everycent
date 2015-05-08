@@ -115,7 +115,19 @@ RSpec.describe Transaction, :type => :model do
   end
 
   describe "when Against Sink Funds" do
+    before do
+      @sink_fund = create(:bank_account, is_sink_fund: true,
+                          closing_balance: 4000_00, closing_date: '2014-12-31')
+      @sub_account = create(:sub_account, amount: 2000)
+      @sink_fund.sub_accounts << @sub_account
+    end
     it "updates the sink fund sub account balances" do
+      transaction = create(:transaction, withdrawal_amount: 500_00, deposit_amount: 0,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @sub_account)
+      expect(@sink_fund.current_balance).to eq 3500_00
+      expect(@sub_account.amount).to eq 1500
     end
 
     context "if transaction deleted" do
