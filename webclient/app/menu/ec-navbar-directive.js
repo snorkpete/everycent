@@ -57,6 +57,11 @@
           StateService.is('budgets-edit') ||
           StateService.is('budgets.new');
       }
+      // TODO: messy way of handling this - need a more scalable solution
+      else if(menuOption === 'sink-funds'){
+        return StateService.is('sink-funds') ||
+          StateService.is('sink-funds.edit');
+      }
       else{
         return StateService.is(menuOption);
       }
