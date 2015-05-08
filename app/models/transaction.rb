@@ -19,6 +19,7 @@ class Transaction < ActiveRecord::Base
 
   belongs_to :allocation
   belongs_to :bank_account
+  belongs_to :sub_account
 
   def self.for_budget_and_bank(budget_id, bank_account_id)
 
@@ -49,7 +50,14 @@ class Transaction < ActiveRecord::Base
       end
     end
 
+    transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
+
+    sink_fund = BankAccount.sink_funds.where(id: params[:bank_account_id]).includes(:sub_accounts).first
+    if sink_fund
+      sink_fund.update_sub_account_balances(transactions)
+    end
+
     #send back the fixed list of transactions
-    Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
+    transactions
   end
 end
