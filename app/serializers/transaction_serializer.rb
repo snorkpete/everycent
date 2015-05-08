@@ -16,8 +16,9 @@
 #
 
 class TransactionSerializer < ActiveModel::Serializer
-  attributes :id, :description, :bank_ref, :bank_account_id, :transaction_date, :withdrawal_amount, :deposit_amount, :payee_id, :payee_code, :payee_name,  :allocation_id
+  attributes :id, :description, :bank_ref, :bank_account_id, :transaction_date, :withdrawal_amount, :deposit_amount, :payee_id, :payee_code, :payee_name,  :allocation_id, :sub_account_id
 
   has_one :allocation
   has_one :bank_account
+  has_one :sub_account
 end
