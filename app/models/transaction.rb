@@ -37,8 +37,12 @@ class Transaction < ActiveRecord::Base
 
   def self.update_with_params(params)
 
+    sink_fund = BankAccount.sink_funds.where(id: params[:bank_account_id]).includes(:sub_accounts).first
+
     # remove the existing transactions in the period
-    Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id]).delete_all
+    previous_transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
+    sink_fund.reverse_transactions_from_sub_accounts(previous_transactions) if sink_fund
+    previous_transactions.delete_all
 
     # re-add the transactions that are being sent
     if params[:transactions]
@@ -50,14 +54,10 @@ class Transaction < ActiveRecord::Base
       end
     end
 
-    transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
-
-    sink_fund = BankAccount.sink_funds.where(id: params[:bank_account_id]).includes(:sub_accounts).first
-    if sink_fund
-      sink_fund.update_sub_account_balances(transactions)
-    end
+    new_transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
+    sink_fund.apply_transactions_to_sub_accounts(new_transactions) if sink_fund
 
     #send back the fixed list of transactions
-    transactions
+    new_transactions
   end
 end

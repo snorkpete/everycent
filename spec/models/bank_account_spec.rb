@@ -66,4 +66,84 @@ RSpec.describe BankAccount, :type => :model do
       end
     end
   end
+
+
+  describe "#reverse_transactions_from_sub_accounts" do
+    before do
+      @sink_fund = create(:bank_account, is_sink_fund: true,
+                          closing_balance: 4000_00, closing_date: '2014-12-31')
+    end
+
+    it "reverses the sub account balances" do
+      @sub_account = create(:sub_account, name: 'First', amount: 2000_00)
+      @sink_fund.sub_accounts << @sub_account
+      transaction = create(:transaction, withdrawal_amount: 500_00, deposit_amount: 0,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @sub_account)
+      @sink_fund.reverse_transactions_from_sub_accounts(Transaction.where(id: transaction.id))
+      expect(@sink_fund.sub_accounts.first.amount).to eq 2500_00
+    end
+
+    it "reverses the sub account balances of multiple sub accounts" do
+      @sub_account = create(:sub_account, name: 'First', amount: 2000_00)
+      @sink_fund.sub_accounts << @sub_account
+
+      @second_sub_account = create(:sub_account, name: 'Second', amount: 1000_00)
+      @sink_fund.sub_accounts << @second_sub_account
+
+      transactions = []
+      transactions << create(:transaction, withdrawal_amount: 500_00, deposit_amount: 0,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @sub_account)
+      transactions << create(:transaction, withdrawal_amount: 700_00, deposit_amount: 0,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @sub_account)
+      transactions << create(:transaction, withdrawal_amount: 100_00, deposit_amount: 0,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @second_sub_account)
+      transaction_ids = transactions.map(&:id)
+      @sink_fund.reverse_transactions_from_sub_accounts(Transaction.where(id: transaction_ids))
+      expect(@sink_fund.sub_accounts.first.amount).to eq 3200_00
+      expect(@sink_fund.sub_accounts.second.amount).to eq 1100_00
+    end
+
+  end
+
+  describe "#apply_transactions_to_sub_accounts" do
+    before do
+      @sink_fund = create(:bank_account, is_sink_fund: true,
+                          closing_balance: 5000_00, closing_date: '2014-12-31')
+    end
+
+    it "updates the sub account balances of multiple sub accounts" do
+      @sub_account = create(:sub_account, name: 'First', amount: 3500_00)
+      @sink_fund.sub_accounts << @sub_account
+
+      @second_sub_account = create(:sub_account, name: 'Second', amount: 1200_00)
+      @sink_fund.sub_accounts << @second_sub_account
+
+      transactions = []
+      transactions << create(:transaction, withdrawal_amount: 0, deposit_amount: 400_00,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @sub_account)
+      transactions << create(:transaction, withdrawal_amount: 600_00, deposit_amount: 0,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @sub_account)
+      transactions << create(:transaction, withdrawal_amount: 900_00, deposit_amount: 0,
+                           transaction_date: '2015-01-12',
+                           bank_account: @sink_fund,
+                           sub_account: @second_sub_account)
+      transaction_ids = transactions.map(&:id)
+      @sink_fund.apply_transactions_to_sub_accounts(Transaction.where(id: transaction_ids))
+      expect(@sink_fund.sub_accounts.first.amount).to eq 3300_00
+      expect(@sink_fund.sub_accounts.second.amount).to eq 300_00
+    end
+
+  end
 end
