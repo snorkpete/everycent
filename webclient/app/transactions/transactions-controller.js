@@ -15,7 +15,6 @@
     vm.search = {};
 
     vm.refreshTransactions = refreshTransactions;
-    vm.refreshAllocations = refreshAllocations;
     vm.switchToEditMode = switchToEditMode;
     vm.addTransaction = addTransaction;
     vm.saveChanges = saveChanges;
@@ -38,6 +37,16 @@
 
         // add a blank allocation at the top of the list
         vm.allocations.unshift({ id: 0, name: '(none)' });
+      });
+    }
+
+    function refreshSubAccounts(){
+      LookupService.clear();
+      return LookupService.refreshList('sub_accounts', {bank_account_id: vm.search.bank_account_id}, true).then(function(subAccounts){
+        vm.subAccounts = subAccounts;
+
+        // add a blank allocation at the top of the list
+        vm.subAccounts.unshift({ id: 0, name: '(none)' });
       });
     }
 
@@ -71,6 +80,7 @@
 
     function refreshTransactions(){
       refreshAllocations();
+      refreshSubAccounts();
 
       var params = {
         bank_account_id: vm.search.bank_account_id,
