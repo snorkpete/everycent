@@ -103,6 +103,24 @@ class BankAccount < ActiveRecord::Base
     end
   end
 
+  def reverse_transactions_from_sub_accounts(transactions_to_reverse)
+    sub_accounts.each do |sub_account|
+      transaction_total = transactions_to_reverse.where(sub_account_id: sub_account.id)
+                                                .sum('deposit_amount - withdrawal_amount')
+      sub_account.amount -= transaction_total
+      sub_account.save
+    end
+  end
+
+  def apply_transactions_to_sub_accounts(transactions_to_reverse)
+    sub_accounts.each do |sub_account|
+      transaction_total = transactions_to_reverse.where(sub_account_id: sub_account.id)
+                                                .sum('deposit_amount - withdrawal_amount')
+      sub_account.amount += transaction_total
+      sub_account.save
+    end
+  end
+
   protected
 
   def fix_name
