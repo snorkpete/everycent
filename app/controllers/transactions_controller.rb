@@ -28,6 +28,6 @@ class TransactionsController < ApplicationController
     params.permit(:budget_id, :bank_account_id, :transactions => [
       :id, :description, :bank_ref, :bank_account_id, :transaction_date,
       :withdrawal_amount, :deposit_amount, :payee_id, :payee_code, :payee_name,
-      :allocation_id])
+      :allocation_id, :sub_account_id])
   end
 end

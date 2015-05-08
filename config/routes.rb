@@ -30,6 +30,7 @@ Rails.application.routes.draw do
 
   resources :account_balances, only: [:index]
   resources :sink_funds, only: [:index, :update]
+  resources :sub_accounts, only: [:index]
 
   resources :recurring_allocations, except: [:new, :edit]
   resources :recurring_incomes, except: [:new, :edit]
