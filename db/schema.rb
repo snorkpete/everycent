@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150508215201) do
+ActiveRecord::Schema.define(version: 20150511182715) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(version: 20150508215201) do
     t.boolean  "allow_default_allocations",  default: false
     t.boolean  "is_sink_fund",               default: false
     t.integer  "default_sub_account_amount", default: 0
+    t.string   "status",                     default: "open"
   end
 
   add_index "bank_accounts", ["institution_id"], name: "index_bank_accounts_on_institution_id", using: :btree

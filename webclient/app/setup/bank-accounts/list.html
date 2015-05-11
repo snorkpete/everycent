@@ -13,7 +13,7 @@
                 <th>Institution</th>
                 <th>Account Type</th>
                 <th>Category</th>
-                <th>Account #</th>
+                <th>Status</th>
                 <th>Default Allocations?</th>
                 <th>Is Sink Fund?</th>
                 <th>Opening Balance</th>
@@ -26,7 +26,7 @@
                 <td> {{ bankAccount.institution.name }} </td>
                 <td title="test"> {{ bankAccount.account_type }} </td>
                 <td> {{ bankAccount.account_category }} </td>
-                <td> {{ bankAccount.account_no }} </td>
+                <td> {{ bankAccount.status }} </td>
                 <td class="text-center"> {{ bankAccount.allow_default_allocations ? 'Yes' : 'No' }} </td>
                 <td class="text-center"> {{ bankAccount.is_sink_fund ? 'Yes' : 'No' }} </td>
                 <td class="text-right"> {{ bankAccount.opening_balance | ecToDollars }} </td>

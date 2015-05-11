@@ -74,6 +74,21 @@
                ng-model="vm.bankAccount.opening_balance">
 </ec-form-field>
 
+<div class="form-group" ng-class="{'has-error': vm.bankAccountForm.status.$error.server }">
+    <label class="col-xs-2 control-label">Status</label>
+    <div class="col-xs-6">
+
+        <select name="status"
+                ng-model="vm.bankAccount.status"
+                class="form-control">
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+        </select>
+
+        <p class="help-block">{{ vm.bankAccountForm.status.$error.server }}</p>
+    </div>
+</div>
+
 <div class="form-group" ng-class="{'has-error': vm.bankAccountForm.allow_default_allocations.$error.server }">
     <div class="col-sm-offset-2 col-xs-10">
         <div class="checkbox">
