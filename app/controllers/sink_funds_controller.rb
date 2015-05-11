@@ -2,7 +2,8 @@ class SinkFundsController < ApplicationController
   before_action :set_sink_fund, only: [:show, :edit, :update, :destroy]
 
   def index
-    @sink_funds = BankAccount.sink_funds.includes(:institution, { sink_fund_allocations: :transactions }).order(:name).all
+    @sink_funds = BankAccount.sink_funds.includes(:institution, :sub_accounts).order(:name)
+    @sink_funds = @sink_funds.where(status:'open') unless params[:include_closed]
     respond_with(@sink_funds, SinkFundSerializer)
   end
 
