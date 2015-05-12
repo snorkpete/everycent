@@ -15,8 +15,8 @@
       var baseAll = Restangular.all('bank_accounts');
       return service;
 
-      function getBankAccounts(){
-        return baseAll.getList();
+      function getBankAccounts(params){
+        return baseAll.getList(params);
       }
 
       function addBankAccount(bankAccount){

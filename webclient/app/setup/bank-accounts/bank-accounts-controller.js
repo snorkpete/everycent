@@ -13,11 +13,13 @@
     vm.state = StateService; // page state handler
     vm.bankAccount = {};
     vm.bankAccounts = [];
+    vm.searchParams = {};
     vm.addBankAccount = addBankAccount;
     vm.selectBankAccountForUpdate = selectBankAccountForUpdate;
     vm.updateBankAccount = updateBankAccount;
     vm.cancelEdit = cancelEdit;
     vm.deleteBankAccount = deleteBankAccount;
+    vm.refreshBankAccountList = refreshBankAccountList;
     activate();
 
     function activate(){
@@ -25,7 +27,7 @@
     }
 
     function refreshBankAccountList(){
-      BankAccountsService.getBankAccounts().then(function(bankAccounts){
+      BankAccountsService.getBankAccounts(vm.searchParams).then(function(bankAccounts){
         vm.bankAccounts = bankAccounts;
       });
     }
