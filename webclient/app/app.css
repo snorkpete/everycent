@@ -111,10 +111,24 @@ body{
 	animation: fadeOutUp .5s;
 }
 
-
 /* change color of loading bar */
-#loading-bar .bar {
-  background-color: red;
+#loading-bar .bar{
+  height: 3px;
+  background-color: #fdd428;
+}
+
+#loading-bar-spinner{
+  /*
+    background-color: white;
+  */
+}
+
+#loading-bar-spinner .spinner-icon{
+  border-top-color: #fdd428;
+  border-right-color: #fdd428;
+  border-radius: 13px;
+  width: 24px;
+  height: 24px;
 }
 
 /*-----------------------------------------------------*/
