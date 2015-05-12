@@ -3,7 +3,7 @@ class SinkFundsController < ApplicationController
 
   def index
     @sink_funds = BankAccount.sink_funds.includes(:institution, :sub_accounts).order(:name)
-    @sink_funds = @sink_funds.where(status:'open') unless params[:include_closed]
+    @sink_funds = @sink_funds.where(status:'open') unless params[:include_closed] == 'true'
     respond_with(@sink_funds, SinkFundSerializer)
   end
 
