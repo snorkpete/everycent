@@ -3,7 +3,7 @@ class BankAccountsController < ApplicationController
 
   def index
     @bank_accounts = BankAccount.includes(:institution, :user).order(:account_category, :name)
-    @bank_accounts = @bank_accounts.where(status:'open') unless params[:include_closed]
+    @bank_accounts = @bank_accounts.where(status:'open') unless params[:include_closed] == 'true'
     respond_with(@bank_accounts, BankAccountSerializer)
   end
 
