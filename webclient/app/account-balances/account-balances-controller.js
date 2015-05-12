@@ -12,6 +12,7 @@
     var vm = this;
     vm.bankAccounts = [];
     vm.refresh = refreshBankAccountList;
+    vm.searchParams = {};
     vm.netWorth = netWorth;
     activate();
 
@@ -20,14 +21,12 @@
     }
 
     function refreshBankAccountList(){
-      AccountBalancesService.getAccountBalances().then(function(bankAccounts){
+      AccountBalancesService.getAccountBalances(vm.searchParams).then(function(bankAccounts){
 
         vm.bankAccounts = bankAccounts;
-
         vm.assetAccounts = filterFilter(bankAccounts, function(bankAccount, index){
           return bankAccount.account_category === 'asset';
         });
-
         vm.liabilityAccounts = filterFilter(bankAccounts, function(bankAccount, index){
           return bankAccount.account_category === 'liability';
         });

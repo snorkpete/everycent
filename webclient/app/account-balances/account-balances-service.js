@@ -15,8 +15,8 @@
       var baseAll = Restangular.all('account_balances');
       return service;
 
-      function getAccountBalances(){
-        return baseAll.getList();
+      function getAccountBalances(params){
+        return baseAll.getList(params);
       }
     }
 })();

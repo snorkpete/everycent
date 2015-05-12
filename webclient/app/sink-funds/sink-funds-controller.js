@@ -17,6 +17,7 @@
     vm.search = {};
     vm.sinkFund = {};
     vm.sinkFunds = [];
+    vm.searchParams = {};
     vm.switchToEditMode = switchToEditMode;
     vm.refreshSinkFunds = refreshSinkFunds;
     vm.selectSinkFundForUpdate = selectSinkFundForUpdate;
@@ -49,7 +50,7 @@
     }
 
     function refreshSinkFunds(){
-      return SinkFundsService.getSinkFunds().then(function(sinkFunds){
+      return SinkFundsService.getSinkFunds(vm.searchParams).then(function(sinkFunds){
         vm.sinkFunds = sinkFunds;
       });
     }
