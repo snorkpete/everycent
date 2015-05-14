@@ -20,10 +20,10 @@
       }
 
       function save(sinkFund, searchOptions){
-        var validSubAccounts = sinkFund.sub_accounts.filter(function(subAccount){
-          return !subAccount.deleted;
+        var validSinkFundAllocations = sinkFund.sink_fund_allocations.filter(function(sinkFundAllocation){
+          return !sinkFundAllocation.deleted;
         });
-        sinkFund.sub_accounts = validSubAccounts;
+        sinkFund.sink_fund_allocations = validSinkFundAllocations;
         return sinkFund.save();
       }
     }

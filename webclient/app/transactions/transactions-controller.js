@@ -40,13 +40,13 @@
       });
     }
 
-    function refreshSubAccounts(){
+    function refreshSinkFundAllocations(){
       LookupService.clear();
-      return LookupService.refreshList('sub_accounts', {bank_account_id: vm.search.bank_account_id}, true).then(function(subAccounts){
-        vm.subAccounts = subAccounts;
+      return LookupService.refreshList('sink_fund_allocations', {bank_account_id: vm.search.bank_account_id}, true).then(function(sinkFundAllocations){
+        vm.sinkFundAllocations = sinkFundAllocations;
 
         // add a blank allocation at the top of the list
-        vm.subAccounts.unshift({ id: 0, name: '(none)' });
+        vm.sinkFundAllocations.unshift({ id: 0, name: '(none)' });
       });
     }
 
@@ -80,7 +80,7 @@
 
     function refreshTransactions(){
       refreshAllocations();
-      refreshSubAccounts();
+      refreshSinkFundAllocations();
 
       var params = {
         bank_account_id: vm.search.bank_account_id,

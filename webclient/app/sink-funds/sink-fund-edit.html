@@ -5,12 +5,14 @@
 </div>
 
 
-<ec-panel title="Edit Sub Accounts for: {{ vm.sinkFund.name }}" type="primary">
+<ec-panel title="Edit sink_fund_allocations for: {{ vm.sinkFund.name }}" type="primary">
     <table class="table table-bordered rounded fixed-layout">
     <thead>
         <tr class="heading">
             <th style="width:25%;">Name</th>
-            <th style="width:15%;" class="text-right">Amount</th>
+            <th style="width:15%;" class="text-right">Allocated</th>
+            <th style="width:15%;" class="text-right">Spent</th>
+            <th style="width:15%;" class="text-right">Remaining</th>
             <th style="width:25%;" class="hidden-xs">Comment</th>
             <th style="width:5%;"></th>
         </tr>
@@ -19,11 +21,16 @@
         <tr class="total">
             <th> Total </th>
             <th class="text-right">
-                {{ vm.util.total(vm.sinkFund.sub_accounts, 'amount') | ecToDollars }}
+                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'amount') | ecToDollars }}
             </th>
             <th class="text-right">
-                Unassigned: &nbsp; &nbsp; <ec-amount-formatted amount="vm.unassignedBalance()"></ec-amount-formatted>
+                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'spent') | ecToDollars }}
             </th>
+            <th class="text-right">
+                <ec-amount-formatted amount="vm.util.total(vm.sinkFund.sink_fund_allocations, 'remaining')">
+                </ec-amount-formatted>
+            </th>
+            <th class="text-right"> </th>
             <th></th>
         </tr>
     </tfoot>
@@ -35,33 +42,42 @@
             <td class="text-right">
                 <strong><ec-amount-formatted amount="vm.unassignedBalance()"></ec-amount-formatted></strong>
             </td>
+            <td></td>
+            <td></td>
             <td>
-                <strong><em> Money not assigned to any sub account</em></strong>
+                <strong><em> Money not allocated</em></strong>
             </td>
             <td></td>
         </tr>
-        <tr ng-repeat="subAccount in vm.sinkFund.sub_accounts" ng-class="{ danger: subAccount.deleted }" >
+        <tr ng-repeat="sinkFundAllocation in vm.sinkFund.sink_fund_allocations" ng-class="{ danger: sinkFundAllocation.deleted }" >
             <td>
-                <span ng-hide="vm.isEditMode" ng-bind="subAccount.name"> </span>
-                <input type="text" ng-show="vm.isEditMode" ng-model="subAccount.name" name="name"></input>
+                <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.name"> </span>
+                <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.name" name="name"></input>
             </td>
             <td class="text-right">
-                <span ng-hide="vm.isEditMode" ng-bind="subAccount.amount | ecToDollars"></span>
-                <input type="text" ng-show="vm.isEditMode" ng-model="subAccount.amount" ec-as-dollars></input>
+                <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.amount | ecToDollars"></span>
+                <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.amount" ec-as-dollars></input>
+            </td>
+            <td class="text-right">
+                <span ng-bind="sinkFundAllocation.spent | ecToDollars"></span>
+            </td>
+            <td class="text-right">
+                <ec-amount-formatted amount="sinkFundAllocation.amount-sinkFundAllocation.spent">
+                </ec-amount-formatted>
             </td>
             <td>
-                <span ng-hide="vm.isEditMode" ng-bind="subAccount.comment"></span>
-                <input type="text" ng-show="vm.isEditMode" ng-model="subAccount.comment"></input>
+                <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.comment"></span>
+                <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.comment"></input>
             </td>
             <td>
                 <span ng-show="vm.isEditMode">
-                    <span ng-hide="subAccount.deleted"
-                          ng-click="vm.markForDeletion(subAccount, true)"
+                    <span ng-hide="sinkFundAllocation.deleted"
+                          ng-click="vm.markForDeletion(sinkFundAllocation, true)"
                           class="text-danger pull-right pointer">
                         <ec-icon type="trash"></ec-icon>
                     </span>
-                    <span ng-show="subAccount.deleted"
-                          ng-click="vm.markForDeletion(subAccount, false)"
+                    <span ng-show="sinkFundAllocation.deleted"
+                          ng-click="vm.markForDeletion(sinkFundAllocation, false)"
                           class="text-success pull-right pointer">
                         <ec-icon type="refresh"></ec-icon>
                     </span>
@@ -70,8 +86,8 @@
         </tr>
         <tr class="category-action">
             <td colspan="6" ng-show="vm.isEditMode">
-                <button class="btn btn-primary" ng-click="vm.addNewSubAccount()">
-                    Add Sub Account
+                <button class="btn btn-primary" ng-click="vm.addNewSinkFundAllocation()">
+                    Add Sink Fund Allocation
                 </button>
             </td>
         </tr>

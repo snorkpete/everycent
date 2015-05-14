@@ -45,7 +45,7 @@
                     <th style="width:15%;" class="hidden-xs">Payee</th>
                     <th style="width:15%;">
                         <span ng-hide="vm.search.bank_account.is_sink_fund">Allocation</span>
-                        <span ng-show="vm.search.bank_account.is_sink_fund">Sub Account</span>
+                        <span ng-show="vm.search.bank_account.is_sink_fund">Sink Fund Allocation</span>
                     </th>
                     <th style="width:10%;" class="text-right">Withdrawn</th>
                     <th style="width:10%;" class="text-right">Deposited</th>
@@ -127,11 +127,11 @@
 
                         <span ng-show="vm.search.bank_account.is_sink_fund">
                             <select ng-show="vm.isEditMode"
-                                    ng-model="transaction.sub_account"
-                                    ng-change="vm.ref.updateReferenceId(transaction, 'sub_account')"
-                                    ng-options="subAccount.name for subAccount in vm.subAccounts track by subAccount.id">
+                                    ng-model="transaction.sink_fund_allocation"
+                                    ng-change="vm.ref.updateReferenceId(transaction, 'sink_fund_allocation')"
+                                    ng-options="sinkFundAllocation.name for sinkFundAllocation in vm.sinkFundAllocations track by sinkFundAllocation.id">
                             </select>
-                            <span ng-hide="vm.isEditMode" ng-bind="transaction.sub_account.name"></span>
+                            <span ng-hide="vm.isEditMode" ng-bind="transaction.sink_fund_allocation.name"></span>
                         </span>
                     </td>
 

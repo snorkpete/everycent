@@ -21,8 +21,8 @@
             <th class="hidden-xs">Institution</th>
             <th class="hidden-xs">Account Type</th>
             <th class="hidden-xs">Category</th>
-            <th>Default Sub Account</th>
-            <th>Other Sub Accounts</th>
+            <th>Default Sink Fund Allocation</th>
+            <th>Other Sink Fund Allocations</th>
             <th>Total</th>
             <th>Action</th>
         </tr>
@@ -33,8 +33,8 @@
             <td class="hidden-xs"> {{ sinkFund.institution.name }} </td>
             <td class="hidden-xs"> {{ sinkFund.account_type }} </td>
             <td class="hidden-xs"> {{ sinkFund.account_category }} </td>
-            <td class="text-right"> {{ sinkFund.default_sub_account_balance | ecToDollars }} </td>
-            <td class="text-right"> {{ sinkFund.other_sub_accounts_balance | ecToDollars }} </td>
+            <td class="text-right"> {{ sinkFund.default_sink_fund_allocation_balance | ecToDollars }} </td>
+            <td class="text-right"> {{ sinkFund.other_sink_fund_allocations_balance | ecToDollars }} </td>
             <td class="text-right"> {{ sinkFund.current_balance | ecToDollars }} </td>
             <td>
                 <span ng-click="vm.selectSinkFundForUpdate(sinkFund)"
@@ -52,10 +52,10 @@
             <th class="hidden-xs text-right" colspan="4">Total</th>
             <th class="visible-xs text-right">Total</th>
             <th class="text-right">
-                {{ vm.util.total(vm.sinkFunds, 'default_sub_account_balance') | ecToDollars }}
+                {{ vm.util.total(vm.sinkFunds, 'default_sink_fund_allocation_balance') | ecToDollars }}
             </th>
             <th class="text-right">
-                {{ vm.util.total(vm.sinkFunds, 'other_sub_accounts_balance') | ecToDollars }}
+                {{ vm.util.total(vm.sinkFunds, 'other_sink_fund_allocations_balance') | ecToDollars }}
             </th>
             <th class="text-right">
                 {{ vm.util.total(vm.sinkFunds, 'current_balance') | ecToDollars }}
