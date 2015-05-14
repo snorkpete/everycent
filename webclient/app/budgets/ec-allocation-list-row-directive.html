@@ -39,8 +39,27 @@
 
     <!-- comment -->
     <td class="hidden-xs">
-        <input type="text" ng-show="vm.isEditMode" ng-model="vm.allocation.comment" />
-        <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.comment"></span>
+        <div>
+            <input type="text" ng-show="vm.isEditMode" ng-model="vm.allocation.comment" />
+            <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.comment"></span>
+        </div>
+
+        <hr/>
+        <div><em>Assigned to Bank Account?</em>
+            <input type="checkbox" ng-show="vm.isEditMode" ng-model="vm.allocation.is_standing_order" />
+            <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.is_standing_order ? 'Yes' : 'No'"></span>
+            &nbsp; &nbsp;
+
+            <span ng-show="vm.allocation.is_standing_order">
+                <select ng-show="vm.isEditMode"
+                        ng-model="vm.allocation.bank_account"
+                        ng-change="vm.ref.updateReferenceId(vm.allocation, 'bank_account')"
+                        ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
+                </select>
+                <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.bank_account.name"></span>
+            </span>
+        </div>
+
     </td>
 
     <!-- actions -->
