@@ -41,8 +41,8 @@
             <thead>
                 <tr class="heading">
                     <th style="width:15%;">Date</th>
-                    <th style="width:25%;">Description</th>
                     <th style="width:15%;" class="hidden-xs">Payee</th>
+                    <th style="width:25%;">Description</th>
                     <th style="width:15%;">
                         <span ng-hide="vm.search.bank_account.is_sink_fund">Allocation</span>
                         <span ng-show="vm.search.bank_account.is_sink_fund">Sink Fund Allocation</span>
@@ -55,8 +55,8 @@
             <tfoot>
                 <tr class="total">
                     <th></th>
-                    <th>Total</th>
                     <th class="hidden-xs"></th>
+                    <th>Total</th>
                     <th></th>
                     <th class="text-right"> {{ vm.util.total(vm.transactions, 'withdrawal_amount') | ecToDollars }}</th>
                     <th class="text-right"> {{ vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}</th>
@@ -99,12 +99,6 @@
                               ng-bind="transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
                     </td>
 
-                    <!-- description -->
-                    <td>
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.description" ></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.description"></span>
-                    </td>
-
                     <!-- payee -->
                     <td class="hidden-xs">
                         <input ng-show="vm.isEditMode" type="text" ng-model="transaction.payee_name" ></input>
@@ -112,6 +106,12 @@
                            <span ng-show="transaction.payee_code"
                                  ng-bind="transaction.payee_name + ' (' + transaction.payee_code + ')'"></span>
                         </span>
+                    </td>
+
+                    <!-- description -->
+                    <td>
+                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.description" ></input>
+                        <span ng-hide="vm.isEditMode" ng-bind="transaction.description"></span>
                     </td>
 
                     <!-- allocation -->
