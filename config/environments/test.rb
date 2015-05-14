@@ -8,7 +8,7 @@ Rails.application.configure do
   config.cache_classes = true
 
   # disable the logging to a file
-  config.logger = ActiveSupport::Logger.new(nil)
+  #config.logger = ActiveSupport::Logger.new(nil)
 
   # Do not eager load code on boot. This avoids loading your whole application
   # just for the purpose of running a single test. If you are using a tool that

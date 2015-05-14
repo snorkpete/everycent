@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150508030711) do
+ActiveRecord::Schema.define(version: 20150508215201) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -135,7 +135,7 @@ ActiveRecord::Schema.define(version: 20150508030711) do
     t.datetime "updated_at",                   null: false
   end
 
-  create_table "sub_accounts", force: :cascade do |t|
+  create_table "sink_fund_allocations", force: :cascade do |t|
     t.string   "name"
     t.integer  "bank_account_id"
     t.integer  "amount"
@@ -144,7 +144,7 @@ ActiveRecord::Schema.define(version: 20150508030711) do
     t.string   "comment"
   end
 
-  add_index "sub_accounts", ["bank_account_id"], name: "index_sub_accounts_on_bank_account_id", using: :btree
+  add_index "sink_fund_allocations", ["bank_account_id"], name: "index_sink_fund_allocations_on_bank_account_id", using: :btree
 
   create_table "transactions", force: :cascade do |t|
     t.string   "description"
@@ -155,11 +155,11 @@ ActiveRecord::Schema.define(version: 20150508030711) do
     t.integer  "deposit_amount"
     t.integer  "payee_id"
     t.integer  "allocation_id"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
     t.string   "payee_code"
     t.string   "payee_name"
-    t.integer  "sub_account_id"
+    t.integer  "sink_fund_allocation_id"
   end
 
   add_index "transactions", ["allocation_id"], name: "index_transactions_on_allocation_id", using: :btree

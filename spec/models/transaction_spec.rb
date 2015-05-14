@@ -81,13 +81,13 @@ RSpec.describe Transaction, :type => :model do
                             closing_balance: 4000_00, closing_date: '2014-12-31')
         @params[:bank_account_id] = @sink_fund.id
       end
-      it "removes previous transactions from sub accounts" do
-        pending "test that we call sink_fund.remove_transactions_from_sub_accounts(previous_transactions)"
+      it "removes previous transactions from sink_fund_allocations" do
+        pending "test that we call sink_fund.remove_transactions_from_sink_fund_allocations(previous_transactions)"
         expect(false).to eq true
       end
 
-      it "adds transactions from sub accounts" do
-        pending "test that we call sink_fund.add_transactions_to_sub_accounts(new_transactions)"
+      it "adds transactions from sink_fund_allocations" do
+        pending "test that we call sink_fund.add_transactions_to_sink_fund_allocations(new_transactions)"
         expect(false).to eq true
       end
 
