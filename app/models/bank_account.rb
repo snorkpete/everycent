@@ -84,7 +84,6 @@ class BankAccount < ActiveRecord::Base
     params = extract_sink_fund_params(input_params)
 
     sink_fund = BankAccount.find(params[:id])
-    #new_sink_fund_allocations = SinkFundAllocation.build_list_from_params(params[:sink_fund_allocations])
 
     validate do
       sink_fund.check_sink_fund_allocation_balance_against_current_balance(params[:sink_fund_allocations])
@@ -97,7 +96,7 @@ class BankAccount < ActiveRecord::Base
   def self.extract_sink_fund_params(input_params)
     # TODO this doesn't belong here - was added for unit testing, which isnt an appropriate reason
     params = ActionController::Parameters.new(input_params)
-    params.permit(:sink_fund => [:id, {sink_fund_allocations: [:name, :amount, :comment] }]).require(:sink_fund)
+    params.permit(:sink_fund => [:id, {sink_fund_allocations: [:id, :name, :amount, :comment] }]).require(:sink_fund)
   end
 
   def check_sink_fund_allocation_balance_against_current_balance(new_sink_fund_allocations)
@@ -112,7 +111,6 @@ class BankAccount < ActiveRecord::Base
 
   def update_sink_fund_allocations(new_allocations_params)
 
-    logger.debug(new_allocations_params)
     # load all the current allocations
     sink_fund_allocations.to_a
     updated_ids = []
@@ -136,6 +134,9 @@ class BankAccount < ActiveRecord::Base
 
     # remove any allocations that need to be removed
     sink_fund_allocations.where('id not in (?)', updated_ids).delete_all
+
+    # update the sink fund allocations with their new values
+    sink_fund_allocations.reload
   end
 
   def reverse_transactions_from_sink_fund_allocations(transactions_to_reverse)
