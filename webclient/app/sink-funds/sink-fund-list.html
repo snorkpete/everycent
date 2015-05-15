@@ -22,7 +22,7 @@
         <tr>
             <th colspan="1" class="visible-xs"></th>
             <th colspan="4" class="hidden-xs"></th>
-            <th colspan="3" class="text-center">Balances</th>
+            <th colspan="3" class="text-center">Totals</th>
             <th></th>
         </tr>
         <tr class="heading">
@@ -30,9 +30,9 @@
             <th class="hidden-xs">Institution</th>
             <th class="hidden-xs">Account Type</th>
             <th class="hidden-xs">Category</th>
-            <th>Default Sink Fund Allocation</th>
-            <th>Other Sink Fund Allocations</th>
-            <th>Total</th>
+            <th>Allocated</th>
+            <th>Spent</th>
+            <th>Remaining</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -42,9 +42,16 @@
             <td class="hidden-xs"> {{ sinkFund.institution.name }} </td>
             <td class="hidden-xs"> {{ sinkFund.account_type }} </td>
             <td class="hidden-xs"> {{ sinkFund.account_category }} </td>
-            <td class="text-right"> {{ sinkFund.default_sink_fund_allocation_balance | ecToDollars }} </td>
-            <td class="text-right"> {{ sinkFund.other_sink_fund_allocations_balance | ecToDollars }} </td>
-            <td class="text-right"> {{ sinkFund.current_balance | ecToDollars }} </td>
+            <td class="text-right">
+                {{ vm.util.total(sinkFund.sink_fund_allocations, 'amount') | ecToDollars }}
+            </td>
+            <td class="text-right">
+                {{ vm.util.total(sinkFund.sink_fund_allocations, 'spent') | ecToDollars }}
+            </td>
+            <td class="text-right">
+                <ec-amount-formatted amount="vm.util.total(sinkFund.sink_fund_allocations, 'remaining')">
+                </ec-amount-formatted>
+            </td>
             <td>
                 <span ng-click="vm.selectSinkFundForUpdate(sinkFund)"
                       class="text-warning pull-right pointer">
@@ -56,22 +63,6 @@
 
         </tr>
     </tbody>
-    <tfoot>
-        <tr class="total">
-            <th class="hidden-xs text-right" colspan="4">Total</th>
-            <th class="visible-xs text-right">Total</th>
-            <th class="text-right">
-                {{ vm.util.total(vm.sinkFunds, 'default_sink_fund_allocation_balance') | ecToDollars }}
-            </th>
-            <th class="text-right">
-                {{ vm.util.total(vm.sinkFunds, 'other_sink_fund_allocations_balance') | ecToDollars }}
-            </th>
-            <th class="text-right">
-                {{ vm.util.total(vm.sinkFunds, 'current_balance') | ecToDollars }}
-            </th>
-            <th></th>
-        </tr>
-    </tfoot>
 </table>
 
 
