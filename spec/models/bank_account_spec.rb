@@ -33,19 +33,18 @@ RSpec.describe BankAccount, :type => :model do
     context "with 2 sink_fund_allocation params" do
       before :each do
         @sink_fund = create(:bank_account, is_sink_fund: true, closing_balance: 10_000_00)
-        @sink_fund_params = { "sink_fund"=>
+        @sink_fund_params = HashWithIndifferentAccess.new({ "sink_fund"=>
                               {"id"=> @sink_fund.id.to_s,
                                 "sink_fund_allocations"=>[
                                   {"amount"=>3000_00, "name"=>"First"},
                                   {"amount"=>4000_00, "name"=>"sdon"}
                                  ]
                               }
-                            }
+                            })
       end
 
       it "creates 2 sink_fund_allocations" do
         sink_fund = BankAccount.update_sink_fund(@sink_fund_params)
-        expect(sink_fund.sink_fund_allocations).to eq 2
         expect(sink_fund.sink_fund_allocations.size).to eq 2
       end
 
@@ -54,9 +53,23 @@ RSpec.describe BankAccount, :type => :model do
         expect(@sink_fund.sink_fund_allocations.size).to eq 1
 
         @sink_fund = BankAccount.update_sink_fund(@sink_fund_params)
-        expect(@sink_fund.sink_fund_allocations).to eq 2
+
         expect(@sink_fund.sink_fund_allocations.size).to eq 2
         expect(@sink_fund.sink_fund_allocations[0].name).to eq 'First'
+      end
+
+      it "updates existing sink_fund_allocations" do
+        @sink_fund.sink_fund_allocations << SinkFundAllocation.new(amount: 100, name: 'first to update')
+        @sink_fund.sink_fund_allocations << SinkFundAllocation.new(amount: 100, name: 'second to update')
+
+        @sink_fund_params[:sink_fund][:sink_fund_allocations] = [
+            {id: @sink_fund.sink_fund_allocations[0].id, "amount"=>3000_00, "name"=>"First"},
+            {id: @sink_fund.sink_fund_allocations[1].id, "amount"=>4000_00, "name"=>"sdon"}
+        ]
+
+        @sink_fund = BankAccount.update_sink_fund(@sink_fund_params)
+        expect(@sink_fund.sink_fund_allocations[0].amount).to eq 3000_00
+        expect(@sink_fund.sink_fund_allocations[1].amount).to eq 4000_00
       end
 
       context "when sink_fund_allocation total is more than account balance" do
