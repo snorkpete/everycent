@@ -85,22 +85,52 @@
             </tbody>
             </table>
 
-            <table class="table table-bordered rounded">
-                <tbody>
-                  <tr>
-                      <th class="text-right">Total Discretionary Amount</th>
-                      <td class="text-right">{{ vm.totalDiscretionaryAmount() | ecToDollars }}</td>
-                  </tr>
-                  <tr>
-                      <th class="text-right"> Pat's Amount</th>
-                      <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
-                  </tr>
-                  <tr>
-                      <th class="text-right">Kion's Amount</th>
-                      <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
-                  </tr>
-                </tbody>
-            </table>
+            <div class="row">
+                <div class="col-sm-6">
+                    <table class="table table-bordered rounded">
+                        <tbody>
+                          <tr>
+                              <th class="text-right">Transfer from Kion's Account</th>
+                              <td class="text-right">{{ vm.transferFrom() | ecToDollars }}</td>
+                          </tr>
+                          <tr>
+                              <th class="text-right">Amount Remaining in Kion's Account</th>
+                              <td class="text-right">{{ vm.leaveBack() | ecToDollars }}</td>
+                          </tr>
+                          <tr>
+                              <th class="text-right"> Transfer from Pat's Account</th>
+                              <td class="text-right">{{ vm.transferFrom() / 2 | ecToDollars }}</td>
+                          </tr>
+                          <tr>
+                              <th class="text-right">Amount Remaining in Pat's Account</th>
+                              <td class="text-right">{{ vm.leaveBack() | ecToDollars }}</td>
+                          </tr>
+                          <tr>
+                              <th class="text-right">Sink Fund Balance</th>
+                              <td class="text-right">{{ vm.sinkFundBalance() / 2 | ecToDollars }}</td>
+                          </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-6">
+                    <table class="table table-bordered rounded">
+                        <tbody>
+                          <tr>
+                              <th class="text-right">Total Discretionary Amount</th>
+                              <td class="text-right">{{ vm.totalDiscretionaryAmount() | ecToDollars }}</td>
+                          </tr>
+                          <tr>
+                              <th class="text-right"> Pat's Amount</th>
+                              <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
+                          </tr>
+                          <tr>
+                              <th class="text-right">Kion's Amount</th>
+                              <td class="text-right">{{ vm.totalDiscretionaryAmount() / 2 | ecToDollars }}</td>
+                          </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <div class="row" ng-show="vm.budget.status==='open'">
                 <div class="col-xs-2">
