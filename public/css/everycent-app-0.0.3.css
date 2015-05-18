@@ -141,6 +141,12 @@ body {
   height: 24px;
 }
 
+/* override of table style for use on the budget screen */
+
+td input[type=checkbox].inline-checkbox {
+  width: auto;
+}
+
 /*-----------------------------------------------------*/
 
 /*FOOTER                                               */

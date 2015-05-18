@@ -1,6 +1,13 @@
 <div class="row">
     <div class="col-xs-12">
         <ec-panel title="Allocations" type="primary">
+            <div class="pull-right">
+                <label>
+                    <input type="checkbox" ng-model="vm.showStandingOrders" >
+                        Show standing order info?
+                    </input>
+                </label>
+            </div>
             <table class="table table-bordered rounded fixed-layout">
             <thead>
                 <tr class="heading">
@@ -8,7 +15,10 @@
                     <th style="width:15%;" class="text-right">Amount</th>
                     <th style="width:15%;" class="text-right">Spent</th>
                     <th style="width:15%;" class="text-right">Remaining</th>
-                    <th style="width:25%;" class="hidden-xs">Comment</th>
+                    <th style="width:25%;" class="hidden-xs">
+                        <span ng-show="vm.showStandingOrders"> Standing Orders </span>
+                        <span ng-hide="vm.showStandingOrders"> Comment </span>
+                    </th>
                     <th style="width:5%;"></th>
                 </tr>
             </thead>
@@ -60,7 +70,8 @@
                 <tr class="category-detail" ec-allocation-list-row
                     ng-repeat="allocation in category.allocations"
                     allocation="allocation"
-                    is-edit-mode="vm.isEditMode">
+                    is-edit-mode="vm.isEditMode"
+                    show-standing-orders="vm.showStandingOrders">
                 </tr>
 
                 <tr class="category-action" ng-repeat-end>

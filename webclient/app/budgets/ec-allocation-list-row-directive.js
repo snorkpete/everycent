@@ -11,7 +11,8 @@
       templateUrl: 'app/budgets/ec-allocation-list-row-directive.html',
       scope: {
         allocation: '=',
-        isEditMode: '='
+        isEditMode: '=',
+        showStandingOrders: '='
       },
       controller: controller,
       controllerAs: 'vm',

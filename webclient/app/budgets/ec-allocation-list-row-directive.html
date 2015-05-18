@@ -37,27 +37,30 @@
         <ec-amount-formatted amount="vm.allocation.amount - vm.allocation.spent"> </ec-amount-formatted>
     </td>
 
-    <!-- comment -->
+    <!-- standing order info or comment -->
     <td class="hidden-xs">
-        <div>
-            <input type="text" ng-show="vm.isEditMode" ng-model="vm.allocation.comment" />
-            <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.comment"></span>
+        <div ng-hide="vm.showStandingOrders">
+            <em>
+                <input type="text" ng-show="vm.isEditMode" ng-model="vm.allocation.comment" />
+                <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.comment"></span>
+            </em>
         </div>
 
-        <hr/>
-        <div><em>Assigned to Bank Account?</em>
-            <input type="checkbox" ng-show="vm.isEditMode" ng-model="vm.allocation.is_standing_order" />
-            <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.is_standing_order ? 'Yes' : 'No'"></span>
-            &nbsp; &nbsp;
-
-            <span ng-show="vm.allocation.is_standing_order">
+        <div ng-show="vm.showStandingOrders">
+            <label ng-show="vm.isEditMode" >
+               <input type="checkbox" ng-model="vm.allocation.is_standing_order" class="inline-checkbox">
+               Standing Order?
+           </label>
+           <br/>
+            <div ng-show="vm.allocation.is_standing_order">
+                <em>From Bank Account: </em>
                 <select ng-show="vm.isEditMode"
                         ng-model="vm.allocation.bank_account"
                         ng-change="vm.ref.updateReferenceId(vm.allocation, 'bank_account')"
                         ng-options="bankAccount.name for bankAccount in vm.bankAccounts track by bankAccount.id">
                 </select>
-                <span ng-hide="vm.isEditMode" ng-bind="vm.allocation.bank_account.name"></span>
-            </span>
+                <strong ng-hide="vm.isEditMode" ng-bind="vm.allocation.bank_account.name"></strong>
+            </div>
         </div>
 
     </td>

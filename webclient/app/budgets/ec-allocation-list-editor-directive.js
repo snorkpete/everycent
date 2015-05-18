@@ -23,6 +23,7 @@
   function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService, $rootScope, $timeout){
     var vm = this;
     vm.isEditMode = false;
+    vm.showStandingOrders = false;
 
     vm.state = StateService;
     vm.ref = ReferenceService;
