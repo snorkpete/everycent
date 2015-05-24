@@ -95,6 +95,9 @@
       }
 
       function _accountIncomeTotal(account, budget){
+        if(!budget.incomes){
+          return 0;
+        }
         var accountIncomes = budget.incomes.filter(function(income){
           return account.id === income.bank_account_id;
         });
