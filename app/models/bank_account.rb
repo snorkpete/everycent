@@ -52,10 +52,6 @@ class BankAccount < ActiveRecord::Base
     closing_balance.to_i + new_transaction_total
   end
 
-  def sink_fund_allocation_balance
-    sink_fund_allocations.sum(:amount)
-  end
-
   def expected_closing_balance
     transaction_list = transactions.where('transaction_date > ? and transaction_date <= ?',
                                           closing_date, next_closing_date).to_a
@@ -76,6 +72,11 @@ class BankAccount < ActiveRecord::Base
 
   ### Sink Fund related functions
   ### TODO: possibly move these into their own concern/module
+
+  def sink_fund_allocation_balance
+    sink_fund_allocations.sum(:amount)
+  end
+
   def self.sink_funds
     self.where(is_sink_fund: true)
   end
@@ -104,7 +105,13 @@ class BankAccount < ActiveRecord::Base
       allocation_param[:amount]
     end
 
-    if sink_fund_allocation_total > current_balance
+    sink_fund_allocation_ids = new_sink_fund_allocations.map do |allocation|
+      allocation[:id]
+    end
+
+    spent_to_date = Transaction.where(sink_fund_allocation_id: sink_fund_allocation_ids).sum('withdrawal_amount - deposit_amount')
+
+    if sink_fund_allocation_total - spent_to_date > current_balance
       errors.add(:base, "sink_fund_allocation balance exceeds current balance")
     end
   end
