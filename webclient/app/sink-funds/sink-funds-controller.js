@@ -99,7 +99,8 @@
     }
 
     function unassignedBalance(){
-      return vm.sinkFund.current_balance - vm.util.total(vm.sinkFund.sink_fund_allocations, 'amount');
+      return vm.sinkFund.current_balance -
+            (vm.util.total(vm.sinkFund.sink_fund_allocations, 'amount') - vm.util.total(vm.sinkFund.sink_fund_allocations, 'spent'));
     }
 
     function canSave(){
