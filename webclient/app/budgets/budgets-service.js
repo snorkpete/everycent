@@ -5,8 +5,8 @@
     .module('everycent.budgets')
     .factory('BudgetsService', BudgetsService);
 
-    BudgetsService.$inject = ['$http', 'Restangular', 'filterFilter'];
-    function BudgetsService($http, Restangular, filterFilter){
+    BudgetsService.$inject = ['$http', 'Restangular', 'filterFilter', 'UtilService'];
+    function BudgetsService($http, Restangular, filterFilter, UtilService){
       var service = {
         getBudgets: getBudgets,
         getBudget: getBudget,
@@ -18,7 +18,9 @@
         addNewIncome: addNewIncome,
         addNewAllocation: addNewAllocation,
         groupAllocationsByCategory: groupAllocationsByCategory,
-        save: save
+        save: save,
+        transferFrom: transferFrom,
+        leaveBack: leaveBack
       };
 
       var baseAll = Restangular.all('budgets');
@@ -90,6 +92,34 @@
 
       function save(budget){
         return budget.save();
+      }
+
+      function _accountIncomeTotal(account, budget){
+        var accountIncomes = budget.incomes.filter(function(income){
+          return account.id === income.bank_account_id;
+        });
+
+        return UtilService.total(accountIncomes, 'amount');
+      }
+
+      function transferFrom(account, budget){
+        var accountIncomeAmount = _accountIncomeTotal(account, budget);
+
+        if(accountIncomeAmount === 0){
+          return 0;
+        }
+
+        var standingOrders = budget.allocations.filter(function(allocation){
+          return account.id === allocation.bank_account_id;
+        });
+
+        var discretionaryAmount = ( UtilService.total(budget.incomes, 'amount') -
+                                    UtilService.total(budget.allocations, 'amount') )/2;
+        return accountIncomeAmount - UtilService.total(standingOrders, 'amount') - discretionaryAmount;
+      }
+
+      function leaveBack(account, budget){
+        return account.closing_balance + _accountIncomeTotal(account, budget) - transferFrom(account, budget);
       }
     }
 })();

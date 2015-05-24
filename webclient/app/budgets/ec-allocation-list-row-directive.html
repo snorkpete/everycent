@@ -53,7 +53,7 @@
            </label>
            <br/>
             <div ng-show="vm.allocation.is_standing_order">
-                <em>From Bank Account: </em>
+                <em>From Bank Account: &nbsp; </em>
                 <select ng-show="vm.isEditMode"
                         ng-model="vm.allocation.bank_account"
                         ng-change="vm.ref.updateReferenceId(vm.allocation, 'bank_account')"

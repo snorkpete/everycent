@@ -88,27 +88,19 @@
             <div class="row">
                 <div class="col-sm-6">
                     <table class="table table-bordered rounded">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th class="text-right">Transfer to Joint</th>
+                                <th class="text-right">Leave Back</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                          <tr>
-                              <th class="text-right">Transfer from Kion's Account</th>
-                              <td class="text-right">{{ vm.transferFrom() | ecToDollars }}</td>
-                          </tr>
-                          <tr>
-                              <th class="text-right">Amount Remaining in Kion's Account</th>
-                              <td class="text-right">{{ vm.leaveBack() | ecToDollars }}</td>
-                          </tr>
-                          <tr>
-                              <th class="text-right"> Transfer from Pat's Account</th>
-                              <td class="text-right">{{ vm.transferFrom() / 2 | ecToDollars }}</td>
-                          </tr>
-                          <tr>
-                              <th class="text-right">Amount Remaining in Pat's Account</th>
-                              <td class="text-right">{{ vm.leaveBack() | ecToDollars }}</td>
-                          </tr>
-                          <tr>
-                              <th class="text-right">Sink Fund Balance</th>
-                              <td class="text-right">{{ vm.sinkFundBalance() / 2 | ecToDollars }}</td>
-                          </tr>
+                            <tr ng-repeat="account in vm.transferAccounts" ng-show="vm.transferFrom(account) > 0">
+                                <td>{{ account.name }}</td>
+                                <td class="text-right">{{ vm.transferFrom(account) | ecToDollars }}</td>
+                                <td class="text-right">{{ vm.leaveBack(account) | ecToDollars }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

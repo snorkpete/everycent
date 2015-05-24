@@ -19,11 +19,12 @@
     return directive;
   }
 
-  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService', '$rootScope', '$timeout'];
-  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService, $rootScope, $timeout){
+  controller.$inject = ['UtilService', 'LookupService', 'StateService', 'BudgetsService', 'ReferenceService', '$rootScope', '$timeout', 'SettingsService'];
+  function controller(UtilService, LookupService, StateService, BudgetsService, ReferenceService, $rootScope, $timeout, SettingsService){
     var vm = this;
     vm.isEditMode = false;
     vm.showStandingOrders = false;
+    vm.transferAccounts = [];
 
     vm.state = StateService;
     vm.ref = ReferenceService;
@@ -45,11 +46,15 @@
     vm.totalDiscretionaryAmount = totalDiscretionaryAmount;
     vm.totalRemaining = totalRemaining;
 
+    vm.transferFrom = transferFrom;
+    vm.leaveBack = leaveBack;
+
     activate();
 
     function activate(){
       LookupService.refreshList('bank_accounts').then(function(bankAccounts){
         vm.bankAccounts = bankAccounts;
+        _setTransferAccounts();
       });
 
       $rootScope.$on('budget.loaded', function(){
@@ -63,6 +68,25 @@
         });
         }, 10);
       });
+    }
+
+    function _setTransferAccounts(){
+      SettingsService.getSettings().then(function(settings){
+        vm.primary_budget_account_id = settings.primary_budget_account_id;
+
+        vm.transferAccounts = vm.bankAccounts.filter(function(account){
+          return account.id !== vm.primary_budget_account_id &&
+                 account.account_category === 'asset';
+        });
+      });
+    }
+
+    function transferFrom(account){
+      return BudgetsService.transferFrom(account, vm.budget);
+    }
+
+    function leaveBack(account){
+      return BudgetsService.leaveBack(account, vm.budget);
     }
 
     function addNewAllocation(){
