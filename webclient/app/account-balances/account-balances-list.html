@@ -16,6 +16,14 @@
 </div>
 <div class="row">
     <div class="col-xs-12">
+        <ec-panel type="primary" title="Current Account">
+            <ec-account-balance-list bank-accounts="vm.currentAccounts">
+            </ec-account-balance-list>
+        </ec-panel>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
         <ec-panel type="primary" title="Asset Accounts">
             <ec-account-balance-list bank-accounts="vm.assetAccounts">
             </ec-account-balance-list>
@@ -35,7 +43,7 @@
 <div class="row">
     <div class="col-xs-12">
        <h3 class="net-worth text-right">
-            Net Worth: &nbsp; <ec-amount-formatted amount="vm.netWorth()">
+            Net Worth: &nbsp; <ec-amount-formatted amount="vm.netWorth(vm.bankAccounts)">
                        </ec-amount-formatted>
        </h3>
     </div>

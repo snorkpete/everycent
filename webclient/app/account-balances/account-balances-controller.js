@@ -13,7 +13,7 @@
     vm.bankAccounts = [];
     vm.refresh = refreshBankAccountList;
     vm.searchParams = {};
-    vm.netWorth = netWorth;
+    vm.netWorth = AccountBalancesService.netWorth;
     activate();
 
     function activate(){
@@ -24,6 +24,9 @@
       AccountBalancesService.getAccountBalances(vm.searchParams).then(function(bankAccounts){
 
         vm.bankAccounts = bankAccounts;
+        vm.currentAccounts = filterFilter(bankAccounts, function(bankAccount, index){
+          return bankAccount.account_category === 'current';
+        });
         vm.assetAccounts = filterFilter(bankAccounts, function(bankAccount, index){
           return bankAccount.account_category === 'asset';
         });
@@ -34,14 +37,5 @@
       });
     }
 
-    function netWorth(){
-
-      var net = 0;
-      vm.bankAccounts.forEach(function(bankAccount){
-        net += bankAccount.current_balance;
-      });
-
-      return net;
-    }
   }
 })();
