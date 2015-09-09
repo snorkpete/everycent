@@ -32,7 +32,14 @@
 
     function activate(){
       refreshSinkFunds().then(function(){
-        _setInitialSinkFund();
+
+        // if only one sink fund exists, automatically redirect to it
+        // ----------------------------------------------------------
+        if(StateService.is('sink-funds') && vm.sinkFunds.length === 1){
+          selectSinkFundForUpdate(vm.sinkFunds[0]);
+        }else{
+          _setInitialSinkFund();
+        }
       });
     }
 
