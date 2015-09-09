@@ -86,9 +86,10 @@ class BankAccount < ActiveRecord::Base
 
     sink_fund = BankAccount.find(params[:id])
 
-    validate do
-      sink_fund.check_sink_fund_allocation_balance_against_current_balance(params[:sink_fund_allocations])
-    end
+    # TODO: temporarily disable the validation - it has issues that have to be investigated further
+    #validate do
+    #  sink_fund.check_sink_fund_allocation_balance_against_current_balance(params[:sink_fund_allocations])
+    #end
 
     sink_fund.update_sink_fund_allocations(params[:sink_fund_allocations]) if sink_fund.valid?
     sink_fund
