@@ -4,6 +4,9 @@
         <h2>Transactions</h2>
     </div>
     <div class="col-xs-6 text-right">
+        <button ng-show="vm.search.bank_account.is_sink_fund" class="btn btn-default" ng-click="vm.goToSinkFund()">Go to Sink Fund</button>
+        &nbsp;
+        &nbsp;
         <button class="btn btn-default" ng-click="vm.goToBudget()">Go to Budget</button>
     </div>
 </div>

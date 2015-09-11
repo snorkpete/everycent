@@ -23,6 +23,7 @@
     vm.markAllForDeletion = markAllForDeletion;
     vm.checkTransactionDate = checkTransactionDate;
     vm.goToBudget = goToBudget;
+    vm.goToSinkFund = goToSinkFund;
     vm.defaultAllocations = defaultAllocations;
 
     activate();
@@ -121,6 +122,10 @@
 
     function goToBudget(){
       StateService.go('budgets-edit', {budget_id: vm.search.budget_id});
+    }
+
+    function goToSinkFund(){
+      StateService.go('sink-funds');
     }
 
     function defaultAllocations(){
