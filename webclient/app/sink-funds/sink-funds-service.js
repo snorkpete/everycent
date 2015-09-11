@@ -20,10 +20,6 @@
       }
 
       function save(sinkFund, searchOptions){
-        var validSinkFundAllocations = sinkFund.sink_fund_allocations.filter(function(sinkFundAllocation){
-          return !sinkFundAllocation.deleted;
-        });
-        sinkFund.sink_fund_allocations = validSinkFundAllocations;
         return sinkFund.save();
       }
     }

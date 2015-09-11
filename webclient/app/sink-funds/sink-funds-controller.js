@@ -14,6 +14,7 @@
     vm.state = StateService;
     vm.util = UtilService;
     vm.isEditMode = false;
+    vm.showClosed = false;
     vm.search = {};
     vm.sinkFund = {};
     vm.sinkFunds = [];
@@ -23,10 +24,13 @@
     vm.selectSinkFundForUpdate = selectSinkFundForUpdate;
     vm.addNewSinkFundAllocation = addNewSinkFundAllocation;
     vm.markForDeletion = markForDeletion;
+    vm.markForOpening = markForOpening;
+    vm.markForClosing = markForClosing;
     vm.saveChanges = saveChanges;
     vm.cancelEdit = cancelEdit;
     vm.unassignedBalance = unassignedBalance;
     vm.canSave = canSave;
+    vm.isSinkFundAllocationVisible = isSinkFundAllocationVisible;
 
     activate();
 
@@ -69,14 +73,14 @@
 
     function saveChanges(){
       SinkFundsService.save(vm.sinkFund).then(function(){
-        refreshSinkFunds().then(function(){
+        return refreshSinkFunds();
+
+      }).then(function(){
           _setInitialSinkFund();
           MessageService.setMessage('Sink fund saved.');
           switchToViewMode();
-        });
-      },
-      // error handler
-      function(){
+
+      }).catch(function(){
         MessageService.setErrorMessage('Sink fund NOT saved.');
       });
     }
@@ -101,8 +105,18 @@
       vm.isEditMode = true;
     }
 
-    function markForDeletion(sinkFund, isDeleted){
-      sinkFund.deleted = isDeleted;
+    function markForDeletion(sinkFundAllocation, isDeleted){
+      sinkFundAllocation.deleted = isDeleted;
+    }
+
+    function markForOpening(sinkFundAllocation){
+      sinkFundAllocation['status'] = 'open';
+      sinkFundAllocation.unsaved = true;
+    }
+
+    function markForClosing(sinkFundAllocation){
+      sinkFundAllocation['status'] = 'closed';
+      sinkFundAllocation.unsaved = true;
     }
 
     function unassignedBalance(){
@@ -112,6 +126,12 @@
 
     function canSave(){
       return unassignedBalance() >= 0;
+    }
+
+    function isSinkFundAllocationVisible(sinkFundAllocation){
+      return sinkFundAllocation['status'] === 'open' || 
+             sinkFundAllocation.unsaved ||
+             (vm.showClosed && sinkFundAllocation.status == 'closed');
     }
   }
 })();

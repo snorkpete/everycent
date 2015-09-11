@@ -1,6 +1,15 @@
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-6">
         <h2>Edit Sink Fund: {{ vm.sinkFund.name }}</h2>
+    </div>
+    <div class="col-sm-6">
+        <div class="text-right">
+                <label>
+                    <input type="checkbox"
+                           ng-model="vm.showClosed" />
+                    Include Closed Allocations?
+                </label>
+        </div>
     </div>
 </div>
 
@@ -10,10 +19,11 @@
     <thead>
         <tr class="heading">
             <th style="width:25%;">Name</th>
-            <th style="width:15%;" class="text-right">Allocated</th>
-            <th style="width:15%;" class="text-right">Spent</th>
-            <th style="width:15%;" class="text-right">Remaining</th>
+            <th style="width:10%;" class="text-right">Allocated</th>
+            <th style="width:10%;" class="text-right">Spent</th>
+            <th style="width:10%;" class="text-right">Remaining</th>
             <th style="width:25%;" class="hidden-xs">Comment</th>
+            <th style="width:15%;" class="hidden-xs">Status</th>
             <th style="width:5%;"></th>
         </tr>
     </thead>
@@ -32,6 +42,7 @@
             </th>
             <th class="text-right"> </th>
             <th></th>
+            <th></th>
         </tr>
     </tfoot>
     <tbody>
@@ -48,8 +59,12 @@
                 <strong><em> Money not allocated</em></strong>
             </td>
             <td></td>
+            <td></td>
         </tr>
-        <tr ng-repeat="sinkFundAllocation in vm.sinkFund.sink_fund_allocations" ng-class="{ danger: sinkFundAllocation.deleted }" >
+        <tr ng-repeat="sinkFundAllocation in vm.sinkFund.sink_fund_allocations"
+            ng-class="{ danger: sinkFundAllocation.deleted, warning: sinkFundAllocation.status === 'closed' }"
+            ng-show="vm.isSinkFundAllocationVisible(sinkFundAllocation)">
+
             <td>
                 <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.name"> </span>
                 <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.name" name="name"></input>
@@ -70,16 +85,32 @@
                 <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.comment"></input>
             </td>
             <td>
+                {{ sinkFundAllocation.status }}
+            </td>
+            <td>
                 <span ng-show="vm.isEditMode">
                     <span ng-hide="sinkFundAllocation.deleted"
                           ng-click="vm.markForDeletion(sinkFundAllocation, true)"
                           class="text-danger pull-right pointer">
-                        <ec-icon type="trash"></ec-icon>
+                        <ec-icon type="trash" tooltip="Delete"></ec-icon>
                     </span>
                     <span ng-show="sinkFundAllocation.deleted"
                           ng-click="vm.markForDeletion(sinkFundAllocation, false)"
                           class="text-success pull-right pointer">
-                        <ec-icon type="refresh"></ec-icon>
+                        <ec-icon type="refresh" tooltip="Undo Delete"></ec-icon>
+                    </span>
+
+                    <span ng-show="sinkFundAllocation.status === 'open'"
+                          ng-click="vm.markForClosing(sinkFundAllocation)"
+                          class="text-warning pull-right pointer">
+                        <ec-icon type="remove" tooltip="Close"></ec-icon>
+                        &nbsp;
+                    </span>
+                    <span ng-show="sinkFundAllocation.status === 'closed'"
+                          ng-click="vm.markForOpening(sinkFundAllocation)"
+                          class="text-warning pull-right pointer">
+                        <ec-icon type="folder-open" tooltip="Open"></ec-icon>
+                        &nbsp;
                     </span>
                 </span>
             </td>
@@ -93,7 +124,6 @@
         </tr>
     </tbody>
     </table>
-
 
     <div class="row">
         <div class="col-sm-6">
