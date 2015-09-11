@@ -22,7 +22,7 @@ class BankAccount < ActiveRecord::Base
   belongs_to :institution
 
   has_many :transactions
-  has_many :sink_fund_allocations
+  has_many :sink_fund_allocations,  -> { order(:status => :desc, :name => :asc) }
 
   validates :name,  presence: true
 
@@ -98,7 +98,7 @@ class BankAccount < ActiveRecord::Base
   def self.extract_sink_fund_params(input_params)
     # TODO this doesn't belong here - was added for unit testing, which isnt an appropriate reason
     params = ActionController::Parameters.new(input_params)
-    params.permit(:sink_fund => [:id, {sink_fund_allocations: [:id, :name, :amount, :comment] }]).require(:sink_fund)
+    params.permit(:sink_fund => [:id, {sink_fund_allocations: [:id, :name, :amount, :comment, :status, :deleted] }]).require(:sink_fund)
   end
 
   def check_sink_fund_allocation_balance_against_current_balance(new_sink_fund_allocations)
@@ -121,27 +121,27 @@ class BankAccount < ActiveRecord::Base
 
     # load all the current allocations
     sink_fund_allocations.to_a
-    updated_ids = []
+    ids_to_delete = []
     new_allocations_params.each do |allocation_params|
 
       id = allocation_params.fetch(:id, 0).to_i
 
-      if id == 0
-        allocation = SinkFundAllocation.create(allocation_params)
-        sink_fund_allocations << allocation
-        updated_ids << allocation.id
-      else
+      case
+      when allocation_params[:deleted]
+        ids_to_delete << id
 
+      when id == 0
+        allocation = SinkFundAllocation.create(allocation_params.except(:deleted))
+        sink_fund_allocations << allocation
+
+      else
         allocation = sink_fund_allocations.where(id: allocation_params[:id]).first
-        if allocation
-          allocation.update(allocation_params.except(:id))
-          updated_ids << allocation.id
-        end
+        allocation.update(allocation_params.except([:id, :deleted])) if allocation
       end
     end
 
     # remove any allocations that need to be removed
-    sink_fund_allocations.where('id not in (?)', updated_ids).delete_all
+    sink_fund_allocations.where(id: ids_to_delete).delete_all
 
     # update the sink fund allocations with their new values
     sink_fund_allocations.reload
