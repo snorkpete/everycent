@@ -16,8 +16,4 @@ class SinkFundsController < ApplicationController
     def set_sink_fund
       @sink_fund = BankAccount.sink_funds.find(params[:id])
     end
-
-    def sink_fund_params
-      params.fetch(:sink_fund, {}).permit({ sink_fund_allocations: [:name, :amount, :comment] })
-    end
 end
