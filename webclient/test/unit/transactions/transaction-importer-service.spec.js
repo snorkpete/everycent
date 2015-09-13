@@ -23,7 +23,7 @@ describe('TransactionImporterService', function(){
       beforeEach(function(){
       });
 
-      fit('returns a transaction list with one transaction', function(){
+      it('returns a transaction list with one transaction', function(){
         var input = '01/23/2015		\n' +
                     'POS FEE (DEBIT)\n' +
                     '0010092 SAMANTHA SINGH\n' +
@@ -38,7 +38,7 @@ describe('TransactionImporterService', function(){
         // expect(result[0].description).toEqual('SAMANTHA SINGH');
       });
 
-      it('handles service charge transactions', function(){
+      xit('handles service charge transactions', function(){
         var input = '02/23/2015		\n' +
                     'SERVICE CHARGE SBQIBQSBFIBF\n' +
                     '0568053 MARAVAL ROAD\n' +

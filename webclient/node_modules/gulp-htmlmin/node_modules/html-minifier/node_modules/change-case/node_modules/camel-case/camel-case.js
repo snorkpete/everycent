@@ -1,5 +1,5 @@
-var upperCase    = require('upper-case');
-var sentenceCase = require('sentence-case');
+var upperCase = require('upper-case')
+var sentenceCase = require('sentence-case')
 
 /**
  * Camel case a string.
@@ -14,6 +14,6 @@ module.exports = function (string, locale) {
     .replace(/(\d) (?=\d)/g, '$1_')
     // Replace spaces between words with an upper cased character.
     .replace(/ (.)/g, function (m, $1) {
-      return upperCase($1, locale);
-    });
-};
+      return upperCase($1, locale)
+    })
+}

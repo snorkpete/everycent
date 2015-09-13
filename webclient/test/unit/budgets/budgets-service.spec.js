@@ -33,6 +33,7 @@ describe('BudgetsService', function(){
 
       ];
       var result = BudgetsService.groupAllocationsByCategory(allocations, allocationCategories);
+      
       expect(result).toEqual(expectedResult);
     });
   });

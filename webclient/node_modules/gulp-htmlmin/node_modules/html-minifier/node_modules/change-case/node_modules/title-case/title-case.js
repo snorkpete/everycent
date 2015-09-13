@@ -1,5 +1,5 @@
-var upperCase    = require('upper-case');
-var sentenceCase = require('sentence-case');
+var upperCase = require('upper-case')
+var sentenceCase = require('sentence-case')
 
 /**
  * Title case a string.
@@ -10,6 +10,6 @@ var sentenceCase = require('sentence-case');
  */
 module.exports = function (str, locale) {
   return sentenceCase(str, locale).replace(/^.| ./g, function (m) {
-    return upperCase(m, locale);
-  });
-};
+    return upperCase(m, locale)
+  })
+}

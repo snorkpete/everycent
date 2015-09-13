@@ -1,6 +1,7 @@
 # Camel Case
 
 [![NPM version][npm-image]][npm-url]
+[![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
@@ -12,21 +13,21 @@ Supports Unicode (non-ASCII characters) and non-string entities, such as objects
 
 ### Node
 
-```sh
+```
 npm install camel-case --save
 ```
 
 ## Usage
 
 ```javascript
-var camelCase = require('camel-case');
+var camelCase = require('camel-case')
 
-camelCase('string');         //=> "string"
-camelCase('dot.case');       //=> "dotCase"
-camelCase('PascalCase');     //=> "pascalCase"
-camelCase('version 1.2.10'); //=> "version1_2_10"
+camelCase('string')         //=> "string"
+camelCase('dot.case')       //=> "dotCase"
+camelCase('PascalCase')     //=> "pascalCase"
+camelCase('version 1.2.10') //=> "version1_2_10"
 
-camelCase('STRING 1.2', 'tr'); //=> "strıng1_2"
+camelCase('STRING 1.2', 'tr') //=> "strıng1_2"
 ```
 
 ## License
@@ -35,6 +36,8 @@ MIT
 
 [npm-image]: https://img.shields.io/npm/v/camel-case.svg?style=flat
 [npm-url]: https://npmjs.org/package/camel-case
+[downloads-image]: https://img.shields.io/npm/dm/camel-case.svg?style=flat
+[downloads-url]: https://npmjs.org/package/camel-case
 [travis-image]: https://img.shields.io/travis/blakeembrey/camel-case.svg?style=flat
 [travis-url]: https://travis-ci.org/blakeembrey/camel-case
 [coveralls-image]: https://img.shields.io/coveralls/blakeembrey/camel-case.svg?style=flat
