@@ -31,6 +31,8 @@ factory('ipCookie', ['$document',
           expiresFor;
 
         options = options || {};
+        var dec = options.decode || tryDecodeURIComponent;
+        var enc = options.encode || encodeURIComponent;
 
         if (value !== undefined) {
           // we are setting value
@@ -50,6 +52,8 @@ factory('ipCookie', ['$document',
                 options.expires.setMinutes(options.expires.getMinutes() + expiresFor);
               } else if (options.expirationUnit === 'seconds') {
                 options.expires.setSeconds(options.expires.getSeconds() + expiresFor);
+              } else if (options.expirationUnit === 'milliseconds') {
+                options.expires.setMilliseconds(options.expires.getMilliseconds() + expiresFor);
               } else {
                 options.expires.setDate(options.expires.getDate() + expiresFor);
               }
@@ -58,9 +62,9 @@ factory('ipCookie', ['$document',
             }
           }
           return ($document[0].cookie = [
-            encodeURIComponent(key),
+            enc(key),
             '=',
-            encodeURIComponent(value),
+            enc(value),
             options.expires ? '; expires=' + options.expires.toUTCString() : '',
             options.path ? '; path=' + options.path : '',
             options.domain ? '; domain=' + options.domain : '',
@@ -82,7 +86,7 @@ factory('ipCookie', ['$document',
             cookie = list[i];
             pos = cookie.indexOf('=');
             name = cookie.substring(0, pos);
-            value = tryDecodeURIComponent(cookie.substring(pos + 1));
+            value = dec(cookie.substring(pos + 1));
             if(angular.isUndefined(value))
               continue;
 

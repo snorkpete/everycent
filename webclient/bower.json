@@ -21,7 +21,7 @@
   "dependencies": {
     "angular-animate": "1.4.x",
     "angular-cookies": "1.4.x",
-    "angular-loading-bar": "0.7.x",
+    "angular-loading-bar": "0.8.x",
     "angular-toastr": "1.x",
     "angular-ui-router": "~0.2.13",
     "angular": "1.4.x",
@@ -30,7 +30,7 @@
     "angular-bootstrap": "0.x",
     "angular-mocks": "1.4.x",
     "ng-token-auth": "~0.0.24",
-    "restangular": "1.4.x",
+    "restangular": "1.5.x",
     "angular-scroll": "~0.7.0"
   },
   "resolutions": {
