@@ -26,7 +26,6 @@ class BankAccount < ActiveRecord::Base
 
   validates :name,  presence: true
 
-  before_save :fix_name
 
   def update_balance(budget_id, closing_date)
     total_transaction_amount = 0
@@ -77,8 +76,12 @@ class BankAccount < ActiveRecord::Base
     sink_fund_allocations.sum(:amount)
   end
 
+  def is_sink_fund
+    account_type == 'sink_fund'
+  end
+
   def self.sink_funds
-    self.where(is_sink_fund: true)
+    self.where(account_type: 'sink_fund')
   end
 
   def self.update_sink_fund(input_params)
@@ -163,12 +166,5 @@ class BankAccount < ActiveRecord::Base
       sink_fund_allocation.amount += transaction_total
       sink_fund_allocation.save
     end
-  end
-
-  protected
-
-  def fix_name
-    #return if self.name.nil?
-    #self.name = name.titleize
   end
 end

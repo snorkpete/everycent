@@ -32,7 +32,7 @@ RSpec.describe BankAccount, :type => :model do
   describe ".update_sink_fund" do
     context "with 2 sink_fund_allocation params" do
       before :each do
-        @sink_fund = create(:bank_account, is_sink_fund: true, closing_balance: 10_000_00)
+        @sink_fund = create(:bank_account, account_type: 'sink_fund', closing_balance: 10_000_00)
         @sink_fund_params = HashWithIndifferentAccess.new({ "sink_fund"=>
                               {"id"=> @sink_fund.id.to_s,
                                 "sink_fund_allocations"=>[
@@ -46,16 +46,6 @@ RSpec.describe BankAccount, :type => :model do
       it "creates 2 sink_fund_allocations" do
         sink_fund = BankAccount.update_sink_fund(@sink_fund_params)
         expect(sink_fund.sink_fund_allocations.size).to eq 2
-      end
-
-      it "removes any old sink_fund_allocations" do
-        @sink_fund.sink_fund_allocations << SinkFundAllocation.new(amount: 100, name: 'will be deleted')
-        expect(@sink_fund.sink_fund_allocations.size).to eq 1
-
-        @sink_fund = BankAccount.update_sink_fund(@sink_fund_params)
-
-        expect(@sink_fund.sink_fund_allocations.size).to eq 2
-        expect(@sink_fund.sink_fund_allocations[0].name).to eq 'First'
       end
 
       it "updates existing sink_fund_allocations" do
@@ -74,6 +64,7 @@ RSpec.describe BankAccount, :type => :model do
 
       context "when sink_fund_allocation total is more than account balance" do
         it "does not save" do
+          pending "validations removed temporarily"
           @sink_fund_params["sink_fund"]["sink_fund_allocations"] << { amount: 4000_00, name: 'Too much'}
           sink_fund = BankAccount.update_sink_fund(@sink_fund_params)
           expect(sink_fund).to be_invalid
@@ -85,7 +76,7 @@ RSpec.describe BankAccount, :type => :model do
 
   describe "#reverse_transactions_from_sink_fund_allocations" do
     before do
-      @sink_fund = create(:bank_account, is_sink_fund: true,
+      @sink_fund = create(:bank_account, account_type: 'sink_fund',
                           closing_balance: 4000_00, closing_date: '2014-12-31')
     end
 
@@ -130,7 +121,7 @@ RSpec.describe BankAccount, :type => :model do
 
   describe "#apply_transactions_to_sink_fund_allocations" do
     before do
-      @sink_fund = create(:bank_account, is_sink_fund: true,
+      @sink_fund = create(:bank_account, account_type: 'sink_fund',
                           closing_balance: 5000_00, closing_date: '2014-12-31')
     end
 
