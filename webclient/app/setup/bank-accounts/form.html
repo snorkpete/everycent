@@ -9,14 +9,30 @@
                ng-model="vm.bankAccount.name">
 </ec-form-field>
 
-<ec-form-field label="Account Type" label-width="2"
-               name="account_type"
-               error="vm.bankAccountForm.account_type.$error"
+<div class="form-group" ng-class="{'has-error': vm.bankAccountForm.account_type.$error.server }">
+    <label class="col-xs-2 control-label">Type</label>
+    <div class="col-xs-6">
+
+        <select name="account_type"
+                ng-model="vm.bankAccount.account_type"
+                class="form-control">
+                <option value="normal">Normal Account</option>
+                <option value="sink_fund">Sink Fund</option>
+                <option value="credit_card">Credit Card</option>
+        </select>
+
+        <p class="help-block">{{ vm.bankAccountForm.account_type.$error.server }}</p>
+    </div>
+</div>
+
+<ec-form-field label="Account Type Description" label-width="2"
+               name="account_type_description"
+               error="vm.bankAccountForm.account_type_description.$error"
                field-width="6"
                placeholder="Money Market Fund, Savings, Checking etc"
                type="text"
                ng-required="true"
-               ng-model="vm.bankAccount.account_type">
+               ng-model="vm.bankAccount.account_type_description">
 </ec-form-field>
 
 <div class="form-group" ng-class="{'has-error': vm.bankAccountForm.account_category.$error.server }">
@@ -102,18 +118,4 @@
         </div>
     </div>
     <p class="help-block">{{ vm.bankAccountForm.allow_default_allocations.$error.server }}</p>
-</div>
-
-<div class="form-group" ng-class="{'has-error': vm.bankAccountForm.is_sink_fund.$error.server }">
-    <div class="col-sm-offset-2 col-xs-10">
-        <div class="checkbox">
-            <label>
-                <input type="checkbox"
-                       name="is_sink_fund"
-                       ng-model="vm.bankAccount.is_sink_fund" />
-                Is Sink Fund?
-            </label>
-        </div>
-    </div>
-    <p class="help-block">{{ vm.bankAccountForm.is_sink_fund.$error.server }}</p>
 </div>

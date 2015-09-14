@@ -77,7 +77,7 @@ RSpec.describe Transaction, :type => :model do
 
     describe "when Against Sink Funds" do
       before do
-        @sink_fund = create(:bank_account, is_sink_fund: true,
+        @sink_fund = create(:bank_account, account_type: 'sink_fund',
                             closing_balance: 4000_00, closing_date: '2014-12-31')
         @params[:bank_account_id] = @sink_fund.id
       end

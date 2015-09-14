@@ -22,10 +22,10 @@
                 <th>Name</th>
                 <th>Institution</th>
                 <th>Account Type</th>
+                <th>Description</th>
                 <th>Category</th>
                 <th>Status</th>
                 <th>Default Allocations?</th>
-                <th>Is Sink Fund?</th>
                 <th>Opening Balance</th>
                 <th>Actions</th>
             </tr>
@@ -34,11 +34,11 @@
             <tr ng-repeat="bankAccount in vm.bankAccounts">
                 <td> {{ bankAccount.name }} </td>
                 <td> {{ bankAccount.institution.name }} </td>
-                <td title="test"> {{ bankAccount.account_type }} </td>
+                <td> {{ bankAccount.account_type | ecHumanize }} </td>
+                <td> {{ bankAccount.account_type_description }} </td>
                 <td> {{ bankAccount.account_category }} </td>
                 <td> {{ bankAccount.status }} </td>
                 <td class="text-center"> {{ bankAccount.allow_default_allocations ? 'Yes' : 'No' }} </td>
-                <td class="text-center"> {{ bankAccount.is_sink_fund ? 'Yes' : 'No' }} </td>
                 <td class="text-right"> {{ bankAccount.opening_balance | ecToDollars }} </td>
                 <td>
                     <span ng-click="vm.deleteBankAccount(bankAccount)"

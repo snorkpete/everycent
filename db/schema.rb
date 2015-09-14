@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150909190507) do
+ActiveRecord::Schema.define(version: 20150914004222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,20 +43,20 @@ ActiveRecord::Schema.define(version: 20150909190507) do
 
   create_table "bank_accounts", force: :cascade do |t|
     t.string   "name"
-    t.string   "account_type"
+    t.string   "account_type_description"
     t.string   "account_no"
     t.integer  "user_id"
     t.integer  "institution_id"
     t.integer  "opening_balance"
     t.integer  "closing_balance"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
     t.date     "closing_date"
     t.string   "account_category",           default: "asset"
     t.boolean  "allow_default_allocations",  default: false
-    t.boolean  "is_sink_fund",               default: false
     t.integer  "default_sub_account_amount", default: 0
     t.string   "status",                     default: "open"
+    t.string   "account_type",               default: "normal"
   end
 
   add_index "bank_accounts", ["institution_id"], name: "index_bank_accounts_on_institution_id", using: :btree
