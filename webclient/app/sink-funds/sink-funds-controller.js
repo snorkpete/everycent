@@ -94,7 +94,7 @@
     }
 
     function addNewSinkFundAllocation(){
-      vm.sinkFund.sink_fund_allocations.push({ amount: 0 });
+      vm.sinkFund.sink_fund_allocations.push({ status: 'open', amount: 0 });
     }
 
     function switchToViewMode(){
@@ -129,7 +129,7 @@
     }
 
     function isSinkFundAllocationVisible(sinkFundAllocation){
-      return sinkFundAllocation['status'] === 'open' || 
+      return sinkFundAllocation.status === 'open' ||
              sinkFundAllocation.unsaved ||
              (vm.showClosed && sinkFundAllocation.status == 'closed');
     }
