@@ -132,4 +132,9 @@ RSpec.describe Transaction, :type => :model do
     end
   end
 
+  describe "status" do
+    it "defaults to paid for non-credit-card transactions"
+    it "defaults to unpaid for credit-card transactions"
+  end
+
 end
