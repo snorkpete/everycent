@@ -162,6 +162,7 @@ ActiveRecord::Schema.define(version: 20150914004222) do
     t.string   "payee_code"
     t.string   "payee_name"
     t.integer  "sink_fund_allocation_id"
+    t.string   "status"
   end
 
   add_index "transactions", ["allocation_id"], name: "index_transactions_on_allocation_id", using: :btree

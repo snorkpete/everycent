@@ -133,8 +133,29 @@ RSpec.describe Transaction, :type => :model do
   end
 
   describe "status" do
-    it "defaults to paid for non-credit-card transactions"
-    it "defaults to unpaid for credit-card transactions"
+    it "defaults to paid for normal bank account transactions" do
+      normal_bank_account = create(:bank_account, account_type: 'normal')
+      transaction = create(:transaction, bank_account: normal_bank_account)
+      expect(transaction.status).to eq 'paid'
+    end
+
+    it "defaults to paid for sink fund transactions" do
+      sink_fund_account = create(:bank_account, account_type: 'sink_fund')
+      transaction = create(:transaction, bank_account: sink_fund_account)
+      expect(transaction.status).to eq 'paid'
+    end
+
+    it "defaults to unpaid for credit-card transactions" do
+      credit_card = create(:bank_account, account_type: 'credit_card')
+      transaction = create(:transaction, bank_account: credit_card)
+      expect(transaction.status).to eq 'unpaid'
+    end
+
+    it "does not change existing statuses if already set" do
+      credit_card = create(:bank_account, account_type: 'credit_card')
+      transaction = create(:transaction, bank_account: credit_card, status: 'paid')
+      expect(transaction.status).to eq 'paid'
+    end
   end
 
 end
