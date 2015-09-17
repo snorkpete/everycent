@@ -21,6 +21,8 @@ class Transaction < ActiveRecord::Base
   belongs_to :bank_account
   belongs_to :sink_fund_allocation
 
+  before_save :check_status
+
   def self.for_budget_and_bank(budget_id, bank_account_id)
 
     # find the budget
@@ -63,5 +65,17 @@ class Transaction < ActiveRecord::Base
 
     ##send back the fixed list of transactions
     Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
+  end
+
+
+  def check_status
+    Rails::logger.info "where is my cheese: #{status}"
+    return true if status.present?
+
+    if self.bank_account && bank_account.account_type == 'credit_card'
+      self.status = 'unpaid'
+    else
+      self.status = 'paid'
+    end
   end
 end
