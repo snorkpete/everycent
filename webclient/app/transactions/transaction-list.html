@@ -44,14 +44,15 @@
             <thead>
                 <tr class="heading">
                     <th style="width:15%;">Date</th>
-                    <th style="width:15%;" class="hidden-xs">Payee</th>
-                    <th style="width:25%;">Description</th>
+                    <th style="width:12%;" class="hidden-xs">Payee</th>
+                    <th style="width:23%;">Description</th>
                     <th style="width:15%;">
                         <span ng-hide="vm.search.bank_account.is_sink_fund">Allocation</span>
                         <span ng-show="vm.search.bank_account.is_sink_fund">Sink Fund Allocation</span>
                     </th>
                     <th style="width:10%;" class="text-right">Withdrawn</th>
                     <th style="width:10%;" class="text-right">Deposited</th>
+                    <th style="width: 5%;" class="text-center">Paid?</th>
                     <th style="width: 5%;"></th>
                 </tr>
             </thead>
@@ -63,6 +64,16 @@
                     <th></th>
                     <th class="text-right"> {{ vm.util.total(vm.transactions, 'withdrawal_amount') | ecToDollars }}</th>
                     <th class="text-right"> {{ vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}</th>
+
+
+                    <th class="text-right">
+                        <input type="checkbox"
+                               ng-show="vm.isEditMode"
+                               ng-model="vm.allPaid"
+                               ng-click="vm.updateAllTransactionStatuses(vm.transactions, vm.allPaid)"
+                        />
+                    </th>
+
                     <th>
                         <span ng-show="vm.isEditMode">
 
@@ -149,6 +160,18 @@
                         <input ng-show="vm.isEditMode" type="text" ng-model="transaction.deposit_amount" ec-as-dollars></input>
                         <span ng-hide="vm.isEditMode" ng-bind="transaction.deposit_amount | ecToDollars"></span>
                     </td>
+
+                    <!-- status -->
+                    <td class="text-right">
+                        <input type="checkbox"
+                               ng-show="vm.isEditMode"
+                               ng-model="transaction.paid"
+                               ng-click="vm.updateTransactionStatus(transaction)"
+                        />
+                        <span ng-hide="vm.isEditMode"
+                              ng-bind="transaction.status === 'paid' ? 'Yes' : 'No'"></span>
+                    </td>
+
 
                     <td>
                         <span ng-show="vm.isEditMode">

@@ -25,6 +25,8 @@
     vm.goToBudget = goToBudget;
     vm.goToSinkFund = goToSinkFund;
     vm.defaultAllocations = defaultAllocations;
+    vm.updateTransactionStatus = TransactionsService.updateTransactionStatus;
+    vm.updateAllTransactionStatuses = TransactionsService.updateAllTransactionStatuses;
 
     activate();
 
@@ -175,5 +177,6 @@
 
       });
     }
+
   }
 })();

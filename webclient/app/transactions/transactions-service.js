@@ -14,7 +14,10 @@
         save: save,
         showTransactionList: showTransactionList,
         getValidTransactions: getValidTransactions,
-        getDefaultAllocations: getDefaultAllocations
+        getDefaultAllocations: getDefaultAllocations,
+        updateTransactionStatus: updateTransactionStatus,
+        updateAllTransactionStatuses: updateAllTransactionStatuses
+
       };
 
       var baseAll = Restangular.all('transactions');
@@ -116,6 +119,28 @@
         }
 
       }
-    }
+
+      function updateTransactionStatus(transaction){
+        if(transaction.paid){
+          transaction.status = 'paid';
+        }else{
+          transaction.status = 'unpaid';
+        }
+      }
+
+      function updateAllTransactionStatuses(transactions, paid){
+        var newStatus;
+        if(paid){
+          newStatus = 'paid';
+        }else{
+          newStatus = 'unpaid';
+        }
+
+        transactions.forEach(function(transaction){
+          transaction.paid = paid;
+          transaction.status = newStatus;
+        });
+      }
+    } // end of service
 
 })();

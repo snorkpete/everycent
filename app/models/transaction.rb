@@ -67,6 +67,9 @@ class Transaction < ActiveRecord::Base
     Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
   end
 
+  def paid
+    return status == 'paid'
+  end
 
   def check_status
     Rails::logger.info "where is my cheese: #{status}"
