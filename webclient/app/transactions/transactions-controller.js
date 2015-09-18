@@ -27,6 +27,7 @@
     vm.defaultAllocations = defaultAllocations;
     vm.updateTransactionStatus = TransactionsService.updateTransactionStatus;
     vm.updateAllTransactionStatuses = TransactionsService.updateAllTransactionStatuses;
+    vm.onAllocationChange = onAllocationChange;
 
     activate();
 
@@ -178,5 +179,19 @@
       });
     }
 
-  }
+    function onAllocationChange(transaction){
+      vm.ref.updateReferenceId(transaction, 'allocation');
+
+      // user selected an allocation
+      if(transaction.allocation && transaction.allocation.id !== 0){
+        transaction.paid = true;
+      }else{
+        transaction.paid = false;
+      }
+
+      vm.updateTransactionStatus(transaction);
+    }
+
+
+  } // end controller
 })();

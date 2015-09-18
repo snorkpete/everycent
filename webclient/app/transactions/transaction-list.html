@@ -133,7 +133,7 @@
                         <span ng-hide="vm.search.bank_account.is_sink_fund">
                             <select ng-show="vm.isEditMode"
                                     ng-model="transaction.allocation"
-                                    ng-change="vm.ref.updateReferenceId(transaction, 'allocation')"
+                                    ng-change="vm.onAllocationChange(transaction)"
                                     ng-options="allocation.name group by allocation.allocation_category.name for allocation in vm.allocations track by allocation.id">
                             </select>
                             <span ng-hide="vm.isEditMode" ng-bind="transaction.allocation.name"></span>
