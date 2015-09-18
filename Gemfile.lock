@@ -22,6 +22,7 @@ GEM
       rails-html-sanitizer (~> 1.0, >= 1.0.1)
     active_model_serializers (0.9.3)
       activemodel (>= 3.2)
+    active_record_query_trace (1.4)
     activejob (4.2.1)
       activesupport (= 4.2.1)
       globalid (>= 0.3.0)
@@ -237,6 +238,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers
+  active_record_query_trace
   annotate
   database_cleaner
   devise_token_auth
