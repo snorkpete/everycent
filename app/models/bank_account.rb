@@ -17,6 +17,7 @@
 #
 
 class BankAccount < ActiveRecord::Base
+  include CreditCard
 
   belongs_to :user
   belongs_to :institution
