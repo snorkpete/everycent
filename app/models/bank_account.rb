@@ -69,8 +69,10 @@ class BankAccount < ActiveRecord::Base
     next_budget_to_close.end_date
   end
 
+  ##############################
   ### Sink Fund related functions
   ### TODO: possibly move these into their own concern/module
+  ##############################
 
   def sink_fund_allocation_balance
     sink_fund_allocations.sum(:amount)
@@ -167,4 +169,19 @@ class BankAccount < ActiveRecord::Base
       sink_fund_allocation.save
     end
   end
+
+  ##############################
+  # end sink fund functions
+  ##############################
+
+  
+
+  ##############################
+  #  credit card functions
+  ##############################
+
+
+  ##############################
+  # credit card functions
+  ##############################
 end
