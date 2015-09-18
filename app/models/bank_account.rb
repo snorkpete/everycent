@@ -27,6 +27,9 @@ class BankAccount < ActiveRecord::Base
 
   validates :name,  presence: true
 
+  def transactions_between(start_date, end_date)
+     transactions.where('transaction_date >= ? and transaction_date <= ?', start_date, end_date)
+  end
 
   def update_balance(budget_id, closing_date)
     total_transaction_amount = 0
