@@ -16,11 +16,16 @@ module CreditCard
   def add_brought_forward_transactions(start_date, end_date)
     return false unless is_credit_card
 
+    brought_forward_date = end_date.tomorrow
+    transactions_to_bring_forward = transactions_between(start_date, end_date).unpaid
     added_transactions = []
-    transactions_between(start_date, end_date).each do |transaction|
-      added_transactions << transaction.to_brought_forward_version
+
+    transactions_to_bring_forward.each do |transaction|
+      added_transactions << transaction.to_brought_forward_version(brought_forward_date)
     end
 
     transactions << added_transactions
+
+    transactions_to_bring_forward.update_all status: 'paid', brought_forward_status: 'brought_forward'
   end
 end

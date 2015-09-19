@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150914004222) do
+ActiveRecord::Schema.define(version: 20150919003427) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -163,6 +163,7 @@ ActiveRecord::Schema.define(version: 20150914004222) do
     t.string   "payee_name"
     t.integer  "sink_fund_allocation_id"
     t.string   "status"
+    t.string   "brought_forward_status"
   end
 
   add_index "transactions", ["allocation_id"], name: "index_transactions_on_allocation_id", using: :btree
