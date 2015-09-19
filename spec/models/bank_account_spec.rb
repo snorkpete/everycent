@@ -29,7 +29,7 @@ RSpec.describe BankAccount, :type => :model do
     end
   end
 
-  describe ".update_sink_fund" do
+  describe "#update_sink_fund" do
     context "with 2 sink_fund_allocation params" do
       before :each do
         @sink_fund = create(:bank_account, account_type: 'sink_fund', closing_balance: 10_000_00)
