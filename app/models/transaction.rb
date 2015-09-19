@@ -37,6 +37,10 @@ class Transaction < ActiveRecord::Base
     Transaction.where('allocation_id = ?', allocation_id)
   end
 
+  def self.between(start_date, end_date)
+     where('transaction_date >= ? and transaction_date <= ?', start_date, end_date)
+  end
+
   def self.unpaid
     where(status: 'unpaid')
   end
