@@ -98,4 +98,8 @@ class Transaction < ActiveRecord::Base
     new_transaction.brought_forward_status = 'added'
     new_transaction
   end
+
+  def net_amount
+    withdrawal_amount - deposit_amount
+  end
 end

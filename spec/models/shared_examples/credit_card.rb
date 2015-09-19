@@ -42,99 +42,66 @@ shared_examples_for "CreditCard" do
       @outside_date = Date.new(2015,07,23)
     end
 
+    before do
+      @credit_card.transactions << build(:unpaid_transaction, transaction_date: @inside_date,
+                                         withdrawal_amount: 400_00, deposit_amount: 0)
+
+      @credit_card.transactions << build(:unpaid_transaction, transaction_date: @inside_date,
+                                           withdrawal_amount: 150_00, deposit_amount: 0)
+
+    end
+
     it "does nothing if the account is not a credit card" do
       @bank_account = create(:bank_account, account_type: 'normal')
       result = @bank_account.add_brought_forward_transactions(@start_date, @end_date)
       expect(result).to eq false
     end
 
-    it "adds new transactions for every transaction not paid in the credit period + the adjustment transaction" do
-      @credit_card.transactions << build(:transaction, transaction_date: @inside_date, status:'unpaid')
-      @credit_card.transactions << build(:transaction, transaction_date: @inside_date_2, status:'unpaid')
-
-      expect{
-        @credit_card.add_brought_forward_transactions(@start_date, @end_date)
-      }.to change{ Transaction.count }.by(2)
+    it "calls #build_transactions_to_bring_forward" do
+      expect(@credit_card).to receive(:build_transactions_to_bring_forward)
+                              .with(@start_date, @end_date).and_call_original
+      @credit_card.add_brought_forward_transactions(@start_date, @end_date)
     end
 
-    it "does not add brought forward transactions for 'paid' transactions in the credit period" do
-      @credit_card.transactions << build(:transaction, transaction_date: @inside_date, status:'paid')
-
-      expect{
-        @credit_card.add_brought_forward_transactions(@start_date, @end_date)
-      }.not_to change{ Transaction.count }
+    it "calls #build_adjustment_transaction" do
+      expect(@credit_card).to receive(:build_adjustment_transaction)
+                              .with(@start_date, @end_date).and_call_original
+      @credit_card.add_brought_forward_transactions(@start_date, @end_date)
     end
 
-    it "does not add brought forward transactions for 'unpaid' transactions outside the credit period" do
-      @credit_card.transactions << build(:transaction, transaction_date: @outside_date, status:'unpaid')
-
-      expect{
-        @credit_card.add_brought_forward_transactions(@start_date, @end_date)
-      }.not_to change{ Transaction.count }
+    it "marks the original transactions as 'paid' and 'brought_forward'" do
+      @credit_card.add_brought_forward_transactions(@start_date, @end_date)
+      expect(@credit_card.transactions.first.status).to eq 'paid'
+      expect(@credit_card.transactions.second.status).to eq 'paid'
     end
 
-    context "when unpaid transaction exists" do
-      before do
-        @credit_card.transactions << build(:transaction, transaction_date: @inside_date,
-                                      description: 'Racing Wheel', status:'unpaid')
+    it "marks the original transactions as brought_forward_status = 'brought_forward'" do
+      @credit_card.add_brought_forward_transactions(@start_date, @end_date)
+      expect(@credit_card.transactions.first.brought_forward_status).to eq 'brought_forward'
+      expect(@credit_card.transactions.second.brought_forward_status).to eq 'brought_forward'
+    end
 
+    context "when there is a net balance unpaid" do
+      it "adds brought_forward transactions and the adjustment transaction" do
         @credit_card.add_brought_forward_transactions(@start_date, @end_date)
-
-        @original_transaction = @credit_card.transactions.first
-        @added_transaction = @credit_card.transactions.second
-      end
-
-      it "marks the new transactions with transaction date as one day after the end date" do
-        expect(@added_transaction.transaction_date).to eq (@end_date + 1)
-      end
-
-      it "marks the new transactions as brought_forward_status = 'added'" do
-        expect(@added_transaction.brought_forward_status).to eq 'added'
-      end
-
-      it "makes the description of those new transactions = old description + (b/f)" do
-        expect(@added_transaction.description).to eq 'Racing Wheel (B/F)'
-      end
-
-      it "marks the original transactions as 'paid'" do
-        expect(@original_transaction.status).to eq 'paid'
-      end
-
-      it "marks the original transactions as brought_forward_status = 'brought_forward'" do
-        expect(@original_transaction.brought_forward_status).to eq 'brought_forward'
-      end
-
-      it "marks the new transaction as brought_forward_status = 'added'" do
-        expect(@added_transaction.brought_forward_status).to eq 'added'
+        expect(@credit_card.transactions.size).to eq 5 # 2 original transactions, 2 copies + 1 adjustment
       end
     end
 
-
-    context "when multiple unpaid transactions exist" do
-      before do
-        @credit_card.transactions << build(:transaction, transaction_date: @inside_date,
-                                           withdrawal_amount: 400_00,
-                                           description: 'Racing Wheel', status:'unpaid')
-
-        @credit_card.transactions << build(:transaction, transaction_date: @inside_date,
-                                           withdrawal_amount: 150_00,
-                                           description: 'Pedals', status:'unpaid')
-
+    context "when there no net balance unpaid" do
+      it "adds brought_forward transactions only (no adjustment transaction)" do
+        balancing_transaction = build(:unpaid_transaction, transaction_date: @inside_date,
+                                      withdrawal_amount: 0, deposit_amount: 400_00 + 150_00)
+        @credit_card.transactions << balancing_transaction
+        
+        adjustment = @credit_card.build_adjustment_transaction(@start_date, @end_date)
+        expect(adjustment.net_amount).to eq 0
         @credit_card.add_brought_forward_transactions(@start_date, @end_date)
 
-        @adjustment_transaction = @credit_card.transactions.last
+        # 3 original transactions, 3 copies, no adjustment
+        expect(@credit_card.transactions.size).to eq 6
       end
 
-      it "creates duplicates of existing transactions + 1 adjustment transaction to balance" do
-        pending
-        expect(@credit_card.transactions.count).to eq 5
-      end
-
-      it "creates a new transaction that is a sum of all 'added' transactions * -1" do
-      end
-
-      it "labels the newly created transaction description as 'Balance B/F Adj Entry'"
-      it "sets the date of the newly created transaction as one day after the end date"
     end
 
   end
@@ -224,10 +191,6 @@ shared_examples_for "CreditCard" do
       @adjustment_transaction = @credit_card.build_adjustment_transaction(@start_date, @end_date)
     end
 
-    it "returns a transaction" do
-      expect(@adjustment_transaction.class).to eq Transaction
-    end
-
     it "creates a transaction with withdrawal_amount = reversal of sum of all withdrawals" do
       expect(@adjustment_transaction.withdrawal_amount).to eq ( 400_00 + 150_00 ) * -1
     end
@@ -240,8 +203,16 @@ shared_examples_for "CreditCard" do
       expect(@adjustment_transaction.description).to eq 'Balance B/F Adj Entry'
     end
 
-    it "sets the date of the newly created transaction as one day after the end date" do
+    it "creates a transaction with transaction date one day after the end date" do
       expect(@adjustment_transaction.transaction_date).to eq @end_date + 1
+    end
+
+    it "creates a transaction with status = 'unpaid'" do
+      expect(@adjustment_transaction.status).to eq 'unpaid'
+    end
+
+    it "creates a transaction with brought_forward_status = 'added'" do
+      expect(@adjustment_transaction.brought_forward_status).to eq 'added'
     end
 
   end

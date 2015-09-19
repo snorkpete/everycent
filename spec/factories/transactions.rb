@@ -22,6 +22,14 @@ FactoryGirl.define do
     transaction_date "2015-01-19"
     withdrawal_amount 1
     deposit_amount 1
+
+    factory :unpaid_transaction do
+      status 'unpaid'
+    end
+
+    factory :paid_transaction do
+      status 'paid'
+    end
   end
 
 end
