@@ -175,8 +175,6 @@ shared_examples_for "CreditCard" do
       @start_date = Date.new(2015,06,23)
       @end_date = Date.new(2015,07,22)
       @inside_date = Date.new(2015,07,01)
-      @inside_date_2 = Date.new(2015,07,05)
-      @outside_date = Date.new(2015,07,23)
 
       @credit_card.transactions << build(:transaction, transaction_date: @inside_date,
                                          withdrawal_amount: 400_00,
@@ -218,10 +216,54 @@ shared_examples_for "CreditCard" do
   end
 
   describe "#remove_brought_forward_transactions" do
-    it "does nothing if the account is not a credit card"
-    it "changes brought_forward_status='brought_forward' transactions in the period back to 'unpaid'"
-    it "sets the brought_forward_status='brought_forward' transactions to nil"
-    it "removes transactions in the new period with brought_forward_status = 'added'"
+    before do
+      @credit_card = create(:bank_account, account_type: 'credit_card')
+      @start_date = Date.new(2015,06,23)
+      @end_date = Date.new(2015,07,22)
+      @inside_date = Date.new(2015,07,01)
+      @inside_date_2 = Date.new(2015,07,05)
+      @outside_date = Date.new(2015,07,23)
+
+      @first = build(:transaction, transaction_date: @inside_date,
+                                         withdrawal_amount: 400_00,
+                                         deposit_amount: 10_00,
+                                         description: 'Racing Wheel', status:'unpaid')
+
+      @second = build(:transaction, transaction_date: @inside_date,
+                                         withdrawal_amount: 150_00,
+                                         deposit_amount: 20_00,
+                                         description: 'Pedals', status:'unpaid')
+      @credit_card.transactions << @first
+      @credit_card.transactions << @second
+      @credit_card.add_brought_forward_transactions(@start_date, @end_date)
+    end
+    
+    it "changes 'brought_forward' transactions in the period back to 'unpaid'" do
+      @credit_card.remove_brought_forward_transactions(@start_date, @end_date)
+
+      @first.reload
+      @second.reload
+
+      expect(@first.status).to eq 'unpaid'
+      expect(@second.status).to eq 'unpaid'
+    end
+    it "sets the brought_forward_status of 'brought_forward' transactions to nil" do
+      @credit_card.remove_brought_forward_transactions(@start_date, @end_date)
+
+      @first.reload
+      @second.reload
+
+      expect(@first.brought_forward_status).to eq nil
+      expect(@second.brought_forward_status).to eq nil
+    end
+
+    it "removes the transactions added in the next period" do
+      expect(@credit_card.transactions.size).to eq 5
+      expect{
+        @credit_card.remove_brought_forward_transactions(@start_date, @end_date)
+      }.to change{ Transaction.count }.by(-3)
+
+    end
   end
 end
 
