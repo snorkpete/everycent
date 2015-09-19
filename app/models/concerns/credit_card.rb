@@ -13,6 +13,10 @@ module CreditCard
     account_type == 'credit_card'
   end
 
+  def credit_card?
+    is_credit_card
+  end
+
   def add_brought_forward_transactions(start_date, end_date)
     return false unless is_credit_card
 

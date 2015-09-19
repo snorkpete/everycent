@@ -22,11 +22,13 @@ shared_examples_for "CreditCard" do
     it "returns true if account_type == 'credit_card'" do
       bank_account = build(:bank_account, account_type: 'credit_card')
       expect(bank_account.is_credit_card).to eq true
+      expect(bank_account.credit_card?).to eq true
     end
 
     it "returns true if account_type == 'credit_card'" do
       bank_account = build(:bank_account, account_type: 'normal')
       expect(bank_account.is_credit_card).to eq false
+      expect(bank_account.credit_card?).to eq false
     end
   end
 
