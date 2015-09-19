@@ -37,6 +37,10 @@ class Transaction < ActiveRecord::Base
     Transaction.where('allocation_id = ?', allocation_id)
   end
 
+  def self.unpaid
+    where(status: 'unpaid')
+  end
+
   def self.update_with_params(params)
 
     sink_fund = BankAccount.sink_funds.where(id: params[:bank_account_id]).includes(:sink_fund_allocations).first
@@ -80,5 +84,14 @@ class Transaction < ActiveRecord::Base
     else
       self.status = 'paid'
     end
+  end
+
+  def to_brought_forward_version(brought_forward_date)
+    new_transaction = dup
+    new_transaction.description = "#{description} (B/F)"
+    new_transaction.transaction_date = brought_forward_date
+    new_transaction.status = 'unpaid'
+    new_transaction.brought_forward_status = 'added'
+    new_transaction
   end
 end

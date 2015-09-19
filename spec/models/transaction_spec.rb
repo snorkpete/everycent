@@ -158,4 +158,72 @@ RSpec.describe Transaction, :type => :model do
     end
   end
 
+  describe "#to_brought_forward_version" do
+    before do
+      @original_transaction = build(:transaction,
+                                    bank_account_id: 22,
+                                    description: 'Expensive Watch',
+                                    bank_ref:'xxxx', withdrawal_amount: 30_000,
+                                    deposit_amount: 5_00, allocation_id: 3,
+                                    payee_code: 'A50', payee_name: 'Amazon', payee_id: 40)
+
+      @date = Date.new(2015, 7, 23)
+      @new_transaction = @original_transaction.to_brought_forward_version(@date)
+    end
+
+    it "creates a new transaction" do
+      expect(@new_transaction.class).to eq Transaction
+    end
+
+    it "sets the bank account of the new transaction to the same as the original transaction" do
+      expect(@new_transaction.bank_account_id).to eq @original_transaction.bank_account_id
+    end
+
+    it "sets the bank_ref the new transaction to the same as the original transaction" do
+      expect(@new_transaction.bank_ref).to eq @original_transaction.bank_ref
+    end
+
+    it "sets the withdrawal_amount of the new transaction to the same as the original transaction" do
+
+      expect(@new_transaction.withdrawal_amount).to eq @original_transaction.withdrawal_amount
+    end
+
+    it "sets the deposit_amount of the new transaction to the same as the original transaction" do
+      expect(@new_transaction.deposit_amount).to eq @original_transaction.deposit_amount
+    end
+
+    it "sets the payee_id of the new transaction to the same as the original transaction" do
+      expect(@new_transaction.payee_id).to eq @original_transaction.payee_id
+    end
+
+    it "sets the payee_code of the new transaction to the same as the original transaction" do
+      expect(@new_transaction.payee_code).to eq @original_transaction.payee_code
+    end
+
+    it "sets the payee_name of the new transaction to the same as the original transaction" do
+      expect(@new_transaction.payee_name).to eq @original_transaction.payee_name
+    end
+
+    it "sets the allocation of the new transaction to the same as the original transaction" do
+      expect(@new_transaction.allocation_id).to eq @original_transaction.allocation_id
+    end
+
+    it "adds (B/F) to the description of the new transaction" do
+      expect(@new_transaction.description).to eq "Expensive Watch (B/F)"
+    end
+
+    it "sets the transaction date of the new transaction to the passed date parameter" do
+      expect(@new_transaction.transaction_date).to eq @date
+    end
+
+    it "sets the status of the new transaction to 'unpaid'" do
+      expect(@new_transaction.status).to eq 'unpaid'
+    end
+
+    it "sets the brought_forward_status of the new transaction to 'added'" do
+      expect(@new_transaction.brought_forward_status).to eq 'added'
+    end
+
+  end
+
 end
