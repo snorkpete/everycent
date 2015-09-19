@@ -54,4 +54,16 @@ module CreditCard
                                  status: 'unpaid', brought_forward_status: 'added'
     adjustment
   end
+
+  def remove_brought_forward_transactions(start_date, end_date)
+    # reset the original brought forward transactions back to unpaid
+    transactions.between(start_date, end_date)
+                .where(brought_forward_status: 'brought_forward', status: 'paid')
+                .update_all status: 'unpaid', brought_forward_status: nil
+
+    # remove the (b/f) transactions and the adjusting transaction
+    transactions.where('transaction_date >= ?', end_date.tomorrow)
+                .where(brought_forward_status: 'added')
+                .delete_all
+  end
 end

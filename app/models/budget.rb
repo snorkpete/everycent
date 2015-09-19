@@ -62,8 +62,7 @@ class Budget < ActiveRecord::Base
   def close
     BankAccount.all.each do |bank_account|
       bank_account.update_balance(self.id, self.end_date)
-      #TODO to implement
-      #bank_account.add_brought_forward_transactions(self.start_date, self.end_date)
+      bank_account.add_brought_forward_transactions(self.start_date, self.end_date)
     end
     self.status = 'closed'
     save
@@ -85,8 +84,7 @@ class Budget < ActiveRecord::Base
                                      bank_account.opening_balance
       bank_account.closing_date = budget.start_date.yesterday
       bank_account.save
-      # TODO to implement
-      #bank_account.remove_brought_forward_transactions(budget.start_date, budget.end_date)
+      bank_account.remove_brought_forward_transactions(budget.start_date, budget.end_date)
     end
 
     budget
