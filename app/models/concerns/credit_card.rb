@@ -18,45 +18,40 @@ module CreditCard
   end
 
   def add_brought_forward_transactions(start_date, end_date)
-    return false unless is_credit_card
+    return false unless credit_card?
 
-    brought_forward_date = end_date.tomorrow
-    transactions_to_bring_forward = transactions.between(start_date, end_date).unpaid
     added_transactions = []
+    added_transactions << build_transactions_to_bring_forward(start_date, end_date)
 
-    transactions_to_bring_forward.each do |transaction|
-      added_transactions << transaction.to_brought_forward_version(brought_forward_date)
-    end
+    adjustment = build_adjustment_transaction(start_date, end_date)
+    added_transactions << adjustment unless adjustment.net_amount == 0
 
-    adjustment_transaction = Transaction.new description: '',
-                                             transaction_date: brought_forward_date,
-                                             withdrawal_amount: 0, deposit_amount: 0
+    self.transactions << added_transactions
 
-    #added_transactions << adjustment_transaction
-    transactions << added_transactions
-
-    transactions_to_bring_forward.update_all status: 'paid', brought_forward_status: 'brought_forward'
+    transactions_to_copy(start_date, end_date).update_all status: 'paid',
+                                                          brought_forward_status: 'brought_forward'
   end
 
-  def transactions_to_bring_forward(start_date, end_date)
+  def transactions_to_copy(start_date, end_date)
     transactions.between(start_date, end_date).unpaid
   end
 
   def build_transactions_to_bring_forward(start_date, end_date)
     brought_forward_date = end_date.tomorrow
 
-    return transactions_to_bring_forward(start_date, end_date).map do |transaction|
+    return transactions_to_copy(start_date, end_date).map do |transaction|
       transaction.to_brought_forward_version(brought_forward_date)
     end
   end
 
   def build_adjustment_transaction(start_date, end_date)
-    withdrawals = transactions_to_bring_forward(start_date, end_date).sum(:withdrawal_amount) * -1
-    deposits = transactions_to_bring_forward(start_date, end_date).sum(:deposit_amount) * -1
+    withdrawals = transactions_to_copy(start_date, end_date).sum(:withdrawal_amount) * -1
+    deposits = transactions_to_copy(start_date, end_date).sum(:deposit_amount) * -1
 
     adjustment = Transaction.new withdrawal_amount: withdrawals, deposit_amount: deposits,
                                  description: 'Balance B/F Adj Entry', 
-                                 transaction_date: end_date.tomorrow
+                                 transaction_date: end_date.tomorrow,
+                                 status: 'unpaid', brought_forward_status: 'added'
     adjustment
   end
 end

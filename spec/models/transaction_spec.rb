@@ -158,6 +158,13 @@ RSpec.describe Transaction, :type => :model do
     end
   end
 
+  describe "#net_amount" do
+    it "equal to the withdrawal_amount - deposit_amount" do
+      transaction = build(:transaction, withdrawal_amount: 50_00, deposit_amount: 60_00)
+      expect(transaction.net_amount).to eq -10_00
+    end
+  end
+
   describe "#to_brought_forward_version" do
     before do
       @original_transaction = build(:transaction,
