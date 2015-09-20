@@ -110,12 +110,12 @@
     }
 
     function markForOpening(sinkFundAllocation){
-      sinkFundAllocation['status'] = 'open';
+      sinkFundAllocation.status = 'open';
       sinkFundAllocation.unsaved = true;
     }
 
     function markForClosing(sinkFundAllocation){
-      sinkFundAllocation['status'] = 'closed';
+      sinkFundAllocation.status = 'closed';
       sinkFundAllocation.unsaved = true;
     }
 
