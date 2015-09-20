@@ -2,7 +2,7 @@ class BankAccountsController < ApplicationController
   before_action :set_bank_account, only: [:show, :edit, :update, :destroy]
 
   def index
-    @bank_accounts = BankAccount.includes(:institution, :user).order(:account_category, :name)
+    @bank_accounts = BankAccount.includes(:institution, :user).account_category_order
     @bank_accounts = @bank_accounts.where(status:'open') unless params[:include_closed] == 'true'
     respond_with(@bank_accounts, BankAccountSerializer)
   end
