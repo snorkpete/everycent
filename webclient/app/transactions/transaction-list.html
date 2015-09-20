@@ -94,7 +94,7 @@
                 </tr>
             </tfoot>
             <tbody>
-                <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted }">
+                <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted, 'text-danger': !transaction.paid }">
 
                     <!-- transaction date -->
                     <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">
