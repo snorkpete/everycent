@@ -25,7 +25,12 @@ class BankAccount < ActiveRecord::Base
   has_many :transactions
   has_many :sink_fund_allocations,  -> { order(:status => :desc, :name => :asc) }
 
+
   validates :name,  presence: true
+
+  def self.account_category_order
+    order("CASE when account_category='current' THEN 1 ELSE 2 END, account_category, name")
+  end
 
   def update_balance(budget_id, closing_date)
     total_transaction_amount = 0
