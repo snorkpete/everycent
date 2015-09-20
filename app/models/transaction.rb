@@ -80,10 +80,9 @@ class Transaction < ActiveRecord::Base
   end
 
   def check_status
-    Rails::logger.info "where is my cheese: #{status}"
     return true if status.present?
 
-    if self.bank_account && bank_account.account_type == 'credit_card'
+    if bank_account && bank_account.account_type == 'credit_card' && withdrawal?
       self.status = 'unpaid'
     else
       self.status = 'paid'
@@ -101,5 +100,13 @@ class Transaction < ActiveRecord::Base
 
   def net_amount
     withdrawal_amount - deposit_amount
+  end
+
+  def deposit?
+    net_amount < 0
+  end
+
+  def withdrawal?
+    net_amount >= 0
   end
 end

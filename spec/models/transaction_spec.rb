@@ -151,6 +151,12 @@ RSpec.describe Transaction, :type => :model do
       expect(transaction.status).to eq 'unpaid'
     end
 
+    it "defaults to paid if transaction is a net deposit (i.e. payment)" do
+      credit_card = create(:bank_account, account_type: 'credit_card')
+      transaction = create(:transaction, bank_account: credit_card, deposit_amount: 100, withdrawal_amount: 10)
+      expect(transaction.status).to eq 'paid'
+    end
+
     it "does not change existing statuses if already set" do
       credit_card = create(:bank_account, account_type: 'credit_card')
       transaction = create(:transaction, bank_account: credit_card, status: 'paid')
