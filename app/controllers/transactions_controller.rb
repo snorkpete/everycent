@@ -13,6 +13,11 @@ class TransactionsController < ApplicationController
     respond_with(@transactions, TransactionSerializer)
   end
 
+  def last_update
+    @transaction = Transaction.order(transaction_date: :desc).first
+    respond_with(@transaction, TransactionSerializer)
+  end
+
   def create
     @transactions = Transaction.update_with_params(transaction_params)
     respond_with(@transactions, TransactionSerializer)

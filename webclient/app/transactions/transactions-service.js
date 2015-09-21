@@ -16,8 +16,8 @@
         getValidTransactions: getValidTransactions,
         getDefaultAllocations: getDefaultAllocations,
         updateTransactionStatus: updateTransactionStatus,
-        updateAllTransactionStatuses: updateAllTransactionStatuses
-
+        updateAllTransactionStatuses: updateAllTransactionStatuses,
+        getLastUpdate: getLastUpdate
       };
 
       var baseAll = Restangular.all('transactions');
@@ -140,6 +140,10 @@
           transaction.paid = paid;
           transaction.status = newStatus;
         });
+      }
+
+      function getLastUpdate(){
+        return baseAll.customGET('last_update');
       }
     } // end of service
 

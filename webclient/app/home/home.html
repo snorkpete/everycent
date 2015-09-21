@@ -1,2 +1,11 @@
 
 <h2> Welcome to EveryCent!!!</h2>
+
+<div class="text-right">
+    <strong> Last transaction date entered: </strong>
+    <span class="label label-primary">
+        {{ vm.lastUpdate.transaction_date | date:long }}
+    </span>
+</div>
+
+<br/>
