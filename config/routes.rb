@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     collection do
       put 'update_all'
       get 'by_allocation'
+      get 'last_update'
     end
   end
   resources :payees, except: [:new, :edit]
