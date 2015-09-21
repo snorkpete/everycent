@@ -76,7 +76,7 @@
 
         vm.transferAccounts = vm.bankAccounts.filter(function(account){
           return account.id !== vm.primary_budget_account_id &&
-                 account.account_category === 'asset';
+                 account.account_category === 'current';
         });
       });
     }
