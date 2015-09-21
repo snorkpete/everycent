@@ -25,6 +25,10 @@
                 <th>Difference (Bank vs Budget)</th>
                 <td class="text-right"><ec-amount-formatted amount="vm.budgetDifference()"></ec-amount-formatted></td>
             </tr>
+            <tr ng-if="vm.showUnpaidBalance()" class="total">
+                <th>Unpaid Balance</th>
+                <td class="text-right"><ec-amount-formatted amount="vm.unpaidBalance()"></ec-amount-formatted></td>
+            </tr>
         </tbody>
     </table>
 </ec-panel>

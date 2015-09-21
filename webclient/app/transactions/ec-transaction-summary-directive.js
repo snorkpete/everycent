@@ -36,6 +36,9 @@
     vm.currentBudgetBalance = currentBudgetBalance;
     vm.budgetDifference = budgetDifference;
 
+    vm.showUnpaidBalance = showUnpaidBalance;
+    vm.unpaidBalance = unpaidBalance;
+
     activate();
 
     function activate(){
@@ -85,29 +88,33 @@
     }
 
     function currentBudgetBalance(){
-
-      // todo: temporarily don't use any logic to determine what's currently being edited
       return lastBudgetBalance();
-
-      if(!vm.transactions){
-        return 0;
-      }
-
-      var totalWithdrawals = 0;
-      var totalDeposits = 0;
-
-      vm.transactions.forEach(function(transaction){
-        if(!transaction.deleted && transaction.allocation_id >= 0){
-          totalWithdrawals += transaction.withdrawal_amount;
-          totalDeposits += transaction.deposit_amount;
-        }
-      });
-
-      return totalDeposits - totalWithdrawals;
     }
 
     function budgetDifference(){
       return currentBankBalance() - currentBudgetBalance();
     }
-  }
+
+    function showUnpaidBalance(){
+      if(!vm.bankAccount){
+        return false;
+      }
+
+      return vm.bankAccount.account_type === 'credit_card';
+    }
+
+    function unpaidBalance(){
+      if(!vm.transactions){
+        return 0;
+      }
+
+      var unpaidTransactions = vm.transactions.filter(function(transaction){
+        return !transaction.paid;
+      });
+
+      return vm.util.total(unpaidTransactions, 'net_amount');
+    }
+
+  } // end of controller
+
 })();
