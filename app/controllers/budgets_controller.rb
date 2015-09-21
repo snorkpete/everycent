@@ -6,8 +6,8 @@ class BudgetsController < ApplicationController
 
   def index
     #@budgets = Budget.includes(:incomes, { allocations: [:allocation_category, :transactions] }).all
-    @budgets = preloaded.all.order(start_date: :desc)
-    respond_with(@budgets, BudgetSerializer)
+    @budgets = Budget.all.order(start_date: :desc)
+    respond_with(@budgets, SimpleBudgetSerializer)
   end
 
   def show
