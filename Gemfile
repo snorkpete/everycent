@@ -10,13 +10,12 @@ group :development do
   gem 'annotate'
   gem 'lol_dba'
   gem 'meta_request'
+  # log where queries are being generated from in the code base
+  gem 'active_record_query_trace'
 end
 
 # database gem
 gem 'pg'
-
-# log where queries are being generated from in the code base
-gem 'active_record_query_trace'
 
 # fix for time
 gem 'tzinfo-data'
