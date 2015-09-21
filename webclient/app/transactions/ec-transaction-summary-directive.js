@@ -38,6 +38,7 @@
 
     vm.showUnpaidBalance = showUnpaidBalance;
     vm.unpaidBalance = unpaidBalance;
+    vm.unpaidDifference = unpaidDifference;
 
     activate();
 
@@ -113,6 +114,10 @@
       });
 
       return vm.util.total(unpaidTransactions, 'net_amount');
+    }
+
+    function unpaidDifference(){
+      return currentBankBalance() - unpaidBalance();
     }
 
   } // end of controller
