@@ -99,14 +99,14 @@ class Transaction < ActiveRecord::Base
   end
 
   def net_amount
-    withdrawal_amount - deposit_amount
+    deposit_amount - withdrawal_amount
   end
 
   def deposit?
-    net_amount < 0
+    net_amount > 0
   end
 
   def withdrawal?
-    net_amount >= 0
+    net_amount <= 0
   end
 end
