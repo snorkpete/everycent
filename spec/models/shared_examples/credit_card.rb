@@ -266,26 +266,102 @@ shared_examples_for "CreditCard" do
     end
   end
 
-  describe "credit card view by statement period" do
-    describe "Credit Card" do
-      before do
-        @credit_card = build(:bank_account, account_type: 'credit_card',
-                             statement_day: 10, payment_due_day: 1)
-      end
-
-      context "when given a reference date" do
-        before do
-          @today = Date.new(2015, 9, 21)
-        end
-
-        it "has a current_period_statement_start"
-        it "has a current_period_statement_end"
-        it "has a current_period_payment_due_date"
-        it "has a previous_period_statement_start"
-        it "has a previous_period_statement_end"
-        it "has a previous_period_payment_due_date"
-      end
+  describe "Credit Card dates" do
+    before do
     end
-  end
+
+    context "when statement_day < current day" do
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card', statement_day: 10)
+        @today = Date.new(2015, 10, 20)
+      end
+
+      it "#current_period_statement_start returns the statement_day in the current month" do
+        expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2015, 10, 10)
+      end
+
+      it "#current_period_statement_end returns the date before statement_day in the next month"
+
+      it "#previous_period_statement_start returns the statement_day in the previous month"
+      it "#previous_period_statement_end returns the date before statement_day in the current month"
+    end
+
+    context "when current day == statement_day" do
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card', statement_day: 10)
+        @today = Date.new(2015, 12, 10)
+      end
+
+      it "#current_period_statement_start returns the statement_day in the current month" do
+        expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2015, 12, 10)
+      end
+
+      it "#current_period_statement_end returns the date before statement_day in the next month"
+
+      it "#previous_period_statement_start returns the statement_day in the previous month"
+      it "#previous_period_statement_end returns the date before statement_day in the current month"
+    end
+
+    context "when current day < statement_day" do
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card', statement_day: 10)
+        @today = Date.new(2015, 1, 1)
+      end
+
+      it "#current_period_statement_start returns the statement_day in the previous month" do
+        expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2014, 12, 10)
+      end
+
+      it "#current_period_statement_end returns the date before statement_day in the current month"
+
+      it "#previous_period_statement_start returns the statement_day in the 2nd month prior"
+      it "#previous_period_statement_end returns the date before statement_day in the previous month"
+    end
+
+    context "when the current month doesn't have the day before the statement day" do
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card', statement_day: 30)
+        @today = Date.new(2015, 2, 15)
+      end
+
+      it "#current_period_statement_start returns the statement_day in the previous month" do
+        expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2015, 1, 30)
+      end
+
+      it "#current_period_statement_end returns the last date in the current month"
+    end
+
+    context "when the previous month doesn't have the day before the statement day" do
+      it "#previous_period_statement_start returns the date in the 2nd month prior using last day of the current month"
+      it "#previous_period_statement_end returns the date before statement_day in the previous month"
+    end
+
+    context "when payment_due_day < current day" do
+      it "#current_period_payment_due returns the payment_due_day in the next month"
+      it "#previous_period_payment_due returns the payment_due_day in the current month"
+    end
+
+    context "when current day == payment_due_day" do
+      it "#current_period_payment_due returns the payment_due_day in the current month"
+      it "#previous_period_payment_due returns the payment_due_day in the previous month"
+    end
+
+    context "when current day < payment_due_day" do
+      it "#current_period_payment_due returns the payment_due_day in the current month"
+      it "#previous_period_payment_due returns the payment_due_day in the previous month"
+    end
+
+    context "when the current month doesn't have the payment_due_day" do
+      it "#current_period_payment_due returns the last date of the current month"
+    end
+
+    context "when the previous month doesn't have the payment_due_day" do
+      it "#previous_period_payment_due returns the last date of the previous month"
+    end
+
+    describe "when rolling over to a previous year"
+
+  end # end of Credit Card dates
+
 end
 
