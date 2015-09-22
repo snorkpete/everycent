@@ -37,13 +37,13 @@ module CreditCard
                                                           brought_forward_status: 'brought_forward'
   end
 
-  # returns the unpaid transactions that are eligible to be 
+  # returns the unpaid transactions that are eligible to be
   # copied into the new transaction period
   def transactions_to_copy(start_date, end_date)
     transactions.between(start_date, end_date).unpaid
   end
 
-  # builds the actual new transactions to be added 
+  # builds the actual new transactions to be added
   # in the new period that mimic the original transactions to be copied
   def build_transactions_to_bring_forward(start_date, end_date)
     brought_forward_date = end_date.tomorrow
@@ -54,14 +54,14 @@ module CreditCard
   end
 
 
-  # returns the adjustment transaction that balances the 
+  # returns the adjustment transaction that balances the
   # transactions that will be copied to the new period
   def build_adjustment_transaction(start_date, end_date)
     withdrawals = transactions_to_copy(start_date, end_date).sum(:withdrawal_amount) * -1
     deposits = transactions_to_copy(start_date, end_date).sum(:deposit_amount) * -1
 
     adjustment = Transaction.new withdrawal_amount: withdrawals, deposit_amount: deposits,
-                                 description: 'Balance B/F Adj Entry', 
+                                 description: 'Balance B/F Adj Entry',
                                  transaction_date: end_date.tomorrow,
                                  status: 'unpaid', brought_forward_status: 'added'
     adjustment
@@ -81,5 +81,20 @@ module CreditCard
     transactions.where('transaction_date >= ?', end_date.tomorrow)
                 .where(brought_forward_status: 'added')
                 .delete_all
+  end
+
+  def current_period_statement_start(current_date)
+    if Date.valid_date?(current_date.year, current_date.month, statement_day)
+      day_to_use = statement_day
+    else
+      day_to_use = current_date.end_of_month.day
+    end
+
+    statement_date_in_current_month = Date.new(current_date.year, current_date.month, day_to_use)
+    if current_date.day < statement_day
+      return statement_date_in_current_month.last_month
+    else
+      return statement_date_in_current_month
+    end
   end
 end
