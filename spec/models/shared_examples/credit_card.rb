@@ -265,5 +265,27 @@ shared_examples_for "CreditCard" do
 
     end
   end
+
+  describe "credit card view by statement period" do
+    describe "Credit Card" do
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card',
+                             statement_day: 10, payment_due_day: 1)
+      end
+
+      context "when given a reference date" do
+        before do
+          @today = Date.new(2015, 9, 21)
+        end
+
+        it "has a current_period_statement_start"
+        it "has a current_period_statement_end"
+        it "has a current_period_payment_due_date"
+        it "has a previous_period_statement_start"
+        it "has a previous_period_statement_end"
+        it "has a previous_period_payment_due_date"
+      end
+    end
+  end
 end
 
