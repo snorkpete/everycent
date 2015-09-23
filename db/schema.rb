@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150919003427) do
+ActiveRecord::Schema.define(version: 20150922194046) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,6 +57,8 @@ ActiveRecord::Schema.define(version: 20150919003427) do
     t.integer  "default_sub_account_amount", default: 0
     t.string   "status",                     default: "open"
     t.string   "account_type",               default: "normal"
+    t.integer  "statement_day"
+    t.integer  "payment_due_day"
   end
 
   add_index "bank_accounts", ["institution_id"], name: "index_bank_accounts_on_institution_id", using: :btree
