@@ -1,7 +1,10 @@
+require 'core_extensions/date_extensions/relative_date'
+
 module CreditCard
   extend ActiveSupport::Concern
 
   included do
+    Date.include CoreExtensions::DateExtensions::RelativeDate
   end
 
   module ClassMethods
@@ -84,52 +87,33 @@ module CreditCard
   end
 
   # the date that the statement period starts, for the current date
-  def current_period_statement_start(current_date)
-
-    if Date.valid_date?(current_date.year, current_date.month, statement_day)
-      statement_date_in_current_month = Date.new(current_date.year, current_date.month, statement_day)
-      if current_date.day < statement_day
-        return statement_date_in_current_month.last_month
-      else
-        return statement_date_in_current_month
-      end
-    end
-
-    # if exact statement date doesn't exist in the current month
-    # then current_day MUST be < statement_day
-    # so find the correct day in the previous month
-    date_in_previous_month = current_date.last_month
-    if Date.valid_date?(date_in_previous_month.year, date_in_previous_month.month, statement_day)
-      return Date.new(date_in_previous_month.year, date_in_previous_month.month, statement_day)
-    else
-      return date_in_previous_month.end_of_month
-    end
-
+  def current_period_statement_start(current_date=Date.today)
+    return nil if statement_day.nil?
+    current_date.previous_date_for_day_of_month(statement_day)
   end
 
-  def current_period_statement_end(current_date)
-    if Date.valid_date?(current_date.year, current_date.month, statement_day)
-      statement_date_in_current_month = Date.new(current_date.year, current_date.month, statement_day)
-      if current_date.day < statement_day
-        return statement_date_in_current_month.prev_day
-      else
-        return statement_date_in_current_month.next_month.prev_day
-      end
-    end
-
-    date_in_next_month = current_date.next_month
-    if Date.valid_date?(date_in_next_month.year, date_in_next_month.month, statement_day)
-      return Date.new(date_in_next_month.year, date_in_next_month.month, statement_day).prev_day
-    else
-      return date_in_previous_month.end_of_month
-    end
+  def current_period_statement_end(current_date=Date.today)
+    return nil if statement_day.nil?
+    current_date.next_date_for_day_of_month(statement_day).prev_day
   end
 
-  def previous_period_statement_start(current_date)
+  def previous_period_statement_start(current_date=Date.today)
+    return nil if statement_day.nil?
     current_period_statement_start(current_date).last_month
   end
 
-  def previous_period_statement_end(current_date)
+  def previous_period_statement_end(current_date=Date.today)
+    return nil if statement_day.nil?
     current_period_statement_end(current_date).last_month
+  end
+
+  def current_period_payment_due(current_date=Date.today)
+    return nil if payment_due_day.nil?
+    current_date.next_date_for_day_of_month(payment_due_day)
+  end
+
+  def previous_period_payment_due(current_date=Date.today)
+    return nil if payment_due_day.nil?
+    current_period_payment_due(current_date).last_month
   end
 end
