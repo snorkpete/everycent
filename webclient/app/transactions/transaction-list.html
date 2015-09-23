@@ -94,103 +94,13 @@
                 </tr>
             </tfoot>
             <tbody>
-                <tr ng-repeat="transaction in vm.transactions" ng-class="{ danger: transaction.deleted, 'text-danger': !transaction.paid }">
-
-                    <!-- transaction date -->
-                    <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">
-                        <input ng-show="vm.isEditMode"
-                            name="transaction_date[{{$index}}]"
-                            type="date"
-                            ng-model="transaction.transaction_date"
-                            ng-change="vm.checkTransactionDate(transaction, vm.search.budget)"
-                            ng-required="!transaction.deleted"
-                            ec-as-date>
-                        </input>
-                        <span style="positive:relative; top:20px;" ng-show="transaction.transaction_date_invalid" class=".help-block">
-                            Transaction date outside the budget period
-                        </span>
-                        <span ng-hide="vm.isEditMode"
-                              ng-bind="transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
-                    </td>
-
-                    <!-- payee -->
-                    <td class="hidden-xs">
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.payee_name" ></input>
-                        <span ng-hide="vm.isEditMode">
-                           <span ng-show="transaction.payee_code"
-                                 ng-bind="transaction.payee_name + ' (' + transaction.payee_code + ')'"></span>
-                        </span>
-                    </td>
-
-                    <!-- description -->
-                    <td>
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.description" ></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.description"></span>
-                    </td>
-
-                    <!-- allocation -->
-                    <td>
-                        <span ng-hide="vm.search.bank_account.is_sink_fund">
-                            <select ng-show="vm.isEditMode"
-                                    ng-model="transaction.allocation"
-                                    ng-change="vm.onAllocationChange(transaction)"
-                                    ng-options="allocation.name group by allocation.allocation_category.name for allocation in vm.allocations track by allocation.id">
-                            </select>
-                            <span ng-hide="vm.isEditMode" ng-bind="transaction.allocation.name"></span>
-                        </span>
-
-                        <span ng-show="vm.search.bank_account.is_sink_fund">
-                            <select ng-show="vm.isEditMode"
-                                    ng-model="transaction.sink_fund_allocation"
-                                    ng-change="vm.ref.updateReferenceId(transaction, 'sink_fund_allocation')"
-                                    ng-options="sinkFundAllocation.name for sinkFundAllocation in vm.sinkFundAllocations track by sinkFundAllocation.id">
-                            </select>
-                            <span ng-hide="vm.isEditMode" ng-bind="transaction.sink_fund_allocation.name"></span>
-                        </span>
-                    </td>
-
-                    <!-- withdrawal amount -->
-                    <td class="text-right">
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.withdrawal_amount" ec-as-dollars></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.withdrawal_amount | ecToDollars"></span>
-                    </td>
-
-                    <!-- deposit amount -->
-                    <td class="text-right">
-                        <input ng-show="vm.isEditMode" type="text" ng-model="transaction.deposit_amount" ec-as-dollars></input>
-                        <span ng-hide="vm.isEditMode" ng-bind="transaction.deposit_amount | ecToDollars"></span>
-                    </td>
-
-                    <!-- status -->
-                    <td class="text-right">
-                        <input type="checkbox"
-                               ng-show="vm.isEditMode"
-                               ng-model="transaction.paid"
-                               ng-click="vm.updateTransactionStatus(transaction)"
-                        />
-                        <span ng-hide="vm.isEditMode"
-                              ng-bind="transaction.status === 'paid' ? 'Yes' : 'No'"></span>
-                    </td>
-
-
-                    <td>
-                        <span ng-show="vm.isEditMode">
-
-                            <span ng-hide="transaction.deleted"
-                                  ng-click="vm.markForDeletion(transaction, true)"
-                                  class="text-danger pull-right pointer">
-                                <ec-icon type="trash"></ec-icon>
-                            </span>
-
-                            <span ng-show="transaction.deleted"
-                                  ng-click="vm.markForDeletion(transaction, false)"
-                                  class="text-success pull-right pointer">
-                                <ec-icon type="refresh"></ec-icon>
-                            </span>
-
-                        </span>
-                    </td>
-
+                <tr ec-transaction-list-row
+                    ng-repeat="transaction in vm.transactions"
+                    transaction="transaction"
+                    search="vm.search"
+                    is-edit-mode="vm.isEditMode"
+                    transactionForm="vm.transactionForm"
+                    ng-class="{ danger: transaction.deleted, 'text-danger': !transaction.paid }">
                 </tr>
             </tbody>
             </table>

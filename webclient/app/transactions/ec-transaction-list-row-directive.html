@@ -1,0 +1,100 @@
+
+<tr ng-class="{ danger: vm.transaction.deleted, 'text-danger': !vm.transaction.paid }">
+
+    <!-- transaction date -->
+    <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">
+        <input ng-show="vm.isEditMode"
+            name="vm.transaction_date[{{$index}}]"
+            type="date"
+            ng-model="vm.transaction.transaction_date"
+            ng-change="vm.checkTransactionDate(vm.transaction, vm.search.budget)"
+            ng-required="!vm.transaction.deleted"
+            ec-as-date>
+        </input>
+        <span style="positive:relative; top:20px;" ng-show="vm.transaction.transaction_date_invalid" class=".help-block">
+            Transaction date outside the budget period
+        </span>
+        <span ng-hide="vm.isEditMode"
+              ng-bind="vm.transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
+    </td>
+
+    <!-- payee -->
+    <td class="hidden-xs">
+        <input ng-show="vm.isEditMode" type="text" ng-model="vm.transaction.payee_name" ></input>
+        <span ng-hide="vm.isEditMode">
+           <span ng-show="vm.transaction.payee_code"
+                 ng-bind="vm.transaction.payee_name + ' (' + vm.transaction.payee_code + ')'"></span>
+        </span>
+    </td>
+
+    <!-- description -->
+    <td>
+        test
+        <input ng-show="vm.isEditMode" type="text" ng-model="vm.transaction.description" ></input>
+        <span ng-hide="vm.isEditMode" ng-bind="vm.transaction.description"></span>
+    </td>
+
+    <!-- allocation -->
+    <td>
+        <span ng-hide="vm.search.bank_account.is_sink_fund">
+            <select ng-show="vm.isEditMode"
+                    ng-model="vm.transaction.allocation"
+                    ng-change="vm.onAllocationChange(vm.transaction)"
+                    ng-options="allocation.name group by allocation.allocation_category.name for allocation in vm.allocations track by allocation.id">
+            </select>
+            <span ng-hide="vm.isEditMode" ng-bind="vm.transaction.allocation.name"></span>
+        </span>
+
+        <span ng-show="vm.search.bank_account.is_sink_fund">
+            <select ng-show="vm.isEditMode"
+                    ng-model="vm.transaction.sink_fund_allocation"
+                    ng-change="vm.ref.updateReferenceId(vm.transaction, 'sink_fund_allocation')"
+                    ng-options="sinkFundAllocation.name for sinkFundAllocation in vm.sinkFundAllocations track by sinkFundAllocation.id">
+            </select>
+            <span ng-hide="vm.isEditMode" ng-bind="vm.transaction.sink_fund_allocation.name"></span>
+        </span>
+    </td>
+
+    <!-- withdrawal amount -->
+    <td class="text-right">
+        <input ng-show="vm.isEditMode" type="text" ng-model="vm.transaction.withdrawal_amount" ec-as-dollars></input>
+        <span ng-hide="vm.isEditMode" ng-bind="vm.transaction.withdrawal_amount | ecToDollars"></span>
+    </td>
+
+    <!-- deposit amount -->
+    <td class="text-right">
+        <input ng-show="vm.isEditMode" type="text" ng-model="vm.transaction.deposit_amount" ec-as-dollars></input>
+        <span ng-hide="vm.isEditMode" ng-bind="vm.transaction.deposit_amount | ecToDollars"></span>
+    </td>
+
+    <!-- status -->
+    <td class="text-right">
+        <input type="checkbox"
+               ng-show="vm.isEditMode"
+               ng-model="vm.transaction.paid"
+               ng-click="vm.updateTransactionStatus(vm.transaction)"
+        />
+        <span ng-hide="vm.isEditMode"
+              ng-bind="vm.transaction.status === 'paid' ? 'Yes' : 'No'"></span>
+    </td>
+
+
+    <td>
+        <span ng-show="vm.isEditMode">
+
+            <span ng-hide="vm.transaction.deleted"
+                  ng-click="vm.markForDeletion(vm.transaction, true)"
+                  class="text-danger pull-right pointer">
+                <ec-icon type="trash"></ec-icon>
+            </span>
+
+            <span ng-show="vm.transaction.deleted"
+                  ng-click="vm.markForDeletion(vm.transaction, false)"
+                  class="text-success pull-right pointer">
+                <ec-icon type="refresh"></ec-icon>
+            </span>
+
+        </span>
+    </td>
+
+</tr>

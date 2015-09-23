@@ -42,8 +42,8 @@
                 <td>
                     {{ bankAccount.account_type_description }}
                     <div ng-show="bankAccount.is_credit_card">
-                        <div> <em>Statement day:</em> {{ bankAccount.statement_day_ordinal }} </div>
-                        <div> <em>Payment Due day:</em> {{ bankAccount.payment_due_day_ordinal }} </div>
+                        <div> <em>Statement day:</em> <strong>{{ bankAccount.statement_day_ordinal }}</strong> </div>
+                        <div> <em>Payment Due day:</em> <strong> {{ bankAccount.payment_due_day_ordinal }} </strong> </div>
                     </div>
                 </td>
                 <td> {{ bankAccount.account_category }} </td>
