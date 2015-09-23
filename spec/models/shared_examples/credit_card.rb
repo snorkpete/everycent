@@ -280,10 +280,16 @@ shared_examples_for "CreditCard" do
         expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2015, 10, 10)
       end
 
-      it "#current_period_statement_end returns the date before statement_day in the next month"
+      it "#current_period_statement_end returns the date before statement_day in the next month" do
+        expect(@credit_card.current_period_statement_end(@today)).to eq Date.new(2015, 11, 9)
+      end
 
-      it "#previous_period_statement_start returns the statement_day in the previous month"
-      it "#previous_period_statement_end returns the date before statement_day in the current month"
+      it "#previous_period_statement_start returns the statement_day in the previous month" do
+        expect(@credit_card.previous_period_statement_start(@today)).to eq Date.new(2015, 9, 10)
+      end
+      it "#previous_period_statement_end returns the date before statement_day in the current month" do
+        expect(@credit_card.previous_period_statement_end(@today)).to eq Date.new(2015, 10, 9)
+      end
     end
 
     context "when current day == statement_day" do
@@ -296,10 +302,17 @@ shared_examples_for "CreditCard" do
         expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2015, 12, 10)
       end
 
-      it "#current_period_statement_end returns the date before statement_day in the next month"
+      it "#current_period_statement_end returns the date before statement_day in the next month" do
+        expect(@credit_card.current_period_statement_end(@today)).to eq Date.new(2016, 1, 9)
+      end
 
-      it "#previous_period_statement_start returns the statement_day in the previous month"
-      it "#previous_period_statement_end returns the date before statement_day in the current month"
+      it "#previous_period_statement_start returns the statement_day in the previous month" do
+        expect(@credit_card.previous_period_statement_start(@today)).to eq Date.new(2015, 11, 10)
+      end
+
+      it "#previous_period_statement_end returns the date before statement_day in the current month" do
+        expect(@credit_card.previous_period_statement_end(@today)).to eq Date.new(2015, 12, 9)
+      end
     end
 
     context "when current day < statement_day" do
@@ -312,10 +325,17 @@ shared_examples_for "CreditCard" do
         expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2014, 12, 10)
       end
 
-      it "#current_period_statement_end returns the date before statement_day in the current month"
+      it "#current_period_statement_end returns the date before statement_day in the current month" do
+        expect(@credit_card.current_period_statement_end(@today)).to eq Date.new(2015, 1, 9)
+      end
 
-      it "#previous_period_statement_start returns the statement_day in the 2nd month prior"
-      it "#previous_period_statement_end returns the date before statement_day in the previous month"
+      it "#previous_period_statement_start returns the statement_day in the 2nd month prior" do
+        expect(@credit_card.previous_period_statement_start(@today)).to eq Date.new(2014, 11, 10)
+      end
+
+      it "#previous_period_statement_end returns the date before statement_day in the previous month" do
+        expect(@credit_card.previous_period_statement_end(@today)).to eq Date.new(2014, 12, 9)
+      end
     end
 
     context "when the current month doesn't have the day before the statement day" do
@@ -328,12 +348,9 @@ shared_examples_for "CreditCard" do
         expect(@credit_card.current_period_statement_start(@today)).to eq Date.new(2015, 1, 30)
       end
 
-      it "#current_period_statement_end returns the last date in the current month"
-    end
-
-    context "when the previous month doesn't have the day before the statement day" do
-      it "#previous_period_statement_start returns the date in the 2nd month prior using last day of the current month"
-      it "#previous_period_statement_end returns the date before statement_day in the previous month"
+      it "#current_period_statement_end returns the last date in the current month" do
+        expect(@credit_card.previous_period_statement_start(@today)).to eq Date.new(2014, 12, 30)
+      end
     end
 
     context "when payment_due_day < current day" do

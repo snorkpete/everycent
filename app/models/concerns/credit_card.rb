@@ -83,18 +83,53 @@ module CreditCard
                 .delete_all
   end
 
+  # the date that the statement period starts, for the current date
   def current_period_statement_start(current_date)
+
     if Date.valid_date?(current_date.year, current_date.month, statement_day)
-      day_to_use = statement_day
-    else
-      day_to_use = current_date.end_of_month.day
+      statement_date_in_current_month = Date.new(current_date.year, current_date.month, statement_day)
+      if current_date.day < statement_day
+        return statement_date_in_current_month.last_month
+      else
+        return statement_date_in_current_month
+      end
     end
 
-    statement_date_in_current_month = Date.new(current_date.year, current_date.month, day_to_use)
-    if current_date.day < statement_day
-      return statement_date_in_current_month.last_month
+    # if exact statement date doesn't exist in the current month
+    # then current_day MUST be < statement_day
+    # so find the correct day in the previous month
+    date_in_previous_month = current_date.last_month
+    if Date.valid_date?(date_in_previous_month.year, date_in_previous_month.month, statement_day)
+      return Date.new(date_in_previous_month.year, date_in_previous_month.month, statement_day)
     else
-      return statement_date_in_current_month
+      return date_in_previous_month.end_of_month
     end
+
+  end
+
+  def current_period_statement_end(current_date)
+    if Date.valid_date?(current_date.year, current_date.month, statement_day)
+      statement_date_in_current_month = Date.new(current_date.year, current_date.month, statement_day)
+      if current_date.day < statement_day
+        return statement_date_in_current_month.prev_day
+      else
+        return statement_date_in_current_month.next_month.prev_day
+      end
+    end
+
+    date_in_next_month = current_date.next_month
+    if Date.valid_date?(date_in_next_month.year, date_in_next_month.month, statement_day)
+      return Date.new(date_in_next_month.year, date_in_next_month.month, statement_day).prev_day
+    else
+      return date_in_previous_month.end_of_month
+    end
+  end
+
+  def previous_period_statement_start(current_date)
+    current_period_statement_start(current_date).last_month
+  end
+
+  def previous_period_statement_end(current_date)
+    current_period_statement_end(current_date).last_month
   end
 end
