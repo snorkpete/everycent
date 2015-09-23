@@ -354,29 +354,20 @@ shared_examples_for "CreditCard" do
     end
 
     context "when payment_due_day < current day" do
-      it "#current_period_payment_due returns the payment_due_day in the next month"
-      it "#previous_period_payment_due returns the payment_due_day in the current month"
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card', payment_due_day: 1)
+        @today = Date.new(2015, 2, 15)
+      end
+
+      it "#current_period_payment_due returns the payment_due_day in the next month" do
+        expect(@credit_card.current_period_payment_due(@today)).to eq Date.new(2015, 3, 1)
+      end
+
+      it "#previous_period_payment_due returns the payment_due_day in the current month" do
+        expect(@credit_card.previous_period_payment_due(@today)).to eq Date.new(2015, 2, 1)
+      end
     end
 
-    context "when current day == payment_due_day" do
-      it "#current_period_payment_due returns the payment_due_day in the current month"
-      it "#previous_period_payment_due returns the payment_due_day in the previous month"
-    end
-
-    context "when current day < payment_due_day" do
-      it "#current_period_payment_due returns the payment_due_day in the current month"
-      it "#previous_period_payment_due returns the payment_due_day in the previous month"
-    end
-
-    context "when the current month doesn't have the payment_due_day" do
-      it "#current_period_payment_due returns the last date of the current month"
-    end
-
-    context "when the previous month doesn't have the payment_due_day" do
-      it "#previous_period_payment_due returns the last date of the previous month"
-    end
-
-    describe "when rolling over to a previous year"
 
   end # end of Credit Card dates
 
