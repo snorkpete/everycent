@@ -16,6 +16,9 @@
         labelWidth:'@',
         fieldWidth:'@',
         placeholder:'@',
+        min:'@',
+        max:'@',
+        step:'@',
         listOf:'@',
         isRequired: '=ngRequired',
         // Accept the ngModel attribute and bind it to scope.model

@@ -32,10 +32,20 @@
         </thead>
         <tbody>
             <tr ng-repeat="bankAccount in vm.bankAccounts">
-                <td> {{ bankAccount.name }} </td>
+                <td>
+                    {{ bankAccount.name }}
+                </td>
                 <td> {{ bankAccount.institution.name }} </td>
-                <td> {{ bankAccount.account_type | ecHumanize }} </td>
-                <td> {{ bankAccount.account_type_description }} </td>
+                <td>
+                    {{ bankAccount.account_type | ecHumanize }}
+                </td>
+                <td>
+                    {{ bankAccount.account_type_description }}
+                    <div ng-show="bankAccount.is_credit_card">
+                        <div> <em>Statement day:</em> {{ bankAccount.statement_day_ordinal }} </div>
+                        <div> <em>Payment Due day:</em> {{ bankAccount.payment_due_day_ordinal }} </div>
+                    </div>
+                </td>
                 <td> {{ bankAccount.account_category }} </td>
                 <td> {{ bankAccount.status }} </td>
                 <td class="text-center"> {{ bankAccount.allow_default_allocations ? 'Yes' : 'No' }} </td>

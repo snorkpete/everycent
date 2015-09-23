@@ -119,3 +119,30 @@
     </div>
     <p class="help-block">{{ vm.bankAccountForm.allow_default_allocations.$error.server }}</p>
 </div>
+
+<fieldset>
+    <legend>Credit Card Related</legend>
+
+    <ec-form-field label="Statement Day" label-width="2"
+                   name="statement_day"
+                   error="vm.bankAccountForm.statement_day.$error"
+                   field-width="2"
+                   placeholder="Day that the credit card billing period starts"
+                   type="number"
+                   ng-model="vm.bankAccount.statement_day">
+    </ec-form-field>
+
+    <ec-form-field label="Payment Due Day" label-width="2"
+                   name="payment_due_day"
+                   error="vm.bankAccountForm.payment_due_day.$error"
+                   field-width="2"
+                   placeholder="deadline day for paying credit card balance of previous billing period"
+                   type="number"
+                   min="1"
+                   max="31"
+                   step="1"
+                   ng-required="true"
+                   ng-model="vm.bankAccount.payment_due_day">
+    </ec-form-field>
+
+</fieldset>

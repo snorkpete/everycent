@@ -19,7 +19,15 @@
 class BankAccountSerializer < ActiveModel::Serializer
   attributes :id, :name, :account_type, :account_type_description, :account_category, :account_no,
              :user_id, :institution_id, :opening_balance, :closing_balance,
-             :allow_default_allocations, :is_sink_fund, :status
+             :allow_default_allocations, :is_sink_fund, :is_credit_card, :status,
+             :statement_day, :payment_due_day,
+             :statement_day_ordinal, :payment_due_day_ordinal,
+             :current_period_statement_start,
+             :current_period_statement_end,
+             :previous_period_statement_start,
+             :previous_period_statement_end,
+             :current_period_payment_due,
+             :previous_period_payment_due
 
   has_one :user
   has_one :institution
