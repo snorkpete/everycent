@@ -5,8 +5,8 @@
     .module('everycent.transactions')
     .factory('TransactionsService', TransactionsService);
 
-    TransactionsService.$inject = ['Restangular', 'DateService', '$modal', '$document', 'MessageService'];
-    function TransactionsService(Restangular, DateService, $modal, $document, MessageService){
+    TransactionsService.$inject = ['Restangular', 'DateService', '$modal', 'MessageService'];
+    function TransactionsService(Restangular, DateService, $modal, MessageService){
       var service = {
         newTransaction: newTransaction,
         getTransactions: getTransactions,
@@ -99,7 +99,6 @@
           var vm = this;
           vm.options = {};
           vm.transactions = transactions;
-          modalFix();
 
           vm.options.confirm = function(){
             modalInstance.close('ok');
@@ -109,16 +108,6 @@
             modalInstance.dismiss('cancel');
           };
         }
-
-        /** TODO: this is a temporary fix for a bootstrap 3.1.1 issue
-         * Should be removed once that issue is fixed */
-        function modalFix(){
-          setTimeout(function(){
-            angular.element($document[0].querySelectorAll('div.modal-backdrop'))
-                 .css('height','1000px');
-                }, 100);
-        }
-
       }
 
       function updateTransactionStatus(transaction){
