@@ -14,7 +14,7 @@
       return service;
 
       function updateReferenceId(model, referenceName){
-        if(model === undefined){
+        if(model === undefined || model[referenceName] === undefined){
           return;
         }
         model[referenceName + '_id'] = model[referenceName].id;
