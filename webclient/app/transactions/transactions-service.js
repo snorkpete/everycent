@@ -10,6 +10,7 @@
       var service = {
         newTransaction: newTransaction,
         getTransactions: getTransactions,
+        getCreditCardTransactions: getCreditCardTransactions,
         transactionsFor: transactionsFor,
         save: save,
         showTransactionList: showTransactionList,
@@ -33,6 +34,10 @@
 
       function getTransactions(params){
         return baseAll.getList(params);
+      }
+
+      function getCreditCardTransactions(bankAccountId){
+        return baseAll.customGET('by_credit_card', { bank_account_id: bankAccountId });
       }
 
       function transactionsFor(allocationId){

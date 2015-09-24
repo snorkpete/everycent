@@ -1,0 +1,82 @@
+
+<div class="row">
+    <div class="col-xs-6">
+        <h2>Transactions</h2>
+    </div>
+    <div class="col-xs-6 text-right">
+        <button ng-show="vm.search.bank_account.is_sink_fund" class="btn btn-default" ng-click="vm.goToSinkFund()">Go to Sink Fund</button>
+        &nbsp;
+        &nbsp;
+        <button class="btn btn-default" ng-click="vm.goToBudget()">Go to Budget</button>
+    </div>
+</div>
+<div class="row">
+</div>
+<br/>
+
+<div class="row">
+    <div class="col-sm-6">
+        <ec-transaction-search-form search-options="vm.search"
+                                    on-submit="vm.refreshTransactions();">
+        </ec-transaction-search-form>
+    </div>
+    <div class="col-sm-6">
+        <ec-transaction-summary bank_account="vm.search.bank_account"
+                                allocations="vm.allocations"
+                                transactions="vm.transactions">
+        </ec-transaction-summary>
+    </div>
+</div>
+
+<div ng-show="vm.isEditMode">
+    <ec-transaction-importer transactions="vm.transactions"
+                             start-date="vm.search.budget.start_date"
+                             end-date="vm.search.budget.end_date"
+    >
+    </ec-transaction-importer>
+</div>
+
+<form class="form-horizontal" novalidate name="vm.transactionsForm">
+<div class="row">
+    <div class="col-xs-12">
+        <div style="max-height:400px; overflow-y:scroll;">
+            <table class="table table-bordered clear-background rounded fixed-layout">
+            <thead>
+                <tr ec-transaction-list-header-row bank-account="vm.search.bank_account">
+                </tr>
+            </thead>
+            <tfoot>
+              <tr ec-transaction-list-total-row
+                    transactions="vm.transactions"
+                    is-edit-mode="vm.isEditMode"
+                    search="vm.search">
+              </tr>
+            </tfoot>
+            <tbody>
+                <tr ec-transaction-list-row
+                    ng-repeat="transaction in vm.transactions"
+                    transaction="transaction"
+                    allocations="vm.allocations"
+                    sink-fund-allocations="vm.sinkFundAllocations"
+                    search="vm.search"
+                    is-edit-mode="vm.isEditMode"
+                    transactionForm="vm.transactionForm" >
+                </tr>
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</form>
+
+<br/>
+
+<ec-transaction-list-actions-panel transactions="vm.transactions"
+                                   is-edit-mode="vm.isEditMode"
+                                   search="vm.search"
+                                   on-save="vm.refreshTransactions()"
+                                   on-cancel="vm.refreshTransactions()"
+                                   >
+</ec-transaction-list-actions-panel>
+
+<br/>

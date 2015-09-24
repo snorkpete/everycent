@@ -20,6 +20,17 @@
           }]
         }
       })
+      .state('credit-card-transactions', {
+        url: '/credit-card-transactions?bank_account',
+        reloadOnSearch: false,
+        templateUrl: 'app/transactions/credit-card-transaction-list.html',
+        controller: 'CreditCardTransactionsCtrl as vm',
+        resolve:{
+          auth: ['$auth', function($auth){
+            return $auth.validateUser();
+          }]
+        }
+      })
     ;
   }
 })();
