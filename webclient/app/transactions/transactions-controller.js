@@ -52,7 +52,6 @@
       };
       return TransactionsService.getTransactions(params).then(function(transactions){
         vm.transactions = transactions;
-        vm.originalTransactions = transactions;
       });
     }
 
