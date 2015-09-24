@@ -5,8 +5,8 @@
     .module('everycent.transactions')
     .factory('TransactionsService', TransactionsService);
 
-    TransactionsService.$inject = ['Restangular', 'DateService', '$modal', '$document'];
-    function TransactionsService(Restangular, DateService, $modal, $document){
+    TransactionsService.$inject = ['Restangular', 'DateService', '$modal', '$document', 'MessageService'];
+    function TransactionsService(Restangular, DateService, $modal, $document, MessageService){
       var service = {
         newTransaction: newTransaction,
         getTransactions: getTransactions,
@@ -17,6 +17,7 @@
         getDefaultAllocations: getDefaultAllocations,
         updateTransactionStatus: updateTransactionStatus,
         updateAllTransactionStatuses: updateAllTransactionStatuses,
+        markForDeletion: markForDeletion,
         getLastUpdate: getLastUpdate
       };
 
@@ -145,6 +146,19 @@
       function getLastUpdate(){
         return baseAll.customGET('last_update');
       }
+
+      function markForDeletion(transaction, search, isDeleted){
+        var transactionDate = new Date(transaction.transaction_date);
+        var startDate = new Date(search.budget.start_date);
+        var endDate = new Date(search.budget.end_date);
+        if(!isDeleted && (transactionDate < startDate || transactionDate > endDate)){
+
+          MessageService.setErrorMessage('Transaction date not in budget range.');
+          return;
+        }
+        transaction.deleted = isDeleted;
+      }
+
     } // end of service
 
 })();

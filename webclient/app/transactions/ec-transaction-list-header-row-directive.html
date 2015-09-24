@@ -1,0 +1,13 @@
+<tr class="heading">
+    <th style="width:15%;">Date</th>
+    <th style="width:12%;" class="hidden-xs">Payee</th>
+    <th style="width:23%;">Description</th>
+    <th style="width:15%;">
+        <span ng-hide="vm.bankAccount.is_sink_fund">Allocation</span>
+        <span ng-show="vm.bankAccount.is_sink_fund">Sink Fund Allocation</span>
+    </th>
+    <th style="width:10%;" class="text-right">Withdrawn</th>
+    <th style="width:10%;" class="text-right">Deposited</th>
+    <th style="width: 5%;" class="text-center">Paid?</th>
+    <th style="width: 5%;"></th>
+</tr>

@@ -42,65 +42,25 @@
         <div style="max-height:400px; overflow-y:scroll;">
             <table class="table table-bordered clear-background rounded fixed-layout">
             <thead>
-                <tr class="heading">
-                    <th style="width:15%;">Date</th>
-                    <th style="width:12%;" class="hidden-xs">Payee</th>
-                    <th style="width:23%;">Description</th>
-                    <th style="width:15%;">
-                        <span ng-hide="vm.search.bank_account.is_sink_fund">Allocation</span>
-                        <span ng-show="vm.search.bank_account.is_sink_fund">Sink Fund Allocation</span>
-                    </th>
-                    <th style="width:10%;" class="text-right">Withdrawn</th>
-                    <th style="width:10%;" class="text-right">Deposited</th>
-                    <th style="width: 5%;" class="text-center">Paid?</th>
-                    <th style="width: 5%;"></th>
+                <tr ec-transaction-list-header-row bank-account="vm.search.bank_account">
                 </tr>
             </thead>
             <tfoot>
-                <tr class="total">
-                    <th></th>
-                    <th class="hidden-xs"></th>
-                    <th>Total</th>
-                    <th></th>
-                    <th class="text-right"> {{ vm.util.total(vm.transactions, 'withdrawal_amount') | ecToDollars }}</th>
-                    <th class="text-right"> {{ vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}</th>
-
-
-                    <th class="text-right">
-                        <input type="checkbox"
-                               ng-show="vm.isEditMode"
-                               ng-model="vm.allPaid"
-                               ng-click="vm.updateAllTransactionStatuses(vm.transactions, vm.allPaid)"
-                        />
-                    </th>
-
-                    <th>
-                        <span ng-show="vm.isEditMode">
-
-                            <span ng-hide="vm.transactions.deleted"
-                                  ng-click="vm.markAllForDeletion(vm.transactions, true)"
-                                  class="text-danger pull-right pointer">
-                                <ec-icon type="trash"></ec-icon>
-                            </span>
-
-                            <span ng-show="vm.transactions.deleted"
-                                  ng-click="vm.markAllForDeletion(vm.transactions, false)"
-                                  class="text-success pull-right pointer">
-                                <ec-icon type="refresh"></ec-icon>
-                            </span>
-
-                        </span>
-                    </th>
-                </tr>
+              <tr ec-transaction-list-total-row
+                    transactions="vm.transactions"
+                    is-edit-mode="vm.isEditMode"
+                    search="vm.search">
+              </tr>
             </tfoot>
             <tbody>
                 <tr ec-transaction-list-row
                     ng-repeat="transaction in vm.transactions"
                     transaction="transaction"
+                    allocations="vm.allocations"
+                    sink-fund-allocations="vm.sinkFundAllocations"
                     search="vm.search"
                     is-edit-mode="vm.isEditMode"
-                    transactionForm="vm.transactionForm"
-                    ng-class="{ danger: transaction.deleted, 'text-danger': !transaction.paid }">
+                    transactionForm="vm.transactionForm" >
                 </tr>
             </tbody>
             </table>
@@ -110,42 +70,13 @@
 </form>
 
 <br/>
-<div class="row">
-    <div class="col-xs-4">
-        <button ng-hide="vm.isEditMode"
-                class="btn btn-primary"
-                ng-click="vm.switchToEditMode()">
-            Make Changes
-        </button>
 
-        <button ng-show="vm.isEditMode"
-                class="btn btn-primary"
-                ng-click="vm.addTransaction()">
-            Add Transaction
-        </button>
-        &nbsp;
-        <button ng-show="vm.isEditMode && vm.search.bank_account.allow_default_allocations"
-                class="btn btn-info"
-                ng-click="vm.defaultAllocations()">
-            Default Allocations
-        </button>
-    </div>
-    <div class="col-xs-8">
-        <span ng-show="vm.isEditMode" class="pull-right">
-            <button class="btn btn-success"
-                    ng-disabled="vm.transactionsForm.$invalid"
-                    ng-click="vm.saveChanges()">
-                Save Changes
-            </button>
-
-            &nbsp; &nbsp; &nbsp;
-
-            <button class="btn btn-danger"
-                    ng-click="vm.cancelEdit()">
-                Cancel
-            </button>
-        </span>
-    </div>
-</div>
+<ec-transaction-list-actions-panel transactions="vm.transactions"
+                                   is-edit-mode="vm.isEditMode"
+                                   search="vm.search"
+                                   on-save="vm.refreshTransactions()"
+                                   on-cancel="vm.refreshTransactions()"
+                                   >
+</ec-transaction-list-actions-panel>
 
 <br/>

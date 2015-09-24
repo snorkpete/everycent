@@ -1,0 +1,35 @@
+<tr class="total">
+    <th></th>
+    <th class="hidden-xs"></th>
+    <th>Total</th>
+    <th></th>
+    <th class="text-right"> {{ vm.util.total(vm.transactions, 'withdrawal_amount') | ecToDollars }}</th>
+    <th class="text-right"> {{ vm.util.total(vm.transactions, 'deposit_amount') | ecToDollars }}</th>
+
+
+    <th class="text-right">
+        <input type="checkbox"
+               ng-show="vm.isEditMode"
+               ng-model="vm.allPaid"
+               ng-click="vm.updateAllTransactionStatuses(vm.transactions, vm.allPaid)"
+        />
+    </th>
+
+    <th>
+        <span ng-show="vm.isEditMode">
+
+            <span ng-hide="vm.transactions.deleted"
+                  ng-click="vm.markAllForDeletion(vm.transactions, true)"
+                  class="text-danger pull-right pointer">
+                <ec-icon type="trash"></ec-icon>
+            </span>
+
+            <span ng-show="vm.transactions.deleted"
+                  ng-click="vm.markAllForDeletion(vm.transactions, false)"
+                  class="text-success pull-right pointer">
+                <ec-icon type="refresh"></ec-icon>
+            </span>
+
+        </span>
+    </th>
+</tr>

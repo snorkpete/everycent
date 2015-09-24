@@ -1,5 +1,5 @@
 
-<tr ng-class="{ danger: vm.transaction.deleted, 'text-danger': !vm.transaction.paid }">
+<tr ng-class="{ 'danger': vm.transaction.deleted, 'text-danger': !(vm.transaction.paid) }">
 
     <!-- transaction date -->
     <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">
@@ -29,7 +29,6 @@
 
     <!-- description -->
     <td>
-        test
         <input ng-show="vm.isEditMode" type="text" ng-model="vm.transaction.description" ></input>
         <span ng-hide="vm.isEditMode" ng-bind="vm.transaction.description"></span>
     </td>

@@ -13,7 +13,9 @@
         transaction: '=',
         isEditMode: '=',
         transactionForm: '=',
-        search: '='
+        search: '=',
+        allocations: '=',
+        sinkFundAllocations: '='
       },
       controller: controller,
       controllerAs: 'vm',
