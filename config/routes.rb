@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     collection do
       put 'update_all'
       get 'by_allocation'
+      get 'by_credit_card'
       get 'last_update'
     end
   end

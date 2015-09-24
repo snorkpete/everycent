@@ -3,13 +3,18 @@ class TransactionsController < ApplicationController
 
   def index
     @transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
-                               .includes({ allocation: :allocation_category }, { bank_account: :institution })
+                               .preloaded
                                .order(:transaction_date)
     respond_with(@transactions, TransactionSerializer)
   end
 
   def by_allocation
-    @transactions = Transaction.by_allocation(params[:allocation_id])
+    @transactions = Transaction.by_allocation(params[:allocation_id]).preloaded
+    respond_with(@transactions, TransactionSerializer)
+  end
+
+  def by_credit_card
+    @transactions = Transaction.by_credit_card(params[:bank_account_id]).preloaded
     respond_with(@transactions, TransactionSerializer)
   end
 

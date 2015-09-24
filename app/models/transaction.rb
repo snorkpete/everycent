@@ -23,6 +23,10 @@ class Transaction < ActiveRecord::Base
 
   before_save :check_status
 
+  def self.preloaded
+    includes({ allocation: :allocation_category }, { bank_account: :institution })
+  end
+
   def self.for_budget_and_bank(budget_id, bank_account_id)
 
     # find the budget
@@ -35,6 +39,15 @@ class Transaction < ActiveRecord::Base
 
   def self.by_allocation(allocation_id)
     Transaction.where('allocation_id = ?', allocation_id)
+  end
+
+  def self.by_credit_card(bank_account_id)
+    credit_card = BankAccount.where(id: bank_account_id).first
+    return Transaction.none if credit_card.nil? || !credit_card.credit_card?
+
+    start = credit_card.previous_period_statement_start
+    credit_card.transactions.between(start, Date.today)
+    credit_card.transactions
   end
 
   def self.between(start_date, end_date)
