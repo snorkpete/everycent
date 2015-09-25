@@ -15,6 +15,7 @@
         transactionForm: '=',
         search: '=',
         allocations: '=',
+        creditCardHighlights: '@',
         sinkFundAllocations: '='
       },
       controller: controller,
@@ -35,6 +36,7 @@
     vm.checkTransactionDate = checkTransactionDate;
     vm.updateTransactionStatus = TransactionsService.updateTransactionStatus;
     vm.onAllocationChange = onAllocationChange;
+    vm.getRowClass = getRowClass;
 
     activate();
 
@@ -76,6 +78,43 @@
       vm.updateTransactionStatus(transaction);
     }
 
+    function getRowClass(transaction){
+      var bgClass = '';
+      var textClass = '';
+
+      var result = {};
+
+      if(transaction.deleted){
+        result.danger = true;
+      }
+
+      if(!vm.transaction.paid){
+        result['text-danger'] = true;
+      }
+      
+      // no more classes necessary if credit card highlights not required
+      if(vm.creditCardHighlights !== 'on'){
+        return result;
+      }
+
+      result['bg-warning'] = isTransactionBetween(transaction, 
+                              vm.search.bank_account.previous_period_statement_start,
+                              vm.search.bank_account.previous_period_statement_end);
+
+      result['bg-info'] = isTransactionBetween(transaction, 
+                              vm.search.bank_account.current_period_statement_start,
+                              vm.search.bank_account.current_period_statement_end);
+
+      return result;
+    }
+
+    function isTransactionBetween(transaction, start, end){
+      var startDate = new Date(start);
+      var endDate = new Date(end);
+      var transactionDate = new Date(transaction.transaction_date);
+      
+      return (startDate <= transactionDate && transactionDate <= endDate);
+    }
 
   } // end of controller
 })();

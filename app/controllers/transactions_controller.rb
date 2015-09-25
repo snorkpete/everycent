@@ -10,11 +10,13 @@ class TransactionsController < ApplicationController
 
   def by_allocation
     @transactions = Transaction.by_allocation(params[:allocation_id]).preloaded
+                               .order(:transaction_date)
     respond_with(@transactions, TransactionSerializer)
   end
 
   def by_credit_card
     @transactions = Transaction.by_credit_card(params[:bank_account_id]).preloaded
+                               .order(:transaction_date)
     respond_with(@transactions, TransactionSerializer)
   end
 

@@ -10,6 +10,7 @@
       templateUrl: 'app/transactions/ec-transaction-search-form-directive.html',
       scope: {
         search: '=searchOptions',
+        mode: '@',
         onSubmit: '&'
       },
       controller: controller,
@@ -26,12 +27,19 @@
     vm.ref = ReferenceService;
 
     vm.onParamChange = onParamChange;
+    vm.isCreditCardMode = isCreditCardMode;
 
     activate();
 
     function activate(){
       var accountPromise =LookupService.refreshList('bank_accounts').then(function(items){
         vm.bank_accounts = items;
+
+        if(isCreditCardMode()){
+          vm.bank_accounts = vm.bank_accounts.filter(function(bankAccount){
+            return bankAccount.is_credit_card;
+          });
+        }
       });
 
       var budgetPromise =LookupService.refreshList('budgets').then(function(items){
@@ -43,6 +51,10 @@
         setInitialSearchParams();
         vm.onSubmit();
       });
+    }
+
+    function isCreditCardMode(){
+      return vm.mode === 'credit-card';
     }
 
     function setInitialSearchParams(){

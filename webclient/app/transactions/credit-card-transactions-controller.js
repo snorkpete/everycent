@@ -11,6 +11,7 @@
   function CreditCardTransactionsCtrl(MessageService, TransactionsService, LookupService, StateService){
     var vm = this;
     vm.search = {};
+    vm.today = new Date();
 
     vm.refreshTransactions = refreshTransactions;
 

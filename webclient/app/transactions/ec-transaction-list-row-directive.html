@@ -1,5 +1,5 @@
 
-<tr ng-class="{ 'danger': vm.transaction.deleted, 'text-danger': !(vm.transaction.paid) }">
+<tr ng-class="vm.getRowClass(vm.transaction)">
 
     <!-- transaction date -->
     <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">

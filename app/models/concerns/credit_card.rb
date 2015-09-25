@@ -86,6 +86,10 @@ module CreditCard
                 .delete_all
   end
 
+  def current_period_starting_balance
+    transactions.where('transaction_date < ?', current_period_statement_start).sum('deposit_amount-withdrawal_amount')
+  end
+
   # the date that the statement period starts, for the current date
   def current_period_statement_start(current_date=Date.today)
     return nil if statement_day.nil?
@@ -95,6 +99,10 @@ module CreditCard
   def current_period_statement_end(current_date=Date.today)
     return nil if statement_day.nil?
     current_date.next_date_for_day_of_month(statement_day).prev_day
+  end
+
+  def previous_period_starting_balance
+    transactions.where('transaction_date < ?', previous_period_statement_start).sum('deposit_amount-withdrawal_amount')
   end
 
   def previous_period_statement_start(current_date=Date.today)
@@ -109,7 +117,7 @@ module CreditCard
 
   def current_period_payment_due(current_date=Date.today)
     return nil if payment_due_day.nil?
-    current_date.next_date_for_day_of_month(payment_due_day)
+    current_date.next_month.next_date_for_day_of_month(payment_due_day)
   end
 
   def previous_period_payment_due(current_date=Date.today)
