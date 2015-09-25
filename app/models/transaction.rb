@@ -47,7 +47,6 @@ class Transaction < ActiveRecord::Base
 
     start = credit_card.previous_period_statement_start
     credit_card.transactions.between(start, Date.today)
-    credit_card.transactions
   end
 
   def self.between(start_date, end_date)
