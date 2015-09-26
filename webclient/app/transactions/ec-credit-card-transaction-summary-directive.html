@@ -3,17 +3,25 @@
         <thead>
         </thead>
         <tbody>
-            <tr class="bg-warning heading">
-                <th>Statement Balance: {{ vm.bankAccount.previous_period_statement_end | date:long }} </th>
+            <tr class="bg-warning">
+                <th>Previous Statement Balance: <br/>
+                    <em>
+                        {{ vm.bankAccount.previous_period_statement_start | date:long }} to
+                        {{ vm.bankAccount.previous_period_statement_end | date:long }}
+                    </em>
+                </th>
                 <td class="text-right">{{ vm.previousStatementBalance() | ecToDollars }}</td>
             </tr>
             <tr class="bg-warning">
-                <th>Paid</th>
-                <td class="text-right">{{ vm.previousStatementBalancePaid() | ecToDollars }}</td>
+                <th>Unpaid Balance</th>
+                <td class="text-right">
+                    <ec-amount-formatted amount="vm.previousStatementBalanceUnpaid()">
+                    </ec-amount-formatted>
+                </td>
             </tr>
-            <tr class="bg-warning">
-                <th>Outstanding</th>
-                <td class="text-right">{{ vm.previousStatementOutstanding() | ecToDollars }}</td>
+            <tr class="bg-warning total">
+                <th>Difference</th>
+                <td class="text-right">{{ vm.previousStatementUnpaidDifference() | ecToDollars }}</td>
             </tr>
             <tr class="bg-warning">
                 <th>Due On</th>
@@ -21,17 +29,25 @@
             </tr>
 
 
-            <tr class="bg-info heading">
-                <th>Statement Balance: {{ vm.bankAccount.current_period_statement_end | date:long }} </th>
+            <tr class="bg-info">
+                <th>Current Statement Balance: <br/>
+                    <em>
+                        {{ vm.bankAccount.current_period_statement_start | date:long }} to
+                        {{ vm.bankAccount.current_period_statement_end | date:long }}
+                    </em>
+                </th>
                 <td class="text-right">{{ vm.currentStatementBalance() | ecToDollars }}</td>
             </tr>
             <tr class="bg-info">
-                <th>Paid</th>
-                <td class="text-right">{{ vm.currentStatementBalancePaid() | ecToDollars }}</td>
+                <th>Unpaid Balance</th>
+                <td class="text-right">
+                    <ec-amount-formatted amount="vm.currentStatementBalanceUnpaid()">
+                    </ec-amount-formatted>
+                </td>
             </tr>
-            <tr class="bg-info">
-                <th>Outstanding</th>
-                <td class="text-right">{{ vm.currentStatementOutstanding() | ecToDollars }}</td>
+            <tr class="bg-info total">
+                <th>Difference</th>
+                <td class="text-right">{{ vm.currentStatementUnpaidDifference() | ecToDollars }}</td>
             </tr>
             <tr class="bg-info">
                 <th>Due On</th>

@@ -26,31 +26,18 @@
 
     vm.util = UtilService;
 
-    vm.transactionTotal = transactionTotal;
     vm.previousStatementBalance = previousStatementBalance;
-    vm.previousStatementBalancePaid = previousStatementBalancePaid;
-    vm.previousStatementOutstanding = previousStatementOutstanding;
-    vm.previousStatementPaidDifference = previousStatementPaidDifference;
+    vm.previousStatementBalanceUnpaid = previousStatementBalanceUnpaid;
+    vm.previousStatementUnpaidDifference = previousStatementUnpaidDifference;
 
     vm.currentStatementBalance = currentStatementBalance;
-    vm.currentStatementBalancePaid = currentStatementBalancePaid;
-    vm.currentStatementOutstanding = currentStatementOutstanding;
-    vm.currentStatementPaidDifference = currentStatementPaidDifference;
+    vm.currentStatementBalanceUnpaid = currentStatementBalanceUnpaid;
+    vm.currentStatementUnpaidDifference = currentStatementUnpaidDifference;
 
-    //vm.unpaidBalance = unpaidBalance;
-    //vm.unpaidDifference = unpaidDifference;
 
     activate();
 
     function activate(){
-    }
-
-    function transactionTotal(){
-      if(!vm.transactions){
-        return 0;
-      }
-
-      return vm.util.total(transactions, 'net_amount');
     }
 
 
@@ -64,7 +51,7 @@
       ) + vm.bankAccount.previous_period_starting_balance;
     }
 
-    function previousStatementBalancePaid(){
+    function previousStatementBalanceUnpaid(){
       if(!vm.bankAccount){
         return 0;
       }
@@ -72,12 +59,12 @@
       return sumTransactionsBetweenDates(vm.transactions,
           vm.bankAccount.previous_period_statement_start,
           vm.bankAccount.previous_period_statement_end,
-          'paid'
-      ) + vm.bankAccount.previous_period_starting_balance;
+          'unpaid'
+      );
     }
 
-    function previousStatementOutstanding(){
-      return previousStatementBalance() - previousStatementBalancePaid();
+    function previousStatementUnpaidDifference(){
+      return previousStatementBalance() - previousStatementBalanceUnpaid();
     }
 
     function currentStatementBalance(){
@@ -90,19 +77,22 @@
       ) + vm.bankAccount.previous_period_starting_balance;
     }
 
-    function currentStatementBalancePaid(){
+    function currentStatementBalanceUnpaid(){
       if(!vm.bankAccount){
         return 0;
       }
-      return sumTransactionsBetweenDates(vm.transactions,
+
+      var totalUnpaid = sumTransactionsBetweenDates(vm.transactions,
           vm.bankAccount.previous_period_statement_start,
-          vm.bankAccount.current_period_statement_end,
-          'paid'
+          new Date(),
+          'unpaid'
       );
+
+      return totalUnpaid - previousStatementBalanceUnpaid();
     }
 
-    function currentStatementOutstanding(){
-      return currentStatementBalance() - currentStatementBalancePaid();
+    function currentStatementUnpaidDifference(){
+      return currentStatementBalance() - currentStatementBalanceUnpaid();
     }
 
 
@@ -133,15 +123,6 @@
 
       return vm.util.total(transactionsBetween, 'net_amount');
    }
-
-   function previousStatementPaidDifference(){
-     return previousStatementBalancePaid() - previousStatementBalanceUnpaid();
-   }
-
-   function currentStatementPaidDifference(){
-     return currentStatementBalancePaid() - currentStatementBalanceUnpaid();
-   }
-
 
 
   } // end of controller
