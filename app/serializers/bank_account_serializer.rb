@@ -22,7 +22,6 @@ class BankAccountSerializer < ActiveModel::Serializer
              :allow_default_allocations, :is_sink_fund, :is_credit_card, :status,
              :statement_day, :payment_due_day,
              :statement_day_ordinal, :payment_due_day_ordinal,
-             :current_period_starting_balance,
              :current_period_statement_start,
              :current_period_statement_end,
              :previous_period_starting_balance,
