@@ -28,6 +28,7 @@
     vm.util = UtilService;
 
     vm.markAllForDeletion = markAllForDeletion;
+    vm.selectAllTransactions = selectAllTransactions;
     vm.updateAllTransactionStatuses = TransactionsService.updateAllTransactionStatuses;
 
     activate();
@@ -41,6 +42,12 @@
         TransactionsService.markForDeletion(transaction, vm.search, isDeleted);
       });
       transactions.deleted = isDeleted;
+    }
+
+    function selectAllTransactions(transactions, selected){
+      transactions.forEach(function(transaction){
+        transaction.selected = selected;
+      });
     }
 
   } // end of controller

@@ -1,4 +1,10 @@
 <tr class="total">
+    <th class="text-center">
+        <input type="checkbox"
+               ng-model="vm.allSelected"
+               ng-click="vm.selectAllTransactions(vm.transactions, vm.allSelected)"
+        />
+    </th>
     <th></th>
     <th class="hidden-xs"></th>
     <th>Total</th>
