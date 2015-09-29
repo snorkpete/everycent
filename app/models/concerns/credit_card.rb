@@ -66,7 +66,7 @@ module CreditCard
     adjustment = Transaction.new withdrawal_amount: withdrawals, deposit_amount: deposits,
                                  description: 'Balance B/F Adj Entry',
                                  transaction_date: end_date.tomorrow,
-                                 status: 'unpaid', brought_forward_status: 'added'
+                                 status: 'unpaid', brought_forward_status: 'adjustment'
     adjustment
   end
 
@@ -82,7 +82,7 @@ module CreditCard
 
     # remove the (b/f) transactions and the adjusting transaction
     transactions.where('transaction_date >= ?', end_date.tomorrow)
-                .where(brought_forward_status: 'added')
+                .where(brought_forward_status:[ 'added', 'adjustment'])
                 .delete_all
   end
 

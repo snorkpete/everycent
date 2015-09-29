@@ -209,8 +209,8 @@ shared_examples_for "CreditCard" do
       expect(@adjustment_transaction.status).to eq 'unpaid'
     end
 
-    it "creates a transaction with brought_forward_status = 'added'" do
-      expect(@adjustment_transaction.brought_forward_status).to eq 'added'
+    it "creates a transaction with brought_forward_status = 'adjustment'" do
+      expect(@adjustment_transaction.brought_forward_status).to eq 'adjustment'
     end
 
   end
@@ -237,7 +237,7 @@ shared_examples_for "CreditCard" do
       @credit_card.transactions << @second
       @credit_card.add_brought_forward_transactions(@start_date, @end_date)
     end
-    
+
     it "changes 'brought_forward' transactions in the period back to 'unpaid'" do
       @credit_card.remove_brought_forward_transactions(@start_date, @end_date)
 
