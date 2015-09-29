@@ -1,9 +1,9 @@
 
 <tr ng-class="vm.getRowClass(vm.transaction)">
     <!-- selector -->
-    <td class="text-center">
-        <input type="checkbox" ng-model="vm.transaction.selected" />
-    </td>
+    <th>
+            <input type="checkbox" ng-model="vm.transaction.selected" />
+    </th>
 
     <!-- transaction date -->
     <td ng-class="{'danger': vm.transactionsForm['transaction_date['+$index+']'].$invalid}">
