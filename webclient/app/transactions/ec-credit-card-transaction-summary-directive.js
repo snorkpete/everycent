@@ -61,6 +61,11 @@
           vm.bankAccount.previous_period_statement_end,
           'unpaid'
       );
+      //return sumTransactionsBetweenDates(vm.transactions,
+      //    vm.bankAccount.current_period_statement_start,
+      //    new Date(),
+      //    'brought_forward'
+      //);
     }
 
     function previousStatementUnpaidDifference(){
@@ -115,6 +120,16 @@
 
           if(status === 'unpaid' && transaction.paid){
             return false;
+          }
+
+          if(status === 'brought_forward'){
+            if(transaction.brought_forward_status !== 'added'){
+              return false;
+            }
+
+            if(transaction.paid){
+              return false;
+            }
           }
         }
 
