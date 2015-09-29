@@ -5,11 +5,13 @@
     .module('everycent.sink-funds')
     .factory('SinkFundsService', SinkFundsService);
 
-    SinkFundsService.$inject = ['Restangular', 'DateService', '$modal', '$document'];
-    function SinkFundsService(Restangular, DateService, $modal, $document){
+    SinkFundsService.$inject = ['Restangular', 'UtilService'];
+    function SinkFundsService(Restangular, UtilService){
       var service = {
         getSinkFunds: getSinkFunds,
-        save: save
+        save: save,
+        unassignedBalance: unassignedBalance,
+        accountBalance: accountBalance
       };
 
       var baseAll = Restangular.all('sink_funds');
@@ -21,6 +23,17 @@
 
       function save(sinkFund, searchOptions){
         return sinkFund.save();
+      }
+
+      function unassignedBalance(sinkFund){
+        return sinkFund.current_balance -
+              (UtilService.total(sinkFund.sink_fund_allocations, 'amount') - 
+               UtilService.total(sinkFund.sink_fund_allocations, 'spent'));
+      }
+
+      function accountBalance(sinkFund){
+        return UtilService.total(sinkFund.sink_fund_allocations, 'remaining') +
+               unassignedBalance(sinkFund);
       }
     }
 })();

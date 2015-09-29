@@ -28,8 +28,8 @@
     vm.markForClosing = markForClosing;
     vm.saveChanges = saveChanges;
     vm.cancelEdit = cancelEdit;
-    vm.unassignedBalance = unassignedBalance;
-    vm.canSave = canSave;
+    vm.unassignedBalance = SinkFundsService.unassignedBalance;
+    vm.accountBalance = SinkFundsService.accountBalance;
     vm.isSinkFundAllocationVisible = isSinkFundAllocationVisible;
 
     activate();
@@ -117,15 +117,6 @@
     function markForClosing(sinkFundAllocation){
       sinkFundAllocation.status = 'closed';
       sinkFundAllocation.unsaved = true;
-    }
-
-    function unassignedBalance(){
-      return vm.sinkFund.current_balance -
-            (vm.util.total(vm.sinkFund.sink_fund_allocations, 'amount') - vm.util.total(vm.sinkFund.sink_fund_allocations, 'spent'));
-    }
-
-    function canSave(){
-      return unassignedBalance() >= 0;
     }
 
     function isSinkFundAllocationVisible(sinkFundAllocation){

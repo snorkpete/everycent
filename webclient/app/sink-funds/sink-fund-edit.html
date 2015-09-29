@@ -37,7 +37,7 @@
                 {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'spent') | ecToDollars }}
             </th>
             <th class="text-right">
-                <ec-amount-formatted amount="vm.util.total(vm.sinkFund.sink_fund_allocations, 'remaining')">
+                <ec-amount-formatted amount="vm.accountBalance(vm.sinkFund)">
                 </ec-amount-formatted>
             </th>
             <th class="text-right"> </th>
@@ -51,7 +51,7 @@
                 <strong> Unassigned Money </strong>
             </td>
             <td class="text-right">
-                <strong><ec-amount-formatted amount="vm.unassignedBalance()"></ec-amount-formatted></strong>
+                <strong><ec-amount-formatted amount="vm.unassignedBalance(vm.sinkFund)"></ec-amount-formatted></strong>
             </td>
             <td></td>
             <td></td>

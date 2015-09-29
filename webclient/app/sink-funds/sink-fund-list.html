@@ -49,7 +49,7 @@
                 {{ vm.util.total(sinkFund.sink_fund_allocations, 'spent') | ecToDollars }}
             </td>
             <td class="text-right">
-                <ec-amount-formatted amount="vm.util.total(sinkFund.sink_fund_allocations, 'remaining')">
+                <ec-amount-formatted amount="vm.accountBalance(sinkFund)">
                 </ec-amount-formatted>
             </td>
             <td>
