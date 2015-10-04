@@ -18,7 +18,8 @@
 class TransactionSerializer < ActiveModel::Serializer
   attributes :id, :description, :bank_ref, :bank_account_id, :transaction_date,
              :withdrawal_amount, :deposit_amount, :payee_id, :payee_code, :payee_name,
-             :allocation_id, :sink_fund_allocation_id, :status, :paid, :net_amount
+             :allocation_id, :sink_fund_allocation_id, :status, :paid, :net_amount,
+             :brought_forward_status
 
   has_one :allocation
   has_one :bank_account
