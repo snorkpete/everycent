@@ -56,16 +56,16 @@
         return 0;
       }
 
-      return sumTransactionsBetweenDates(vm.transactions,
-          vm.bankAccount.previous_period_statement_start,
-          vm.bankAccount.previous_period_statement_end,
-          'unpaid'
-      );
       //return sumTransactionsBetweenDates(vm.transactions,
-      //    vm.bankAccount.current_period_statement_start,
-      //    new Date(),
-      //    'brought_forward'
+      //    vm.bankAccount.previous_period_statement_start,
+      //    vm.bankAccount.previous_period_statement_end,
+      //    'unpaid'
       //);
+      return sumTransactionsBetweenDates(vm.transactions,
+          vm.bankAccount.current_period_statement_start,
+          new Date(),
+          'brought_forward'
+      );
     }
 
     function previousStatementUnpaidDifference(){
@@ -93,7 +93,14 @@
           'unpaid'
       );
 
-      return totalUnpaid - previousStatementBalanceUnpaid();
+      var previousUnpaid = sumTransactionsBetweenDates(vm.transactions,
+          vm.bankAccount.previous_period_statement_start,
+          vm.bankAccount.previous_period_statement_end,
+          'unpaid'
+      );
+
+
+      return totalUnpaid - previousUnpaid;
     }
 
     function currentStatementUnpaidDifference(){
