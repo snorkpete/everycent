@@ -117,7 +117,7 @@ module CreditCard
 
   def current_period_payment_due(current_date=Date.today)
     return nil if payment_due_day.nil?
-    current_date.next_month.next_date_for_day_of_month(payment_due_day)
+    current_date.next_date_for_day_of_month(payment_due_day)
   end
 
   def previous_period_payment_due(current_date=Date.today)
