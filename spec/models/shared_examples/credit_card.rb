@@ -359,12 +359,12 @@ shared_examples_for "CreditCard" do
         @today = Date.new(2015, 2, 15)
       end
 
-      it "#current_period_payment_due returns the payment_due_day in the 2nd month after" do
-        expect(@credit_card.current_period_payment_due(@today)).to eq Date.new(2015, 4, 1)
+      it "#current_period_payment_due returns the payment_due_day in the next month after" do
+        expect(@credit_card.current_period_payment_due(@today)).to eq Date.new(2015, 3, 1)
       end
 
       it "#previous_period_payment_due returns the payment_due_day in the current month" do
-        expect(@credit_card.previous_period_payment_due(@today)).to eq Date.new(2015, 3, 1)
+        expect(@credit_card.previous_period_payment_due(@today)).to eq Date.new(2015, 2, 1)
       end
     end
 
