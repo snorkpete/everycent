@@ -1,6 +1,6 @@
 
-<div style="position:fixed; top:50px; right: 50px;" ng-show="vm.showCalculator()">
-    <ec-panel type="info" title="Selected Transaction Total">
+<div style="position:fixed; top:60px; right: 60px; z-index:1000;" ng-show="vm.showCalculator()">
+    <ec-panel type="danger" title="Selected Transaction Total">
         Total: <strong>{{ vm.transactionTotal() | ecToDollars | currency }}</strong>
         <div class="text-right">
             <button class="btn btn-danger" ng-click="vm.clearSelections()">
