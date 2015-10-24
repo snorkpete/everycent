@@ -24,3 +24,5 @@
 
 # ignore the machine-specific vagrant directory
 .vagrant/*
+
+.env
