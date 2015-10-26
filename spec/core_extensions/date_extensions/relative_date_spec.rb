@@ -14,8 +14,8 @@ describe "CoreExtensions::DateExtensions::RelativeDate" do
     end
 
     context "when self.day == day_of_month" do
-      it "#returns the day_of_month in the current month" do
-        expect(Date.new(2015,12,10).previous_date_for_day_of_month(10)).to eq Date.new(2015, 12, 10)
+      it "#returns the day_of_month in the previous month" do
+        expect(Date.new(2015,12,10).previous_date_for_day_of_month(10)).to eq Date.new(2015, 11, 10)
       end
     end
 

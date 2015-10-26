@@ -93,12 +93,13 @@ module CreditCard
   # the date that the statement period starts, for the current date
   def current_period_statement_start(current_date=Date.today)
     return nil if statement_day.nil?
-    current_date.previous_date_for_day_of_month(statement_day)
+    current_date.previous_date_for_day_of_month(statement_day).next_day
   end
 
   def current_period_statement_end(current_date=Date.today)
     return nil if statement_day.nil?
-    current_date.next_date_for_day_of_month(statement_day).prev_day
+    return current_date if current_date.day == statement_day
+    current_date.next_date_for_day_of_month(statement_day)
   end
 
   def previous_period_starting_balance
