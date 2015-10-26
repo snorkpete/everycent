@@ -13,15 +13,17 @@
                 <td class="text-right">{{ vm.previousStatementBalance() | ecToDollars }}</td>
             </tr>
             <tr class="bg-warning">
-                <th>Unpaid Brought Forward</th>
+                <th>Balance Paid</th>
                 <td class="text-right">
-                    <ec-amount-formatted amount="vm.previousStatementBalanceUnpaid()">
-                    </ec-amount-formatted>
+                    {{ vm.previousStatementBalancePaid() | ecToDollars }}
                 </td>
             </tr>
             <tr class="bg-warning total">
-                <th>Difference</th>
-                <td class="text-right">{{ vm.previousStatementUnpaidDifference() | ecToDollars }}</td>
+                <th>Outstanding</th>
+                <td class="text-right">
+                    <ec-amount-formatted amount="vm.previousStatementOutstanding()">
+                    </ec-amount-formatted>
+                </td>
             </tr>
             <tr class="bg-warning">
                 <th>Due On</th>
@@ -39,15 +41,17 @@
                 <td class="text-right">{{ vm.currentStatementBalance() | ecToDollars }}</td>
             </tr>
             <tr class="bg-info">
-                <th>Unpaid Balance</th>
+                <th>Balance Paid</th>
                 <td class="text-right">
-                    <ec-amount-formatted amount="vm.currentStatementBalanceUnpaid()">
-                    </ec-amount-formatted>
+                    {{ vm.currentStatementBalancePaid() | ecToDollars }}
                 </td>
             </tr>
             <tr class="bg-info total">
-                <th>Difference</th>
-                <td class="text-right">{{ vm.currentStatementUnpaidDifference() | ecToDollars }}</td>
+                <th>Outstanding</th>
+                <td class="text-right">
+                    <ec-amount-formatted amount="vm.currentStatementOutstanding()">
+                    </ec-amount-formatted>
+                </td>
             </tr>
             <tr class="bg-info">
                 <th>Due On</th>
