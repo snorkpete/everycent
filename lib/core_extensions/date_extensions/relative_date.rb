@@ -7,7 +7,7 @@ module CoreExtensions
 
         if Date.valid_date?(self.year, self.month, day_of_month)
           date_in_current_month = Date.new(self.year, self.month, day_of_month)
-          if self.day < day_of_month
+          if self.day <= day_of_month
             return date_in_current_month.last_month
           else
             return date_in_current_month
