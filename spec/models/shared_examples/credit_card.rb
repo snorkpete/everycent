@@ -93,7 +93,7 @@ shared_examples_for "CreditCard" do
         balancing_transaction = build(:unpaid_transaction, transaction_date: @inside_date,
                                       withdrawal_amount: 0, deposit_amount: 400_00 + 150_00)
         @credit_card.transactions << balancing_transaction
-        
+
         adjustment = @credit_card.build_adjustment_transaction(@start_date, @end_date)
         expect(adjustment.net_amount).to eq 0
         @credit_card.add_brought_forward_transactions(@start_date, @end_date)
@@ -353,13 +353,29 @@ shared_examples_for "CreditCard" do
       end
     end
 
-    context "when payment_due_day < current day" do
+
+    context "when payment_due_day < statement day < current day" do
       before do
-        @credit_card = build(:bank_account, account_type: 'credit_card', payment_due_day: 1)
-        @today = Date.new(2015, 2, 15)
+        @credit_card = build(:bank_account, account_type: 'credit_card', payment_due_day: 1, statement_day: 10)
+        @today = Date.new(2015, 10, 24)
       end
 
-      it "#current_period_payment_due returns the payment_due_day in the next month after" do
+      it "#current_period_payment_due returns the payment_due_day in the next month" do
+        expect(@credit_card.current_period_payment_due(@today)).to eq Date.new(2015, 12, 1)
+      end
+
+      it "#previous_period_payment_due returns the payment_due_day in the current month" do
+        expect(@credit_card.previous_period_payment_due(@today)).to eq Date.new(2015, 11, 1)
+      end
+    end
+
+    context "when payment_due_day < current day < statement day" do
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card', payment_due_day: 1, statement_day: 10)
+        @today = Date.new(2015, 2, 5)
+      end
+
+      it "#current_period_payment_due returns the payment_due_day in the next month" do
         expect(@credit_card.current_period_payment_due(@today)).to eq Date.new(2015, 3, 1)
       end
 
@@ -367,6 +383,22 @@ shared_examples_for "CreditCard" do
         expect(@credit_card.previous_period_payment_due(@today)).to eq Date.new(2015, 2, 1)
       end
     end
+1
+    context "when payment_due_day > statement day" do
+      before do
+        @credit_card = build(:bank_account, account_type: 'credit_card', payment_due_day: 16, statement_day: 10)
+        @today = Date.new(2015, 2, 15)
+      end
+
+      it "#current_period_payment_due returns the payment_due_day in the current month" do
+        expect(@credit_card.current_period_payment_due(@today)).to eq Date.new(2015, 3, 16)
+      end
+
+      it "#previous_period_payment_due returns the payment_due_day in the current month" do
+        expect(@credit_card.previous_period_payment_due(@today)).to eq Date.new(2015, 2, 16)
+      end
+    end
+
 
 
   end # end of Credit Card dates
