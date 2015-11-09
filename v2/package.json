@@ -1,0 +1,14 @@
+{
+  "name": "everycent",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "systemjs": "0.19.4",
+    "angular2": "2.0.0-alpha.45"
+  },
+  "devDependencies": {
+    "angular-cli": "0.0.*",
+    "angular-cli-github-pages": "^0.2.0",
+    "ember-cli-inject-live-reload": "^1.3.0"
+  }
+}

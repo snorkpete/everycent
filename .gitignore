@@ -26,3 +26,19 @@
 .vagrant/*
 
 .env
+
+# compiled output
+/dist
+/tmp
+
+# dependencies
+#/node_modules
+#/bower_components
+
+# misc
+v2/.sass-cache
+v2/connect.lock
+v2/coverage/*
+v2/libpeerconnection.log
+v2/npm-debug.log
+v2/testem.log
