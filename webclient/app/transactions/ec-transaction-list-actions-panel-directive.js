@@ -13,7 +13,7 @@
         isEditMode: '=',
         onSave: '&',
         onCancel: '&',
-        originalTransactions: '=',
+        allocations: '=',
         search: '='
       },
       controller: controller,
