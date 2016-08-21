@@ -24,7 +24,7 @@
   controller.$inject = ['TransactionImporterService'];
   function controller(TransactionImporterService){
     var vm = this;
-    vm.importType = 'bank-account';
+    vm.importType = 'new-bank-account';
     vm.showForm = false;
     vm.startImport = startImport;
     vm.cancelImport = cancelImport;
