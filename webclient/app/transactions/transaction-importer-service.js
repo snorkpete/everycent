@@ -115,12 +115,14 @@
         transaction.transaction_date = new Date(monthAndDay + ' ' + year);
         transaction.description = line1Description + ' ' + line2Description;
 
+        // remove any commas in the number string before atttempting to convert
+        var amountAsNumber = Number(amount.replace(/,/g, ''));
         if(sign == ""){
-          transaction.deposit_amount = Number(amount) * 100;
+          transaction.deposit_amount = amountAsNumber * 100;
           transaction.withdrawal_amount = 0;
         }else{
           transaction.deposit_amount = 0;
-          transaction.withdrawal_amount = Number(amount) * 100;
+          transaction.withdrawal_amount = amountAsNumber * 100;
         }
 
         var start = DateService.toDate(startDate);
