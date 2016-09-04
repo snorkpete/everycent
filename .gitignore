@@ -26,3 +26,7 @@
 .vagrant/*
 
 .env
+
+# javascript-specific ignores
+node_modules
+typings
