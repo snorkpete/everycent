@@ -1,7 +1,7 @@
 import {Component, OnInit, Input} from "@angular/core";
 
 @Component({
-  selector: 'gg-card',
+  selector: 'ec-card, ec-panel',
   styles: [],
   template: `
     <md-card>
