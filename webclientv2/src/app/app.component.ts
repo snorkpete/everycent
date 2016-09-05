@@ -6,6 +6,7 @@ import {AuthService} from "./auth/auth.service";
     <md-sidenav-layout fullscreen>
       <md-sidenav #sidenav opened="false">
         <h3>Menu options go here</h3>
+        <ec-menu (close)="sidenav.close()"></ec-menu>
       </md-sidenav>
       <md-toolbar color="primary">
         <button md-icon-button (click)="sidenav.toggle()"><md-icon>menu</md-icon></button>
