@@ -13,6 +13,7 @@ import {AuthService} from "./auth/auth.service";
         EveryCent V2 &nbsp;&nbsp;&nbsp;<small>built with Angular 2</small> 
       </md-toolbar>
       
+      <ec-message-display></ec-message-display>
       <router-outlet></router-outlet>
       
     </md-sidenav-layout>
