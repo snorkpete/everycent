@@ -10,16 +10,19 @@ import {MdSidenavModule} from "@angular2-material/sidenav";
 import {MdIconModule} from "@angular2-material/icon";
 import {MdButtonModule} from "@angular2-material/button";
 import {FormsModule} from "@angular/forms";
+import {MessageDisplayComponent} from "./message-display.component";
 
 @NgModule({
     imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
     declarations:[
         CardComponent,
         LoadingIndicatorComponent,
+        MessageDisplayComponent
     ],
     exports: [
         CardComponent,
         LoadingIndicatorComponent,
+        MessageDisplayComponent,
 
         // Re-export the common module
         CommonModule,
