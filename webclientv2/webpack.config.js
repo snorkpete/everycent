@@ -29,15 +29,18 @@ module.exports = {
       }
     ],
     loaders:[
-      {test: /\.ts$/, loader: 'ts'},
-      {test: /\.css$/, loader: 'style!css'},
-      {test: /\.json$/, loader: 'json'}
+      {test: /\.ts$/, loader: 'ts', exclude: 'node_modules'},
+      {test: /\.css$/, loader: 'style!css', exclude: 'node_modules'},
+      {test: /\.json$/, loader: 'json', exclude: 'node_modules'}
     ]
   },
   resolve:{
     extensions: ['', '.js', '.ts']
   },
   plugins:[
+    new webpack.optimize.UglifyJsPlugin({
+      compress: { warnings: false }
+    }),
     new webpack.optimize.CommonsChunkPlugin({
       name: ['app', 'vendor', 'polyfills'],
     }),
