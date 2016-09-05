@@ -9,6 +9,7 @@ import {MdRippleModule, MdCoreModule} from "@angular2-material/core";
 import {MdSidenavModule} from "@angular2-material/sidenav";
 import {MdIconModule} from "@angular2-material/icon";
 import {MdButtonModule} from "@angular2-material/button";
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
     imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
@@ -22,6 +23,9 @@ import {MdButtonModule} from "@angular2-material/button";
 
         // Re-export the common module
         CommonModule,
+
+        // Re-export the form module
+        FormsModule,
 
         // re-export the material design modules
         MdCoreModule,
