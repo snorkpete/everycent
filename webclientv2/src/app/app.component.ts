@@ -1,4 +1,5 @@
 import {Component, OnInit} from "@angular/core";
+import {AuthService} from "./auth/auth.service";
 @Component({
   selector: 'gg-app',
   template: `
@@ -17,6 +18,11 @@ import {Component, OnInit} from "@angular/core";
   `
 })
 export class AppComponent implements OnInit{
+  constructor(private authService: AuthService){
+    this.authService.init();
+  }
+
   ngOnInit(){
+
   }
 }
