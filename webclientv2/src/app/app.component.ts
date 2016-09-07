@@ -1,5 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {AuthService} from "./auth/auth.service";
+import {Observable} from "rxjs";
+import {MenuDisplayService} from "./root/menu-display.service";
 @Component({
   selector: 'gg-app',
   template: `
@@ -8,23 +10,28 @@ import {AuthService} from "./auth/auth.service";
         <h3>Menu options go here</h3>
         <ec-menu (close)="sidenav.close()"></ec-menu>
       </md-sidenav>
-      <md-toolbar color="primary">
+      <md-toolbar color="primary" *ngIf="showMenu$ | async">
         <button md-icon-button (click)="sidenav.toggle()"><md-icon>menu</md-icon></button>
         EveryCent V2 &nbsp;&nbsp;&nbsp;<small>built with Angular 2</small> 
       </md-toolbar>
       
       <ec-message-display></ec-message-display>
       <router-outlet></router-outlet>
-      
     </md-sidenav-layout>
   `
 })
 export class AppComponent implements OnInit{
-  constructor(private authService: AuthService){
+
+  showMenu$: Observable<boolean>;
+
+  constructor(
+    private authService: AuthService,
+    private menuDisplayService: MenuDisplayService
+  ){
     this.authService.init();
   }
 
   ngOnInit(){
-
+    this.showMenu$ = this.menuDisplayService.isMenuVisible$();
   }
 }
