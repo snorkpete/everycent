@@ -11,6 +11,7 @@ import {MdIconModule} from "@angular2-material/icon";
 import {MdButtonModule} from "@angular2-material/button";
 import {FormsModule} from "@angular/forms";
 import {MessageDisplayComponent} from "./message-display.component";
+import {RouterModule} from "@angular/router";
 
 @NgModule({
     imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
@@ -29,6 +30,7 @@ import {MessageDisplayComponent} from "./message-display.component";
 
         // Re-export the form module
         FormsModule,
+        RouterModule,
 
         // re-export the material design modules
         MdCoreModule,

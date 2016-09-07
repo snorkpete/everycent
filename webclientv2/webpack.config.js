@@ -7,6 +7,10 @@ module.exports = {
   devtool: 'cheap-module-eval-source-map',
 
   entry: {
+    //globals: [
+    //  'zone.js',
+    //  'reflect-metadata'
+    //],
     'polyfills': './src/polyfills.ts',
     'vendor': './src/vendor.ts',
     'app': './src/main.ts'
@@ -39,7 +43,12 @@ module.exports = {
   },
   plugins:[
     new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false }
+      minimize: true,
+      sourceMap: true,
+      compress: {
+        drop_console: true
+      },
+      mangle: true
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: ['app', 'vendor', 'polyfills'],

@@ -3,6 +3,7 @@ import {Angular2TokenService} from "angular2-token/lib/angular2-token.service";
 import {Response} from "@angular/http";
 import {Router} from "@angular/router";
 import {AuthService} from "./auth.service";
+import {ApiGateway} from "../core/api-gateway.service";
 @Component({
   selector: 'ec-login',
   template:`
@@ -26,19 +27,24 @@ import {AuthService} from "./auth.service";
           <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
         </form>
     </ec-panel>
-
-    <br/>
   `
 })
 export class LoginComponent{
 
+  lastUpdate;
+
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
+    private apiGateway: ApiGateway
   ) {
   }
 
   logIn(email, password){
     this.authService.login(email, password);
   }
+
+  ngOnInit(): void {
+  }
+
 
 }

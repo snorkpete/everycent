@@ -12,13 +12,21 @@ export class ApiGateway {
   ) {
   }
 
+  private getHeaders(){
+    return new Headers({
+      'Content-Type': 'application/json',
+      'access-token': localStorage.getItem('accessToken'),
+      'client': localStorage.getItem('client'),
+      'expiry': localStorage.getItem('expiry'),
+      'token-type': localStorage.getItem('tokenType'),
+      'uid': localStorage.getItem('uid')
+    });
+  }
 
   get(url:string, data: any = {}): Observable<any>{
 
     let options = new RequestOptions({
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      }),
+      headers: this.getHeaders(),
       body: ""
     });
 

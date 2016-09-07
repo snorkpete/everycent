@@ -13,8 +13,8 @@ export class AuthService{
     private messageService: MessageService
   ){}
 
-  isAuthenticated(): Observable<boolean>{
-    return this.tokenService.validateToken().map(res => (res.status == 200));
+  isAuthenticated():boolean{
+    return localStorage.getItem("isLoggedIn") == "yes";
   }
 
   init(){
@@ -30,14 +30,21 @@ export class AuthService{
       );
   }
 
-  logout(){
+  logout(message?: string){
+
+    if(!message){
+      message = "Logged out successfully."
+    }
     this.tokenService.signOut();
-    this.messageService.setMessage("Logged out successfully.");
+    localStorage.clear();
+    this.messageService.setMessage(message);
     this.router.navigate(['/login']);
   }
 
 
   private onSuccess(result: any){
+    //localStorage.setItem("email", res)
+    localStorage.setItem("isLoggedIn", "yes");
     this.messageService.setMessage("Logged in successfully.");
     this.router.navigate(['/']);
   }
