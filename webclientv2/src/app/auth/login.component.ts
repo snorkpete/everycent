@@ -5,28 +5,31 @@ import {Router} from "@angular/router";
 import {AuthService} from "./auth.service";
 import {ApiGateway} from "../core/api-gateway.service";
 @Component({
+  styles:[`
+    .fields{
+        margin-top: 15px;
+    }
+    div.main{
+        margin: 20px 30%;
+    }
+  `],
   selector: 'ec-login',
   template:`
     <br/>
-    <h2>EveryCent <small> the zero-based budget manager</small></h2>
-
     <br/>
-    <br/>
-    <ec-panel title="Sign In" type="primary">
-        <form (submit)="logIn(email, password)" role="form">
-          <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" name="email" [(ngModel)]="email" required="required" class="form-control"/>
-          </div>
-
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" [(ngModel)]="password" required="required" class="form-control"/>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
-        </form>
-    </ec-panel>
+    <div class="main">
+      <ec-panel title="EveryCent - Sign In" type="primary">
+          <form (submit)="logIn(email, password)" role="form">
+              <div layout="column" class="fields">
+                 <md-input placeholder="Email Address" [(ngModel)]="email" name="email"> </md-input> 
+                 <md-input placeholder="Password" [(ngModel)]="password" name="password"> </md-input> 
+              </div>
+              <div class="center">
+                 <button md-raised-button color="accent">Sign In </button>
+              </div>
+          </form>
+      </ec-panel>
+    </div>
   `
 })
 export class LoginComponent{
