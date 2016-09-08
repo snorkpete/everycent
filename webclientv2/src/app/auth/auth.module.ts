@@ -10,7 +10,6 @@ import {AuthGuard} from "./auth-guard.service";
   ],
   imports: [SharedModule],
   exports:[
-    LoginComponent
   ],
   providers: [
     AuthService,
