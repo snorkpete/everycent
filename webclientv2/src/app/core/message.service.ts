@@ -20,16 +20,17 @@ export class MessageService {
 
   setMessage(message) {
     this.message$.next({text: message, type: MessageType.INFO});
-    console.log(message);
+    setTimeout(() => this.clearMessage(), 5000);
   }
 
   setErrorMessage(message) {
     this.message$.next({text: message, type: MessageType.ERROR});
-    console.error(message);
+    setTimeout(() => this.clearMessage(), 5000);
   }
 
   setWarningMessage(message) {
     this.message$.next({text: message, type: MessageType.WARNING});
+    setTimeout(() => this.clearMessage(), 5000);
   }
 
   clearMessage() {
