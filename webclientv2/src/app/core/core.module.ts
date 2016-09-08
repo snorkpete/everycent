@@ -1,5 +1,5 @@
 
-import {NgModule} from "@angular/core";
+import {NgModule, Optional, SkipSelf} from "@angular/core";
 import {ActionDispatcher} from "./action-dispatcher.service";
 import {MdIconRegistry} from "@angular2-material/icon";
 import {ApiGateway} from "./api-gateway.service";
@@ -15,4 +15,11 @@ import {AuthGuard} from "../auth/auth-guard.service";
     MessageService
   ]
 })
-export class CoreModule{}
+export class CoreModule{
+  constructor(@Optional() @SkipSelf() parentModule: CoreModule){
+    if(parentModule){
+      throw new Error("CoreModule is already loaded. Import it in AppModule only!");
+    }
+
+  }
+}
