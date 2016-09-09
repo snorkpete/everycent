@@ -1,12 +1,12 @@
 
 import {Routes, RouterModule} from "@angular/router";
 import {ModuleWithProviders} from "@angular/core";
-import {AccountBalancesListComponent} from "./account-balances-list.component";
+import {AccountBalancesComponent} from "./account-balances.component";
 import {MenuOption} from "../shared/menu-option.model";
 import {Icons} from '../shared/icons.constants';
 
 const routes: Routes = [
-  { path: 'account-balances', component: AccountBalancesListComponent }
+  { path: 'account-balances', component: AccountBalancesComponent }
 ];
 
 export const accountBalancesMenuOptions: MenuOption[] = [

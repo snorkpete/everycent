@@ -1,15 +1,17 @@
 import {NgModule} from "@angular/core";
 import {SharedModule} from "../shared/shared.module";
 import {routing} from "./account-balances.routing";
-import {AccountBalancesListComponent} from "./account-balances-list.component";
+import {AccountBalancesComponent} from "./account-balances.component";
+import {AccountBalancesService} from "./account-balances.service";
 
 @NgModule({
   declarations:[
-    AccountBalancesListComponent
+    AccountBalancesComponent,
   ],
   imports: [
     SharedModule,
     routing
-  ]
+  ],
+  providers: [AccountBalancesService]
 })
 export class AccountBalancesModule{}
