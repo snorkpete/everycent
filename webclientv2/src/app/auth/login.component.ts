@@ -22,7 +22,7 @@ import {ApiGateway} from "../core/api-gateway.service";
           <form (submit)="logIn(email, password)" role="form">
               <div layout="column" class="fields">
                  <md-input placeholder="Email Address" [(ngModel)]="email" name="email"> </md-input> 
-                 <md-input placeholder="Password" [(ngModel)]="password" name="password"> </md-input> 
+                 <md-input placeholder="Password" type="password" [(ngModel)]="password" name="password"> </md-input> 
               </div>
               <div class="center">
                  <button md-raised-button color="accent">Sign In </button>

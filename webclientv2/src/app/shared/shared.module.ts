@@ -12,6 +12,7 @@ import {MdButtonModule} from "@angular2-material/button";
 import {FormsModule} from "@angular/forms";
 import {MessageDisplayComponent} from "./message-display.component";
 import {RouterModule} from "@angular/router";
+import {MdListModule} from "@angular2-material/list";
 
 @NgModule({
     imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
@@ -35,7 +36,7 @@ import {RouterModule} from "@angular/router";
         // re-export the material design modules
         MdCoreModule,
         MdInputModule, MdRippleModule, MdSidenavModule, MdIconModule,
-        MdToolbarModule, MdButtonModule, MdCardModule
+        MdListModule, MdToolbarModule, MdButtonModule, MdCardModule
     ]
 })
 export class SharedModule{}

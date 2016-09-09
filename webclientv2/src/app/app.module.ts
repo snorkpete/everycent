@@ -8,6 +8,7 @@ import {CoreModule} from "./core/core.module";
 import {routing, appRoutingProviders} from "./app.routing";
 import {AuthModule} from "./auth/auth.module";
 import {RootModule} from "./root/root.module";
+import {AccountBalancesModule} from "./account-balances/account-balances.module";
 
 @NgModule({
     declarations: [
@@ -18,7 +19,8 @@ import {RootModule} from "./root/root.module";
         CoreModule,
         SharedModule,
         AuthModule,
-        RootModule
+        RootModule,
+        AccountBalancesModule
     ],
     bootstrap: [AppComponent],
     providers: [
