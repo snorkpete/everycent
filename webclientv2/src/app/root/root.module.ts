@@ -3,7 +3,7 @@ import {SharedModule} from "../shared/shared.module";
 import {RootComponent} from "./root.component";
 import {MenuComponent} from "./menu.component";
 import {HomeComponent} from "./home.component";
-import {MenuDisplayService} from "./menu-display.service";
+import {MenuDisplayService} from "../core/menu-display.service";
 @NgModule({
   declarations:[
     RootComponent,

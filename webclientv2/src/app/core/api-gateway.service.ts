@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
-import {Http, Headers, RequestOptions, URLSearchParams} from "@angular/http";
+import {Http, Headers, RequestOptions, URLSearchParams, Response} from "@angular/http";
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import {Observable, BehaviorSubject} from "rxjs/Rx";
+import {AuthService} from "../auth/auth.service";
 
 @Injectable()
 export class ApiGateway {
 
   constructor(
-    private http: Http
+    private http: Http,
+    private authService: AuthService
   ) {
   }
 
@@ -36,6 +38,12 @@ export class ApiGateway {
 
     return this.http
       .get(`${url}?${urlEncodedParams}`, options)
+      .do((response: Response) => {
+        if(response.status == 401){
+          this.authService.logout('You have been logged out. Please log in again.');
+          throw new Error('not logged in');
+        }
+      })
       .map(response => response.json())
   }
 
