@@ -5,10 +5,7 @@ import {Component, OnInit, Input} from "@angular/core";
   styles: [],
   template: `
     <md-card>
-      <md-toolbar [color]="color" *ngIf="title">
-        <md-icon *ngIf="icon">{{icon}}</md-icon> <span *ngIf="icon">&nbsp; &nbsp;</span>
-        {{ title }}
-      </md-toolbar>
+      <ec-toolbar [title]="title" [color]="color" [icon]="icon"></ec-toolbar>
       <md-card-content>
         <ng-content></ng-content>
       </md-card-content>
