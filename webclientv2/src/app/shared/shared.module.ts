@@ -13,16 +13,19 @@ import {FormsModule} from "@angular/forms";
 import {MessageDisplayComponent} from "./message-display.component";
 import {RouterModule} from "@angular/router";
 import {MdListModule} from "@angular2-material/list";
+import {ToolbarComponent} from "./toolbar.component";
 
 @NgModule({
     imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
     declarations:[
         CardComponent,
+        ToolbarComponent,
         LoadingIndicatorComponent,
         MessageDisplayComponent
     ],
     exports: [
         CardComponent,
+        ToolbarComponent,
         LoadingIndicatorComponent,
         MessageDisplayComponent,
 
