@@ -1,16 +1,23 @@
 import {Component, OnInit} from "@angular/core";
 import {MenuDisplayService} from "../core/menu-display.service";
 import {AccountBalancesService} from "./account-balances.service";
+import {FormControl} from "@angular/forms";
 
 @Component({
   template: `
+    <div align="end">
+      <md-checkbox [formControl]="includeClosedControl">
+          Include Closed Accounts?
+      </md-checkbox>
+    </div>
+        <!--
+    <div
     <md-checkbox
        (click)="setupAccountCategories()"
         [(ngModel)]="includeClosed"
     >
         Include Closed Accounts?
     </md-checkbox>
-        <!--
         <div class="col-xs-6">
             <div class="text-right">
                     <label>
@@ -53,7 +60,7 @@ export class AccountBalancesComponent implements OnInit{
   assetAccounts = [];
   liabilityAccounts = [];
 
-  includeClosed: boolean = false;
+  includeClosedControl = new FormControl(false);
 
   constructor(
     private menuDisplayService: MenuDisplayService,
@@ -62,12 +69,15 @@ export class AccountBalancesComponent implements OnInit{
 
   ngOnInit(){
     this.menuDisplayService.setHeading('Account Balances');
+    this.includeClosedControl
+        .valueChanges
+        .subscribe(includeClosed => this.setupAccountCategories(includeClosed));
+
     this.setupAccountCategories();
 
   }
 
-  setupAccountCategories(){
-    let include_closed = this.includeClosed;
+  setupAccountCategories(include_closed?: boolean){
 
     this.accountBalancesService
       .getAccountBalances({include_closed})

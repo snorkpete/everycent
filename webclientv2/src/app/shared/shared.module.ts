@@ -9,13 +9,13 @@ import {MdRippleModule, MdCoreModule} from "@angular2-material/core";
 import {MdSidenavModule} from "@angular2-material/sidenav";
 import {MdIconModule} from "@angular2-material/icon";
 import {MdButtonModule} from "@angular2-material/button";
-import {FormsModule} from "@angular/forms";
 import {MessageDisplayComponent} from "./message-display.component";
 import {RouterModule} from "@angular/router";
 import {MdListModule} from "@angular2-material/list";
 import {ToDollarsPipe} from "./to-dollars.pipe";
 import {ToolbarComponent} from "./toolbar.component";
 import {MdCheckboxModule} from "@angular2-material/checkbox";
+import {ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
     imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
@@ -37,7 +37,7 @@ import {MdCheckboxModule} from "@angular2-material/checkbox";
         CommonModule,
 
         // Re-export the form module
-        FormsModule,
+        ReactiveFormsModule,
         RouterModule,
 
         // re-export the material design modules
