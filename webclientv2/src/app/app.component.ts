@@ -22,6 +22,7 @@ import {MenuDisplayService} from "./core/menu-display.service";
         EveryCent V2 &nbsp; <span *ngIf="heading$ | async"> - {{ heading$ | async }}</span>
       </md-toolbar>
       
+      <ec-loading-indicator></ec-loading-indicator>
       <ec-card>
         <ec-message-display></ec-message-display>
         <router-outlet></router-outlet>

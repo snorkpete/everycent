@@ -4,13 +4,15 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import {Observable, BehaviorSubject} from "rxjs/Rx";
 import {AuthService} from "../auth/auth.service";
+import {LoadingIndicatorService} from "./loading-indicator.service";
 
 @Injectable()
 export class ApiGateway {
 
   constructor(
     private http: Http,
-    private authService: AuthService
+    private authService: AuthService,
+    private loadingIndicator: LoadingIndicatorService
   ) {
   }
 
@@ -26,6 +28,8 @@ export class ApiGateway {
   }
 
   get(url:string, data: any = {}): Observable<any>{
+
+    this.loadingIndicator.show();
 
     let options = new RequestOptions({
       headers: this.getHeaders(),
@@ -44,6 +48,7 @@ export class ApiGateway {
           throw new Error('not logged in');
         }
 
+        this.loadingIndicator.hide();
         //localStorage.setItem('expiry', response.headers.get('expiry'));
         //localStorage.setItem('accessToken', response.headers.get('access-token'));
       })

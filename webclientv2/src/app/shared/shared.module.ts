@@ -16,9 +16,18 @@ import {ToDollarsPipe} from "./to-dollars.pipe";
 import {ToolbarComponent} from "./toolbar.component";
 import {MdCheckboxModule} from "@angular2-material/checkbox";
 import {ReactiveFormsModule} from "@angular/forms";
+import {MdProgressBarModule} from "@angular2-material/progress-bar";
+import {MdProgressCircleModule} from "@angular2-material/progress-circle";
 
 @NgModule({
-    imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
+    imports: [
+        CommonModule,
+        MdCardModule,
+        MdToolbarModule,
+        MdIconModule,
+        MdProgressCircleModule,
+        MdProgressBarModule
+    ],
     declarations:[
         CardComponent,
         ToolbarComponent,
@@ -44,7 +53,7 @@ import {ReactiveFormsModule} from "@angular/forms";
         MdCoreModule,
         MdInputModule, MdRippleModule, MdSidenavModule, MdIconModule,
         MdListModule, MdToolbarModule, MdButtonModule, MdCardModule,
-        MdCheckboxModule
+        MdCheckboxModule, MdProgressBarModule, MdProgressCircleModule
     ]
 })
 export class SharedModule{}
