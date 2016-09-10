@@ -13,7 +13,7 @@ import {MenuDisplayService} from "./core/menu-display.service";
   template: `
     <md-sidenav-layout fullscreen>
     
-      <md-sidenav #sidenav opened="true" mode="side">
+      <md-sidenav #sidenav opened="false" mode="side">
         <ec-menu (close)="sidenav.close()"></ec-menu>
       </md-sidenav>
       
