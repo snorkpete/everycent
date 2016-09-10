@@ -1,9 +1,10 @@
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {Angular2TokenService} from "angular2-token/lib/angular2-token.service";
 import {Response} from "@angular/http";
 import {Router} from "@angular/router";
 import {AuthService} from "./auth.service";
 import {ApiGateway} from "../core/api-gateway.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 @Component({
   styles:[`
     .fields{
@@ -19,10 +20,10 @@ import {ApiGateway} from "../core/api-gateway.service";
     <br/>
     <div class="main">
       <ec-panel title="EveryCent - Sign In" type="primary">
-          <form (submit)="logIn(email, password)" role="form">
+          <form [formGroup]="form" (ngSubmit)="logIn()" role="form">
               <div layout="column" class="fields">
-                 <md-input placeholder="Email Address" [(ngModel)]="email" name="email"> </md-input> 
-                 <md-input placeholder="Password" type="password" [(ngModel)]="password" name="password"> </md-input> 
+                 <md-input placeholder="Email Address" formControlName="email"> </md-input> 
+                 <md-input placeholder="Password" type="password" formControlName="password"> </md-input> 
               </div>
               <div class="center">
                  <button md-raised-button color="accent">Sign In </button>
@@ -32,22 +33,29 @@ import {ApiGateway} from "../core/api-gateway.service";
     </div>
   `
 })
-export class LoginComponent{
+export class LoginComponent implements OnInit{
 
   lastUpdate;
+  form: FormGroup;
 
   constructor(
     private authService: AuthService,
+    private fb: FormBuilder,
     private apiGateway: ApiGateway
   ) {
   }
 
-  logIn(email, password){
-    this.authService.login(email, password);
-  }
 
   ngOnInit(): void {
+    this.form = this.fb.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required]
+    })
   }
 
+
+  logIn(){
+    this.authService.login(this.form.value.email, this.form.value.password);
+  }
 
 }
