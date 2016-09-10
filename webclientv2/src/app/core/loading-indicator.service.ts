@@ -9,11 +9,11 @@ export class LoadingIndicatorService{
         this.loadingIndicator = new BehaviorSubject(true);
     }
 
-    showLoadingIndicator(){
-        this.loadingIndicator.next(true);
+    show(){
+      this.loadingIndicator.next(true);
     }
 
-    hideLoadingIndicator(){
-        this.loadingIndicator.next(false);
+    hide(){
+      this.loadingIndicator.next(false);
     }
 }

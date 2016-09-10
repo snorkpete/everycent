@@ -7,12 +7,14 @@ import {Angular2TokenService} from "angular2-token";
 import {AuthService} from "../auth/auth.service";
 import {MessageService} from "./message.service";
 import {AuthGuard} from "../auth/auth-guard.service";
+import {LoadingIndicatorService} from "./loading-indicator.service";
 
 @NgModule({
   providers:[
     ApiGateway, ActionDispatcher,
     MdIconRegistry, Angular2TokenService,
-    MessageService
+    MessageService,
+    LoadingIndicatorService
   ]
 })
 export class CoreModule{

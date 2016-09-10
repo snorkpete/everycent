@@ -1,41 +1,29 @@
 
 import {Component, Input, OnInit} from "@angular/core";
 import {Observable, BehaviorSubject} from "rxjs";
-import {LoadingIndicatorService} from "./loading-indicator.service";
+import {LoadingIndicatorService} from "../core/loading-indicator.service";
 @Component({
-    selector: 'gg-loading-indicator',
+    selector: 'ec-loading-indicator',
     styles:[`
-        div.backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: block;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 2500;
+        div.container{
+            width: 100%;
+            margin-left:10px;
         }
-        div.loading-text{
-            background-color: #464843;
-            font-weight: bold;
-            border: 2px solid white;
-            color: white;
-            margin: auto;
-            text-align: center;
-            width: 100px;
-            top: 400px;
-            margin-top: 400px;
-            padding: 10px;
+        md-progress-circle{
+            width: 25px;
+            height: 25px;
+        }
+        md-progress-bar{
         }
     `],
     template: `
-         <div class="backdrop" *ngIf="showLoading | async">
-            <div class="loading-text">Loading...</div>
+         <div *ngIf="showLoading | async" class="loading-container">
+            <md-progress-bar mode="indeterminate" color="accent"></md-progress-bar>
         </div>
     `
 })
 export class LoadingIndicatorComponent implements OnInit{
-    public showLoading: Observable<boolean> = new BehaviorSubject<boolean>(false);
+    public showLoading: Observable<boolean>;
 
     constructor(
         private loadingIndicatorService: LoadingIndicatorService
@@ -43,6 +31,5 @@ export class LoadingIndicatorComponent implements OnInit{
 
     ngOnInit(){
         this.showLoading = this.loadingIndicatorService.loadingIndicator;
-        //this.showLoading = showLoading$.debounceTime(300);
     }
 }
