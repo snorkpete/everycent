@@ -43,6 +43,9 @@ export class ApiGateway {
           this.authService.logout('You have been logged out. Please log in again.');
           throw new Error('not logged in');
         }
+
+        //localStorage.setItem('expiry', response.headers.get('expiry'));
+        //localStorage.setItem('accessToken', response.headers.get('access-token'));
       })
       .map(response => response.json())
   }

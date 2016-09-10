@@ -13,7 +13,9 @@ import {FormsModule} from "@angular/forms";
 import {MessageDisplayComponent} from "./message-display.component";
 import {RouterModule} from "@angular/router";
 import {MdListModule} from "@angular2-material/list";
+import {ToDollarsPipe} from "./to-dollars.pipe";
 import {ToolbarComponent} from "./toolbar.component";
+import {MdCheckboxModule} from "@angular2-material/checkbox";
 
 @NgModule({
     imports: [CommonModule, MdCardModule, MdToolbarModule, MdIconModule],
@@ -21,13 +23,15 @@ import {ToolbarComponent} from "./toolbar.component";
         CardComponent,
         ToolbarComponent,
         LoadingIndicatorComponent,
-        MessageDisplayComponent
+        MessageDisplayComponent,
+        ToDollarsPipe
     ],
     exports: [
         CardComponent,
         ToolbarComponent,
         LoadingIndicatorComponent,
         MessageDisplayComponent,
+        ToDollarsPipe,
 
         // Re-export the common module
         CommonModule,
@@ -39,7 +43,8 @@ import {ToolbarComponent} from "./toolbar.component";
         // re-export the material design modules
         MdCoreModule,
         MdInputModule, MdRippleModule, MdSidenavModule, MdIconModule,
-        MdListModule, MdToolbarModule, MdButtonModule, MdCardModule
+        MdListModule, MdToolbarModule, MdButtonModule, MdCardModule,
+        MdCheckboxModule
     ]
 })
 export class SharedModule{}
