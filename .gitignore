@@ -30,3 +30,6 @@
 # javascript-specific ignores
 node_modules
 typings
+
+# ignore the production builds for now - will have to figure out solution long term
+public/v2

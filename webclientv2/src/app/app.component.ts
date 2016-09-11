@@ -8,6 +8,13 @@ import {MenuDisplayService} from "./core/menu-display.service";
         margin-left: 10px;
         margin-right: 10px;
     }
+    md-toolbar.menu-bar{
+        position: fixed;
+    }
+    
+    div.main-content-area{
+        margin-top: 80px;
+    }
   `],
   selector: 'gg-app',
   template: `
@@ -17,16 +24,18 @@ import {MenuDisplayService} from "./core/menu-display.service";
         <ec-menu (close)="sidenav.close()"></ec-menu>
       </md-sidenav>
       
-      <md-toolbar color="primary" *ngIf="showMenu$ | async">
+      <md-toolbar color="primary" *ngIf="showMenu$ | async" class="menu-bar">
         <button md-icon-button (click)="sidenav.toggle()"><md-icon>menu</md-icon></button>
         EveryCent V2 &nbsp; <span *ngIf="heading$ | async"> - {{ heading$ | async }}</span>
       </md-toolbar>
       
-      <ec-loading-indicator></ec-loading-indicator>
-      <ec-card>
-        <ec-message-display></ec-message-display>
-        <router-outlet></router-outlet>
-      </ec-card>
+      <div class="main-content-area">
+        <ec-loading-indicator></ec-loading-indicator>
+        <ec-card>
+          <ec-message-display></ec-message-display>
+          <router-outlet></router-outlet>
+        </ec-card>
+      </div>
     </md-sidenav-layout>
   `
 })
