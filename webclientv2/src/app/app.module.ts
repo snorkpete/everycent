@@ -9,18 +9,20 @@ import {routing, appRoutingProviders} from "./app.routing";
 import {AuthModule} from "./auth/auth.module";
 import {RootModule} from "./root/root.module";
 import {AccountBalancesModule} from "./account-balances/account-balances.module";
+import {BudgetsModule} from "./budgets/budgets.module";
 
 @NgModule({
     declarations: [
-        AppComponent,
+      AppComponent,
     ],
     imports: [
-        BrowserModule, HttpModule, routing,
-        CoreModule,
-        SharedModule,
-        AuthModule,
-        RootModule,
-        AccountBalancesModule
+      BrowserModule, HttpModule, routing,
+      CoreModule,
+      SharedModule,
+      AuthModule,
+      RootModule,
+      AccountBalancesModule,
+      BudgetsModule
     ],
     bootstrap: [AppComponent],
     providers: [
