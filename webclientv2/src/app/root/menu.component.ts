@@ -4,6 +4,7 @@ import {AuthService} from "../auth/auth.service";
 import {MenuOption} from "../shared/menu-option.model";
 import {accountBalancesMenuOptions} from "../account-balances/account-balances.routing";
 import {Icons} from '../shared/icons.constants';
+import {budgetsMenuOptions} from "../budgets/budgets.routing";
 
 @Component({
   styles:[`
@@ -60,6 +61,7 @@ export class MenuComponent implements OnInit{
 
   private setupMenuOptions() {
     this.menuOptions = []
-          .concat(accountBalancesMenuOptions);
+          .concat(budgetsMenuOptions)
+          .concat(accountBalancesMenuOptions)
   }
 }

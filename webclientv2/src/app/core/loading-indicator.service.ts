@@ -6,7 +6,7 @@ export class LoadingIndicatorService{
 
     public loadingIndicator: BehaviorSubject<boolean>;
     constructor(){
-        this.loadingIndicator = new BehaviorSubject(true);
+        this.loadingIndicator = new BehaviorSubject(false);
     }
 
     show(){
