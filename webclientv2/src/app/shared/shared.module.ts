@@ -18,6 +18,7 @@ import {MdCheckboxModule} from "@angular2-material/checkbox";
 import {ReactiveFormsModule} from "@angular/forms";
 import {MdProgressBarModule} from "@angular2-material/progress-bar";
 import {MdProgressCircleModule} from "@angular2-material/progress-circle";
+import {FormattedAmountComponent} from "./formatted-amount-component";
 
 @NgModule({
     imports: [
@@ -30,22 +31,24 @@ import {MdProgressCircleModule} from "@angular2-material/progress-circle";
     ],
     declarations:[
         CardComponent,
-        ToolbarComponent,
+        FormattedAmountComponent,
         LoadingIndicatorComponent,
         MessageDisplayComponent,
-        ToDollarsPipe
+        ToolbarComponent,
+
+        ToDollarsPipe,
     ],
     exports: [
         CardComponent,
-        ToolbarComponent,
+        FormattedAmountComponent,
         LoadingIndicatorComponent,
         MessageDisplayComponent,
+        ToolbarComponent,
+
         ToDollarsPipe,
 
-        // Re-export the common module
+        // Re-export common angular modules
         CommonModule,
-
-        // Re-export the form module
         ReactiveFormsModule,
         RouterModule,
 
