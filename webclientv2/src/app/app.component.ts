@@ -8,13 +8,6 @@ import {MenuDisplayService} from "./core/menu-display.service";
         margin-left: 10px;
         margin-right: 10px;
     }
-    md-toolbar.menu-bar{
-        position: fixed;
-    }
-    
-    div.main-content-area{
-        margin-top: 80px;
-    }
   `],
   selector: 'gg-app',
   template: `
@@ -29,13 +22,11 @@ import {MenuDisplayService} from "./core/menu-display.service";
         EveryCent V2 &nbsp; <span *ngIf="heading$ | async"> - {{ heading$ | async }}</span>
       </md-toolbar>
       
-      <div class="main-content-area">
-        <ec-loading-indicator></ec-loading-indicator>
-        <ec-card>
-          <ec-message-display></ec-message-display>
-          <router-outlet></router-outlet>
-        </ec-card>
-      </div>
+      <ec-loading-indicator></ec-loading-indicator>
+      <ec-card>
+        <ec-message-display></ec-message-display>
+        <router-outlet></router-outlet>
+      </ec-card>
     </md-sidenav-layout>
   `
 })
