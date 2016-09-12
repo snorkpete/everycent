@@ -1,6 +1,6 @@
 
 
-export default function transactionTotal(items: Array<any>, fieldToSum : string): number {
+export default function total(items: Array<any>, fieldToSum : string): number {
   return items.reduce(((sum, item) => {
 
     // don't include deleted items
