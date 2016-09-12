@@ -1,5 +1,5 @@
 import {Component, Input} from "@angular/core";
-import transactionTotal from "../shared/transaction-total.function";
+import transactionTotal from "../shared/item-total.function";
 import {Icons} from "../shared/icons.constants";
 
 @Component({
