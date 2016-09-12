@@ -32,7 +32,7 @@ import {Icons} from "../shared/icons.constants";
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let bankAccount of bankAccounts">
+            <tr *ngFor="let bankAccount of bankAccounts; trackBy: trackByFn">
                 <td> {{ bankAccount.name }} </td>
                 <td class="hidden-xs"> {{ bankAccount.institution.name }} </td>
                 <td class="hidden-xs"> {{ bankAccount.account_type }} </td>
@@ -71,4 +71,8 @@ export class AccountBalanceListComponent {
 
     //private
   ){}
+
+  trackByFn(bankAccount, index){
+    return bankAccount.id;
+  }
 }
