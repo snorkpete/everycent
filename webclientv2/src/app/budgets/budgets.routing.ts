@@ -5,9 +5,15 @@ import {ModuleWithProviders} from "@angular/core";
 import {MenuOption} from "../shared/menu-option.model";
 import {Icons} from "../shared/icons.constants";
 import {BudgetsComponent} from "./budgets.component";
+import {BudgetListComponent} from "./budget-list.component";
 
 const routes: Routes = [
-  { path: 'budgets', component: BudgetsComponent}
+  {
+    path: 'budgets', component: BudgetsComponent,
+    children: [
+      { path: '', component: BudgetListComponent }
+    ]
+  }
 ];
 
 export const budgetsMenuOptions: MenuOption[] = [
