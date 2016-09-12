@@ -4,6 +4,7 @@ import {routing} from "./budgets.routing";
 import {BudgetsComponent} from "./budgets.component";
 import {BudgetListComponent} from "./budget-list.component";
 import {BudgetService} from "./budget.service";
+import {BudgetEditorComponent} from "./budget-editor.component";
 @NgModule({
   imports: [
     SharedModule,
@@ -11,7 +12,8 @@ import {BudgetService} from "./budget.service";
   ],
   declarations:[
     BudgetsComponent,
-    BudgetListComponent
+    BudgetListComponent,
+    BudgetEditorComponent
   ],
   exports:[
 

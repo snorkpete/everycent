@@ -10,4 +10,8 @@ export class BudgetService{
   getBudgets(){
     return this.apiGateway.get('/budgets');
   }
+
+  getBudget(id){
+    return this.apiGateway.get(`/budgets/${id}`);
+  }
 }

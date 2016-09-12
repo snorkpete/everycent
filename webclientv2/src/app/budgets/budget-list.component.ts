@@ -1,6 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {BudgetService} from "./budget.service";
 import {Icons} from '../shared/icons.constants';
+import {Router} from "@angular/router";
 
 @Component({
   template: `
@@ -88,11 +89,16 @@ export class BudgetListComponent implements OnInit{
   public Icons = Icons;
 
   constructor(
-    private budgetService: BudgetService
+    private budgetService: BudgetService,
+    private router: Router
   ){}
 
   ngOnInit(): void {
     this.budgets = this.budgetService.getBudgets();
+  }
+
+  viewBudget(budget){
+    this.router.navigateByUrl(`/budgets/edit/${budget.id}`);
   }
 
 }
