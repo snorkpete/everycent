@@ -6,12 +6,14 @@ import {MenuOption} from "../shared/menu-option.model";
 import {Icons} from "../shared/icons.constants";
 import {BudgetsComponent} from "./budgets.component";
 import {BudgetListComponent} from "./budget-list.component";
+import {BudgetEditorComponent} from "./budget-editor.component";
 
 const routes: Routes = [
   {
     path: 'budgets', component: BudgetsComponent,
     children: [
-      { path: '', component: BudgetListComponent }
+      { path: '', component: BudgetListComponent },
+      { path: 'edit/:id', component: BudgetEditorComponent }
     ]
   }
 ];
