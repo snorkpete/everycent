@@ -146,3 +146,11 @@ table.table td {
     text-align: right;
 }
 
+
+/* fixes for putting icons next to button text */
+/* the icon appears too high in the button relative to the text  */
+/* so, shift the icon down a few px                              */
+button[md-raised-button] md-icon{
+    position: relative;
+    top: 6px;
+}

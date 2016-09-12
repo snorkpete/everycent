@@ -2,7 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {MenuDisplayService} from "../core/menu-display.service";
 @Component({
   template: `
-    <h1>Budgets</h1>
+    <router-outlet></router-outlet>
   `
 })
 export class BudgetsComponent implements OnInit{
