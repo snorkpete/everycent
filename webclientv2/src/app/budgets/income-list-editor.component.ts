@@ -4,10 +4,15 @@ import {BehaviorSubject, Observable} from "rxjs";
 import total from '../shared/item-total.function';
 
 @Component({
+  styles:[`
+    md-card-actions div[align="end"]{
+       margin-right: 16px; 
+    }
+  `],
   selector: 'ec-income-list-editor',
   template: `
-    <ec-panel title="Incomes" type="primary">
-       <table class="table" *ngIf="budget?.incomes">
+    <ec-card title="Incomes" type="primary">
+       <table class="table compact" *ngIf="budget?.incomes">
        <thead>
           <tr class="heading">
             <th style="width:25%;">Name</th>
@@ -71,7 +76,7 @@ import total from '../shared/item-total.function';
         </tfoot>
         </table>
 
-        <md-card-actions *ngIf="isEditable()">
+        <div ec-card-actions *ngIf="isEditable()">
             
           <button md-raised-button color="primary" *ngIf="!(isEditMode$ | async)"
                   (click)="switchToEditMode()">
@@ -95,8 +100,8 @@ import total from '../shared/item-total.function';
                   Cancel
               </button>
           </div>
-        </md-card-actions>
-     </ec-panel>
+        </div>
+     </ec-card>
   `
 })
 export class IncomeListEditorComponent implements OnInit{
