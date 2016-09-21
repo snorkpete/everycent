@@ -22,15 +22,6 @@
               ng-bind="vm.transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
     </td>
 
-    <!-- payee -->
-    <td class="hidden-xs">
-        <input ng-show="vm.isEditMode" type="text" ng-model="vm.transaction.payee_name" ></input>
-        <span ng-hide="vm.isEditMode">
-           <span ng-show="vm.transaction.payee_code"
-                 ng-bind="vm.transaction.payee_name + ' (' + vm.transaction.payee_code + ')'"></span>
-        </span>
-    </td>
-
     <!-- description -->
     <td>
         <input ng-show="vm.isEditMode" type="text" ng-model="vm.transaction.description" ></input>
