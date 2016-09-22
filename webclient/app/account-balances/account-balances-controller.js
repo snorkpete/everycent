@@ -13,6 +13,12 @@
     vm.bankAccounts = [];
     vm.refresh = refreshBankAccountList;
     vm.searchParams = {};
+    vm.totalAssets = AccountBalancesService.totalAssets;
+    vm.totalLiabilities = AccountBalancesService.totalLiabilities;
+    vm.netCurrentCash = AccountBalancesService.netCurrentCash;
+    vm.netCashAssets = AccountBalancesService.netCashAssets;
+    vm.netNonCashAssets = AccountBalancesService.netNonCashAssets;
+
     vm.netWorth = AccountBalancesService.netWorth;
     activate();
 
@@ -30,8 +36,20 @@
         vm.assetAccounts = filterFilter(bankAccounts, function(bankAccount, index){
           return bankAccount.account_category === 'asset';
         });
+        vm.cashAssetAccounts = filterFilter(bankAccounts, function(bankAccount, index){
+          return bankAccount.account_category === 'asset' && bankAccount.is_cash;
+        });
+        vm.nonCashAssetAccounts = filterFilter(bankAccounts, function(bankAccount, index){
+          return bankAccount.account_category === 'asset' && !bankAccount.is_cash;
+        });
         vm.liabilityAccounts = filterFilter(bankAccounts, function(bankAccount, index){
           return bankAccount.account_category === 'liability';
+        });
+        vm.creditCardAccounts = filterFilter(bankAccounts, function(bankAccount, index){
+          return bankAccount.account_category === 'liability' && bankAccount.is_cash;
+        });
+        vm.loanAccounts = filterFilter(bankAccounts, function(bankAccount, index){
+          return bankAccount.account_category === 'liability' && !bankAccount.is_cash;
         });
 
       });

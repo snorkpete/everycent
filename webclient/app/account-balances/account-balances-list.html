@@ -16,7 +16,7 @@
 </div>
 <div class="row">
     <div class="col-xs-12">
-        <ec-panel type="primary" title="Current Account">
+        <ec-panel type="primary" title="Current Accounts">
             <ec-account-balance-list bank-accounts="vm.currentAccounts">
             </ec-account-balance-list>
         </ec-panel>
@@ -24,22 +24,88 @@
 </div>
 <div class="row">
     <div class="col-xs-12">
-        <ec-panel type="primary" title="Asset Accounts">
-            <ec-account-balance-list bank-accounts="vm.assetAccounts">
+        <ec-panel type="primary" title="Cash Assets">
+            <ec-account-balance-list bank-accounts="vm.cashAssetAccounts">
             </ec-account-balance-list>
         </ec-panel>
     </div>
 </div>
 <div class="row">
     <div class="col-xs-12">
+        <ec-panel type="primary" title="Non Cash Assets">
+            <ec-account-balance-list bank-accounts="vm.nonCashAssetAccounts">
+            </ec-account-balance-list>
+        </ec-panel>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="net-worth text-right">
+            Total Assets: &nbsp; <ec-amount-formatted amount="vm.totalAssets(vm.bankAccounts)">
+        </ec-amount-formatted>
+        </h4>
+    </div>
+</div>
+
+<hr>
+<br/>
+<div class="row">
+    <div class="col-xs-12">
         <div class="panel panel-primary">
-            <ec-panel type="primary" title="Liability Accounts">
-                <ec-account-balance-list bank-accounts="vm.liabilityAccounts">
+            <ec-panel type="primary" title="Credit Cards">
+                <ec-account-balance-list bank-accounts="vm.creditCardAccounts">
                 </ec-account-balance-list>
             </ec-panel>
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-primary">
+            <ec-panel type="primary" title="Loans">
+                <ec-account-balance-list bank-accounts="vm.loanAccounts">
+                </ec-account-balance-list>
+            </ec-panel>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="net-worth text-right">
+            Total Liabilities: &nbsp; <ec-amount-formatted amount="vm.totalLiabilities(vm.bankAccounts)">
+        </ec-amount-formatted>
+        </h4>
+    </div>
+</div>
+<br/>
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="net-worth text-right">
+            Net Current Cash: &nbsp; <ec-amount-formatted amount="vm.netCurrentCash(vm.bankAccounts)">
+        </ec-amount-formatted>
+        </h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="net-worth text-right">
+            Net Cash Assets: &nbsp; <ec-amount-formatted amount="vm.netCashAssets(vm.bankAccounts)">
+        </ec-amount-formatted>
+        </h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="net-worth text-right">
+            Net Non Cash Assets: &nbsp; <ec-amount-formatted amount="vm.netNonCashAssets(vm.bankAccounts)">
+        </ec-amount-formatted>
+        </h4>
+    </div>
+</div>
+<hr>
 <div class="row">
     <div class="col-xs-12">
        <h3 class="net-worth text-right">
