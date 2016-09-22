@@ -26,3 +26,5 @@
 .vagrant/*
 
 .env
+node_modules/
+typings/
