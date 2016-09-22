@@ -62,7 +62,7 @@
 
       function netNonCashAssets(bankAccounts){
         return bankAccounts
-            .filter(a => a.account_category == 'asset' && !a.is_cash)
+            .filter(a => (a.account_category == 'asset' || a.account_category == 'liability') && !a.is_cash)
             .reduce((acc, curr) => acc + curr.current_balance, 0);
       }
 
