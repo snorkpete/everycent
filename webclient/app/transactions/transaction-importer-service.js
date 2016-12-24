@@ -14,20 +14,15 @@
       return service;
 
       function convertToTransactions(input, startDate, endDate, importType){
-
-        if(importType === 'bank-account'){
-          return _convertFromNewTransactionFormat(input, startDate, endDate);
-        }
-
-        return [];
+        return _convertFromNewTransactionFormat(input, startDate, endDate, importType);
       }
 
 
-      function _convertFromNewTransactionFormat(input, startDate, endDate){
+      function _convertFromNewTransactionFormat(input, startDate, endDate, importType){
         var lines = _convertInputToLines(input);
 
         var transactionDataList = _convertLinesToTransactionData(lines);
-        return _convertTransactionArrayDataToTransactions(transactionDataList, startDate, endDate);
+        return _convertTransactionArrayDataToTransactions(transactionDataList, startDate, endDate, importType);
       }
 
       function _convertInputToLines(input) {
@@ -60,13 +55,13 @@
         return transactionDataList;
       }
 
-      function _convertTransactionArrayDataToTransactions(transactionArrayList, startDate, endDate){
+      function _convertTransactionArrayDataToTransactions(transactionArrayList, startDate, endDate, importType){
         return transactionArrayList.map(function(transactionArray){
-          return _convertTransactionArrayToTransaction(transactionArray, startDate, endDate);
+          return _convertTransactionArrayToTransaction(transactionArray, startDate, endDate, importType);
         })
       }
 
-      function _convertTransactionArrayToTransaction(transactionArray, startDate, endDate){
+      function _convertTransactionArrayToTransaction(transactionArray, startDate, endDate, importType){
         if(transactionArray.length != 4){
           return {};
         }
@@ -123,6 +118,15 @@
         }else{
           transaction.deposit_amount = 0;
           transaction.withdrawal_amount = amountAsNumber * 100;
+        }
+
+        // for credit cards, normal charges are shown as positive,
+        // and credit card payments are shown as negative,
+        // so flip around the withdrawals and deposits
+        if(importType == 'credit-card'){
+          var oldWithdrawal = transaction.withdrawal_amount;
+          transaction.withdrawal_amount = transaction.deposit_amount;
+          transaction.deposit_amount = oldWithdrawal;
         }
 
         var start = DateService.toDate(startDate);
