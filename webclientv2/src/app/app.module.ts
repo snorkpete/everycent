@@ -16,13 +16,14 @@ import {BudgetsModule} from "./budgets/budgets.module";
       AppComponent,
     ],
     imports: [
-      BrowserModule, HttpModule, routing,
+      BrowserModule,
+      HttpModule, routing,
       CoreModule,
       SharedModule,
       AuthModule,
       RootModule,
       AccountBalancesModule,
-      BudgetsModule
+      BudgetsModule,
     ],
     bootstrap: [AppComponent],
     providers: [
