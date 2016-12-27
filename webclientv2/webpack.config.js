@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var LiveReloadPlugin = require('webpack-livereload-plugin');
 
@@ -6,6 +7,7 @@ module.exports = {
 
   devtool: 'cheap-module-eval-source-map',
 
+  context: path.resolve(__dirname, ""),
   entry: {
     //globals: [
     //  'zone.js',
@@ -21,26 +23,15 @@ module.exports = {
     chunkFilename:'v2/[id].chunk.js'
   },
   module:{
-    preLoaders:[
-      {
-        test: /.js$/,
-        loader: 'string-replace-loader',
-        query: {
-          search: 'moduleId: module.id,',
-          replace: '',
-          flags: 'g'
-        }
-      }
-    ],
     loaders:[
-      {test: /\.ts$/, loader: 'ts', exclude: 'node_modules'},
-      {test: /\.css$/, loader: 'style!css', exclude: 'node_modules'},
-      {test: /\.scss$/, loader: 'style!css!sass', exclude: 'node_modules'},
-      {test: /\.json$/, loader: 'json', exclude: 'node_modules'}
+      {test: /\.ts$/, loader: 'ts-loader', exclude: 'node_modules'},
+      {test: /\.css$/, loader: 'style-loader!css-loader', exclude: 'node_modules'},
+      {test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader', exclude: 'node_modules'},
+      {test: /\.json$/, loader: 'json-loader', exclude: 'node_modules'}
     ]
   },
   resolve:{
-    extensions: ['', '.js', '.ts']
+    extensions: ['.js', '.ts']
   },
   plugins:[
     new webpack.optimize.UglifyJsPlugin({

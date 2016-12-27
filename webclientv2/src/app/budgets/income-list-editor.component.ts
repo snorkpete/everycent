@@ -8,6 +8,10 @@ import total from '../shared/item-total.function';
     md-card-actions div[align="end"]{
        margin-right: 16px; 
     }
+    
+    table md-input{
+      top: 1px;
+    }
   `],
   selector: 'ec-income-list-editor',
   template: `
@@ -125,7 +129,7 @@ export class IncomeListEditorComponent implements OnInit{
   }
 
   switchToViewMode(){
-    this.isEditMode$.next(true);
+    this.isEditMode$.next(false);
   }
 
   cancelEdit(){
