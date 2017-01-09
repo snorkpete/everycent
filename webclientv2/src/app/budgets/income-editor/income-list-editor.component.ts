@@ -3,6 +3,7 @@ import {BehaviorSubject, Observable} from "rxjs";
 
 import total from '../../shared/item-total.function';
 import ColumnAlignments from "./income-list-align-values";
+import {Icons} from "../../shared/icons.constants";
 
 @Component({
   styles:[`
@@ -19,12 +20,12 @@ import ColumnAlignments from "./income-list-align-values";
   template: `
     <ec-card title="Incomes" type="primary">
        <div class="compact" *ngIf="budget?.incomes">
-       <div class="heading" fxLayout="row">
+       <div class="heading" fxLayout="row" fxLayoutAlign="space-around">
           <div [fxFlex]="alignments.name">Name</div>
           <div [fxFlex]="alignments.amount" class="text-right">Amount</div>
           <div [fxFlex]="alignments.bankAccount">Bank Account</div>
           <div [fxFlex]="alignments.comment">Comment</div>
-          <div [fxFlex]="alignments.action">&nbsp;</div>
+          <div [fxFlex]="alignments.action" *ngIf="isEditMode$ | async">&nbsp;</div>
        </div>
        <ec-income-list-editor-row 
            *ngFor="let income of budget.incomes"
@@ -37,16 +38,16 @@ import ColumnAlignments from "./income-list-align-values";
           <div [fxFlex]="alignments.amount" class="text-right">{{ total(budget.incomes, 'amount') | ecToDollars }}</div>
           <div [fxFlex]="alignments.bankAccount"></div>
           <div [fxFlex]="alignments.comment"></div>
-          <div [fxFlex]="alignments.action">&nbsp;</div>
+          <div [fxFlex]="alignments.action" *ngIf="isEditMode$ | async">&nbsp;</div>
        </div>
         </div>
 
         <div ec-card-actions *ngIf="isEditable()">
             
-          <button md-raised-button color="primary" *ngIf="!(isEditMode$ | async)"
-                  (click)="switchToEditMode()">
-              Make Changes
-          </button>
+          <ec-icon-button [icon]="Icons.EDIT" (click)="switchToEditMode()" *ngIf="!(isEditMode$ | async)" >
+             Make Changes 
+          </ec-icon-button>
+          
           
           <button md-raised-button color="accent" *ngIf="isEditMode$ | async"
                   (click)="addNewIncome()">
@@ -55,15 +56,15 @@ import ColumnAlignments from "./income-list-align-values";
           
           <div align="end" *ngIf="isEditMode$ | async">
           
-              <button md-raised-button color="accent"
+              <ec-icon-button color="accent" [icon]="Icons.CLOSE"
                       (click)="switchToViewMode()">
                   Back to View Mode
-              </button>
+              </ec-icon-button>
               
-              <button md-raised-button color="warn"
+              <ec-icon-button color="warn" [icon]="Icons.CLOSE"
                       (click)="cancelEdit()">
                   Cancel
-              </button>
+              </ec-icon-button>
           </div>
         </div>
      </ec-card>
@@ -77,6 +78,7 @@ export class IncomeListEditorComponent implements OnInit{
   isViewMode$: Observable<boolean>;
   total = total;
   alignments = ColumnAlignments;
+  Icons = Icons;
 
   ngOnInit(): void {
     this.isViewMode$ = this.isEditMode$.map(mode => !mode);

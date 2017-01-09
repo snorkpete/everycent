@@ -5,6 +5,11 @@ import ColumnAlignments from "./income-list-align-values";
   styles:[`
     div.deleted{
         background-color: mediumvioletred;
+        padding: 5px;
+        border: 2px solid grey;
+        border-radius: 5px; 
+        margin-bottom: 3px;
+        color: white;
     }
   `],
   selector: 'ec-income-list-editor-row',
@@ -21,7 +26,7 @@ import ColumnAlignments from "./income-list-align-values";
       </select>
       <md-input [readonly]="isViewMode" [value]="income.comment" [fxFlex]="columnAlignments.comment"></md-input>
 
-      <ec-delete-button [item]="income" [fxFlex]="columnAlignments.action"></ec-delete-button>
+      <ec-delete-button *ngIf="!isViewMode" [item]="income" [fxFlex]="columnAlignments.action"></ec-delete-button>
     </div>
   `
 })
