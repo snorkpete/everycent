@@ -12,6 +12,7 @@ import {MaterialModule} from "@angular/material/module";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {DeleteButtonComponent} from "./delete-button.component";
 import {MoneyFieldComponent} from "./money-field.component";
+import {IconButton} from "./icon-button.component";
 
 @NgModule({
     imports: [
@@ -26,7 +27,9 @@ import {MoneyFieldComponent} from "./money-field.component";
         LoadingIndicatorComponent,
         MessageDisplayComponent,
         ToolbarComponent,
+
         DeleteButtonComponent,
+        IconButton,
         MoneyFieldComponent,
 
         ToDollarsPipe,
@@ -40,6 +43,7 @@ import {MoneyFieldComponent} from "./money-field.component";
 
         MoneyFieldComponent,
         DeleteButtonComponent,
+        IconButton,
 
         ToDollarsPipe,
 
