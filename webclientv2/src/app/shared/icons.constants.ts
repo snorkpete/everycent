@@ -9,6 +9,7 @@ export const Icons = {
   // Budget related Icons
 
   // General Purpose Icons
+  ADD: 'add_circle',
   EDIT: 'edit',
   CLOSE: 'lock',
   COPY: 'content_copy'

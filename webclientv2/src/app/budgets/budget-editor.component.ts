@@ -5,19 +5,21 @@ import {BudgetService} from "./budget.service";
 import {MenuDisplayService} from "../core/menu-display.service";
 @Component({
   template: `
-    <h1>Budget: {{ budgetName$ | async }} <small>Setup Budget</small></h1> 
-    
-    <div align="end">
-        <button md-raised-button routerLink="/budgets"> Back to Budget List</button>
-        <button md-raised-button [routerLink]="'/transactions?budget='+budget?.id">View Transactions</button>
-    </div>
+    <div class="base-container">
+      <h1>Budget: {{ budgetName$ | async }} <small>Setup Budget</small></h1> 
+      
+      <div align="end">
+          <button md-raised-button routerLink="/budgets"> Back to Budget List</button>
+          <button md-raised-button [routerLink]="'/transactions?budget='+budget?.id">View Transactions</button>
+      </div>
+    </div> 
 
     <ec-income-list-editor [budget]="budget"></ec-income-list-editor>
     <!--
     <ec-allocation-list-editor budget="vm.budget"></ec-allocation-list-editor>
     -->
 
-    <div *ngIf="budget?.status=='open'">
+    <div class="base-container" *ngIf="budget?.status=='open'">
         <button md-raised-button color="accent"
                 (click)="saveChanges(budget)">
             Save Changes

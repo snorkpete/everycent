@@ -13,6 +13,7 @@ import {FlexLayoutModule} from "@angular/flex-layout";
 import {DeleteButtonComponent} from "./delete-button.component";
 import {MoneyFieldComponent} from "./money-field.component";
 import {IconButton} from "./icon-button.component";
+import {HideOnMobileDirective} from "./hide-on-mobile.directive";
 
 @NgModule({
     imports: [
@@ -32,6 +33,7 @@ import {IconButton} from "./icon-button.component";
         IconButton,
         MoneyFieldComponent,
 
+        HideOnMobileDirective,
         ToDollarsPipe,
     ],
     exports: [
@@ -44,6 +46,8 @@ import {IconButton} from "./icon-button.component";
         MoneyFieldComponent,
         DeleteButtonComponent,
         IconButton,
+
+        HideOnMobileDirective,
 
         ToDollarsPipe,
 
