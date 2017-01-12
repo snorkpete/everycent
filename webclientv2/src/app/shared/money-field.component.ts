@@ -15,7 +15,7 @@ export const MONEY_FIELD_VALUE_ACCESSOR: any = {
     }
   `],
   template: `
-    <md-input #input [value]="dollarValue()" (blur)="updateValue(input)" [readonly]="readonly">
+    <md-input class="text-right" #input [value]="dollarValue()" (blur)="updateValue(input)" [readonly]="readonly">
 <!--      <span md-prefix>
         <i class="material-icons app-input-icon">motorcycle</i>
         &nbsp;

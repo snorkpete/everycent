@@ -7,6 +7,9 @@ import {BudgetService} from "./budget.service";
 import {BudgetEditorComponent} from "./budget-editor.component";
 import {IncomeListEditorComponent} from "./income-editor/income-list-editor.component";
 import {IncomeListEditorRowComponent} from "./income-editor/income-list-editor-row.component";
+import {IncomeListEditorHeaderRowComponent} from "./income-editor/income-list-editor-header-row.component";
+import {IncomeListEditorFooterRowComponent} from "./income-editor/income-list-editor-footer-row.component";
+import {IncomeListEditorActionsComponent} from "./income-editor/income-list-editor-actions.component";
 @NgModule({
   imports: [
     SharedModule,
@@ -18,7 +21,10 @@ import {IncomeListEditorRowComponent} from "./income-editor/income-list-editor-r
     BudgetEditorComponent,
 
     IncomeListEditorRowComponent,
+    IncomeListEditorHeaderRowComponent,
+    IncomeListEditorFooterRowComponent,
     IncomeListEditorComponent,
+    IncomeListEditorActionsComponent,
   ],
   exports:[
 

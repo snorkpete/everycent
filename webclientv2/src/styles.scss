@@ -24,7 +24,7 @@
     text-align: center;
 }
 
-.text-right md-input input{
+.text-right input, div.text-right{
     text-align: right;
 }
 
@@ -74,6 +74,14 @@ ec-loading-indicator{
 .underline-dashed{
     border-bottom: 1px dashed grey;
 }
+
+div.base-container{
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+
+
 
 /* **************** */
 /* table formatting */

@@ -8,7 +8,6 @@ import {MenuDisplayService} from "./core/menu-display.service";
 @Component({
   styles:[`
     md-toolbar {
-        margin-left: 10px;
         margin-right: 10px;
     }
   `],
@@ -22,14 +21,15 @@ import {MenuDisplayService} from "./core/menu-display.service";
       
       <md-toolbar color="primary" *ngIf="showMenu$ | async" class="menu-bar">
         <button md-icon-button (click)="sidenav.toggle()"><md-icon>menu</md-icon></button>
-        EveryCent V2 &nbsp; <span *ngIf="heading$ | async"> - {{ heading$ | async }}</span>
+        <div fxLayout="row">
+          <div>EveryCent V2 </div>
+          <div *ngIf="heading$ | async"> - {{ heading$ | async }}</div>
+        </div>
       </md-toolbar>
       
       <ec-loading-indicator></ec-loading-indicator>
-      <ec-card>
-        <ec-message-display></ec-message-display>
-        <router-outlet></router-outlet>
-      </ec-card>
+      <ec-message-display></ec-message-display>
+      <router-outlet></router-outlet>
     </md-sidenav-layout>
   `
 })
