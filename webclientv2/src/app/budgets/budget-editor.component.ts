@@ -6,15 +6,28 @@ import {MenuDisplayService} from "../core/menu-display.service";
 @Component({
   template: `
     <div class="base-container">
-      <h1>Budget: {{ budgetName$ | async }} <small>Setup Budget</small></h1> 
-      
       <div align="end">
           <button md-raised-button routerLink="/budgets"> Back to Budget List</button>
           <button md-raised-button [routerLink]="'/transactions?budget='+budget?.id">View Transactions</button>
       </div>
     </div> 
 
-    <ec-income-list-editor [budget]="budget"></ec-income-list-editor>
+    <div class="base-container">
+      <md-tab-group>
+        <md-tab label="Incomes">
+          <ec-income-list-editor [budget]="budget"></ec-income-list-editor>
+        </md-tab>
+        
+        <md-tab label="Allocations">
+          allocation editor goes here 
+        </md-tab>
+        
+        <md-tab label="Budget Summary">
+          summary sheet goes here 
+        </md-tab>
+      
+      </md-tab-group>
+    </div>
     <!--
     <ec-allocation-list-editor budget="vm.budget"></ec-allocation-list-editor>
     -->
@@ -53,5 +66,7 @@ export class BudgetEditorComponent implements OnInit{
                            .do(b => this.budget = b)  // extract the budget for use elsewhere TODO: may not be necessary
                            .map(b => b.name)
                            .do(name => this.menuDisplay.setHeading(`Edit Budget: ${name}`))
+
+    this.budgetName$.subscribe();
   }
 }
