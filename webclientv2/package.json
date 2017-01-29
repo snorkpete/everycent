@@ -23,6 +23,8 @@
     "@angular/platform-browser": "2.4.1",
     "@angular/platform-browser-dynamic": "2.4.1",
     "@angular/router": "3.4.1",
+    "ag-grid": "^7.2.1",
+    "ag-grid-ng2": "^7.2.1",
     "angular2-token": "^0.1.5",
     "bootstrap": "^3.3.6",
     "core-js": "^2.4.1",

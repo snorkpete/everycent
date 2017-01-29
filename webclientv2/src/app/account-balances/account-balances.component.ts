@@ -1,7 +1,8 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewChild} from "@angular/core";
 import {MenuDisplayService} from "../core/menu-display.service";
 import {AccountBalancesService} from "./account-balances.service";
 import {FormControl} from "@angular/forms";
+import {AgGridNg2} from "ag-grid-ng2";
 
 @Component({
   template: `
@@ -23,9 +24,32 @@ import {FormControl} from "@angular/forms";
     <ec-card>
         <h3 align="end">Net Worth: <ec-amount-formatted [amount]="netWorth"></ec-amount-formatted> </h3>
     </ec-card>
+    
+    
+  <button (click)="autoResize()"> Resize</button>
+   <ag-grid-ng2 #agGrid style="width: 100%; height: 450px;" class="ag-material" (gridSizeChanged)="autoResize()"
+
+      [columnDefs]="columnDefs"
+      [rowData]="currentAccounts"
+
+      rowHeight="42"
+      rowSelection="single"
+      >
+
+  </ag-grid-ng2> 
   `
 })
 export class AccountBalancesComponent implements OnInit{
+
+  columnDefs = [
+    { headerName: 'Name', field: 'name' },
+    { headerName: 'Institution', field: 'name' },
+    { headerName: 'Account Type', field: 'account_type' },
+    { headerName: 'Category', field: 'account_category' },
+    { headerName: 'Balance At Start', field: 'closing_balance' },
+    { headerName: 'Balance At Close', field: 'expected_closing_balance' },
+    { headerName: 'Current Balance', field: 'current_balance' },
+  ];
 
   bankAccounts = [];
   netWorth: number;
@@ -34,6 +58,9 @@ export class AccountBalancesComponent implements OnInit{
   liabilityAccounts = [];
 
   includeClosedControl = new FormControl(false);
+
+  @ViewChild('agGrid')
+  grid: AgGridNg2;
 
   constructor(
     private menuDisplayService: MenuDisplayService,
@@ -47,6 +74,7 @@ export class AccountBalancesComponent implements OnInit{
         .subscribe(includeClosed => this.setupAccountCategories(includeClosed));
 
     this.setupAccountCategories();
+
 
   }
 
@@ -62,8 +90,17 @@ export class AccountBalancesComponent implements OnInit{
         this.liabilityAccounts = this.bankAccounts.filter( b => b.account_category == 'liability');
 
         this.netWorth = this.accountBalancesService.netWorth(bankAccounts);
+
+        this.grid.api.sizeColumnsToFit();
     });
 
   }
 
+  autoResize(){
+    console.log('resize');
+    if(!this.grid.api){
+      return;
+    }
+    this.grid.api.sizeColumnsToFit();
+  }
 }

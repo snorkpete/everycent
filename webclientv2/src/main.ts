@@ -1,3 +1,6 @@
+import "ag-grid/dist/styles/ag-grid.css";
+import "ag-grid/dist/styles/theme-material.css";
+
 import "./styles.scss";
 import '@angular/material/core/theming/prebuilt/indigo-pink.css';
 import "hammerjs";

@@ -14,6 +14,7 @@ import {DeleteButtonComponent} from "./delete-button.component";
 import {MoneyFieldComponent} from "./money-field.component";
 import {IconButton} from "./icon-button.component";
 import {HideOnMobileDirective} from "./hide-on-mobile.directive";
+import {AgGridNg2, AgGridModule} from "ag-grid-ng2";
 
 @NgModule({
     imports: [
@@ -21,6 +22,7 @@ import {HideOnMobileDirective} from "./hide-on-mobile.directive";
         MaterialModule.forRoot(),
         FlexLayoutModule.forRoot(),
         FormsModule, ReactiveFormsModule,
+        AgGridModule.withComponents([]),
     ],
     declarations:[
         CardComponent,
@@ -60,6 +62,8 @@ import {HideOnMobileDirective} from "./hide-on-mobile.directive";
         // re-export the material design modules
         MaterialModule,
         FlexLayoutModule,
+
+        AgGridModule,
     ]
 })
 export class SharedModule{}
