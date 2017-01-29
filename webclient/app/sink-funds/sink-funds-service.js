@@ -5,13 +5,14 @@
     .module('everycent.sink-funds')
     .factory('SinkFundsService', SinkFundsService);
 
-    SinkFundsService.$inject = ['Restangular', 'UtilService'];
-    function SinkFundsService(Restangular, UtilService){
+    SinkFundsService.$inject = ['Restangular', 'UtilService', '$http'];
+    function SinkFundsService(Restangular, UtilService, $http){
       var service = {
         getSinkFunds: getSinkFunds,
         save: save,
         unassignedBalance: unassignedBalance,
-        accountBalance: accountBalance
+        accountBalance: accountBalance,
+        transferAllocation: transferAllocation,
       };
 
       var baseAll = Restangular.all('sink_funds');
@@ -21,14 +22,16 @@
         return baseAll.getList(params);
       }
 
+      function transferAllocation(sinkFund, transferParams){
+        return $http.post('sink_funds/' + sinkFund.id +'/transfer_allocation', transferParams);
+      }
+
       function save(sinkFund, searchOptions){
         return sinkFund.save();
       }
 
       function unassignedBalance(sinkFund){
-        return sinkFund.current_balance -
-              (UtilService.total(sinkFund.sink_fund_allocations, 'amount') - 
-               UtilService.total(sinkFund.sink_fund_allocations, 'spent'));
+        return sinkFund.current_balance - UtilService.total(sinkFund.sink_fund_allocations, 'current_balance');
       }
 
       function accountBalance(sinkFund){

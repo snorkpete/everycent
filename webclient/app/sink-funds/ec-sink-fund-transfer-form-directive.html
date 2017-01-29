@@ -1,0 +1,55 @@
+
+<div class="row">
+    <div class="col-xs-12">
+        <form id="sink-fund-transfer-form" class="form-horizontal" novalidate
+              name="vm.transferForm"
+              ng-submit="vm.transferAllocation(vm.transfer, vm.transferForm)">
+            <ec-panel type="primary" title="Edit Bank Account">
+
+                <div class="form-group" ng-class="{'has-error': vm.error.server }">
+                    <label class="col-xs-2 control-label">Transfer From</label>
+                    <div class="col-xs-6">
+                           <select  name="existing_allocation_id"
+                                    ng-model="vm.transfer.existing_allocation_id"
+                                    ng-required="true"
+                                    ng-options="allocation.id as allocation.name for allocation in vm.sinkFund.sink_fund_allocations"
+                                    class="form-control">
+                            </select>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-class="{'has-error': vm.error.server }">
+                    <label class="col-xs-2 control-label">Transfer To</label>
+                    <div class="col-xs-6">
+                        <select  name="new_allocation_id"
+                                 ng-model="vm.transfer.new_allocation_id"
+                                 ng-required="true"
+                                 ng-options="allocation.id as allocation.name for allocation in vm.sinkFund.sink_fund_allocations"
+                                 class="form-control">
+                        </select>
+                    </div>
+                </div>
+
+                <ec-form-field label="Amount" label-width="2"
+                               name="amount"
+                               error="vm.transferForm.amount.$error"
+                               field-width="6"
+                               placeholder="Amount being transferred"
+                               type="dollars"
+                               ng-required="true"
+                               ng-model="vm.transfer.amount">
+                </ec-form-field>
+
+
+                <div class="form-group">
+                    <div class="col-xs-offset-2 col-xs-4">
+                        <button type="submit" class="btn btn-primary">Submit Transfer</button>
+                    </div>
+                    <div class="col-xs-4">
+                        <button type="button" class="btn btn-danger" ng-click="vm.cancelEdit()">Cancel</button>
+                    </div>
+                </div>
+            </ec-panel>
+        </form>
+    </div>
+</div>

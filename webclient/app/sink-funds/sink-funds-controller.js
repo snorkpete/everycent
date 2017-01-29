@@ -6,9 +6,9 @@
     .module('everycent.sink-funds')
     .controller('SinkFundsCtrl', SinkFundsCtrl);
 
-  SinkFundsCtrl.$inject = ['MessageService', 'SinkFundsService', 'LookupService', 'ReferenceService', 'UtilService', 'StateService'];
+  SinkFundsCtrl.$inject = ['MessageService', 'SinkFundsService', 'LookupService', 'ReferenceService', 'UtilService', 'StateService', '$modal'];
 
-  function SinkFundsCtrl(MessageService, SinkFundsService, LookupService, ReferenceService, UtilService, StateService){
+  function SinkFundsCtrl(MessageService, SinkFundsService, LookupService, ReferenceService, UtilService, StateService, $modal){
     var vm = this;
     vm.ref = ReferenceService;
     vm.state = StateService;
@@ -31,6 +31,7 @@
     vm.unassignedBalance = SinkFundsService.unassignedBalance;
     vm.accountBalance = SinkFundsService.accountBalance;
     vm.isSinkFundAllocationVisible = isSinkFundAllocationVisible;
+    vm.showTransferForm = showTransferForm;
 
     activate();
 
@@ -123,6 +124,58 @@
       return sinkFundAllocation.status === 'open' ||
              sinkFundAllocation.unsaved ||
              (vm.showClosed && sinkFundAllocation.status == 'closed');
+    }
+
+    function showTransferForm(sinkFund){
+
+      var template =
+        '<div class="modal-header">' +
+        '     <h3>Transfer Money </h3>' +
+        ' </div>' +
+        ' <div class="modal-body">' +
+        '    <ec-sink-fund-transfer-form sink-fund="vm.sinkFund"' +
+        '                                on-save="vm.options.confirm()">' +
+        '                                on-cancel="vm.options.cancel()">' +
+        '    </ec-sink-fund-transfer-form>' +
+        ' </div>' //;+
+        ' <div class="modal-footer">' +
+        '     <button class="btn btn-primary" ' +
+        '           ng-click="vm.options.confirm();">' +
+        '           Save' +
+        '     </button>' +
+        '     <button class="btn btn-danger" ' +
+        '           ng-click="vm.options.cancel();">' +
+        '           Cancel' +
+        '     </button>' +
+        ' </div>';
+
+      var modalInstance = $modal.open({
+        template: template,
+        backdrop:'static',
+        controller: modalController,
+        controllerAs: 'vm'
+      });
+
+      return modalInstance.result;
+
+      function modalController(){
+        /* jshint validthis: true */
+        var vm = this;
+        vm.options = {};
+        vm.sinkFund = sinkFund;
+
+        vm.options.confirm = function(){
+          modalInstance.close('ok');
+          refreshSinkFunds().then(function(){
+            _setInitialSinkFund();
+            MessageService.setMessage('Sink fund saved.');
+          });
+        };
+
+        vm.options.cancel = function(){
+          modalInstance.dismiss('cancel');
+        };
+      }
     }
   }
 })();

@@ -31,7 +31,11 @@ Rails.application.routes.draw do
   end
 
   resources :account_balances, only: [:index]
-  resources :sink_funds, only: [:index, :update]
+  resources :sink_funds, only: [:index, :update] do
+    member do
+      post 'transfer_allocation'
+    end
+  end
   resources :sink_fund_allocations, only: [:index]
 
   resources :recurring_allocations, except: [:new, :edit]

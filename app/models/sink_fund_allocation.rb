@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: sink_fund_allocations
+#
+#  id              :integer          not null, primary key
+#  name            :string
+#  bank_account_id :integer
+#  amount          :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  comment         :string
+#  status          :string           default("open")
+#
+
+# TODO: rename sink fund allocation to 'Financial Obligation'
 class SinkFundAllocation < ActiveRecord::Base
   belongs_to :bank_account
 
@@ -12,6 +27,7 @@ class SinkFundAllocation < ActiveRecord::Base
   end
 
 
+  #TODO: remove this - part of the old user interface
   def spent
     # TODO: to follow up on why summing in the db causes n+1 queries
     # transactions.sum('withdrawal_amount - deposit_amount')
@@ -23,8 +39,27 @@ class SinkFundAllocation < ActiveRecord::Base
     end
   end
 
+  #TODO: remove this - part of the old user interface
   def remaining
     amount - spent
   end
 
+  # target is the
+  def target
+    amount
+  end
+
+  def target=(new_amount)
+    self.amount = new_amount
+  end
+
+  def current_balance
+    transactions.to_a.sum do |transaction|
+      transaction.deposit_amount - transaction.withdrawal_amount
+    end
+  end
+
+  def difference
+    target - current_balance
+  end
 end
