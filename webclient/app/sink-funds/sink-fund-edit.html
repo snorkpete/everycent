@@ -7,21 +7,21 @@
                 <label>
                     <input type="checkbox"
                            ng-model="vm.showClosed" />
-                    Include Closed Allocations?
+                    Include Closed Financial Obligations?
                 </label>
         </div>
     </div>
 </div>
 
 
-<ec-panel title="Edit Allocations for: {{ vm.sinkFund.name }}" type="primary">
+<ec-panel title="Edit Financial Obligations/Goals for: {{ vm.sinkFund.name }}" type="primary">
     <table class="table table-bordered rounded fixed-layout">
     <thead>
         <tr class="heading">
-            <th style="width:25%;">Name</th>
-            <th style="width:10%;" class="text-right">Allocated</th>
-            <th style="width:10%;" class="text-right">Spent</th>
-            <th style="width:10%;" class="text-right">Remaining</th>
+            <th style="width:25%;">Goal/Obligation</th>
+            <th style="width:10%;" class="text-right">Target</th>
+            <th style="width:10%;" class="text-right">Current Balance</th>
+            <th style="width:10%;" class="text-right">Outstanding (Still to Save)</th>
             <th style="width:25%;" class="hidden-xs">Comment</th>
             <th style="width:15%;" class="hidden-xs">Status</th>
             <th style="width:5%;"></th>
@@ -31,14 +31,16 @@
         <tr class="total">
             <th> Total </th>
             <th class="text-right">
-                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'amount') | ecToDollars }}
+                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'target') | ecToDollars }}
             </th>
             <th class="text-right">
-                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'spent') | ecToDollars }}
+                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'current_balance') | ecToDollars }}
             </th>
             <th class="text-right">
+                <!--
                 <ec-amount-formatted amount="vm.accountBalance(vm.sinkFund)">
                 </ec-amount-formatted>
+                -->
             </th>
             <th class="text-right"> </th>
             <th></th>
@@ -48,17 +50,30 @@
     <tbody>
         <tr>
             <td>
-                <strong> Unassigned Money </strong>
+                <strong>Sink Fund Account Balance</strong>
             </td>
+            <td></td>
             <td class="text-right">
-                <strong><ec-amount-formatted amount="vm.unassignedBalance(vm.sinkFund)"></ec-amount-formatted></strong>
+                <strong><ec-amount-formatted amount="vm.sinkFund.current_balance"></ec-amount-formatted></strong>
+            </td>
+            <td></td>
+            <td>
+                <strong><em>Current Account Balance</em></strong>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <strong>Unassigned Money</strong>
             </td>
             <td></td>
             <td class="text-right">
                 <strong><ec-amount-formatted amount="vm.unassignedBalance(vm.sinkFund)"></ec-amount-formatted></strong>
             </td>
+            <td></td>
             <td>
-                <strong><em> Money not allocated</em></strong>
+                <strong><em>Money not assigned to any financial goal/obligation</em></strong>
             </td>
             <td></td>
             <td></td>
@@ -72,14 +87,16 @@
                 <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.name" name="name"></input>
             </td>
             <td class="text-right">
-                <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.amount | ecToDollars"></span>
-                <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.amount" ec-as-dollars></input>
+                <strong>
+                    <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.target | ecToDollars"></span>
+                </strong>
+                <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.target" ec-as-dollars></input>
             </td>
             <td class="text-right">
-                <span ng-bind="sinkFundAllocation.spent | ecToDollars"></span>
+                <span ng-bind="sinkFundAllocation.current_balance | ecToDollars"></span>
             </td>
             <td class="text-right">
-                <ec-amount-formatted amount="sinkFundAllocation.amount-sinkFundAllocation.spent">
+                <ec-amount-formatted amount="sinkFundAllocation.current_balance-sinkFundAllocation.target">
                 </ec-amount-formatted>
             </td>
             <td>
@@ -128,7 +145,7 @@
     </table>
 
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-12">
             <span ng-hide="vm.isEditMode">
                 <button class="btn btn-primary"
                         ng-click="vm.switchToEditMode()">
@@ -139,6 +156,12 @@
                         ng-click="vm.state.go('sink-funds')">
                     Back to List
                 </button>
+                &nbsp; &nbsp;
+                <button class="btn btn-primary"
+                        ng-click="vm.showTransferForm(vm.sinkFund)">
+                    Transfer Money Between Allocations
+                </button>
+
                 &nbsp; &nbsp;
                 <button class="btn btn-default"
                     ng-click="vm.state.go('transactions', { bank_account: vm.sinkFund.id })">

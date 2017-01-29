@@ -127,7 +127,7 @@ class BankAccount < ActiveRecord::Base
   def self.extract_sink_fund_params(input_params)
     # TODO this doesn't belong here - was added for unit testing, which isnt an appropriate reason
     params = ActionController::Parameters.new(input_params)
-    params.permit(:sink_fund => [:id, {sink_fund_allocations: [:id, :name, :amount, :comment, :status, :deleted] }]).require(:sink_fund)
+    params.permit(:sink_fund => [:id, {sink_fund_allocations: [:id, :name, :amount, :target, :comment, :status, :deleted] }]).require(:sink_fund)
   end
 
   def check_sink_fund_allocation_balance_against_current_balance(new_sink_fund_allocations)
@@ -192,6 +192,33 @@ class BankAccount < ActiveRecord::Base
       sink_fund_allocation.amount += transaction_total
       sink_fund_allocation.save
     end
+  end
+
+
+  def transfer_allocation(existing_allocation_id, new_allocation_id, amount, date=Date.today)
+
+    return if existing_allocation_id == 0 and new_allocation_id == 0
+
+    # remove the amount from the existing allocation
+    transaction_from = transaction_for_transfer(existing_allocation_id, date)
+    transaction_from.withdrawal_amount = amount
+    self.transactions << transaction_from
+
+    transaction_to = transaction_for_transfer(new_allocation_id, date)
+    transaction_to.deposit_amount = amount
+    self.transactions << transaction_to
+
+    #self.save
+  end
+
+  def transaction_for_transfer(sink_fund_allocation_id, date)
+    new_transaction = Transaction.new(sink_fund_allocation_id: sink_fund_allocation_id)
+    new_transaction.description = "Internal Allocation Transfer"
+    new_transaction.withdrawal_amount = 0
+    new_transaction.deposit_amount = 0
+    new_transaction.transaction_date = date
+    new_transaction.status = 'paid'
+    new_transaction
   end
 
   ##############################

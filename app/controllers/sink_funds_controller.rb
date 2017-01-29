@@ -1,5 +1,5 @@
 class SinkFundsController < ApplicationController
-  before_action :set_sink_fund, only: [:show, :edit, :update, :destroy]
+  before_action :set_sink_fund, only: [:show, :edit, :update, :destroy, :transfer_allocation]
 
   def index
     @sink_funds = BankAccount.sink_funds.includes(:institution, { :sink_fund_allocations => :transactions }).order(:name)
@@ -9,6 +9,15 @@ class SinkFundsController < ApplicationController
 
   def update
     @sink_fund = BankAccount.update_sink_fund(params)
+    respond_with(@sink_fund, SinkFundSerializer)
+  end
+
+  def transfer_allocation
+
+    @sink_fund.transfer_allocation(
+        params[:existing_allocation_id],
+        params[:new_allocation_id],
+        params[:amount])
     respond_with(@sink_fund, SinkFundSerializer)
   end
 
