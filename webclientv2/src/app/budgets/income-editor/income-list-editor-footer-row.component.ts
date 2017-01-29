@@ -1,5 +1,5 @@
 import {Component, Input} from "@angular/core";
-import {Income} from "../income.model";
+import {IncomeData} from "../income.model";
 import ColumnAlignments from "./income-list-align-values";
 import total from '../../shared/item-total.function';
 
@@ -23,7 +23,7 @@ import total from '../../shared/item-total.function';
 })
 export class IncomeListEditorFooterRowComponent{
   @Input() isEditMode: boolean;
-  @Input() incomes: Income[];
+  @Input() incomes: IncomeData[];
   alignments = ColumnAlignments;
   total = total;
 }
