@@ -3,22 +3,24 @@
 /* ***********************/
 /* layout helper styles  */
 /* ***********************/
-[layout="row"]{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-[layout="row"] > *{
-    flex: 1;
-}
-[layout="column"]{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-[layout="column"] > *{
-    flex: 1;
-}
+/*[layout="row"]{
+/*    display: flex;
+/*    flex-direction: row;
+/*    justify-content: space-between;
+/*}
+/*[layout="row"] > *{
+/*    flex: 1;
+/*}
+/*[layout="column"]{
+/*    display: flex;
+/*    flex-direction: column;
+/*    justify-content: space-between;
+/*}
+/*[layout="column"] > *{
+/*    flex: 1;
+/*}
+
+ */
 
 .center{
     text-align: center;
@@ -36,7 +38,7 @@ md-sidenav-layout {
 }
 
 md-card{
-    margin: 10px;
+    margin: 3px;
     border-radius: 10px;
 }
 
