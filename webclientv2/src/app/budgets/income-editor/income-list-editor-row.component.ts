@@ -1,5 +1,5 @@
 import {Component, Input} from "@angular/core";
-import {Income} from "../income.model";
+import {IncomeData} from "../income.model";
 import ColumnAlignments from "./income-list-align-values";
 @Component({
   styles:[`
@@ -40,7 +40,7 @@ import ColumnAlignments from "./income-list-align-values";
   `
 })
 export class IncomeListEditorRowComponent{
-  @Input() income: Income;
+  @Input() income: IncomeData;
   @Input() isViewMode: boolean;
 
   bankAccounts: any[];
