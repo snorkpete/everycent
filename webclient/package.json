@@ -1,6 +1,6 @@
 {
   "name": "everycent",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Everycent Zero Based Budget Manager",
   "main": "server.js",
   "repository": {
