@@ -134,7 +134,7 @@
         ' </div>' +
         ' <div class="modal-body">' +
         '    <ec-sink-fund-transfer-form sink-fund="vm.sinkFund"' +
-        '                                on-save="vm.options.confirm()">' +
+        '                                on-save="vm.options.confirm()"' +
         '                                on-cancel="vm.options.cancel()">' +
         '    </ec-sink-fund-transfer-form>' +
         ' </div>' //;+

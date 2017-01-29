@@ -43,7 +43,6 @@
     }
 
     function cancelEdit(){
-      console.log('implement cance');
       vm.onCancel();
     }
 
