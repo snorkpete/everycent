@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import 'rxjs/add/operator/map';
+import {ApiGateway} from '../api/api-gateway.service';
 
 @Component({
   selector: 'ec-root',
@@ -8,6 +10,15 @@ import { Component } from '@angular/core';
     Hello from trinidad {{ title }}
   `,
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'ec works!';
+  result: any;
+
+  constructor(
+    private apiGateway: ApiGateway
+  ) { }
+
+  ngOnInit() {
+    this.apiGateway.test();
+  }
 }
