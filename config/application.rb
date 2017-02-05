@@ -35,5 +35,13 @@ module Everycent
 
       g.fixture_replacement :factory_girl, dir: 'spec/factories'
     end
+
+    # configure rails to allow CORS from all sources
+    config.middleware.insert_before 0, "Rack::Cors" do
+      allow do
+        origins '*'
+        resource '*', :headers => :any, :methods => [:get, :post, :options]
+      end
+    end
   end
 end

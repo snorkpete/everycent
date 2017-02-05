@@ -145,6 +145,7 @@ GEM
     rack (1.6.0)
     rack-contrib (1.2.0)
       rack (>= 0.9.1)
+    rack-cors (0.4.1)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.1)
@@ -254,6 +255,7 @@ DEPENDENCIES
   omniauth
   pg
   puma
+  rack-cors
   rails (~> 4.2)
   rails-api
   rails_12factor

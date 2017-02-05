@@ -28,6 +28,9 @@ gem 'devise_token_auth'
 gem 'active_model_serializers'
 gem 'responders'
 
+gem 'rack-cors', :require => 'rack/cors'
+
+
 #for heroku
 group :production do
   gem 'rails_12factor'
