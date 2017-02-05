@@ -2,6 +2,7 @@
 
 import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import {ApiGateway} from "../api/api-gateway.service";
 
 describe('AppComponent', () => {
   beforeEach(() => {
@@ -9,6 +10,9 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
+      providers: [
+        { provide: ApiGateway, useValue: { test: (_: any) => {}} }
+      ]
     });
     TestBed.compileComponents();
   });
