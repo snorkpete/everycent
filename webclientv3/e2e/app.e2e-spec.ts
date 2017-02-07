@@ -9,6 +9,6 @@ describe('everycent App', function() {
 
   it('should display message saying app works', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('ec works!');
+    expect(page.getParagraphText()).toContain('ec works!');
   });
 });

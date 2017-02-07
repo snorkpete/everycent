@@ -10,8 +10,9 @@ export class ApiGateway{
     private http: Http
   ) {}
 
-  test(){
+  test() {
     this.http.get(this.BASE_URL + '/account_balances')
+    //this.http.get('/api/account_balances')
       .map(res => res.json())
       .subscribe( result => console.log(result))
   }

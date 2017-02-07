@@ -1,17 +1,20 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-import {ApiGateway} from "../api/api-gateway.service";
+import {async, TestBed} from '@angular/core/testing';
+import {AppComponent} from './app.component';
+import {ApiGateway} from '../api/api-gateway.service';
+import {ApiGatewayStub} from '../../test/api-gateway-stub';
 
 describe('AppComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+      ],
       declarations: [
         AppComponent
       ],
       providers: [
-        { provide: ApiGateway, useValue: { test: (_: any) => {}} }
+        { provide: ApiGateway, useValue: ApiGatewayStub }
       ]
     });
     TestBed.compileComponents();
