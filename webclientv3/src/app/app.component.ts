@@ -14,13 +14,10 @@ import {ApiGateway} from '../api/api-gateway.service';
 })
 export class AppComponent implements OnInit{
   title = 'ec works!';
-  result: any;
 
   constructor(
-    private apiGateway: ApiGateway
   ) { }
 
   ngOnInit() {
-    this.apiGateway.test();
   }
 }
