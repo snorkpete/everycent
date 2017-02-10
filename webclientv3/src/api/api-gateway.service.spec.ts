@@ -1,10 +1,6 @@
-
 import {ApiGateway} from './api-gateway.service';
 import {async, inject, TestBed} from '@angular/core/testing';
-import {
-  BaseRequestOptions, BaseResponseOptions, ConnectionBackend, Http, HttpModule, RequestOptions, Response, ResponseOptions,
-  XHRBackend
-} from '@angular/http';
+import {BaseRequestOptions, Http, HttpModule, Request, RequestMethod, RequestOptions, Response, ResponseOptions} from '@angular/http';
 import {MockBackend, MockConnection} from '@angular/http/testing';
 
 describe('ApiGateway', () => {
@@ -38,24 +34,44 @@ describe('ApiGateway', () => {
 
   describe('get()', () => {
 
-    it('makes a request to the url', async(() => {
+    let request: Request;
+    let connection: MockConnection;
 
+    beforeEach(async(() => {
+      // grab the mock connection and request to inspect them later
+      mockBackend.connections.subscribe((_connection: MockConnection) => {
+        connection = _connection;
+        request = _connection.request;
+      });
+    }));
+
+    it("requests the correct url", async(() => {
+      let url = "accounts";
+      apiGateway.get(url).subscribe();
+      expect(request.url).toContain(url, 'requests the correct url');
+    }));
+
+    it("makes a 'GET' request", async(() => {
+      apiGateway.get('hello').subscribe();
+      expect(request.method).toEqual(RequestMethod.Get);
+    }));
+
+    it('makes a request to the url', async(() => {
       let mockResponse = [
         {id: 0, name: 'Account 0'},
         {id: 1, name: 'Account 1'},
         {id: 2, name: 'Account 2'},
-        {id: 3, name: 'Account 3'},
+        {id: 2, name: 'Account 2'},
       ];
 
-      mockBackend.connections.subscribe((connection: MockConnection) => {
-        connection.mockRespond(new Response( new ResponseOptions({body: JSON.stringify(mockResponse)})));
-      });
-
-      apiGateway.get()
+      apiGateway.get('random')
         .subscribe(accounts => {
           expect(accounts.length).toEqual(4, '4 accounts returned');
         });
+      let response = new Response( new ResponseOptions({body: JSON.stringify(mockResponse)}));
+      connection.mockRespond(response);
     }));
+
   });
 });
 
