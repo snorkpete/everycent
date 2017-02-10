@@ -1,19 +1,19 @@
 import {Injectable} from "@angular/core";
 import {Http} from "@angular/http";
 import {BASE_URL} from "./base-url.service";
+import {Observable} from 'rxjs';
 
 @Injectable()
-export class ApiGateway{
+export class ApiGateway {
 
   private BASE_URL = BASE_URL;
   constructor(
     private http: Http
   ) {}
 
-  test() {
-    this.http.get(this.BASE_URL + '/account_balances')
-    //this.http.get('/api/account_balances')
-      .map(res => res.json())
-      .subscribe( result => console.log(result))
+  get(): Observable<any> {
+
+    return this.http.get(this.BASE_URL + '/account_balances')
+               .map(res => res.json());
   }
 }
