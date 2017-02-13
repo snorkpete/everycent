@@ -31,7 +31,7 @@ export class ApiGateway {
     });
   }
 
-  private urlEncode(obj: Object): string {
+  private urlEncode(obj: any): string {
     let urlSearchParams = new URLSearchParams();
     for (let key in obj) {
       urlSearchParams.append(key, obj[key]);
