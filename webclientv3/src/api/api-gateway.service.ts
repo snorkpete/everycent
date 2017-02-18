@@ -20,6 +20,15 @@ export class ApiGateway {
                     .map(res => res.json());
   }
 
+  postWithoutAuthentication(url: string, data: any) {
+    const headers = new Headers({
+      'Content-Type': 'application/json'
+    });
+    const options = new RequestOptions({ headers: headers});
+    return this.http.post(url, data, options).map(res => res.json());
+
+  }
+
   private getAuthenticationHeaders() {
     return new Headers({
       'Content-Type': 'application/json',

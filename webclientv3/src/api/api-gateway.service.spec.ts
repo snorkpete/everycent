@@ -98,5 +98,41 @@ describe('ApiGateway', () => {
     });
 
   });
+
+  describe('postWithoutAuthentication()', () => {
+
+    let request: Request;
+    let connection: MockConnection;
+
+    beforeEach(() => {
+      // grab the mock connection and request to inspect them later
+      mockBackend.connections.subscribe((_connection: MockConnection) => {
+        connection = _connection;
+        request = _connection.request;
+      });
+    });
+
+    it("POSTs to the correct url", () => {
+      let url = '/login';
+      apiGateway.postWithoutAuthentication(url, {}).subscribe();
+      expect(request.url).toContain(url, 'uses correct url');
+      expect(request.method).toEqual(RequestMethod.Post, 'uses correct method');
+    });
+
+    it("adds additional data to the request body", () => {
+      apiGateway.postWithoutAuthentication('test', {mydata: 'yes', name: 'Jess'});
+
+      let requestBodyAsJSON = JSON.parse(request.getBody());
+      expect(requestBodyAsJSON).toEqual({mydata: 'yes', name: 'Jess'});
+
+    });
+
+    it("does NOT add any authentication headers", () => {
+      apiGateway.postWithoutAuthentication('test', {});
+      expect(request.headers.get('Content-Type')).toEqual('application/json', 'has correct content type');
+      expect(request.headers.get('access-token')).toEqual(null, 'no access token');
+    });
+
+  });
 });
 
