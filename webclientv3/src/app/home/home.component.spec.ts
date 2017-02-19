@@ -1,9 +1,8 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
-import { HomeComponent } from './home.component';
+import {HomeComponent} from './home.component';
 import {MaterialModule} from '@angular/material';
 import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
 
@@ -14,13 +13,13 @@ describe('HomeComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        MaterialModule.forRoot(),
+        //MaterialModule.forRoot(),
       ],
       declarations: [ HomeComponent ],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         MainToolbarService,
       ]
-
     })
     .compileComponents();
   }));
