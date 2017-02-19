@@ -1,6 +1,17 @@
 import {ApiGateway} from './api-gateway.service';
-import {inject, TestBed} from '@angular/core/testing';
-import {BaseRequestOptions, Http, HttpModule, Request, RequestMethod, RequestOptions, Response, ResponseOptions} from '@angular/http';
+import {async, inject, TestBed} from '@angular/core/testing';
+import {
+  BaseRequestOptions,
+  Headers,
+  Http,
+  HttpModule,
+  Request,
+  RequestMethod,
+  RequestOptions,
+  Response,
+  ResponseOptions,
+  ResponseType
+} from '@angular/http';
 import {MockBackend, MockConnection} from '@angular/http/testing';
 
 describe('ApiGateway', () => {
@@ -132,6 +143,43 @@ describe('ApiGateway', () => {
       expect(request.headers.get('Content-Type')).toEqual('application/json', 'has correct content type');
       expect(request.headers.get('access-token')).toEqual(null, 'no access token');
     });
+
+    it("sends the authentication response headers as the output on success", async(() => {
+
+      apiGateway.postWithoutAuthentication('test', {}).subscribe(result => {
+        expect(result['access-token']).toEqual('a');
+        expect(result['client']).toEqual('c');
+        expect(result['expiry']).toEqual('e');
+        expect(result['token-type']).toEqual('t');
+        expect(result['uid']).toEqual('u');
+      });
+
+      let headers = new Headers({
+        'access-token': 'a',
+        'client': 'c',
+        'expiry': 'e',
+        'token-type': 't',
+        'uid': 'u'
+      });
+
+      let response = new Response({ headers: headers});
+      connection.mockRespond(response);
+    }));
+
+    it("sends the error message as the response if the request fails", async(() => {
+
+      let errorMessage = "Authentication failed";
+      let errorJSON = { "errors": ["Authentication failed"]};
+      apiGateway.postWithoutAuthentication('test', {}).subscribe({
+        error: (error) => {
+          expect(error).toEqual({ "errors": [errorMessage] });
+        }
+      });
+
+      let response = new Response({ type: ResponseType.Error, status: 401, body: errorJSON});
+      connection.mockError(response);
+
+    }));
 
   });
 });

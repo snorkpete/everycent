@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ApiGateway} from '../../api/api-gateway.service';
+import {ApiGateway} from '../../../api/api-gateway.service';
 import 'rxjs/add/operator/toPromise';
 import {Observable} from 'rxjs/Observable';
 
