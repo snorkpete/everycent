@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
 import { LoginComponent } from './login.component';
 import {MaterialModule} from '@angular/material';
@@ -14,14 +14,15 @@ describe('LoginComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        MaterialModule.forRoot(),
+        // importing this module slows down tests dramatically
+        //MaterialModule.forRoot(),
       ],
       declarations: [ LoginComponent ],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         MainToolbarService,
       ]
-    })
-    .compileComponents();
+    });
   }));
 
   beforeEach(() => {
@@ -33,4 +34,10 @@ describe('LoginComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+
+  it('calls AuthService#login when the Log In button is clicked', () => {pending();});
+  it('shows the error from AuthService if one is returned', () => {pending();});
+
+  it('clears the form when the Reset button is clicked', () => {pending();});
 });
