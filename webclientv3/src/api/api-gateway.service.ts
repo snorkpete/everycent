@@ -19,6 +19,8 @@ export class ApiGateway {
 
     return this.http.get(fullUrl, options)
                     .map(res => res.json());
+    // TODO: catch authentication errors and redirect to the login page
+
   }
 
   postWithoutAuthentication(url: string, data: any): Observable<any> {
