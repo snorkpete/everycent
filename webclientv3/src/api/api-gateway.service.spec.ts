@@ -21,7 +21,7 @@ describe('ApiGateway', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpModule,
+        //HttpModule,
       ],
       providers: [
         ApiGateway,
