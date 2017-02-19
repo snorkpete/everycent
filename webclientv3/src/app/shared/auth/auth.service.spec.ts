@@ -99,12 +99,12 @@ describe('AuthService', () => {
   });
 
   describe("logOut()", () => {
-    it('clears the authentication info in local storage', () => {});
-    it('redirects (or submits an event to redirect) to the login page', () => {});
+    it('clears the authentication info in local storage', () => {pending();});
+    it('redirects (or submits an event to redirect) to the login page', () => {pending();});
   });
 
   describe("isLoggedIn()", () => {
-    it('returns true after successful login', () => {});
-    it('returns false after logout', () => {});
+    it('returns true after successful login', () => {pending();});
+    it('returns false after logout', () => {pending();});
   });
 });
