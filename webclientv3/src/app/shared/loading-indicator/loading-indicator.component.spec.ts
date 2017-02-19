@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
 import { LoadingIndicatorComponent } from './loading-indicator.component';
 import {MaterialModule} from '@angular/material';
@@ -12,8 +12,9 @@ describe('LoadingIndicatorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MaterialModule.forRoot()],
-      declarations: [ LoadingIndicatorComponent ]
+      //imports: [MaterialModule.forRoot()],
+      declarations: [ LoadingIndicatorComponent ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
   }));

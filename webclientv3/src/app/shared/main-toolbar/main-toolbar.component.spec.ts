@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 import {async, ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
 import { MainToolbarComponent } from './main-toolbar.component';
 import {SharedModule} from '../shared.module';
@@ -14,11 +14,12 @@ describe('MainToolbarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MaterialModule.forRoot()],
+      //imports: [MaterialModule.forRoot()],
       declarations: [ MainToolbarComponent ],
       providers: [
         MainToolbarService,
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     })
     .compileComponents();
   }));

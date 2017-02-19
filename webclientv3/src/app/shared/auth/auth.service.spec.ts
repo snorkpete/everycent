@@ -1,11 +1,12 @@
 /* tslint:disable:no-unused-variable */
 
-import {TestBed, async, inject, fakeAsync, tick} from '@angular/core/testing';
-import { AuthService } from './auth.service';
+import {inject, TestBed} from '@angular/core/testing';
+import {AuthService} from './auth.service';
 import {ApiGateway} from '../../../api/api-gateway.service';
 import {Observable} from 'rxjs/Observable';
 import 'hammerjs';
 import {Http} from '@angular/http';
+import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
 
 describe('AuthService', () => {
@@ -20,6 +21,9 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        //MaterialModule.forRoot()
+      ],
       providers: [
         AuthService,
         ApiGateway,
