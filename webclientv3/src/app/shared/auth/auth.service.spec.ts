@@ -8,22 +8,15 @@ import 'hammerjs';
 import {Http} from '@angular/http';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
+import {httpStub} from '../../../../test/http-stub';
 
 describe('AuthService', () => {
 
   let authService: AuthService;
   let apiGateway: ApiGateway;
 
-  let httpStub = {
-    get: (_: any) => {},
-    post: (_: any) => {},
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        //MaterialModule.forRoot()
-      ],
       providers: [
         AuthService,
         ApiGateway,
