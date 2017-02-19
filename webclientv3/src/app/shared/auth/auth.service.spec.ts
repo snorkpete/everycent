@@ -2,7 +2,7 @@
 
 import {TestBed, async, inject, fakeAsync, tick} from '@angular/core/testing';
 import { AuthService } from './auth.service';
-import {ApiGateway} from '../../api/api-gateway.service';
+import {ApiGateway} from '../../../api/api-gateway.service';
 import {Observable} from 'rxjs/Observable';
 import 'hammerjs';
 import {Http} from '@angular/http';
