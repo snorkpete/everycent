@@ -39,7 +39,7 @@ describe('AuthService', () => {
       const password = 'password';
 
       authService.logIn(email, password).then(() => {
-        expect(spy.calls.mostRecent().args[0]).toEqual('/login', 'calls to the correct url');
+        expect(spy.calls.mostRecent().args[0]).toEqual('/auth/sign_in', 'calls to the correct url');
         expect(spy.calls.mostRecent().args[1]).toEqual({email, password}, 'passes the email and password properly');
       });
     });
