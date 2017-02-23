@@ -11,6 +11,7 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {RouterModule} from '@angular/router';
 import {AppRoutingModule} from '../app-routing.module';
 import {MainToolbarService} from './main-toolbar/main-toolbar.service';
+import {MessageService} from '../message-display/message.service';
 import {AuthService} from './auth/auth.service';
 
 @NgModule({
@@ -41,6 +42,7 @@ import {AuthService} from './auth/auth.service';
   providers: [
     LoadingIndicator,
     MainToolbarService,
+    MessageService,
     AuthService,
   ]
 })
