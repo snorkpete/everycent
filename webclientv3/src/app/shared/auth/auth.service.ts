@@ -15,7 +15,7 @@ export class AuthService {
 
   logIn(email: string, password: string): Promise<any> {
     return this.apiGateway
-            .postWithoutAuthentication('/login', {email, password})
+            .postWithoutAuthentication('/auth/sign_in', {email, password})
             .do(userCredentials => this.saveCredentials(userCredentials))
             // On any error, clear the credentials and rethrow the error
             .catch(error => {

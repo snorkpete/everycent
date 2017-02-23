@@ -11,6 +11,7 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {RouterModule} from '@angular/router';
 import {AppRoutingModule} from '../app-routing.module';
 import {MainToolbarService} from './main-toolbar/main-toolbar.service';
+import {AuthService} from './auth/auth.service';
 
 @NgModule({
   imports: [
@@ -40,6 +41,7 @@ import {MainToolbarService} from './main-toolbar/main-toolbar.service';
   providers: [
     LoadingIndicator,
     MainToolbarService,
+    AuthService,
   ]
 })
 export class SharedModule { }
