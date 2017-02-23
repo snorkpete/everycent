@@ -5,3 +5,4 @@ let ApiGatewayStub = {
 }
 
 export {ApiGatewayStub};
+
