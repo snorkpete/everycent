@@ -11,12 +11,15 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {RouterModule} from '@angular/router';
 import {AppRoutingModule} from '../app-routing.module';
 import {MainToolbarService} from './main-toolbar/main-toolbar.service';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MessageService} from '../message-display/message.service';
 import {AuthService} from './auth/auth.service';
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     MaterialModule.forRoot(),
     RouterModule,
     FlexLayoutModule,
@@ -29,6 +32,8 @@ import {AuthService} from './auth/auth.service';
     MenuComponent,
   ],
   exports: [
+    FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     FlexLayoutModule,
 

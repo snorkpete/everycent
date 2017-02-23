@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
+import {AuthService} from '../shared/auth/auth.service';
+import {MessageService} from '../message-display/message.service';
 
 @Component({
   selector: 'ec-login',
@@ -24,18 +26,18 @@ import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
         
         <md-card-content fxLayout="column">
             <md-input-container>
-                <input md-input placeholder="Email" type="text" />
+                <input md-input placeholder="Email" type="text" name="email" [(ngModel)]="email" class="email"/>
             </md-input-container>
             
             <md-input-container>
-                <input md-input placeholder="Password" type="password" />
+                <input md-input placeholder="Password" type="password" name="password" [(ngModel)]="password" class="password"/>
             </md-input-container>
         </md-card-content>
         
         <md-divider></md-divider>
         
         <md-card-actions>
-            <button md-raised-button color="primary" type="submit">Log In</button>
+            <button md-raised-button color="primary" type="submit" class="login">Log In</button>
             <button md-raised-button color="" type="reset">Cancel</button>
         </md-card-actions>
     </md-card>
@@ -44,16 +46,22 @@ import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
 })
 export class LoginComponent implements OnInit {
 
+  email: string;
+  password: string;
+
   constructor(
-    private mainToolbarService: MainToolbarService
+    private mainToolbarService: MainToolbarService,
+    private authService: AuthService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit() {
     this.mainToolbarService.hideToolbar();
   }
 
-  login() {
-
+  login(): Promise<any> {
+    return this.authService.logIn(this.email, this.password)
+                           .catch(error => this.messageService.setErrorMessage(error)) ;
   }
 
 }
