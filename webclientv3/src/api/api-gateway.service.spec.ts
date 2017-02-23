@@ -172,7 +172,7 @@ describe('ApiGateway', () => {
       let errorJSON = { "errors": ["Authentication failed"]};
       apiGateway.postWithoutAuthentication('test', {}).subscribe({
         error: (error) => {
-          expect(error).toEqual({ "errors": [errorMessage] });
+          expect(error).toEqual("Authentication failed");
         }
       });
 
