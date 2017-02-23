@@ -3,6 +3,7 @@ import {Headers, Http, RequestOptions, URLSearchParams} from '@angular/http';
 import {BASE_URL} from './base-url.service';
 import {Observable} from 'rxjs/Observable';
 import {AuthCredentials} from '../app/shared/auth/auth-credentials';
+import 'rxjs/add/observable/throw';
 
 @Injectable()
 export class ApiGateway {
@@ -15,7 +16,7 @@ export class ApiGateway {
   get(url: string, params?: any): Observable<any> {
 
     const options = new RequestOptions({ headers: this.getAuthenticationHeaders() });
-    const fullUrl = `${this.BASE_URL}/${url}?${this.urlEncode(params)}`;
+    const fullUrl = `${this.BASE_URL}${url}?${this.urlEncode(params)}`;
 
     return this.http.get(fullUrl, options)
                     .map(res => res.json());
@@ -28,7 +29,8 @@ export class ApiGateway {
       'Content-Type': 'application/json'
     });
     const options = new RequestOptions({ headers: headers});
-    return this.http.post(url, data, options)
+    const fullUrl = `${this.BASE_URL}${url}`;
+    return this.http.post(fullUrl, data, options)
                     .map( response => ({
                       'access-token': response.headers.get('access-token'),
                       'client': response.headers.get('client'),
@@ -37,7 +39,8 @@ export class ApiGateway {
                       'uid': response.headers.get('uid'),
                     }))
                     .catch( error => {
-                      return Observable.throw(error.json());
+                      let errorResponse = error.json();
+                      return Observable.throw(errorResponse["errors"][0]);
                     });
 
   }
