@@ -34,7 +34,8 @@ module.exports = function (config) {
     },
     reporters: config.angularCli && config.angularCli.codeCoverage
               ? ['dots', 'karma-remap-istanbul']
-              : ['spec'],
+              : ['spec'], // Use the spec reporter
+              //: ['dots'],   // use the dots reporter
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
