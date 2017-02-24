@@ -11,6 +11,7 @@ import {Router} from '@angular/router';
         width: 350px;
         margin: auto;
         margin-top: 15px;
+        box-shadow: 10px 10px 10px #888888;
     }
     md-card-actions {
         margin: 0;

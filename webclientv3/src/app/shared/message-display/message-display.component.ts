@@ -12,12 +12,13 @@ import {MessageService, MessageType} from '../../message-display/message.service
         font-weight: 400;
         font-size: 1.1em;
         border-radius: 5px;
+        box-shadow: 10px 10px 5px #888888;
     }
 
     div.error {
         color: white;
-        background-color: #ffb300;
-        border: 2px solid #886b27;
+        background-color: #f44336;
+        border: 2px solid #892822;
     }
     div.info {
         color: white;
