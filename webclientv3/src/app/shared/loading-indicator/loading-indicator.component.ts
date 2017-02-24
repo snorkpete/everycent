@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {LoadingIndicator} from './loading-indicator.service';
 
 @Component({
   selector: 'ec-loading-indicator',
@@ -8,12 +9,16 @@ import { Component, OnInit } from '@angular/core';
     }
   `],
   template: `
-    <md-progress-bar color="accent" mode="indeterminate"></md-progress-bar>
+
+    <md-progress-bar color="accent" mode="indeterminate" class="loader" *ngIf="loadingIndicator.isVisible()">
+    </md-progress-bar>
   `
 })
 export class LoadingIndicatorComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public loadingIndicator: LoadingIndicator
+  ) { }
 
   ngOnInit() {
   }

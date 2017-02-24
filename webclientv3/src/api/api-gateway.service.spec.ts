@@ -13,6 +13,7 @@ import {
   ResponseType
 } from '@angular/http';
 import {MockBackend, MockConnection} from '@angular/http/testing';
+import {LoadingIndicator} from '../app/shared/loading-indicator/loading-indicator.service';
 
 describe('ApiGateway', () => {
 
@@ -34,6 +35,7 @@ describe('ApiGateway', () => {
         },
         MockBackend,
         BaseRequestOptions,
+        LoadingIndicator,
       ]
     });
   });

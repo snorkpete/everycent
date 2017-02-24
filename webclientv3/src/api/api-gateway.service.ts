@@ -4,13 +4,15 @@ import {BASE_URL} from './base-url.service';
 import {Observable} from 'rxjs/Observable';
 import {AuthCredentials} from '../app/shared/auth/auth-credentials';
 import 'rxjs/add/observable/throw';
+import {LoadingIndicator} from '../app/shared/loading-indicator/loading-indicator.service';
 
 @Injectable()
 export class ApiGateway {
 
   private BASE_URL = BASE_URL;
   constructor(
-    public http: Http
+    public http: Http,
+    private loadingIndicator: LoadingIndicator
   ) {}
 
   get(url: string, params?: any): Observable<any> {
@@ -30,7 +32,10 @@ export class ApiGateway {
     });
     const options = new RequestOptions({ headers: headers});
     const fullUrl = `${this.BASE_URL}${url}`;
+
+    this.loadingIndicator.show();
     return this.http.post(fullUrl, data, options)
+                    .do(() => this.loadingIndicator.hide())
                     .map( response => ({
                       'access-token': response.headers.get('access-token'),
                       'client': response.headers.get('client'),
@@ -39,6 +44,7 @@ export class ApiGateway {
                       'uid': response.headers.get('uid'),
                     }))
                     .catch( error => {
+                      this.loadingIndicator.hide();
                       let errorResponse = error.json();
                       return Observable.throw(errorResponse["errors"][0]);
                     });

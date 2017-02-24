@@ -9,6 +9,7 @@ import {Http} from '@angular/http';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
 import {httpStub} from '../../../../test/http-stub';
+import {LoadingIndicator} from '../loading-indicator/loading-indicator.service';
 
 describe('AuthService', () => {
 
@@ -20,7 +21,8 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         ApiGateway,
-        { provide: Http, useValue: httpStub }
+        { provide: Http, useValue: httpStub },
+        LoadingIndicator,
       ]
     });
   });
@@ -99,12 +101,12 @@ describe('AuthService', () => {
   });
 
   describe("logOut()", () => {
-    it('clears the authentication info in local storage', () => {pending();});
-    it('redirects (or submits an event to redirect) to the login page', () => {pending();});
+    it('clears the authentication info in local storage', () => {pending(); });
+    it('redirects (or submits an event to redirect) to the login page', () => {pending(); });
   });
 
   describe("isLoggedIn()", () => {
-    it('returns true after successful login', () => {pending();});
-    it('returns false after logout', () => {pending();});
+    it('returns true after successful login', () => {pending(); });
+    it('returns false after logout', () => {pending(); });
   });
 });
