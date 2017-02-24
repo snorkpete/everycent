@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
 import {AuthService} from '../shared/auth/auth.service';
 import {MessageService} from '../message-display/message.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'ec-login',
@@ -52,7 +53,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private mainToolbarService: MainToolbarService,
     private authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -60,8 +62,12 @@ export class LoginComponent implements OnInit {
   }
 
   login(): Promise<any> {
-    return this.authService.logIn(this.email, this.password)
-                           .catch(error => this.messageService.setErrorMessage(error)) ;
+    this.messageService.clear();
+
+    return this.authService
+      .logIn(this.email, this.password)
+      .then(result => this.router.navigateByUrl('/'))
+      .catch(error => this.messageService.setErrorMessage(error)) ;
   }
 
 }
