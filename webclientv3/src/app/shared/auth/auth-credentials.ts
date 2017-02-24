@@ -1,6 +1,10 @@
 import {Headers} from '@angular/http';
 export class AuthCredentials {
 
+  // needed to be able to index into AuthCredentials without getting type errors
+  //  (i.e.  this['access-token'] throws error without the index signature line below
+  [key: string]: any;
+
   static fromLocalStorage(): AuthCredentials {
     return new AuthCredentials({
       'access-token': localStorage.getItem('access-token'),
