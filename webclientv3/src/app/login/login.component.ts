@@ -10,6 +10,7 @@ import {Router} from '@angular/router';
     md-card {
         width: 350px;
         margin: auto;
+        margin-top: 15px;
     }
     md-card-actions {
         margin: 0;
