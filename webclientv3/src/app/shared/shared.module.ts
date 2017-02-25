@@ -15,6 +15,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MessageService} from '../message-display/message.service';
 import {AuthService} from './auth/auth.service';
 import { EcIconComponent } from './ec-icon/ec-icon.component';
+import {AuthGuard} from './auth/auth-guard.service';
 import { MenuItemComponent } from './menu/menu-item.component';
 
 @NgModule({
@@ -53,6 +54,7 @@ import { MenuItemComponent } from './menu/menu-item.component';
     MainToolbarService,
     MessageService,
     AuthService,
+    AuthGuard,
   ]
 })
 export class SharedModule { }
