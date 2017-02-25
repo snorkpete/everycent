@@ -1,34 +1,37 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {MainToolbarService} from './main-toolbar.service';
+import {Icon} from '../ec-icon/icon.type';
 
 @Component({
   selector: 'ec-main-toolbar',
+  styles: [`
+    .heading {
+    }
+  `],
   template: `
     <md-toolbar color="primary" *ngIf="toolbarService.isToolbarVisible()" class="menu-bar">
-        <button md-icon-button class="open-menu-button" (click)="openMenu.emit()"><md-icon>menu</md-icon></button>
-        <div class="full-width" fxLayout="row" fxLayoutAlign="space-between center">
-            <span >EveryCent V3 </span>
-            <span fxFlex>
-                <div *ngIf="heading"> - {{ heading }}</div>
-            </span>
-            <a  routerLink="/logout">Log out</a>
-        </div>
+
+        <ec-icon iconType="button"
+                 [icon]="Icon.MENU"
+                 class="open-menu-button"
+                 (click)="openMenu.emit()">
+        </ec-icon>
+        EveryCent V3
+        <span *ngIf="heading" fxHide.xs class="heading">
+            --- {{ heading }}
+        </span>
+
+        <md-toolbar-row fxHide.sm>
+           {{ heading }}
+        </md-toolbar-row>
     </md-toolbar>
   `,
-  styles: [`
-    .full-width {
-        width: 100%;
-    }
-    a {
-        color: white;
-        font-size: 0.7em;
-    }
-  `]
 })
 export class MainToolbarComponent implements OnInit {
 
-  heading = 'Welcome to everycent';
+  heading = 'Welcome to Everycent';
   @Output() openMenu = new EventEmitter();
+  Icon = Icon;
 
   constructor(
     public toolbarService: MainToolbarService

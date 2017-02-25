@@ -8,7 +8,7 @@ import {Router} from '@angular/router';
   selector: 'ec-login',
   styles: [`
     md-card {
-        width: 350px;
+        width: 300px;
         margin: auto;
         margin-top: 15px;
         box-shadow: 10px 10px 10px #888888;
