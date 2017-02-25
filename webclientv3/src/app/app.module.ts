@@ -11,6 +11,7 @@ import {MaterialModule} from '@angular/material';
 import {AppRoutingModule} from './app-routing.module';
 import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
+import {SinkFundsModule} from './sink-funds/sink-funds.module';
 
 @NgModule({
   imports: [
@@ -20,6 +21,9 @@ import { HomeComponent } from './home/home.component';
 
     ApiModule,
     SharedModule,
+
+    // feature modules
+    SinkFundsModule,
   ],
   declarations: [
     AppComponent,
