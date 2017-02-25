@@ -25,6 +25,11 @@ export class AuthService {
             .toPromise();
   }
 
+  logOut(): Promise<any> {
+    this.clearCredentials();
+    return Promise.resolve(true);
+  }
+
   private saveCredentials(userCredentials: any): void {
     localStorage.setItem('access-token', userCredentials['access-token']);
     localStorage.setItem('client', userCredentials['client']);

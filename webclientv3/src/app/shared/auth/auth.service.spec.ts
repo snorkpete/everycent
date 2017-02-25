@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import {inject, TestBed} from '@angular/core/testing';
+import {async, inject, TestBed} from '@angular/core/testing';
 import {AuthService} from './auth.service';
 import {ApiGateway} from '../../../api/api-gateway.service';
 import {Observable} from 'rxjs/Observable';
@@ -101,8 +101,17 @@ describe('AuthService', () => {
   });
 
   describe("logOut()", () => {
-    it('clears the authentication info in local storage', () => {pending(); });
-    it('redirects (or submits an event to redirect) to the login page', () => {pending(); });
+    it('clears the authentication info in local storage', async(() => {
+
+      localStorage.setItem('access-token', 'boo');
+      localStorage.setItem('uid', 'uid');
+
+      authService.logOut().then(() => {
+        expect(localStorage.getItem('access-token')).toEqual(null);
+        expect(localStorage.getItem('uid')).toEqual(null);
+      });
+    }));
+
   });
 
   describe("isLoggedIn()", () => {

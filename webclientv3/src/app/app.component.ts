@@ -9,7 +9,7 @@ import 'rxjs/add/operator/map';
       <md-sidenav-layout fullscreen>
 
           <md-sidenav #sidenav opened="false" mode="overlay">
-              <ec-menu (close)="sidenav.close()"></ec-menu>
+              <ec-menu (menuSelect)="sidenav.close()"></ec-menu>
           </md-sidenav>
               
           <ec-main-toolbar (openMenu)="sidenav.open()"> </ec-main-toolbar>    
