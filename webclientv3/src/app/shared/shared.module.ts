@@ -14,6 +14,7 @@ import {MainToolbarService} from './main-toolbar/main-toolbar.service';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MessageService} from '../message-display/message.service';
 import {AuthService} from './auth/auth.service';
+import { EcIconComponent } from './ec-icon/ec-icon.component';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import {AuthService} from './auth/auth.service';
     LoadingIndicatorComponent,
     MessageDisplayComponent,
     MenuComponent,
+    EcIconComponent,
   ],
   exports: [
     FormsModule,
