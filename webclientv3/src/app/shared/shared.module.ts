@@ -15,6 +15,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MessageService} from '../message-display/message.service';
 import {AuthService} from './auth/auth.service';
 import { EcIconComponent } from './ec-icon/ec-icon.component';
+import { MenuItemComponent } from './menu/menu-item.component';
 
 @NgModule({
   imports: [
@@ -32,6 +33,7 @@ import { EcIconComponent } from './ec-icon/ec-icon.component';
     MessageDisplayComponent,
     MenuComponent,
     EcIconComponent,
+    MenuItemComponent,
   ],
   exports: [
     FormsModule,
