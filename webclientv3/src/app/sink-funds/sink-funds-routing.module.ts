@@ -1,9 +1,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import {SinkFundsComponent} from './sink-funds.component';
+import {AuthGuard} from '../shared/auth/auth-guard.service';
 
 const routes: Routes = [
-  { path: 'sink-funds', component: SinkFundsComponent },
+  {
+    path: '',
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'sink-funds', component: SinkFundsComponent },
+    ]
+  }
 ];
 
 @NgModule({
