@@ -23,6 +23,10 @@ export class AuthCredentials {
     this['uid'] = authData['uid'];
   }
 
+  hasAccessToken(): boolean {
+    return !!this['access-token'];
+  }
+
   toJSON(): any {
     return {
       'access-token': this['access-token'] || null,

@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import {async, inject, TestBed} from '@angular/core/testing';
+import {async, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
 import {AuthService} from './auth.service';
 import {ApiGateway} from '../../../api/api-gateway.service';
 import {Observable} from 'rxjs/Observable';
@@ -8,6 +8,7 @@ import 'hammerjs';
 import {Http} from '@angular/http';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/operator/map';
 import {httpStub} from '../../../../test/http-stub';
 import {LoadingIndicator} from '../loading-indicator/loading-indicator.service';
 
@@ -115,7 +116,88 @@ describe('AuthService', () => {
   });
 
   describe("isLoggedIn()", () => {
-    it('returns true after successful login', () => {pending(); });
-    it('returns false after logout', () => {pending(); });
+    describe('if localStorage is empty',() => {
+      it('returns FALSE promise',  async(() => {
+        localStorage.clear();
+
+        authService.isLoggedIn().then(isLoggedIn => {
+          expect(isLoggedIn).toEqual(false, 'not logged in');
+        });
+      }));
+    });
+
+    describe('if localStorage has auth info', () => {
+
+      it('checks the auth info against the server and resolves to true if auth info is valid', async(() => {
+        let expectedResponse = {
+          "success": true,
+          "data": {
+            "id": 2,
+            "provider": "email",
+            "uid": "kion.stephen@gmail.com",
+            "first_name": "Kion",
+            "last_name": "Stephen",
+            "nickname": '',
+            "image": '',
+            "email": "kion.stephen@gmail.com"
+          }
+        };
+
+        localStorage.setItem('access-token', 'access');
+        let spy = spyOn(apiGateway, 'get').and.returnValue(Observable.of(expectedResponse));
+
+        authService.isLoggedIn().then(isLoggedIn => {
+          expect(spy.calls.mostRecent().args[0]).toEqual('/auth/validate_token');
+          expect(isLoggedIn).toEqual(true);
+        });
+
+      }));
+
+
+      it("rejects with a FALSE Promise if server says auth info is invalid", async(() => {
+
+        let expectedResponse = {
+          "success": false,
+          "errors": [
+            "Invalid login credentials"
+          ]
+        };
+        spyOn(apiGateway, 'get').and.returnValue(Observable.throw(expectedResponse));
+        authService.isLoggedIn()
+          .then(isLoggedIn => {
+            expect(true).toEqual(false, 'should NOT get here - expect a rejected promise');
+          })
+          .catch(isLoggedIn => {
+            expect(isLoggedIn).toEqual(false);
+          });
+      }));
+
+      it('caches the authentication state (no further server validation needed)', fakeAsync(() => {
+
+        let expectedResponse = {
+          "success": true,
+          "data": {
+            "id": 2,
+            "provider": "email",
+            "uid": "kion.stephen@gmail.com",
+            "first_name": "Kion",
+            "last_name": "Stephen",
+            "nickname": '',
+            "image": '',
+            "email": "kion.stephen@gmail.com"
+          }
+        };
+        let spy = spyOn(apiGateway, 'get').and.returnValue(Observable.of(expectedResponse));
+        authService.isLoggedIn();
+        tick();
+
+        authService.isLoggedIn();
+        tick();
+
+        expect(spy.calls.count()).toEqual(1, 'only one call to the api');
+
+      }));
+
+    });
   });
 });
