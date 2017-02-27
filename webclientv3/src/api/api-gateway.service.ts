@@ -30,19 +30,23 @@ export class ApiGateway {
     const headers = new Headers({
       'Content-Type': 'application/json'
     });
+
     const options = new RequestOptions({ headers: headers});
+
     const fullUrl = `${this.BASE_URL}${url}`;
 
     this.loadingIndicator.show();
     return this.http.post(fullUrl, data, options)
                     .do(() => this.loadingIndicator.hide())
-                    .map( response => ({
-                      'access-token': response.headers.get('access-token'),
-                      'client': response.headers.get('client'),
-                      'expiry': response.headers.get('expiry'),
-                      'token-type': response.headers.get('token-type'),
-                      'uid': response.headers.get('uid'),
-                    }))
+                    .map( response => {
+                      return {
+                        'access-token': response.headers.get('access-token'),
+                        'client': response.headers.get('client'),
+                        'expiry': response.headers.get('expiry'),
+                        'token-type': response.headers.get('token-type'),
+                        'uid': response.headers.get('uid'),
+                      };
+                    })
                     .catch( error => {
                       this.loadingIndicator.hide();
                       let errorResponse = error.json();
@@ -53,6 +57,7 @@ export class ApiGateway {
 
   private getAuthenticationHeaders() {
     let headers = AuthCredentials.fromLocalStorage().toHeaders();
+    // ensure that we receive responses as json
     headers.append('Content-Type', 'application/json');
     return headers;
   }
