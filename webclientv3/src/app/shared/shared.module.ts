@@ -37,6 +37,7 @@ import { MenuItemComponent } from './menu/menu-item.component';
     MenuItemComponent,
   ],
   exports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,

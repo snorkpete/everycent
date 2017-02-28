@@ -1,28 +1,54 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { SinkFundsComponent } from './sink-funds.component';
+import {SinkFundComponent} from './sink-fund/sink-fund.component';
+import {SinkFundService} from './sink-fund.service';
+import {ApiGateway} from '../../api/api-gateway.service';
+import {ApiGatewayStub} from '../../../test/api-gateway-stub';
+import {SampleSinkFundData} from '../../../test/sample-sink-fund-data';
+
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 
 describe('SinkFundsComponent', () => {
   let component: SinkFundsComponent;
   let fixture: ComponentFixture<SinkFundsComponent>;
 
+  let sinkFundService: SinkFundService;
+  let apiGateway: ApiGateway;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SinkFundsComponent ]
+      declarations: [ SinkFundsComponent, SinkFundComponent ],
+      providers: [
+        SinkFundService,
+        { provide: ApiGateway, useValue: ApiGatewayStub },
+      ],
     })
     .compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(inject([SinkFundService], (service, gateway) => {
     fixture = TestBed.createComponent(SinkFundsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+
+    sinkFundService = service;
+    apiGateway = gateway;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('gets the current sink fund', async(() => {
+    let response = SampleSinkFundData;
+    let spy = spyOn(sinkFundService, 'getCurrent').and.returnValue(Observable.of(response));
+
+    fixture.detectChanges();
+    expect(component.sinkFund).toEqual(response);
+
+  }));
 });
