@@ -1,10 +1,9 @@
 /* tslint:disable:no-unused-variable */
 import {async, ComponentFixture, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
 import { SinkFundsComponent } from './sink-funds.component';
-import {SinkFundComponent} from './sink-fund/sink-fund.component';
 import {SinkFundService} from './sink-fund.service';
 import {ApiGateway} from '../../api/api-gateway.service';
 import {ApiGatewayStub} from '../../../test/api-gateway-stub';
@@ -22,7 +21,8 @@ describe('SinkFundsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SinkFundsComponent, SinkFundComponent ],
+      declarations: [ SinkFundsComponent ],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         SinkFundService,
         { provide: ApiGateway, useValue: ApiGatewayStub },

@@ -1,0 +1,72 @@
+/* **************** */
+/* table formatting */
+/* **************** */
+
+table.table {
+  position: relative;
+  border: 1px solid rgba(0,0,0,.12);
+  border-collapse: collapse;
+  font-size: 12px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+  width: 100%;
+}
+
+table.table thead {
+  padding-bottom: 3px;
+}
+table.table td:first-of-type, table.table th:first-of-type {
+  padding-left: 24px;
+  text-align: left;
+  border-left: none;
+}
+table.table th {
+  position: relative;
+  vertical-align: bottom;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0;
+  height: 48px;
+  font-size: 14px;
+  color: rgba(0,0,0,.54);
+  box-sizing: border-box;
+  padding: 0 18px 12px 18px;
+  text-align: right;
+  border-bottom: 2px solid black;
+  border-left: 1px solid rgba(0,0,0,.12);
+}
+table.table tbody tr {
+  position: relative;
+  height: 35px;
+  transition-duration: .28s;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-property: background-color;
+}
+table.table tbody tr:hover {
+  background-color: #eee;
+}
+
+table.table tbody tr.selected {
+  background-color: #ddd;
+}
+
+table.table tbody tr.total{
+  font-weight: bold;
+  size: 1.1em;
+}
+
+table.table td:first-of-type, table.table th:first-of-type {
+  padding-left: 24px;
+}
+
+table.table td {
+  vertical-align: middle;
+  position: relative;
+  height: 35px;
+  border-top: 1px solid rgba(0,0,0,.12);
+  border-bottom: 1px solid rgba(0,0,0,.12);
+  padding: 12px 18px;
+  box-sizing: border-box;
+  text-align: right;
+  border-left: 1px solid rgba(0,0,0,.12);
+}

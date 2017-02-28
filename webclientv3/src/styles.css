@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/core/theming/prebuilt/deeppurple-amber.css';
 
+@import 'data-table-styles.scss';
+
 div.md-sidenav-content {
     background-color: #a09fa2;
 }
