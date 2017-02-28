@@ -1,7 +1,8 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {SinkFundData} from '../sink-fund-data.model';
 import {ObservableMedia} from '@angular/flex-layout';
-import {Subscription} from 'rxjs';
+import {Subscription} from 'rxjs/Subscription';
+import {total} from '../../util/total';
 
 @Component({
   selector: 'ec-sink-fund',
@@ -19,6 +20,17 @@ import {Subscription} from 'rxjs';
     table.table.small {
         width: 768px;
     }
+    
+    .highlight {
+        font-weight: bold;
+        font-size: 13px;
+    }
+    
+    .total {
+        font-weight: bold;
+        font-size: 14px;
+        border-top: 2px solid black;
+    }
   `],
   template: `
       <md-card>
@@ -31,6 +43,16 @@ import {Subscription} from 'rxjs';
                   </thead>
 
                   <tbody>
+                    <tr class="highlight">
+                        <td *ngFor="let column of getAccountBalanceColumns()">
+                            {{ column }}
+                        </td>
+                    </tr>
+                    <tr class="highlight">
+                        <td *ngFor="let column of getUnassignedMoneyColumns()">
+                            {{ column }}
+                        </td>
+                    </tr>
                     <tr *ngFor="let allocation of sinkFund.sink_fund_allocations">
                         <td *ngFor="let column of columns">
                             {{ allocation[column.allocationField] }}
@@ -38,7 +60,14 @@ import {Subscription} from 'rxjs';
                     </tr>
                   </tbody>
                   
-                  <tfoot></tfoot>
+                  <tfoot>
+                    <tr class="total">
+                        <td *ngFor="let column of getTotalColumns()">
+                            {{ column }}
+                        </td>
+                    </tr>
+
+                  </tfoot>
               </table>
           </div>
 
@@ -59,6 +88,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.sinkFund = { sink_fund_allocations: [] };
     this.createColumns();
 
     this.mediaSubscription = this.media.subscribe( () => {
@@ -69,6 +99,54 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.mediaSubscription.unsubscribe();
   }
+
+  getAccountBalanceColumns() {
+    return [
+      'Sink Fund Account Balance',
+      '',
+      this.sinkFund.current_balance,
+      '',
+      'Current Account Balance',
+      '',
+      ''
+    ];
+  }
+
+  getUnassignedMoneyColumns() {
+    return [
+      'Unassigned Money',
+      '',
+      total(this.sinkFund ? this.sinkFund.sink_fund_allocations : [], 'amount'),
+      '',
+      'Money not assigned to any financial goal/obligation',
+      '',
+      '',
+    ];
+  }
+
+  getTotalColumns() {
+    return [
+      'Total',
+      total(this.sinkFund.sink_fund_allocations, 'target'),
+      total(this.sinkFund.sink_fund_allocations, 'current_balance'),
+
+      this.getAccountBalance(),
+      '',
+      '',
+      '',
+    ];
+  }
+
+  getUnassignedBalance(){
+    return this.sinkFund.current_balance - total(this.sinkFund.sink_fund_allocations, 'current_balance');
+  }
+
+
+  getAccountBalance() {
+    return total(this.sinkFund.sink_fund_allocations, 'remaining') +
+        this.getUnassignedBalance();
+  }
+
 
   private createColumns() {
     this.columns = [
@@ -81,7 +159,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
       { text: 'Status', allocationField: 'comment', flex: 10 },
       { text: '', allocationField: 'none', flex: 5 },
     ];
-  }
 
+  };
 
 }
