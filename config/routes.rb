@@ -32,6 +32,10 @@ Rails.application.routes.draw do
 
   resources :account_balances, only: [:index]
   resources :sink_funds, only: [:index, :update] do
+    collection do
+      get 'current'
+    end
+
     member do
       post 'transfer_allocation'
     end
