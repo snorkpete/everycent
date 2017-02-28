@@ -1,9 +1,10 @@
 /* tslint:disable:no-unused-variable */
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
 import { SinkFundComponent } from './sink-fund.component';
+import {FlexLayoutModule} from '@angular/flex-layout';
 
 describe('SinkFundComponent', () => {
   let component: SinkFundComponent;
@@ -11,7 +12,9 @@ describe('SinkFundComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SinkFundComponent ]
+      imports: [FlexLayoutModule],
+      declarations: [ SinkFundComponent ],
+      schemas: [NO_ERRORS_SCHEMA],
     })
     .compileComponents();
   }));

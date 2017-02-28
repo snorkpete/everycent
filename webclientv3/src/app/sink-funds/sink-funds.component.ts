@@ -7,10 +7,7 @@ import {SinkFundService} from './sink-fund.service';
   styles: [`
   `],
   template: `
-    <ec-sink-fund></ec-sink-fund>
-    
-    {{ sinkFund | json }}
-
+    <ec-sink-fund [sinkFund]="sinkFund"></ec-sink-fund>
   `,
 })
 export class SinkFundsComponent implements OnInit {
