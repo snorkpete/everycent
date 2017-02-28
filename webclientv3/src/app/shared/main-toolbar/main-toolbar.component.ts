@@ -21,7 +21,7 @@ import {Icon} from '../ec-icon/icon.type';
             --- {{ heading }}
         </span>
 
-        <md-toolbar-row fxHide.sm>
+        <md-toolbar-row fxHide.gt-xs>
            {{ heading }}
         </md-toolbar-row>
     </md-toolbar>
