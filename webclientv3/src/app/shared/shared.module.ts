@@ -23,7 +23,7 @@ import { MenuItemComponent } from './menu/menu-item.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MaterialModule.forRoot(),
+    MaterialModule,
     RouterModule,
     FlexLayoutModule,
     AppRoutingModule,
