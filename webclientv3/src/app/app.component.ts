@@ -6,7 +6,7 @@ import 'rxjs/add/operator/map';
   styles: [`
   `],
   template: `
-      <md-sidenav-layout fullscreen>
+      <md-sidenav-container fullscreen>
 
           <md-sidenav #sidenav opened="false" mode="overlay">
               <ec-menu (menuSelect)="sidenav.close()"></ec-menu>
@@ -16,8 +16,8 @@ import 'rxjs/add/operator/map';
           <ec-loading-indicator></ec-loading-indicator>
           <ec-message-display></ec-message-display>
           <router-outlet></router-outlet>
-          
-      </md-sidenav-layout>
+
+      </md-sidenav-container>
   `,
 })
 export class AppComponent implements OnInit{
