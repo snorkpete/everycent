@@ -17,6 +17,7 @@ import {AuthService} from './auth/auth.service';
 import { EcIconComponent } from './ec-icon/ec-icon.component';
 import {AuthGuard} from './auth/auth-guard.service';
 import { MenuItemComponent } from './menu/menu-item.component';
+import {TextFieldComponent} from './form/text-field/text-field.component';
 
 @NgModule({
   imports: [
@@ -35,6 +36,7 @@ import { MenuItemComponent } from './menu/menu-item.component';
     MenuComponent,
     EcIconComponent,
     MenuItemComponent,
+    TextFieldComponent,
   ],
   exports: [
     CommonModule,
@@ -48,6 +50,7 @@ import { MenuItemComponent } from './menu/menu-item.component';
     MessageDisplayComponent,
     MenuComponent,
 
+    TextFieldComponent,
     AppRoutingModule,
   ],
   providers: [
