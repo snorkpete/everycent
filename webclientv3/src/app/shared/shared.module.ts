@@ -17,6 +17,7 @@ import {AuthService} from './auth/auth.service';
 import { EcIconComponent } from './ec-icon/ec-icon.component';
 import {AuthGuard} from './auth/auth-guard.service';
 import { MenuItemComponent } from './menu/menu-item.component';
+import {FormFieldComponent} from './form/form-field/form-field.component';
 import {TextFieldComponent} from './form/text-field/text-field.component';
 import { MoneyPipe } from './money.pipe';
 import {MoneyFieldComponent} from './form/money-field/money-field.component';
@@ -39,9 +40,11 @@ import {DateFieldComponent} from './form/date-field/date-field.component';
     MenuComponent,
     EcIconComponent,
     MenuItemComponent,
+
     TextFieldComponent,
     DateFieldComponent,
     MoneyFieldComponent,
+    FormFieldComponent,
     MoneyPipe,
   ],
   exports: [
@@ -59,7 +62,9 @@ import {DateFieldComponent} from './form/date-field/date-field.component';
     TextFieldComponent,
     DateFieldComponent,
     MoneyFieldComponent,
+    FormFieldComponent,
     MoneyPipe,
+
     AppRoutingModule,
   ],
   providers: [
