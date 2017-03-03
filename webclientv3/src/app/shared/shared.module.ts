@@ -20,6 +20,7 @@ import { MenuItemComponent } from './menu/menu-item.component';
 import {TextFieldComponent} from './form/text-field/text-field.component';
 import { MoneyPipe } from './money.pipe';
 import {MoneyFieldComponent} from './form/money-field/money-field.component';
+import {DateFieldComponent} from './form/date-field/date-field.component';
 
 @NgModule({
   imports: [
@@ -39,6 +40,7 @@ import {MoneyFieldComponent} from './form/money-field/money-field.component';
     EcIconComponent,
     MenuItemComponent,
     TextFieldComponent,
+    DateFieldComponent,
     MoneyFieldComponent,
     MoneyPipe,
   ],
@@ -55,6 +57,7 @@ import {MoneyFieldComponent} from './form/money-field/money-field.component';
     MenuComponent,
 
     TextFieldComponent,
+    DateFieldComponent,
     MoneyFieldComponent,
     MoneyPipe,
     AppRoutingModule,
