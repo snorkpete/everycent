@@ -23,8 +23,8 @@ export class TextFieldComponent implements OnInit, AfterViewInit, ControlValueAc
 
   control = new FormControl('');
 
-  private onChange: Function;
-  private onTouch: Function;
+  private onChange: Function = (_: any) => {};
+  private onTouch: Function = () => {};
 
   constructor() { }
 
