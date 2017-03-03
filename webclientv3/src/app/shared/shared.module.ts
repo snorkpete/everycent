@@ -18,6 +18,8 @@ import { EcIconComponent } from './ec-icon/ec-icon.component';
 import {AuthGuard} from './auth/auth-guard.service';
 import { MenuItemComponent } from './menu/menu-item.component';
 import {TextFieldComponent} from './form/text-field/text-field.component';
+import { MoneyPipe } from './money.pipe';
+import {MoneyFieldComponent} from './form/money-field/money-field.component';
 
 @NgModule({
   imports: [
@@ -37,6 +39,8 @@ import {TextFieldComponent} from './form/text-field/text-field.component';
     EcIconComponent,
     MenuItemComponent,
     TextFieldComponent,
+    MoneyFieldComponent,
+    MoneyPipe,
   ],
   exports: [
     CommonModule,
@@ -51,6 +55,8 @@ import {TextFieldComponent} from './form/text-field/text-field.component';
     MenuComponent,
 
     TextFieldComponent,
+    MoneyFieldComponent,
+    MoneyPipe,
     AppRoutingModule,
   ],
   providers: [
