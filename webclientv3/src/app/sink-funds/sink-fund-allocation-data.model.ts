@@ -4,11 +4,12 @@ export interface SinkFundAllocationData {
   name?: string;
   amount?: number;
   bank_account_id?: number;
-  comment: string;
+  comment?: string;
   spent?: number;
   remaining?: number;
-  status: string;
+  status?: string;
   target?: number;
   current_balance?: number;
   difference?: number;
+  deleted?: boolean;
 }
