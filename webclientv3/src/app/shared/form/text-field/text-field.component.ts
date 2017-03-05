@@ -9,7 +9,9 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
   `],
   template: `
     <md-input-container *ngIf="editMode">
-        <input mdInput type="text" [(ngModel)]="value" [formControl]="control" class="value"/>
+        <input #input mdInput type="text" class="value"
+               (input)="updateValue(input.value)"
+               [formControl]="control" />
     </md-input-container>
     <span class="value" *ngIf="!editMode">{{value}}</span>
   `,
@@ -37,8 +39,13 @@ export class TextFieldComponent implements OnInit, AfterViewInit, ControlValueAc
   ngAfterViewInit(): void {
   }
 
+  updateValue(newValue: string) {
+    this.value = newValue;
+  }
+
   writeValue(newValue: string): void {
     this.value = newValue;
+    this.control.setValue(this.value);
   }
 
   registerOnChange(fn: any): void {
