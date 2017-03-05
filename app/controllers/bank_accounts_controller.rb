@@ -41,7 +41,7 @@ class BankAccountsController < ApplicationController
     end
 
     def bank_account_params
-      params.fetch(:bank_account, {}).permit(:name, :account_type, :account_type_description, :account_no,
+      params.fetch(:bank_account, {}).permit(:name, :account_type, :account_type_description, :is_cash, :account_no,
                                              :user_id, :institution_id, :opening_balance, :account_category,
                                              :allow_default_allocations, :status,
                                              :statement_day, :payment_due_day)

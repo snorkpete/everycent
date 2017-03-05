@@ -29,11 +29,11 @@ import {Router} from '@angular/router';
         
         <md-card-content fxLayout="column">
             <md-input-container>
-                <input md-input placeholder="Email" type="text" name="email" [(ngModel)]="email" class="email"/>
+                <input mdInput placeholder="Email" type="text" name="email" [(ngModel)]="email" class="email"/>
             </md-input-container>
             
             <md-input-container>
-                <input md-input placeholder="Password" type="password" name="password" [(ngModel)]="password" class="password"/>
+                <input mdInput placeholder="Password" type="password" name="password" [(ngModel)]="password" class="password"/>
             </md-input-container>
         </md-card-content>
         

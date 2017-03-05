@@ -87,6 +87,13 @@ body {
   font-size: 1.1em;
 }
 
+td.border-right,
+th.border-right,
+div.border-right,
+.border-right {
+  border-right: 2px solid black !important;
+}
+
 /* Global animations */
 
 .animate.ng-enter,
