@@ -19,8 +19,8 @@
     <thead>
         <tr class="heading">
             <th style="width:25%;">Goal/Obligation</th>
+            <th style="width:10%;" class="text-right border-right">Current Balance</th>
             <th style="width:10%;" class="text-right">Target</th>
-            <th style="width:10%;" class="text-right">Current Balance</th>
             <th style="width:10%;" class="text-right">Outstanding (Still to Save)</th>
             <th style="width:25%;" class="hidden-xs">Comment</th>
             <th style="width:15%;" class="hidden-xs">Status</th>
@@ -30,11 +30,11 @@
     <tfoot>
         <tr class="total">
             <th> Total </th>
-            <th class="text-right">
-                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'target') | ecToDollars }}
+            <th class="text-right border-right">
+                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'current_balance') | ecToDollars }}
             </th>
             <th class="text-right">
-                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'current_balance') | ecToDollars }}
+                {{ vm.util.total(vm.sinkFund.sink_fund_allocations, 'target') | ecToDollars }}
             </th>
             <th class="text-right">
                 <!--
@@ -52,10 +52,10 @@
             <td>
                 <strong>Sink Fund Account Balance</strong>
             </td>
-            <td></td>
-            <td class="text-right">
+            <td class="text-right border-right">
                 <strong><ec-amount-formatted amount="vm.sinkFund.current_balance"></ec-amount-formatted></strong>
             </td>
+            <td></td>
             <td></td>
             <td>
                 <strong><em>Current Account Balance</em></strong>
@@ -67,10 +67,10 @@
             <td>
                 <strong>Unassigned Money</strong>
             </td>
-            <td></td>
-            <td class="text-right">
+            <td class="text-right border-right">
                 <strong><ec-amount-formatted amount="vm.unassignedBalance(vm.sinkFund)"></ec-amount-formatted></strong>
             </td>
+            <td></td>
             <td></td>
             <td>
                 <strong><em>Money not assigned to any financial goal/obligation</em></strong>
@@ -86,14 +86,14 @@
                 <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.name"> </span>
                 <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.name" name="name"></input>
             </td>
+            <td class="text-right border-right">
+                <span ng-bind="sinkFundAllocation.current_balance | ecToDollars"></span>
+            </td>
             <td class="text-right">
                 <strong>
                     <span ng-hide="vm.isEditMode" ng-bind="sinkFundAllocation.target | ecToDollars"></span>
                 </strong>
                 <input type="text" ng-show="vm.isEditMode" ng-model="sinkFundAllocation.target" ec-as-dollars></input>
-            </td>
-            <td class="text-right">
-                <span ng-bind="sinkFundAllocation.current_balance | ecToDollars"></span>
             </td>
             <td class="text-right">
                 <ec-amount-formatted amount="sinkFundAllocation.current_balance-sinkFundAllocation.target">

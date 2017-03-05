@@ -32,7 +32,8 @@
 </ec-transaction-calculator>
 
 <div ng-show="vm.isEditMode">
-    <ec-transaction-importer transactions="vm.transactions"
+    <ec-transaction-importer bank-account="vm.search.bank_account"
+                             transactions="vm.transactions"
                              start-date="vm.search.budget.start_date"
                              end-date="vm.search.budget.end_date"
     >

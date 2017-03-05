@@ -12,6 +12,7 @@
       controllerAs: 'vm',
       bindToController: true,
       scope: {
+        bankAccount: '=',
         transactions: '=',
         startDate:'=',
         endDate:'='
@@ -24,7 +25,7 @@
   controller.$inject = ['TransactionImporterService'];
   function controller(TransactionImporterService){
     var vm = this;
-    vm.importType = 'bank-account';
+
     vm.showForm = false;
     vm.startImport = startImport;
     vm.cancelImport = cancelImport;
@@ -42,6 +43,12 @@
     }
 
     function convertToTransactions(input){
+      if(vm.bankAccount && vm.bankAccount.is_credit_card){
+        vm.importType = 'credit-card';
+      }else{
+        vm.importType = 'bank-account';
+      }
+
       var newTransactions = TransactionImporterService.convertToTransactions(input, vm.startDate, vm.endDate, vm.importType);
       vm.transactions = vm.transactions.concat(newTransactions);
       vm.showForm = false;

@@ -46,7 +46,7 @@
                         <div> <em>Payment Due day:</em> <strong> {{ bankAccount.payment_due_day_ordinal }} </strong> </div>
                     </div>
                 </td>
-                <td> {{ bankAccount.account_category }} </td>
+                <td> {{ bankAccount.account_category }} <br/><em>({{ bankAccount.is_cash ? 'Cash' : 'Non-Cash' }})</em> </td>
                 <td> {{ bankAccount.status }} </td>
                 <td class="text-center"> {{ bankAccount.allow_default_allocations ? 'Yes' : 'No' }} </td>
                 <td class="text-right"> {{ bankAccount.opening_balance | ecToDollars }} </td>
