@@ -1,4 +1,5 @@
 
+import {SinkFundAllocationData} from './sink-fund-allocation-data.model';
 export interface SinkFundData {
   id?: number;
   name?: string;
@@ -13,5 +14,5 @@ export interface SinkFundData {
   sink_fund_allocation_balance?: number;
   is_sink_fund?: boolean;
   institution?: { id: number, name: string };
-  sink_fund_allocations?: SinkFundData[];
+  sink_fund_allocations?: SinkFundAllocationData[];
 };

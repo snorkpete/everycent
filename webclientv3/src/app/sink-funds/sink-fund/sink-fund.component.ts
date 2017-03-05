@@ -1,8 +1,10 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {SinkFundData} from '../sink-fund-data.model';
 import {ObservableMedia} from '@angular/flex-layout';
 import {Subscription} from 'rxjs/Subscription';
 import {total} from '../../util/total';
+import {FormType} from '../../shared/form/form-field/form-field.component';
+import {SinkFundCalculator} from '../sink-fund-calculator.service';
 
 @Component({
   selector: 'ec-sink-fund',
@@ -17,7 +19,7 @@ import {total} from '../../util/total';
         width: 100%; 
     }
     
-    table.table.small {
+    table.table.small-screen {
         width: 768px;
     }
     
@@ -33,54 +35,89 @@ import {total} from '../../util/total';
     }
   `],
   template: `
-      <md-card>
-          <md-toolbar color="primary">Sink Fund Obligations</md-toolbar>
-          <div class="fixed">
-              <table *ngIf="sinkFund" class="table" [class.small]="isSmall">
+    <md-card>
+        <md-toolbar color="primary">Sink Fund Obligations</md-toolbar>
+        <div class="fixed">
+            <table *ngIf="sinkFund" class="table" [class.small-screen]="isSmallScreen">
 
-                  <thead>
-                    <th *ngFor="let column of columns" [style.width.%]="column.flex">{{column.text}}</th>
-                  </thead>
+              <thead>
+              <tr>
+                <th [style.width.%]="30">Goal / Obligation</th>
+                <th [style.width.%]="10">Target</th>
+                <th [style.width.%]="10">Current Balance</th>
 
-                  <tbody>
-                    <tr class="highlight">
-                        <td *ngFor="let column of getAccountBalanceColumns()">
-                            {{ column }}
-                        </td>
-                    </tr>
-                    <tr class="highlight">
-                        <td *ngFor="let column of getUnassignedMoneyColumns()">
-                            {{ column }}
-                        </td>
-                    </tr>
-                    <tr *ngFor="let allocation of sinkFund.sink_fund_allocations">
-                        <td *ngFor="let column of columns">
-                            {{ allocation[column.allocationField] }}
-                        </td>
-                    </tr>
-                  </tbody>
+                <th [style.width.%]="10">Outstanding</th>
+                <th [style.width.%]="25">Comment</th>
+                <th [style.width.%]="5">Status</th>
+              </tr>
+              </thead>
+
+              <tbody>
+              
+                <tr class="highlight">
+                    <td>Sink Fund Account Balance</td>
+                    <td></td>
+                    <td><ec-money-field [value]="sinkFund.current_balance"></ec-money-field></td>
+ 
+                    <td></td>
+                    <td>Current Account Balance</td>
+                    <td></td>
+                </tr>
+                
+                <tr class="highlight">
+                    <td>Unassigned Money</td>
+                    <td></td>
+                    <td><ec-money-field [value]="calculator.unassignedBalance(sinkFund)"></ec-money-field></td>
+
+                    <td></td>
+                    <td>Money not assigned to any financial goal/obligation</td>
+                    <td></td>
+                </tr>
+                
+                <tr *ngFor="let allocation of sinkFund.sink_fund_allocations">
+                    <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
+                    <td><ec-money-field [(ngModel)]="allocation.amount" [editMode]="isEditMode"></ec-money-field></td>
+                    <td><ec-money-field [value]="allocation.current_balance"></ec-money-field></td>
+
+                    <td><ec-money-field [value]="allocation.current_balance-allocation.amount"></ec-money-field></td>
+                    <td><ec-text-field [(ngModel)]="allocation.comment"></ec-text-field></td>
+                    <td>
+                        <!--<pre>{{allocation | json}}</pre>-->
+                    </td>
+                </tr>
+              </tbody>
+
+              <tfoot>
+              <tr class="total">
+                  <td>Total</td>
+                  <td><ec-money-field [value]="calculator.totalTarget(sinkFund)"></ec-money-field></td>
+                  <td><ec-money-field [value]="sinkFund.current_balance"></ec-money-field></td>
                   
-                  <tfoot>
-                    <tr class="total">
-                        <td *ngFor="let column of getTotalColumns()">
-                            {{ column }}
-                        </td>
-                    </tr>
+                  <td><ec-money-field [value]="calculator.totalOutstanding(sinkFund)"></ec-money-field></td>
+                  <td></td>
+                  <td></td>
+              </tr>
 
-                  </tfoot>
-              </table>
-          </div>
+              </tfoot>
+            </table>
+        </div>
+        <md-card-actions>
+            <button md-raised-button (click)="isEditMode = !isEditMode">Toggle Edit</button>
+        </md-card-actions>
 
-      </md-card>
+    </md-card>
   `,
 })
 export class SinkFundComponent implements OnInit, OnDestroy {
 
   @Input() sinkFund: SinkFundData;
 
-  columns: { flex: number, allocationField: string, text: string}[];
+  calculator = new SinkFundCalculator();
 
-  isSmall: boolean;
+  columns: { flex: number, allocationField: string, text: string, type: string, editable?: boolean}[];
+
+  isSmallScreen: boolean;
+  isEditMode = false;
   mediaSubscription: Subscription;
 
   constructor(
@@ -89,77 +126,13 @@ export class SinkFundComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sinkFund = { sink_fund_allocations: [] };
-    this.createColumns();
 
     this.mediaSubscription = this.media.subscribe( () => {
-      this.isSmall = this.media.isActive('xs');
+      this.isSmallScreen = this.media.isActive('xs');
     });
   }
 
   ngOnDestroy() {
     this.mediaSubscription.unsubscribe();
   }
-
-  getAccountBalanceColumns() {
-    return [
-      'Sink Fund Account Balance',
-      '',
-      this.sinkFund.current_balance,
-      '',
-      'Current Account Balance',
-      '',
-      ''
-    ];
-  }
-
-  getUnassignedMoneyColumns() {
-    return [
-      'Unassigned Money',
-      '',
-      total(this.sinkFund ? this.sinkFund.sink_fund_allocations : [], 'amount'),
-      '',
-      'Money not assigned to any financial goal/obligation',
-      '',
-      '',
-    ];
-  }
-
-  getTotalColumns() {
-    return [
-      'Total',
-      total(this.sinkFund.sink_fund_allocations, 'target'),
-      total(this.sinkFund.sink_fund_allocations, 'current_balance'),
-
-      this.getAccountBalance(),
-      '',
-      '',
-      '',
-    ];
-  }
-
-  getUnassignedBalance(){
-    return this.sinkFund.current_balance - total(this.sinkFund.sink_fund_allocations, 'current_balance');
-  }
-
-
-  getAccountBalance() {
-    return total(this.sinkFund.sink_fund_allocations, 'remaining') +
-        this.getUnassignedBalance();
-  }
-
-
-  private createColumns() {
-    this.columns = [
-      { text: 'Goal / Obligation', allocationField: 'name',   flex: 30 },
-      { text: 'Target',            allocationField: 'amount', flex: 10 },
-      { text: 'Current Balance', allocationField: 'current_balance', flex: 10 },
-
-      { text: 'Outstanding', allocationField: 'difference', flex: 10 },
-      { text: 'Comment', allocationField: 'comment', flex: 25 },
-      { text: 'Status', allocationField: 'comment', flex: 10 },
-      { text: '', allocationField: 'none', flex: 5 },
-    ];
-
-  };
-
 }
