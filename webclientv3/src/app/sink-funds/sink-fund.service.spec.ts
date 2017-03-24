@@ -49,4 +49,20 @@ describe('SinkFundService', () => {
         });
     }));
   });
+
+  describe('#save()', () => {
+
+    it('calls the apiGateway correctly', async(() => {
+      let sample = SampleSinkFundData;
+      let spy = spyOn(apiGateway, 'post').and.returnValue(Observable.of(sample));
+
+      sinkFundService.save(sample).subscribe(response => {
+        expect(spy.calls.any()).toBeTruthy('calls the apiGateway');
+        expect(spy.calls.mostRecent().args[0]).toEqual(`/sink_funds/${sample.id}`);
+        expect(spy.calls.mostRecent().args[1]).toEqual(sample);
+        expect(response).toEqual(sample);
+      });
+
+    }));
+  })
 });

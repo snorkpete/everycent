@@ -4,6 +4,7 @@ import {SinkFundsComponent} from './sink-funds.component';
 import {SharedModule} from '../shared/shared.module';
 import { SinkFundComponent } from './sink-fund/sink-fund.component';
 import {SinkFundService} from './sink-fund.service';
+import { SinkFundActionsComponent } from './sink-fund-actions/sink-fund-actions.component';
 
 @NgModule({
   imports: [
@@ -13,6 +14,7 @@ import {SinkFundService} from './sink-fund.service';
   declarations: [
     SinkFundsComponent,
     SinkFundComponent,
+    SinkFundActionsComponent,
   ],
   providers: [
     SinkFundService,

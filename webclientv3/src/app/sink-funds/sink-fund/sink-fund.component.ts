@@ -1,10 +1,9 @@
-import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {SinkFundData} from '../sink-fund-data.model';
 import {ObservableMedia} from '@angular/flex-layout';
 import {Subscription} from 'rxjs/Subscription';
-import {total} from '../../util/total';
-import {FormType} from '../../shared/form/form-field/form-field.component';
 import {SinkFundCalculator} from '../sink-fund-calculator.service';
+import {SinkFundService} from '../sink-fund.service';
 
 @Component({
   selector: 'ec-sink-fund',
@@ -76,10 +75,10 @@ import {SinkFundCalculator} from '../sink-fund-calculator.service';
                 
                 <tr *ngFor="let allocation of sinkFund.sink_fund_allocations">
                     <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
-                    <td><ec-money-field [(ngModel)]="allocation.amount" [editMode]="isEditMode"></ec-money-field></td>
+                    <td><ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field></td>
                     <td><ec-money-field [value]="allocation.current_balance"></ec-money-field></td>
 
-                    <td><ec-money-field [value]="allocation.current_balance-allocation.amount"></ec-money-field></td>
+                    <td><ec-money-field [value]="allocation.current_balance-allocation.target"></ec-money-field></td>
                     <td><ec-text-field [(ngModel)]="allocation.comment"></ec-text-field></td>
                     <td>
                         <!--<pre>{{allocation | json}}</pre>-->
@@ -102,7 +101,12 @@ import {SinkFundCalculator} from '../sink-fund-calculator.service';
             </table>
         </div>
         <md-card-actions>
-            <button md-raised-button (click)="isEditMode = !isEditMode">Toggle Edit</button>
+            <ec-edit-actions
+                    [(editMode)]="isEditMode"
+                    (save)="save()"
+                    (cancel)="cancel()"
+                    >
+            </ec-edit-actions>
         </md-card-actions>
 
     </md-card>
@@ -114,14 +118,13 @@ export class SinkFundComponent implements OnInit, OnDestroy {
 
   calculator = new SinkFundCalculator();
 
-  columns: { flex: number, allocationField: string, text: string, type: string, editable?: boolean}[];
-
   isSmallScreen: boolean;
   isEditMode = false;
   mediaSubscription: Subscription;
 
   constructor(
-    private media: ObservableMedia
+    private media: ObservableMedia,
+    private sinkFundService: SinkFundService
   ) { }
 
   ngOnInit() {
@@ -130,6 +133,25 @@ export class SinkFundComponent implements OnInit, OnDestroy {
     this.mediaSubscription = this.media.subscribe( () => {
       this.isSmallScreen = this.media.isActive('xs');
     });
+  }
+
+  switchToEditMode() {
+    this.isEditMode = true;
+  }
+
+  save() {
+    this.sinkFundService
+        .save(this.sinkFund)
+        .subscribe( result => {
+          this.sinkFund = result;
+          this.isEditMode = false;
+        },
+          error => alert(JSON.stringify(error))
+        );
+  }
+
+  cancel() {
+    console.log('cancel')
   }
 
   ngOnDestroy() {

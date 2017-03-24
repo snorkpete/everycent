@@ -20,10 +20,32 @@ export class ApiGateway {
     const options = new RequestOptions({ headers: this.getAuthenticationHeaders() });
     const fullUrl = `${this.BASE_URL}${url}?${this.urlEncode(params)}`;
 
+    this.loadingIndicator.show();
     return this.http.get(fullUrl, options)
+                    .do(() => this.loadingIndicator.hide())
                     .map(res => res.json());
     // TODO: catch authentication errors and redirect to the login page
 
+  }
+
+  post(url: string, data?: any): Observable<any> {
+    const options = new RequestOptions({ headers: this.getAuthenticationHeaders() });
+    const fullUrl = `${this.BASE_URL}${url}`;
+
+    this.loadingIndicator.show();
+    return this.http.post(fullUrl, data, options)
+      .do(() => this.loadingIndicator.hide())
+      .map(res => res.json());
+  }
+
+  put(url: string, data?: any): Observable<any> {
+    const options = new RequestOptions({ headers: this.getAuthenticationHeaders() });
+    const fullUrl = `${this.BASE_URL}${url}`;
+
+    this.loadingIndicator.show();
+    return this.http.put(fullUrl, data, options)
+                    .do(() => this.loadingIndicator.hide())
+                    .map(res => res.json());
   }
 
   postWithoutAuthentication(url: string, data: any): Observable<any> {

@@ -14,4 +14,8 @@ export class SinkFundService {
     return this.apiGateway.get('/sink_funds/current');
   }
 
+  save(sinkFund: SinkFundData): Observable<SinkFundData> {
+    return this.apiGateway.put(`/sink_funds/${sinkFund.id}`, sinkFund);
+  }
+
 }
