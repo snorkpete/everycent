@@ -42,7 +42,7 @@ module Everycent
         origins '*'
         resource '*',
                  :headers => :any,
-                 :methods => [:get, :post, :options],
+                 :methods => [:get, :post, :put, :patch, :delete, :options],
                  :expose => ['access-token', 'client', 'expiry', 'token-type', 'uid']
       end
     end
