@@ -28,4 +28,9 @@ describe('SinkFundComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('defaults to "non-edit-mode"', () => {
+    expect(component.isEditMode).toBeFalsy('non-edit-mode by default');
+  });
+
 });

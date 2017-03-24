@@ -8,7 +8,9 @@
 /node_modules
 
 # IDEs and editors
-/.idea
+/.idea/
+/webclient/.idea/*
+/webclientv3/.idea/
 .project
 .classpath
 .c9/

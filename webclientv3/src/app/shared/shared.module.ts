@@ -22,6 +22,7 @@ import {TextFieldComponent} from './form/text-field/text-field.component';
 import { MoneyPipe } from './money.pipe';
 import {MoneyFieldComponent} from './form/money-field/money-field.component';
 import {DateFieldComponent} from './form/date-field/date-field.component';
+import { EditActionsComponent } from './edit-actions/edit-actions.component';
 
 @NgModule({
   imports: [
@@ -46,6 +47,7 @@ import {DateFieldComponent} from './form/date-field/date-field.component';
     MoneyFieldComponent,
     FormFieldComponent,
     MoneyPipe,
+    EditActionsComponent,
   ],
   exports: [
     CommonModule,
@@ -64,6 +66,7 @@ import {DateFieldComponent} from './form/date-field/date-field.component';
     MoneyFieldComponent,
     FormFieldComponent,
     MoneyPipe,
+    EditActionsComponent,
 
     AppRoutingModule,
   ],
