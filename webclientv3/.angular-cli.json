@@ -1,4 +1,5 @@
 {
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
     "version": "1.0.0-beta.28.3",
     "name": "everycent"
@@ -15,14 +16,15 @@
       "main": "main.ts",
       "polyfills": "polyfills.ts",
       "test": "test.ts",
-      "tsconfig": "tsconfig.json",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
       "prefix": "ec",
       "styles": [
         "styles.css"
       ],
       "scripts": [],
+      "environmentSource": "environments/environment.ts",
       "environments": {
-        "source": "environments/environment.ts",
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
       }
@@ -36,11 +38,11 @@
   "lint": [
     {
       "files": "src/**/*.ts",
-      "project": "src/tsconfig.json"
+      "project": "src/tsconfig.app.json"
     },
     {
       "files": "e2e/**/*.ts",
-      "project": "e2e/tsconfig.json"
+      "project": "e2e/tsconfig.e2e.json"
     }
   ],
   "test": {
