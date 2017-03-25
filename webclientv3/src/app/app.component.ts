@@ -20,7 +20,7 @@ import 'rxjs/add/operator/map';
       </md-sidenav-container>
   `,
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   title = 'ec works!';
 
   constructor(

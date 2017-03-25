@@ -151,7 +151,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   }
 
   cancel() {
-    console.log('cancel')
+    console.log('cancel');
   }
 
   ngOnDestroy() {

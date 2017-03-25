@@ -1,10 +1,9 @@
 import {environment} from "../environments/environment";
 
-let BASE_URL = ''
+let BASE_URL = '';
 if (environment.production) {
   BASE_URL = '';
-}
-else {
+} else {
   BASE_URL = 'http://localhost:3000';
 }
 
