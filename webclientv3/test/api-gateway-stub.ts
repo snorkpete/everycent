@@ -1,7 +1,8 @@
 
 let ApiGatewayStub = {
   get: (url: string, params: any) => { },
-  post: (url: string, params: any, data?: any) => {}
+  post: (url: string, params: any, data?: any) => {},
+  put: (url: string, params: any, data?: any) => {}
 }
 
 export {ApiGatewayStub};

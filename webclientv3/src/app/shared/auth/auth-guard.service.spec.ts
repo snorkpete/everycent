@@ -11,7 +11,7 @@ describe('AuthGuard', () => {
 
   beforeEach(() => {
     authService = new AuthService(ApiGatewayStub as any);
-    authGuard = new AuthGuard();
+    //authGuard = new AuthGuard();
   });
 
   describe('#canActivate', () => {

@@ -22,7 +22,7 @@ describe('SinkFundService', () => {
     });
   });
 
-  beforeEach(inject([SinkFundService, ApiGateway], (service: SinkFundService, gateway) => {
+  beforeEach(inject([SinkFundService, ApiGateway], (service: SinkFundService, gateway: ApiGateway) => {
     sinkFundService = service;
     apiGateway = gateway;
   }));
@@ -54,7 +54,7 @@ describe('SinkFundService', () => {
 
     it('calls the apiGateway correctly', async(() => {
       let sample = SampleSinkFundData;
-      let spy = spyOn(apiGateway, 'post').and.returnValue(Observable.of(sample));
+      let spy = spyOn(apiGateway, 'put').and.returnValue(Observable.of(sample));
 
       sinkFundService.save(sample).subscribe(response => {
         expect(spy.calls.any()).toBeTruthy('calls the apiGateway');
@@ -64,5 +64,5 @@ describe('SinkFundService', () => {
       });
 
     }));
-  })
+  });
 });

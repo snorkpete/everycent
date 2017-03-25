@@ -5,6 +5,9 @@ import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
 import { SinkFundComponent } from './sink-fund.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {SinkFundService} from '../sink-fund.service';
+import {ApiGateway} from '../../../api/api-gateway.service';
+import {ApiGatewayStub} from '../../../../test/api-gateway-stub';
 
 describe('SinkFundComponent', () => {
   let component: SinkFundComponent;
@@ -14,6 +17,10 @@ describe('SinkFundComponent', () => {
     TestBed.configureTestingModule({
       imports: [FlexLayoutModule],
       declarations: [ SinkFundComponent ],
+      providers: [
+        SinkFundService,
+        { provide: ApiGateway, useValue: ApiGatewayStub },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     })
     .compileComponents();
