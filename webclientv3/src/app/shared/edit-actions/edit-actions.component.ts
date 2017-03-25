@@ -2,8 +2,14 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'ec-edit-actions',
+  styles: [`
+    div.button-container {
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+  `],
   template: `
-    <div>
+    <div class="button-container">
         <button md-raised-button color="primary" class="make-changes"
                 *ngIf="!editMode"
                 (click)="switchToEditMode()">
@@ -28,8 +34,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
         
         
     </div>
-  `,
-  styles: []
+  `
 })
 export class EditActionsComponent implements OnInit {
 
