@@ -36,10 +36,10 @@ describe('EditActionsComponent', () => {
       expect(makeChangesBtn.nativeElement.textContent).toContain('Make Changes');
     });
 
-    it('clicking it fires the switchToEditMode event', () => {
+    it('clicking it fires the editModeChange event', () => {
       let subject = new Subject();
       let spy = spyOn(subject, 'next');
-      component.switchToEditMode.subscribe(subject);
+      component.editModeChange.subscribe(subject);
 
       let makeChangesBtn = fixture.debugElement.query(By.css('button.make-changes'));
       makeChangesBtn.nativeElement.click();
