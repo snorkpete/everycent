@@ -36,6 +36,7 @@ import {SinkFundService} from '../sink-fund.service';
   template: `
     <md-card>
         <md-toolbar color="primary">Sink Fund Obligations</md-toolbar>
+        <md-card-content>
         <div class="fixed">
             <table *ngIf="sinkFund" class="table" [class.small-screen]="isSmallScreen">
 
@@ -100,6 +101,7 @@ import {SinkFundService} from '../sink-fund.service';
               </tfoot>
             </table>
         </div>
+        </md-card-content>
         <md-card-actions>
             <ec-edit-actions
                     [(editMode)]="isEditMode"
