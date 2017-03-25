@@ -8,7 +8,7 @@ export class SinkFundCalculator {
   constructor() { }
 
   private sinkFundAllocationsOf(sinkFund: SinkFundData): SinkFundAllocationData[] {
-    if(isNullOrUndefined(sinkFund)) {
+    if (isNullOrUndefined(sinkFund)) {
       return [];
     }
 
