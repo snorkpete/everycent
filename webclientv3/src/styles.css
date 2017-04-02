@@ -7,3 +7,10 @@ div.md-sidenav-content {
     background-color: #a09fa2;
 }
 
+.deleted {
+    background-color: rgba(160, 38, 38, 0.35);
+}
+
+.deleted:hover{
+    background-color: rgba(160, 38, 38, 0.55) !important;
+}

@@ -25,6 +25,7 @@ import {DateFieldComponent} from './form/date-field/date-field.component';
 import { EditActionsComponent } from './edit-actions/edit-actions.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { DeleteButtonComponent } from './delete-button/delete-button.component';
+import { HighlightDeletedDirective } from './highlight-deleted.directive';
 
 @NgModule({
   imports: [
@@ -52,6 +53,7 @@ import { DeleteButtonComponent } from './delete-button/delete-button.component';
     MoneyPipe,
     EditActionsComponent,
     DeleteButtonComponent,
+    HighlightDeletedDirective,
   ],
   exports: [
     CommonModule,
@@ -73,6 +75,7 @@ import { DeleteButtonComponent } from './delete-button/delete-button.component';
     MoneyPipe,
     EditActionsComponent,
     DeleteButtonComponent,
+    HighlightDeletedDirective,
 
     AppRoutingModule,
   ],
