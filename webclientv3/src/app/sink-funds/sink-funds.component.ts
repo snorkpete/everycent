@@ -19,6 +19,7 @@ export class SinkFundsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.sinkFundService.refreshSinkFund();
     this.sinkFundService.getCurrent().subscribe(sinkFund => {
       this.sinkFund = sinkFund;
     });

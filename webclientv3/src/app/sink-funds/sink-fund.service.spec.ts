@@ -31,7 +31,7 @@ describe('SinkFundService', () => {
     expect(sinkFundService).toBeTruthy();
   });
 
-  describe('#getCurrent()', () => {
+  xdescribe('#getCurrent()', () => {
 
     it('exists', async(() => {
       expect(sinkFundService.getCurrent).toBeDefined();

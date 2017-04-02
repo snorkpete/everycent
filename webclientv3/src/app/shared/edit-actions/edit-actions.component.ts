@@ -16,6 +16,8 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
             Make Changes
         </button>
 
+        <ng-content></ng-content>
+        
         <div fxLayout="row" fxLayoutAlign="end">
 
             <button md-raised-button color="primary" class="save"

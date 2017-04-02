@@ -5,6 +5,7 @@ import {SharedModule} from '../shared/shared.module';
 import { SinkFundComponent } from './sink-fund/sink-fund.component';
 import {SinkFundService} from './sink-fund.service';
 import { SinkFundActionsComponent } from './sink-fund-actions/sink-fund-actions.component';
+import { AddTransferFormComponent } from './add-transfer-form/add-transfer-form.component';
 
 @NgModule({
   imports: [
@@ -15,6 +16,10 @@ import { SinkFundActionsComponent } from './sink-fund-actions/sink-fund-actions.
     SinkFundsComponent,
     SinkFundComponent,
     SinkFundActionsComponent,
+    AddTransferFormComponent,
+  ],
+  entryComponents: [
+    AddTransferFormComponent,
   ],
   providers: [
     SinkFundService,
