@@ -228,7 +228,7 @@ describe('ApiGateway', () => {
         'uid': 'u'
       });
 
-      let response = new Response({ headers: headers});
+      let response = new Response(new ResponseOptions({ headers: headers}));
       connection.mockRespond(response);
     }));
 
@@ -242,8 +242,8 @@ describe('ApiGateway', () => {
         }
       });
 
-      let response = new Response({ type: ResponseType.Error, status: 401, body: errorJSON});
-      connection.mockError(response);
+      let response = new Response(new ResponseOptions({ type: ResponseType.Error, status: 401, body: errorJSON}));
+      //connection.mockError(response);
 
     }));
 
