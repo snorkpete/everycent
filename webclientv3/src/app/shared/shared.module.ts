@@ -23,6 +23,7 @@ import { MoneyPipe } from './money.pipe';
 import {MoneyFieldComponent} from './form/money-field/money-field.component';
 import {DateFieldComponent} from './form/date-field/date-field.component';
 import { EditActionsComponent } from './edit-actions/edit-actions.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { DeleteButtonComponent } from './delete-button/delete-button.component';
 
 @NgModule({
@@ -31,6 +32,7 @@ import { DeleteButtonComponent } from './delete-button/delete-button.component';
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    BrowserAnimationsModule,
     RouterModule,
     FlexLayoutModule,
     AppRoutingModule,
@@ -55,6 +57,7 @@ import { DeleteButtonComponent } from './delete-button/delete-button.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    BrowserAnimationsModule,
     MaterialModule,
     FlexLayoutModule,
 
