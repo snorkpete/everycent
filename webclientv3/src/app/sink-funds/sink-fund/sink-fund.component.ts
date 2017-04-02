@@ -77,7 +77,7 @@ import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.c
                     <td></td>
                 </tr>
                 
-                <tr *ngFor="let allocation of sinkFund.sink_fund_allocations">
+                <tr *ngFor="let allocation of sinkFund.sink_fund_allocations" [ecHighlightDeletedFor]="allocation">
                     <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
                     <td class="highlight"><ec-money-field [value]="allocation.current_balance"></ec-money-field></td>
                     <td><ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field></td>
