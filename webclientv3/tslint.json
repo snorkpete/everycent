@@ -11,7 +11,7 @@
     ],
     "curly": true,
     "eofline": true,
-    "import-blacklist": [true, "rxjs"],
+    "import-blacklist": [true, "rxjs", "rxjs/Rx"],
     "import-spacing": true,
     "indent": [
       true,
