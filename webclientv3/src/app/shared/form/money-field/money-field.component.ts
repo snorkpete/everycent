@@ -13,17 +13,26 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
     input {
         text-align: right;
     }
+     .positive {
+        color: darkgreen;
+        font-weight: bold;
+    }
+    md-input-container {
+        width: 100%;
+    }
   `],
   template: `
       <md-input-container *ngIf="editMode">
           <input #input mdInput class="value" type="text"
                  (input)="updateInnerValue(input.value)"
                  (blur)="formatTextValue()"
+                 [placeholder]="placeholder"
                  [class.negative]="isNegative()"
                  [formControl]="control" />
       </md-input-container>
       <span class="value"
             [class.negative]="isNegative()"
+            [class.positive]="isPositive()"
             *ngIf="!editMode">{{ value | ecMoney }}</span>
   `,
   providers: [
@@ -36,6 +45,9 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
   isDisabled = false;
 
   @Input() editMode: boolean;
+  @Input() highlightPositive: false;
+  @Input() placeholder: string;
+
   control = new FormControl(0);
 
   private onChange: Function = (_: any) => {};
@@ -58,6 +70,10 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
 
   isNegative(): boolean {
     return this.value < 0;
+  }
+
+  isPositive(): boolean {
+    return this.highlightPositive && !this.isNegative();
   }
 
   updateInnerValue(dollarValueString: string) {
