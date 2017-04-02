@@ -31,13 +31,13 @@ describe('SinkFundsComponent', () => {
     .compileComponents();
   }));
 
-  beforeEach(inject([SinkFundService], (service, gateway) => {
+  beforeEach(inject([SinkFundService], (service: SinkFundService, gateway: ApiGateway) => {
     fixture = TestBed.createComponent(SinkFundsComponent);
     component = fixture.componentInstance;
 
     sinkFundService = service;
     apiGateway = gateway;
-  });
+  }));
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -45,7 +45,8 @@ describe('SinkFundsComponent', () => {
 
   it('gets the current sink fund', async(() => {
     let response = SampleSinkFundData;
-    let spy = spyOn(sinkFundService, 'getCurrent').and.returnValue(Observable.of(response));
+    spyOn(sinkFundService, 'refreshSinkFund').and.returnValue(null);
+    spyOn(sinkFundService, 'getCurrent').and.returnValue(Observable.of(response));
 
     fixture.detectChanges();
     expect(component.sinkFund).toEqual(response);
