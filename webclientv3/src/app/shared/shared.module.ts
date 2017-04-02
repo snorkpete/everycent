@@ -23,6 +23,7 @@ import { MoneyPipe } from './money.pipe';
 import {MoneyFieldComponent} from './form/money-field/money-field.component';
 import {DateFieldComponent} from './form/date-field/date-field.component';
 import { EditActionsComponent } from './edit-actions/edit-actions.component';
+import { DeleteButtonComponent } from './delete-button/delete-button.component';
 
 @NgModule({
   imports: [
@@ -48,6 +49,7 @@ import { EditActionsComponent } from './edit-actions/edit-actions.component';
     FormFieldComponent,
     MoneyPipe,
     EditActionsComponent,
+    DeleteButtonComponent,
   ],
   exports: [
     CommonModule,
@@ -67,6 +69,7 @@ import { EditActionsComponent } from './edit-actions/edit-actions.component';
     FormFieldComponent,
     MoneyPipe,
     EditActionsComponent,
+    DeleteButtonComponent,
 
     AppRoutingModule,
   ],
