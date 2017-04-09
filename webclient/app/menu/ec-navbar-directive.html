@@ -48,15 +48,35 @@
                    <li ng-class="{ active: vm.isActive('transactions')}">
                        <a ng-click="vm.go('transactions');">Transactions</a>
                    </li>
-                   <li ng-class="{ active: vm.isActive('credit-card-transactions')}">
-                       <a ng-click="vm.go('credit-card-transactions');">Credit Cards</a>
-                   </li>
                    <li ng-class="{ active: vm.isActive('account-balances')}">
                        <a ng-click="vm.go('account-balances');">Account Balances</a>
                    </li>
-                   <li ng-class="{ active: vm.isActive('sink-funds')}">
-                       <a ng-click="vm.go('sink-funds');">Sink Funds</a>
-                   </li>
+
+                    <li ng-class="{ open: vm.newOpen }">
+                        <a class="dropdown-toggle"
+                           data-toggle="dropdown" role="button"
+                           ng-click="vm.newOpen = !vm.newOpen"
+                           aria-expanded="false">
+                            New Features<span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li> <a href="/v3/#/sink-funds">Sink Funds (New)</a> </li>
+                        </ul>
+                    </li>
+
+                    <li ng-class="{ active: vm.isActive('sink-funds'), open: vm.oldOpen }">
+                        <a class="dropdown-toggle"
+                           data-toggle="dropdown" role="button"
+                           ng-click="vm.oldOpen = !vm.oldOpen"
+                           aria-expanded="false">
+                            Replaced <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a ng-click="vm.go('sink-funds');">Sink Funds</a>
+                            </li>
+                        </ul>
+                    </li>
                 </li>
             </ul>
         </div><!-- /.navbar-collapse -->
