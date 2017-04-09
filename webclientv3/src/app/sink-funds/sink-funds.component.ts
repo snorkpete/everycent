@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {SinkFundData} from './sink-fund-data.model';
 import {SinkFundService} from './sink-fund.service';
+import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
 
 @Component({
   selector: 'ec-sink-funds',
@@ -15,7 +16,8 @@ export class SinkFundsComponent implements OnInit {
   sinkFund: SinkFundData;
 
   constructor(
-    private sinkFundService: SinkFundService
+    private sinkFundService: SinkFundService,
+    private toolbarService: MainToolbarService
   ) { }
 
   ngOnInit() {
@@ -23,6 +25,8 @@ export class SinkFundsComponent implements OnInit {
     this.sinkFundService.getCurrent().subscribe(sinkFund => {
       this.sinkFund = sinkFund;
     });
+
+    this.toolbarService.setHeading('Sink Fund Obligations');
   }
 
 }

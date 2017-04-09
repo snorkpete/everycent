@@ -38,7 +38,6 @@ import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.c
   `],
   template: `
     <md-card>
-        <md-toolbar color="primary">Sink Fund Obligations</md-toolbar>
         <md-card-content>
         <div class="fixed">
             <table *ngIf="sinkFund" class="table" [class.small-screen]="isSmallScreen">
@@ -85,7 +84,7 @@ import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.c
                     <td>
                         <ec-money-field [value]="allocation.current_balance-allocation.target" highlightPositive="true"></ec-money-field>
                     </td>
-                    <td><ec-text-field [(ngModel)]="allocation.comment"></ec-text-field></td>
+                    <td><ec-text-field [(ngModel)]="allocation.comment" [editMode]="isEditMode"></ec-text-field></td>
                     <td>
                         <ec-delete-button [item]="allocation" [editMode]="isEditMode"></ec-delete-button>
                     </td>
@@ -152,8 +151,11 @@ export class SinkFundComponent implements OnInit, OnDestroy {
         .subscribe( result => {
           this.sinkFund = result;
           this.isEditMode = false;
+          this.snackbar.open('Sink fund saved', null, {duration: 3000});
         },
-          error => alert(JSON.stringify(error))
+          error => {
+            this.snackbar.open('Not saved: ' + JSON.stringify(error), null, {duration: 3000});
+          }
         );
   }
 
