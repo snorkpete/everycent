@@ -14,3 +14,13 @@ div.md-sidenav-content {
 .deleted:hover{
     background-color: rgba(160, 38, 38, 0.55) !important;
 }
+
+html, body {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    background-color: #d0cdcd;
+}
