@@ -34,5 +34,8 @@ node_modules/
 webclient/node_modules/
 webclientv3/node_modules/
 
+webclient/.idea/
+webclientv3/.idea/
+
 # ignore the production builds for now - will have to figure out solution long term
 public/v2
