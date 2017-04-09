@@ -6,6 +6,9 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
 @Component({
   selector: 'ec-text-field',
   styles: [`
+      md-input-container {
+          width: 100%;
+      }
   `],
   template: `
     <md-input-container *ngIf="editMode">
