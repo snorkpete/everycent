@@ -11,6 +11,13 @@ import 'rxjs/add/operator/filter';
   template: `
     <md-list>
 
+        <md-divider></md-divider>
+        <md-list-item>
+            <ec-icon [icon]="Icon.HOME"></ec-icon>
+            <a href="/">Go to Old Version </a>
+        </md-list-item>
+        <md-divider></md-divider>
+        
         <ec-menu-item [icon]="Icon.HOME" route="/">
             Home
         </ec-menu-item>
