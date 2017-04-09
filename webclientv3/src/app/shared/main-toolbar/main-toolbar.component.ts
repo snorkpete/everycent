@@ -17,19 +17,18 @@ import {Icon} from '../ec-icon/icon.type';
                  (click)="openMenu.emit()">
         </ec-icon>
         EveryCent V3
-        <span *ngIf="heading" fxHide.xs class="heading">
-            --- {{ heading }}
+        <span *ngIf="getMainHeading()" fxHide.xs class="heading">
+            --- {{ getMainHeading() }}
         </span>
 
         <md-toolbar-row fxHide.gt-xs>
-           {{ heading }}
+           {{ getMainHeading() }}
         </md-toolbar-row>
     </md-toolbar>
   `,
 })
 export class MainToolbarComponent implements OnInit {
 
-  heading = 'Welcome to Everycent';
   @Output() openMenu = new EventEmitter();
   Icon = Icon;
 
@@ -38,5 +37,10 @@ export class MainToolbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.toolbarService.setHeading('Welcome to EveryCent');
+  }
+
+  getMainHeading(): string {
+    return this.toolbarService.getHeading();
   }
 }
