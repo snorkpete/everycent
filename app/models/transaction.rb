@@ -46,6 +46,10 @@ class Transaction < ActiveRecord::Base
     Transaction.where('allocation_id = ?', allocation_id)
   end
 
+  def self.by_sink_fund_allocation(allocation_id)
+    Transaction.where('sink_fund_allocation_id = ?', allocation_id)
+  end
+
   def self.by_credit_card(bank_account_id)
     credit_card = BankAccount.where(id: bank_account_id).first
     return Transaction.none if credit_card.nil? || !credit_card.credit_card?

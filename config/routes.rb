@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     collection do
       put 'update_all'
       get 'by_allocation'
+      get 'by_sink_fund_allocation'
       get 'by_credit_card'
       get 'last_update'
     end
@@ -54,52 +55,52 @@ Rails.application.routes.draw do
   ############## V2 routes - duplicate of the V1 routes
 
 
-  scope 'v2' do
-    resources :transactions, except: [:new, :edit] do
-      collection do
-        put 'update_all'
-        get 'by_allocation'
-        get 'by_credit_card'
-        get 'last_update'
-      end
-    end
-    resources :payees, except: [:new, :edit]
-    resources :budgets, except: [:new, :edit] do
-      member do
-        put 'copy'
-        put 'close'
-      end
+  #scope 'v2' do
+  #  resources :transactions, except: [:new, :edit] do
+  #    collection do
+  #      put 'update_all'
+  #      get 'by_allocation'
+  #      get 'by_credit_card'
+  #      get 'last_update'
+  #    end
+  #  end
+  #  resources :payees, except: [:new, :edit]
+  #  resources :budgets, except: [:new, :edit] do
+  #    member do
+  #      put 'copy'
+  #      put 'close'
+  #    end
 
-      collection do
-        get 'current'
-        post 'reopen_last_budget'
-      end
-    end
+  #    collection do
+  #      get 'current'
+  #      post 'reopen_last_budget'
+  #    end
+  #  end
 
-    resources :settings, only: [:index, :create]
+  #  resources :settings, only: [:index, :create]
 
-    resources :allocations, only: [:index]
-    resources :default_allocations, only: [:index] do
-      collection do
-        post 'retrieve'
-      end
-    end
+  #  resources :allocations, only: [:index]
+  #  resources :default_allocations, only: [:index] do
+  #    collection do
+  #      post 'retrieve'
+  #    end
+  #  end
 
-    resources :account_balances, only: [:index]
-    resources :sink_funds, only: [:index, :update]
-    resources :sink_fund_allocations, only: [:index]
+  #  resources :account_balances, only: [:index]
+  #  resources :sink_funds, only: [:index, :update]
+  #  resources :sink_fund_allocations, only: [:index]
 
-    resources :recurring_allocations, except: [:new, :edit]
-    resources :recurring_incomes, except: [:new, :edit]
-    resources :allocation_categories, except: [:new, :edit]
-    resources :bank_accounts, except: [:new, :edit]
-    resources :institutions, except: [:new, :edit]
-    resources :users, except: [:new, :edit]
-  end
+  #  resources :recurring_allocations, except: [:new, :edit]
+  #  resources :recurring_incomes, except: [:new, :edit]
+  #  resources :allocation_categories, except: [:new, :edit]
+  #  resources :bank_accounts, except: [:new, :edit]
+  #  resources :institutions, except: [:new, :edit]
+  #  resources :users, except: [:new, :edit]
+  #end
 
-  namespace :v2 do
-    mount_devise_token_auth_for 'User', at: '/auth'
-  end
+  #namespace :v2 do
+  #  mount_devise_token_auth_for 'User', at: '/auth'
+  #end
 
 
 
