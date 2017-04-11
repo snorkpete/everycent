@@ -6,6 +6,7 @@ import {SinkFundCalculator} from '../sink-fund-calculator.service';
 import {SinkFundService} from '../sink-fund.service';
 import {MdDialog, MdSnackBar} from '@angular/material';
 import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.component';
+import {Icon} from '../../shared/ec-icon/icon.type';
 
 @Component({
   selector: 'ec-sink-fund',
@@ -35,6 +36,15 @@ import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.c
         border-top: 2px solid black;
         border-bottom: 2px solid black;
     }
+    
+    ec-icon.small /deep/ .material-icons {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        padding-top: 1px;
+        cursor: pointer;
+    }
+    
   `],
   template: `
     <md-card>
@@ -78,7 +88,13 @@ import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.c
                 
                 <tr *ngFor="let allocation of sinkFund.sink_fund_allocations" [ecHighlightDeletedFor]="allocation">
                     <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
-                    <td class="highlight"><ec-money-field [value]="allocation.current_balance"></ec-money-field></td>
+                    <td class="highlight">
+                        <div fxLayout="row" fxLayoutAlign="start center">
+                            <ec-icon [icon]="Icon.SHOW_TRANSACTIONS" class="small"></ec-icon>
+                            <span fxFlex></span>
+                            <ec-money-field [value]="allocation.current_balance"></ec-money-field>
+                        </div>
+                    </td>
                     <td><ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field></td>
 
                     <td>
@@ -122,6 +138,7 @@ import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.c
 })
 export class SinkFundComponent implements OnInit, OnDestroy {
 
+  Icon = Icon;
   @Input() sinkFund: SinkFundData;
 
   calculator = new SinkFundCalculator();
@@ -160,7 +177,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   }
 
   cancel() {
-    console.log('cancel');
+    this.snackbar.open('Sink fund not saved', null, {duration: 1000})
   }
 
   showTransferForm() {
