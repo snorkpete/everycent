@@ -4,9 +4,12 @@ import {ObservableMedia} from '@angular/flex-layout';
 import {Subscription} from 'rxjs/Subscription';
 import {SinkFundCalculator} from '../sink-fund-calculator.service';
 import {SinkFundService} from '../sink-fund.service';
-import {MdDialog, MdSnackBar} from '@angular/material';
+import {MdDialog, MdDialogRef, MdSnackBar} from '@angular/material';
 import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.component';
 import {Icon} from '../../shared/ec-icon/icon.type';
+import {TransactionListComponent} from '../../transactions/transaction-list/transaction-list.component';
+import {TransactionService} from '../../transactions/transaction.service';
+import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
 
 @Component({
   selector: 'ec-sink-fund',
@@ -90,7 +93,10 @@ import {Icon} from '../../shared/ec-icon/icon.type';
                     <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
                     <td class="highlight">
                         <div fxLayout="row" fxLayoutAlign="start center">
-                            <ec-icon [icon]="Icon.SHOW_TRANSACTIONS" class="small"></ec-icon>
+                            <ec-icon [icon]="Icon.SHOW_TRANSACTIONS" 
+                                     (click)="showTransactionsFor(allocation)"
+                                     class="small">
+                            </ec-icon>
                             <span fxFlex></span>
                             <ec-money-field [value]="allocation.current_balance"></ec-money-field>
                         </div>
@@ -150,6 +156,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   constructor(
     private media: ObservableMedia,
     private sinkFundService: SinkFundService,
+    private transactionService: TransactionService,
     private dialog: MdDialog,
     private snackbar: MdSnackBar
   ) { }
@@ -177,13 +184,11 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   }
 
   cancel() {
-    this.snackbar.open('Sink fund not saved', null, {duration: 1000})
+    this.snackbar.open('Sink fund not saved', null, {duration: 1000});
   }
 
   showTransferForm() {
-    let dialogRef = this.dialog.open(AddTransferFormComponent, {
-      width: '300px'
-    });
+    let dialogRef = this.dialog.open(AddTransferFormComponent, { width: '300px' });
     dialogRef.componentInstance.sinkFund = this.sinkFund;
     dialogRef.afterClosed().subscribe(isSaved => {
       if (isSaved) {
@@ -192,6 +197,18 @@ export class SinkFundComponent implements OnInit, OnDestroy {
         this.snackbar.open('Transfer cancelled.', null, {duration: 1500});
       }
     });
+  }
+
+  showTransactionsFor(sinkFundAllocation: SinkFundAllocationData) {
+    let dialogRef: MdDialogRef<TransactionListComponent>;
+    this.transactionService
+        .getTransactionsForSinkFundAllocation(sinkFundAllocation.id)
+        .subscribe(transactions => {
+           dialogRef = this.dialog.open(TransactionListComponent, { width: '500px' });
+           debugger;
+           dialogRef.componentInstance.transactions = transactions;
+           dialogRef.componentInstance.itemName = sinkFundAllocation.name;
+        });
   }
 
   ngOnDestroy() {

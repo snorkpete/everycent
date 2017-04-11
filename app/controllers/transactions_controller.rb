@@ -14,6 +14,12 @@ class TransactionsController < ApplicationController
     respond_with(@transactions, TransactionSerializer)
   end
 
+  def by_sink_fund_allocation
+    @transactions = Transaction.by_sink_fund_allocation(params[:sink_fund_allocation_id]).preloaded
+                               .order(:transaction_date).limit(25)
+    respond_with(@transactions, TransactionSerializer)
+  end
+
   def by_credit_card
     @transactions = Transaction.by_credit_card(params[:bank_account_id]).preloaded
                                .order(:transaction_date)
