@@ -68,6 +68,7 @@ import { HighlightDeletedDirective } from './highlight-deleted.directive';
     MessageDisplayComponent,
     MenuComponent,
 
+    EcIconComponent,
     TextFieldComponent,
     DateFieldComponent,
     MoneyFieldComponent,
