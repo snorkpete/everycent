@@ -131,6 +131,11 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
         <md-card-actions>
             <ec-edit-actions [(editMode)]="isEditMode" (save)="save()" (cancel)="cancel()" >
 
+                <button md-raised-button color="accent" *ngIf="isEditMode"
+                        (click)="addObligation()">
+                    Add Obligation
+                </button>
+                
                 <button md-raised-button color="primary" *ngIf="!isEditMode"
                         (click)="showTransferForm()">
                     Transfer Money
@@ -209,6 +214,10 @@ export class SinkFundComponent implements OnInit, OnDestroy {
            dialogRef.componentInstance.transactions = transactions;
            dialogRef.componentInstance.itemName = sinkFundAllocation.name;
         });
+  }
+
+  addObligation() {
+    this.sinkFund.sink_fund_allocations.push({ amount: 0, current_balance: 0, target: 0 });
   }
 
   ngOnDestroy() {
