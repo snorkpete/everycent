@@ -27,6 +27,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { DeleteButtonComponent } from './delete-button/delete-button.component';
 import { HighlightDeletedDirective } from './highlight-deleted.directive';
 import {DeactivateButtonComponent} from "./deactivate-button/deactivate-button.component";
+import {DeactivateService} from "./deactivate-button/deactivate.service";
 
 @NgModule({
   imports: [
@@ -89,6 +90,7 @@ import {DeactivateButtonComponent} from "./deactivate-button/deactivate-button.c
     MessageService,
     AuthService,
     AuthGuard,
+    DeactivateService,
   ]
 })
 export class SharedModule { }

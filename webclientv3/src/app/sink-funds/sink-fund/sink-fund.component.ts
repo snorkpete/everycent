@@ -10,6 +10,7 @@ import {Icon} from '../../shared/ec-icon/icon.type';
 import {TransactionListComponent} from '../../transactions/transaction-list/transaction-list.component';
 import {TransactionService} from '../../transactions/transaction.service';
 import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
+import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
 
 @Component({
   selector: 'ec-sink-fund',
@@ -52,6 +53,7 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
   template: `
     <md-card>
         <md-card-content>
+          <md-slide-toggle [(ngModel)]="showDeactivated" color="primary">Show Closed Obligations?</md-slide-toggle>
         <div class="fixed">
             <table *ngIf="sinkFund" class="table" [class.small-screen]="isSmallScreen">
 
@@ -91,33 +93,35 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
                     <td></td>
                     <td></td>
                 </tr>
-                
-                <tr *ngFor="let allocation of sinkFund.sink_fund_allocations" [ecHighlightDeletedFor]="allocation">
-                    <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
-                    <td class="highlight">
-                        <div fxLayout="row" fxLayoutAlign="start center">
-                            <ec-icon [icon]="Icon.SHOW_TRANSACTIONS" 
-                                     (click)="showTransactionsFor(allocation)"
-                                     class="small">
-                            </ec-icon>
-                            <span fxFlex></span>
-                            <ec-money-field [value]="allocation.current_balance"></ec-money-field>
-                        </div>
-                    </td>
-                    <td><ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field></td>
 
-                    <td>
-                        <ec-money-field [value]="allocation.current_balance-allocation.target" highlightPositive="true"></ec-money-field>
-                    </td>
-                    <td><ec-text-field [(ngModel)]="allocation.comment" [editMode]="isEditMode"></ec-text-field></td>
-                    <td>
-                      <ec-text-field [(ngModel)]="allocation.status"></ec-text-field>
-                    </td>
-                    <td>
-                      <ec-delete-button [item]="allocation" [editMode]="isEditMode"></ec-delete-button>
-                      <ec-deactivate-button [item]="allocation" [editMode]="isEditMode"></ec-deactivate-button>
-                    </td>
-                </tr>
+                <ng-container *ngFor="let allocation of sinkFund.sink_fund_allocations" [ecHighlightDeletedFor]="allocation">
+                  <tr *ngIf="deactivateService.isItemVisible(allocation, showDeactivated)">
+                      <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
+                      <td class="highlight">
+                          <div fxLayout="row" fxLayoutAlign="start center">
+                              <ec-icon [icon]="Icon.SHOW_TRANSACTIONS" 
+                                       (click)="showTransactionsFor(allocation)"
+                                       class="small">
+                              </ec-icon>
+                              <span fxFlex></span>
+                              <ec-money-field [value]="allocation.current_balance"></ec-money-field>
+                          </div>
+                      </td>
+                      <td><ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field></td>
+
+                      <td>
+                          <ec-money-field [value]="allocation.current_balance-allocation.target" highlightPositive="true"></ec-money-field>
+                      </td>
+                      <td><ec-text-field [(ngModel)]="allocation.comment" [editMode]="isEditMode"></ec-text-field></td>
+                      <td>
+                        <ec-text-field [(ngModel)]="allocation.status"></ec-text-field>
+                      </td>
+                      <td>
+                        <ec-delete-button [item]="allocation" [editMode]="isEditMode"></ec-delete-button>
+                        <ec-deactivate-button [item]="allocation" [editMode]="isEditMode"></ec-deactivate-button>
+                      </td>
+                  </tr>
+                </ng-container>
               </tbody>
 
               <tfoot>
@@ -164,6 +168,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
 
   isSmallScreen: boolean;
   isEditMode = false;
+  showDeactivated = false;
   mediaSubscription: Subscription;
 
   constructor(
@@ -171,7 +176,8 @@ export class SinkFundComponent implements OnInit, OnDestroy {
     private sinkFundService: SinkFundService,
     private transactionService: TransactionService,
     private dialog: MdDialog,
-    private snackbar: MdSnackBar
+    private snackbar: MdSnackBar,
+    public deactivateService: DeactivateService
   ) { }
 
   ngOnInit() {
