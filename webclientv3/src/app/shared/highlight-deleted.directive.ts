@@ -13,6 +13,11 @@ export class HighlightDeletedDirective {
     return this.item.deleted;
   }
 
+  @HostBinding('class.deactivated')
+  get isDeactivated() {
+    return this.item.deactivated;
+  }
+
   constructor() { }
 
 }

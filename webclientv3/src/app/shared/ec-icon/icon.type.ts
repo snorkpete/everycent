@@ -9,6 +9,9 @@ let Icon = {
 
   DELETE: "delete_forever",
   UNDO_DELETE: "refresh",
+
+  DEACTIVATE: "archive",
+  ACTIVATE: "unarchive",
 };
 
 export {Icon};

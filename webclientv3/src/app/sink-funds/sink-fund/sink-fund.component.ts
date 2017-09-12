@@ -57,13 +57,14 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
 
               <thead>
               <tr>
-                <th [style.width.%]="30">Goal / Obligation</th>
+                <th [style.width.%]="25">Goal / Obligation</th>
                 <th [style.width.%]="10">Current Balance</th>
                 <th [style.width.%]="10">Target</th>
 
                 <th [style.width.%]="10">Outstanding</th>
-                <th [style.width.%]="25">Comment</th>
+                <th [style.width.%]="20">Comment</th>
                 <th [style.width.%]="5">Status</th>
+                <th [style.width.%]="10">Actions</th>
               </tr>
               </thead>
 
@@ -77,6 +78,7 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
                     <td></td>
                     <td>Current Account Balance</td>
                     <td></td>
+                    <td></td>
                 </tr>
                 
                 <tr class="total">
@@ -86,6 +88,7 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
 
                     <td></td>
                     <td>Money not assigned to any financial goal/obligation</td>
+                    <td></td>
                     <td></td>
                 </tr>
                 
@@ -108,7 +111,11 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
                     </td>
                     <td><ec-text-field [(ngModel)]="allocation.comment" [editMode]="isEditMode"></ec-text-field></td>
                     <td>
-                        <ec-delete-button [item]="allocation" [editMode]="isEditMode"></ec-delete-button>
+                      <ec-text-field [(ngModel)]="allocation.status"></ec-text-field>
+                    </td>
+                    <td>
+                      <ec-delete-button [item]="allocation" [editMode]="isEditMode"></ec-delete-button>
+                      <ec-deactivate-button [item]="allocation" [editMode]="isEditMode"></ec-deactivate-button>
                     </td>
                 </tr>
               </tbody>
@@ -120,6 +127,7 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
                   <td><ec-money-field [value]="calculator.totalTarget(sinkFund)"></ec-money-field></td>
                   
                   <td><ec-money-field [value]="calculator.totalOutstanding(sinkFund)"></ec-money-field></td>
+                  <td></td>
                   <td></td>
                   <td></td>
               </tr>
@@ -190,6 +198,10 @@ export class SinkFundComponent implements OnInit, OnDestroy {
 
   cancel() {
     this.snackbar.open('Sink fund not saved', null, {duration: 1000});
+  }
+
+  isAllocationVisible(allocation: any) {
+
   }
 
   showTransferForm() {

@@ -26,6 +26,7 @@ import { EditActionsComponent } from './edit-actions/edit-actions.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { DeleteButtonComponent } from './delete-button/delete-button.component';
 import { HighlightDeletedDirective } from './highlight-deleted.directive';
+import {DeactivateButtonComponent} from "./deactivate-button/deactivate-button.component";
 
 @NgModule({
   imports: [
@@ -53,6 +54,7 @@ import { HighlightDeletedDirective } from './highlight-deleted.directive';
     MoneyPipe,
     EditActionsComponent,
     DeleteButtonComponent,
+    DeactivateButtonComponent,
     HighlightDeletedDirective,
   ],
   exports: [
@@ -76,6 +78,7 @@ import { HighlightDeletedDirective } from './highlight-deleted.directive';
     MoneyPipe,
     EditActionsComponent,
     DeleteButtonComponent,
+    DeactivateButtonComponent,
     HighlightDeletedDirective,
 
     AppRoutingModule,
