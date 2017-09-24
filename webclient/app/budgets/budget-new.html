@@ -5,14 +5,14 @@
             ng-submit="vm.addBudget(vm.budget, vm.budgetForm)">
             <ec-panel type="primary" title="Add New Budget">
 
-                <ec-form-field label="Name" label-width="2"
+                <ec-form-field label="Start Date" label-width="2"
                                name="start_date"
                                error="vm.budgetForm.start_date.$error"
                                field-width="6"
                                placeholder="Starting date of the budget"
                                type="date"
                                ng-required="true"
-                               ng-model="vm.budget.start_date">
+                               ng-model="vm.budget.start_date" >
                 </ec-form-field>
 
                 <div class="form-group">

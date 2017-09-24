@@ -12,6 +12,7 @@
     var vm = this;
     vm.state = StateService; // page state handler
     vm.budgets = [];
+    vm.budget = {};
     vm.addBudget = addBudget;
     vm.selectBudgetForUpdate = selectBudgetForUpdate;
     vm.copyBudget = copyBudget;
@@ -31,11 +32,15 @@
     }
 
     function addBudget(budget, form){
+
       BudgetsService.addBudget(budget).then(function(response){
-        refreshBudgetList();
-        MessageService.setMessage('Budget "' + budget.name + '" added successfully.');
+
+        // the server generates the budget name,
+        // so retrieve the name from the response
+        MessageService.setMessage('Budget "' + response.name + '" added successfully.');
         // TODO:  hack - need to find a better way of clearing the name
         FormService.resetForm(budget, form, ['start_date']);
+        refreshBudgetList();
 
       }, function(errorResponse){
         FormService.setErrors(form, errorResponse.data);

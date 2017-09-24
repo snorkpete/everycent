@@ -26,6 +26,18 @@
                placeholder="{{ vm.placeholder }}">
         </input>
 
+        <!-- use a date element with conversion to date element if type='date' -->
+        <input ng-switch-when="date"
+               type="date"
+               name="vm.fieldName"
+               ng-model="vm.model"
+               ng-change="vm.change"
+               class="form-control"
+               ec-as-date
+               ng-required="vm.isRequired"
+               placeholder="{{ vm.placeholder }}">
+        </input>
+
         <!-- otherwise use a normal input element -->
         <input ng-switch-default
                type="{{ vm.type }}"
