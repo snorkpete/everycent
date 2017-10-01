@@ -27,10 +27,28 @@ class Setting < ActiveRecord::Base
     get_setting_record.bank_charges_allocation_name
   end
 
+  def self.husband
+    get_setting_record.husband
+  end
+
+  def self.husband=(husband)
+    get_setting_record.update(husband: husband)
+  end
+
+  def self.wife
+    get_setting_record.wife
+  end
+
+  def self.wife=(wife)
+    get_setting_record.update(wife: wife)
+  end
+
   def self.as_hash
     result = {
       primary_budget_account_id: get_setting_record.primary_budget_account_id,
-      bank_charges_allocation_name: get_setting_record.bank_charges_allocation_name
+      bank_charges_allocation_name: get_setting_record.bank_charges_allocation_name,
+      husband: get_setting_record.husband,
+      wife: get_setting_record.wife
     }
     result
   end

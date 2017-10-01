@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160921223242) do
+ActiveRecord::Schema.define(version: 20171001175254) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -135,8 +135,10 @@ ActiveRecord::Schema.define(version: 20160921223242) do
   create_table "settings", force: :cascade do |t|
     t.integer  "primary_budget_account_id"
     t.string   "bank_charges_allocation_name"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.string   "husband",                      default: "Husband"
+    t.string   "wife",                         default: "Wife"
   end
 
   create_table "sink_fund_allocations", force: :cascade do |t|
