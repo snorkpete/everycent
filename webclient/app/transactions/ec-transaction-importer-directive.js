@@ -30,6 +30,7 @@
     vm.startImport = startImport;
     vm.cancelImport = cancelImport;
     vm.convertToTransactions = convertToTransactions;
+    vm.importType = 'new-bank-account';
 
     function startImport(){
       vm.showForm = true;
@@ -43,12 +44,6 @@
     }
 
     function convertToTransactions(input){
-      if(vm.bankAccount && vm.bankAccount.is_credit_card){
-        vm.importType = 'credit-card';
-      }else{
-        vm.importType = 'bank-account';
-      }
-
       var newTransactions = TransactionImporterService.convertToTransactions(input, vm.startDate, vm.endDate, vm.importType);
       vm.transactions = vm.transactions.concat(newTransactions);
       vm.showForm = false;
