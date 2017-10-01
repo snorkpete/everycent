@@ -26,6 +26,9 @@
     vm.showStandingOrders = false;
     vm.transferAccounts = [];
 
+    vm.husband = 'husband';
+    vm.wife = 'wife';
+
     vm.state = StateService;
     vm.ref = ReferenceService;
     vm.util = UtilService;
@@ -73,6 +76,8 @@
     function _setTransferAccounts(){
       SettingsService.getSettings().then(function(settings){
         vm.primary_budget_account_id = settings.primary_budget_account_id;
+        vm.husband = settings.husband;
+        vm.wife = settings.wife;
 
         vm.transferAccounts = vm.bankAccounts.filter(function(account){
           return account.id !== vm.primary_budget_account_id &&

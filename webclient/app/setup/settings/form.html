@@ -5,13 +5,12 @@
             ng-submit="vm.saveSettings(vm.settings, vm.settingsForm)">
             <ec-panel type="primary" title="Update Settings">
 
-                <ec-form-field label="Bank Charges Allocation Name"
+                <ec-form-field label="Bank Charges Allocation Name (unused)"
                                label-width="4"
                                name="bank_charges_allocation_name"
                                error="vm.settingsForm.bank_charges_allocation_name.$error"
                                field-width="6"
                                type="text"
-                               ng-required="true"
                                ng-model="vm.settings.bank_charges_allocation_name">
                 </ec-form-field>
 
@@ -23,6 +22,24 @@
                                type="select"
                                list-of="bank_accounts"
                                ng-model="vm.settings.primary_budget_account_id">
+                </ec-form-field>
+
+                <ec-form-field label="Husband's Name"
+                               label-width="4"
+                               name="husband"
+                               error="vm.settingsForm.husband.$error"
+                               field-width="6"
+                               type="text"
+                               ng-model="vm.settings.husband">
+                </ec-form-field>
+
+                <ec-form-field label="Wife's Name"
+                               label-width="4"
+                               name="wife"
+                               error="vm.settingsForm.wife.$error"
+                               field-width="6"
+                               type="text"
+                               ng-model="vm.settings.wife">
                 </ec-form-field>
 
                 <div class="form-group" ng-hide="vm.isEditMode">
