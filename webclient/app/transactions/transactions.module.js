@@ -1,7 +1,7 @@
 
 (function(){
   angular
-    .module('everycent.transactions', ['everycent.common'])
+    .module('everycent.transactions', ['everycent.common', 'everycent.transactions.importers'])
     .config(RouteConfiguration);
 
   RouteConfiguration.$inject = ['$stateProvider'];
