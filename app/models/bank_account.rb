@@ -60,6 +60,11 @@ class BankAccount < ActiveRecord::Base
       total_transaction_amount -= transaction.withdrawal_amount
     end
 
+    # initialize closing balance if it hasn't been used yet
+    # this happens with new accounts
+    if self.closing_balance.nil?
+      self.closing_balance = 0
+    end
     self.closing_balance += total_transaction_amount
     self.closing_date = closing_date
     save
