@@ -30,7 +30,7 @@
     vm.startImport = startImport;
     vm.cancelImport = cancelImport;
     vm.convertToTransactions = convertToTransactions;
-    vm.importType = 'new-bank-account';
+    vm.importType = 'abn-amro-bank';
 
     function startImport(){
       vm.showForm = true;

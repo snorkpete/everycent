@@ -1,44 +1,3 @@
-// 15 Oct `17
-// Albert Heijn 1289 AMSTER,PAS351
-// - 9,03
-// A'damse Fietswinkel AMST,PAS351
-// - 295,00
-// NL04INGB0007552562
-// Simpel.nl B.V.
-// NL04 INGB 0007 5525 62
-// - 35,00
-// NL04INGB0007552562
-// Simpel.nl B.V.
-// NL04 INGB 0007 5525 62
-// - 35,00
-// 14 Oct `17
-// Dominos Amsterdam Amster,PAS351
-// - 21,40
-// NL19DEUT0319821366
-// Stichting Derdengelden B
-// NL19 DEUT 0319 8213 66
-// - 7,50
-// NL19DEUT0319821366
-// Stichting Derdengelden B
-// NL19 DEUT 0319 8213 66
-// - 7,50
-// NL19DEUT0319821366
-// Stichting Derdengelden B
-// NL19 DEUT 0319 8213 66
-// - 7,50
-// NL19DEUT0319821366
-// Stichting Derdengelden B
-// NL19 DEUT 0319 8213 66
-// - 7,50
-// 13 Oct `17
-// NL37DEUT0265134285
-// BOOKING.COM B.V.
-// NL37 DEUT 0265 1342 85
-// + 7.750,00
-// 7 Oct `17
-// PAKKETVERZ. POLISNR. 254085105
-// - 7,88
-// `
 
 (function(){
   'use strict';
@@ -50,7 +9,7 @@
   AbnAmroImporter.$inject = ['DateService'];
   function AbnAmroImporter(DateService){
     var service = {
-      convertFromBankFormat: _convertFromFCBankFormat,
+      convertFromBankFormat: _convertFromBankFormat,
       convertFromCreditCardFormat: _convertFromCreditCardFormat
     };
 
@@ -67,60 +26,118 @@
     }
 
 
-    function _convertFromFCBankFormat(input, startDate, endDate) {
+    function _convertFromBankFormat(input, startDate, endDate) {
       // SAMPLE DATA
-      // 2017-09-10	SAVINGS WITHDRAWAL - ATM	$500.00	$0.00	$1,819.61
-      // 2017-09-08	SAVINGS WITHDRAWAL - ATM	$500.00	$0.00	$2,319.61
-      // 2017-09-06	ACH CREDIT MEMO	$0.00	$250.00	$2,819.61
-      // 2017-09-02	SAVINGS WITHDRAWAL - ATM	$1,000.00	$0.00	$2,569.61
-      // 2017-09-01	ABM Withdrawal Fee - SAV	$3.00	$0.00	$3,569.61
-
-      // first split into lines
-      var lines = _convertInputToLines(input);
-
-      // then split each line into its parts
-      return lines.map(function(line){
-        return _convertFCBankLineDataToTransaction(line, startDate, endDate);
-      });
-    }
-
-    function _convertFCBankLineDataToTransaction(line, startDate, endDate) {
-      var transaction = {};
-      var parts = line.split('\t');
-      transaction.transaction_date = new Date(parts[0]);
-      transaction.description = parts[1];
-      var withdrawalAsStringWithDollarSign = parts[2];
-      var depositAsStringWithDollarSign = parts[3];
-
-      transaction.withdrawal_amount = extractNumberFromDollarString(withdrawalAsStringWithDollarSign);
-      transaction.deposit_amount = extractNumberFromDollarString(depositAsStringWithDollarSign);
-
+      // 3 Nov \`17
+      // Albert Heijn Fr.8642 ALM,PAS361
+      // - 57,06
+      // Het Beeldverhaal ALMERE ,PAS361
+      // - 30,97
+      // NL12RABO0306498111
+      // TLS BV INZ. OV-CHIPKAART
+      // NL12 RABO 0306 4981 11
+      // - 50,00
+      // 2 Nov \`17
+      // NL12RABO0306498111
+      // TLS BV INZ. OV-CHIPKAART
+      // NL12 RABO 0306 4981 11
+      // + 49,26
 
       var start = DateService.toDate(startDate);
       var end = DateService.toDate(endDate);
 
-      // confirm that the transaction date is within the period
-      if(transaction.transaction_date < start || transaction.transaction_date > end){
-        transaction.deleted = true;
-      }
+      var transactions = [];
+      var transaction, currentDate, withdrawalAmount, depositAmount;
+      var currentDescription = '';
 
-      // also remove any transactions with 0 amounts
-      if(transaction.withdrawal_amount === 0 && transaction.deposit_amount === 0){
-        transaction.deleted = true;
-      }
+      // first split into lines
+      var lines = _convertInputToLines(input);
+      lines.forEach(function(line) {
 
-      return transaction;
+        if(isDate(line)){
+          currentDate = extractDate(line);
+          return;
+        }
 
+        if(isNumber(line)){
+          var numberParts = extractNumberParts(line);
+          if(numberParts.sign == '+') {
+            depositAmount = numberParts.amount;
+            withdrawalAmount = 0;
+
+          } else {
+            depositAmount = 0;
+            withdrawalAmount = numberParts.amount;
+          }
+
+        // it's a description, but exclude bank stuff
+        } else if (line.substr(0,2) !== 'NL') {
+            currentDescription = line;
+        }
+
+        if(isEndOfTransaction(line)) {
+          transaction = {
+            transaction_date: currentDate,
+            description: currentDescription,
+            withdrawal_amount: withdrawalAmount,
+            deposit_amount: depositAmount
+          };
+
+          // confirm that the transaction date is within the period
+          if(transaction.transaction_date < start || transaction.transaction_date > end){
+            transaction.deleted = true;
+          }
+
+          // also remove any transactions with 0 amounts
+          if(transaction.withdrawal_amount === 0 && transaction.deposit_amount === 0){
+            transaction.deleted = true;
+          }
+          transactions.push(transaction);
+          currentDescription = '';
+          withdrawalAmount = 0;
+          depositAmount = 0;
+        }
+      });
+
+      return transactions;
     }
 
-    function extractNumberFromDollarString(dollarString) {
-      if(!dollarString) {
-        return 0;
+    function isDate(line) {
+      if(!line) {
+        return false;
       }
-      var amountWithCommas = dollarString.replace(/\$/g, '');
-      var amountAsNumberInDollars = Number(amountWithCommas.replace(/,/g, ''));
-      return amountAsNumberInDollars * 100;
+      return line.match(/(\d\d?) ([A-z]{3}) `(\d\d)/);
     }
+
+    function extractDate(line) {
+      if(!isDate(line)) {
+        return undefined;
+      }
+
+      return new Date(line.replace(/`/g, ''));
+    }
+
+    function isNumber(line) {
+      var firstChar = line.trim().substr(0,1);
+
+      return firstChar == '-' || firstChar == '+';
+    }
+
+    function extractNumberParts(line) {
+      var sign = line.trim().substr(0,1);
+      var numberString = line.substring(1).trim().replace(/\./g, '').replace(/,/g, '.');
+      var amount = Number(numberString) * 100;
+
+      return {
+        sign: sign,
+        amount: amount
+      };
+    }
+
+    function isEndOfTransaction(line) {
+      return isNumber(line);
+    }
+
   }
 
 })();
