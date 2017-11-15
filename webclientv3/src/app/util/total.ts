@@ -1,5 +1,5 @@
 
-let total = (items: any[], fieldToSum: string): number => {
+let total = (items: any[] = [], fieldToSum: string): number => {
 
   return items.reduce((sum, item) => {
 

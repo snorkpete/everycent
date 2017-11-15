@@ -2,6 +2,7 @@
 let Icon = {
   HOME: "home",
   SINK_FUND: "card_membership",
+  ACCOUNT_BALANCES: "account_balance",
   LOGOUT: "account_circle",
   MENU: "menu",
 

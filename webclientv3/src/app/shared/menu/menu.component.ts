@@ -23,7 +23,11 @@ import 'rxjs/add/operator/filter';
         </ec-menu-item>
 
         <ec-menu-item [icon]="Icon.MENU" route="/sink-funds">
-            Sink Funds
+          Sink Funds
+        </ec-menu-item>
+
+        <ec-menu-item [icon]="Icon.ACCOUNT_BALANCES" route="/account-balances">
+            Account Balances
         </ec-menu-item>
         
         <md-divider></md-divider>
