@@ -228,7 +228,6 @@ export class SinkFundComponent implements OnInit, OnDestroy {
         .getTransactionsForSinkFundAllocation(sinkFundAllocation.id)
         .subscribe(transactions => {
            dialogRef = this.dialog.open(TransactionListComponent, { width: '500px' });
-           debugger;
            dialogRef.componentInstance.transactions = transactions;
            dialogRef.componentInstance.itemName = sinkFundAllocation.name;
         });
