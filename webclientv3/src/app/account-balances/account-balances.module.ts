@@ -6,6 +6,7 @@ import { AccountBalancesComponent } from './account-balances/account-balances.co
 import { AccountListComponent } from './account-list/account-list.component';
 import { AccountBalanceTotalsComponent } from './account-balance-totals/account-balance-totals.component';
 import {AccountBalancesService} from "./account-balances.service";
+import {AccountListHeaderComponent} from "./account-list/account-list-header.component";
 
 @NgModule({
   imports: [
@@ -14,7 +15,12 @@ import {AccountBalancesService} from "./account-balances.service";
 
     AccountBalancesRoutingModule,
   ],
-  declarations: [AccountBalancesComponent, AccountListComponent, AccountBalanceTotalsComponent],
+  declarations: [
+    AccountBalancesComponent,
+    AccountListComponent,
+    AccountListHeaderComponent,
+    AccountBalanceTotalsComponent,
+  ],
   providers: [
     AccountBalancesService,
   ]
