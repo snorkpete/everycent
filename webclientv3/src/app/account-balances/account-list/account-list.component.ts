@@ -4,6 +4,8 @@ import {total} from "../../util/total";
 
 @Component({
   selector: 'ec-account-list',
+  styles: [`
+  `],
   template: `
     <md-card>
       <md-card-header>{{heading}}</md-card-header>
@@ -57,7 +59,6 @@ import {total} from "../../util/total";
       </md-card-content>
     </md-card>
   `,
-  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountListComponent implements OnInit, OnChanges {
