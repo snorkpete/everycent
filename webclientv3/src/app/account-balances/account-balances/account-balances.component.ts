@@ -8,7 +8,6 @@ import {MdSlideToggleChange} from "@angular/material";
   selector: 'ec-account-balances',
   styles: [`
     .total {
-      font-size: 1.4em;
       margin-right: 25px;
     }
 
