@@ -48,9 +48,6 @@
                    <li ng-class="{ active: vm.isActive('transactions')}">
                        <a ng-click="vm.go('transactions');">Transactions</a>
                    </li>
-                   <li ng-class="{ active: vm.isActive('account-balances')}">
-                       <a ng-click="vm.go('account-balances');">Account Balances</a>
-                   </li>
 
                     <li ng-class="{ open: vm.newOpen }">
                         <a class="dropdown-toggle"
@@ -61,6 +58,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li> <a href="/v3/#/sink-funds">Sink Funds (New)</a> </li>
+                            <li> <a href="/v3/#/account-balances">Account Balances (New)</a> </li>
                         </ul>
                     </li>
 
@@ -74,6 +72,9 @@
                         <ul class="dropdown-menu" role="menu">
                             <li>
                                 <a ng-click="vm.go('sink-funds');">Sink Funds</a>
+                            </li>
+                            <li>
+                                <a ng-click="vm.go('account-balances');">Account Balances</a>
                             </li>
                         </ul>
                     </li>
