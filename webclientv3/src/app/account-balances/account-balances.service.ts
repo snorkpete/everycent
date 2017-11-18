@@ -12,8 +12,14 @@ export class AccountBalancesService {
     private apiGateway: ApiGateway
   ) { }
 
-  getAccountBalances$(): Observable<BankAccountData[]> {
-    this.bankAccounts$ = this.apiGateway.get('/account_balances');
+  getAccountBalances$(includeClosed?: boolean): Observable<BankAccountData[]> {
+    let url = '/account_balances';
+
+    if (includeClosed) {
+      url += '?include_closed=true'
+    }
+
+    this.bankAccounts$ = this.apiGateway.get(url);
     return this.bankAccounts$;
   }
 
