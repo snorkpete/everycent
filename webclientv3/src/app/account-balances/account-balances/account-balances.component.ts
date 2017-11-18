@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
 import {AccountBalancesService} from "../account-balances.service";
 import {BankAccountData} from "../bank-account.model";
+import {MdSlideToggleChange} from "@angular/material";
 
 @Component({
   selector: 'ec-account-balances',
@@ -17,6 +18,7 @@ import {BankAccountData} from "../bank-account.model";
   `],
   template: `
     <div fxLayout="column">
+      <md-slide-toggle fxFlexAlign="end end" [checked]="false" (change)="onIncludeClosedChanged($event)">Include Closed Accounts?</md-slide-toggle>
       <ec-account-list [bankAccounts]="currentAccounts" heading="Current Accounts"></ec-account-list>
       <ec-account-list [bankAccounts]="cashAssetAccounts" heading="Cash Assets"></ec-account-list>
       <ec-account-list [bankAccounts]="nonCashAssetAccounts" heading="Non Cash Assets"></ec-account-list>
@@ -45,6 +47,8 @@ export class AccountBalancesComponent implements OnInit {
   totalAssets = 0;
   searchParams = {};
 
+  includeClosedAccounts = false;
+
   constructor(
     private toolbarService: MainToolbarService,
     private accountBalancesService: AccountBalancesService
@@ -55,8 +59,13 @@ export class AccountBalancesComponent implements OnInit {
     this.refreshBankAccountList();
   }
 
+  onIncludeClosedChanged(toggleEvent: MdSlideToggleChange) {
+    this.includeClosedAccounts = toggleEvent.checked;
+    this.refreshBankAccountList();
+  }
+
   refreshBankAccountList(){
-    this.accountBalancesService.getAccountBalances$().subscribe( bankAccounts => {
+    this.accountBalancesService.getAccountBalances$(this.includeClosedAccounts).subscribe( bankAccounts => {
       this.bankAccounts = bankAccounts;
       this.updateBankAccountLists();
       this.totalAssets = this.accountBalancesService.totalAssets(this.bankAccounts);
