@@ -5,15 +5,30 @@ import {BankAccountData} from "../bank-account.model";
 
 @Component({
   selector: 'ec-account-balances',
+  styles: [`
+    .total {
+      font-size: 1.4em;
+      margin-right: 25px;
+    }
+
+    ec-account-list {
+      margin-bottom: 5px;
+    }
+  `],
   template: `
-    <ec-account-list [bankAccounts]="currentAccounts" heading="Current Accounts"></ec-account-list>
-    <ec-account-list [bankAccounts]="cashAssetAccounts" heading="Cash Assets"></ec-account-list>
-    <ec-account-list [bankAccounts]="nonCashAssetAccounts" heading="Non Cash Assets"></ec-account-list>
-    <h2>{{ totalAssets | ecMoney }}</h2>
-    <ec-account-list [bankAccounts]="creditCardAccounts" heading="Credit Cards"></ec-account-list>
-    <ec-account-list [bankAccounts]="loanAccounts" heading="Loans"></ec-account-list>
-  `,
-  styles: []
+    <div fxLayout="column">
+      <ec-account-list [bankAccounts]="currentAccounts" heading="Current Accounts"></ec-account-list>
+      <ec-account-list [bankAccounts]="cashAssetAccounts" heading="Cash Assets"></ec-account-list>
+      <ec-account-list [bankAccounts]="nonCashAssetAccounts" heading="Non Cash Assets"></ec-account-list>
+      <div class="total" fxLayoutAlign="end">
+        <h3>Total Assets: {{ totalAssets | ecMoney }}</h3>
+      </div>
+      <ec-account-list [bankAccounts]="creditCardAccounts" heading="Credit Cards"></ec-account-list>
+      <ec-account-list [bankAccounts]="loanAccounts" heading="Loans"></ec-account-list>
+
+      <ec-account-balance-totals [bankAccounts]="bankAccounts"></ec-account-balance-totals>
+    </div>
+  `
 })
 export class AccountBalancesComponent implements OnInit {
   bankAccounts: BankAccountData[] = [];

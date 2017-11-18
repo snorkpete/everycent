@@ -43,7 +43,6 @@ import {total} from "../../util/total";
           
           <tr class="total">
             <th class="hidden-xs text-right" colspan="4">Total</th>
-            <th class="visible-xs text-right">Total</th>
             <th class="text-right">
               {{ closingBalance() | ecMoney }}
             </th>

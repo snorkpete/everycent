@@ -4,52 +4,51 @@ import {AccountBalancesService} from "../account-balances.service";
 
 @Component({
   selector: 'ec-account-balance-totals',
+  styles: [`
+    div.holder {
+      margin: 30px;
+    }
+    span, ec-money-field {
+      text-align: end;
+    }
+
+    hr {
+      width: 100%;
+    }
+  `],
   template: `
-    <div class="row">
-      <div class="col-xs-12">
-        <h4 class="net-worth text-right">
-          Total Liabilities: &nbsp; <ec-money-field [value]="abs.totalLiabilities(bankAccounts)">
-        </ec-money-field>
-        </h4>
-      </div>
-    </div>
-    <br/>
-    <hr>
-    <div class="row">
-      <div class="col-xs-12">
-        <h4 class="net-worth text-right">
-          Net Current Cash: &nbsp; <ec-money-field [value]="abs.netCurrentCash(bankAccounts)">
-        </ec-money-field>
-        </h4>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <h4 class="net-worth text-right">
-          Net Cash Assets: &nbsp; <ec-money-field [value]="abs.netCashAssets(bankAccounts)">
-        </ec-money-field>
-        </h4>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <h4 class="net-worth text-right">
-          Net Non Cash Assets: &nbsp; <ec-money-field [value]="abs.netNonCashAssets(bankAccounts)">
-        </ec-money-field>
-        </h4>
-      </div>
-    </div>
-    <hr>
-    <div class="row">
-      <div class="col-xs-12">
-        <h3 class="net-worth text-right">
-          Net Worth: &nbsp; <ec-money-field [value]="abs.netWorth(bankAccounts)">
-        </ec-money-field>
-        </h3>
-      </div>
+    <div class="holder" fxLayout="column">
+
+      <h3 fxLayout="row" fxLayoutAlign="end end">
+        <span fxFlex="80">Total Liabilities</span>
+        <ec-money-field fxFlex="20" [value]="abs.totalLiabilities(bankAccounts)"></ec-money-field>
+      </h3>
+
+      <hr/>
+
+      <h3 class="net-worth" fxLayout="row" fxLayoutAlign="end center">
+        <span fxFlex="80">Net Current Cash:</span>
+        <ec-money-field fxFlex="20" [value]="abs.netCurrentCash(bankAccounts)"> </ec-money-field>
+      </h3>
+
+      <h3 class="net-worth text-right" fxLayout="row">
+        <span fxFlex="80" fxFlexAlign="end">Net Cash Assets:</span>
+        <ec-money-field fxFlex="20" [value]="abs.netCashAssets(bankAccounts)"> </ec-money-field>
+      </h3>
+
+      <h3 class="net-worth text-right" fxLayout="row" fxLayoutAlign="end center">
+        <span fxFlex="80">Net Non Cash Assets:</span>
+        <ec-money-field fxFlex="20" [value]="abs.netNonCashAssets(bankAccounts)"> </ec-money-field>
+      </h3>
+
+      <hr/>
+
+      <h2 fxLayout="row">
+        <span fxFlex="80">Net Worth:</span>
+        <ec-money-field fxFlex="20" [value]="abs.netWorth(bankAccounts)"> </ec-money-field>
+      </h2>
     </div>
   `,
-  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountBalanceTotalsComponent implements OnInit, OnChanges {
