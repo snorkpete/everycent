@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
+    "version": "1.0.0-beta.28.3",
     "name": "everycent"
   },
   "apps": [
@@ -36,16 +37,12 @@
   },
   "lint": [
     {
-      "project": "src/tsconfig.app.json",
-      "exclude": "**/node_modules/**"
+      "files": "src/**/*.ts",
+      "project": "src/tsconfig.app.json"
     },
     {
-      "project": "src/tsconfig.spec.json",
-      "exclude": "**/node_modules/**"
-    },
-    {
-      "project": "e2e/tsconfig.e2e.json",
-      "exclude": "**/node_modules/**"
+      "files": "e2e/**/*.ts",
+      "project": "e2e/tsconfig.e2e.json"
     }
   ],
   "test": {
@@ -55,16 +52,18 @@
   },
   "defaults": {
     "styleExt": "css",
-    "component": {
-      "inlineStyle": true,
-      "inlineTemplate": true}
-  },
-  "spec": {
-    "class": false,
-    "component": true,
-    "directive": true,
-    "module": false,
-    "pipe": true,
-    "service": true
+    "prefixInterfaces": false,
+    "inline": {
+      "style": true,
+      "template": true
+    },
+    "spec": {
+      "class": false,
+      "component": true,
+      "directive": true,
+      "module": false,
+      "pipe": true,
+      "service": true
+    }
   }
 }

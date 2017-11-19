@@ -1,0 +1,34 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/core/theming/prebuilt/deeppurple-amber.css';
+
+@import 'data-table-styles.scss';
+
+div.md-sidenav-content {
+    background-color: #a09fa2;
+}
+
+.deactivated {
+  background-color: rgba(33, 33, 33, 0.3);
+}
+
+.deactivated:hover{
+  background-color: rgba(33, 33, 33, 0.5) !important;
+}
+
+.deleted {
+    background-color: rgba(160, 38, 38, 0.35);
+}
+
+.deleted:hover{
+    background-color: rgba(160, 38, 38, 0.55) !important;
+}
+
+html, body {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    background-color: #d0cdcd;
+}
