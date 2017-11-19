@@ -11,6 +11,7 @@
       "dom"
     ],
     "outDir": "../out-tsc/app",
+    "baseUrl": "./",
     "module": "es2015",
     "baseUrl": "",
     "types": [
