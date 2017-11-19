@@ -1,14 +1,14 @@
-import { EverycentPage } from './app.po';
+import { AppPage } from './app.po';
 
-describe('everycent App', function() {
-  let page: EverycentPage;
+describe('everycent App', () => {
+  let page: AppPage;
 
   beforeEach(() => {
-    page = new EverycentPage();
+    page = new AppPage();
   });
 
-  it('should display message saying app works', () => {
+  it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toContain('ec works!');
+    expect(page.getParagraphText()).toEqual('Welcome to ec!');
   });
 });
