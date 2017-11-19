@@ -1,31 +1,64 @@
-import { TestBed, async } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { AppComponent } from './app.component';
+/* tslint:disable:no-unused-variable */
+
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppComponent} from './app.component';
+import {ApiGateway} from '../api/api-gateway.service';
+import {ApiGatewayStub} from '../../test/api-gateway-stub';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+
 describe('AppComponent', () => {
-  beforeEach(async(() => {
+
+  let fixture: ComponentFixture<AppComponent>;
+  let app: any;
+
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
       ],
       declarations: [
         AppComponent
       ],
-    }).compileComponents();
-  }));
+      providers: [
+        { provide: ApiGateway, useValue: ApiGatewayStub }
+      ],
+      // we're not gonna instantiate the nested components of AppComponent,
+      // so don't bother to error check the template
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+    TestBed.compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    app = fixture.debugElement.componentInstance;
+    fixture.detectChanges();
+  })
+
   it('should create the app', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   }));
-  it(`should have as title 'ec'`, async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('ec');
+
+  it(`should have as title 'ec works!'`, async(() => {
+    expect(app.title).toEqual('ec works!');
   }));
-  it('should render title in a h1 tag', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to ec!');
+
+  it('has a nested menu component', async(() => {
+    const element = fixture.debugElement.nativeElement;
+    expect(element.querySelector('ec-menu')).toBeTruthy();
+  }));
+
+  it('has a nested loading indicator component', async(() => {
+    const element = fixture.debugElement.nativeElement;
+    expect(element.querySelector('ec-loading-indicator')).toBeTruthy();
+  }));
+
+  it('has a nested main toolbar component', async(() => {
+    const element = fixture.debugElement.nativeElement;
+    expect(element.querySelector('ec-main-toolbar')).toBeTruthy();
+  }));
+
+  it('has a nested router outlet', async(() => {
+    const element = fixture.debugElement.nativeElement;
+    expect(element.querySelector('router-outlet')).toBeTruthy();
   }));
 });
