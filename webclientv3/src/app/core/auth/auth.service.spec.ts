@@ -10,7 +10,7 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/map';
 import {httpStub} from '../../../../test/http-stub';
-import {LoadingIndicator} from '../loading-indicator/loading-indicator.service';
+import {LoadingIndicator} from '../../shared/loading-indicator/loading-indicator.service';
 
 describe('AuthService', () => {
 

@@ -5,7 +5,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 import {LoginComponent} from './login.component';
 import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
-import {AuthService} from '../shared/auth/auth.service';
+import {AuthService} from '../core/auth/auth.service';
 import {FormsModule} from '@angular/forms';
 import {ApiGateway} from '../../api/api-gateway.service';
 import {ApiGatewayStub} from '../../../test/api-gateway-stub';

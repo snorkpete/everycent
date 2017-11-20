@@ -1,28 +1,31 @@
 import {BrowserModule} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {HttpModule} from '@angular/http';
 
+import {CoreModule} from "./core/core.module";
 import {AppComponent} from './app.component';
-import {ApiModule} from '../api/api.module';
+
 import {SharedModule} from './shared/shared.module';
 import {LoginComponent} from './login/login.component';
 import {HomeComponent} from './home/home.component';
-import {SinkFundsModule} from './sink-funds/sink-funds.module';
-import {AccountBalancesModule} from "./account-balances/account-balances.module";
+//import {AppRoutingModule} from "./app-routing.module";
+// import {SinkFundsModule} from './sink-funds/sink-funds.module';
+// import {AccountBalancesModule} from "./account-balances/account-balances.module";
 
 @NgModule({
   imports: [
     BrowserModule,
-    FormsModule,
-    HttpModule,
+    BrowserAnimationsModule,
 
-    ApiModule,
+    CoreModule,
     SharedModule,
 
+    // main routing module
+    //AppRoutingModule,
+
     // feature modules
-    SinkFundsModule,
-    AccountBalancesModule,
+    // SinkFundsModule,
+    // AccountBalancesModule,
   ],
   declarations: [
     AppComponent,
