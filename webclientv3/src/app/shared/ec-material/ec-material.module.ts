@@ -1,40 +1,53 @@
+import 'hammerjs';
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatButtonModule} from "@angular/material/button";
-import {MatCardModule} from "@angular/material/card";
-import {MatDialogModule} from "@angular/material/dialog";
+// import {MatCardModule} from "@angular/material/card";
+// import {MatDialogModule} from "@angular/material/dialog";
 import {MatIconModule} from "@angular/material/icon";
-import {MatInputModule} from "@angular/material/input";
-import {MatListModule} from "@angular/material/list";
-import {MatProgressBarModule} from "@angular/material/progress-bar";
-import {MatSelectModule} from "@angular/material/select";
-import {MatSidenavModule} from "@angular/material/sidenav";
-import {MatSlideToggleModule} from "@angular/material/slide-toggle";
-import {MatSnackBarModule} from "@angular/material/snack-bar";
+// import {MatInputModule} from "@angular/material/input";
+// import {MatListModule} from "@angular/material/list";
+// import {MatProgressBarModule} from "@angular/material/progress-bar";
+// import {MatSelectModule} from "@angular/material/select";
+// import {MatSidenavModule} from "@angular/material/sidenav";
+// import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+// import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatToolbarModule} from "@angular/material/toolbar";
 
 
 @NgModule({
   imports: [
-    CommonModule
-  ],
-  declarations: [],
-  exports: [
+    FlexLayoutModule,
+
     MatButtonModule,
-    MatCardModule,
-    MatDialogModule,
+    // MatCardModule,
+    // MatDialogModule,
     MatIconModule,
-    MatInputModule,
-    MatListModule,
-    MatProgressBarModule,
-    MatSelectModule,
-    MatSidenavModule,
-    MatSlideToggleModule,
-    MatSnackBarModule,
+    // MatInputModule,
+    // MatListModule,
+    // MatProgressBarModule,
+    // MatSelectModule,
+    // MatSidenavModule,
+    // MatSlideToggleModule,
+    // MatSnackBarModule,
+    MatToolbarModule,
+  ],
+  exports: [
+    FlexLayoutModule,
+
+    MatButtonModule,
+    // MatCardModule,
+    // MatDialogModule,
+    MatIconModule,
+    // MatInputModule,
+    // MatListModule,
+    // MatProgressBarModule,
+    // MatSelectModule,
+    // MatSidenavModule,
+    // MatSlideToggleModule,
+    // MatSnackBarModule,
     MatToolbarModule,
 
-    FlexLayoutModule,
   ]
 })
 export class EcMaterialModule { }

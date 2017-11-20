@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../../core/auth/auth.service';
 import {Icon} from '../ec-icon/icon.type';
 import 'rxjs/add/operator/filter';
 

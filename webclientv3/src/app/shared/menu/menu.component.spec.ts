@@ -6,7 +6,7 @@ import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 import { MenuComponent } from './menu.component';
 import {RouterStub} from '../../../../test/router-stub';
 import {Router} from '@angular/router';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../../core/auth/auth.service';
 import {ApiGatewayStub} from '../../../../test/api-gateway-stub';
 import {ApiGateway} from '../../../api/api-gateway.service';
 
