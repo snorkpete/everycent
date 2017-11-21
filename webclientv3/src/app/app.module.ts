@@ -8,7 +8,7 @@ import {AppComponent} from './app.component';
 import {SharedModule} from './shared/shared.module';
 import {LoginComponent} from './login/login.component';
 import {HomeComponent} from './home/home.component';
-//import {AppRoutingModule} from "./app-routing.module";
+import {AppRoutingModule} from "./app-routing.module";
 // import {SinkFundsModule} from './sink-funds/sink-funds.module';
 // import {AccountBalancesModule} from "./account-balances/account-balances.module";
 
@@ -21,7 +21,7 @@ import {HomeComponent} from './home/home.component';
     SharedModule,
 
     // main routing module
-    //AppRoutingModule,
+    AppRoutingModule,
 
     // feature modules
     // SinkFundsModule,

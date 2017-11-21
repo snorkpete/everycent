@@ -22,8 +22,8 @@ import {Component, OnInit} from '@angular/core';
       <!---->
            <!--&lt;!&ndash;<ec-loading-indicator></ec-loading-indicator>&ndash;&gt;-->
            <!--&lt;!&ndash;<ec-message-display></ec-message-display>&ndash;&gt;-->
-           <!--&lt;!&ndash;<router-outlet></router-outlet>&ndash;&gt;-->
       <!---->
+      <router-outlet></router-outlet>
          <!--</mat-sidenav-container>-->
      </div>
   `,

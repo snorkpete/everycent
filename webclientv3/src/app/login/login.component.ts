@@ -21,7 +21,30 @@ import {Router} from '@angular/router';
     }
   `],
   template: `
-    login
+    <form (ngSubmit)="login()">
+      <mat-card>
+        <mat-card-title color=""><mat-icon>lock </mat-icon> EveryCent - Log In</mat-card-title>
+
+        <!--<mat-divider></mat-divider>-->
+
+        <mat-card-content fxLayout="column">
+          <mat-input-container>
+            <input matInput placeholder="Email" type="text" name="email" [(ngModel)]="email" class="email"/>
+          </mat-input-container>
+
+          <mat-input-container>
+            <input matInput placeholder="Password" type="password" name="password" [(ngModel)]="password" class="password"/>
+          </mat-input-container>
+        </mat-card-content>
+
+        <!--<mat-divider></mat-divider>-->
+
+        <mat-card-actions>
+          <button mat-raised-button color="primary" type="submit" class="login">Log In</button>
+          <button mat-raised-button color="" type="reset">Cancel</button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
   `
 })
 export class LoginComponent implements OnInit {
@@ -49,27 +72,3 @@ export class LoginComponent implements OnInit {
   }
 
 }
-// <form (ngSubmit)="login()">
-//   <mat-card>
-//   <mat-card-title color=""><mat-icon>lock </mat-icon> EveryCent - Log In</mat-card-title>
-//
-// <mat-divider></mat-divider>
-//
-// <mat-card-content fxLayout="column">
-//   <mat-input-container>
-//   <input matInput placeholder="Email" type="text" name="email" [(ngModel)]="email" class="email"/>
-//   </mat-input-container>
-//
-//   <mat-input-container>
-//   <input matInput placeholder="Password" type="password" name="password" [(ngModel)]="password" class="password"/>
-//   </mat-input-container>
-//   </mat-card-content>
-//
-//   <mat-divider></mat-divider>
-//
-//   <mat-card-actions>
-//   <button mat-raised-button color="primary" type="submit" class="login">Log In</button>
-// <button mat-raised-button color="" type="reset">Cancel</button>
-//   </mat-card-actions>
-//   </mat-card>
-//   </form>
