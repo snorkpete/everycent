@@ -20,8 +20,8 @@ import {EcIconComponent} from './ec-icon/ec-icon.component';
 import {LoadingIndicator} from './loading-indicator/loading-indicator.service';
 import {MainToolbarComponent} from './main-toolbar/main-toolbar.component';
 import {MainToolbarService} from './main-toolbar/main-toolbar.service';
-// import {MenuItemComponent} from './menu/menu-item.component';
-// import {MenuComponent} from './menu/menu.component';
+import {MenuItemComponent} from './menu/menu-item.component';
+import {MenuComponent} from './menu/menu.component';
 // import {MessageDisplayComponent} from './message-display/message-display.component';
 import {MessageService} from '../message-display/message.service';
 // import {MoneyPipe} from './money.pipe';
@@ -36,12 +36,11 @@ import {MessageService} from '../message-display/message.service';
   ],
   declarations: [
     MainToolbarComponent,
+    EcIconComponent,
     // LoadingIndicatorComponent,
     // MessageDisplayComponent,
-    // MenuComponent,
-    EcIconComponent,
-    // MenuItemComponent,
-    //
+    MenuComponent,
+    MenuItemComponent,
     // TextFieldComponent,
     // DateFieldComponent,
     // MoneyFieldComponent,
@@ -63,9 +62,9 @@ import {MessageService} from '../message-display/message.service';
     MainToolbarComponent,
     // LoadingIndicatorComponent,
     // MessageDisplayComponent,
-    // MenuComponent,
+    MenuComponent,
     //
-    // EcIconComponent,
+    EcIconComponent,
     // TextFieldComponent,
     // DateFieldComponent,
     // MoneyFieldComponent,
