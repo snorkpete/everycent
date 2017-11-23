@@ -3,7 +3,6 @@ import {Headers, Http, RequestOptions, URLSearchParams} from '@angular/http';
 import {BASE_URL} from './base-url.service';
 import {Observable} from 'rxjs/Observable';
 import {AuthCredentials} from '../app/core/auth/auth-credentials';
-import 'rxjs/add/observable/throw';
 import {LoadingIndicator} from '../app/shared/loading-indicator/loading-indicator.service';
 
 @Injectable()
