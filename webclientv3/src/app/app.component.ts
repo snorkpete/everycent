@@ -11,32 +11,26 @@ import {Component, OnInit} from '@angular/core';
   template: `
     <div fxLayout="column" fxFlex>
        <ec-main-toolbar (openMenu)="sidenav.open()"> </ec-main-toolbar>
-      <!--<ec-main-toolbar (openMenu)="opened()"> </ec-main-toolbar>-->
 
          <mat-sidenav-container fxFlex>
-      <!---->
+
            <mat-sidenav #sidenav opened="false" mode="overlay">
-             
              <ec-menu (menuSelect)="sidenav.close()"></ec-menu>
            </mat-sidenav>
-      <!---->
-           <!--&lt;!&ndash;<ec-loading-indicator></ec-loading-indicator>&ndash;&gt;-->
-           <!--&lt;!&ndash;<ec-message-display></ec-message-display>&ndash;&gt;-->
-      <!---->
+
+           <ec-loading-indicator></ec-loading-indicator>
+           <ec-message-display></ec-message-display>
            <router-outlet></router-outlet>
+
          </mat-sidenav-container>
      </div>
   `,
 })
 export class AppComponent implements OnInit {
-  title = 'ec works!';
 
   constructor(
   ) { }
 
   ngOnInit() {
-  }
-  opened() {
-    alert('hello')
   }
 }

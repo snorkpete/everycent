@@ -16,7 +16,7 @@ import {Icon} from '../ec-icon/icon.type';
             <a href="/">Go to Old Version </a>
         </mat-list-item>
         <mat-divider></mat-divider>
-        
+
         <ec-menu-item [icon]="Icon.HOME" route="/">
             Home
         </ec-menu-item>
@@ -28,7 +28,7 @@ import {Icon} from '../ec-icon/icon.type';
         <ec-menu-item [icon]="Icon.ACCOUNT_BALANCES" route="/account-balances">
             Account Balances
         </ec-menu-item>
-        
+
         <mat-divider></mat-divider>
         <mat-list-item (click)="logOut()">
             <ec-icon [icon]="Icon.LOGOUT"></ec-icon> Log out

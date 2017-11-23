@@ -16,9 +16,9 @@ import {Icon} from '../ec-icon/icon.type';
                    class="open-menu-button"
                    (click)="openMenu.emit()">
           </ec-icon>
-          
+
           EveryCent V3
-          
+
             <span *ngIf="getMainHeading()" fxHide.xs class="heading">
                 -- {{ getMainHeading() }}
             </span>
@@ -27,6 +27,7 @@ import {Icon} from '../ec-icon/icon.type';
         <mat-toolbar-row fxHide.gt-xs>
            {{ getMainHeading() }}
         </mat-toolbar-row>
+
     </mat-toolbar>
   `,
 })

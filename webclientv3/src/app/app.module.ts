@@ -9,8 +9,8 @@ import {SharedModule} from './shared/shared.module';
 import {LoginComponent} from './login/login.component';
 import {HomeComponent} from './home/home.component';
 import {AppRoutingModule} from "./app-routing.module";
-// import {SinkFundsModule} from './sink-funds/sink-funds.module';
-// import {AccountBalancesModule} from "./account-balances/account-balances.module";
+import {SinkFundsModule} from './sink-funds/sink-funds.module';
+import {AccountBalancesModule} from "./account-balances/account-balances.module";
 
 @NgModule({
   imports: [
@@ -24,13 +24,13 @@ import {AppRoutingModule} from "./app-routing.module";
     AppRoutingModule,
 
     // feature modules
-    // SinkFundsModule,
-    // AccountBalancesModule,
+    AccountBalancesModule,
+    SinkFundsModule,
   ],
   declarations: [
     AppComponent,
-    LoginComponent,
     HomeComponent,
+    LoginComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]
