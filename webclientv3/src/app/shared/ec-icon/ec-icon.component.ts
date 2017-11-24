@@ -8,7 +8,7 @@ import {Component, Input, OnInit} from '@angular/core';
     }
   `],
   template: `
-      <button md-icon-button *ngIf="iconType=='button'">
+      <button mat-icon-button *ngIf="iconType=='button'">
           <mat-icon>{{icon}}</mat-icon>
       </button>
       
