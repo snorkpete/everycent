@@ -10,7 +10,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
   `],
   template: `
     <div class="button-container">
-        <button md-raised-button color="primary" class="make-changes"
+        <button mat-raised-button color="primary" class="make-changes"
                 *ngIf="!editMode"
                 (click)="switchToEditMode()">
             Make Changes
@@ -20,13 +20,13 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
         
         <div fxLayout="row" fxLayoutAlign="end">
 
-            <button md-raised-button color="primary" class="save"
+            <button mat-raised-button color="primary" class="save"
                     *ngIf="editMode"
                     (click)="save.emit()">
                 Save Changes
             </button>
             
-            <button md-raised-button color="warn" class="cancel"
+            <button mat-raised-button color="warn" class="cancel"
                     *ngIf="editMode"
                     (click)="cancelEdit()">
                 Cancel

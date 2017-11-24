@@ -17,13 +17,13 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
         color: darkgreen;
         font-weight: bold;
     }
-    md-input-container {
+    mat-input-container {
         width: 100%;
     }
   `],
   template: `
       <mat-input-container *ngIf="editMode">
-          <input #input mdInput class="value" type="text"
+          <input #input matInput class="value" type="text"
                  (input)="updateInnerValue(input.value)"
                  (blur)="formatTextValue()"
                  [placeholder]="placeholder"
