@@ -6,7 +6,7 @@ import {SinkFundCalculator} from '../sink-fund-calculator.service';
 import {SinkFundService} from '../sink-fund.service';
 import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.component';
 import {Icon} from '../../shared/ec-icon/icon.type';
-import {TransactionListComponent} from '../../transactions/transaction-list/transaction-list.component';
+import {TransactionListComponent} from '../../transactions/compact-transaction-list/compact-transaction-list.component';
 import {TransactionService} from '../../transactions/transaction.service';
 import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
 import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
@@ -145,12 +145,12 @@ import {MatDialogRef} from "@angular/material/dialog";
         <mat-card-actions>
             <ec-edit-actions [(editMode)]="isEditMode" (save)="save()" (cancel)="cancel()" >
 
-                <button md-raised-button color="accent" *ngIf="isEditMode"
+                <button mat-raised-button color="accent" *ngIf="isEditMode"
                         (click)="addObligation()">
                     Add Obligation
                 </button>
                 
-                <button md-raised-button color="primary" *ngIf="!isEditMode"
+                <button mat-raised-button color="primary" *ngIf="!isEditMode"
                         (click)="showTransferForm()">
                     Transfer Money
                 </button>

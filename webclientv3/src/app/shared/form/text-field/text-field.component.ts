@@ -12,7 +12,7 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
   `],
   template: `
     <mat-input-container *ngIf="editMode">
-        <input #input mdInput type="text" class="value"
+        <input #input matInput type="text" class="value"
                (input)="updateValue(input.value)"
                [formControl]="control" />
     </mat-input-container>

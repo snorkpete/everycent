@@ -7,7 +7,7 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
   `],
   template: `
       <mat-input-container *ngIf="editMode">
-          <input mdInput type="date" [(ngModel)]="value" [formControl]="control" class="value"/>
+          <input matInput type="date" [(ngModel)]="value" [formControl]="control" class="value"/>
       </mat-input-container>
       <span class="value" *ngIf="!editMode">{{ value | date:'mediumDate' }}</span>
   `,
