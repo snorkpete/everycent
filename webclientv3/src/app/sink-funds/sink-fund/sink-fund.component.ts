@@ -6,13 +6,13 @@ import {SinkFundCalculator} from '../sink-fund-calculator.service';
 import {SinkFundService} from '../sink-fund.service';
 import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.component';
 import {Icon} from '../../shared/ec-icon/icon.type';
-import {TransactionListComponent} from '../../transactions/compact-transaction-list/compact-transaction-list.component';
 import {TransactionService} from '../../transactions/transaction.service';
 import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
 import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
 import {MatDialog} from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatDialogRef} from "@angular/material/dialog";
+import {TransactionListComponent} from "../../transactions/transaction-list/transaction-list.component";
 
 @Component({
   selector: 'ec-sink-fund',
