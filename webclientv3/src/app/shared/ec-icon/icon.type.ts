@@ -3,6 +3,7 @@ let Icon = {
   HOME: "home",
   SINK_FUND: "card_membership",
   ACCOUNT_BALANCES: "account_balance",
+  TRANSACTIONS: "euro_symbol",
   LOGOUT: "account_circle",
   MENU: "menu",
 
