@@ -96,8 +96,8 @@ import {TransactionListComponent} from "../../transactions/transaction-list/tran
                     <td></td>
                 </tr>
 
-                <ng-container *ngFor="let allocation of sinkFund.sink_fund_allocations" [ecHighlightDeletedFor]="allocation">
-                  <tr *ngIf="deactivateService.isItemVisible(allocation, showDeactivated)">
+                <ng-container *ngFor="let allocation of sinkFund.sink_fund_allocations" >
+                  <tr *ngIf="deactivateService.isItemVisible(allocation, showDeactivated)" [ecHighlightDeletedFor]="allocation">
                       <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
                       <td class="highlight">
                           <div fxLayout="row" fxLayoutAlign="start center">
