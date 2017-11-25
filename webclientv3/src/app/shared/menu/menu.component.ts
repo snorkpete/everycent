@@ -21,6 +21,10 @@ import {Icon} from '../ec-icon/icon.type';
             Home
         </ec-menu-item>
 
+        <ec-menu-item [icon]="Icon.TRANSACTIONS" route="/transactions">
+          Transactions
+        </ec-menu-item>
+
         <ec-menu-item [icon]="Icon.MENU" route="/sink-funds">
           Sink Funds
         </ec-menu-item>
