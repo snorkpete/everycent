@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {SharedModule} from '../shared/shared.module';
-import {TransactionListComponent} from './transaction-list/transaction-list.component';
+import {CompactTransactionListComponent} from './compact-transaction-list/compact-transaction-list.component';
 import {TransactionService} from './transaction.service';
 import { TransactionsComponent } from './transactions/transactions.component';
 import {TransactionsRoutingModule} from "./transactions-routing.module";
@@ -14,15 +14,16 @@ import { TransactionSummaryComponent } from './transaction-summary/transaction-s
   ],
   declarations: [
     TransactionsComponent,
-    TransactionListComponent,
+    CompactTransactionListComponent,
     TransactionSearchFormComponent,
     TransactionSummaryComponent,
+    TransactionListComponent,
   ],
   exports: [
-    TransactionListComponent,
+    CompactTransactionListComponent,
   ],
   entryComponents: [
-    TransactionListComponent,
+    CompactTransactionListComponent,
   ],
   providers: [
     TransactionService,
