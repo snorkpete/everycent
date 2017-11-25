@@ -12,7 +12,7 @@ import {DeactivateService} from "../../shared/deactivate-button/deactivate.servi
 import {MatDialog} from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatDialogRef} from "@angular/material/dialog";
-import {TransactionListComponent} from "../../transactions/transaction-list/transaction-list.component";
+import {CompactTransactionListComponent} from "../../transactions/compact-transaction-list/compact-transaction-list.component";
 
 @Component({
   selector: 'ec-sink-fund',
@@ -225,11 +225,11 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   }
 
   showTransactionsFor(sinkFundAllocation: SinkFundAllocationData) {
-    let dialogRef: MatDialogRef<TransactionListComponent>;
+    let dialogRef: MatDialogRef<CompactTransactionListComponent>;
     this.transactionService
         .getTransactionsForSinkFundAllocation(sinkFundAllocation.id)
         .subscribe(transactions => {
-           dialogRef = this.dialog.open(TransactionListComponent, { width: '500px' });
+           dialogRef = this.dialog.open(CompactTransactionListComponent, { width: '500px' });
            dialogRef.componentInstance.transactions = transactions;
            dialogRef.componentInstance.itemName = sinkFundAllocation.name;
         });
