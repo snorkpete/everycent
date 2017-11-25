@@ -1,4 +1,5 @@
 // Class level operators
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/throw';
 
 // Instance level operators

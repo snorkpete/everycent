@@ -6,6 +6,7 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import {TransactionsRoutingModule} from "./transactions-routing.module";
 import { TransactionSearchFormComponent } from './transaction-search-form/transaction-search-form.component';
 import { TransactionSummaryComponent } from './transaction-summary/transaction-summary.component';
+import { TransactionListComponent } from './transaction-list/transaction-list.component';
 
 @NgModule({
   imports: [
