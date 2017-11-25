@@ -1,12 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BankAccountData} from "../../account-balances/bank-account.model";
+import {BudgetData} from "../../budgets/budget.model";
+import {TransactionSearchParams} from "./transaction-search-params.model";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {Observable} from "rxjs/Observable";
+import {BankAccountService} from "../../bank-accounts/bank-account.service";
+import {BudgetService} from "../../budgets/budget.service";
 
 @Component({
   selector: 'ec-transaction-search-form',
   styles: [`
   `],
   template: `
-    <form (ngSubmit)="onSubmit()">
+    <form (ngSubmit)="onSubmit()" [formGroup]="form">
     <mat-card>
 
       <mat-card-title>Select Transactions to View</mat-card-title>
@@ -14,15 +20,15 @@ import {BankAccountData} from "../../account-balances/bank-account.model";
         
         <div fxLayout="column" fxLayoutGap="20px">
         
-          <mat-form-field placeholder="Bank Account" fxFlex>
-            <mat-select>
-              <mat-option *ngFor="let bankAccount of bankAccounts">{{bankAccount.name}}</mat-option>
+          <mat-form-field fxFlex>
+            <mat-select placeholder="Bank Account" formControlName="bank_account_id">
+              <mat-option *ngFor="let bankAccount of bankAccounts" [value]="bankAccount.id">{{bankAccount.name}}</mat-option>
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field placeholder="Budget" fxFlex>
-            <mat-select>
-              <mat-option *ngFor="let budget of budgets">{{budget.name}}</mat-option>
+          <mat-form-field fxFlex>
+            <mat-select placeholder="Budget" formControlName="budget_id">
+              <mat-option *ngFor="let budget of budgets" [value]="budget.id">{{budget.name}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -31,6 +37,7 @@ import {BankAccountData} from "../../account-balances/bank-account.model";
     
       <mat-card-actions>
         <button mat-button type="submit" color="primary">Refresh</button>
+        {{ form.value | json }}
       </mat-card-actions>
     </mat-card>
     </form>
@@ -39,10 +46,56 @@ import {BankAccountData} from "../../account-balances/bank-account.model";
 export class TransactionSearchFormComponent implements OnInit {
 
   bankAccounts: BankAccountData[] = [];
+  budgets: BudgetData[] = [];
+  @Output() change = new EventEmitter<TransactionSearchParams>();
 
-  constructor() { }
+  form: FormGroup;
+
+  constructor(
+    private bankAccountService: BankAccountService,
+    private budgetService: BudgetService,
+    private fb: FormBuilder
+  ) { }
 
   ngOnInit() {
+    this.form = this.fb.group({
+      budget_id: 0,
+      bank_account_id: 0
+    });
+
+    this.form.valueChanges.subscribe(v => {
+      this.change.emit(v);
+    });
+
+    this.loadBudgetsAndBankAccounts();
+  }
+
+  loadBudgetsAndBankAccounts() {
+    Observable.combineLatest(
+      this.bankAccountService.getBankAccounts(),
+      this.budgetService.getBudgets(),
+    ).subscribe((results) => {
+      [this.bankAccounts, this.budgets] = results;
+      this.setInitialValues();
+    });
+
+  }
+
+  setInitialValues() {
+    let bankAccountId = 0;
+    if (this.bankAccounts.length > 0) {
+      bankAccountId = this.bankAccounts[0].id;
+    }
+    let budgetId = 0;
+    if (this.budgets.length > 0) {
+      budgetId = this.budgets[0].id;
+    }
+
+    this.form.setValue({ budget_id: budgetId, bank_account_id: bankAccountId});
+  }
+
+  onSubmit() {
+    this.change.emit(this.form.value);
   }
 
 }

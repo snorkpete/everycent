@@ -11,6 +11,8 @@ import {HomeComponent} from './home/home.component';
 import {AppRoutingModule} from "./app-routing.module";
 import {SinkFundsModule} from './sink-funds/sink-funds.module';
 import {AccountBalancesModule} from "./account-balances/account-balances.module";
+import {BudgetsModule} from "./budgets/budgets.module";
+import {BankAccountsModule} from "./bank-accounts/bank-accounts.module";
 
 @NgModule({
   imports: [
@@ -25,6 +27,8 @@ import {AccountBalancesModule} from "./account-balances/account-balances.module"
 
     // feature modules
     AccountBalancesModule,
+    BankAccountsModule,
+    BudgetsModule,
     SinkFundsModule,
   ],
   declarations: [
