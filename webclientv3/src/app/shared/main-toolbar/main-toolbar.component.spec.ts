@@ -6,6 +6,7 @@ import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 import { MainToolbarComponent } from './main-toolbar.component';
 import {SharedModule} from '../shared.module';
 import {MainToolbarService} from './main-toolbar.service';
+import {EcMaterialModule} from "../ec-material/ec-material.module";
 
 describe('MainToolbarComponent', () => {
   let component: MainToolbarComponent;
@@ -13,7 +14,7 @@ describe('MainToolbarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule],
+      imports: [EcMaterialModule],
       declarations: [ MainToolbarComponent ],
       providers: [
         MainToolbarService,
