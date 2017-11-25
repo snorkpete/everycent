@@ -10,7 +10,7 @@ import {LoadingIndicator} from './loading-indicator.service';
   `],
   template: `
 
-    <mat-progress-bar color="accent" mode="indeterminate" class="loader" *ngIf="loadingIndicator.isVisible()">
+    <mat-progress-bar color="warn" mode="indeterminate" class="loader" *ngIf="loadingIndicator.isVisible()">
     </mat-progress-bar>
   `
 })
