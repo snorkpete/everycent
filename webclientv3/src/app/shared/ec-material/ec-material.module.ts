@@ -13,6 +13,7 @@ import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatToolbarModule} from "@angular/material/toolbar";
+import {MatTableModule} from "@angular/material/table";
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import {MatToolbarModule} from "@angular/material/toolbar";
     MatSidenavModule,
     MatSlideToggleModule,
     MatSnackBarModule,
+    MatTableModule,
     MatToolbarModule,
   ],
   exports: [
@@ -46,8 +48,8 @@ import {MatToolbarModule} from "@angular/material/toolbar";
     MatSidenavModule,
     MatSlideToggleModule,
     MatSnackBarModule,
+    MatTableModule,
     MatToolbarModule,
-
   ]
 })
 export class EcMaterialModule { }
