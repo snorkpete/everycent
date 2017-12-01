@@ -1,9 +1,8 @@
 /* tslint:disable:no-unused-variable */
 
 import {AuthGuard} from './auth-guard.service';
+import {ApiGatewayStub} from "../../../../test/api-gateway-stub";
 import {AuthService} from './auth.service';
-import {ApiGatewayStub} from '../../../../test/api-gateway-stub';
-import {ApiGateway} from '../../../api/api-gateway.service';
 
 describe('AuthGuard', () => {
   let authGuard: AuthGuard;
