@@ -5,6 +5,7 @@ import {SharedModule} from '../shared.module';
 import {EcIconComponent} from '../ec-icon/ec-icon.component';
 import {By} from '@angular/platform-browser';
 import {Icon} from '../ec-icon/icon.type';
+import {EcMaterialModule} from "../ec-material/ec-material.module";
 
 describe('DeactivateButtonComponent', () => {
   let component: DeactivateButtonComponent;
@@ -12,7 +13,7 @@ describe('DeactivateButtonComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule],
+      imports: [EcMaterialModule],
       declarations: [ DeactivateButtonComponent, EcIconComponent ]
     })
     .compileComponents();
@@ -40,16 +41,16 @@ describe('DeactivateButtonComponent', () => {
     let item: any;
 
     beforeEach(() => {
-      item = { deleted: false };
+      item = { deactivated: false };
       component.item = item;
       component.editMode = true;
       fixture.detectChanges();
     });
 
     it('shows a delete icon', () => {
-      let deleteIcon = fixture.debugElement.query(By.css('ec-icon'));
-      expect(deleteIcon).toBeTruthy();
-      expect(component.icon).toEqual(Icon.DELETE);
+      let deactivateIcon = fixture.debugElement.query(By.css('ec-icon'));
+      expect(deactivateIcon).toBeTruthy();
+      expect(component.icon).toEqual(Icon.DEACTIVATE);
     });
 
     it('changes the item.deleted property to true when delete button clicked', () => {
@@ -57,8 +58,8 @@ describe('DeactivateButtonComponent', () => {
       deleteIcon.nativeElement.click();
       fixture.detectChanges();
 
-      expect(item.deleted).toBe(true);
-      expect(component.icon).toEqual(Icon.UNDO_DELETE);
+      expect(item.deactivated).toBe(true);
+      expect(component.icon).toEqual(Icon.ACTIVATE);
     });
   });
 
@@ -67,16 +68,16 @@ describe('DeactivateButtonComponent', () => {
     let item: any;
 
     beforeEach(() => {
-      item = { deleted: true };
+      item = { deactivated: true };
       component.item = item;
       component.editMode = true;
       fixture.detectChanges();
     });
 
     it('shows an undo-delete icon', () => {
-      let deleteIcon = fixture.debugElement.query(By.css('ec-icon'));
-      expect(deleteIcon).toBeTruthy();
-      expect(component.icon).toEqual(Icon.UNDO_DELETE);
+      let deactivateIcon = fixture.debugElement.query(By.css('ec-icon'));
+      expect(deactivateIcon).toBeTruthy();
+      expect(component.icon).toEqual(Icon.ACTIVATE);
     });
 
     it('changes the item.deleted property to true when delete button clicked', () => {
@@ -84,8 +85,8 @@ describe('DeactivateButtonComponent', () => {
       deleteIcon.nativeElement.click();
       fixture.detectChanges();
 
-      expect(item.deleted).toBe(false);
-      expect(component.icon).toEqual(Icon.DELETE);
+      expect(item.deactivated).toBe(false);
+      expect(component.icon).toEqual(Icon.DEACTIVATE);
     });
   });
 });
