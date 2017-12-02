@@ -6,6 +6,7 @@ import { DebugElement } from '@angular/core';
 import { DateFieldComponent } from './date-field.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from "../../shared.module";
+import {EcMaterialModule} from "../../ec-material/ec-material.module";
 
 describe('DateFieldComponent', () => {
   let component: DateFieldComponent;
@@ -13,7 +14,7 @@ describe('DateFieldComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, ReactiveFormsModule],
+      imports: [EcMaterialModule, ReactiveFormsModule],
       declarations: [ DateFieldComponent ]
     })
     .compileComponents();

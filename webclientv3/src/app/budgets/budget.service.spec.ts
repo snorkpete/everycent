@@ -1,11 +1,16 @@
 import { TestBed, inject } from '@angular/core/testing';
 
 import { BudgetService } from './budget.service';
+import {ApiGateway} from "../../api/api-gateway.service";
+import {ApiGatewayStub} from "../../../test/api-gateway-stub";
 
 describe('BudgetsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [BudgetService]
+      providers: [
+        BudgetService,
+        {provide: ApiGateway, useValue: ApiGatewayStub}
+      ]
     });
   });
 

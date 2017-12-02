@@ -7,6 +7,9 @@ import { MoneyFieldComponent } from './money-field.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MoneyPipe} from '../../money.pipe';
 import {SharedModule} from "../../shared.module";
+import {EcMaterialModule} from "../../ec-material/ec-material.module";
+import {NoopAnimationsModule} from "@angular/platform-browser/animations";
+
 
 describe('MoneyFieldComponent', () => {
   let component: MoneyFieldComponent;
@@ -14,7 +17,10 @@ describe('MoneyFieldComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, ReactiveFormsModule],
+      imports: [
+        NoopAnimationsModule,
+        EcMaterialModule,
+        ReactiveFormsModule],
       declarations: [ MoneyFieldComponent, MoneyPipe ]
     });
   }));

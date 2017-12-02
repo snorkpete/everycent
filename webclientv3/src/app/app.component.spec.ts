@@ -38,10 +38,6 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   }));
 
-  it(`should have as title 'ec works!'`, async(() => {
-    expect(app.title).toEqual('ec works!');
-  }));
-
   it('has a nested menu component', async(() => {
     const element = fixture.debugElement.nativeElement;
     expect(element.querySelector('ec-menu')).toBeTruthy();
