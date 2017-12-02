@@ -7,8 +7,12 @@ import {Router} from "@angular/router";
 import {RouterStub} from "./router-stub";
 import {AccountBalancesService} from "../src/app/account-balances/account-balances.service";
 import {AccountBalancesServiceStub} from "./account-balances-service-stub";
+import {NoopAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
+  imports: [
+    NoopAnimationsModule,
+  ],
   providers: [
     { provide: ApiGateway, useValue: ApiGatewayStub},
     { provide: Http, useValue: httpStub },

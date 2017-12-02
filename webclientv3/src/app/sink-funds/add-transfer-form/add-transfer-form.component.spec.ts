@@ -7,18 +7,26 @@ import {ApiGateway} from '../../../api/api-gateway.service';
 import {ApiGatewayStub} from '../../../../test/api-gateway-stub';
 import {SinkFundService} from '../sink-fund.service';
 import {LoginComponent} from '../../login/login.component';
+import {EcMaterialModule} from "../../shared/ec-material/ec-material.module";
+import {MatDialogRef} from "@angular/material";
+import {SampleSinkFundData} from "../../../../test/sample-sink-fund-data";
+import {TestConfigModule} from "../../../../test/test-config.module";
 
-xdescribe('AddTransferFormComponent', () => {
+describe('AddTransferFormComponent', () => {
   let component: AddTransferFormComponent;
   let fixture: ComponentFixture<AddTransferFormComponent>;
 
+  const MatDialogRefStub = {
+    close: () => {},
+  };
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule],
+      imports: [TestConfigModule, SharedModule],
       declarations: [ AddTransferFormComponent, LoginComponent ],
       providers: [
         SinkFundService,
-        { provide: ApiGateway, useValue: ApiGatewayStub }
+        { provide: ApiGateway, useValue: ApiGatewayStub },
+        { provide: MatDialogRef, useValue: MatDialogRefStub }
       ]
     })
     .compileComponents();
@@ -27,6 +35,7 @@ xdescribe('AddTransferFormComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AddTransferFormComponent);
     component = fixture.componentInstance;
+    component.sinkFund = SampleSinkFundData;
     fixture.detectChanges();
   });
 
