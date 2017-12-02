@@ -6,6 +6,7 @@ import {Component, ElementRef, NO_ERRORS_SCHEMA, OnInit, ViewChild} from '@angul
 import {TextFieldComponent} from './text-field.component';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from "../../shared.module";
+import {EcMaterialModule} from "../../ec-material/ec-material.module";
 
 @Component({
   selector: 'ec-form-tester',
@@ -42,7 +43,7 @@ describe('TextFieldComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, ReactiveFormsModule],
+      imports: [EcMaterialModule, ReactiveFormsModule],
       declarations: [ TextFieldComponent, FormTesterComponent ],
       //schemas: [NO_ERRORS_SCHEMA],
     });

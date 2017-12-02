@@ -5,6 +5,7 @@ import {SharedModule} from '../shared.module';
 import {EcIconComponent} from '../ec-icon/ec-icon.component';
 import {By} from '@angular/platform-browser';
 import {Icon} from '../ec-icon/icon.type';
+import {EcMaterialModule} from "../ec-material/ec-material.module";
 
 describe('DeleteButtonComponent', () => {
   let component: DeleteButtonComponent;
@@ -12,7 +13,7 @@ describe('DeleteButtonComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule],
+      imports: [EcMaterialModule],
       declarations: [ DeleteButtonComponent, EcIconComponent ]
     })
     .compileComponents();

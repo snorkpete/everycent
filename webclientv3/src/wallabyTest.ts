@@ -8,6 +8,7 @@ import 'zone.js/dist/async-test';
 import 'zone.js/dist/fake-async-test';
 
 import './rxjs-imports';
+import '../test/animations-patch-for-testing';
 
 import { getTestBed } from '@angular/core/testing';
 import {
