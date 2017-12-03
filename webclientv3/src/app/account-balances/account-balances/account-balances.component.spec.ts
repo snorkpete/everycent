@@ -5,7 +5,7 @@ import {NO_ERRORS_SCHEMA} from "@angular/core";
 import {SharedModule} from "../../shared/shared.module";
 import {AccountBalancesService} from "../account-balances.service";
 import {ApiGateway} from "../../../api/api-gateway.service";
-import {ApiGatewayStub} from "../../../../test/api-gateway-stub";
+import {ApiGatewayStub} from "../../../../test/stub-services/api-gateway-stub";
 import {TestConfigModule} from "../../../../test/test-config.module";
 
 describe('AccountBalancesComponent', () => {

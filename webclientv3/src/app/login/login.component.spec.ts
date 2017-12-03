@@ -8,10 +8,10 @@ import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
 import {AuthService} from '../core/auth/auth.service';
 import {FormsModule} from '@angular/forms';
 import {ApiGateway} from '../../api/api-gateway.service';
-import {ApiGatewayStub} from '../../../test/api-gateway-stub';
+import {ApiGatewayStub} from '../../../test/stub-services/api-gateway-stub';
 import {MessageService} from '../message-display/message.service';
 import {Router} from '@angular/router';
-import {RouterStub} from '../../../test/router-stub';
+import {RouterStub} from '../../../test/stub-services/router-stub';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;

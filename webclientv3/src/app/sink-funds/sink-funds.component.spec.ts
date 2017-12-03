@@ -6,14 +6,16 @@ import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 import { SinkFundsComponent } from './sink-funds.component';
 import {SinkFundService} from './sink-fund.service';
 import {ApiGateway} from '../../api/api-gateway.service';
-import {ApiGatewayStub} from '../../../test/api-gateway-stub';
+import {ApiGatewayStub} from '../../../test/stub-services/api-gateway-stub';
 import {SampleSinkFundData} from '../../../test/sample-sink-fund-data';
 
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import {TransactionService} from '../transactions/transaction.service';
+import {TestConfigModule} from "../../../test/test-config.module";
+import {MainToolbarService} from "../shared/main-toolbar/main-toolbar.service";
 
-xdescribe('SinkFundsComponent', () => {
+describe('SinkFundsComponent', () => {
   let component: SinkFundsComponent;
   let fixture: ComponentFixture<SinkFundsComponent>;
 
@@ -22,11 +24,14 @@ xdescribe('SinkFundsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        TestConfigModule,
+      ],
       declarations: [ SinkFundsComponent ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
+        MainToolbarService,
         SinkFundService,
-        { provide: ApiGateway, useValue: ApiGatewayStub },
         TransactionService,
       ],
     })

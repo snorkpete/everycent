@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 
 import {AuthGuard} from './auth-guard.service';
-import {ApiGatewayStub} from "../../../../test/api-gateway-stub";
+import {ApiGatewayStub} from "../../../../test/stub-services/api-gateway-stub";
 import {AuthService} from './auth.service';
 
 describe('AuthGuard', () => {

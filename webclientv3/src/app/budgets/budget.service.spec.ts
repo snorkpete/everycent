@@ -2,7 +2,7 @@ import { TestBed, inject } from '@angular/core/testing';
 
 import { BudgetService } from './budget.service';
 import {ApiGateway} from "../../api/api-gateway.service";
-import {ApiGatewayStub} from "../../../test/api-gateway-stub";
+import {ApiGatewayStub} from "../../../test/stub-services/api-gateway-stub";
 
 describe('BudgetsService', () => {
   beforeEach(() => {

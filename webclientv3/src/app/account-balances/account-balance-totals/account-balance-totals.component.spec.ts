@@ -4,7 +4,7 @@ import { AccountBalanceTotalsComponent } from './account-balance-totals.componen
 import {SharedModule} from "../../shared/shared.module";
 import {AccountBalancesService} from "../account-balances.service";
 import {Observable} from "rxjs/Observable";
-import {AccountBalancesServiceStub} from "../../../../test/account-balances-service-stub";
+import {AccountBalancesServiceStub} from "../../../../test/stub-services/account-balances-service-stub";
 
 describe('AccountBalanceTotalsComponent', () => {
   let component: AccountBalanceTotalsComponent;
