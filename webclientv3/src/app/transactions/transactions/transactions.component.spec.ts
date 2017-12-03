@@ -8,12 +8,9 @@ import {TransactionSearchFormComponent} from "../transaction-search-form/transac
 import {TransactionService} from "../transaction.service";
 import {Observable} from "rxjs/Observable";
 import {NO_ERRORS_SCHEMA} from "@angular/core";
+import {TestConfigModule} from "../../../../test/test-config.module";
 
-const TransactionServiceStub = {
-  getTransactions: (_: any) => Observable.of([])
-};
-
-xdescribe('TransactionsComponent', () => {
+describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
   let fixture: ComponentFixture<TransactionsComponent>;
 
@@ -21,6 +18,7 @@ xdescribe('TransactionsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         SharedModule,
+        TestConfigModule,
       ],
       declarations: [
         TransactionsComponent,
@@ -28,9 +26,6 @@ xdescribe('TransactionsComponent', () => {
       schemas: [
         NO_ERRORS_SCHEMA
       ],
-      providers: [
-        { provide: TransactionService, useValue: TransactionServiceStub }
-      ]
     })
     .compileComponents();
   }));

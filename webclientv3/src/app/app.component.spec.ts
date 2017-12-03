@@ -3,7 +3,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {AppComponent} from './app.component';
 import {ApiGateway} from '../api/api-gateway.service';
-import {ApiGatewayStub} from '../../test/api-gateway-stub';
+import {ApiGatewayStub} from '../../test/stub-services/api-gateway-stub';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 describe('AppComponent', () => {

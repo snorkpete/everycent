@@ -9,7 +9,7 @@ import {Http} from '@angular/http';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/map';
-import {httpStub} from '../../../../test/http-stub';
+import {httpStub} from '../../../../test/stub-services/http-stub';
 import {LoadingIndicator} from '../../shared/loading-indicator/loading-indicator.service';
 
 describe('AuthService', () => {

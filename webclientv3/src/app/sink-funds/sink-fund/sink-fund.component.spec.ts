@@ -1,28 +1,21 @@
-/* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
-
-import { SinkFundComponent } from './sink-fund.component';
-import {FlexLayoutModule} from '@angular/flex-layout';
-import {SinkFundService} from '../sink-fund.service';
-import {ApiGateway} from '../../../api/api-gateway.service';
-import {ApiGatewayStub} from '../../../../test/api-gateway-stub';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TestConfigModule} from "../../../../test/test-config.module";
 import {SharedModule} from '../../shared/shared.module';
+import {SinkFundService} from '../sink-fund.service';
 
-xdescribe('SinkFundComponent', () => {
+import {SinkFundComponent} from './sink-fund.component';
+
+describe('SinkFundComponent', () => {
   let component: SinkFundComponent;
   let fixture: ComponentFixture<SinkFundComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FlexLayoutModule, SharedModule],
+      imports: [TestConfigModule, SharedModule],
       declarations: [ SinkFundComponent ],
       providers: [
         SinkFundService,
-        { provide: ApiGateway, useValue: ApiGatewayStub },
       ],
-      schemas: [NO_ERRORS_SCHEMA],
     })
     .compileComponents();
   }));
