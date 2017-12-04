@@ -21,28 +21,28 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
         width: 100%;
         overflow-x: auto;
     }
-    
+
     table.table {
         table-layout: fixed;
-        width: 100%; 
+        width: 100%;
     }
-    
+
     table.table.small-screen {
         width: 768px;
     }
-    
+
     .highlight {
         font-weight: bold;
         font-size: 13px;
     }
-    
+
     .total {
         font-weight: bold;
         font-size: 16px;
         border-top: 2px solid black;
         border-bottom: 2px solid black;
     }
-    
+
     ec-icon.small /deep/ .material-icons {
         font-size: 16px;
         height: 16px;
@@ -50,7 +50,7 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
         padding-top: 1px;
         cursor: pointer;
     }
-    
+
   `],
   template: `
     <mat-card>
@@ -73,18 +73,18 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
               </thead>
 
               <tbody>
-              
+
                 <tr class="total">
                     <td>Sink Fund Account Balance</td>
                     <td><ec-money-field [value]="sinkFund.current_balance"></ec-money-field></td>
                     <td></td>
- 
+
                     <td></td>
                     <td>Current Account Balance</td>
                     <td></td>
                     <td></td>
                 </tr>
-                
+
                 <tr class="total">
                     <td>Unassigned Money</td>
                     <td><ec-money-field [value]="calculator.unassignedBalance(sinkFund)"></ec-money-field></td>
@@ -101,7 +101,7 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
                       <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
                       <td class="highlight">
                           <div fxLayout="row" fxLayoutAlign="start center">
-                              <ec-icon [icon]="Icon.SHOW_TRANSACTIONS" 
+                              <ec-icon [icon]="Icon.SHOW_TRANSACTIONS"
                                        (click)="showTransactionsFor(allocation)"
                                        class="small">
                               </ec-icon>
@@ -131,7 +131,7 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
                   <td>Total</td>
                   <td><ec-money-field [value]="calculator.totalAssignedBalance(sinkFund)"></ec-money-field></td>
                   <td><ec-money-field [value]="calculator.totalTarget(sinkFund)"></ec-money-field></td>
-                  
+
                   <td><ec-money-field [value]="calculator.totalOutstanding(sinkFund)"></ec-money-field></td>
                   <td></td>
                   <td></td>
@@ -149,12 +149,12 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
                         (click)="addObligation()">
                     Add Obligation
                 </button>
-                
+
                 <button mat-raised-button color="primary" *ngIf="!isEditMode"
                         (click)="showTransferForm()">
                     Transfer Money
                 </button>
-                
+
             </ec-edit-actions>
         </mat-card-actions>
 
@@ -218,7 +218,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(isSaved => {
       if (isSaved) {
         this.snackbar.open('Transfer complete.', null, {duration: 3000});
-      }else {
+      } else {
         this.snackbar.open('Transfer cancelled.', null, {duration: 1500});
       }
     });
