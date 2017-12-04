@@ -17,7 +17,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
         </button>
 
         <ng-content></ng-content>
-        
+
         <div fxLayout="row" fxLayoutAlign="end">
 
             <button mat-raised-button color="primary" class="save"
@@ -25,16 +25,16 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
                     (click)="save.emit()">
                 Save Changes
             </button>
-            
+
             <button mat-raised-button color="warn" class="cancel"
                     *ngIf="editMode"
                     (click)="cancelEdit()">
                 Cancel
             </button>
-            
+
         </div>
-        
-        
+
+
     </div>
   `
 })
