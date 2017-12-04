@@ -14,6 +14,7 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatTableModule} from "@angular/material/table";
+import {MatCheckboxModule} from "@angular/material";
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import {MatTableModule} from "@angular/material/table";
 
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatDialogModule,
     MatIconModule,
     MatInputModule,
@@ -39,6 +41,7 @@ import {MatTableModule} from "@angular/material/table";
 
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatDialogModule,
     MatIconModule,
     MatInputModule,
