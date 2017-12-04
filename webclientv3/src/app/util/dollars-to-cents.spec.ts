@@ -23,4 +23,8 @@ describe('#dollarsToCents', () => {
   it('rounds to the nearest cent', () => {
     expect(dollarsToCents('5.019')).toEqual(502);
   });
+
+  it('converts a string with a dollar value with commas to cents', () => {
+    expect(dollarsToCents('3,300.00')).toEqual(330000);
+  });
 });
