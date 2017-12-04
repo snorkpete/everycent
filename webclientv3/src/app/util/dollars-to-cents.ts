@@ -1,7 +1,7 @@
 
 let dollarsToCents = (dollarValue: number | string): number => {
   let dollarValueToConvert = dollarValue;
-  if(dollarValue && dollarValue.replace) {
+  if (typeof dollarValue === 'string') {
     dollarValueToConvert = dollarValue.replace(/,/g, '');
   }
   let numericDollarValue = Number(dollarValueToConvert);
