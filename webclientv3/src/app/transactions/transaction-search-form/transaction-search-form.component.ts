@@ -17,9 +17,9 @@ import {BudgetService} from "../../budgets/budget.service";
 
       <mat-card-title>Select Transactions to View</mat-card-title>
       <mat-card-content>
-        
+
         <div fxLayout="column" fxLayoutGap="20px">
-        
+
           <mat-form-field fxFlex>
             <mat-select placeholder="Bank Account" formControlName="bank_account_id">
               <mat-option *ngFor="let bankAccount of bankAccounts" [value]="bankAccount.id">{{bankAccount.name}}</mat-option>
@@ -34,10 +34,9 @@ import {BudgetService} from "../../budgets/budget.service";
         </div>
         
       </mat-card-content>
-    
+
       <mat-card-actions>
         <button mat-button type="submit" color="primary">Refresh</button>
-        {{ form.value | json }}
       </mat-card-actions>
     </mat-card>
     </form>
@@ -64,10 +63,21 @@ export class TransactionSearchFormComponent implements OnInit {
     });
 
     this.form.valueChanges.subscribe(v => {
+      this.updateBudgetAndBankAccount(v);
       this.change.emit(v);
     });
 
     this.loadBudgetsAndBankAccounts();
+  }
+
+  updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
+    if (!searchParams.bankAccount) {
+      searchParams.bankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
+    }
+
+    if (!searchParams.budget) {
+      searchParams.budget = this.bankAccounts.find(account => account.id === searchParams.budget_id);
+    }
   }
 
   loadBudgetsAndBankAccounts() {
@@ -89,13 +99,17 @@ export class TransactionSearchFormComponent implements OnInit {
     let budgetId = 0;
     if (this.budgets.length > 0) {
       budgetId = this.budgets[0].id;
+      //TODO: temporary adjustment to make testing easier
+      budgetId = this.budgets[4].id;
     }
 
     this.form.setValue({ budget_id: budgetId, bank_account_id: bankAccountId});
   }
 
   onSubmit() {
-    this.change.emit(this.form.value);
+    let output = Object.assign({}, this.form.value);
+    this.updateBudgetAndBankAccount(output);
+    this.change.emit(output);
   }
 
 }

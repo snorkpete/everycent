@@ -18,8 +18,9 @@ export class TransactionService {
   }
 
   getTransactions(searchParams: TransactionSearchParams = {}): Observable<TransactionData[]> {
+    let params = Object.assign({no_bank_account: true}, searchParams);
     return this.apiGateway
-      .get('/transactions', searchParams);
+      .get('/transactions', params);
 
   }
 }
