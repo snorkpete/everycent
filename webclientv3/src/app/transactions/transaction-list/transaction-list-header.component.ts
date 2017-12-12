@@ -1,0 +1,35 @@
+import {Component, Input, OnInit} from '@angular/core';
+import {BankAccountData} from "../../bank-accounts/bank-account.model";
+
+// noinspection TsLint
+@Component({
+  selector: '[ec-transaction-list-header]',
+  template: `
+    <tr class="heading">
+      <th style="width:2%;"></th>
+      <th style="width:15%;">Date</th>
+      <th style="width:44%;">Description</th>
+      <th style="width:14%;" class="allocation-header">
+        <span *ngIf="bankAccount?.is_sink_fund; else allocationHeader">Sink Fund Allocation</span>
+        <ng-template #allocationHeader>
+          <span>Allocation</span>
+        </ng-template>
+      </th>
+      <th style="width:10%;" class="text-right">Withdrawn</th>
+      <th style="width:10%;" class="text-right">Deposited</th>
+      <th style="width: 5%;" class="text-center">Paid?</th>
+      <th style="width: 5%;"></th>
+    </tr>
+  `,
+  styles: [`
+  `]
+})
+export class TransactionListHeaderComponent implements OnInit {
+
+  @Input() bankAccount: BankAccountData;
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}

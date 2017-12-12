@@ -3,6 +3,8 @@ import {TransactionSearchParams} from "../transaction-search-form/transaction-se
 import {LoadingIndicator} from "../../shared/loading-indicator/loading-indicator.service";
 import {TransactionData} from "../transaction-data.model";
 import {TransactionService} from "../transaction.service";
+import {BankAccountData} from "../../bank-accounts/bank-account.model";
+import {BudgetData} from "../../budgets/budget.model";
 
 @Component({
   selector: 'ec-transactions',
@@ -20,11 +22,11 @@ import {TransactionService} from "../transaction.service";
               (change)="refreshTransactions($event)"
             >
             </ec-transaction-search-form>
-            
+
             <ec-transaction-summary fxFlex></ec-transaction-summary>
           </div>
           <div fxFlex="2 0 auto">
-            <ec-transaction-list [transactions]="transactions"></ec-transaction-list>
+            <ec-transaction-list [transactions]="transactions" [bankAccount]="bankAccount" [budget]="budget"></ec-transaction-list>
           </div>
         </div>
       </mat-card-content>
@@ -34,6 +36,8 @@ import {TransactionService} from "../transaction.service";
 export class TransactionsComponent implements OnInit {
 
   transactions: TransactionData[] = [];
+  bankAccount: BankAccountData = {};
+  budget: BudgetData = {};
 
   constructor(
     private transactionsService: TransactionService,
@@ -50,6 +54,8 @@ export class TransactionsComponent implements OnInit {
         .getTransactions(searchParams)
         .subscribe(transactions => {
           this.transactions = transactions;
+          this.bankAccount = searchParams.bankAccount;
+          this.budget = searchParams.budget;
           this.loadingIndicator.hide();
         });
   }
