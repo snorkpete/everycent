@@ -1,5 +1,5 @@
 
-import {SampleSinkFundData} from '../../../test/sample-sink-fund-data';
+import {SampleSinkFundData} from '../../../test/samples/sample-sink-fund-data';
 import {SinkFundData} from './sink-fund-data.model';
 import {SinkFundCalculator} from './sink-fund-calculator.service';
 
