@@ -1,5 +1,5 @@
 
-import {SinkFundData} from '../src/app/sink-funds/sink-fund-data.model';
+import {SinkFundData} from '../../src/app/sink-funds/sink-fund-data.model';
 
 let SampleSinkFundData: SinkFundData = {
         id: 12,

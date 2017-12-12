@@ -7,7 +7,7 @@ import { SinkFundsComponent } from './sink-funds.component';
 import {SinkFundService} from './sink-fund.service';
 import {ApiGateway} from '../../api/api-gateway.service';
 import {ApiGatewayStub} from '../../../test/stub-services/api-gateway-stub';
-import {SampleSinkFundData} from '../../../test/sample-sink-fund-data';
+import {SampleSinkFundData} from '../../../test/samples/sample-sink-fund-data';
 
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
