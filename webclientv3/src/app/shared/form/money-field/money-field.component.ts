@@ -22,14 +22,14 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
     }
   `],
   template: `
-      <mat-input-container *ngIf="editMode">
+      <mat-form-field *ngIf="editMode">
           <input #input matInput class="value" type="text"
                  (input)="updateInnerValue(input.value)"
                  (blur)="formatTextValue()"
                  [placeholder]="placeholder"
                  [class.negative]="isNegative()"
                  [formControl]="control" />
-      </mat-input-container>
+      </mat-form-field>
       <span class="value"
             [class.negative]="isNegative()"
             [class.positive]="isPositive()"
