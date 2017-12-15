@@ -1,4 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ActivatedRoute, ParamMap} from "@angular/router";
+import {Subject} from "rxjs/Subject";
 import {BankAccountData} from "../../account-balances/bank-account.model";
 import {BudgetData} from "../../budgets/budget.model";
 import {TransactionSearchParams} from "./transaction-search-params.model";
@@ -50,10 +52,13 @@ export class TransactionSearchFormComponent implements OnInit {
 
   form: FormGroup;
 
+  private componentDestroyed = new Subject();
+
   constructor(
     private bankAccountService: BankAccountService,
     private budgetService: BudgetService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit() {
@@ -62,12 +67,20 @@ export class TransactionSearchFormComponent implements OnInit {
       bank_account_id: 0
     });
 
+    this.activatedRoute.queryParamMap.subscribe(params => {
+      let searchParams = {
+        budget_id: parseInt(params.get('budget_id'), 10),
+        bank_account_id: parseInt(params.get('bank_account_id'), 10),
+      };
+      this.form.patchValue(searchParams);
+    });
+
+    this.loadBudgetsAndBankAccounts();
+
     this.form.valueChanges.subscribe(v => {
       this.updateBudgetAndBankAccount(v);
       this.change.emit(v);
     });
-
-    this.loadBudgetsAndBankAccounts();
   }
 
   updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
@@ -76,7 +89,7 @@ export class TransactionSearchFormComponent implements OnInit {
     }
 
     if (!searchParams.budget) {
-      searchParams.budget = this.bankAccounts.find(account => account.id === searchParams.budget_id);
+      searchParams.budget = this.budgets.find(account => account.id === searchParams.budget_id);
     }
   }
 
@@ -84,26 +97,30 @@ export class TransactionSearchFormComponent implements OnInit {
     Observable.combineLatest(
       this.bankAccountService.getBankAccounts(),
       this.budgetService.getBudgets(),
+      this.activatedRoute.queryParamMap.take(1)
     ).subscribe((results) => {
-      [this.bankAccounts, this.budgets] = results;
-      this.setInitialValues();
+      let initialParams: ParamMap;
+      [this.bankAccounts, this.budgets, initialParams] = results;
+      this.setInitialValues({
+        budget_id: parseInt(initialParams.get('budget_id'), 10),
+        bank_account_id: parseInt(initialParams.get('bank_account_id'), 10)
+      });
     });
 
   }
 
-  setInitialValues() {
-    let bankAccountId = 0;
-    if (this.bankAccounts.length > 0) {
-      bankAccountId = this.bankAccounts[0].id;
+  setInitialValues(initialParams: TransactionSearchParams) {
+    let bankAccountId = this.bankAccounts[0] && this.bankAccounts[0].id;
+    if (this.bankAccounts.find(account => account.id === initialParams.bank_account_id)) {
+      bankAccountId = initialParams.bank_account_id;
     }
-    let budgetId = 0;
-    if (this.budgets.length > 0) {
-      budgetId = this.budgets[0].id;
-      //TODO: temporary adjustment to make testing easier
-      budgetId = this.budgets[4].id;
+    let budgetId = this.budgets[0] && this.budgets[0].id;
+    if (this.budgets.find(budget => budget.id === initialParams.budget_id)) {
+      budgetId = initialParams.budget_id;
     }
 
-    this.form.setValue({ budget_id: budgetId, bank_account_id: bankAccountId});
+    this.form.patchValue({ budget_id: budgetId, bank_account_id: bankAccountId});
+    this.onSubmit();
   }
 
   onSubmit() {
