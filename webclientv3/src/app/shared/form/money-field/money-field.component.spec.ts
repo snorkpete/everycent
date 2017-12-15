@@ -42,7 +42,7 @@ describe('MoneyFieldComponent', () => {
       component.value = 10000;
       let displayEl = fixture.debugElement.query(By.css('span.value'));
       fixture.detectChanges();
-      expect(displayEl.nativeElement.textContent).toEqual('100.00');
+      expect(displayEl.nativeElement.textContent.trim()).toEqual('100.00');
     });
   });
 

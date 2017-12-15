@@ -11,12 +11,14 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
       }
   `],
   template: `
-    <mat-input-container *ngIf="editMode">
+    <mat-form-field *ngIf="editMode; else textDisplay">
         <input #input matInput type="text" class="value"
                (input)="updateValue(input.value)"
                [formControl]="control" />
-    </mat-input-container>
-    <span class="value" *ngIf="!editMode">{{value}}</span>
+    </mat-form-field>
+    <ng-template #textDisplay>
+      <span class="value">{{value}}</span>
+    </ng-template>
   `,
   providers: [
     { provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => TextFieldComponent )}
