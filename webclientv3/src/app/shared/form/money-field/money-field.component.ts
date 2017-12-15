@@ -22,7 +22,7 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
     }
   `],
   template: `
-      <mat-form-field *ngIf="editMode">
+      <mat-form-field *ngIf="editMode; else textDisplay ">
           <input #input matInput class="value" type="text"
                  (input)="updateInnerValue(input.value)"
                  (blur)="formatTextValue()"
@@ -30,10 +30,12 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
                  [class.negative]="isNegative()"
                  [formControl]="control" />
       </mat-form-field>
-      <span class="value"
-            [class.negative]="isNegative()"
-            [class.positive]="isPositive()"
-            *ngIf="!editMode">{{ value | ecMoney }}</span>
+
+      <ng-template #textDisplay>
+        <span class="value" [class.negative]="isNegative()" [class.positive]="isPositive()">
+          {{ value | ecMoney }}
+        </span>
+      </ng-template>
   `,
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => MoneyFieldComponent)},
