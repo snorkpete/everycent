@@ -35,4 +35,9 @@ describe('TransactionsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('sets up the page heading properly', () => {
+    let toolbarService: MainToolbarService = TestBed.get(MainToolbarService);
+    expect(toolbarService.getHeading()).toBe('Transactions');
+  });
 });

@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
 import {TransactionSearchParams} from "../transaction-search-form/transaction-search-params.model";
 import {LoadingIndicator} from "../../shared/loading-indicator/loading-indicator.service";
 import {TransactionData} from "../transaction-data.model";
@@ -41,10 +42,12 @@ export class TransactionsComponent implements OnInit {
 
   constructor(
     private transactionsService: TransactionService,
-    private loadingIndicator: LoadingIndicator
+    private loadingIndicator: LoadingIndicator,
+    private toolbarService: MainToolbarService
   ) { }
 
   ngOnInit() {
+    this.toolbarService.setHeading('Transactions');
   }
 
   refreshTransactions(searchParams: TransactionSearchParams = {}) {
