@@ -34,7 +34,7 @@ import {BudgetService} from "../../budgets/budget.service";
             </mat-select>
           </mat-form-field>
         </div>
-        
+
       </mat-card-content>
 
       <mat-card-actions>
@@ -67,13 +67,11 @@ export class TransactionSearchFormComponent implements OnInit {
       bank_account_id: 0
     });
 
-    this.activatedRoute.queryParamMap.subscribe(params => {
-      let searchParams = {
-        budget_id: parseInt(params.get('budget_id'), 10),
-        bank_account_id: parseInt(params.get('bank_account_id'), 10),
-      };
-      this.form.patchValue(searchParams);
-    });
+    this.activatedRoute.queryParamMap
+                       .map(this.convertToNumericParams)
+                       .subscribe(params => {
+                         this.form.patchValue(params);
+                       });
 
     this.loadBudgetsAndBankAccounts();
 
@@ -83,43 +81,54 @@ export class TransactionSearchFormComponent implements OnInit {
     });
   }
 
-  updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
-    if (!searchParams.bankAccount) {
-      searchParams.bankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
-    }
+  private convertToNumericParams(params: ParamMap): TransactionSearchParams {
+    return {
+      budget_id: parseInt(params.get('budget_id'), 10),
+      bank_account_id: parseInt(params.get('bank_account_id'), 10),
+    };
+  }
 
-    if (!searchParams.budget) {
-      searchParams.budget = this.budgets.find(account => account.id === searchParams.budget_id);
-    }
+  updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
+    searchParams.bankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
+    searchParams.budget = this.budgets.find(account => account.id === searchParams.budget_id);
   }
 
   loadBudgetsAndBankAccounts() {
     Observable.combineLatest(
       this.bankAccountService.getBankAccounts(),
       this.budgetService.getBudgets(),
-      this.activatedRoute.queryParamMap.take(1)
+      this.activatedRoute.queryParamMap.map(this.convertToNumericParams).take(1)
     ).subscribe((results) => {
-      let initialParams: ParamMap;
+      let initialParams;
       [this.bankAccounts, this.budgets, initialParams] = results;
-      this.setInitialValues({
-        budget_id: parseInt(initialParams.get('budget_id'), 10),
-        bank_account_id: parseInt(initialParams.get('bank_account_id'), 10)
-      });
+      this.updateSelectedValues(initialParams);
     });
 
   }
 
-  setInitialValues(initialParams: TransactionSearchParams) {
-    let bankAccountId = this.bankAccounts[0] && this.bankAccounts[0].id;
-    if (this.bankAccounts.find(account => account.id === initialParams.bank_account_id)) {
-      bankAccountId = initialParams.bank_account_id;
-    }
-    let budgetId = this.budgets[0] && this.budgets[0].id;
-    if (this.budgets.find(budget => budget.id === initialParams.budget_id)) {
-      budgetId = initialParams.budget_id;
-    }
+  firstBudgetId() {
+    return this.budgets.length > 0 ? this.budgets[0].id : 0;
+  }
 
-    this.form.patchValue({ budget_id: budgetId, bank_account_id: bankAccountId});
+  firstBankAccountId() {
+    return this.bankAccounts.length > 0 ? this.bankAccounts[0].id : 0;
+  }
+
+  convertToValidParams(externalParams: TransactionSearchParams): TransactionSearchParams {
+    let foundBankAccount = this.bankAccounts.find(account => account.id === externalParams.bank_account_id);
+    let bank_account_id = foundBankAccount ? foundBankAccount.id : this.firstBankAccountId();
+    let foundBudget = this.budgets.find(budget => budget.id === externalParams.budget_id);
+    let budget_id = foundBudget ? foundBudget.id : this.firstBudgetId();
+    return {
+      bank_account_id,
+      budget_id,
+      bankAccount: foundBankAccount,
+      budget: foundBudget,
+    };
+  }
+  updateSelectedValues(initialParams: TransactionSearchParams) {
+    let properParams = this.convertToValidParams(initialParams);
+    this.form.patchValue(properParams);
     this.onSubmit();
   }
 
