@@ -8,7 +8,7 @@ const routes: Routes = [
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: 'sink-funds', component: SinkFundsComponent },
+      { path: '', component: SinkFundsComponent },
     ]
   }
 ];

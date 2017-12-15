@@ -15,7 +15,7 @@ describe('AccountBalancesComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedModule,
+        SharedModule.forRoot(),
         TestConfigModule,
       ],
       declarations: [ AccountBalancesComponent ],

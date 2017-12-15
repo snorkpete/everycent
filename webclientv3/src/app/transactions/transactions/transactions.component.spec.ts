@@ -1,14 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { TransactionsComponent } from './transactions.component';
-import { TransactionListComponent } from '../transaction-list/transaction-list.component';
-import {SharedModule} from "../../shared/shared.module";
-import {TransactionSummaryComponent} from "../transaction-summary/transaction-summary.component";
-import {TransactionSearchFormComponent} from "../transaction-search-form/transaction-search-form.component";
-import {TransactionService} from "../transaction.service";
-import {Observable} from "rxjs/Observable";
 import {NO_ERRORS_SCHEMA} from "@angular/core";
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TestConfigModule} from "../../../../test/test-config.module";
+import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
+import {SharedModule} from "../../shared/shared.module";
+
+import {TransactionsComponent} from './transactions.component';
 
 describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
@@ -17,7 +13,7 @@ describe('TransactionsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedModule,
+        SharedModule.forRoot(),
         TestConfigModule,
       ],
       declarations: [

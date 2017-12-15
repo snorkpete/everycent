@@ -12,6 +12,9 @@ const appRoutes: Routes = [
     canActivate: [AuthGuard],
     children: [
       {path: '', component: HomeComponent},
+      {path: 'transactions', loadChildren: 'app/transactions/transactions.module#TransactionsModule'},
+      {path: 'sink-funds', loadChildren: 'app/sink-funds/sink-funds.module#SinkFundsModule'},
+      {path: 'account-balances', loadChildren: 'app/account-balances/account-balances.module#AccountBalancesModule'},
     ]
   }
 ];
