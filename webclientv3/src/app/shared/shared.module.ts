@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import {NgModule} from '@angular/core';
+import {ModuleWithProviders, NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 
@@ -76,11 +76,17 @@ import { PaidFieldComponent } from './form/paid-field/paid-field.component';
     PaidFieldComponent,
     TextFieldComponent,
   ],
-  providers: [
-    DeactivateService,
-    LoadingIndicator,
-    MainToolbarService,
-    MessageService,
-  ]
 })
-export class SharedModule { }
+export class SharedModule {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: SharedModule,
+      providers: [
+        DeactivateService,
+        LoadingIndicator,
+        MainToolbarService,
+        MessageService,
+      ],
+    };
+  }
+}

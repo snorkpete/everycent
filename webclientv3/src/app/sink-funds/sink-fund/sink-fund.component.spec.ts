@@ -11,7 +11,7 @@ describe('SinkFundComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [TestConfigModule, SharedModule],
+      imports: [TestConfigModule, SharedModule.forRoot()],
       declarations: [ SinkFundComponent ],
       providers: [
         SinkFundService,
