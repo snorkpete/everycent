@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ActivatedRoute, ParamMap} from "@angular/router";
 import {Subject} from "rxjs/Subject";
 import {BankAccountData} from "../../account-balances/bank-account.model";
@@ -44,7 +44,7 @@ import {BudgetService} from "../../budgets/budget.service";
     </form>
   `
 })
-export class TransactionSearchFormComponent implements OnInit {
+export class TransactionSearchFormComponent implements OnInit, OnDestroy {
 
   bankAccounts: BankAccountData[] = [];
   budgets: BudgetData[] = [];
@@ -67,30 +67,43 @@ export class TransactionSearchFormComponent implements OnInit {
       bank_account_id: 0
     });
 
+    this.loadBudgetsAndBankAccounts();
+
+    // setup the form to monitor the URL for parameter changes
     this.activatedRoute.queryParamMap
                        .map(this.convertToNumericParams)
+                       .takeUntil(this.componentDestroyed)
                        .subscribe(params => {
                          this.form.patchValue(params);
                        });
 
-    this.loadBudgetsAndBankAccounts();
-
-    this.form.valueChanges.subscribe(v => {
-      this.updateBudgetAndBankAccount(v);
-      this.change.emit(v);
-    });
+    // changes to the form are emitted as change events
+    this.form.valueChanges
+        .takeUntil(this.componentDestroyed)
+        .subscribe(() => {
+          this.onSubmit();
+        });
   }
 
   private convertToNumericParams(params: ParamMap): TransactionSearchParams {
+    let budget_id = parseInt(params.get('budget_id'), 10) || 0;
+    let bank_account_id = parseInt(params.get('bank_account_id'), 10) || 0;
+
     return {
-      budget_id: parseInt(params.get('budget_id'), 10),
-      bank_account_id: parseInt(params.get('bank_account_id'), 10),
+      budget_id,
+      bank_account_id,
     };
   }
 
   updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
-    searchParams.bankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
-    searchParams.budget = this.budgets.find(account => account.id === searchParams.budget_id);
+    let validBankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
+    if (validBankAccount) {
+      searchParams.bankAccount = validBankAccount;
+    }
+    let validBudget = this.budgets.find(account => account.id === searchParams.budget_id);
+    if (validBudget) {
+      searchParams.budget = validBudget;
+    }
   }
 
   loadBudgetsAndBankAccounts() {
@@ -101,9 +114,24 @@ export class TransactionSearchFormComponent implements OnInit {
     ).subscribe((results) => {
       let initialParams;
       [this.bankAccounts, this.budgets, initialParams] = results;
-      this.updateSelectedValues(initialParams);
+      this.setInitialFormValue(initialParams);
     });
 
+  }
+
+  setInitialFormValue(initialParams: TransactionSearchParams) {
+    let properParams = this.initializeWithDefaultValuesIfNeeded(initialParams);
+    this.form.patchValue(properParams);
+    this.onSubmit();
+  }
+
+  initializeWithDefaultValuesIfNeeded(externalParams: TransactionSearchParams): TransactionSearchParams {
+    let bank_account_id = externalParams.bank_account_id || this.firstBankAccountId();
+    let budget_id = externalParams.budget_id || this.firstBudgetId();
+    return {
+      bank_account_id,
+      budget_id,
+    };
   }
 
   firstBudgetId() {
@@ -114,28 +142,14 @@ export class TransactionSearchFormComponent implements OnInit {
     return this.bankAccounts.length > 0 ? this.bankAccounts[0].id : 0;
   }
 
-  convertToValidParams(externalParams: TransactionSearchParams): TransactionSearchParams {
-    let foundBankAccount = this.bankAccounts.find(account => account.id === externalParams.bank_account_id);
-    let bank_account_id = foundBankAccount ? foundBankAccount.id : this.firstBankAccountId();
-    let foundBudget = this.budgets.find(budget => budget.id === externalParams.budget_id);
-    let budget_id = foundBudget ? foundBudget.id : this.firstBudgetId();
-    return {
-      bank_account_id,
-      budget_id,
-      bankAccount: foundBankAccount,
-      budget: foundBudget,
-    };
-  }
-  updateSelectedValues(initialParams: TransactionSearchParams) {
-    let properParams = this.convertToValidParams(initialParams);
-    this.form.patchValue(properParams);
-    this.onSubmit();
-  }
-
   onSubmit() {
     let output = Object.assign({}, this.form.value);
     this.updateBudgetAndBankAccount(output);
     this.change.emit(output);
   }
 
+  ngOnDestroy(): void {
+    this.componentDestroyed.next();
+    this.componentDestroyed.complete();
+  }
 }
