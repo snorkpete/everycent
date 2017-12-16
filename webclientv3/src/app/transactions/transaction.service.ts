@@ -18,9 +18,10 @@ export class TransactionService {
   }
 
   getTransactions(searchParams: TransactionSearchParams = {}): Observable<TransactionData[]> {
-    let params = Object.assign({no_bank_account: true}, searchParams);
-    return this.apiGateway
-      .get('/transactions', params);
-
+    // remove unnecessary params
+    let urlParams = Object.assign({no_bank_account: true}, searchParams);
+    delete urlParams.budget;
+    delete urlParams.bankAccount;
+    return this.apiGateway.get('/transactions', urlParams);
   }
 }
