@@ -1,5 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BankAccountData} from "../../bank-accounts/bank-account.model";
+import {SinkFundAllocationData} from "../../sink-funds/sink-fund-allocation-data.model";
+import {AllocationData} from "../allocation-data.model";
 import {TransactionData} from "../transaction-data.model";
 
 @Component({ /* tslint:disable component-selector */
@@ -76,6 +78,8 @@ export class TransactionListRowComponent implements OnInit {
 
   @Input() transaction: TransactionData;
   @Input() bankAccount: BankAccountData;
+  @Input() allocations: AllocationData[] = [];
+  @Input() sinkFundAllocations: SinkFundAllocationData[] = [];
   @Input() editMode: boolean;
 
   constructor() { }
