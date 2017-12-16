@@ -1,6 +1,7 @@
 import {NgModule} from '@angular/core';
 import {SharedModule} from '../shared/shared.module';
 import {CompactTransactionListComponent} from './compact-transaction-list/compact-transaction-list.component';
+import {TransactionDataService} from "./transaction-data.service";
 import {TransactionListRowComponent} from "./transaction-list/transaction-list-row.component";
 import {TransactionService} from './transaction.service';
 import { TransactionsComponent } from './transactions/transactions.component';
@@ -32,6 +33,7 @@ import {TransactionListHeaderComponent} from "./transaction-list/transaction-lis
   ],
   providers: [
     TransactionService,
+    TransactionDataService,
   ]
 })
 export class TransactionsModule { }

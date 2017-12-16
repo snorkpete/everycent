@@ -1,5 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {BudgetData} from "../../budgets/budget.model";
+import {SinkFundAllocationData} from "../../sink-funds/sink-fund-allocation-data.model";
+import {AllocationData} from "../allocation-data.model";
 import {TransactionData} from "../transaction-data.model";
 import {MatTableDataSource} from "@angular/material";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
@@ -30,6 +32,8 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
               <tr ec-transaction-list-row
                   *ngFor="let transaction of transactions; trackBy: trackByFn"
                   [transaction]="transaction"
+                  [allocations]="allocations"
+                  [sinkFundAllocations]="sinkFundAllocations"
                   [editMode]="isEditMode"
                   [ecHighlightDeletedFor]="transaction"
               ></tr>
@@ -46,6 +50,8 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
 export class TransactionListComponent implements OnInit, OnChanges {
 
   @Input() transactions: TransactionData[] = [];
+  @Input() allocations: AllocationData[] = [];
+  @Input() sinkFundAllocations: SinkFundAllocationData[] = [];
   @Input() bankAccount: BankAccountData;
   @Input() budget: BudgetData;
   @Input() isEditMode = false;

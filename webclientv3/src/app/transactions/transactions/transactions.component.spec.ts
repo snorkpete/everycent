@@ -1,8 +1,13 @@
 import {NO_ERRORS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TestConfigModule} from "../../../../test/test-config.module";
+import {BankAccountService} from "../../bank-accounts/bank-account.service";
+import {BudgetService} from "../../budgets/budget.service";
 import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
 import {SharedModule} from "../../shared/shared.module";
+import {TransactionDataService} from "../transaction-data.service";
+import {TransactionSearchParams} from "../transaction-search-form/transaction-search-params.model";
+import {TransactionService} from "../transaction.service";
 
 import {TransactionsComponent} from './transactions.component';
 
@@ -22,6 +27,12 @@ describe('TransactionsComponent', () => {
       schemas: [
         NO_ERRORS_SCHEMA
       ],
+      providers: [
+        TransactionDataService,
+        BudgetService,
+        BankAccountService,
+        TransactionService,
+      ]
     })
     .compileComponents();
   }));
@@ -29,15 +40,18 @@ describe('TransactionsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
   it('sets up the page heading properly', () => {
+    fixture.detectChanges();
     let toolbarService: MainToolbarService = TestBed.get(MainToolbarService);
     expect(toolbarService.getHeading()).toBe('Transactions');
   });
+
+
 });
