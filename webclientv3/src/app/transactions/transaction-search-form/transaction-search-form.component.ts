@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {ActivatedRoute, ParamMap} from "@angular/router";
+import {ActivatedRoute, ParamMap, Router} from "@angular/router";
 import {Subject} from "rxjs/Subject";
 import {BankAccountData} from "../../account-balances/bank-account.model";
 import {BudgetData} from "../../budgets/budget.model";
@@ -58,7 +58,8 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
     private bankAccountService: BankAccountService,
     private budgetService: BudgetService,
     private fb: FormBuilder,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -69,14 +70,6 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
 
     this.loadBudgetsAndBankAccounts();
 
-    // setup the form to monitor the URL for parameter changes
-    this.activatedRoute.queryParamMap
-                       .map(this.convertToNumericParams)
-                       .takeUntil(this.componentDestroyed)
-                       .subscribe(params => {
-                         this.form.patchValue(params);
-                       });
-
     // changes to the form are emitted as change events
     this.form.valueChanges
         .takeUntil(this.componentDestroyed)
@@ -85,38 +78,26 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
         });
   }
 
-  private convertToNumericParams(params: ParamMap): TransactionSearchParams {
-    let budget_id = parseInt(params.get('budget_id'), 10) || 0;
-    let bank_account_id = parseInt(params.get('bank_account_id'), 10) || 0;
-
-    return {
-      budget_id,
-      bank_account_id,
-    };
-  }
-
-  updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
-    let validBankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
-    if (validBankAccount) {
-      searchParams.bankAccount = validBankAccount;
-    }
-    let validBudget = this.budgets.find(account => account.id === searchParams.budget_id);
-    if (validBudget) {
-      searchParams.budget = validBudget;
-    }
-  }
-
   loadBudgetsAndBankAccounts() {
     Observable.combineLatest(
       this.bankAccountService.getBankAccounts(),
       this.budgetService.getBudgets(),
-      this.activatedRoute.queryParamMap.map(this.convertToNumericParams).take(1)
+      this.activatedRoute.paramMap.map(this.convertToNumericParams).take(1)
     ).subscribe((results) => {
       let initialParams;
       [this.bankAccounts, this.budgets, initialParams] = results;
       this.setInitialFormValue(initialParams);
     });
+  }
 
+  private convertToNumericParams(params: ParamMap): TransactionSearchParams {
+    let budget_id = Number(params.get('budget_id')) || 0;
+    let bank_account_id = Number(params.get('bank_account_id')) || 0;
+
+    return {
+      budget_id,
+      bank_account_id,
+    };
   }
 
   setInitialFormValue(initialParams: TransactionSearchParams) {
@@ -143,9 +124,24 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    let output = Object.assign({}, this.form.value);
-    this.updateBudgetAndBankAccount(output);
-    this.change.emit(output);
+    let searchParams = Object.assign({}, this.form.value);
+    this.updateBudgetAndBankAccount(searchParams);
+    this.change.emit(searchParams);
+    this.router.navigate([
+      {budget_id: searchParams.budget_id, bank_account_id: searchParams.bank_account_id}
+      ], {relativeTo: this.activatedRoute}
+    );
+  }
+
+  private updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
+    let validBankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
+    if (validBankAccount) {
+      searchParams.bankAccount = validBankAccount;
+    }
+    let validBudget = this.budgets.find(account => account.id === searchParams.budget_id);
+    if (validBudget) {
+      searchParams.budget = validBudget;
+    }
   }
 
   ngOnDestroy(): void {

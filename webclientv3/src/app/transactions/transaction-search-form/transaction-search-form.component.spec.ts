@@ -1,6 +1,6 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormBuilder} from "@angular/forms";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Observable} from "rxjs/Observable";
 import {ActivatedRouteStub} from "../../../../test/stub-services/activated-route-stub";
 import {TestConfigModule} from "../../../../test/test-config.module";
@@ -23,6 +23,7 @@ const BudgetServiceStub = {
 describe('TransactionsSearchFormComponent', () => {
   let component: TransactionSearchFormComponent;
   let fixture: ComponentFixture<TransactionSearchFormComponent>;
+  let router: Router;
   let route: ActivatedRouteStub;
   let bankAccountService: BankAccountService;
   let budgetService: BudgetService;
@@ -42,7 +43,6 @@ describe('TransactionsSearchFormComponent', () => {
       providers: [
         { provide: BankAccountService, useValue: BankAccountServiceStub },
         { provide: BudgetService, useValue: BudgetServiceStub },
-        { provide: ActivatedRoute, useClass: ActivatedRouteStub },
         FormBuilder,
       ]
     })
@@ -53,6 +53,7 @@ describe('TransactionsSearchFormComponent', () => {
     fixture = TestBed.createComponent(TransactionSearchFormComponent);
     component = fixture.componentInstance;
     route = TestBed.get(ActivatedRoute);
+    router = TestBed.get(Router);
     bankAccountService = TestBed.get(BankAccountService);
     budgetService = TestBed.get(BudgetService);
   });
@@ -116,7 +117,7 @@ describe('TransactionsSearchFormComponent', () => {
     it('emits the value of the budget id & bank_account_id', () => {
       let secondBankAccount = sampleBankAccounts[1];
       let secondBudget = sampleBudgets[1];
-      route.testQueryParamMap = {bank_account_id: secondBankAccount.id, budget_id: secondBudget.id};
+      route.testParamMap = {bank_account_id: secondBankAccount.id, budget_id: secondBudget.id};
       let changeEmitCount = 0;
       component.change.subscribe(searchParams => {
         changeEmitCount += 1;
@@ -134,7 +135,7 @@ describe('TransactionsSearchFormComponent', () => {
 
   describe('when has invalid params', () => {
     it('emits an object without bankAccount and budget set', () => {
-      route.testQueryParamMap = {bank_account_id: 40, budget_id: 100};
+      route.testParamMap = {bank_account_id: 40, budget_id: 100};
 
       let changeEmitCount = 0;
       component.change.subscribe(searchParams => {
@@ -169,6 +170,30 @@ describe('TransactionsSearchFormComponent', () => {
       component.form.setValue({budget_id: thirdBudget.id, bank_account_id: thirdAccount.id});
       fixture.detectChanges();
       expect(changeEmitCount).toEqual(1);
+    });
+
+    it('navigates to the new URL', () => {
+      let firstAccount = sampleBankAccounts[0];
+      let firstBudget = sampleBudgets[0];
+      let thirdAccount = sampleBankAccounts[2];
+      let thirdBudget = sampleBudgets[2];
+      let spy = spyOn(router, "navigate").and.callThrough();
+
+      // ngOnInit to setup the component form
+      // Form should automatically navigate to first item
+      fixture.detectChanges();
+      expect(spy.calls.count()).toEqual(1);
+      expect(spy.calls.mostRecent().args[0]).toEqual([
+        { budget_id: firstBudget.id, bank_account_id: firstAccount.id },
+      ]);
+
+      // update the form value and ensure it navigates properly
+      let newSelectedValues = {budget_id: thirdBudget.id, bank_account_id: thirdAccount.id};
+      component.form.setValue(newSelectedValues);
+
+      fixture.detectChanges();
+      expect(spy.calls.count()).toEqual(2);
+      expect(spy.calls.mostRecent().args[0]).toEqual([ newSelectedValues ]);
     });
   });
 
