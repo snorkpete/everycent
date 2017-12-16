@@ -16,6 +16,9 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
       max-height: 400px;
       overflow-y: scroll;
     }
+    .mat-form-field-infix {
+      width: 5px;
+    }
   `],
   template: `
     <mat-card>
@@ -42,14 +45,10 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
 })
 export class TransactionListComponent implements OnInit, OnChanges {
 
-  @Input()
-  transactions: TransactionData[] = [];
-  @Input()
-  bankAccount: BankAccountData;
-  @Input()
-  budget: BudgetData;
-  @Input()
-  isEditMode = false;
+  @Input() transactions: TransactionData[] = [];
+  @Input() bankAccount: BankAccountData;
+  @Input() budget: BudgetData;
+  @Input() isEditMode = false;
 
   constructor() { }
 

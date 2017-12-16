@@ -55,15 +55,15 @@ import {TransactionData} from "../transaction-data.model";
          </ng-template>
       </td>
 
-      <td class="text-right">
+      <td class="right">
         <ec-money-field [editMode]="editMode" [(ngModel)]="transaction.withdrawal_amount"></ec-money-field>
       </td>
 
-      <td class="text-right">
+      <td class="right">
         <ec-money-field [editMode]="editMode" [(ngModel)]="transaction.deposit_amount"></ec-money-field>
       </td>
 
-      <td>
+      <td class="center">
         <ec-paid-field [editMode]="editMode" [(ngModel)]="transaction.status"></ec-paid-field>
       </td>
 

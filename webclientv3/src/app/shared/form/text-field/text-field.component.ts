@@ -6,7 +6,7 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
 @Component({
   selector: 'ec-text-field',
   styles: [`
-      mat-input-container {
+      mat-form-field {
           width: 100%;
       }
   `],

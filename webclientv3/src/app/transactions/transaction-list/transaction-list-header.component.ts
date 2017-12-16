@@ -1,8 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BankAccountData} from "../../bank-accounts/bank-account.model";
 
-// noinspection TsLint
-@Component({
+@Component({/* tslint:disable component-selector */
   selector: '[ec-transaction-list-header]',
   template: `
     <tr class="heading">
@@ -15,9 +14,9 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
           <span>Allocation</span>
         </ng-template>
       </th>
-      <th style="width:10%;" class="text-right">Withdrawn</th>
-      <th style="width:10%;" class="text-right">Deposited</th>
-      <th style="width: 5%;" class="text-center">Paid?</th>
+      <th style="width:10%;" class="right">Withdrawn</th>
+      <th style="width:10%;" class="right">Deposited</th>
+      <th style="width: 5%;" class="center">Paid?</th>
       <th style="width: 5%;"></th>
     </tr>
   `,
