@@ -17,7 +17,7 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
         color: darkgreen;
         font-weight: bold;
     }
-    mat-input-container {
+    mat-form-field {
         width: 100%;
     }
   `],
