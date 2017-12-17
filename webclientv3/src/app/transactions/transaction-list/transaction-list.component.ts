@@ -14,6 +14,9 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
     ec-money-field {
       text-align: end;
     }
+    table.table {
+      table-layout: fixed;
+    }
     .table-container {
       max-height: 400px;
       overflow-y: scroll;
