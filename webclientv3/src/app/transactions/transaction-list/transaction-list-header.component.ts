@@ -5,10 +5,11 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
   selector: '[ec-transaction-list-header]',
   template: `
     <tr class="heading">
-      <th style="width:2%;"></th>
+      <th style="width:5%;"></th>
       <th style="width:15%;">Date</th>
-      <th style="width:44%;">Description</th>
-      <th style="width:14%;" class="allocation-header">
+      <th style="width:30%;">Description</th>
+
+      <th style="width:20%;" class="allocation-header">
         <span *ngIf="bankAccount?.is_sink_fund; else allocationHeader">Sink Fund Allocation</span>
         <ng-template #allocationHeader>
           <span>Allocation</span>
