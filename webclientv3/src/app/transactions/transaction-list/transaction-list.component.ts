@@ -35,6 +35,7 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
               <tr ec-transaction-list-row
                   *ngFor="let transaction of transactions; trackBy: trackByFn"
                   [transaction]="transaction"
+                  [bankAccount]="bankAccount"
                   [allocations]="allocations"
                   [sinkFundAllocations]="sinkFundAllocations"
                   [editMode]="isEditMode"
