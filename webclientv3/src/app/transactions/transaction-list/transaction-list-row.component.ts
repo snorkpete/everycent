@@ -40,21 +40,23 @@ import {TransactionData} from "../transaction-data.model";
       </td>
 
       <td>
-        <mat-form-field fxFlex *ngIf="bankAccount?.is_sink_fund; else allocationField">
-          <mat-select [(ngModel)]="transaction.sink_fund_allocation_id">
-            <mat-option [value]=""></mat-option>
-            <mat-option *ngFor="let allocation of sinkFundAllocations" [value]="allocation.id">{{allocation.name}}</mat-option>
-          </mat-select>
-        </mat-form-field>
+        <ng-container *ngIf="bankAccount?.is_sink_fund; then sinkFundAllocationField else allocationField">
+        </ng-container>
+
+        <ng-template #sinkFundAllocationField>
+          <ec-list-field [editMode]="editMode"
+                         [items]="sinkFundAllocations"
+                         [(ngModel)]="transaction.sink_fund_allocation_id">
+          </ec-list-field>
+        </ng-template>
 
         <ng-template #allocationField>
-          <mat-form-field fxFlex>
-            <mat-select [(ngModel)]="transaction.allocation_id">
-              <mat-option [value]=""></mat-option>
-              <mat-option *ngFor="let allocation of allocations" [value]="allocation.id">{{allocation.name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-         </ng-template>
+          <ec-list-field [editMode]="editMode"
+                         [items]="allocations"
+                         groupBy="allocation_category"
+                         [value]="transaction.allocation_id">
+          </ec-list-field>
+        </ng-template>
       </td>
 
       <td class="right">
