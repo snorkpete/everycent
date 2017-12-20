@@ -25,6 +25,7 @@ import {MessageDisplayComponent} from './message-display/message-display.compone
 import {MessageService} from '../message-display/message.service';
 import {MoneyPipe} from './money.pipe';
 import { PaidFieldComponent } from './form/paid-field/paid-field.component';
+import { ListFieldComponent } from './form/list-field/list-field.component';
 
 @NgModule({
   imports: [
@@ -43,6 +44,7 @@ import { PaidFieldComponent } from './form/paid-field/paid-field.component';
     FormFieldComponent,
     HighlightDeletedDirective,
     LoadingIndicatorComponent,
+    ListFieldComponent,
     MainToolbarComponent,
     MessageDisplayComponent,
     MenuComponent,
@@ -67,6 +69,7 @@ import { PaidFieldComponent } from './form/paid-field/paid-field.component';
     EditActionsComponent,
     FormFieldComponent,
     HighlightDeletedDirective,
+    ListFieldComponent,
     LoadingIndicatorComponent,
     MainToolbarComponent,
     MenuComponent,
