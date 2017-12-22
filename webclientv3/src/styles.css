@@ -7,6 +7,10 @@ div.md-sidenav-content {
     background-color: #a09fa2;
 }
 
+mat-card.main {
+  background-color: #a5b0ff;
+}
+
 .deactivated {
   background-color: rgba(33, 33, 33, 0.3);
 }
