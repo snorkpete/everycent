@@ -7,7 +7,11 @@ import {TransactionData} from "../../../transactions/transaction-data.model";
   selector: 'ec-paid-field',
   styles: [],
   template: `
-    <mat-checkbox *ngIf="editMode; else textDisplay" [formControl]="control" (change)="updateInnerValue($event)"></mat-checkbox>
+    <mat-checkbox *ngIf="editMode; else textDisplay"
+                  color="primary"
+                  [formControl]="control"
+                  (change)="updateInnerValue($event)">
+    </mat-checkbox>
     <ng-template #textDisplay>
       <span class="value">{{ paidStatusDisplay }}</span>
     </ng-template>
