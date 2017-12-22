@@ -13,7 +13,7 @@ import {TransactionData} from "../transaction-data.model";
   `],
   template: `
       <td>
-        <mat-checkbox [(ngModel)]="transaction.selected"></mat-checkbox>
+        <mat-checkbox color="primary" [(ngModel)]="transaction.selected"></mat-checkbox>
       </td>
       <td>
         <ec-date-field [editMode]="editMode" [(ngModel)]="transaction.transaction_date"></ec-date-field>
