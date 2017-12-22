@@ -1,10 +1,11 @@
 import {CommonModule} from "@angular/common";
-import {DebugElement} from "@angular/core";
+import {DebugElement, NO_ERRORS_SCHEMA} from "@angular/core";
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import {By} from "@angular/platform-browser";
 import {SampleTransactionData} from "../../../../test/samples/sample-transaction-data";
 import {TestConfigModule} from "../../../../test/test-config.module";
 import {SharedModule} from "../../shared/shared.module";
+import {TransactionDateValidatorDirective} from "../transaction-date-validator.directive";
 
 import { TransactionListRowComponent } from './transaction-list-row.component';
 import {TransactionData} from "../transaction-data.model";
@@ -21,7 +22,10 @@ describe('TransactionListRowComponent', () => {
         SharedModule,
         TestConfigModule,
       ],
-      declarations: [ TransactionListRowComponent ]
+      declarations: [
+        TransactionDateValidatorDirective,
+        TransactionListRowComponent,
+      ],
     })
     .compileComponents();
   }));
