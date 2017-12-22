@@ -19,7 +19,7 @@ import {BudgetData} from "../../budgets/budget.model";
     }
   `],
   template: `
-    <mat-card>
+    <mat-card class="main">
       <mat-card-content>
         <div fxLayout="column" class="container" fxLayoutGap="20px">
           <div class="header" fxLayout="row" fxLayoutGap="20px" fxFlex="1 0 auto">
