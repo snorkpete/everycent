@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BankAccountData} from "../../bank-accounts/bank-account.model";
+import {BudgetData} from "../../budgets/budget.model";
 import {SinkFundAllocationData} from "../../sink-funds/sink-fund-allocation-data.model";
 import {AllocationData} from "../allocation-data.model";
 import {TransactionData} from "../transaction-data.model";
@@ -16,7 +17,13 @@ import {TransactionData} from "../transaction-data.model";
         <mat-checkbox color="primary" [(ngModel)]="transaction.selected"></mat-checkbox>
       </td>
       <td>
-        <ec-date-field [editMode]="editMode" [(ngModel)]="transaction.transaction_date"></ec-date-field>
+        <ec-date-field
+          [editMode]="editMode"
+          [(ngModel)]="transaction.transaction_date"
+          [ecValidateWithinBudget]="budget"
+          [errorMessage]="'test'"
+        >
+        </ec-date-field>
       </td>
       <!--
         <input ng-show="vm.isEditMode"
@@ -54,7 +61,7 @@ import {TransactionData} from "../transaction-data.model";
           <ec-list-field [editMode]="editMode"
                          [items]="allocations"
                          groupBy="allocation_category"
-                         [value]="transaction.allocation_id">
+                         [(ngModel)]="transaction.allocation_id">
           </ec-list-field>
         </ng-template>
       </td>
@@ -80,6 +87,7 @@ export class TransactionListRowComponent implements OnInit {
 
   @Input() transaction: TransactionData;
   @Input() bankAccount: BankAccountData;
+  @Input() budget: BudgetData;
   @Input() allocations: AllocationData[] = [];
   @Input() sinkFundAllocations: SinkFundAllocationData[] = [];
   @Input() editMode: boolean;

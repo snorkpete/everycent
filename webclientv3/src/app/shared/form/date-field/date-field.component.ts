@@ -1,5 +1,7 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {Component, forwardRef, Input, OnInit, Optional} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {BudgetData} from "../../../budgets/budget.model";
+import {TransactionDateValidatorDirective} from "../../../transactions/transaction-date-validator.directive";
 
 @Component({
   selector: 'ec-date-field',
@@ -8,6 +10,7 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
   template: `
       <mat-form-field *ngIf="editMode; else textDisplay">
           <input matInput type="date" [(ngModel)]="value" [formControl]="control" class="value"/>
+            <mat-error>Date is outside of budget range</mat-error>
       </mat-form-field>
       <ng-template #textDisplay>
         <span class="value">{{ value | date:'mediumDate' }}</span>
@@ -21,16 +24,26 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
 
   @Input() value: Date;
   @Input() editMode: boolean;
+  // TODO: this should NOT be needed
+  @Input('ecValidateWithinBudget') budget: BudgetData = {};
+  @Input() errorMessage: string;
 
   control = new FormControl();
 
   private onChange: Function = (_: any) => {};
   private onTouch: Function = () => {};
 
-  constructor() { }
+  constructor(
+    @Optional()
+    private validator: TransactionDateValidatorDirective
+  ) { }
 
   ngOnInit() {
     this.control.valueChanges.subscribe((v: string) => {
+      if (this.validator) {
+        let errors = this.validator.validate(this.control);
+        this.control.setErrors(errors);
+      }
       this.onChange(v);
     });
   }

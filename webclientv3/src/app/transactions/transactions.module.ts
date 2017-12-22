@@ -10,6 +10,7 @@ import { TransactionSearchFormComponent } from './transaction-search-form/transa
 import { TransactionSummaryComponent } from './transaction-summary/transaction-summary.component';
 import { TransactionListComponent } from './transaction-list/transaction-list.component';
 import {TransactionListHeaderComponent} from "./transaction-list/transaction-list-header.component";
+import { TransactionDateValidatorDirective } from './transaction-date-validator.directive';
 
 @NgModule({
   imports: [
@@ -19,11 +20,12 @@ import {TransactionListHeaderComponent} from "./transaction-list/transaction-lis
   declarations: [
     TransactionsComponent,
     CompactTransactionListComponent,
-    TransactionSearchFormComponent,
-    TransactionSummaryComponent,
+    TransactionDateValidatorDirective,
     TransactionListComponent,
     TransactionListHeaderComponent,
     TransactionListRowComponent,
+    TransactionSearchFormComponent,
+    TransactionSummaryComponent,
   ],
   exports: [
     CompactTransactionListComponent,

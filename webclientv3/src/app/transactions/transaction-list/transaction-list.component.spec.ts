@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TransactionDateValidatorDirective} from "../transaction-date-validator.directive";
 import {TransactionListRowComponent} from "./transaction-list-row.component";
 
 import { TransactionListComponent } from './transaction-list.component';
@@ -21,6 +22,7 @@ describe('TransactionListComponent', () => {
         TransactionListComponent,
         TransactionListHeaderComponent,
         TransactionListRowComponent,
+        TransactionDateValidatorDirective,
       ]
     })
     .compileComponents();
