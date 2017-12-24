@@ -23,9 +23,15 @@ export class MessageService {
     return this._messageType;
   }
 
-  setMessage(newMessage: string): void {
+  setMessage(newMessage: string, timeout?: number): void {
     this._messageText = newMessage;
     this._messageType = MessageType.INFO;
+
+    if (timeout) {
+      setTimeout(() => {
+        this.clear();
+      }, timeout);
+    }
   }
 
   setErrorMessage(newMessage: string): void {
