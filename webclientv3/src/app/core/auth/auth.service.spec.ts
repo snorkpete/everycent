@@ -1,6 +1,7 @@
 /* tslint:disable:no-unused-variable */
 
 import {async, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
+import {TestConfigModule} from "../../../../test/test-config.module";
 import {AuthService} from './auth.service';
 import {ApiGateway} from '../../../api/api-gateway.service';
 import {Observable} from 'rxjs/Observable';
@@ -19,10 +20,12 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        TestConfigModule,
+      ],
       providers: [
         AuthService,
         ApiGateway,
-        { provide: Http, useValue: httpStub },
         LoadingIndicator,
       ]
     });
