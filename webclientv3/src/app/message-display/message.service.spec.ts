@@ -1,5 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
+import {fakeAsync, tick} from "@angular/core/testing";
 import {MessageService, MessageType} from './message.service';
 
 describe('MessageService', () => {
@@ -17,6 +18,15 @@ describe('MessageService', () => {
     expect(messageService.getMessage()).toEqual('hello');
     expect(messageService.getMessageType()).toEqual(MessageType.INFO, 'message type is INFO');
   });
+
+  it('can automatically clear a message', fakeAsync(() => {
+    messageService.setMessage('Test', 5000);
+    expect(messageService.getMessage()).toEqual('Test');
+    tick(4999);
+    expect(messageService.getMessage()).toEqual('Test');
+    tick(2);
+    expect(messageService.getMessage()).toEqual('');
+  }));
 
   it('can set an error message', () => {
     messageService.setErrorMessage('bad');
