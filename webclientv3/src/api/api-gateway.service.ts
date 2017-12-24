@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Headers, Http, RequestOptions, URLSearchParams} from '@angular/http';
+import {Router} from "@angular/router";
 import {BASE_URL} from './base-url.service';
 import {Observable} from 'rxjs/Observable';
 import {AuthCredentials} from '../app/core/auth/auth-credentials';
@@ -11,6 +12,7 @@ export class ApiGateway {
   private BASE_URL = BASE_URL;
   constructor(
     public http: Http,
+    private router: Router,
     private loadingIndicator: LoadingIndicator
   ) {}
 
@@ -22,8 +24,14 @@ export class ApiGateway {
     this.loadingIndicator.show();
     return this.http.get(fullUrl, options)
                     .do(() => this.loadingIndicator.hide())
-                    .map(res => res.json());
-    // TODO: catch authentication errors and redirect to the login page
+                    .map(res => res.json())
+                    .catch(error => {
+                      // TODO: only catch authentication errors
+                      //       when doing this redirect
+                      this.router.navigateByUrl('/login');
+                      this.loadingIndicator.hide();
+                      return Observable.empty();
+                    });
 
   }
 
