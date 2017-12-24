@@ -1,9 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Subject} from "rxjs/Subject";
+import {MessageService} from "../../message-display/message.service";
 import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
 import {SinkFundAllocationData} from "../../sink-funds/sink-fund-allocation-data.model";
 import {AllocationData} from "../allocation-data.model";
 import {TransactionDataService} from "../transaction-data.service";
+import {TransactionListComponent} from "../transaction-list/transaction-list.component";
 import {TransactionSearchParams} from "../transaction-search-form/transaction-search-params.model";
 import {LoadingIndicator} from "../../shared/loading-indicator/loading-indicator.service";
 import {TransactionData} from "../transaction-data.model";
@@ -38,7 +40,10 @@ import {BudgetData} from "../../budgets/budget.model";
               [allocations]="allocations"
               [sinkFundAllocations]="sinkFundAllocations"
               [bankAccount]="bankAccount"
-              [budget]="budget">
+              [budget]="budget"
+              (save)="save($event)"
+              (cancel)="cancel()"
+            >
             </ec-transaction-list>
           </div>
         </div>
@@ -53,12 +58,17 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   bankAccount: BankAccountData = {};
   budget: BudgetData = {};
 
+  @ViewChild(TransactionListComponent)
+  transactionList: TransactionListComponent;
+
   componentDestroyed = new Subject();
 
   constructor(
+    private transactionService: TransactionService,
     private transactionDataService: TransactionDataService,
     private loadingIndicator: LoadingIndicator,
-    private toolbarService: MainToolbarService
+    private toolbarService: MainToolbarService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit() {
@@ -81,6 +91,20 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.budget = searchParams.budget;
     this.transactionDataService.refresh(searchParams);
   }
+
+  save() {
+    this.loadingIndicator.show();
+    this.transactionService.save(this.transactions, this.bankAccount, this.budget).subscribe(() => {
+      this.loadingIndicator.hide();
+      this.transactionList.switchToDisplayMode();
+      this.messageService.setMessage('Transactions saved.', 5000);
+    });
+  }
+
+  cancel() {
+    this.transactionDataService.refresh({bank_account_id: this.bankAccount.id, budget_id: this.budget.id});
+  }
+
 
   ngOnDestroy(): void {
     this.componentDestroyed.next();

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {BudgetData} from "../../budgets/budget.model";
 import {SinkFundAllocationData} from "../../sink-funds/sink-fund-allocation-data.model";
 import {AllocationData} from "../allocation-data.model";
@@ -46,13 +46,19 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
           </div>
       </mat-card-content>
       <mat-card-actions>
-        <ec-edit-actions [(editMode)]="isEditMode" (save)="save()" (cancel)="cancel()"></ec-edit-actions>
+        <ec-edit-actions [(editMode)]="isEditMode"
+                         (save)="save.emit(transactions)"
+                         (cancel)="cancel.emit()">
+          <button *ngIf="isEditMode" mat-raised-button color="primary" (click)="addTransaction()">
+            Add New Transaction
+          </button>
+        </ec-edit-actions>
       </mat-card-actions>
     </mat-card>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransactionListComponent implements OnInit, OnChanges {
+export class TransactionListComponent implements OnInit {
 
   @Input() transactions: TransactionData[] = [];
   @Input() allocations: AllocationData[] = [];
@@ -61,23 +67,26 @@ export class TransactionListComponent implements OnInit, OnChanges {
   @Input() budget: BudgetData;
   @Input() isEditMode = false;
 
+  @Output() save = new EventEmitter<TransactionData[]>();
+  @Output() cancel = new EventEmitter();
+
   constructor() { }
 
   ngOnInit() {
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-  }
-
-  save(): void {
-
-  }
-
-  cancel(): void {
-
+  addTransaction(): void {
+    this.transactions.push({
+      withdrawal_amount: 0,
+      deposit_amount: 0
+    });
   }
 
   trackByFn(index: number, transaction: TransactionData) {
     return transaction.id;
+  }
+
+  switchToDisplayMode() {
+    this.isEditMode = false;
   }
 }

@@ -43,4 +43,9 @@ describe('TransactionListComponent', () => {
     let editActionsEl = de.query(By.css('ec-edit-actions'));
     expect(editActionsEl).toBeTruthy();
   });
+
+  it('#switchToDisplayMode changes editMode flag to false', () => {
+    component.switchToDisplayMode();
+    expect(component.isEditMode).toBe(false);
+  });
 });
