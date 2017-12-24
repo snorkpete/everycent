@@ -98,30 +98,34 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
 
                 <ng-container *ngFor="let allocation of sinkFund.sink_fund_allocations" >
                   <tr *ngIf="deactivateService.isItemVisible(allocation, showDeactivated)" [ecHighlightDeletedFor]="allocation">
-                      <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
-                      <td class="highlight">
-                          <div fxLayout="row" fxLayoutAlign="start center">
-                              <ec-icon [icon]="Icon.SHOW_TRANSACTIONS"
-                                       (click)="showTransactionsFor(allocation)"
-                                       class="small">
-                              </ec-icon>
-                              <span fxFlex></span>
-                              <ec-money-field [value]="allocation.current_balance"></ec-money-field>
-                          </div>
-                      </td>
-                      <td><ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field></td>
-
-                      <td>
-                          <ec-money-field [value]="allocation.current_balance-allocation.target" highlightPositive="true"></ec-money-field>
-                      </td>
-                      <td><ec-text-field [(ngModel)]="allocation.comment" [editMode]="isEditMode"></ec-text-field></td>
-                      <td>
-                        <ec-text-field [(ngModel)]="allocation.status"></ec-text-field>
-                      </td>
-                      <td>
-                        <ec-delete-button [item]="allocation" [editMode]="isEditMode"></ec-delete-button>
-                        <ec-deactivate-button [item]="allocation" [editMode]="isEditMode"></ec-deactivate-button>
-                      </td>
+                    <td><ec-text-field [(ngModel)]="allocation.name" [editMode]="isEditMode"></ec-text-field></td>
+                    <td class="highlight">
+                        <div fxLayout="row" fxLayoutAlign="start center">
+                            <ec-icon [icon]="Icon.SHOW_TRANSACTIONS"
+                                     (click)="showTransactionsFor(allocation)"
+                                     class="small">
+                            </ec-icon>
+                            <span fxFlex></span>
+                            <ec-money-field [value]="allocation.current_balance"></ec-money-field>
+                        </div>
+                    </td>
+                    <td class="right">
+                      <ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field>
+                    </td>
+                    <td class="right">
+                      <ec-money-field [value]="allocation.current_balance-allocation.target" highlightPositive="true">
+                      </ec-money-field>
+                    </td>
+                    <td>
+                      <ec-text-field [(ngModel)]="allocation.comment" [editMode]="isEditMode"></ec-text-field>
+                    </td>
+                    <td>
+                      <ec-text-field [(ngModel)]="allocation.status"></ec-text-field>
+                    </td>
+                    <td>
+                      <ec-delete-button [item]="allocation" [editMode]="isEditMode"></ec-delete-button>
+                      <ec-deactivate-button [item]="allocation" [editMode]="isEditMode"></ec-deactivate-button>
+                    </td>
                   </tr>
                 </ng-container>
               </tbody>
@@ -133,6 +137,7 @@ import {CompactTransactionListComponent} from "../../transactions/compact-transa
                   <td><ec-money-field [value]="calculator.totalTarget(sinkFund)"></ec-money-field></td>
 
                   <td><ec-money-field [value]="calculator.totalOutstanding(sinkFund)"></ec-money-field></td>
+
                   <td></td>
                   <td></td>
                   <td></td>

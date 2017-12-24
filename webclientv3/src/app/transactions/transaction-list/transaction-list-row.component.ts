@@ -25,23 +25,6 @@ import {TransactionData} from "../transaction-data.model";
         >
         </ec-date-field>
       </td>
-      <!--
-        <input ng-show="vm.isEditMode"
-               name="vm.transaction_date[{{$index}}]"
-               type="date"
-               ng-model="vm.transaction.transaction_date"
-               ng-change="vm.checkTransactionDate(vm.transaction, vm.search.budget)"
-               ng-required="!vm.transaction.deleted"
-               ec-as-date>
-        </input>
-        <span style="positive:relative; top:20px;" ng-show="vm.transaction.transaction_date_invalid" class=".help-block">
-            Transaction date outside the budget period
-        </span>
-        <span ng-hide="vm.isEditMode"
-              ng-bind="vm.transaction.transaction_date | date:'EEE dd MMM, yy'"></span>
-      </td>
-      -->
-
       <td>
         <ec-text-field [editMode]="editMode" [(ngModel)]="transaction.description"></ec-text-field>
       </td>
