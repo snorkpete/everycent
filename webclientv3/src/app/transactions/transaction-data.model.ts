@@ -21,4 +21,5 @@ export interface TransactionData {
   allocation?: any;
   sink_fund_allocation?: SinkFundAllocationData;
   bank_account?: BankAccountData;
+  deleted?: boolean;
 }
