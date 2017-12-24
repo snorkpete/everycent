@@ -1,3 +1,4 @@
+import {TestConfigModule} from "../../test/test-config.module";
 import {ApiGateway} from './api-gateway.service';
 import {async, inject, TestBed} from '@angular/core/testing';
 import {
@@ -22,7 +23,7 @@ describe('ApiGateway', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        //HttpModule,
+        TestConfigModule,
       ],
       providers: [
         ApiGateway,
