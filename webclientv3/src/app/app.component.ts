@@ -10,12 +10,12 @@ import {Component, OnInit} from '@angular/core';
   `],
   template: `
     <div fxLayout="column" fxFlex>
-       <ec-main-toolbar (openMenu)="sidenav.open()"> </ec-main-toolbar>
+       <ec-main-toolbar (openMenu)="sideNav.open()"> </ec-main-toolbar>
 
-         <mat-sidenav-container fxFlex>
+         <mat-sidenav-container fxFlex class="main">
 
-           <mat-sidenav #sidenav opened="false" mode="overlay">
-             <ec-menu (menuSelect)="sidenav.close()"></ec-menu>
+           <mat-sidenav #sideNav opened="false" mode="overlay">
+             <ec-menu (menuSelect)="sideNav.close()"></ec-menu>
            </mat-sidenav>
 
            <ec-loading-indicator></ec-loading-indicator>

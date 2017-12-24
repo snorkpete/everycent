@@ -58,18 +58,6 @@ describe('EditActionsComponent', () => {
       expect(makeChangesBtn).toBeFalsy('button does not exist');
     });
 
-    //it('editModeChange updates the editMode property', () => {
-    //  component.editMode = false;
-    //  fixture.detectChanges();
-
-    //  component.editModeChange.emit(true);
-    //  fixture.detectChanges();
-    //  expect(component.editMode).toBeTruthy();
-
-    //  component.editModeChange.emit(false);
-    //  fixture.detectChanges();
-    //  expect(component.editMode).toBeFalsy();
-    //});
   });
 
   describe('"Save" button', () => {
@@ -137,4 +125,5 @@ describe('EditActionsComponent', () => {
       expect(spy.calls.any()).toBeTruthy('calls next on the subject');
     });
   });
+
 });
