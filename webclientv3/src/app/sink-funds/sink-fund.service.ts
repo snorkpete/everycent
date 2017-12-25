@@ -14,8 +14,8 @@ export class SinkFundService {
     private apiGateway: ApiGateway
   ) { }
 
-  currentSinkFund$(): Observable<SinkFundData> {
-    return this._currentSinkFund$.asObservable();
+  getSinkFunds(): Observable<SinkFundData[]> {
+    return this.apiGateway.get('/sink_funds');
   }
 
   getCurrent(): Observable<SinkFundData> {

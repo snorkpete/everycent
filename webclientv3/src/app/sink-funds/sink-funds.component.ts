@@ -14,6 +14,7 @@ import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
 export class SinkFundsComponent implements OnInit {
 
   sinkFund: SinkFundData;
+  sinkFunds: SinkFundData[];
 
   constructor(
     private sinkFundService: SinkFundService,
@@ -21,6 +22,9 @@ export class SinkFundsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.sinkFundService.getSinkFunds().subscribe(sinkFunds => {
+      this.sinkFunds = sinkFunds;
+    });
     this.sinkFundService.refreshSinkFund();
     this.sinkFundService.getCurrent().subscribe(sinkFund => {
       this.sinkFund = sinkFund;

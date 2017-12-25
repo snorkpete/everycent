@@ -7,6 +7,7 @@ import {SinkFundService} from './sink-fund.service';
 import {SinkFundActionsComponent} from './sink-fund-actions/sink-fund-actions.component';
 import {AddTransferFormComponent} from './add-transfer-form/add-transfer-form.component';
 import {TransactionsModule} from '../transactions/transactions.module';
+import { SinkFundSelectorComponent } from './sink-fund-selector/sink-fund-selector.component';
 
 @NgModule({
   imports: [
@@ -21,6 +22,7 @@ import {TransactionsModule} from '../transactions/transactions.module';
     SinkFundComponent,
     SinkFundActionsComponent,
     AddTransferFormComponent,
+    SinkFundSelectorComponent,
   ],
   entryComponents: [
     AddTransferFormComponent,
