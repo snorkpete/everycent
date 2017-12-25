@@ -7,7 +7,7 @@ div.md-sidenav-content {
     background-color: #a09fa2;
 }
 
-mat-card.main {
+mat-card.main, mat-sidenav-container.main {
   background-color: #a5b0ff;
 }
 
