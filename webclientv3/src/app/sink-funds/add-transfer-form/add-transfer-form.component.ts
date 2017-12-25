@@ -11,11 +11,11 @@ import {SinkFundService} from '../sink-fund.service';
     mat-select, ec-money-field {
         margin-top: 36px;
     }
-    
+
     div.actions {
         width: 100%;
     }
-    
+
     ec-money-field mat-input-container{
         width: 100%;
     }
@@ -25,19 +25,23 @@ import {SinkFundService} from '../sink-fund.service';
     <div mat-dialog-content>
         <div fxLayout="column" fxLayoutAlign="space-between" [formGroup]="transfer">
               <mat-select placeholder="Transfer From" formControlName="existing_allocation_id">
-                  <mat-option [value]="0">Unassigned Money - {{ calculator.unassignedBalance(sinkFund) | ecMoney}}</mat-option>
+                  <mat-option [value]="0">
+                    Unassigned Money - {{ calculator.unassignedBalance(sinkFund) | ecMoney}}
+                  </mat-option>
                   <mat-option *ngFor="let allocation of sinkFund.sink_fund_allocations" [value]="allocation.id">
                       {{ allocation.name }} ( {{ allocation.current_balance | ecMoney }} )
                   </mat-option>
               </mat-select>
 
               <mat-select placeholder="Transfer To" formControlName="new_allocation_id">
-                  <mat-option [value]="0">Unassigned Money - {{ calculator.unassignedBalance(sinkFund) | ecMoney}}</mat-option>
+                  <mat-option [value]="0">
+                    Unassigned Money - {{ calculator.unassignedBalance(sinkFund) | ecMoney}}
+                  </mat-option>
                   <mat-option *ngFor="let allocation of sinkFund.sink_fund_allocations" [value]="allocation.id">
                       {{ allocation.name }} - {{ allocation.current_balance | ecMoney}}
                   </mat-option>
               </mat-select>
-                
+
             <ec-money-field placeholder="Amount" formControlName="amount" fxFlex="1"
                             [editMode]="true">
             </ec-money-field>
@@ -80,7 +84,6 @@ export class AddTransferFormComponent implements OnInit {
         },
           (error) => alert(error)
         );
-
   }
 
   cancel() {
