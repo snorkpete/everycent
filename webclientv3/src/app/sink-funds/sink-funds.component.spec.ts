@@ -54,6 +54,7 @@ describe('SinkFundsComponent', () => {
     let response = SampleSinkFundData;
     spyOn(sinkFundService, 'refreshSinkFund').and.returnValue(null);
     spyOn(sinkFundService, 'getCurrent').and.returnValue(Observable.of(response));
+    spyOn(sinkFundService, 'getSinkFunds').and.returnValue(Observable.of([response]));
 
     fixture.detectChanges();
     expect(component.sinkFund).toEqual(response);
