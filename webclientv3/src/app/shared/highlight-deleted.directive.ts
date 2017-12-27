@@ -13,6 +13,11 @@ export class HighlightDeletedDirective {
     return this.item.deleted;
   }
 
+  @HostBinding('class.unpaid')
+  get isUnpaid() {
+    return this.item.status !== 'paid';
+  }
+
   @HostBinding('class.deactivated')
   get isDeactivated() {
     return this.item.deactivated;
