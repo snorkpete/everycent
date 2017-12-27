@@ -56,7 +56,7 @@ describe('TransactionsComponent', () => {
     expect(toolbarService.getHeading()).toBe('Transactions');
   });
 
-  it('resets properly after save', () => {
+  xit('resets properly after save', () => {
     let transactionService = TestBed.get(TransactionService);
     spyOn(transactionService, "save").and.returnValue(Observable.of([]));
     fixture.detectChanges();
