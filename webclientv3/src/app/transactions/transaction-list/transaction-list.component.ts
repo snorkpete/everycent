@@ -52,6 +52,9 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
           <button *ngIf="isEditMode" mat-raised-button color="primary" (click)="addTransaction()">
             Add New Transaction
           </button>
+          <button *ngIf="isEditMode" mat-raised-button color="accent" (click)="import.emit()">
+            Import Transactions
+          </button>
         </ec-edit-actions>
       </mat-card-actions>
     </mat-card>
@@ -68,6 +71,7 @@ export class TransactionListComponent implements OnInit {
   @Input() isEditMode = false;
 
   @Output() save = new EventEmitter<TransactionData[]>();
+  @Output() import = new EventEmitter();
   @Output() cancel = new EventEmitter();
 
   constructor() { }
@@ -78,7 +82,8 @@ export class TransactionListComponent implements OnInit {
   addTransaction(): void {
     this.transactions.push({
       withdrawal_amount: 0,
-      deposit_amount: 0
+      deposit_amount: 0,
+      status: 'unpaid'
     });
   }
 

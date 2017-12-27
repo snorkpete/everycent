@@ -1,6 +1,7 @@
 import {NgModule} from '@angular/core';
 import {SharedModule} from '../shared/shared.module';
 import {CompactTransactionListComponent} from './compact-transaction-list/compact-transaction-list.component';
+import {TransactionImporterModule} from "./importers/transaction-importer.module";
 import {TransactionDataService} from "./transaction-data.service";
 import {TransactionListRowComponent} from "./transaction-list/transaction-list-row.component";
 import {TransactionService} from './transaction.service';
@@ -15,6 +16,7 @@ import { TransactionDateValidatorDirective } from './transaction-date-validator.
 @NgModule({
   imports: [
     SharedModule,
+    TransactionImporterModule,
     TransactionsRoutingModule,
   ],
   declarations: [

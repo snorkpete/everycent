@@ -1,32 +1,36 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Subject} from "rxjs/Subject";
-import {MessageService} from "../../message-display/message.service";
-import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
-import {SinkFundAllocationData} from "../../sink-funds/sink-fund-allocation-data.model";
-import {AllocationData} from "../allocation-data.model";
-import {TransactionDataService} from "../transaction-data.service";
-import {TransactionListComponent} from "../transaction-list/transaction-list.component";
-import {TransactionSearchParams} from "../transaction-search-form/transaction-search-params.model";
-import {LoadingIndicator} from "../../shared/loading-indicator/loading-indicator.service";
-import {TransactionData} from "../transaction-data.model";
-import {TransactionService} from "../transaction.service";
-import {BankAccountData} from "../../bank-accounts/bank-account.model";
-import {BudgetData} from "../../budgets/budget.model";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
+import { Subject } from "rxjs/Subject";
+import { MessageService } from "../../message-display/message.service";
+import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
+import { SinkFundAllocationData } from "../../sink-funds/sink-fund-allocation-data.model";
+import { AllocationData } from "../allocation-data.model";
+import { TransactionImporterComponent } from "../importers/transaction-importer/transaction-importer.component";
+import { TransactionDataService } from "../transaction-data.service";
+import { TransactionListComponent } from "../transaction-list/transaction-list.component";
+import { TransactionSearchParams } from "../transaction-search-form/transaction-search-params.model";
+import { LoadingIndicator } from "../../shared/loading-indicator/loading-indicator.service";
+import { TransactionData } from "../transaction-data.model";
+import { TransactionService } from "../transaction.service";
+import { BankAccountData } from "../../bank-accounts/bank-account.model";
+import { BudgetData } from "../../budgets/budget.model";
 
 @Component({
-  selector: 'ec-transactions',
-  styles: [`
+  selector: "ec-transactions",
+  styles: [
+    `
     mat-card-content, .container {
       height: 100%;
     }
-  `],
+  `
+  ],
   template: `
     <mat-card class="main">
       <mat-card-content>
         <div fxLayout="column" class="container" fxLayoutGap="20px">
           <div class="header" fxLayout="row" fxLayoutGap="20px" fxFlex="1 0 auto">
             <ec-transaction-search-form fxFlex="1 0 auto"
-              (change)="refreshTransactions($event)"
+                                        (change)="refreshTransactions($event)"
             >
             </ec-transaction-search-form>
 
@@ -43,6 +47,7 @@ import {BudgetData} from "../../budgets/budget.model";
               [budget]="budget"
               (save)="save($event)"
               (cancel)="cancel()"
+              (import)="showImportForm()"
             >
             </ec-transaction-list>
           </div>
@@ -68,21 +73,24 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private transactionDataService: TransactionDataService,
     private loadingIndicator: LoadingIndicator,
     private toolbarService: MainToolbarService,
-    private messageService: MessageService
-  ) { }
+    private messageService: MessageService,
+    private dialog: MatDialog,
+    private snackbar: MatSnackBar
+  ) {}
 
   ngOnInit() {
-    this.toolbarService.setHeading('Transactions');
+    this.toolbarService.setHeading("Transactions");
 
     this.transactionDataService.init();
-    this.transactionDataService.allData$()
-        .takeUntil(this.componentDestroyed)
-        .subscribe(([transactions, allocations, sinkFundAllocations]) => {
-          this.transactions = transactions;
-          this.allocations = allocations;
-          this.sinkFundAllocations = sinkFundAllocations;
-          this.loadingIndicator.hide();
-        });
+    this.transactionDataService
+      .allData$()
+      .takeUntil(this.componentDestroyed)
+      .subscribe(([transactions, allocations, sinkFundAllocations]) => {
+        this.transactions = transactions;
+        this.allocations = allocations;
+        this.sinkFundAllocations = sinkFundAllocations;
+        this.loadingIndicator.hide();
+      });
   }
 
   refreshTransactions(searchParams: TransactionSearchParams = {}) {
@@ -92,19 +100,52 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.transactionDataService.refresh(searchParams);
   }
 
-  save() {
-    this.loadingIndicator.show();
-    this.transactionService.save(this.transactions, this.bankAccount, this.budget).subscribe(() => {
-      this.loadingIndicator.hide();
-      this.transactionList.switchToDisplayMode();
-      this.messageService.setMessage('Transactions saved.', 5000);
+  refresh() {
+    this.refreshTransactions({
+      budget_id: this.budget.id,
+      bank_account_id: this.bankAccount.id
     });
   }
 
-  cancel() {
-    this.transactionDataService.refresh({bank_account_id: this.bankAccount.id, budget_id: this.budget.id});
+  save() {
+    this.loadingIndicator.show();
+    this.transactionService
+      .save(this.transactions, this.bankAccount, this.budget)
+      .subscribe(() => {
+        this.loadingIndicator.hide();
+        this.transactionList.switchToDisplayMode();
+        this.refresh();
+        this.snackbar.open('Transactions saved', null, {duration: 3000});
+        this.messageService.setMessage("Transactions saved.", 5000);
+      });
   }
 
+  cancel() {
+    this.transactionDataService.refresh({
+      bank_account_id: this.bankAccount.id,
+      budget_id: this.budget.id
+    });
+  }
+
+  // TODO: move this to a service
+  showImportForm(): MatDialogRef<TransactionImporterComponent> {
+    let dialogRef = this.dialog.open(TransactionImporterComponent, {
+      width: "350px"
+    });
+    dialogRef.componentInstance.startDate = this.budget.start_date;
+    dialogRef.componentInstance.endDate = this.budget.end_date;
+    // TODO: read this from the bank account
+    dialogRef.componentInstance.importType = "abn-amro-bank";
+
+    dialogRef.afterClosed().subscribe((newTransactions: TransactionData[]) => {
+      // newTransactions.forEach(transaction => {
+      //   this.transactions.push(transaction);
+      // });
+      this.transactions = this.transactions.concat(newTransactions);
+    });
+
+    return dialogRef;
+  }
 
   ngOnDestroy(): void {
     this.componentDestroyed.next();
