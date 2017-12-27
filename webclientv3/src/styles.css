@@ -19,6 +19,10 @@ mat-card.main, mat-sidenav-container.main {
   background-color: rgba(33, 33, 33, 0.5) !important;
 }
 
+.unpaid {
+  color:rgb(230, 40, 40);
+}
+
 .deleted {
     background-color: rgba(160, 38, 38, 0.35);
 }
