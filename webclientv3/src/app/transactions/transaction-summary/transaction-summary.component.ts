@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { BankAccountData } from "../../bank-accounts/bank-account.model";
+import {SettingsService} from "../../shared/settings.service";
 import {total} from "../../util/total";
 import { AllocationData } from "../allocation-data.model";
 import { TransactionData } from "../transaction-data.model";
@@ -79,14 +80,18 @@ export class TransactionSummaryComponent implements OnInit {
   @Input() transactions: TransactionData[];
   @Input() allocations: AllocationData[];
 
-  constructor() {}
+  constructor(
+    private settingsService: SettingsService
+  ) {}
 
   ngOnInit() {
     // TODO;
     // SettingsService.getSettings().then(function(settings){
     //   vm.primary_budget_account_id = settings.primary_budget_account_id;
     // });
-    this.primary_budget_account_id = 3;
+    this.settingsService.getSettings().subscribe(settings => {
+      this.primary_budget_account_id = settings.primary_budget_account_id;
+    });
   }
 
   lastBankBalance() {

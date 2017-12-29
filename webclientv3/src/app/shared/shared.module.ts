@@ -26,6 +26,7 @@ import {MessageService} from '../message-display/message.service';
 import {MoneyPipe} from './money.pipe';
 import { PaidFieldComponent } from './form/paid-field/paid-field.component';
 import { ListFieldComponent } from './form/list-field/list-field.component';
+import {SettingsService} from "./settings.service";
 
 @NgModule({
   imports: [
@@ -89,6 +90,7 @@ export class SharedModule {
         LoadingIndicator,
         MainToolbarService,
         MessageService,
+        SettingsService,
       ],
     };
   }
