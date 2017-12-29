@@ -1,4 +1,5 @@
 import { TestBed, inject } from '@angular/core/testing';
+import {AbnAmroCreditCardImporterService} from "./abn-amro-credit-card-importer.service";
 
 import { AbnAmroImporterService } from './abn-amro-importer.service';
 
@@ -7,7 +8,7 @@ describe('AbnAmroImporterService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AbnAmroImporterService]
+      providers: [AbnAmroImporterService, AbnAmroCreditCardImporterService]
     });
   });
 

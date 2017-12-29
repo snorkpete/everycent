@@ -1,11 +1,14 @@
 import { Injectable } from "@angular/core";
+import {AbnAmroCreditCardImporterService} from "./abn-amro-credit-card-importer.service";
 
 @Injectable()
 export class AbnAmroImporterService {
-  constructor() {}
+  constructor(
+    private creditCardImporter: AbnAmroCreditCardImporterService
+  ) {}
 
   convertFromCreditCardFormat(input: string, startDate: string, endDate: string) {
-    throw new Error("not implemented yet");
+    return this.creditCardImporter.convertToTransactions(input, startDate, endDate);
   }
 
   convertFromBankFormat(input: string, startDate: string, endDate: string) {
