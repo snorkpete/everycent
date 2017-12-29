@@ -50,7 +50,7 @@ import { BudgetData } from "../../budgets/budget.model";
               [sinkFundAllocations]="sinkFundAllocations"
               [bankAccount]="bankAccount"
               [budget]="budget"
-              (save)="save($event)"
+              (save)="save()"
               (cancel)="cancel()"
               (import)="showImportForm()"
             >
