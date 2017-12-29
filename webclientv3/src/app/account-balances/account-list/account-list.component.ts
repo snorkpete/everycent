@@ -32,22 +32,22 @@ import {total} from "../../util/total";
               <td class="hidden-xs"> {{ bankAccount?.institution?.name }} </td>
               <td class="hidden-xs"> {{ bankAccount?.account_type }} </td>
               <td class="hidden-xs"> {{ bankAccount?.account_category }} </td>
-              <td class="text-right"> {{ bankAccount?.closing_balance | ecMoney }} </td>
-              <td class="text-right"> {{ bankAccount?.expected_closing_balance | ecMoney }} </td>
-              <td class="text-right"> {{ bankAccount?.current_balance | ecMoney }} </td>
+              <td class="right"> {{ bankAccount?.closing_balance | ecMoney }} </td>
+              <td class="right"> {{ bankAccount?.expected_closing_balance | ecMoney }} </td>
+              <td class="right"> {{ bankAccount?.current_balance | ecMoney }} </td>
             </tr>
           </tbody>
           <tfoot>
 
           <tr class="total">
             <th class="hidden-xs text-right" colspan="4">Total</th>
-            <th class="text-right">
+            <th class="right">
               {{ closingBalance() | ecMoney }}
             </th>
-            <th class="text-right">
+            <th class="right">
               {{ expectedClosingBalance() | ecMoney }}
             </th>
-            <th class="text-right">
+            <th class="right">
               {{ currentBalance() | ecMoney }}
             </th>
           </tr>
