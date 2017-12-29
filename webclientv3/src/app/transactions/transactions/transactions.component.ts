@@ -36,7 +36,12 @@ import { BudgetData } from "../../budgets/budget.model";
 
           </div>
           <div>
-            <ec-transaction-summary fxFlex="3 0 auto"></ec-transaction-summary>
+            <ec-transaction-summary fxFlex="3 0 auto"
+                                    [transactions]="transactions"
+                                    [bankAccount]="bankAccount"
+                                    [allocations]="allocations"
+            >
+            </ec-transaction-summary>
           </div>
           <div fxFlex="2 0 auto">
             <ec-transaction-list
