@@ -33,6 +33,7 @@ import { TransactionImporterService } from "../transaction-importer.service";
 export class TransactionImporterComponent implements OnInit {
   options = [
     { text: "ABN Amro Bank Account", value: "abn-amro-bank" },
+    { text: "ABN Amro Bank Account (old format)", value: "abn-amro-bank-old" },
     { text: "ABN Amro Credit Card", value: "abn-amro-creditcard" },
     { text: "Scotia Bank Account", value: "new-bank-account" },
     { text: "FCB Bank Account", value: "fc-bank" },

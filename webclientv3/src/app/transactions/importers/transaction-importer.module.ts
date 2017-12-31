@@ -2,6 +2,7 @@ import {NgModule} from '@angular/core';
 import {SharedModule} from "../../shared/shared.module";
 import {AbnAmroCreditCardImporterService} from "./abn-amro-credit-card-importer.service";
 import {AbnAmroImporterService} from "./abn-amro-importer.service";
+import {AbnAmroOldFormatImporterService} from "./abn-amro-old-format-importer.service";
 import {FcbImporterService} from "./fcb-importer.service";
 import {ScotiaImporterService} from "./scotia-importer.service";
 import {TransactionImporterService} from "./transaction-importer.service";
@@ -12,6 +13,7 @@ let TRANSACTION_IMPORTER_PROVIDERS = [
   FcbImporterService,
   ScotiaImporterService,
   AbnAmroImporterService,
+  AbnAmroOldFormatImporterService,
   AbnAmroCreditCardImporterService,
 ];
 

@@ -1,32 +1,38 @@
 import { Injectable } from "@angular/core";
 import {AbnAmroCreditCardImporterService} from "./abn-amro-credit-card-importer.service";
+import {AbnAmroOldFormatImporterService} from "./abn-amro-old-format-importer.service";
 
 @Injectable()
 export class AbnAmroImporterService {
   constructor(
-    private creditCardImporter: AbnAmroCreditCardImporterService
+    private creditCardImporter: AbnAmroCreditCardImporterService,
+    private oldImporter: AbnAmroOldFormatImporterService
   ) {}
 
   convertFromCreditCardFormat(input: string, startDate: string, endDate: string) {
     return this.creditCardImporter.convertToTransactions(input, startDate, endDate);
   }
 
+  convertFromOldBankFormat(input: string, startDate: string, endDate: string) {
+    return this.oldImporter.convertToTransactions(input, startDate, endDate);
+  }
+
   convertFromBankFormat(input: string, startDate: string, endDate: string) {
     // SAMPLE DATA
-    // 3 Nov \`17
+    // today
+    //
+    // €- 33,80
+    // Stichting Cent. Bureau R
+    //
+    // €- 33,80
+    // Stichting Cent. Bureau R
+    // yesterday
+    //
+    // €- 34,08
     // Albert Heijn Fr.8642 ALM,PAS361
-    // - 57,06
-    // Het Beeldverhaal ALMERE ,PAS361
-    // - 30,97
-    // NL12RABO0306498111
-    // TLS BV INZ. OV-CHIPKAART
-    // NL12 RABO 0306 4981 11
-    // - 50,00
-    // 2 Nov \`17
-    // NL12RABO0306498111
-    // TLS BV INZ. OV-CHIPKAART
-    // NL12 RABO 0306 4981 11
-    // + 49,26
+    //
+    // €+ 28,40
+    // DOMINOS NL BY ADYEN
 
     let start = new Date(startDate);
     let end = new Date(endDate);
@@ -38,24 +44,29 @@ export class AbnAmroImporterService {
     // first split into lines
     let lines = this._convertInputToLines(input);
     lines.forEach(line => {
+      // skip blank lines
+      if (this.isBlank(line)) {
+        return;
+      }
       if (this.isDate(line)) {
         currentDate = this.extractDate(line);
         return;
       }
 
       if (this.isNumber(line)) {
-        let numberParts = this.extractNumberParts(line);
-        if (numberParts.sign === "+") {
-          depositAmount = numberParts.amount;
-          withdrawalAmount = 0;
-        } else {
+        let amount = this.extractAmount(line);
+        if (amount < 0) {
+          withdrawalAmount = Math.abs(amount);
           depositAmount = 0;
-          withdrawalAmount = numberParts.amount;
+        } else {
+          withdrawalAmount = 0;
+          depositAmount = amount;
         }
+        return;
+      }
 
-        // it's a description, but exclude bank stuff
-      } else if (line.substr(0, 2) !== "NL") {
-        currentDescription += line;
+      if (this.isDescription(line)) {
+        currentDescription = line;
       }
 
       if (this.isEndOfTransaction(line)) {
@@ -64,7 +75,7 @@ export class AbnAmroImporterService {
           description: currentDescription,
           withdrawal_amount: withdrawalAmount,
           deposit_amount: depositAmount,
-          status: 'unpaid',
+          status: 'paid',
         };
 
         // confirm that the transaction date is within the period
@@ -106,24 +117,72 @@ export class AbnAmroImporterService {
     if (!line) {
       return false;
     }
-    return line.match(/(\d\d?) ([A-z]{3}) `(\d\d)/) || this.isNewDateFormat(line);
+    if (line === 'today' || line === 'yesterday') {
+      return true;
+    }
+    return this.isFormattedDate(line);
   }
 
-  isNewDateFormat(line) {
+  isFormattedDate(line) {
     return line.match(/^(\d{2})\-(\d{2})\-(\d{4})/);
   }
 
-  extractDate(line) {
+  // This is provided here to provide an easy entry point for mocking the current date
+  // thus allowing for predictable test results
+  currentDate() {
+    return new Date();
+  }
+
+  extractDate(line, relativeTo = this.currentDate()): Date {
     if (!this.isDate(line)) {
       return undefined;
     }
 
-    let dateParts = this.isNewDateFormat(line);
-    if (dateParts) {
-      return new Date(`${dateParts[3]}-${dateParts[2]}-${dateParts[1]}`);
+    if (line === 'today') {
+      return relativeTo;
     }
 
-    return new Date(line.replace(/`/g, ""));
+    if (line === 'yesterday') {
+      let yesterday = new Date(relativeTo.valueOf());
+      yesterday.setDate(yesterday.getDate() - 1);
+      return yesterday;
+    }
+
+    let dateParts = this.isFormattedDate(line);
+    return new Date(`${dateParts[3]}-${dateParts[2]}-${dateParts[1]}`);
+  }
+
+  isAmount(line: string) {
+    if (this.isDate(line)) {
+      return false;
+    }
+    return line.trim().replace(/\./g, '').match(/€([+-]) (\d*,?\d*)/);
+  }
+
+  extractAmount(line: string): number {
+    let matches = this.isAmount(line);
+    if (!matches) {
+      return 0;
+    }
+    let [_, sign, amountString] = matches;
+    let amount = Number(amountString.replace(/,/g, '.'));
+    amount = Math.round(amount * 100);
+    if (sign === '-') {
+      return amount * -1;
+    } else {
+      return amount;
+    }
+  }
+
+  isBlank(line: string): boolean {
+    if (!line) {
+      return true;
+    }
+    return line.trim() === "";
+  }
+
+  isDescription(input: string) {
+    return !this.isBlank(input) && !this.isDate(input) && !this.isAmount(input);
   }
 
   isNumber(line) {
@@ -132,25 +191,8 @@ export class AbnAmroImporterService {
     return firstChar === "-" || firstChar === "+" || firstChar === '€';
   }
 
-  extractNumberParts(line) {
-    if (line.substr(0,1) === '€') {
-      line = line.substr(1);
-    }
-    let sign = line.trim().substr(0, 1);
-    let numberString = line
-      .substring(1)
-      .trim()
-      .replace(/\./g, "")
-      .replace(/,/g, ".");
-    let amount = Number(numberString) * 100;
-
-    return {
-      sign: sign,
-      amount: amount
-    };
-  }
-
   isEndOfTransaction(line) {
-    return this.isNumber(line);
+    return this.isDescription(line);
   }
+
 }
