@@ -30,6 +30,13 @@ export class TransactionImporterService {
         endDate
       );
     }
+    if (importType === "abn-amro-bank-old") {
+      return this.abnAmroImporter.convertFromOldBankFormat(
+        input,
+        startDate,
+        endDate
+      );
+    }
     if (importType === "abn-amro-creditcard") {
       return this.abnAmroImporter.convertFromCreditCardFormat(
         input,
