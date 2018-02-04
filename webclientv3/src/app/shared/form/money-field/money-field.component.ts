@@ -64,7 +64,7 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
 
   set value(newValueInCents: number) {
     this.valueInCents = newValueInCents;
-    this.control.setValue(centsToDollars(newValueInCents));
+    this.control.setValue(centsToDollars(newValueInCents), {emitEvent: false}  );
   }
 
   ngOnInit() {
