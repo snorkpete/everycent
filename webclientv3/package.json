@@ -1,11 +1,11 @@
 {
   "name": "everycent",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start-aot": "ng serve --aot",
+    "start:aot": "ng serve --aot",
     "build": "ng build --prod --aot --build-optimizer --base-href /v3/",
     "test": "ng test --sourcemaps=false",
     "lint": "ng lint",
