@@ -8,8 +8,8 @@ import {SinkFundService} from '../sink-fund.service';
 @Component({
   selector: 'ec-add-transfer-form',
   styles: [`
-    mat-select, ec-money-field {
-        margin-top: 36px;
+    mat-form-field, ec-money-field {
+        margin-top: 24px;
     }
 
     div.actions {
@@ -24,6 +24,7 @@ import {SinkFundService} from '../sink-fund.service';
     <h1 mat-dialog-title>Transfer Money</h1>
     <div mat-dialog-content>
         <div fxLayout="column" fxLayoutAlign="space-between" [formGroup]="transfer">
+          <mat-form-field>
               <mat-select placeholder="Transfer From" formControlName="existing_allocation_id">
                   <mat-option [value]="0">
                     Unassigned Money - {{ calculator.unassignedBalance(sinkFund) | ecMoney}}
@@ -32,7 +33,9 @@ import {SinkFundService} from '../sink-fund.service';
                       {{ allocation.name }} ( {{ allocation.current_balance | ecMoney }} )
                   </mat-option>
               </mat-select>
+          </mat-form-field>
 
+          <mat-form-field>
               <mat-select placeholder="Transfer To" formControlName="new_allocation_id">
                   <mat-option [value]="0">
                     Unassigned Money - {{ calculator.unassignedBalance(sinkFund) | ecMoney}}
@@ -41,10 +44,10 @@ import {SinkFundService} from '../sink-fund.service';
                       {{ allocation.name }} - {{ allocation.current_balance | ecMoney}}
                   </mat-option>
               </mat-select>
-
-            <ec-money-field placeholder="Amount" formControlName="amount" fxFlex="1"
-                            [editMode]="true">
-            </ec-money-field>
+          </mat-form-field>
+          <ec-money-field placeholder="Amount" formControlName="amount" fxFlex="1"
+                          [editMode]="true">
+          </ec-money-field>
         </div>
     </div>
     <div mat-dialog-actions>
@@ -79,7 +82,7 @@ export class AddTransferFormComponent implements OnInit {
     this.sinkFundService
         .transfer(this.sinkFund, this.transfer.value)
         .subscribe( sinkFund => {
-          this.sinkFundService.refreshSinkFund();
+          this.sinkFundService.refreshSinkFund(this.sinkFund.id);
           this.dialogRef.close(sinkFund);
         },
           (error) => alert(error)
