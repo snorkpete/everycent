@@ -218,7 +218,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   }
 
   showTransferForm() {
-    let dialogRef = this.dialog.open(AddTransferFormComponent, { width: '300px' });
+    let dialogRef = this.dialog.open(AddTransferFormComponent, { width: '350px' });
     dialogRef.componentInstance.sinkFund = this.sinkFund;
     dialogRef.afterClosed().subscribe(isSaved => {
       if (isSaved) {
