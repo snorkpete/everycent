@@ -25,13 +25,13 @@ export class ApiGateway {
     return this.http.get(fullUrl, options)
                     .do(() => this.loadingIndicator.hide())
                     .map(res => res.json())
-                    .catch(error => {
-                      // TODO: only catch authentication errors
-                      //       when doing this redirect
-                      this.router.navigateByUrl('/login');
-                      this.loadingIndicator.hide();
-                      return Observable.empty();
-                    });
+                    // .catch(error => {
+                    //   // TODO: only catch authentication errors
+                    //   //       when doing this redirect
+                    //   this.router.navigateByUrl('/login');
+                    //   this.loadingIndicator.hide();
+                    //   return Observable.empty();
+                    // });
 
   }
 
