@@ -28,7 +28,17 @@ export class AbnAmroCreditCardImporterService {
         status: 'unpaid',
       }
 
+      let start = new Date(startDate);
+      let end = new Date(endDate);
+      let transactionDate: Date;
+      if (transaction.transaction_date instanceof Date) {
+        transactionDate = transaction.transaction_date;
+      } else {
+        transactionDate = new Date(transaction.transaction_date);
+      }
+
       if (transaction.transaction_date >= startDate && transaction.transaction_date <= endDate) {
+      // if (transactionDate >= start && transactionDate <= end) {
         transactions.push(transaction);
       }
     }
@@ -43,8 +53,14 @@ export class AbnAmroCreditCardImporterService {
     return input.trim().split(/[\n]/);
   }
 
+  // This is provided here to provide an easy entry point for mocking the current date
+  // thus allowing for predictable test results
+  currentDate() {
+    return new Date();
+  }
+
   extractDate(monthAndDay: string): string {
-    let currentYear = new Date().getFullYear();
+    let currentYear = this.currentDate().getFullYear();
     let dateParts = monthAndDay.match(/(\d+) (.+)/);
     let [_, day, month] = dateParts;
     let months = {
