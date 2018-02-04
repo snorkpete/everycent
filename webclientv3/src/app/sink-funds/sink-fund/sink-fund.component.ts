@@ -241,7 +241,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   }
 
   addObligation() {
-    this.sinkFund.sink_fund_allocations.push({ amount: 0, current_balance: 0, target: 0 });
+    this.sinkFund.sink_fund_allocations.push({ amount: 0, current_balance: 0, target: 0, unsaved: true });
   }
 
   ngOnDestroy() {
