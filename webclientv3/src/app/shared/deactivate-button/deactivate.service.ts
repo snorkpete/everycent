@@ -10,6 +10,6 @@ export class DeactivateService {
       return true;
     }
 
-    return item.unsaved || item.status == 'open';
+    return item.unsaved || item.status === 'open';
   }
 }
