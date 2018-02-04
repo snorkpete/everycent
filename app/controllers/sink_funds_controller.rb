@@ -7,6 +7,11 @@ class SinkFundsController < ApplicationController
     respond_with(@sink_funds, SinkFundSerializer)
   end
 
+  def show
+    @sink_fund = BankAccount.sink_funds.where(id: params[:id]).includes(:institution, { :sink_fund_allocations => :transactions }).first
+    respond_with(@sink_fund, SinkFundSerializer)
+  end
+
   def current
     @sink_fund = BankAccount.sink_funds.where(status: 'open').includes(:institution, { :sink_fund_allocations => :transactions }).order(:created_at).last
     respond_with(@sink_fund, SinkFundSerializer)
