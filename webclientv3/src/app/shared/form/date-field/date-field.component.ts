@@ -9,7 +9,7 @@ import {TransactionDateValidatorDirective} from "../../../transactions/transacti
   `],
   template: `
       <mat-form-field *ngIf="editMode; else textDisplay">
-          <input matInput type="date" [(ngModel)]="value" [formControl]="control" class="value"/>
+          <input #input matInput type="date" [value]="value" (input)="value=Date.parse(input.value)" [formControl]="control" class="value"/>
             <mat-error>Date is outside of budget range</mat-error>
       </mat-form-field>
       <ng-template #textDisplay>

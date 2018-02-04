@@ -59,7 +59,6 @@ import {BankAccountData} from "../../bank-accounts/bank-account.model";
       </mat-card-actions>
     </mat-card>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionListComponent implements OnInit {
 
