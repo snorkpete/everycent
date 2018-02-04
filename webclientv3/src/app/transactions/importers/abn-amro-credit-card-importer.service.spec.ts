@@ -40,6 +40,7 @@ GOOGLE *GAMEHOUSE G.CO/HELPPAY# GBR
  `;
 
   it("#convertToTransactions extracts transactions", () => {
+    spyOn(importer, "currentDate").and.returnValue(new Date('2017-12-20'));
     let transactions = importer.convertToTransactions(sample, '2017-12-19', '2017-12-23');
     expect(transactions.length).toEqual(5);
 
