@@ -12,4 +12,5 @@ export interface SinkFundAllocationData {
   current_balance?: number;
   difference?: number;
   deleted?: boolean;
+  unsaved?: boolean;
 }
