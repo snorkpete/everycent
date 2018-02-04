@@ -22,8 +22,8 @@ export class SinkFundService {
     return this._currentSinkFund$.asObservable();
   }
 
-  refreshSinkFund(): void {
-    this.apiGateway.get('/sink_funds/current').subscribe((sinkFund: SinkFundData) => {
+  refreshSinkFund(currentId: number): void {
+    this.apiGateway.get(`/sink_funds/${currentId}`).subscribe((sinkFund: SinkFundData) => {
       this._currentSinkFund$.next(sinkFund);
     });
   }

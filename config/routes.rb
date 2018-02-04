@@ -32,7 +32,7 @@ Rails.application.routes.draw do
   end
 
   resources :account_balances, only: [:index]
-  resources :sink_funds, only: [:index, :update] do
+  resources :sink_funds, only: [:index, :update, :show] do
     collection do
       get 'current'
     end
