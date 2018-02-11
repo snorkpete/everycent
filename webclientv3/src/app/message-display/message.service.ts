@@ -27,11 +27,12 @@ export class MessageService {
     this._messageText = newMessage;
     this._messageType = MessageType.INFO;
 
-    if (timeout) {
-      setTimeout(() => {
-        this.clear();
-      }, timeout);
+    if (!timeout) {
+      timeout = 3000;
     }
+    setTimeout(() => {
+      this.clear();
+    }, timeout);
   }
 
   setErrorMessage(newMessage: string): void {
