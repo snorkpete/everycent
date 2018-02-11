@@ -17,4 +17,13 @@ export class BudgetService {
       budget_id: budgetId
     });
   }
+
+  getBudget(budgetId: number){
+    return this.apiGateway.get(`/budgets/${budgetId}`);
+  }
+
+  getCurrentBudget(){
+    return this.apiGateway.get('/budgets/current')
+                .switchMap(budgetId => this.getBudget(budgetId));
+  }
 }

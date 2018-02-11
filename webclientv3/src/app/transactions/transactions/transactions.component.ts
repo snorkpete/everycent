@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
+import {ActivatedRoute, Router} from "@angular/router";
 import { Subject } from "rxjs/Subject";
 import { MessageService } from "../../message-display/message.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
@@ -26,6 +27,9 @@ import { BudgetData } from "../../budgets/budget.model";
   ],
   template: `
     <mat-card class="main">
+      <mat-card-actions fxLayoutGap="10px" align="end">
+        <button mat-raised-button (click)="goToBudget()">&laquo; View Budget</button>
+      </mat-card-actions>
       <mat-card-content>
         <div fxLayout="column" class="container" fxLayoutGap="20px">
           <div class="header" fxLayout="row" fxLayoutGap="20px" fxFlex="1 0 auto">
@@ -80,7 +84,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private toolbarService: MainToolbarService,
     private messageService: MessageService,
     private dialog: MatDialog,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -150,6 +156,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     });
 
     return dialogRef;
+  }
+
+  goToBudget() {
+    this.router.navigate(['..', 'budgets', this.budget.id], { relativeTo: this.route.parent });
   }
 
   ngOnDestroy(): void {

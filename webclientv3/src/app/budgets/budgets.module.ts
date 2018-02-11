@@ -1,15 +1,19 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
-import { BudgetsRoutingModule } from './budgets-routing.module';
+import {NgModule} from '@angular/core';
+import {SharedModule} from "../shared/shared.module";
 import {BudgetService} from "./budget.service";
+
+import {BudgetsRoutingModule} from './budgets-routing.module';
+import {BudgetsComponent} from './budgets/budgets.component';
+import { BudgetListComponent } from './budget-list/budget-list.component';
+import { BudgetComponent } from './budget/budget.component';
+import { BudgetEditorComponent } from './budget-editor/budget-editor.component';
 
 @NgModule({
   imports: [
-    CommonModule,
-    BudgetsRoutingModule
+    SharedModule,
+    BudgetsRoutingModule,
   ],
-  declarations: [],
+  declarations: [BudgetsComponent, BudgetListComponent, BudgetComponent, BudgetEditorComponent],
   providers: [
     BudgetService,
   ]
