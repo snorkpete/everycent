@@ -55,6 +55,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   set items(newItems: any[]) {
     this._items = newItems;
     this.updateGroupings();
+    this.value = this.value;
   }
 
   @Input() get groupBy(): string {
