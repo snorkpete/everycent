@@ -15,6 +15,9 @@ export class HighlightDeletedDirective {
 
   @HostBinding('class.unpaid')
   get isUnpaid() {
+    if (this.item.status === undefined) {
+      return false;
+    }
     return this.item.status !== 'paid';
   }
 
