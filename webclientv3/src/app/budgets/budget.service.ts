@@ -22,11 +22,11 @@ export class BudgetService {
     return this.apiGateway.get("/allocation_categories");
   }
 
-  getBudget(budgetId: number){
+  getBudget(budgetId: number) {
     return this.apiGateway.get(`/budgets/${budgetId}`);
   }
 
-  getCurrentBudget(){
+  getCurrentBudget() {
     return this.apiGateway.get('/budgets/current')
                 .switchMap(budgetId => this.getBudget(budgetId));
   }
