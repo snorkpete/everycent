@@ -1,6 +1,6 @@
 import {Component, forwardRef, Input, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import * as _ from 'lodash';
+import {groupBy} from 'lodash';
 
 @Component({
   selector: 'ec-list-field',
@@ -131,7 +131,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
 
     let groupByIdFieldName = `${this.groupBy}_id`;
     let groupByFieldName = this.groupBy || 'none'; /*? groupByIdFieldName */
-    let itemsByGroupId = _.groupBy(this.items, groupByIdFieldName); /*? itemsByGroupId */
+    let itemsByGroupId = groupBy(this.items, groupByIdFieldName); /*? itemsByGroupId */
     this.groups = Object.keys(itemsByGroupId).map(groupId => {
       let group: any = { id: groupId };
       let items = itemsByGroupId[groupId];
