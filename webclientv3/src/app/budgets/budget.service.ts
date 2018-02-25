@@ -30,4 +30,8 @@ export class BudgetService {
     return this.apiGateway.get('/budgets/current')
                 .switchMap(budgetId => this.getBudget(budgetId));
   }
+
+  saveBudget(budget: BudgetData) {
+    return this.apiGateway.put(`/budgets/${budget.id}`, budget);
+  }
 }

@@ -77,8 +77,13 @@ export class BudgetComponent implements OnInit, OnDestroy {
   }
 
   saveBudget() {
-    //TODO: to implement
-    this.messageService.setMessage("Budget saved.");
+    this.budgetService
+      .saveBudget(this.budget)
+      .subscribe(budget => {
+        this.budget = budget;
+        this.messageService.setMessage("Budget saved.");
+        this.editMode = false;
+      });
   }
 
   cancel() {
