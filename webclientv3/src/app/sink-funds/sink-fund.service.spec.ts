@@ -41,10 +41,11 @@ describe('SinkFundService', () => {
       let response = SampleSinkFundData;
       let spy = spyOn(apiGateway, 'get').and.returnValue(Observable.of(response));
 
-      sinkFundService.refreshSinkFund();
+      let sinkFundID = 5;
+      sinkFundService.refreshSinkFund(sinkFundID);
 
       expect(spy.calls.any()).toBeTruthy('calls the apiGateway');
-      expect(spy.calls.mostRecent().args[0]).toEqual('/sink_funds/current');
+      expect(spy.calls.mostRecent().args[0]).toEqual(`/sink_funds/${sinkFundID}`);
       sinkFundService.getCurrent().subscribe(sinkFund => {
         expect(sinkFund).toEqual(SampleSinkFundData);
       });
