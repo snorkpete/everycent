@@ -18,7 +18,7 @@ import {BudgetService} from "../../budget.service";
             <td>{{category.name}}</td>
             <td class="right"><ec-money-field [value]="totalAmountFor(category)"></ec-money-field></td>
             <td class="right"><ec-money-field [value]="totalSpentFor(category)"></ec-money-field></td>
-            <td class="right"><ec-money-field [value]="totalRemainingFor(category)"></ec-money-field></td>
+            <td class="right"><ec-money-field [value]="totalRemainingFor(category)" [highlightPositive]="true"></ec-money-field></td>
             <td></td>
             <td></td>
           </tr>
@@ -39,15 +39,15 @@ import {BudgetService} from "../../budget.service";
           </tr>
         </ng-container>
       </tbody>
-      <tfoot ec-allocation-list-footer></tfoot>
+      <tfoot ec-allocation-list-footer [budget]="budget"></tfoot>
     </table>
-    <ec-allocation-list-summary>
+    <ec-allocation-list-summary [budget]="budget">
     </ec-allocation-list-summary>
   `,
   styles: [`
     .heading {
       font-weight: bold;
-      font-size: 20px;
+      font-size: 16px;
       border-top: 3px solid blue;
       border-bottom: 2px solid blue;
     }
