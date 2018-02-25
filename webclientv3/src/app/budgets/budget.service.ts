@@ -34,4 +34,10 @@ export class BudgetService {
   saveBudget(budget: BudgetData) {
     return this.apiGateway.put(`/budgets/${budget.id}`, budget);
   }
+
+  transactionsForAllocation(allocation: AllocationData) {
+    return this.apiGateway
+      .get('/transactions/by_allocation',
+      { allocation_id: allocation.id });
+  }
 }
