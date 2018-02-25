@@ -1,11 +1,10 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MatSelect} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
-import { Subject } from "rxjs/Subject";
-import { SinkFundData } from "./sink-fund-data.model";
+import {Subject} from "rxjs/Subject";
+import {MainToolbarService} from "../shared/main-toolbar/main-toolbar.service";
+import {SinkFundData} from "./sink-fund-data.model";
 import {SinkFundSelectorComponent} from "./sink-fund-selector/sink-fund-selector.component";
-import { SinkFundService } from "./sink-fund.service";
-import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
+import {SinkFundService} from "./sink-fund.service";
 
 @Component({
   selector: "ec-sink-funds",
@@ -42,6 +41,7 @@ export class SinkFundsComponent implements OnInit, OnDestroy {
     });
     this.activatedRoute.paramMap
       .map(param => Number(param.get("sink_fund_id")))
+      .filter(sinkFundId => sinkFundId > 0)
       .takeUntil(this.onDestroy$)
       .subscribe(sinkFundId => this.selectSinkFund(sinkFundId));
 

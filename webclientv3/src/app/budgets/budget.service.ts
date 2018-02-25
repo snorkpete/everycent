@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ApiGateway } from "../../api/api-gateway.service";
 import { AllocationData } from "../transactions/allocation-data.model";
+import {AllocationCategoryData} from "./allocation.model";
 import { BudgetData } from "./budget.model";
 import { Observable } from "rxjs/Observable";
 
@@ -31,13 +32,24 @@ export class BudgetService {
                 .switchMap(budgetId => this.getBudget(budgetId));
   }
 
+  createBudget(budget: BudgetData) {
+    return this.apiGateway.post('/budgets', budget);
+  }
+
   saveBudget(budget: BudgetData) {
     return this.apiGateway.put(`/budgets/${budget.id}`, budget);
   }
 
-  transactionsForAllocation(allocation: AllocationData) {
-    return this.apiGateway
-      .get('/transactions/by_allocation',
-      { allocation_id: allocation.id });
+  copyBudget(budget: BudgetData) {
+    return this.apiGateway.put(`/budgets/${budget.id}/copy`);
   }
+
+  closeBudget(budget: BudgetData) {
+    return this.apiGateway.put(`/budgets/${budget.id}/close`);
+  }
+
+  reopenLastBudget() {
+    return this.apiGateway.put('/budgets/reopen_last_budget');
+  }
+
 }

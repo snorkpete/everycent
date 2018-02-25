@@ -1,4 +1,5 @@
 import { NgModule } from "@angular/core";
+import {SharedTransactionsModule} from "../shared-transactions/shared-transactions.module";
 import { SharedModule } from "../shared/shared.module";
 import {SinkFundsModule} from "../sink-funds/sink-funds.module";
 import { BudgetService } from "./budget.service";
@@ -20,7 +21,7 @@ import { AllocationListFooterComponent } from "./budget-editor/allocations/alloc
 
 @NgModule({
   //TODO: to extract shared transaction module
-  imports: [SharedModule, BudgetsRoutingModule, SinkFundsModule],
+  imports: [SharedModule, BudgetsRoutingModule, SharedTransactionsModule],
   declarations: [
     BudgetsComponent,
     BudgetListComponent,

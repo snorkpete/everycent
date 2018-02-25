@@ -1,4 +1,5 @@
 import {NgModule} from '@angular/core';
+import {SharedTransactionsModule} from "../shared-transactions/shared-transactions.module";
 import {SinkFundsRoutingModule} from './sink-funds-routing.module';
 import {SinkFundsComponent} from './sink-funds.component';
 import {SharedModule} from '../shared/shared.module';
@@ -12,10 +13,8 @@ import { SinkFundSelectorComponent } from './sink-fund-selector/sink-fund-select
 @NgModule({
   imports: [
     SharedModule,
+    SharedTransactionsModule,
     SinkFundsRoutingModule,
-
-    // TODO: not sure i like this - might want to create a shared transactions module
-    TransactionsModule,
   ],
   declarations: [
     SinkFundsComponent,
