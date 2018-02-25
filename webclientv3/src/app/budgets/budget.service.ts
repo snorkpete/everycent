@@ -18,6 +18,10 @@ export class BudgetService {
     });
   }
 
+  getAllocationCategories(): Observable<AllocationCategoryData[]> {
+    return this.apiGateway.get("/allocation_categories");
+  }
+
   getBudget(budgetId: number){
     return this.apiGateway.get(`/budgets/${budgetId}`);
   }

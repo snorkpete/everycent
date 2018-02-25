@@ -1,4 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TestConfigModule} from "../../../../../test/test-config.module";
+import {BankAccountService} from "../../../bank-accounts/bank-account.service";
+import {BudgetsModule} from "../../budgets.module";
 
 import { IncomeListComponent } from './income-list.component';
 
@@ -8,7 +11,14 @@ describe('IncomeListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ IncomeListComponent ]
+      imports: [
+        TestConfigModule,
+        BudgetsModule,
+      ],
+      // declarations: [ IncomeListComponent ]
+      providers: [
+        BankAccountService,
+      ]
     })
     .compileComponents();
   }));

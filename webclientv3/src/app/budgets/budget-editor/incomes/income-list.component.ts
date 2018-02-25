@@ -1,24 +1,26 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BankAccountData} from "../../../bank-accounts/bank-account.model";
 import {BankAccountService} from "../../../bank-accounts/bank-account.service";
+import {BudgetData} from "../../budget.model";
 import {IncomeData} from "../../income.model";
 
 @Component({
   selector: 'ec-income-list',
   template: `
-    <table class="table table-bordered rounded">
+    <h1>Incomes</h1>
+    <table class="table">
       <thead ec-income-list-header>
       </thead>
       <tbody>
         <tr ec-income-list-row
-            *ngFor="let income of incomes"
+            *ngFor="let income of budget.incomes"
             [income]="income"
             [editMode]="editMode"
             [bankAccounts]="bankAccounts"
             [ecHighlightDeletedFor]="income">
         </tr>
       </tbody>
-      <tfoot ec-income-list-footer [incomes]="incomes">
+      <tfoot ec-income-list-footer [incomes]="budget.incomes">
       </tfoot>
     </table>
   `,
@@ -26,7 +28,7 @@ import {IncomeData} from "../../income.model";
 })
 export class IncomeListComponent implements OnInit {
 
-  @Input() incomes: IncomeData[];
+  @Input() budget: BudgetData = { incomes: [], allocations: []};
   @Input() editMode: boolean;
   bankAccounts: BankAccountData[] = [];
 
@@ -39,4 +41,14 @@ export class IncomeListComponent implements OnInit {
       .subscribe( bankAccounts => this.bankAccounts = bankAccounts );
   }
 
+  addNewIncome(): void {
+    let newIncome: IncomeData = {
+      id: 0,
+      name: '',
+      amount: 0,
+      budget_id: this.budget.id,
+      bank_account_id: 0
+    };
+    this.budget.incomes.push(newIncome);
+  }
 }

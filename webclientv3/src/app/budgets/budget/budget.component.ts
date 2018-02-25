@@ -9,7 +9,7 @@ import { BudgetService } from "../budget.service";
 @Component({
   selector: "ec-budget",
   template: `
-    <mat-card>
+    <mat-card class="main">
       <mat-card-actions fxLayoutGap="10px" align="end">
         <button mat-raised-button (click)="goToBudgetList()">&laquo; Back to Budget List</button>
         <button mat-raised-button (click)="goToTransactions()">View Transactions</button>

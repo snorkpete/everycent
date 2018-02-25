@@ -30,7 +30,7 @@ import {IncomeData} from "../../income.model";
 })
 export class IncomeListRowComponent implements OnInit {
 
-  @Input() income: IncomeData;
+  @Input() income: IncomeData = {};
   @Input() editMode: boolean;
   @Input() bankAccounts: BankAccountData[] = [];
 

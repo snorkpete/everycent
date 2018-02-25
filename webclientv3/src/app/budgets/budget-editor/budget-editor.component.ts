@@ -6,19 +6,16 @@ import {BudgetData} from "../budget.model";
   template: `
     <mat-card>
       <mat-card-content>
-        <ec-income-list [incomes]="budget.incomes" [editMode]="editMode"></ec-income-list>
-        <!--<ec-allocation-list [allocations]="budget.allocations"></ec-allocation-list>-->
+        <ec-income-list [budget]="budget" [editMode]="editMode"></ec-income-list>
+        <ec-allocation-list [budget]="budget" [editMode]="editMode"></ec-allocation-list>
       </mat-card-content>
     </mat-card>
-    <p>
-      budget-editor works!
-    </p>
   `,
   styles: []
 })
 export class BudgetEditorComponent implements OnInit {
 
-  @Input() budget: BudgetData;
+  @Input() budget: BudgetData = { incomes: [], allocations: [] };
   @Input() editMode = false;
   constructor() { }
 

@@ -1,24 +1,24 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import {SharedModule} from "../../../shared/shared.module";
 
-import { IncomeListFooterComponent } from './income-list-footer.component';
+import { AllocationCategoryRowComponent } from './allocation-category-row.component';
 
-describe('IncomeListFooterComponent', () => {
-  let component: IncomeListFooterComponent;
-  let fixture: ComponentFixture<IncomeListFooterComponent>;
+describe('AllocationCategoryRowComponent', () => {
+  let component: AllocationCategoryRowComponent;
+  let fixture: ComponentFixture<AllocationCategoryRowComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
         SharedModule,
       ],
-      declarations: [ IncomeListFooterComponent ]
+      declarations: [ AllocationCategoryRowComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(IncomeListFooterComponent);
+    fixture = TestBed.createComponent(AllocationCategoryRowComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
