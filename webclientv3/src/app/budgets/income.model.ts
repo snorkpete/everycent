@@ -8,7 +8,7 @@ export interface IncomeData {
   budget_id?: number;
   budget?: BudgetData;
   bank_account_id?: number;
-  bankAccount: BankAccountData;
+  bankAccount?: BankAccountData;
   comment?: string;
   deleted?: boolean;
 }

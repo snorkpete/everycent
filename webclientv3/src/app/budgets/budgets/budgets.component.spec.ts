@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import {TestConfigModule} from "../../../../test/test-config.module";
 import {SharedModule} from "../../shared/shared.module";
+import {BudgetsModule} from "../budgets.module";
 
 import { BudgetsComponent } from './budgets.component';
 
@@ -12,11 +13,10 @@ describe('BudgetsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         TestConfigModule,
+        BudgetsModule,
         SharedModule.forRoot(),
       ],
-      declarations: [ BudgetsComponent ]
     })
-    .compileComponents();
   }));
 
   beforeEach(() => {

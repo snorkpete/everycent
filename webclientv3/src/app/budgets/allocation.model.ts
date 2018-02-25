@@ -21,3 +21,8 @@ export interface AllocationData {
   comment?: string;
 }
 
+export interface AllocationsByCategory {
+  id?: number;
+  name?: string;
+  allocations?: AllocationData[];
+}
