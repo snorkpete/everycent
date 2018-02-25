@@ -10,21 +10,26 @@ import {BudgetData} from "../../budget.model";
     <table class="table">
       <tbody>
       <tr>
-        <td class="right">Total Discretionary Amount</td>
+        <td class="right highlight">Total Discretionary Amount</td>
         <td class="right">{{ totalDiscretionaryAmount() | ecMoney }}</td>
       </tr>
       <tr>
-        <td class="right"> {{wife}}'s Amount</td>
+        <td class="right highlight"> {{wife}}'s Amount</td>
         <td class="right">{{ totalDiscretionaryAmount() / 2 | ecMoney }}</td>
       </tr>
       <tr>
-        <td class="right"> {{husband}}'s Amount</td>
+        <td class="right highlight"> {{husband}}'s Amount</td>
         <td class="right">{{ totalDiscretionaryAmount() / 2 | ecMoney }}</td>
       </tr>
       </tbody>
     </table>
   `,
-  styles: []
+  styles: [`
+    .highlight {
+      font-weight: bold;
+      font-size: 14px;
+    }
+  `]
 })
 export class AllocationListSummaryComponent implements OnInit {
 
