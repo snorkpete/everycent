@@ -1,10 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialog, MatDialogRef} from "@angular/material";
+import {SharedTransactionService} from "../../../shared-transactions/shared-transaction.service";
 import {Icon} from "../../../shared/ec-icon/icon.type";
-import {CompactTransactionListComponent} from "../../../transactions/compact-transaction-list/compact-transaction-list.component";
-import {TransactionService} from "../../../transactions/transaction.service";
+import {CompactTransactionListComponent} from "../../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
 import {AllocationData} from "../../allocation.model";
-import {BudgetService} from "../../budget.service";
 
 @Component({ /* tslint:disable component-selector */
   selector: '[ec-allocation-category-row]',
@@ -52,7 +51,7 @@ export class AllocationCategoryRowComponent implements OnInit {
   @Input() editMode = false;
 
   constructor(
-    private budgetService: BudgetService,
+    private transactionService: SharedTransactionService,
     private dialog: MatDialog
   ) { }
 
@@ -61,8 +60,8 @@ export class AllocationCategoryRowComponent implements OnInit {
 
   showTransactionsFor(allocation: AllocationData) {
     let dialogRef: MatDialogRef<CompactTransactionListComponent>;
-    this.budgetService
-      .transactionsForAllocation(allocation)
+    this.transactionService
+      .transactionsForAllocation(allocation.id)
       .subscribe(transactions => {
         dialogRef = this.dialog.open(CompactTransactionListComponent, { width: '500px' });
         dialogRef.componentInstance.transactions = transactions;

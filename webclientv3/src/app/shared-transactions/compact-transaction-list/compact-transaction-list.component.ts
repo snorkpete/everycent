@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MatDialogRef} from '@angular/material/dialog';
 import {total} from "../../util/total";
-import {TransactionData} from '../transaction-data.model';
+import {TransactionData} from '../../transactions/transaction-data.model';
 
 @Component({
   selector: 'ec-compact-transaction-list',
@@ -42,6 +42,7 @@ import {TransactionData} from '../transaction-data.model';
     .total {
       size: 18px;
       font-weight: bold;
+      border-top: 2px solid black;
     }
   `]
 })

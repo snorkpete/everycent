@@ -1,18 +1,17 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {SinkFundData} from '../sink-fund-data.model';
 import {ObservableMedia} from '@angular/flex-layout';
-import {Subscription} from 'rxjs/Subscription';
-import {SinkFundCalculator} from '../sink-fund-calculator.service';
-import {SinkFundService} from '../sink-fund.service';
-import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.component';
-import {Icon} from '../../shared/ec-icon/icon.type';
-import {TransactionService} from '../../transactions/transaction.service';
-import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
-import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
-import {MatDialog} from "@angular/material/dialog";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {MatDialogRef} from "@angular/material/dialog";
-import {CompactTransactionListComponent} from "../../transactions/compact-transaction-list/compact-transaction-list.component";
+import {Subscription} from 'rxjs/Subscription';
+import {SharedTransactionService} from "../../shared-transactions/shared-transaction.service";
+import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
+import {Icon} from '../../shared/ec-icon/icon.type';
+import {CompactTransactionListComponent} from "../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
+import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.component';
+import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
+import {SinkFundCalculator} from '../sink-fund-calculator.service';
+import {SinkFundData} from '../sink-fund-data.model';
+import {SinkFundService} from '../sink-fund.service';
 
 @Component({
   selector: 'ec-sink-fund',
@@ -181,7 +180,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   constructor(
     private media: ObservableMedia,
     private sinkFundService: SinkFundService,
-    private transactionService: TransactionService,
+    private transactionService: SharedTransactionService,
     private dialog: MatDialog,
     private snackbar: MatSnackBar,
     public deactivateService: DeactivateService

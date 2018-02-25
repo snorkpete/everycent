@@ -14,11 +14,6 @@ export class TransactionService {
   ) { }
 
 
-  getTransactionsForSinkFundAllocation(sink_fund_allocation_id: number): Observable<TransactionData[]> {
-    return this.apiGateway
-          .get('/transactions/by_sink_fund_allocation', {sink_fund_allocation_id});
-  }
-
   getTransactions(searchParams: TransactionSearchParams = {}): Observable<TransactionData[]> {
     // remove unnecessary params
     let urlParams = Object.assign({no_bank_account: true}, searchParams);
