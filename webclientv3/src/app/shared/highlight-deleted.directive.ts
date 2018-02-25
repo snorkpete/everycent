@@ -1,4 +1,4 @@
-import {Directive, ElementRef, HostBinding, Input, Renderer, Renderer2} from '@angular/core';
+import {Directive, HostBinding, Input} from '@angular/core';
 
 @Directive({
   selector: '[ecHighlightDeletedFor]',
@@ -18,6 +18,13 @@ export class HighlightDeletedDirective {
     if (this.item.status === undefined) {
       return false;
     }
+
+    // explicitly skip open items -
+    // this is used in sink funds to show open sink fund allocations
+    if (this.item.status === 'open' || this.item.status === 'closed') {
+      return false;
+    }
+
     return this.item.status !== 'paid';
   }
 
