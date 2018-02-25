@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import {MatSnackBar} from "@angular/material";
 
 export enum MessageType {
   NONE,
@@ -13,7 +14,9 @@ export class MessageService {
   private _messageText = '';
   private _messageType = MessageType.NONE;
 
-  constructor() { }
+  constructor(
+    private snackbar: MatSnackBar
+  ) { }
 
   getMessage(): string {
     return this._messageText;
@@ -33,11 +36,14 @@ export class MessageService {
     setTimeout(() => {
       this.clear();
     }, timeout);
+
+    this.snackbar.open(newMessage, null, {duration: 3000});
   }
 
   setErrorMessage(newMessage: string): void {
     this._messageText = newMessage;
     this._messageType = MessageType.ERROR;
+    this.snackbar.open(newMessage, null, {duration: 3000});
   }
 
   clear(): void {
