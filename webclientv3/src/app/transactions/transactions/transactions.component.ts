@@ -29,6 +29,7 @@ import { BudgetData } from "../../budgets/budget.model";
     <mat-card class="main">
       <mat-card-actions fxLayoutGap="10px" align="end">
         <button mat-raised-button (click)="goToBudget()">&laquo; View Budget</button>
+        <button mat-raised-button (click)="goToAccountBalances()">&laquo; View Balances</button>
       </mat-card-actions>
       <mat-card-content>
         <div fxLayout="column" class="container" fxLayoutGap="20px">
@@ -160,6 +161,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   goToBudget() {
     this.router.navigate(['..', 'budgets', this.budget.id], { relativeTo: this.route.parent });
+  }
+
+  goToAccountBalances() {
+    this.router.navigateByUrl('/account-balances');
   }
 
   ngOnDestroy(): void {
