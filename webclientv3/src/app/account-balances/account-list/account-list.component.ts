@@ -28,7 +28,10 @@ import {total} from "../../util/total";
           </thead>
           <tbody>
             <tr *ngFor="let bankAccount of bankAccounts">
-              <td> {{ bankAccount?.name }} </td>
+              <td>
+                <a [routerLink]="['..', 'transactions', {bank_account_id: bankAccount.id }]">
+                  {{ bankAccount?.name }}</a>
+              </td>
               <td class="hidden-xs"> {{ bankAccount?.institution?.name }} </td>
               <td class="hidden-xs"> {{ bankAccount?.account_type }} </td>
               <td class="hidden-xs"> {{ bankAccount?.account_category }} </td>
