@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+import {Observable} from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { MessageService } from "../../message-display/message.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
@@ -40,9 +41,26 @@ export class BudgetComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.activatedRoute.paramMap
-      .takeUntil(this.componentDestroyed$)
-      .map(paramMap => Number(paramMap.get("id")))
+    let idParam$ = this.activatedRoute.paramMap
+                      .takeUntil(this.componentDestroyed$)
+                      .map(paramMap => paramMap.get("id"));
+
+   // check for the 'current' route
+   idParam$
+     .filter(id => id === 'current')
+     .switchMap(() => this.budgetService.getCurrentBudgetId())
+     .subscribe((budgetId: number) => {
+       this.router.navigateByUrl(`/budgets/${budgetId}`);
+     });
+
+    // for all other routes, load the budget
+    this.loadBudgetForId(idParam$);
+  }
+
+  private loadBudgetForId(idParam$: Observable<string>) {
+    idParam$
+      .filter(id => id !== 'current')
+      .map(idString => Number(idString))
       .switchMap(budgetId => this.budgetService.getBudget(budgetId))
       .subscribe(budget => {
         this.budget = budget;

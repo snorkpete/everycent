@@ -21,6 +21,10 @@ import {Icon} from '../ec-icon/icon.type';
         Home
       </ec-menu-item>
 
+      <ec-menu-item [icon]="Icon.BUDGETS" route="/budgets/current">
+        Current Budget
+      </ec-menu-item>
+
       <ec-menu-item [icon]="Icon.BUDGETS" route="/budgets">
         Budgets
       </ec-menu-item>

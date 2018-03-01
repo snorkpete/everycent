@@ -27,9 +27,9 @@ export class BudgetService {
     return this.apiGateway.get(`/budgets/${budgetId}`);
   }
 
-  getCurrentBudget() {
-    return this.apiGateway.get('/budgets/current')
-                .switchMap(budgetId => this.getBudget(budgetId));
+  getCurrentBudgetId() {
+    return this.apiGateway.get('/budgets/current').map(data => data.budget_id);
+                // .switchMap(budgetId => this.getBudget(budgetId));
   }
 
   createBudget(budget: BudgetData) {
