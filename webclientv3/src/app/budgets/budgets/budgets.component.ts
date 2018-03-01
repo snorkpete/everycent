@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import {MatDialog} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
 import {MessageService} from "../../message-display/message.service";
+import {ConfirmationService} from "../../shared/confirmation.service";
+import {ConfirmationComponent} from "../../shared/confirmation/confirmation.component";
 import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
 import {BudgetData} from "../budget.model";
 import {BudgetService} from "../budget.service";
@@ -34,12 +37,16 @@ export class BudgetsComponent implements OnInit {
     private budgetService: BudgetService,
     private messageService: MessageService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private confirmation: ConfirmationService
   ) { }
 
   ngOnInit() {
     this.toolbar.setHeading('Budgets');
+    this.refresh();
+  }
 
+  refresh() {
     this.budgetService.getBudgets().subscribe(budgets => this.budgets = budgets );
   }
 
@@ -49,8 +56,18 @@ export class BudgetsComponent implements OnInit {
   }
 
   reopenLastBudget() {
-    //TODO: to implement
-    this.messageService.setMessage("Reopen not yet implemented - use old version for now");
+    this.confirmation.ask({
+      title: 'Reopen Last Budget',
+      question: 'Are you sure you want to open the last closed budget?',
+      emitNegativeAnswers: false
+    })
+    .subscribe(() => {
+      this.messageService.setMessage("Reopening last budget...");
+      this.budgetService.reopenLastBudget().subscribe(() => {
+        this.messageService.setMessage("Last Budget re-opened.");
+        this.refresh();
+      });
+    });
   }
 
   goToBudget(budget: BudgetData) {
@@ -58,12 +75,34 @@ export class BudgetsComponent implements OnInit {
   }
 
   closeBudget(budget: BudgetData) {
-    //TODO: to implement
-    this.messageService.setMessage("Close not yet implemented");
+    this.confirmation.ask({
+      title: 'Close Budget Period?',
+      question: 'Are you ready to close off this budget?',
+      emitNegativeAnswers: false
+    }).subscribe(() => {
+      this.messageService.setMessage("Closing....");
+      this.budgetService.closeBudget(budget).subscribe(() => {
+        this.messageService.setMessage("Budget closed.");
+        this.refresh();
+      }, () => {
+        this.messageService.setErrorMessage("Budget NOT closed.");
+      });
+    });
   }
 
   copyBudget(budget: BudgetData) {
-    //TODO: to implement
-    this.messageService.setMessage("Copy not yet implemented");
+    this.confirmation.ask({
+      title: 'Copy Budget?',
+      question: 'Are you sure you want to COPY this budget?',
+      emitNegativeAnswers: false
+    }).subscribe(() => {
+      this.messageService.setMessage("Copying...");
+      this.budgetService.copyBudget(budget).subscribe(() => {
+        this.messageService.setMessage("Budget copied.");
+        this.refresh();
+      }, () => {
+        this.messageService.setErrorMessage("Budget NOT copied.");
+      });
+    });
   }
 }
