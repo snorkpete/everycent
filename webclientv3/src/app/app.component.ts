@@ -10,12 +10,12 @@ import {Component, OnInit} from '@angular/core';
   `],
   template: `
     <div fxLayout="column" fxFlex>
-       <ec-main-toolbar (openMenu)="sideNav.open()"> </ec-main-toolbar>
+       <ec-main-toolbar (openMenu)="sideNav.toggle()"> </ec-main-toolbar>
 
          <mat-sidenav-container fxFlex class="main">
 
-           <mat-sidenav #sideNav opened="false" mode="overlay">
-             <ec-menu (menuSelect)="sideNav.close()"></ec-menu>
+           <mat-sidenav #sideNav opened="false" mode="side">
+             <ec-menu (menuSelect)="onMenuSelect()"></ec-menu>
            </mat-sidenav>
 
            <ec-loading-indicator></ec-loading-indicator>
@@ -33,4 +33,9 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
   }
+
+  onMenuSelect() {
+
+  }
+
 }
