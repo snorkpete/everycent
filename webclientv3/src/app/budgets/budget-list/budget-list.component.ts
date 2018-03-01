@@ -10,8 +10,8 @@ import {BudgetData} from "../budget.model";
           <h1 matLine> {{budget.name}} </h1>
           <div matLine fxFlexLayout="row" fxLayoutGap="10px" fxLayoutAlign="end">
             <button mat-raised-button color="primary" (click)="select.emit(budget)">View</button>
-            <button mat-raised-button color="accent" (click)="copy.emit(budget)">Copy</button>
-            <button mat-raised-button color="warn" (click)="close.emit(budget)">Close</button>
+            <button *ngIf="canCopy(budget)" mat-raised-button color="accent" (click)="copy.emit(budget)">Copy</button>
+            <button *ngIf="canClose(budget)" mat-raised-button color="warn" (click)="close.emit(budget)">Close</button>
           </div>
         </mat-list-item>
         <mat-divider></mat-divider>
@@ -32,4 +32,12 @@ export class BudgetListComponent implements OnInit {
   ngOnInit() {
   }
 
+  canCopy(budget: BudgetData): boolean {
+    const firstBudget = this.budgets[0];
+    return firstBudget && firstBudget.id === budget.id;
+  }
+
+  canClose(budget: BudgetData): boolean {
+    return budget.status === 'open';
+  }
 }
