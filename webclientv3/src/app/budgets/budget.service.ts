@@ -49,7 +49,7 @@ export class BudgetService {
   }
 
   reopenLastBudget() {
-    return this.apiGateway.put('/budgets/reopen_last_budget');
+    return this.apiGateway.post('/budgets/reopen_last_budget');
   }
 
 }
