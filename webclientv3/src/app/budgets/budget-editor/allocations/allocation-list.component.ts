@@ -26,6 +26,7 @@ import {BudgetService} from "../../budget.service";
               *ngFor="let allocation of category.allocations; trackBy: trackAllocation"
               [allocation]="allocation"
               [editMode]="editMode"
+              [ecHighlightDeletedFor]="allocation"
           >
           </tr>
           <tr>
