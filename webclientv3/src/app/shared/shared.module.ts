@@ -2,6 +2,7 @@ import {CommonModule} from '@angular/common';
 import {ModuleWithProviders, NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
+import {ConfirmationService} from "./confirmation.service";
 
 import {EcMaterialModule} from "./ec-material/ec-material.module";
 
@@ -27,6 +28,7 @@ import {MoneyPipe} from './money.pipe';
 import { PaidFieldComponent } from './form/paid-field/paid-field.component';
 import { ListFieldComponent } from './form/list-field/list-field.component';
 import {SettingsService} from "./settings.service";
+import { ConfirmationComponent } from './confirmation/confirmation.component';
 
 @NgModule({
   imports: [
@@ -54,6 +56,10 @@ import {SettingsService} from "./settings.service";
     MoneyPipe,
     PaidFieldComponent,
     TextFieldComponent,
+    ConfirmationComponent,
+  ],
+  entryComponents: [
+    ConfirmationComponent,
   ],
   exports: [
     CommonModule,
@@ -86,6 +92,7 @@ export class SharedModule {
     return {
       ngModule: SharedModule,
       providers: [
+        ConfirmationService,
         DeactivateService,
         LoadingIndicator,
         MainToolbarService,
