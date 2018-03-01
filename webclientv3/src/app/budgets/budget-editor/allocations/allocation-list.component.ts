@@ -124,11 +124,12 @@ export class AllocationListComponent implements OnInit {
 
   addAllocation(category: AllocationsByCategory) {
     const newAllocation: AllocationData = {
-      id: 0,
+      id: null,
       name: '',
       amount: 0,
       spent: 0,
       budget_id: this.budget.id,
+      allocation_category_id: category.id,
     };
     this.budget.allocations.push(newAllocation);
     category.allocations.push(newAllocation);
