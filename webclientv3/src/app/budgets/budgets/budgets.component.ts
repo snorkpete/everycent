@@ -11,7 +11,7 @@ import {BudgetService} from "../budget.service";
 @Component({
   selector: 'ec-budgets',
   template: `
-    <mat-card>
+    <mat-card class="main">
       <mat-card-title>Budgets</mat-card-title>
       <mat-card-content>
         <ec-budget-list [budgets]="budgets"
