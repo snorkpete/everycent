@@ -14,7 +14,7 @@ import {Component, OnInit} from '@angular/core';
 
          <mat-sidenav-container fxFlex class="main">
 
-           <mat-sidenav #sideNav opened="false" mode="side">
+           <mat-sidenav #sideNav [opened]="true" mode="side">
              <ec-menu (menuSelect)="onMenuSelect()"></ec-menu>
            </mat-sidenav>
 
