@@ -18,6 +18,7 @@ import { AllocationListHeaderComponent } from "./budget-editor/allocations/alloc
 import { AllocationCategoryRowComponent } from "./budget-editor/allocations/allocation-category-row.component";
 import { AllocationListSummaryComponent } from "./budget-editor/allocations/allocation-list-summary.component";
 import { AllocationListFooterComponent } from "./budget-editor/allocations/allocation-list-footer.component";
+import { FutureBudgetsComponent } from './future-budgets/future-budgets.component';
 
 @NgModule({
   //TODO: to extract shared transaction module
@@ -35,7 +36,8 @@ import { AllocationListFooterComponent } from "./budget-editor/allocations/alloc
     AllocationListHeaderComponent,
     AllocationCategoryRowComponent,
     AllocationListSummaryComponent,
-    AllocationListFooterComponent
+    AllocationListFooterComponent,
+    FutureBudgetsComponent
   ],
   providers: [BudgetService]
 })
