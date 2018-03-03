@@ -13,7 +13,7 @@ import {Component, Input, OnInit} from '@angular/core';
   template: `
       <mat-divider></mat-divider>
       <mat-list-item [routerLink]="route" routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: route == '/' }">
+                    [routerLinkActiveOptions]="{ exact: route == '/' || route == '/future' }">
           <ec-icon [icon]="icon"></ec-icon>
           <ng-content></ng-content>
       </mat-list-item>
@@ -24,6 +24,7 @@ export class MenuItemComponent implements OnInit {
 
   @Input() icon = '';
   @Input() route = '';
+  @Input() exactRoute = false;
 
   constructor() { }
 
@@ -33,6 +34,12 @@ export class MenuItemComponent implements OnInit {
   linkActiveOptions() {
     return {
        exact: this.route === '/'
+    };
+  }
+
+  routerLinkOptions() {
+    return {
+      exact: this.exactRoute
     };
   }
 
