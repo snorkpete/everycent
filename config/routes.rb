@@ -18,6 +18,7 @@ Rails.application.routes.draw do
 
     collection do
       get 'current'
+      get 'future'
       post 'reopen_last_budget'
     end
   end
