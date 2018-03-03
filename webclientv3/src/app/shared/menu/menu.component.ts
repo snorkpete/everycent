@@ -3,6 +3,13 @@ import {NavigationEnd, Router} from '@angular/router';
 import {AuthService} from '../../core/auth/auth.service';
 import {Icon} from '../ec-icon/icon.type';
 
+export interface MenuItemConfig {
+  displayName: string;
+  icon: string;
+  route: string;
+  exact?: boolean;
+}
+
 @Component({
   selector: 'ec-menu',
   styles: [`
@@ -17,28 +24,12 @@ import {Icon} from '../ec-icon/icon.type';
       </mat-list-item>
       <mat-divider></mat-divider>
 
-      <ec-menu-item [icon]="Icon.HOME" route="/">
-        Home
-      </ec-menu-item>
-
-      <ec-menu-item [icon]="Icon.BUDGETS" route="/budgets/current">
-        Current Budget
-      </ec-menu-item>
-
-      <ec-menu-item [icon]="Icon.BUDGETS" route="/budgets">
-        Budgets
-      </ec-menu-item>
-
-      <ec-menu-item [icon]="Icon.TRANSACTIONS" route="/transactions">
-        Transactions
-      </ec-menu-item>
-
-      <ec-menu-item [icon]="Icon.MENU" route="/sink-funds">
-        Sink Funds
-      </ec-menu-item>
-
-      <ec-menu-item [icon]="Icon.ACCOUNT_BALANCES" route="/account-balances">
-        Account Balances
+      <ec-menu-item *ngFor="let menuItem of menuItems"
+                    [icon]="menuItem.icon"
+                    [route]="menuItem.route"
+                    [exactRoute]="menuItem.exact === true"
+      >
+        {{ menuItem.displayName }}
       </ec-menu-item>
 
       <mat-divider></mat-divider>
@@ -56,6 +47,16 @@ export class MenuComponent implements OnInit {
 
   @Output()
   menuSelect = new EventEmitter();
+
+  menuItems: MenuItemConfig[] = [
+    { displayName: 'Home', icon: Icon.HOME, route: "/", exact: true },
+    { displayName: 'Current Budget', icon: Icon.BUDGETS_CURRENT, route: "/budgets/current", exact: true },
+    { displayName: 'Budgets', icon: Icon.BUDGETS, route: "/budgets" },
+    { displayName: 'Future Budgets', icon: Icon.BUDGETS_FUTURE, route: "/budgets/future", exact: true },
+    { displayName: 'Transactions', icon: Icon.TRANSACTIONS, route: "/transactions" },
+    { displayName: 'Sink Funds', icon: Icon.SINK_FUND, route: "/sink-funds" },
+    { displayName: 'Account Balances', icon: Icon.ACCOUNT_BALANCES, route: "/account-balances" },
+  ];
 
   constructor(
     private router: Router,
