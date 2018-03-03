@@ -2,6 +2,8 @@
 let Icon = {
   HOME: "home",
   BUDGETS: "local_atm",
+  BUDGETS_FUTURE: "timeline",
+  BUDGETS_CURRENT: "new_releases",
   SINK_FUND: "card_membership",
   ACCOUNT_BALANCES: "account_balance",
   TRANSACTIONS: "euro_symbol",

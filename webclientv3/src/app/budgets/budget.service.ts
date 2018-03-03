@@ -13,6 +13,10 @@ export class BudgetService {
     return this.apiGateway.get("/budgets");
   }
 
+  getFutureBudgets(): Observable<BudgetData[]> {
+    return this.apiGateway.get("/budgets/future");
+  }
+
   getAllocations(budgetId: number): Observable<AllocationData[]> {
     return this.apiGateway.get("/allocations", {
       budget_id: budgetId
