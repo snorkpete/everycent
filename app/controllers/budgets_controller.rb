@@ -19,6 +19,11 @@ class BudgetsController < ApplicationController
     render json: { budget_id: @budget.id }
   end
 
+  def future
+    @budgets = Budget.future
+    respond_with(@budgets, FutureBudgetSerializer)
+  end
+
   def create
     @budget = Budget.new(budget_params)
     @budget.save
