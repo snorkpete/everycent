@@ -1,6 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TestConfigModule} from "../../../../test/test-config.module";
+import {BudgetService} from "../budget.service";
 
 import { FutureBudgetsComponent } from './future-budgets.component';
+import {FutureBudgetsModule} from "./future-budgets.module";
 
 describe('FutureBudgetsComponent', () => {
   let component: FutureBudgetsComponent;
@@ -8,7 +11,14 @@ describe('FutureBudgetsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FutureBudgetsComponent ]
+      imports: [
+        TestConfigModule,
+        FutureBudgetsModule,
+      ],
+      providers: [
+        BudgetService,
+      ]
+      // declarations: [ FutureBudgetsComponent ]
     })
     .compileComponents();
   }));
