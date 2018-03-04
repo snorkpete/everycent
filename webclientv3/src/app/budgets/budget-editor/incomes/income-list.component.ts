@@ -19,12 +19,25 @@ import {IncomeData} from "../../income.model";
             [bankAccounts]="bankAccounts"
             [ecHighlightDeletedFor]="income">
         </tr>
+        <tr>
+          <td colspan="5">
+            <div class="category-button" *ngIf="editMode">
+              <button mat-raised-button color="primary" (click)="addNewIncome()">
+                Add Income
+              </button>
+            </div>
+          </td>
+        </tr>
       </tbody>
       <tfoot ec-income-list-footer [incomes]="budget.incomes">
       </tfoot>
     </table>
   `,
-  styles: []
+  styles: [`
+    .category-button {
+      margin: 5px;
+    }
+  `]
 })
 export class IncomeListComponent implements OnInit {
 
