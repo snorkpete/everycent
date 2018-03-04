@@ -2,6 +2,8 @@
 import {async, ComponentFixture, inject, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {TestConfigModule} from "../../../test/test-config.module";
+import {SharedModule} from "../shared/shared.module";
 
 import {LoginComponent} from './login.component';
 import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
@@ -23,6 +25,8 @@ describe('LoginComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        TestConfigModule,
+        SharedModule.forRoot(),
         FormsModule,
       ],
       declarations: [ LoginComponent ],
@@ -31,8 +35,6 @@ describe('LoginComponent', () => {
         MainToolbarService,
         AuthService,
         MessageService,
-        { provide: ApiGateway, useValue: ApiGatewayStub },
-        { provide: Router, useValue: RouterStub },
       ]
     });
   }));

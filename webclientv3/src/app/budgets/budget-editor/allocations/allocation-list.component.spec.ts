@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import {Observable} from "rxjs/Observable";
 import { TestConfigModule } from "../../../../../test/test-config.module";
+import {SharedModule} from "../../../shared/shared.module";
 import { AllocationData } from "../../../transactions/allocation-data.model";
 import { BudgetService } from "../../budget.service";
 import { BudgetsModule } from "../../budgets.module";
@@ -68,7 +69,7 @@ describe("AllocationListComponent", () => {
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
-        imports: [TestConfigModule, BudgetsModule]
+        imports: [TestConfigModule, SharedModule.forRoot(), BudgetsModule]
         // declarations: [ AllocationListComponent ]
       }).compileComponents();
     })
@@ -95,7 +96,7 @@ describe("AllocationListComponent", () => {
 
       fixture.detectChanges();
       expect(spy.calls.count()).toBe(1);
-      component.allocations = sampleAllocations;
+      component.budget = { allocations: sampleAllocations };
       expect(component.allocationCategories.length).toEqual(4);
       expect(component.allocationsByCategory.length).toEqual(4);
       expect(component.allocationsByCategory[0]).toEqual({

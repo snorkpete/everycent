@@ -1,12 +1,22 @@
 /* tslint:disable:no-unused-variable */
 
-import {fakeAsync, tick} from "@angular/core/testing";
+import {async, fakeAsync, TestBed, tick} from "@angular/core/testing";
+import {TestConfigModule} from "../../../test/test-config.module";
+import {SharedModule} from "../shared/shared.module";
 import {MessageService, MessageType} from './message.service';
 
 describe('MessageService', () => {
-  let messageService = new MessageService();
+  let messageService: MessageService;
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [TestConfigModule, SharedModule.forRoot()],
+      providers: [
+        MessageService
+      ],
+    });
+  }))
   beforeEach(() => {
-    messageService = new MessageService();
+    messageService = TestBed.get(MessageService);
   });
 
   it('has a getMessage() method', () => {
