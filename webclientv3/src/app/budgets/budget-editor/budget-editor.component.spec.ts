@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import {TestConfigModule} from "../../../../test/test-config.module";
 import {BankAccountService} from "../../bank-accounts/bank-account.service";
+import {SharedModule} from "../../shared/shared.module";
 import {BudgetsModule} from "../budgets.module";
 
 import { BudgetEditorComponent } from './budget-editor.component';
@@ -13,6 +14,7 @@ describe('BudgetEditorComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         TestConfigModule,
+        SharedModule.forRoot(),
         BudgetsModule,
       ],
       // declarations: [ BudgetEditorComponent ]

@@ -1,5 +1,6 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TestConfigModule} from "../../../../test/test-config.module";
+import {SharedTransactionService} from "../../shared-transactions/shared-transaction.service";
 import {SharedModule} from '../../shared/shared.module';
 import {SinkFundService} from '../sink-fund.service';
 
@@ -14,6 +15,7 @@ describe('SinkFundComponent', () => {
       imports: [TestConfigModule, SharedModule.forRoot()],
       declarations: [ SinkFundComponent ],
       providers: [
+        SharedTransactionService,
         SinkFundService,
       ],
     })

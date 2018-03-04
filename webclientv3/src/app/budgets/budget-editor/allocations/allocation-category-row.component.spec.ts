@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TestConfigModule} from "../../../../../test/test-config.module";
+import {SharedTransactionsModule} from "../../../shared-transactions/shared-transactions.module";
 import {SharedModule} from "../../../shared/shared.module";
 
 import { AllocationCategoryRowComponent } from './allocation-category-row.component';
@@ -10,7 +12,9 @@ describe('AllocationCategoryRowComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        TestConfigModule,
         SharedModule,
+        SharedTransactionsModule,
       ],
       declarations: [ AllocationCategoryRowComponent ]
     })

@@ -2,6 +2,8 @@
 import {async, ComponentFixture, fakeAsync, inject, TestBed} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
+import {TestConfigModule} from "../../../../test/test-config.module";
+import {SharedModule} from "../shared.module";
 
 import { MessageDisplayComponent } from './message-display.component';
 import {MessageService} from '../../message-display/message.service';
@@ -14,8 +16,11 @@ describe('MessageDisplayComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MessageDisplayComponent ],
-      providers: [MessageService],
+      imports: [
+        TestConfigModule, SharedModule.forRoot(),
+      ],
+      // declarations: [ MessageDisplayComponent ],
+      // providers: [MessageService],
       schemas: [NO_ERRORS_SCHEMA],
     });
   }));
