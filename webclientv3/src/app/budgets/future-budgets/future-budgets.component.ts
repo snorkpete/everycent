@@ -5,9 +5,13 @@ import {BudgetService} from "../budget.service";
 @Component({
   selector: 'ec-future-budgets',
   template: `
-    <div fxLayout="row">
-      <ec-budget-editor *ngFor="let budget of budgets" [budget]="budget" [simpleView]="true">
-      </ec-budget-editor>
+    <div class="main">
+      <mat-card>
+        <mat-card-content>
+          <ec-future-income-list [budgets]="budgets"></ec-future-income-list>
+          <ec-future-allocation-list [budgets]="budgets"></ec-future-allocation-list>
+        </mat-card-content>
+      </mat-card>
     </div>
   `,
   styles: []

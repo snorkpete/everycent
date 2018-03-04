@@ -61,6 +61,7 @@ table.table tbody tr.selected {
 table.table tbody tr.total{
   font-weight: bold;
   size: 1.1em;
+  border-top: 2px solid rgba(0,0,0,.82);
 }
 
 table.table td:first-of-type, table.table th:first-of-type {
