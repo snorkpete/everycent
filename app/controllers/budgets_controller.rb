@@ -5,7 +5,6 @@ class BudgetsController < ApplicationController
   before_action :set_budget, only: [:show, :edit, :update, :destroy]
 
   def index
-    #@budgets = Budget.includes(:incomes, { allocations: [:allocation_category, :transactions] }).all
     @budgets = Budget.all.order(start_date: :desc)
     respond_with(@budgets, SimpleBudgetSerializer)
   end
