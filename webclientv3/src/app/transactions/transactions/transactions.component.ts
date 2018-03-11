@@ -85,7 +85,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private toolbarService: MainToolbarService,
     private messageService: MessageService,
     private dialog: MatDialog,
-    private snackbar: MatSnackBar,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -127,7 +126,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.loadingIndicator.hide();
         this.transactionList.switchToDisplayMode();
         this.refresh();
-        this.snackbar.open('Transactions saved', null, {duration: 3000});
         this.messageService.setMessage("Transactions saved.", 5000);
       });
   }
@@ -150,9 +148,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     dialogRef.componentInstance.importType = "abn-amro-bank";
 
     dialogRef.afterClosed().subscribe((newTransactions: TransactionData[]) => {
-      // newTransactions.forEach(transaction => {
-      //   this.transactions.push(transaction);
-      // });
       this.transactions = this.transactions.concat(newTransactions);
     });
 
