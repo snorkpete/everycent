@@ -35,6 +35,7 @@ class Budget < ActiveRecord::Base
 
   def self.future
     self.includes(:incomes, :allocations).where(status:'open').order(:start_date)
+    # self.includes(:incomes, :allocations).order(:start_date)
   end
 
   def self.copy(budget_id)
