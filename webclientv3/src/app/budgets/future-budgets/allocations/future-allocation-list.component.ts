@@ -5,20 +5,18 @@ import {BudgetData} from "../../budget.model";
 import {BudgetService} from "../../budget.service";
 import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatter.service";
 
-@Component({
-  selector: 'ec-future-allocation-list',
+@Component({ /* tslint:disable component-selector */
+  selector: '[ec-future-allocation-list]',
   template: `
-    <h1>Allocations</h1>
-    <table class="table">
-      <thead>
+      <tr class="section-heading">
+        <td [attr.colspan]="nbrOfColumns()">Allocations</td>
+      </tr>
       <tr>
         <th>Allocation</th>
         <th *ngFor="let budget of budgets; trackBy: trackById">
           <a [routerLink]="['..', budget.id]"> {{budget.name}}</a>
         </th>
       </tr>
-      </thead>
-      <tbody>
       <ng-container *ngFor="let category of allocationCategories; trackBy: trackById">
         <tr class="heading">
           <td>{{category.name}}</td>
@@ -32,17 +30,13 @@ import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatte
             {{ getAmountForAllocationAndBudget(category, allocationName, budget) | ecMoney }}
           </td>
         </tr>
-        <!--<tr ec-allocation-category-row-->
-            <!--*ngFor="let allocation of category.allocations; trackBy: trackAllocation"-->
-            <!--[allocation]="allocation"-->
-            <!--[editMode]="editMode"-->
-            <!--[ecHighlightDeletedFor]="allocation"-->
-        <!--&gt;-->
-        <!--</tr>-->
       </ng-container>
-      </tbody>
-      <!--<tfoot ec-allocation-list-footer [budget]="budget"></tfoot>-->
-    </table>
+      <tr class="total">
+        <th>Total (not real)</th>
+        <th *ngFor="let budget of budgets" class="right">
+          {{ totalForBudget(budget.name) | ecMoney }}
+        </th>
+      </tr>
   `,
   styles: [`
     .heading {
@@ -94,10 +88,14 @@ export class FutureAllocationListComponent implements OnInit {
     this.displayData = this.formatter.formatAllocationsForDisplay(this.budgets);
   }
 
+  nbrOfColumns() {
+    return this.budgets.length + 1;
+  }
+
   allocationNames(category: AllocationCategoryData) {
 
     let data = this.displayData[category.id];
-    if(!data) {
+    if (!data) {
       return [];
     }
 
@@ -122,6 +120,12 @@ export class FutureAllocationListComponent implements OnInit {
     let categoryData = this.displayData[category.id] || {};
     let allocations = Object.keys(categoryData).map(allocation => categoryData[allocation] || {});
     return total(allocations, budgetName);
+  }
+
+  totalForBudget(budgetName: string) {
+    return 1000;
+    // let incomes = Object.keys(this.displayData).map(income => this.displayData[income]);
+    // return total(incomes, budgetName);
   }
 
   trackById(index: number, budget: BudgetData) {

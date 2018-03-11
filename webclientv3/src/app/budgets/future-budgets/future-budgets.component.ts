@@ -8,8 +8,12 @@ import {BudgetService} from "../budget.service";
     <div class="main">
       <mat-card>
         <mat-card-content>
-          <ec-future-income-list [budgets]="budgets"></ec-future-income-list>
-          <ec-future-allocation-list [budgets]="budgets"></ec-future-allocation-list>
+          <table class="table">
+            <tbody ec-future-income-list [budgets]="budgets">
+            </tbody>
+            <tbody ec-future-allocation-list [budgets]="budgets">
+            </tbody>
+          </table>
         </mat-card-content>
       </mat-card>
     </div>

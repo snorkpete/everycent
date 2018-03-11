@@ -3,34 +3,32 @@ import {total} from "../../../util/total";
 import {BudgetData} from "../../budget.model";
 import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatter.service";
 
-@Component({
-  selector: 'ec-future-income-list',
+@Component({ /* tslint:disable component-selector */
+  selector: '[ec-future-income-list]',
   template: `
-    <h1>Incomes</h1>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Income</th>
-          <th *ngFor="let budget of budgets; trackBy: trackById">{{budget.name}}</th>
-        </tr>
-      </thead>
-      <tbody>
+      <tr class="section-heading">
+        <td [attr.colspan]="nbrOfColumns()">
+          Incomes
+        </td>
+      </tr>
+      <tr class="heading">
+        <th>Income</th>
+        <th *ngFor="let budget of budgets; trackBy: trackById">
+          <a [routerLink]="['..', budget.id]"> {{budget.name}}</a>
+        </th>
+      </tr>
       <tr *ngFor="let incomeName of incomeNames">
         <td>{{incomeName}}</td>
         <td *ngFor="let budget of budgets; trackBy: trackById" class="right">
           {{ displayData[incomeName][budget.name] | ecMoney }}
         </td>
       </tr>
-      </tbody>
-      <tfoot>
-        <tr class="total">
-          <th>Total</th>
-          <th *ngFor="let budget of budgets" class="right">
-             {{ totalFor(budget.name) | ecMoney }}
-          </th>
-        </tr>
-      </tfoot>
-    </table>
+      <tr class="total">
+        <th>Total</th>
+        <th *ngFor="let budget of budgets" class="right">
+           {{ totalFor(budget.name) | ecMoney }}
+        </th>
+      </tr>
   `,
   styles: []
 })
@@ -55,6 +53,10 @@ export class FutureIncomeListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+  }
+
+  nbrOfColumns() {
+    return this.budgets.length + 1;
   }
 
   updateDisplayData() {
