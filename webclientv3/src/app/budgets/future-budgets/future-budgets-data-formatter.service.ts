@@ -24,8 +24,10 @@ export class FutureBudgetsDataFormatterService {
 
     budgets.forEach(budget => {
       budget.allocations.forEach(allocation => {
-        results[allocation.name] = results[allocation.name] || {};
-        results[allocation.name][budget.name] = allocation.amount;
+        let catId = allocation.allocation_category_id;
+        results[catId] = results[catId] || {};
+        results[catId][allocation.name] = results[catId][allocation.name] || {};
+        results[catId][allocation.name][budget.name] = allocation.amount;
       });
     });
 
