@@ -83,7 +83,7 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
   loadBudgetsAndBankAccounts() {
     Observable.combineLatest(
       this.bankAccountService.getBankAccounts(),
-      this.budgetService.getBudgets(),
+      this.budgetService.getBudgetsWithTransactions(),
       this.activatedRoute.paramMap.map(this.convertToNumericParams).take(1)
     ).subscribe((results) => {
       let initialParams;

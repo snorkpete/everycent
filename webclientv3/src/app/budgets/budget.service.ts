@@ -13,6 +13,19 @@ export class BudgetService {
     return this.apiGateway.get("/budgets");
   }
 
+  getBudgetsWithTransactions(): Observable<BudgetData[]> {
+    return this.getBudgets().map(budgets => {
+      const openBudgets = budgets.filter(b => b.status === 'open');
+      const closedBudgets = budgets.filter(b => b.status === 'closed');
+      const currentBudget = openBudgets[openBudgets.length - 1];
+
+      // if we have an open budget, add it to the list
+      if (currentBudget) {
+        closedBudgets.unshift(currentBudget);
+      }
+      return closedBudgets;
+    });
+  }
   getFutureBudgets(): Observable<BudgetData[]> {
     return this.apiGateway.get("/budgets/future");
   }
