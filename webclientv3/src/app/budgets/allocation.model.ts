@@ -8,8 +8,8 @@ export interface AllocationCategoryData {
 }
 
 export interface AllocationData {
-  id?: number,
-  name?: string,
+  id?: number;
+  name?: string;
   amount?: number;
   budget_id?: number;
   spent?: number;

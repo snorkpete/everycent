@@ -1,21 +1,17 @@
-import {NgModule} from "@angular/core";
-import {RouterModule, Routes} from "@angular/router";
-import {TransactionsComponent} from "./transactions/transactions.component";
-import {AuthGuard} from "../core/auth/auth-guard.service";
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { TransactionsComponent } from "./transactions/transactions.component";
+import { AuthGuard } from "../core/auth/auth-guard.service";
 
 const routes: Routes = [
   {
-    path: '',
+    path: "",
     canActivate: [AuthGuard],
-    children: [
-      { path: '', component: TransactionsComponent },
-    ]
+    children: [{ path: "", component: TransactionsComponent }]
   }
-]
-@NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ]
+];
 
+@NgModule({
+  imports: [RouterModule.forChild(routes)]
 })
-export class TransactionsRoutingModule{}
+export class TransactionsRoutingModule {}

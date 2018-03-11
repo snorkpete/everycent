@@ -119,7 +119,7 @@ describe('AuthService', () => {
   });
 
   describe("isLoggedIn()", () => {
-    describe('if localStorage is empty',() => {
+    describe('if localStorage is empty', () => {
       it('returns FALSE promise',  async(() => {
         localStorage.clear();
 

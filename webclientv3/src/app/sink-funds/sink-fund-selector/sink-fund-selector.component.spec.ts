@@ -53,10 +53,10 @@ describe("SinkFundSelectorComponent", () => {
 
     xit("has option elements for each sinkFund", () => {
       fixture.detectChanges();
-      let de = fixture.debugElement;
-      let options = de.nativeElement.querySelectorAll("mat-option");
-      expect(options.length).toEqual(sinkFunds.length);/*? options */
-      expect(options.length).toEqual(sinkFunds.length);/*? options */
+      let el = fixture.debugElement;
+      let options = el.nativeElement.querySelectorAll("mat-option");
+      expect(options.length).toEqual(sinkFunds.length);
+      expect(options.length).toEqual(sinkFunds.length);
 
       expect(options[0].componentInstance.value).toEqual(sinkFunds[0].id);
       expect(options[1].componentInstance.value).toEqual(sinkFunds[1].id);

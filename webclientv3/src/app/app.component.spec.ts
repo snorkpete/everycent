@@ -32,7 +32,7 @@ describe('AppComponent', () => {
     fixture = TestBed.createComponent(AppComponent);
     app = fixture.debugElement.componentInstance;
     fixture.detectChanges();
-  })
+  });
 
   it('should create the app', async(() => {
     expect(app).toBeTruthy();

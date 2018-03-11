@@ -5,6 +5,7 @@ import {Directive, HostBinding, Input} from '@angular/core';
 })
 export class HighlightDeletedDirective {
 
+  /* tslint:disable no-input-rename */
   @Input('ecHighlightDeletedFor')
   item: any;
 

@@ -60,7 +60,7 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
   @Input()
   get value(): number {
     return this.valueInCents;
-  };
+  }
 
   set value(newValueInCents: number) {
     this.valueInCents = newValueInCents;

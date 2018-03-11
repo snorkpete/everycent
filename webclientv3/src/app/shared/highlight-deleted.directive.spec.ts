@@ -30,7 +30,7 @@ describe('HighlightDeletedDirective', () => {
     fixture = TestBed.createComponent(TestComponent);
     testComponent = fixture.debugElement.componentInstance;
     fixture.detectChanges();
-  })
+  });
 
   it('adds a "deleted" class if item is deleted', () => {
     testComponent.item.deleted = true;

@@ -14,7 +14,8 @@ describe('MessageService', () => {
         MessageService
       ],
     });
-  }))
+  }));
+
   beforeEach(() => {
     messageService = TestBed.get(MessageService);
   });

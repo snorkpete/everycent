@@ -1,10 +1,10 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {ActivatedRoute, Router} from "@angular/router";
-import {Subject} from "rxjs/Subject";
-import {MainToolbarService} from "../shared/main-toolbar/main-toolbar.service";
-import {SinkFundData} from "./sink-fund-data.model";
-import {SinkFundSelectorComponent} from "./sink-fund-selector/sink-fund-selector.component";
-import {SinkFundService} from "./sink-fund.service";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { Subject } from "rxjs/Subject";
+import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
+import { SinkFundData } from "./sink-fund-data.model";
+import { SinkFundSelectorComponent } from "./sink-fund-selector/sink-fund-selector.component";
+import { SinkFundService } from "./sink-fund.service";
 
 @Component({
   selector: "ec-sink-funds",
@@ -25,8 +25,7 @@ export class SinkFundsComponent implements OnInit, OnDestroy {
   sinkFunds: SinkFundData[];
   onDestroy$ = new Subject();
 
-  @ViewChild('selector')
-  selector: SinkFundSelectorComponent;
+  @ViewChild("selector") selector: SinkFundSelectorComponent;
 
   constructor(
     private sinkFundService: SinkFundService,
@@ -52,8 +51,11 @@ export class SinkFundsComponent implements OnInit, OnDestroy {
   }
 
   onSinkFundSelect(event: any) {
-    this.router.navigate([this.selector.value], { relativeTo: this.activatedRoute.parent })
+    this.router.navigate([this.selector.value], {
+      relativeTo: this.activatedRoute.parent
+    });
   }
+
   private selectSinkFund(selectedSinkFund: number) {
     this.selector.value = selectedSinkFund;
     this.sinkFundService.refreshSinkFund(selectedSinkFund);

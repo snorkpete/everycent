@@ -86,7 +86,7 @@ export class AccountBalancesComponent implements OnInit {
 
   updateBankAccountLists() {
     this.currentAccounts = this.bankAccounts.filter(
-      b => b.account_category == "current"
+      b => b.account_category === "current"
     );
     this.assetAccounts = this.bankAccounts.filter(
       b => b.account_category === "asset"

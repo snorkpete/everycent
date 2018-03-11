@@ -15,7 +15,7 @@ export interface TransactionData {
   allocation_id?: number;
   sink_fund_allocation_id?: number;
   status?: string;
-  paid?: boolean,
+  paid?: boolean;
   net_amount?: number;
   brought_forward_status?: string;
   allocation?: any;

@@ -26,7 +26,7 @@ export class AbnAmroCreditCardImporterService {
         withdrawal_amount: amount < 0 ? amount * -1 : 0,
         deposit_amount: amount > 0 ? amount : 0,
         status: 'unpaid',
-      }
+      };
 
       let start = new Date(startDate);
       let end = new Date(endDate);

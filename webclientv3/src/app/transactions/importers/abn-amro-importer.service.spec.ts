@@ -43,7 +43,7 @@ McDonald's Almere Ce ALM,PAS361
 
 €- 10,00
 NS- Almere Centr.102 ALM,PAS361
-  
+
 `;
 
   describe("#isDate", () => {

@@ -25,6 +25,7 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
   @Input() value: Date;
   @Input() editMode: boolean;
   // TODO: this should NOT be needed
+  /* tslint:disable no-input-rename */
   @Input('ecValidateWithinBudget') budget: BudgetData = {};
   @Input() errorMessage: string;
 
