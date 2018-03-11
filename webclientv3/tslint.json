@@ -2,6 +2,9 @@
   "rulesDirectory": [
     "node_modules/codelyzer"
   ],
+  "extends": [
+    "rxjs-tslint-rules"
+  ],
   "rules": {
     "arrow-return-shorthand": true,
     "callable-types": true,
@@ -104,7 +107,6 @@
         "variable-declaration": "nospace"
       }
     ],
-    "typeof-compare": true,
     "unified-signatures": true,
     "variable-name": false,
     "whitespace": [
@@ -131,10 +133,11 @@
       "options": [{
         "allowElsewhere": false,
         "allowUnused": false,
-        "file": "./source/rxjs-imports.ts"
+        "file": "./src/rxjs-imports.ts"
       }],
       "severity": "error"
     },
+    "rxjs-no-wholesale": { "severity": "error" },
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
     "use-host-property-decorator": true,
