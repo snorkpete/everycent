@@ -85,10 +85,6 @@ export class TransactionSummaryComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // TODO;
-    // SettingsService.getSettings().then(function(settings){
-    //   vm.primary_budget_account_id = settings.primary_budget_account_id;
-    // });
     this.settingsService.getSettings().subscribe(settings => {
       this.primary_budget_account_id = settings.primary_budget_account_id;
     });
