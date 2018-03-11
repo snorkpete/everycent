@@ -127,7 +127,7 @@ export class AbnAmroOldFormatImporterService {
   }
 
   extractNumberParts(line) {
-    if (line.substr(0,1) === '€') {
+    if (line.substr(0, 1) === '€') {
       line = line.substr(1);
     }
     let sign = line.trim().substr(0, 1);

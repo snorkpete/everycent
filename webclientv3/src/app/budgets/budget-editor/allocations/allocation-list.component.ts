@@ -73,7 +73,7 @@ export class AllocationListComponent implements OnInit {
     this._budget = newBudget;
     this.updateGroupings();
   }
-  _budget: BudgetData = { allocations: [], incomes: [] }
+  _budget: BudgetData = { allocations: [], incomes: [] };
 
   get allocationCategories(): AllocationCategoryData[] {
     return this._allocationCategories;

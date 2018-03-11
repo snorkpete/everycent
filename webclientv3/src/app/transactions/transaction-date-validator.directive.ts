@@ -18,6 +18,8 @@ import { BudgetData } from "../budgets/budget.model";
   ]
 })
 export class TransactionDateValidatorDirective implements Validator {
+
+  /* tslint:disable no-input-rename */
   @Input('ecValidateWithinBudget') budget: BudgetData = {};
 
   constructor() {}

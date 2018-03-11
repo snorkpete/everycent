@@ -46,9 +46,11 @@ describe('SinkFundCalculator', () => {
     expect(calculator.allocationOutstandingAt(sample, 0)).toEqual(-200);
     expect(calculator.allocationOutstandingAt(sample, 1)).toEqual(-1400);
     expect(calculator.allocationOutstandingAt(sample, 2)).toEqual(0);
-  })
+  });
 
   it('#totalOutstanding is the sum of all the outstanding amounts', () => {
     expect(calculator.totalOutstanding(sample)).toEqual(-1600);
   });
+
 });
+

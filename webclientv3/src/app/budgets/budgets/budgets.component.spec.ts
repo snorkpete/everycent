@@ -16,7 +16,7 @@ describe('BudgetsComponent', () => {
         BudgetsModule,
         SharedModule.forRoot(),
       ],
-    })
+    });
   }));
 
   beforeEach(() => {

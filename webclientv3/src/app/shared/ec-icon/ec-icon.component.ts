@@ -11,7 +11,7 @@ import {Component, Input, OnInit} from '@angular/core';
       <button mat-icon-button *ngIf="iconType=='button'">
           <mat-icon>{{icon}}</mat-icon>
       </button>
-      
+
       <mat-icon *ngIf="iconType!=='button'">{{icon}}</mat-icon>
   `
 })

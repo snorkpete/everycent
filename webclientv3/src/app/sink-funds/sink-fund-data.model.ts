@@ -15,4 +15,4 @@ export interface SinkFundData {
   is_sink_fund?: boolean;
   institution?: { id: number, name: string };
   sink_fund_allocations?: SinkFundAllocationData[];
-};
+}

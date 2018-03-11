@@ -12,4 +12,4 @@ export interface IncomeData {
   comment?: string;
   deleted?: boolean;
 }
-;
+

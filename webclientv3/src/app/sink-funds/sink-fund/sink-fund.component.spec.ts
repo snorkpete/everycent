@@ -20,7 +20,7 @@ describe('SinkFundComponent', () => {
       ],
     })
     .compileComponents();
-  }))
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SinkFundComponent);

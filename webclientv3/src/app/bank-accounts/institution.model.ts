@@ -1,5 +1,5 @@
 
 export interface InstitutionData {
-  id?: number,
-  name?: string,
+  id?: number;
+  name?: string;
 }

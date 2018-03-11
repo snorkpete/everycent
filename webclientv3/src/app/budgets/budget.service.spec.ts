@@ -21,7 +21,7 @@ describe('BudgetsService', () => {
   beforeEach(() => {
     budgetService = TestBed.get(BudgetService);
     apiGateway = TestBed.get(ApiGateway);
-  })
+  });
 
   it('should be created', inject([BudgetService], (service: BudgetService) => {
     expect(service).toBeTruthy();

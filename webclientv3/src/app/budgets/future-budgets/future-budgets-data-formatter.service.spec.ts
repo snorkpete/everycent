@@ -13,7 +13,7 @@ describe('FutureBudgetsDataFormatterService', () => {
 
   beforeEach(() => {
     formatter = TestBed.get(FutureBudgetsDataFormatterService);
-  })
+  });
 
   it('should be created', () => {
     expect(formatter).toBeTruthy();

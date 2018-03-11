@@ -20,19 +20,19 @@ describe("AbnAmroCreditCardImporter.ServiceService", () => {
 IDEAL BETALING, DANK U
 23 Dec
 € 819,29Credit
- 
+
 IDEAL BETALING, DANK U
 23 Dec
 € 70,93Credit
- 
+
 DROPBOX DQ87HWQ7RJQT DB.TT/CCHELP IRL
 22 Dec
 € 8,59Debit
- 
+
 SAFARI BKS ONLINE-FLOW 800-775-7330 USA
 20 Dec
 € 172,31Debit
- 
+
 GOOGLE *GAMEHOUSE G.CO/HELPPAY# GBR
 19 Dec
 € 9,26Debit
