@@ -34,19 +34,19 @@ import { BudgetData } from "../../budgets/budget.model";
       <mat-card-content>
         <div fxLayout="column" class="container" fxLayoutGap="20px">
           <div class="header" fxLayout="row" fxLayoutGap="20px" fxFlex="1 0 auto">
-            <ec-transaction-search-form fxFlex="1 0 auto"
+            <ec-transaction-search-form fxFlex="3 0 auto"
                                         (change)="refreshTransactions($event)"
             >
             </ec-transaction-search-form>
-
-          </div>
-          <div>
-            <ec-transaction-summary fxFlex="3 0 auto"
+            <ec-transaction-summary fxFlex="1 0 auto"
                                     [transactions]="transactions"
                                     [bankAccount]="bankAccount"
                                     [allocations]="allocations"
             >
             </ec-transaction-summary>
+
+          </div>
+          <div>
           </div>
           <div fxFlex="2 0 auto">
             <ec-transaction-list

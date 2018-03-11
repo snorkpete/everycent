@@ -9,11 +9,11 @@ import { TransactionData } from "../transaction-data.model";
   selector: "ec-transaction-summary",
   styles: [`
     .heading {
-      flex: 1;
+      flex: 2 0 auto;
       font-weight: bold;
     }
     .value {
-      flex: 1;
+      flex: 1 0 auto;
       text-align: right;
     }
     .total {

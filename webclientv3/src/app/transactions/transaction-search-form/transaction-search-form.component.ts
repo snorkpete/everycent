@@ -20,11 +20,9 @@ import {BudgetService} from "../../budgets/budget.service";
     <form (ngSubmit)="onSubmit()" [formGroup]="form">
     <mat-card>
 
+      <mat-card-title>Select Transactions to View</mat-card-title>
       <mat-card-content>
-
         <div fxLayout="row" fxLayoutGap="20px">
-
-          <mat-card-title fxFlex="4 0 auto">Select Transactions to View</mat-card-title>
 
           <mat-form-field fxFlex="2 0 auto">
             <mat-select placeholder="Bank Account" formControlName="bank_account_id">
@@ -37,10 +35,10 @@ import {BudgetService} from "../../budgets/budget.service";
               <mat-option *ngFor="let budget of budgets" [value]="budget.id">{{budget.name}}</mat-option>
             </mat-select>
           </mat-form-field>
+        </div>
 
-          <div fxFlex="1 0 auto">
-            <button mat-raised-button type="submit" color="primary">Refresh</button>
-          </div>
+        <div fxFlexLayout="row">
+          <button mat-raised-button type="submit" color="primary">Refresh</button>
         </div>
 
       </mat-card-content>
