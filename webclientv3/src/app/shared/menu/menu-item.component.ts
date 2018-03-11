@@ -13,7 +13,7 @@ import {Component, Input, OnInit} from '@angular/core';
   template: `
       <mat-divider></mat-divider>
       <mat-list-item [routerLink]="route" routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: route == '/' || route == '/future' }">
+                    [routerLinkActiveOptions]="{ exact: exactRoute }">
           <ec-icon [icon]="icon"></ec-icon>
           <ng-content></ng-content>
       </mat-list-item>

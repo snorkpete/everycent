@@ -51,7 +51,7 @@ export class MenuComponent implements OnInit {
   menuItems: MenuItemConfig[] = [
     { displayName: 'Home', icon: Icon.HOME, route: "/", exact: true },
     { displayName: 'Current Budget', icon: Icon.BUDGETS_CURRENT, route: "/budgets/current", exact: true },
-    { displayName: 'Budgets', icon: Icon.BUDGETS, route: "/budgets" },
+    { displayName: 'Budgets', icon: Icon.BUDGETS, route: "/budgets", exact: false },
     { displayName: 'Future Budgets', icon: Icon.BUDGETS_FUTURE, route: "/budgets/future", exact: true },
     { displayName: 'Transactions', icon: Icon.TRANSACTIONS, route: "/transactions" },
     { displayName: 'Sink Funds', icon: Icon.SINK_FUND, route: "/sink-funds" },
