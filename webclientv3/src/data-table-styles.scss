@@ -91,3 +91,16 @@ table.table td.right {
 table.table td.center {
   text-align: center;
 }
+
+table.table tr.section-heading {
+  font-size: 24px;
+  font-weight: bold;
+  border-bottom: 4px solid rgba(0,0,0,.5);
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+table.table tr.section-heading td {
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
