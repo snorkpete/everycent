@@ -18,7 +18,7 @@ import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatte
       <tr *ngFor="let incomeName of incomeNames">
         <td>{{incomeName}}</td>
         <td *ngFor="let budget of budgets; trackBy: trackById" class="right">
-          <ec-money-field [value]="displayData[incomeName][budget.name]"></ec-money-field>
+          {{ displayData[incomeName][budget.name] | ecMoney }}
         </td>
       </tr>
       </tbody>
