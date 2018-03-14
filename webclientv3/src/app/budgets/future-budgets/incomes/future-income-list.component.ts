@@ -24,7 +24,7 @@ import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatte
         </td>
       </tr>
       <tr class="total">
-        <th>Total</th>
+        <th>Total Income</th>
         <th *ngFor="let budget of budgets" class="right">
            {{ totalFor(budget.name) | ecMoney }}
         </th>

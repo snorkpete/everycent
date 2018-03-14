@@ -13,6 +13,8 @@ import {BudgetService} from "../budget.service";
             </tbody>
             <tbody ec-future-allocation-list [budgets]="budgets">
             </tbody>
+            <tfoot ec-future-budget-summary [budgets]="budgets">
+            </tfoot>
           </table>
         </mat-card-content>
       </mat-card>
