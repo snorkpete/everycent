@@ -13,11 +13,14 @@ import { SinkFundService } from "./sink-fund.service";
   `
   ],
   template: `
-    <ec-sink-fund-selector #selector
-                           [sinkFunds]="sinkFunds"
-                           (change)="onSinkFundSelect($event)">
-    </ec-sink-fund-selector>
-    <ec-sink-fund [sinkFund]="sinkFund"></ec-sink-fund>
+    <mat-card class="main">
+      <ec-sink-fund-selector #selector
+                             [sinkFunds]="sinkFunds"
+                             (change)="onSinkFundSelect($event)">
+      </ec-sink-fund-selector>
+
+      <ec-sink-fund [sinkFund]="sinkFund"></ec-sink-fund>
+    </mat-card>
   `
 })
 export class SinkFundsComponent implements OnInit, OnDestroy {
