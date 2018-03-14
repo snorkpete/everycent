@@ -8,7 +8,7 @@
     "test": "ng test --sourcemaps=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "analyze": "ng build --prod --stats-json && webpack-bundle-analyzer ../public/v3/stats.json"
+    "analyze": "ng build --prod --build-optimizer --stats-json && webpack-bundle-analyzer ../public/v3/stats.json"
   },
   "private": true,
   "dependencies": {
