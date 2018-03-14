@@ -32,9 +32,9 @@ import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatte
         </tr>
       </ng-container>
       <tr class="total">
-        <th>Total (not real)</th>
-        <th *ngFor="let budget of budgets" class="right">
-          {{ totalForBudget(budget.name) | ecMoney }}
+        <th>Total Allocations</th>
+        <th *ngFor="let budget of budgets; let i = index; trackBy: trackById" class="right">
+          {{ totalForBudget(i) | ecMoney }}
         </th>
       </tr>
   `,
@@ -122,10 +122,9 @@ export class FutureAllocationListComponent implements OnInit {
     return total(allocations, budgetName);
   }
 
-  totalForBudget(budgetName: string) {
-    return 1000;
-    // let incomes = Object.keys(this.displayData).map(income => this.displayData[income]);
-    // return total(incomes, budgetName);
+  totalForBudget(index: number) {
+    let budget = this.budgets[index];
+    return total(budget.allocations, 'amount');
   }
 
   trackById(index: number, budget: BudgetData) {
