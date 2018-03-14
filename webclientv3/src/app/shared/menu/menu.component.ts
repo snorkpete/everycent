@@ -13,9 +13,16 @@ export interface MenuItemConfig {
 @Component({
   selector: 'ec-menu',
   styles: [`
+    .mat-expansion-panel-header {
+      padding: 0 16px;
+      font-size: 16px;
+    }
+    mat-expansion-panel-header ::ng-deep .mat-content{
+      align-items: center;
+    }
   `],
   template: `
-    <mat-list>
+    <mat-nav-list>
 
       <mat-divider></mat-divider>
       <mat-list-item>
@@ -32,13 +39,27 @@ export interface MenuItemConfig {
         {{ menuItem.displayName }}
       </ec-menu-item>
 
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <ec-icon [icon]="Icon.SETUP"></ec-icon>
+            Setup
+        </mat-expansion-panel-header>
+        <ec-menu-item *ngFor="let menuItem of setupMenuItems"
+                      [icon]="menuItem.icon"
+                      [route]="menuItem.route"
+                      [exactRoute]="menuItem.exact === true"
+        >
+          {{ menuItem.displayName }}
+        </ec-menu-item>
+      </mat-expansion-panel>
+
       <mat-divider></mat-divider>
       <mat-list-item (click)="logOut()">
         <ec-icon [icon]="Icon.LOGOUT"></ec-icon>
         Log out
       </mat-list-item>
       <mat-divider></mat-divider>
-    </mat-list>
+    </mat-nav-list>
   `,
 })
 export class MenuComponent implements OnInit {
@@ -56,6 +77,12 @@ export class MenuComponent implements OnInit {
     { displayName: 'Transactions', icon: Icon.TRANSACTIONS, route: "/transactions" },
     { displayName: 'Sink Funds', icon: Icon.SINK_FUND, route: "/sink-funds" },
     { displayName: 'Account Balances', icon: Icon.ACCOUNT_BALANCES, route: "/account-balances" },
+  ];
+
+  setupMenuItems: MenuItemConfig[] = [
+    { displayName: 'Financial Institutions', icon: Icon.INSTITUTIONS, route: "/setup/institutions", exact: false },
+    { displayName: 'Bank Accounts', icon: Icon.BANK_ACCOUNTS, route: "/setup/bank-accounts", exact: false },
+    { displayName: 'Settings', icon: Icon.SETTINGS, route: "/setup/settings", exact: false },
   ];
 
   constructor(
