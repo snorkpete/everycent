@@ -9,6 +9,10 @@ let Icon = {
   TRANSACTIONS: "euro_symbol",
   LOGOUT: "account_circle",
   MENU: "menu",
+  SETUP: "settings",
+  INSTITUTIONS: "work",
+  BANK_ACCOUNTS: "payment",
+  SETTINGS: "settings",
 
   SHOW_TRANSACTIONS: "monetization_on",
 
