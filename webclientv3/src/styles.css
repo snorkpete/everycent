@@ -40,3 +40,10 @@ html, body {
 body {
     background-color: #d0cdcd;
 }
+
+.list-item-with-action-buttons {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

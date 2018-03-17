@@ -16,6 +16,7 @@ const appRoutes: Routes = [
       {path: 'transactions', loadChildren: 'app/transactions/transactions.module#TransactionsModule'},
       {path: 'sink-funds', loadChildren: 'app/sink-funds/sink-funds.module#SinkFundsModule'},
       {path: 'account-balances', loadChildren: 'app/account-balances/account-balances.module#AccountBalancesModule'},
+      {path: 'setup', loadChildren: 'app/setup/setup.module#SetupModule'},
     ]
   }
 ];
