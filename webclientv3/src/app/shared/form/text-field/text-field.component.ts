@@ -9,6 +9,15 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
       mat-form-field {
           width: 100%;
       }
+    .text-display {
+      display: flex;
+      flex-direction: column;
+    }
+    .label {
+      font-size: 12px;
+      font-weight: bold;
+      color: purple;
+    }
   `],
   template: `
     <mat-form-field *ngIf="editMode; else textDisplay">
@@ -18,7 +27,10 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
                [formControl]="control" />
     </mat-form-field>
     <ng-template #textDisplay>
-      <span class="value">{{value}}</span>
+      <span class="text-display">
+        <span class="label">{{placeholder}}</span>
+        <span class="value">{{value}}</span>
+      </span>
     </ng-template>
   `,
   providers: [
