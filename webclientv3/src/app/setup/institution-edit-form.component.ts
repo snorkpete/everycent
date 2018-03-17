@@ -9,14 +9,15 @@ import {InstitutionData} from "../bank-accounts/institution.model";
     <h1 mat-dialog-title>Institution Details</h1>
     <div mat-dialog-content>
       <div [formGroup]="form">
-        <ec-text-field [editMode]="true" formControlName="name" placeholder="Name"></ec-text-field>
+        <ec-text-field [(editMode)]="editMode" formControlName="name" placeholder="Name"></ec-text-field>
       </div>
     </div>
     <div mat-dialog-actions>
-      <div class="actions" fxLayout="row" fxLayoutAlign="space-around">
-        <button mat-raised-button color="primary" (click)="saveChanges()">Save</button>
-        <button mat-raised-button color="warn" (click)="cancelChanges()">Cancel</button>
-      </div>
+      <ec-edit-actions [(editMode)]="editMode"
+                       (save)="saveChanges()"
+      >
+        <button *ngIf="!editMode" mat-raised-button color="warn" (click)="cancelChanges()">Close</button>
+      </ec-edit-actions>
     </div>
   `,
   styles: []
@@ -26,6 +27,7 @@ export class InstitutionEditFormComponent implements OnInit {
   @Input() institution: InstitutionData = {};
   @Output() save = new EventEmitter<InstitutionData>();
   @Output() cancel = new EventEmitter();
+  editMode = false;
 
   form: FormGroup;
 
