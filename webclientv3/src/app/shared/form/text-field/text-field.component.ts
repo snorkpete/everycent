@@ -14,6 +14,7 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
     <mat-form-field *ngIf="editMode; else textDisplay">
         <input #input matInput type="text" class="value"
                (input)="updateValue(input.value)"
+               [placeholder]="placeholder"
                [formControl]="control" />
     </mat-form-field>
     <ng-template #textDisplay>
@@ -27,6 +28,7 @@ import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/for
 export class TextFieldComponent implements OnInit, AfterViewInit, ControlValueAccessor {
   @Input() value: string;
   @Input() editMode: boolean;
+  @Input() placeholder: string;
 
   control = new FormControl('');
 
