@@ -5,13 +5,18 @@ import {InstitutionsComponent} from './institutions.component';
 import {SetupRoutingModule} from './setup-routing.module';
 import {SetupService} from "./setup.service";
 import { InstitutionEditFormComponent } from './institution-edit-form.component';
+import { SettingsComponent } from './settings.component';
 
 @NgModule({
   imports: [
     SharedModule,
     SetupRoutingModule
   ],
-  declarations: [InstitutionsComponent, InstitutionEditFormComponent],
+  declarations: [
+    InstitutionsComponent,
+    InstitutionEditFormComponent,
+    SettingsComponent,
+  ],
   entryComponents: [
     InstitutionEditFormComponent,
   ],
