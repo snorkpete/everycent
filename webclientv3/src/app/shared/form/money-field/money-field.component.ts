@@ -20,6 +20,16 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
     mat-form-field {
         width: 100%;
     }
+
+    .text-display {
+      display: flex;
+      flex-direction: column;
+    }
+    .label {
+      font-size: 12px;
+      font-weight: bold;
+      color: purple;
+    }
   `],
   template: `
       <mat-form-field *ngIf="editMode; else textDisplay ">
@@ -32,8 +42,11 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
       </mat-form-field>
 
       <ng-template #textDisplay>
-        <span class="value" [class.negative]="isNegative()" [class.positive]="isPositive()">
-          {{ value | ecMoney }}
+        <span class="text-display">
+          <span class="label">{{placeholder}}</span>
+          <span class="value" [class.negative]="isNegative()" [class.positive]="isPositive()">
+            {{ value | ecMoney }}
+          </span>
         </span>
       </ng-template>
   `,

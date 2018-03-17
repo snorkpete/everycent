@@ -8,38 +8,53 @@ import {groupBy} from 'lodash';
     select {
       width: 100%;
     }
+    .text-display {
+      display: flex;
+      flex-direction: column;
+    }
+    .label {
+      font-size: 12px;
+      font-weight: bold;
+      color: purple;
+    }
   `],
   template: `
     <!--<select [(ngModel)]="transaction.allocation_id">-->
       <!--<option [value]=""></option>-->
       <!--<option *ngFor="let allocation of allocations" [value]="allocation.id">{{allocation.name}}</option>-->
     <!--</select>-->
-    <select *ngIf="editMode; else textDisplay" [formControl]="control">
-      <option [value]="0"></option>
+    <span class="text-display" *ngIf="editMode; else textDisplay">
+        <span class="label">{{placeholder}}</span>
+        <select [formControl]="control">
+          <option [value]="0"></option>
 
-      <!-- options go here -->
-      <ng-container *ngIf="groupBy; then groupedOptions else normalOptions "></ng-container>
+          <!-- options go here -->
+          <ng-container *ngIf="groupBy; then groupedOptions else normalOptions "></ng-container>
 
-      <!-- grouped options -->
-      <ng-template #groupedOptions>
-        <optgroup [label]="group.name" *ngFor="let group of groups; trackBy: trackById">
-          <option *ngFor="let item of group.items; trackById" [value]="item.id">
-            {{item.name}}
-          </option>
-        </optgroup>
-      </ng-template>
+          <!-- grouped options -->
+          <ng-template #groupedOptions>
+            <optgroup [label]="group.name" *ngFor="let group of groups; trackBy: trackById">
+              <option *ngFor="let item of group.items; trackById" [value]="item.id">
+                {{item.name}}
+              </option>
+            </optgroup>
+          </ng-template>
 
-      <!-- ungrouped options -->
-      <ng-template #normalOptions>
-        <option *ngFor="let item of items; trackBy: trackById" [value]="item.id">
-          {{item.name}}
-        </option>
-      </ng-template>
+          <!-- ungrouped options -->
+          <ng-template #normalOptions>
+            <option *ngFor="let item of items; trackBy: trackById" [value]="item.id">
+              {{item.name}}
+            </option>
+          </ng-template>
 
-    </select>
+        </select>
+    </span>
 
     <ng-template #textDisplay >
-      <span>{{displayValue}}</span>
+      <span class="text-display">
+        <span class="label">{{placeholder}}</span>
+        <span class="value">{{displayValue}}</span>
+      </span>
     </ng-template>
   `,
   providers: [
@@ -69,6 +84,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   private _groupBy: string;
 
   @Input() editMode = false;
+  @Input() placeholder = '';
   private _selectedItem: any = {};
 
   groups: any[];
