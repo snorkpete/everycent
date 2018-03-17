@@ -5,6 +5,7 @@ import {MessageService, MessageType} from '../../message-display/message.service
   selector: 'ec-message-display',
   styles: [`
     div.message-display{
+        position: absolute;
         text-align: center;
         margin: 10px 15px;
         padding: 5px;
