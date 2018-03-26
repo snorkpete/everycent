@@ -12,6 +12,7 @@ import {TransactionSummaryComponent} from './transaction-summary/transaction-sum
 import {TransactionService} from './transaction.service';
 import {TransactionsRoutingModule} from "./transactions-routing.module";
 import {TransactionsComponent} from './transactions/transactions.component';
+import { TransactionCalculatorComponent } from './transaction-calculator/transaction-calculator.component';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import {TransactionsComponent} from './transactions/transactions.component';
     TransactionListRowComponent,
     TransactionSearchFormComponent,
     TransactionSummaryComponent,
+    TransactionCalculatorComponent,
   ],
   providers: [
     TransactionService,
