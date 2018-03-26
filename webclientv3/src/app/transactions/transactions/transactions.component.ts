@@ -32,6 +32,8 @@ import { BudgetData } from "../../budgets/budget.model";
         <button mat-raised-button (click)="goToAccountBalances()">&laquo; View Balances</button>
       </mat-card-actions>
       <mat-card-content>
+        <ec-transaction-calculator [transactions]="transactions">
+        </ec-transaction-calculator>
         <div fxLayout="column" class="container" fxLayoutGap="20px">
           <div class="header" fxLayout="row" fxLayoutGap="20px" fxFlex="1 0 auto">
             <ec-transaction-search-form fxFlex="3 0 auto"
