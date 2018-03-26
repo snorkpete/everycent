@@ -61,7 +61,7 @@ export class AbnAmroCreditCardImporterService {
 
   extractDate(monthAndDay: string): string {
     let currentYear = this.currentDate().getFullYear();
-    let dateParts = monthAndDay.match(/(\d+) (.+)/);
+    let dateParts = monthAndDay.match(/(\d+) (.+?) | .+/);
     let [_, day, month] = dateParts;
     let months = {
       'Jan': '01',
