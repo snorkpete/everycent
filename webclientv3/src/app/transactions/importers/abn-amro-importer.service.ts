@@ -124,7 +124,29 @@ export class AbnAmroImporterService {
   }
 
   isFormattedDate(line) {
-    return line.match(/^(\d{2})\-(\d{2})\-(\d{4})/);
+    let matchResult = line.match(/^(\d{1,2}) ([A-z]+) (\d{4})/);
+    if (!matchResult) {
+      return false;
+    }
+
+    // convert the month to a number
+    const months = {
+      'January': 0,
+      'February': 1,
+      'March': 2,
+      'April': 3,
+      'May': 4,
+      'June': 5,
+      'July': 6,
+      'August': 7,
+      'September': 8,
+      'October': 9,
+      'November': 10,
+      'December': 11,
+    };
+
+    matchResult[2] = months[matchResult[2]];
+    return matchResult;
   }
 
   // This is provided here to provide an easy entry point for mocking the current date
@@ -149,7 +171,10 @@ export class AbnAmroImporterService {
     }
 
     let dateParts = this.isFormattedDate(line);
-    return new Date(`${dateParts[3]}-${dateParts[2]}-${dateParts[1]}`);
+    // the '10' is to force the time to not be midnight
+    // the browser is interpreting the time differently
+    // and causing an 'off-by-one-day' error
+    return new Date(dateParts[3], dateParts[2], dateParts[1], 10);
   }
 
   isAmount(line: string) {
