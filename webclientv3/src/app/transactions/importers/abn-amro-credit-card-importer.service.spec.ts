@@ -18,23 +18,23 @@ describe("AbnAmroCreditCardImporter.ServiceService", () => {
   /** Tslint: ignore trailing-whitespace */
   let sample = `
 IDEAL BETALING, DANK U
-23 Dec
+23 Dec | 07:11:32
 € 819,29Credit
 
 IDEAL BETALING, DANK U
-23 Dec
+23 Dec | 07:11:32
 € 70,93Credit
 
 DROPBOX DQ87HWQ7RJQT DB.TT/CCHELP IRL
-22 Dec
+22 Dec | 07:11:32
 € 8,59Debit
 
 SAFARI BKS ONLINE-FLOW 800-775-7330 USA
-20 Dec
+20 Dec | 07:11:32
 € 172,31Debit
 
 GOOGLE *GAMEHOUSE G.CO/HELPPAY# GBR
-19 Dec
+19 Dec | 07:11:32
 € 9,26Debit
  Extra Card
  `;
@@ -62,7 +62,7 @@ GOOGLE *GAMEHOUSE G.CO/HELPPAY# GBR
   describe('#extractDate', () => {
     it('converts "20 Dec" to proper date', () => {
       let currentYear = new Date().getFullYear();
-      expect(importer.extractDate("20 Dec")).toEqual(`${currentYear}-12-20`);
+      expect(importer.extractDate("20 Dec | 07:11:32")).toEqual(`${currentYear}-12-20`);
     });
   });
 
