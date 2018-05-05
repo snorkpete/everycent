@@ -1,4 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TestConfigModule} from "../../../../../test/test-config.module";
+import {SharedModule} from "../../../shared/shared.module";
+import {BudgetService} from "../../budget.service";
+import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatter.service";
 
 import { FutureAllocationListComponent } from './future-allocation-list.component';
 
@@ -8,7 +12,15 @@ describe('FutureAllocationListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FutureAllocationListComponent ]
+      imports: [
+        TestConfigModule,
+        SharedModule.forRoot(),
+      ],
+      declarations: [ FutureAllocationListComponent ],
+      providers: [
+        BudgetService,
+        FutureBudgetsDataFormatterService,
+      ]
     })
     .compileComponents();
   }));

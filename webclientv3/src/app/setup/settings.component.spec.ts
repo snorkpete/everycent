@@ -1,4 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TestConfigModule} from "../../../test/test-config.module";
+import {BankAccountService} from "../bank-accounts/bank-account.service";
+import {SharedModule} from "../shared/shared.module";
 
 import { SettingsComponent } from './settings.component';
 
@@ -8,7 +11,14 @@ describe('SettingsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SettingsComponent ]
+      imports: [
+        TestConfigModule,
+        SharedModule.forRoot(),
+      ],
+      declarations: [ SettingsComponent ],
+      providers: [
+        BankAccountService,
+      ]
     })
     .compileComponents();
   }));
