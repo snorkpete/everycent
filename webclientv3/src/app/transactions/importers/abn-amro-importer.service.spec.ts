@@ -33,7 +33,7 @@ Albert Heijn Fr.8642 ALM,PAS361
 
 €+ 28,40
 DOMINOS NL BY ADYEN
-28-12-2017
+12 December 2017
 
 €- 1,87
 ABN AMRO Bank N.V.
@@ -56,15 +56,15 @@ NS- Almere Centr.102 ALM,PAS361
     it('returns true for "yesterday"', () => {
       expect(importer.isDate("yesterday")).toBeTruthy();
     });
-    it('returns true for "23-12-2017"', () => {
-      expect(importer.isDate("23-12-2017")).toBeTruthy();
+    it('returns true for "12 December 2017"', () => {
+      expect(importer.isDate("12 December 2017")).toBeTruthy();
     });
   });
 
   describe("#extractDate", () => {
-    it('returns "2017-12-23" for "23-12-2017"', () => {
-      expect(importer.extractDate("23-12-2017")).toEqual(
-        new Date("2017-12-23")
+    it('returns "2017-12-23" for "12 December 2017"', () => {
+      expect(importer.extractDate("12 December 2017")).toEqual(
+        new Date(2017, 11, 12, 10)
       );
     });
     it("returns current date for today", () => {
@@ -131,7 +131,7 @@ NS- Almere Centr.102 ALM,PAS361
     it("returns false for dates", () => {
       expect(importer.isDescription("today")).toBeFalsy();
       expect(importer.isDescription("yesterday")).toBeFalsy();
-      expect(importer.isDescription("23-12-2017")).toBeFalsy();
+      expect(importer.isDescription("4 May 2018")).toBeFalsy();
     });
     it("returns false for numbers", () => {
       expect(importer.isDescription("€+ 4.110,00")).toBeFalsy();
