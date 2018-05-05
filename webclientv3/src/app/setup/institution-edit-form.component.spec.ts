@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TestConfigModule} from "../../../test/test-config.module";
+import {SharedModule} from "../shared/shared.module";
 
 import { InstitutionEditFormComponent } from './institution-edit-form.component';
 
@@ -8,6 +10,10 @@ describe('InstitutionEditFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        TestConfigModule,
+        SharedModule,
+      ],
       declarations: [ InstitutionEditFormComponent ]
     })
     .compileComponents();

@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {TestConfigModule} from "../../../test/test-config.module";
+import {SharedModule} from "../shared/shared.module";
 
 import { InstitutionsComponent } from './institutions.component';
 
@@ -8,6 +10,10 @@ describe('InstitutionsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        TestConfigModule,
+        SharedModule.forRoot(),
+      ],
       declarations: [ InstitutionsComponent ]
     })
     .compileComponents();
@@ -22,4 +28,5 @@ describe('InstitutionsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
 });

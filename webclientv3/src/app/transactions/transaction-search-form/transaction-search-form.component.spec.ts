@@ -17,7 +17,8 @@ const BankAccountServiceStub = {
 };
 
 const BudgetServiceStub = {
-  getBudgets: () => Observable.of([])
+  getBudgets: () => Observable.of([]),
+  getBudgetsWithTransactions: () => Observable.of([]),
 };
 
 describe('TransactionsSearchFormComponent', () => {
@@ -71,6 +72,7 @@ describe('TransactionsSearchFormComponent', () => {
     ];
     spyOn(bankAccountService, 'getBankAccounts').and.returnValue(Observable.of(sampleBankAccounts));
     spyOn(budgetService, 'getBudgets').and.returnValue(Observable.of(sampleBudgets));
+    spyOn(budgetService, 'getBudgetsWithTransactions').and.returnValue(Observable.of(sampleBudgets));
   });
 
   it('should create', () => {
