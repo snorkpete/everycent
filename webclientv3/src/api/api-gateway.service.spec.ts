@@ -1,253 +1,270 @@
-import {TestConfigModule} from "../../test/test-config.module";
-import {ApiGateway} from './api-gateway.service';
-import {async, inject, TestBed} from '@angular/core/testing';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import {
-  BaseRequestOptions,
-  Headers,
-  Http,
-  HttpModule,
-  Request,
-  RequestMethod,
-  RequestOptions,
-  Response,
-  ResponseOptions,
-  ResponseType
-} from '@angular/http';
-import {MockBackend, MockConnection} from '@angular/http/testing';
-import {LoadingIndicator} from '../app/shared/loading-indicator/loading-indicator.service';
+  HttpClientTestingModule,
+  HttpTestingController,
+  TestRequest
+} from "@angular/common/http/testing";
+import { async, TestBed } from "@angular/core/testing";
+import { Router } from "@angular/router";
+import { RouterStub } from "../../test/stub-services/router-stub";
+import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
+import { ApiGateway } from "./api-gateway.service";
 
-describe('ApiGateway', () => {
+describe("ApiGateway", () => {
+  let apiGateway: ApiGateway;
+  let http: HttpClient;
+  let httpTestingController: HttpTestingController;
 
-  let apiGateway: ApiGateway, mockBackend: MockBackend;
+  // helper to make it easier to test against partial URLs
+  function checkRequest(url: string): TestRequest {
+    return httpTestingController.expectOne(request =>
+      request.url.includes(url)
+    );
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-      ],
+      imports: [HttpClientTestingModule],
       providers: [
         ApiGateway,
-        {
-          provide: Http,
-          useFactory: (_mockBackend: MockBackend, options: RequestOptions) => {
-            return new Http(_mockBackend, options);
-          },
-          deps: [MockBackend, BaseRequestOptions]
-        },
-        MockBackend,
-        BaseRequestOptions,
         LoadingIndicator,
+        { provide: Router, useValue: RouterStub }
       ]
     });
   });
 
-  beforeEach(inject([ApiGateway, MockBackend], (_apiGateway: ApiGateway, _mockBackend: MockBackend) => {
-    apiGateway = _apiGateway;
-    mockBackend = _mockBackend;
-  }));
+  beforeEach(() => {
+    apiGateway = TestBed.get(ApiGateway);
+    http = TestBed.get(HttpClient);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
 
-  describe('get()', () => {
-
-    let request: Request;
-    let connection: MockConnection;
-
-    beforeEach(() => {
-      // grab the mock connection and request to inspect them later
-      mockBackend.connections.subscribe((_connection: MockConnection) => {
-        connection = _connection;
-        request = _connection.request;
-      });
-    });
-
+  describe("get()", () => {
     it("requests the correct url", () => {
-      let url = "accounts";
-      apiGateway.get(url).subscribe();
-      expect(request.url).toContain(url, 'requests the correct url');
+      let url = "/accounts";
+      let testData = [{ id: 1, name: "Account" }];
+      apiGateway.get(url).subscribe(data => {
+        expect(data).toEqual(testData);
+      });
+
+      // confirm that we're hitting the correct URL
+      const req = checkRequest(url);
+      req.flush(testData);
+      httpTestingController.verify();
     });
 
     it("makes a 'GET' request", () => {
-      apiGateway.get('hello').subscribe();
-      expect(request.method).toEqual(RequestMethod.Get);
+      apiGateway.get("hello").subscribe();
+      const req = checkRequest("hello");
+      expect(req.request.method).toEqual("GET");
     });
 
-    it('converts the result to JSON', () => {
+    it("converts the result to JSON", () => {
       let mockResponse = [
-        {id: 0, name: 'Account 0'},
-        {id: 1, name: 'Account 1'},
-        {id: 2, name: 'Account 2'},
-        {id: 2, name: 'Account 2'},
+        { id: 0, name: "Account 0" },
+        { id: 1, name: "Account 1" },
+        { id: 2, name: "Account 2" },
+        { id: 2, name: "Account 2" }
       ];
 
-      apiGateway.get('random')
-        .subscribe(accounts => {
-          expect(accounts.length).toEqual(4, '4 accounts returned');
-        });
-      let response = new Response( new ResponseOptions({body: JSON.stringify(mockResponse)}));
-      connection.mockRespond(response);
+      apiGateway.get("random").subscribe(accounts => {
+        expect(accounts.length).toEqual(4, "4 accounts returned");
+      });
+
+      const req = checkRequest("random");
+      req.flush(mockResponse);
     });
 
     it("encodes its params as part of the URL", () => {
-      apiGateway.get('hello', { name: 'joe', last: 'smith'}).subscribe();
-      expect(request.url).toContain('hello?name=joe&last=smith');
+      apiGateway.get("hello", { name: "joe", last: "smith" }).subscribe();
+      const req = checkRequest("hello");
+      expect(req.request.url).toContain("hello?name=joe&last=smith");
     });
 
     it("adds the correct authentication headers", () => {
-
       // setup the local storage
       // Authentication header values should pull from here
-      localStorage.setItem('access-token', 'access');
-      localStorage.setItem('client', 'client');
-      localStorage.setItem('expiry', 'expiry');
-      localStorage.setItem('token-type', 'token');
-      localStorage.setItem('uid', 'uid');
+      localStorage.setItem("access-token", "access");
+      localStorage.setItem("client", "client");
+      localStorage.setItem("expiry", "expiry");
+      localStorage.setItem("token-type", "token");
+      localStorage.setItem("uid", "uid");
 
-      apiGateway.get('hello', { name: 'joe', last: 'smith'}).subscribe();
+      apiGateway.get("hello", { name: "joe", last: "smith" }).subscribe();
 
-      expect(request.headers.get('Content-Type')).toEqual('application/json', 'content type matches');
-      expect(request.headers.get('access-token')).toEqual('access', 'access token matches');
-      expect(request.headers.get('client')).toEqual('client', 'client matches');
-      expect(request.headers.get('expiry')).toEqual('expiry', 'expiry matches');
-      expect(request.headers.get('token-type')).toEqual('token', 'token type matches');
-      expect(request.headers.get('uid')).toEqual('uid', 'uid matches');
+      const req = checkRequest("hello");
+      expect(req.request.headers.get("Content-Type")).toEqual(
+        "application/json",
+        "content type matches"
+      );
+      expect(req.request.headers.get("access-token")).toEqual(
+        "access",
+        "access token matches"
+      );
+      expect(req.request.headers.get("client")).toEqual(
+        "client",
+        "client matches"
+      );
+      expect(req.request.headers.get("expiry")).toEqual(
+        "expiry",
+        "expiry matches"
+      );
+      expect(req.request.headers.get("token-type")).toEqual(
+        "token",
+        "token type matches"
+      );
+      expect(req.request.headers.get("uid")).toEqual("uid", "uid matches");
     });
-
   });
 
-  describe('post()', () => {
-
-    let request: Request;
-    let connection: MockConnection;
-
-    beforeEach(() => {
-      // grab the mock connection and request to inspect them later
-      mockBackend.connections.subscribe((_connection: MockConnection) => {
-        connection = _connection;
-        request = _connection.request;
-      });
-    });
-
+  describe("post()", () => {
     it("posts to the correct url", () => {
       let url = "accounts";
-      let data = { first: 'Hello', second: 'World' };
+      let data = { first: "Hello", second: "World" };
       apiGateway.post(url, data).subscribe();
-      expect(request.url).toContain(url, 'posts to the correct url');
-      let requestBodyAsJSON = JSON.parse(request.getBody());
-      expect(requestBodyAsJSON).toEqual(data, 'posts the data as the body of the request');
+      const req = checkRequest(url);
+      expect(req.request.url).toContain(url, "posts to the correct url");
+      expect(req.request.body).toEqual(
+        data,
+        "posts the data as the body of the request"
+      );
     });
 
     it("makes a 'POST' request", () => {
-      apiGateway.post('hello').subscribe();
-      expect(request.method).toEqual(RequestMethod.Post);
+      apiGateway.post("hello").subscribe();
+      const req = checkRequest("hello");
+      expect(req.request.method).toEqual("POST");
     });
 
-    it('converts the result to JSON', () => {
+    it("converts the result to JSON", () => {
       let mockResponse = [
-        {id: 0, name: 'Account 0'},
-        {id: 1, name: 'Account 1'},
-        {id: 2, name: 'Account 2'},
-        {id: 2, name: 'Account 2'},
+        { id: 0, name: "Account 0" },
+        { id: 1, name: "Account 1" },
+        { id: 2, name: "Account 2" },
+        { id: 2, name: "Account 2" }
       ];
 
-      apiGateway.post('random')
-        .subscribe((accounts: any) => {
-          expect(accounts.length).toEqual(4, '4 accounts returned');
-        });
-      let response = new Response( new ResponseOptions({body: JSON.stringify(mockResponse)}));
-      connection.mockRespond(response);
+      apiGateway.post("random").subscribe((accounts: any) => {
+        expect(accounts.length).toEqual(4, "4 accounts returned");
+      });
+      let req = checkRequest("random");
+      req.flush(mockResponse);
     });
 
     it("adds the correct authentication headers", () => {
-
       // setup the local storage
       // Authentication header values should pull from here
-      localStorage.setItem('access-token', 'access');
-      localStorage.setItem('client', 'client');
-      localStorage.setItem('expiry', 'expiry');
-      localStorage.setItem('token-type', 'token');
-      localStorage.setItem('uid', 'uid');
+      localStorage.setItem("access-token", "access");
+      localStorage.setItem("client", "client");
+      localStorage.setItem("expiry", "expiry");
+      localStorage.setItem("token-type", "token");
+      localStorage.setItem("uid", "uid");
 
-      apiGateway.post('hello', { name: 'joe', last: 'smith'}).subscribe();
+      apiGateway.post("hello", { name: "joe", last: "smith" }).subscribe();
 
-      expect(request.headers.get('Content-Type')).toEqual('application/json', 'content type matches');
-      expect(request.headers.get('access-token')).toEqual('access', 'access token matches');
-      expect(request.headers.get('client')).toEqual('client', 'client matches');
-      expect(request.headers.get('expiry')).toEqual('expiry', 'expiry matches');
-      expect(request.headers.get('token-type')).toEqual('token', 'token type matches');
-      expect(request.headers.get('uid')).toEqual('uid', 'uid matches');
+      const req = checkRequest("hello");
+      expect(req.request.headers.get("Content-Type")).toEqual(
+        "application/json",
+        "content type matches"
+      );
+      expect(req.request.headers.get("access-token")).toEqual(
+        "access",
+        "access token matches"
+      );
+      expect(req.request.headers.get("client")).toEqual(
+        "client",
+        "client matches"
+      );
+      expect(req.request.headers.get("expiry")).toEqual(
+        "expiry",
+        "expiry matches"
+      );
+      expect(req.request.headers.get("token-type")).toEqual(
+        "token",
+        "token type matches"
+      );
+      expect(req.request.headers.get("uid")).toEqual("uid", "uid matches");
     });
-
   });
-  describe('postWithoutAuthentication()', () => {
 
-    let request: Request;
-    let connection: MockConnection;
-
-    beforeEach(() => {
-      // grab the mock connection and request to inspect them later
-      mockBackend.connections.subscribe((_connection: MockConnection) => {
-        connection = _connection;
-        request = _connection.request;
-      });
-    });
-
+  describe("postWithoutAuthentication()", () => {
     it("POSTs to the correct url", () => {
-      let url = '/login';
+      let url = "/login";
       apiGateway.postWithoutAuthentication(url, {}).subscribe();
-      expect(request.url).toContain(url, 'uses correct url');
-      expect(request.method).toEqual(RequestMethod.Post, 'uses correct method');
+      const req = checkRequest(url);
+      expect(req.request.url).toContain(url, "uses correct url");
+      expect(req.request.method).toEqual("POST", "uses correct method");
     });
 
     it("adds additional data to the request body", () => {
-      apiGateway.postWithoutAuthentication('test', {mydata: 'yes', name: 'Jess'});
+      apiGateway
+        .postWithoutAuthentication("test", {
+          mydata: "yes",
+          name: "Jess"
+        })
+        .subscribe();
 
-      let requestBodyAsJSON = JSON.parse(request.getBody());
-      expect(requestBodyAsJSON).toEqual({mydata: 'yes', name: 'Jess'});
-
+      const req = checkRequest("test");
+      expect(req.request.body).toEqual({ mydata: "yes", name: "Jess" });
     });
 
     it("does NOT add any authentication headers", () => {
-      apiGateway.postWithoutAuthentication('test', {});
-      expect(request.headers.get('Content-Type')).toEqual('application/json', 'has correct content type');
-      expect(request.headers.get('access-token')).toEqual(null, 'no access token');
+      apiGateway.postWithoutAuthentication("test", {}).subscribe();
+      const req = checkRequest("test");
+      expect(req.request.headers.get("Content-Type")).toEqual(
+        "application/json",
+        "has correct content type"
+      );
+      expect(req.request.headers.get("access-token")).toEqual(
+        null,
+        "no access token"
+      );
     });
 
-    it("sends the authentication response headers as the output on success", async(() => {
+    it(
+      "sends the authentication response headers as the output on success",
+      async(() => {
+        apiGateway.postWithoutAuthentication("test", {}).subscribe(result => {
+          expect(result["access-token"]).toEqual("a");
+          expect(result["client"]).toEqual("c");
+          expect(result["expiry"]).toEqual("e");
+          expect(result["token-type"]).toEqual("t");
+          expect(result["uid"]).toEqual("u");
+        });
 
-      apiGateway.postWithoutAuthentication('test', {}).subscribe(result => {
-        expect(result['access-token']).toEqual('a');
-        expect(result['client']).toEqual('c');
-        expect(result['expiry']).toEqual('e');
-        expect(result['token-type']).toEqual('t');
-        expect(result['uid']).toEqual('u');
-      });
+        let headers = new HttpHeaders({
+          "access-token": "a",
+          client: "c",
+          expiry: "e",
+          "token-type": "t",
+          uid: "u"
+        });
 
-      let headers = new Headers({
-        'access-token': 'a',
-        'client': 'c',
-        'expiry': 'e',
-        'token-type': 't',
-        'uid': 'u'
-      });
+        const req = checkRequest("test");
+        req.flush("", { headers: headers });
+      })
+    );
 
-      let response = new Response(new ResponseOptions({ headers: headers}));
-      connection.mockRespond(response);
-    }));
+    it(
+      "sends the error message as the response if the request fails",
+      async(() => {
+        let errorJSON = { errors: ["Authentication failed"] };
+        apiGateway.postWithoutAuthentication("test", {}).subscribe({
+          error: error => {
+            expect(error).toEqual("Authentication failed");
+          }
+        });
 
-    it("sends the error message as the response if the request fails", async(() => {
+        const req = checkRequest("test");
+        req.flush(errorJSON, {
+          status: 401,
+          statusText: "Authentication Failed"
+        });
+      })
+    );
+  });
 
-      let errorMessage = "Authentication failed";
-      let errorJSON = { "errors": ["Authentication failed"]};
-      apiGateway.postWithoutAuthentication('test', {}).subscribe({
-        error: (error) => {
-          expect(error).toEqual("Authentication failed");
-        }
-      });
-
-      let response = new Response(new ResponseOptions({ type: ResponseType.Error, status: 401, body: errorJSON}));
-      //connection.mockError(response);
-
-    }));
-
+  afterEach(() => {
+    httpTestingController.verify();
   });
 });
-

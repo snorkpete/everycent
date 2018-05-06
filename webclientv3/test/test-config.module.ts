@@ -1,5 +1,5 @@
+import {HttpClient} from "@angular/common/http";
 import {NgModule} from "@angular/core";
-import {Http} from "@angular/http";
 import {MatDialogRef} from "@angular/material";
 import {NoopAnimationsModule} from "@angular/platform-browser/animations";
 import {SetupService} from "../src/app/setup/setup.service";
@@ -24,7 +24,7 @@ import {TransactionServiceStub} from "./stub-services/transaction-service-stub";
   ],
   providers: [
     // library services
-    { provide: Http, useValue: httpStub },
+    { provide: HttpClient, useValue: httpStub },
     { provide: MatDialogRef, useValue: MatDialogRefStub },
     { provide: Router, useValue: RouterStub },
     { provide: ActivatedRoute, useClass: ActivatedRouteStub },

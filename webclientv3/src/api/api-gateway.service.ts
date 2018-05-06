@@ -1,94 +1,91 @@
-import {Injectable} from '@angular/core';
-import {Headers, Http, RequestOptions, URLSearchParams} from '@angular/http';
-import {Router} from "@angular/router";
-import {BASE_URL} from './base-url.service';
-import {Observable} from 'rxjs/Observable';
-import {AuthCredentials} from '../app/core/auth/auth-credentials';
-import {LoadingIndicator} from '../app/shared/loading-indicator/loading-indicator.service';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Headers, Http, RequestOptions, URLSearchParams } from "@angular/http";
+import { Router } from "@angular/router";
+import { BASE_URL } from "./base-url.service";
+import { Observable } from "rxjs/Observable";
+import { AuthCredentials } from "../app/core/auth/auth-credentials";
+import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
 
 @Injectable()
 export class ApiGateway {
-
   private BASE_URL = BASE_URL;
   constructor(
-    public http: Http,
+    private http: HttpClient,
     private router: Router,
     private loadingIndicator: LoadingIndicator
   ) {}
 
   get(url: string, params?: any): Observable<any> {
-
-    const options = new RequestOptions({ headers: this.getAuthenticationHeaders() });
+    const options = { headers: this.getAuthenticationHeaders() };
     const fullUrl = `${this.BASE_URL}${url}?${this.urlEncode(params)}`;
 
     this.loadingIndicator.show();
-    return this.http.get(fullUrl, options)
-                    .do(() => this.loadingIndicator.hide())
-                    .map(res => res.json())
-                    .catch(error => {
-                      // TODO: only catch authentication errors
-                      //       when doing this redirect
-                      this.router.navigateByUrl('/login');
-                      this.loadingIndicator.hide();
-                      return Observable.empty();
-                    });
-
+    return this.http
+      .get(fullUrl, options)
+      .do(() => this.loadingIndicator.hide())
+      .catch(error => {
+        // TODO: only catch authentication errors
+        //       when doing this redirect
+        this.router.navigateByUrl("/login");
+        this.loadingIndicator.hide();
+        return Observable.empty();
+      });
   }
 
   post(url: string, data?: any): Observable<any> {
-    const options = new RequestOptions({ headers: this.getAuthenticationHeaders() });
+    const options = { headers: this.getAuthenticationHeaders() };
     const fullUrl = `${this.BASE_URL}${url}`;
 
     this.loadingIndicator.show();
-    return this.http.post(fullUrl, data, options)
-      .do(() => this.loadingIndicator.hide())
-      .map(res => res.json());
+    return this.http
+      .post(fullUrl, data, options)
+      .do(() => this.loadingIndicator.hide());
   }
 
   put(url: string, data?: any): Observable<any> {
-    const options = new RequestOptions({ headers: this.getAuthenticationHeaders() });
+    const options = { headers: this.getAuthenticationHeaders() };
     const fullUrl = `${this.BASE_URL}${url}`;
 
     this.loadingIndicator.show();
-    return this.http.put(fullUrl, data, options)
-                    .do(() => this.loadingIndicator.hide())
-                    .map(res => res.json());
+    return this.http
+      .put(fullUrl, data, options)
+      .do(() => this.loadingIndicator.hide());
   }
 
   postWithoutAuthentication(url: string, data: any): Observable<any> {
-    const headers = new Headers({
-      'Content-Type': 'application/json'
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json"
     });
-
-    const options = new RequestOptions({ headers: headers});
 
     const fullUrl = `${this.BASE_URL}${url}`;
 
     this.loadingIndicator.show();
-    return this.http.post(fullUrl, data, options)
-                    .do(() => this.loadingIndicator.hide())
-                    .map( response => {
-                      return {
-                        'access-token': response.headers.get('access-token'),
-                        'client': response.headers.get('client'),
-                        'expiry': response.headers.get('expiry'),
-                        'token-type': response.headers.get('token-type'),
-                        'uid': response.headers.get('uid'),
-                      };
-                    })
-                    .catch( error => {
-                      this.loadingIndicator.hide();
-                      let errorResponse = error.json();
-                      return Observable.throw(errorResponse["errors"][0]);
-                    });
-
+    return this.http
+      .post(fullUrl, data, { headers: headers, observe: "response" })
+      .do(() => this.loadingIndicator.hide())
+      .map(response => {
+        return {
+          "access-token": response.headers.get("access-token"),
+          client: response.headers.get("client"),
+          expiry: response.headers.get("expiry"),
+          "token-type": response.headers.get("token-type"),
+          uid: response.headers.get("uid")
+        };
+      })
+      .catch(errorRes => {
+        console.log(errorRes);
+        this.loadingIndicator.hide();
+        let errorResponse = errorRes.error;
+        return Observable.throw(errorResponse["errors"][0]);
+      });
   }
 
-  private getAuthenticationHeaders() {
+  private getAuthenticationHeaders(): HttpHeaders {
     let headers = AuthCredentials.fromLocalStorage().toHeaders();
     // ensure that we receive responses as json
-    headers.append('Content-Type', 'application/json');
-    return headers;
+    // Note that headers is immutable - append returns a new HttpHeaders object
+    return headers.append("Content-Type", "application/json");
   }
 
   private urlEncode(obj: any): string {

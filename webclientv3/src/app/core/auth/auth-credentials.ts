@@ -1,4 +1,4 @@
-import {Headers} from '@angular/http';
+import {HttpHeaders} from "@angular/common/http";
 export class AuthCredentials {
 
   // needed to be able to index into AuthCredentials without getting type errors
@@ -37,8 +37,8 @@ export class AuthCredentials {
     };
   }
 
-  toHeaders(): Headers {
-    return new Headers(this.toJSON());
+  toHeaders(): HttpHeaders {
+    return new HttpHeaders(this.toJSON());
   }
 
   saveToLocalStorage(): void {
