@@ -1,20 +1,21 @@
-import { TestBed, inject } from '@angular/core/testing';
-import {TestConfigModule} from "../../../test/test-config.module";
-import {SharedModule} from "../shared/shared.module";
+import { TestBed, inject } from "@angular/core/testing";
+import { TestConfigModule } from "../../../test/test-config.module";
+import { SharedModule } from "../shared/shared.module";
 
-import { SetupService } from './setup.service';
+import { SetupService } from "./setup.service";
 
-describe('SetupService', () => {
+describe("SetupService", () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-      ],
+      imports: [TestConfigModule, SharedModule.forRoot()],
       providers: [SetupService]
     });
   });
 
-  it('should be created', inject([SetupService], (service: SetupService) => {
-    expect(service).toBeTruthy();
-  }));
+  it(
+    "should be created",
+    inject([SetupService], (service: SetupService) => {
+      expect(service).toBeTruthy();
+    })
+  );
 });
