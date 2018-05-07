@@ -1,11 +1,10 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Headers, Http, RequestOptions, URLSearchParams } from "@angular/http";
 import { Router } from "@angular/router";
-import { BASE_URL } from "./base-url.service";
 import { Observable } from "rxjs/Observable";
 import { AuthCredentials } from "../app/core/auth/auth-credentials";
 import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
+import { BASE_URL } from "./base-url.service";
 
 @Injectable()
 export class ApiGateway {
@@ -88,13 +87,12 @@ export class ApiGateway {
     return headers.append("Content-Type", "application/json");
   }
 
-  private urlEncode(obj: any): string {
-    let urlSearchParams = new URLSearchParams();
-    for (let key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        urlSearchParams.append(key, obj[key]);
-      }
-    }
-    return urlSearchParams.toString();
+  private urlEncode(obj: any = {}): string {
+    let params = new HttpParams();
+    Object.entries(obj).forEach(entry => {
+      let [key, value] = entry;
+      params = params.append(key, value);
+    });
+    return params.toString();
   }
 }
