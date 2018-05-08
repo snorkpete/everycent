@@ -1,16 +1,16 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {FormBuilder} from "@angular/forms";
-import {ActivatedRoute, Router} from "@angular/router";
-import {Observable} from "rxjs/Observable";
-import {ActivatedRouteStub} from "../../../../test/stub-services/activated-route-stub";
-import {TestConfigModule} from "../../../../test/test-config.module";
-import {BankAccountData} from "../../bank-accounts/bank-account.model";
-import {BankAccountService} from "../../bank-accounts/bank-account.service";
-import {BudgetData} from "../../budgets/budget.model";
-import {BudgetService} from "../../budgets/budget.service";
-import {SharedModule} from "../../shared/shared.module";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormBuilder } from "@angular/forms";
+import { ActivatedRoute, Router } from "@angular/router";
+import { Observable } from "rxjs/Observable";
+import { ActivatedRouteStub } from "../../../../test/stub-services/activated-route-stub";
+import { TestConfigModule } from "../../../../test/test-config.module";
+import { BankAccountData } from "../../bank-accounts/bank-account.model";
+import { BankAccountService } from "../../bank-accounts/bank-account.service";
+import { BudgetData } from "../../budgets/budget.model";
+import { BudgetService } from "../../budgets/budget.service";
+import { SharedModule } from "../../shared/shared.module";
 
-import {TransactionSearchFormComponent} from './transaction-search-form.component';
+import { TransactionSearchFormComponent } from "./transaction-search-form.component";
 
 const BankAccountServiceStub = {
   getBankAccounts: () => Observable.of([])
@@ -18,10 +18,10 @@ const BankAccountServiceStub = {
 
 const BudgetServiceStub = {
   getBudgets: () => Observable.of([]),
-  getBudgetsWithTransactions: () => Observable.of([]),
+  getBudgetsWithTransactions: () => Observable.of([])
 };
 
-describe('TransactionsSearchFormComponent', () => {
+describe("TransactionsSearchFormComponent", () => {
   let component: TransactionSearchFormComponent;
   let fixture: ComponentFixture<TransactionSearchFormComponent>;
   let router: Router;
@@ -32,23 +32,20 @@ describe('TransactionsSearchFormComponent', () => {
   let sampleBankAccounts: BankAccountData[];
   let sampleBudgets: BudgetData[];
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-        SharedModule
-      ],
-      declarations: [ TransactionSearchFormComponent ],
-      schemas: [
-      ],
-      providers: [
-        { provide: BankAccountService, useValue: BankAccountServiceStub },
-        { provide: BudgetService, useValue: BudgetServiceStub },
-        FormBuilder,
-      ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule],
+        declarations: [TransactionSearchFormComponent],
+        schemas: [],
+        providers: [
+          { provide: BankAccountService, useValue: BankAccountServiceStub },
+          { provide: BudgetService, useValue: BudgetServiceStub },
+          FormBuilder
+        ]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionSearchFormComponent);
@@ -61,40 +58,44 @@ describe('TransactionsSearchFormComponent', () => {
 
   beforeEach(() => {
     sampleBankAccounts = [
-      { id: 5, name: 'First Account' },
-      { id: 3, name: 'Second Account' },
-      { id: 2, name: 'Third Account' },
+      { id: 5, name: "First Account" },
+      { id: 3, name: "Second Account" },
+      { id: 2, name: "Third Account" }
     ];
     sampleBudgets = [
-      { id: 15, name: 'First Budget' },
-      { id: 13, name: 'Second Budget' },
-      { id: 4, name: 'Third Budget' },
+      { id: 15, name: "First Budget" },
+      { id: 13, name: "Second Budget" },
+      { id: 4, name: "Third Budget" }
     ];
-    spyOn(bankAccountService, 'getBankAccounts').and.returnValue(Observable.of(sampleBankAccounts));
-    spyOn(budgetService, 'getBudgets').and.returnValue(Observable.of(sampleBudgets));
-    spyOn(budgetService, 'getBudgetsWithTransactions').and.returnValue(Observable.of(sampleBudgets));
+    spyOn(bankAccountService, "getBankAccounts").and.returnValue(
+      Observable.of(sampleBankAccounts)
+    );
+    spyOn(budgetService, "getBudgets").and.returnValue(
+      Observable.of(sampleBudgets)
+    );
+    spyOn(budgetService, "getBudgetsWithTransactions").and.returnValue(
+      Observable.of(sampleBudgets)
+    );
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 
-  describe('when initializing', () => {
+  describe("when initializing", () => {
+    beforeEach(() => {});
 
-    beforeEach(() => {
-    });
-
-    it('sets up the list of bankAccounts', () => {
+    it("sets up the list of bankAccounts", () => {
       fixture.detectChanges();
       expect(component.bankAccounts).toEqual(sampleBankAccounts);
     });
 
-    it('sets up the list of budgets', () => {
+    it("sets up the list of budgets", () => {
       fixture.detectChanges();
       expect(component.budgets).toEqual(sampleBudgets);
     });
 
-    it('emits the first budget and bank account after init when no router params', () => {
+    it("emits the first budget and bank account after init when no router params", () => {
       let firstBankAccount = sampleBankAccounts[0];
       let firstBudget = sampleBudgets[0];
       route.testQueryParamMap = {};
@@ -106,20 +107,22 @@ describe('TransactionsSearchFormComponent', () => {
           bank_account_id: firstBankAccount.id,
           budget_id: firstBudget.id,
           bankAccount: firstBankAccount,
-          budget: firstBudget,
+          budget: firstBudget
         });
       });
       fixture.detectChanges();
       expect(changeEmitCount).toEqual(1);
     });
-
   });
 
-  describe('when has valid router params', () => {
-    it('emits the value of the budget id & bank_account_id', () => {
+  describe("when has valid router params", () => {
+    it("emits the value of the budget id & bank_account_id", () => {
       let secondBankAccount = sampleBankAccounts[1];
       let secondBudget = sampleBudgets[1];
-      route.testParamMap = {bank_account_id: secondBankAccount.id, budget_id: secondBudget.id};
+      route.testParamMap = {
+        bank_account_id: secondBankAccount.id,
+        budget_id: secondBudget.id
+      };
       let changeEmitCount = 0;
       component.change.subscribe(searchParams => {
         changeEmitCount += 1;
@@ -127,7 +130,7 @@ describe('TransactionsSearchFormComponent', () => {
           bank_account_id: secondBankAccount.id,
           budget_id: secondBudget.id,
           bankAccount: secondBankAccount,
-          budget: secondBudget,
+          budget: secondBudget
         });
       });
       fixture.detectChanges();
@@ -135,9 +138,9 @@ describe('TransactionsSearchFormComponent', () => {
     });
   });
 
-  describe('when has invalid params', () => {
-    it('emits an object without bankAccount and budget set', () => {
-      route.testParamMap = {bank_account_id: 40, budget_id: 100};
+  describe("when has invalid params", () => {
+    it("emits an object without bankAccount and budget set", () => {
+      route.testParamMap = { bank_account_id: 40, budget_id: 100 };
 
       let changeEmitCount = 0;
       component.change.subscribe(searchParams => {
@@ -150,9 +153,8 @@ describe('TransactionsSearchFormComponent', () => {
     });
   });
 
-  describe('on form change', () => {
-    it('emits a new change event', () => {
-
+  describe("on form change", () => {
+    it("emits a new change event", () => {
       // allow ngInit to run
       fixture.detectChanges();
 
@@ -166,15 +168,18 @@ describe('TransactionsSearchFormComponent', () => {
           bank_account_id: thirdAccount.id,
           budget_id: thirdBudget.id,
           bankAccount: thirdAccount,
-          budget: thirdBudget,
+          budget: thirdBudget
         });
       });
-      component.form.setValue({budget_id: thirdBudget.id, bank_account_id: thirdAccount.id});
+      component.form.setValue({
+        budget_id: thirdBudget.id,
+        bank_account_id: thirdAccount.id
+      });
       fixture.detectChanges();
       expect(changeEmitCount).toEqual(1);
     });
 
-    it('navigates to the new URL', () => {
+    it("navigates to the new URL", () => {
       let firstAccount = sampleBankAccounts[0];
       let firstBudget = sampleBudgets[0];
       let thirdAccount = sampleBankAccounts[2];
@@ -186,18 +191,19 @@ describe('TransactionsSearchFormComponent', () => {
       fixture.detectChanges();
       expect(spy.calls.count()).toEqual(1);
       expect(spy.calls.mostRecent().args[0]).toEqual([
-        { budget_id: firstBudget.id, bank_account_id: firstAccount.id },
+        { budget_id: firstBudget.id, bank_account_id: firstAccount.id }
       ]);
 
       // update the form value and ensure it navigates properly
-      let newSelectedValues = {budget_id: thirdBudget.id, bank_account_id: thirdAccount.id};
+      let newSelectedValues = {
+        budget_id: thirdBudget.id,
+        bank_account_id: thirdAccount.id
+      };
       component.form.setValue(newSelectedValues);
 
       fixture.detectChanges();
       expect(spy.calls.count()).toEqual(2);
-      expect(spy.calls.mostRecent().args[0]).toEqual([ newSelectedValues ]);
+      expect(spy.calls.mostRecent().args[0]).toEqual([newSelectedValues]);
     });
   });
-
-
 });

@@ -1,23 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {TestConfigModule} from "../../../test/test-config.module";
-import {SharedModule} from "../shared/shared.module";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { TestConfigModule } from "../../../test/test-config.module";
+import { SharedModule } from "../shared/shared.module";
 
-import { InstitutionsComponent } from './institutions.component';
+import { InstitutionsComponent } from "./institutions.component";
 
-describe('InstitutionsComponent', () => {
+describe("InstitutionsComponent", () => {
   let component: InstitutionsComponent;
   let fixture: ComponentFixture<InstitutionsComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-        SharedModule.forRoot(),
-      ],
-      declarations: [ InstitutionsComponent ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule.forRoot()],
+        declarations: [InstitutionsComponent]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(InstitutionsComponent);
@@ -25,8 +23,7 @@ describe('InstitutionsComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
-
 });

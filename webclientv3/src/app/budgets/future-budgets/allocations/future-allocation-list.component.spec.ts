@@ -1,29 +1,24 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {TestConfigModule} from "../../../../../test/test-config.module";
-import {SharedModule} from "../../../shared/shared.module";
-import {BudgetService} from "../../budget.service";
-import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatter.service";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { TestConfigModule } from "../../../../../test/test-config.module";
+import { SharedModule } from "../../../shared/shared.module";
+import { BudgetService } from "../../budget.service";
+import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
 
-import { FutureAllocationListComponent } from './future-allocation-list.component';
+import { FutureAllocationListComponent } from "./future-allocation-list.component";
 
-describe('FutureAllocationListComponent', () => {
+describe("FutureAllocationListComponent", () => {
   let component: FutureAllocationListComponent;
   let fixture: ComponentFixture<FutureAllocationListComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-        SharedModule.forRoot(),
-      ],
-      declarations: [ FutureAllocationListComponent ],
-      providers: [
-        BudgetService,
-        FutureBudgetsDataFormatterService,
-      ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule.forRoot()],
+        declarations: [FutureAllocationListComponent],
+        providers: [BudgetService, FutureBudgetsDataFormatterService]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FutureAllocationListComponent);
@@ -31,7 +26,7 @@ describe('FutureAllocationListComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

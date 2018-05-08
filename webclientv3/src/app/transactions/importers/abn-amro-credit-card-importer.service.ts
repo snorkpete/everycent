@@ -1,12 +1,15 @@
-import { Injectable } from '@angular/core';
-import {TransactionData} from "../transaction-data.model";
+import { Injectable } from "@angular/core";
+import { TransactionData } from "../transaction-data.model";
 
 @Injectable()
 export class AbnAmroCreditCardImporterService {
+  constructor() {}
 
-  constructor() { }
-
-  convertToTransactions(input: string, startDate: string, endDate: string): TransactionData[] {
+  convertToTransactions(
+    input: string,
+    startDate: string,
+    endDate: string
+  ): TransactionData[] {
     let lines = this._convertInputToLines(input);
     let nbrTransactions = lines.length / 4;
 
@@ -25,7 +28,7 @@ export class AbnAmroCreditCardImporterService {
         description: descriptionData,
         withdrawal_amount: amount < 0 ? amount * -1 : 0,
         deposit_amount: amount > 0 ? amount : 0,
-        status: 'unpaid',
+        status: "unpaid"
       };
 
       let start = new Date(startDate);
@@ -37,8 +40,11 @@ export class AbnAmroCreditCardImporterService {
         transactionDate = new Date(transaction.transaction_date);
       }
 
-      if (transaction.transaction_date >= startDate && transaction.transaction_date <= endDate) {
-      // if (transactionDate >= start && transactionDate <= end) {
+      if (
+        transaction.transaction_date >= startDate &&
+        transaction.transaction_date <= endDate
+      ) {
+        // if (transactionDate >= start && transactionDate <= end) {
         transactions.push(transaction);
       }
     }
@@ -64,27 +70,27 @@ export class AbnAmroCreditCardImporterService {
     let dateParts = monthAndDay.match(/(\d+) ([A-z]{3}) | .+/);
     let [_, day, month] = dateParts; /*? dateParts */
     let months = {
-      'Jan': '01',
-      'Feb': '02',
-      'Mar': '03',
-      'Apr': '04',
-      'May': '05',
-      'Jun': '06',
-      'Jul': '07',
-      'Aug': '08',
-      'Sep': '09',
-      'Oct': '10',
-      'Nov': '11',
-      'Dec': '12'
+      Jan: "01",
+      Feb: "02",
+      Mar: "03",
+      Apr: "04",
+      May: "05",
+      Jun: "06",
+      Jul: "07",
+      Aug: "08",
+      Sep: "09",
+      Oct: "10",
+      Nov: "11",
+      Dec: "12"
     };
     return `${currentYear}-${months[month]}-${day}`;
   }
 
   extractAmount(amountText: string): number {
     let parts = amountText.match(/€(.*)(Credit|Debit)/);
-    let[_, numberPart, sign] = parts;
-    let amount = Math.floor(Number(numberPart.replace(',', '.'))  * 100);
-    if (sign === 'Credit') {
+    let [_, numberPart, sign] = parts;
+    let amount = Math.floor(Number(numberPart.replace(",", ".")) * 100);
+    if (sign === "Credit") {
       return amount;
     } else {
       return amount * -1;

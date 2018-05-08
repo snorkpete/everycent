@@ -1,23 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {TestConfigModule} from "../../../../test/test-config.module";
-import {SharedModule} from "../../shared/shared.module";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { TestConfigModule } from "../../../../test/test-config.module";
+import { SharedModule } from "../../shared/shared.module";
 
-import { TransactionCalculatorComponent } from './transaction-calculator.component';
+import { TransactionCalculatorComponent } from "./transaction-calculator.component";
 
-describe('TransactionCalculatorComponent', () => {
+describe("TransactionCalculatorComponent", () => {
   let component: TransactionCalculatorComponent;
   let fixture: ComponentFixture<TransactionCalculatorComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-        SharedModule,
-      ],
-      declarations: [ TransactionCalculatorComponent ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule],
+        declarations: [TransactionCalculatorComponent]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionCalculatorComponent);
@@ -25,7 +23,7 @@ describe('TransactionCalculatorComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

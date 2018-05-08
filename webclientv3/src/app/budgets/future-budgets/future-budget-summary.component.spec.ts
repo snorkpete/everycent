@@ -1,27 +1,23 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {TestConfigModule} from "../../../../test/test-config.module";
-import {SharedModule} from "../../shared/shared.module";
-import {BudgetService} from "../budget.service";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { TestConfigModule } from "../../../../test/test-config.module";
+import { SharedModule } from "../../shared/shared.module";
+import { BudgetService } from "../budget.service";
 
-import { FutureBudgetSummaryComponent } from './future-budget-summary.component';
+import { FutureBudgetSummaryComponent } from "./future-budget-summary.component";
 
-describe('FutureBudgetSummaryComponent', () => {
+describe("FutureBudgetSummaryComponent", () => {
   let component: FutureBudgetSummaryComponent;
   let fixture: ComponentFixture<FutureBudgetSummaryComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-        SharedModule.forRoot(),
-      ],
-      declarations: [ FutureBudgetSummaryComponent ],
-      providers: [
-        BudgetService,
-      ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule.forRoot()],
+        declarations: [FutureBudgetSummaryComponent],
+        providers: [BudgetService]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FutureBudgetSummaryComponent);
@@ -29,7 +25,7 @@ describe('FutureBudgetSummaryComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });
