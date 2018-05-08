@@ -1,27 +1,23 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {TestConfigModule} from "../../../test/test-config.module";
-import {BankAccountService} from "../bank-accounts/bank-account.service";
-import {SharedModule} from "../shared/shared.module";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { TestConfigModule } from "../../../test/test-config.module";
+import { BankAccountService } from "../bank-accounts/bank-account.service";
+import { SharedModule } from "../shared/shared.module";
 
-import { SettingsComponent } from './settings.component';
+import { SettingsComponent } from "./settings.component";
 
-describe('SettingsComponent', () => {
+describe("SettingsComponent", () => {
   let component: SettingsComponent;
   let fixture: ComponentFixture<SettingsComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-        SharedModule.forRoot(),
-      ],
-      declarations: [ SettingsComponent ],
-      providers: [
-        BankAccountService,
-      ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule.forRoot()],
+        declarations: [SettingsComponent],
+        providers: [BankAccountService]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SettingsComponent);
@@ -29,7 +25,7 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

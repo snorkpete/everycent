@@ -1,5 +1,5 @@
 import { TestBed, inject } from "@angular/core/testing";
-import {TransactionData} from "../transaction-data.model";
+import { TransactionData } from "../transaction-data.model";
 import { AbnAmroCreditCardImporterService } from "./abn-amro-credit-card-importer.service";
 
 import { AbnAmroImporterService } from "./abn-amro-importer.service";
@@ -95,7 +95,7 @@ NS- Almere Centr.102 ALM,PAS361
     it('returns false for "yesterday"', () => {
       expect(importer.isAmount("yesterday")).toBeFalsy();
     });
-    it('returns false for blank lines', () => {
+    it("returns false for blank lines", () => {
       expect(importer.isAmount("")).toBeFalsy();
     });
   });
@@ -110,7 +110,7 @@ NS- Almere Centr.102 ALM,PAS361
     it('returns true for "€+ 4.110,00"', () => {
       expect(importer.extractAmount("€+ 4.110,00")).toEqual(411000);
     });
-    it('handles non amounts without errors', () => {
+    it("handles non amounts without errors", () => {
       expect(importer.extractAmount("test")).toEqual(0);
     });
   });
@@ -139,24 +139,27 @@ NS- Almere Centr.102 ALM,PAS361
   });
 
   describe("#convertFromBankFormat", () => {
-    it('gets 5 transactions from the sample', () => {
+    it("gets 5 transactions from the sample", () => {
       // simple fix to force the relative dates to have known values
-      spyOn(importer, "currentDate").and.returnValue(new Date('2017-12-30'));
+      spyOn(importer, "currentDate").and.returnValue(new Date("2017-12-30"));
 
-      let result: TransactionData[] = importer.convertFromBankFormat(sample, '2017-12-28', '2017-12-31');
+      let result: TransactionData[] = importer.convertFromBankFormat(
+        sample,
+        "2017-12-28",
+        "2017-12-31"
+      );
       expect(result.length).toEqual(7);
 
       let first = result[0];
-      expect(first.transaction_date).toEqual('2017-12-30');
+      expect(first.transaction_date).toEqual("2017-12-30");
       expect(first.withdrawal_amount).toEqual(3380);
       expect(first.deposit_amount).toEqual(0);
 
       let fourth = result[3];
-      expect(fourth.transaction_date).toEqual('2017-12-29');
+      expect(fourth.transaction_date).toEqual("2017-12-29");
       expect(fourth.withdrawal_amount).toEqual(0);
       expect(fourth.deposit_amount).toEqual(2840);
-      expect(fourth.description).toEqual('DOMINOS NL BY ADYEN');
+      expect(fourth.description).toEqual("DOMINOS NL BY ADYEN");
     });
-
   });
 });

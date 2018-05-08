@@ -1,23 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {TestConfigModule} from "../../../test/test-config.module";
-import {SharedModule} from "../shared/shared.module";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { TestConfigModule } from "../../../test/test-config.module";
+import { SharedModule } from "../shared/shared.module";
 
-import { InstitutionEditFormComponent } from './institution-edit-form.component';
+import { InstitutionEditFormComponent } from "./institution-edit-form.component";
 
-describe('InstitutionEditFormComponent', () => {
+describe("InstitutionEditFormComponent", () => {
   let component: InstitutionEditFormComponent;
   let fixture: ComponentFixture<InstitutionEditFormComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-        SharedModule,
-      ],
-      declarations: [ InstitutionEditFormComponent ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule],
+        declarations: [InstitutionEditFormComponent]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(InstitutionEditFormComponent);
@@ -25,7 +23,7 @@ describe('InstitutionEditFormComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });
