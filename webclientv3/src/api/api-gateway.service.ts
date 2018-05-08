@@ -90,7 +90,8 @@ export class ApiGateway {
   private urlEncode(obj: any = {}): string {
     let params = new HttpParams();
     Object.entries(obj).forEach(entry => {
-      let [key, value] = entry;
+      let key: string, value: any;
+      [key, value] = entry;
       params = params.append(key, value);
     });
     return params.toString();
