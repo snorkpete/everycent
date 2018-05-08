@@ -1,13 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {MatDialogRef} from '@angular/material/dialog';
-import {SinkFundData} from '../sink-fund-data.model';
-import {SinkFundCalculator} from '../sink-fund-calculator.service';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {SinkFundService} from '../sink-fund.service';
+import { Component, Input, OnInit } from "@angular/core";
+import { MatDialogRef } from "@angular/material/dialog";
+import { SinkFundData } from "../sink-fund-data.model";
+import { SinkFundCalculator } from "../sink-fund-calculator.service";
+import { FormBuilder, FormGroup } from "@angular/forms";
+import { SinkFundService } from "../sink-fund.service";
 
 @Component({
-  selector: 'ec-add-transfer-form',
-  styles: [`
+  selector: "ec-add-transfer-form",
+  styles: [
+    `
     mat-form-field, ec-money-field {
         margin-top: 24px;
     }
@@ -16,10 +17,11 @@ import {SinkFundService} from '../sink-fund.service';
         width: 100%;
     }
 
-    ec-money-field mat-input-container{
+    ec-money-field mat-form-field{
         width: 100%;
     }
-  `],
+  `
+  ],
   template: `
     <h1 mat-dialog-title>Transfer Money</h1>
     <div mat-dialog-content>
@@ -59,7 +61,6 @@ import {SinkFundService} from '../sink-fund.service';
   `
 })
 export class AddTransferFormComponent implements OnInit {
-
   @Input() sinkFund: SinkFundData;
   calculator = new SinkFundCalculator();
   transfer: FormGroup;
@@ -68,7 +69,7 @@ export class AddTransferFormComponent implements OnInit {
     public dialogRef: MatDialogRef<AddTransferFormComponent>,
     private fb: FormBuilder,
     private sinkFundService: SinkFundService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.transfer = this.fb.group({
@@ -79,14 +80,13 @@ export class AddTransferFormComponent implements OnInit {
   }
 
   save() {
-    this.sinkFundService
-        .transfer(this.sinkFund, this.transfer.value)
-        .subscribe( sinkFund => {
-          this.sinkFundService.refreshSinkFund(this.sinkFund.id);
-          this.dialogRef.close(sinkFund);
-        },
-          (error) => alert(error)
-        );
+    this.sinkFundService.transfer(this.sinkFund, this.transfer.value).subscribe(
+      sinkFund => {
+        this.sinkFundService.refreshSinkFund(this.sinkFund.id);
+        this.dialogRef.close(sinkFund);
+      },
+      error => alert(error)
+    );
   }
 
   cancel() {
