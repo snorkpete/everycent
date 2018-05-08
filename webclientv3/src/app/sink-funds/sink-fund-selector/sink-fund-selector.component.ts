@@ -1,19 +1,28 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from "@angular/core";
-import {MatSelect} from "@angular/material";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from "@angular/core";
+import { MatSelect } from "@angular/material";
 import { SinkFundData } from "../sink-fund-data.model";
 
 @Component({
   selector: "ec-sink-fund-selector",
-  styles: [`
+  styles: [
+    `
     mat-form-field {
       width: 100%;
     }
-  `],
+  `
+  ],
   template: `
     <mat-card>
       <mat-card-content>
         <mat-form-field>
-          <mat-select #field color="primary" placeholder="Select a sink fund" (change)="change.emit($event)">
+          <mat-select #field color="primary" placeholder="Select a sink fund" (selectionChange)="change.emit($event)">
             <mat-option *ngFor="let sinkFund of sinkFunds" [value]="sinkFund.id">
               {{sinkFund.name}}
             </mat-option>
@@ -21,13 +30,13 @@ import { SinkFundData } from "../sink-fund-data.model";
         </mat-form-field>
       </mat-card-content>
     </mat-card>
-  `,
+  `
 })
 export class SinkFundSelectorComponent implements OnInit {
   @Input() sinkFunds: SinkFundData[] = [];
   @Output() change = new EventEmitter();
 
-  @ViewChild('field') field: MatSelect;
+  @ViewChild("field") field: MatSelect;
 
   get value() {
     if (this.field) {

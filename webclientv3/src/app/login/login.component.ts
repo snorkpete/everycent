@@ -1,12 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
-import {AuthService} from '../core/auth/auth.service';
-import {MessageService} from '../message-display/message.service';
-import {Router} from '@angular/router';
+import { Component, OnInit } from "@angular/core";
+import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
+import { AuthService } from "../core/auth/auth.service";
+import { MessageService } from "../message-display/message.service";
+import { Router } from "@angular/router";
 
 @Component({
-  selector: 'ec-login',
-  styles: [`
+  selector: "ec-login",
+  styles: [
+    `
     mat-card {
         width: 300px;
         margin: auto;
@@ -19,20 +20,21 @@ import {Router} from '@angular/router';
     mat-toolbar{
         margin-bottom: 15px;
     }
-  `],
+  `
+  ],
   template: `
     <form (ngSubmit)="login()">
       <mat-card>
         <mat-card-title color=""><mat-icon>lock </mat-icon> EveryCent - Log In</mat-card-title>
 
         <mat-card-content fxLayout="column">
-          <mat-input-container>
+          <mat-form-field>
             <input matInput placeholder="Email" type="text" name="email" [(ngModel)]="email" class="email"/>
-          </mat-input-container>
+          </mat-form-field>
 
-          <mat-input-container>
+          <mat-form-field>
             <input matInput placeholder="Password" type="password" name="password" [(ngModel)]="password" class="password"/>
-          </mat-input-container>
+          </mat-form-field>
         </mat-card-content>
 
         <mat-card-actions>
@@ -44,7 +46,6 @@ import {Router} from '@angular/router';
   `
 })
 export class LoginComponent implements OnInit {
-
   email: string;
   password: string;
 
@@ -52,8 +53,8 @@ export class LoginComponent implements OnInit {
     private mainToolbarService: MainToolbarService,
     private authService: AuthService,
     private messageService: MessageService,
-    private router: Router,
-  ) { }
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.mainToolbarService.hideToolbar();
@@ -63,8 +64,7 @@ export class LoginComponent implements OnInit {
     this.messageService.clear();
     return this.authService
       .logIn(this.email, this.password)
-      .then(result => this.router.navigateByUrl('/'))
-      .catch(error => this.messageService.setErrorMessage(error)) ;
+      .then(result => this.router.navigateByUrl("/"))
+      .catch(error => this.messageService.setErrorMessage(error));
   }
-
 }
