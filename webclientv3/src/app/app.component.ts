@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'ec-root',
-  styles: [`
-    :host {
+  selector: "ec-root",
+  styles: [
+    `
+      :host {
         display: flex;
         flex: 1;
       }
@@ -41,15 +42,9 @@ import {Component, OnInit} from '@angular/core';
   `
 })
 export class AppComponent implements OnInit {
+  constructor() {}
 
-  constructor(
-  ) { }
+  ngOnInit() {}
 
-  ngOnInit() {
-  }
-
-  onMenuSelect() {
-
-  }
-
+  onMenuSelect() {}
 }

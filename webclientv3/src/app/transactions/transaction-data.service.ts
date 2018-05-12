@@ -1,26 +1,23 @@
-import { Injectable } from '@angular/core';
-import {ApiGateway} from "../../api/api-gateway.service";
-import {BankAccountService} from "../bank-accounts/bank-account.service";
-import {BudgetService} from "../budgets/budget.service";
-import {AllocationData} from "./allocation-data.model";
-import {TransactionSearchParams} from "./transaction-search-form/transaction-search-params.model";
-import {TransactionService} from "./transaction.service";
+import { Injectable } from "@angular/core";
 import { combineLatest, Subject } from "rxjs";
 import { distinctUntilChanged, map, switchMap } from "rxjs/operators";
+import { BankAccountService } from "../bank-accounts/bank-account.service";
+import { BudgetService } from "../budgets/budget.service";
+import { TransactionSearchParams } from "./transaction-search-form/transaction-search-params.model";
+import { TransactionService } from "./transaction.service";
 
 @Injectable()
 export class TransactionDataService {
-
   private searchParamsSubject = new Subject<TransactionSearchParams>();
 
   constructor(
     private transactionService: TransactionService,
     private budgetService: BudgetService,
     private bankAccountService: BankAccountService
-  ) { }
+  ) {}
 
   public init() {
-   this.searchParamsSubject = new Subject<TransactionSearchParams>();
+    this.searchParamsSubject = new Subject<TransactionSearchParams>();
   }
 
   private searchParams$() {
@@ -49,7 +46,7 @@ export class TransactionDataService {
   }
 
   public allocations$() {
-    return this.budgetId$().pipe(
+    return this.distinctBudgetId$().pipe(
       switchMap(p => this.budgetService.getAllocations(p))
     );
   }

@@ -1,8 +1,8 @@
-import {NavigationExtras} from "@angular/router";
+import { NavigationExtras } from "@angular/router";
 import { BehaviorSubject } from "rxjs";
 
 let RouterStub = {
-  navigatedTo: '',
+  navigatedTo: "",
   navigateByUrl: function(url: string) {
     this.navigatedTo = url;
   },
@@ -14,5 +14,4 @@ let RouterStub = {
 
 RouterStub.navigatedTo = null;
 
-export {RouterStub};
-
+export { RouterStub };

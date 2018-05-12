@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Observable, Subject } from "rxjs";
 import { filter, map, switchMap, takeUntil } from "rxjs/operators";
@@ -52,9 +52,9 @@ export class BudgetComponent implements OnInit, OnDestroy {
         filter(id => id === "current"),
         switchMap(() => this.budgetService.getCurrentBudgetId())
       )
-     .subscribe((budgetId: number) => {
-       this.router.navigateByUrl(`/budgets/${budgetId}`);
-     });
+      .subscribe((budgetId: number) => {
+        this.router.navigateByUrl(`/budgets/${budgetId}`);
+      });
 
     // for all other routes, load the budget
     this.loadBudgetForId(idParam$);
@@ -100,13 +100,11 @@ export class BudgetComponent implements OnInit, OnDestroy {
   }
 
   saveBudget() {
-    this.budgetService
-      .saveBudget(this.budget)
-      .subscribe(budget => {
-        this.budget = budget;
-        this.messageService.setMessage("Budget saved.");
-        this.editMode = false;
-      });
+    this.budgetService.saveBudget(this.budget).subscribe(budget => {
+      this.budget = budget;
+      this.messageService.setMessage("Budget saved.");
+      this.editMode = false;
+    });
   }
 
   cancel() {

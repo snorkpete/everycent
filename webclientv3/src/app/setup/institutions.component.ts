@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import {MatDialog} from "@angular/material";
-import {InstitutionData} from "../bank-accounts/institution.model";
-import {MessageService} from "../message-display/message.service";
-import {MainToolbarService} from "../shared/main-toolbar/main-toolbar.service";
-import {InstitutionEditFormComponent} from "./institution-edit-form.component";
-import {SetupService} from "./setup.service";
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material";
 import { switchMap } from "rxjs/operators";
+import { InstitutionData } from "../bank-accounts/institution.model";
+import { MessageService } from "../message-display/message.service";
+import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
+import { InstitutionEditFormComponent } from "./institution-edit-form.component";
+import { SetupService } from "./setup.service";
 
 @Component({
-  selector: 'ec-institutions',
-  styles: [`
-  `],
+  selector: "ec-institutions",
+  styles: [
+    `
+  `
+  ],
   template: `
     <mat-card class="main">
       <mat-card>
@@ -34,10 +36,9 @@ import { switchMap } from "rxjs/operators";
         </mat-card-actions>
       </mat-card>
     </mat-card>
-  `,
+  `
 })
 export class InstitutionsComponent implements OnInit {
-
   institutions: InstitutionData[] = [];
 
   constructor(
@@ -45,36 +46,43 @@ export class InstitutionsComponent implements OnInit {
     private dialog: MatDialog,
     private toolbar: MainToolbarService,
     private messageService: MessageService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.refresh();
   }
 
   refresh() {
-    this.setupService.getInstitutions().subscribe(institutions => this.institutions = institutions);
+    this.setupService
+      .getInstitutions()
+      .subscribe(institutions => (this.institutions = institutions));
   }
 
   viewDetails(institution: InstitutionData) {
-    let dialogRef = this.dialog.open(InstitutionEditFormComponent, {
-
-    });
+    let dialogRef = this.dialog.open(InstitutionEditFormComponent, {});
 
     const form = dialogRef.componentInstance;
     form.institution = institution;
     form.save
-        .switchMap(updatedInstitution => this.setupService.createOrUpdateInstitution(updatedInstitution))
-        .subscribe(() => {
-          this.messageService.setMessage('Institution saved.');
+      .pipe(
+        switchMap(updatedInstitution =>
+          this.setupService.createOrUpdateInstitution(updatedInstitution)
+        )
+      )
+      .subscribe(
+        () => {
+          this.messageService.setMessage("Institution saved.");
           this.refresh();
           dialogRef.close();
-        }, error => {
-          this.messageService.setErrorMessage('Institution not saved.');
+        },
+        error => {
+          this.messageService.setErrorMessage("Institution not saved.");
           this.refresh();
-        });
+        }
+      );
   }
 
   addInstitution() {
-    this.viewDetails({ id: 0, name: '' });
+    this.viewDetails({ id: 0, name: "" });
   }
 }

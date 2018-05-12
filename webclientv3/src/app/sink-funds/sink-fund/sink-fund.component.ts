@@ -1,21 +1,22 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {ObservableMedia} from '@angular/flex-layout';
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {SharedTransactionService} from "../../shared-transactions/shared-transaction.service";
-import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
-import {Icon} from '../../shared/ec-icon/icon.type';
-import {CompactTransactionListComponent} from "../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
-import {AddTransferFormComponent} from '../add-transfer-form/add-transfer-form.component';
-import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
-import {SinkFundCalculator} from '../sink-fund-calculator.service';
-import {SinkFundData} from '../sink-fund-data.model';
-import {SinkFundService} from '../sink-fund.service';
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { ObservableMedia } from "@angular/flex-layout";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Subscription } from "rxjs";
+import { SharedTransactionService } from "../../shared-transactions/shared-transaction.service";
+import { DeactivateService } from "../../shared/deactivate-button/deactivate.service";
+import { Icon } from "../../shared/ec-icon/icon.type";
+import { CompactTransactionListComponent } from "../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
+import { AddTransferFormComponent } from "../add-transfer-form/add-transfer-form.component";
+import { SinkFundAllocationData } from "../sink-fund-allocation-data.model";
+import { SinkFundCalculator } from "../sink-fund-calculator.service";
+import { SinkFundData } from "../sink-fund-data.model";
+import { SinkFundService } from "../sink-fund.service";
 
 @Component({
-  selector: 'ec-sink-fund',
-  styles: [`
+  selector: "ec-sink-fund",
+  styles: [
+    `
     div.fixed {
         width: 100%;
         overflow-x: auto;
@@ -50,7 +51,8 @@ import { Subscription } from "rxjs";
         cursor: pointer;
     }
 
-  `],
+  `
+  ],
   template: `
     <mat-card>
         <mat-card-content>
@@ -163,10 +165,9 @@ import { Subscription } from "rxjs";
         </mat-card-actions>
 
     </mat-card>
-  `,
+  `
 })
 export class SinkFundComponent implements OnInit, OnDestroy {
-
   Icon = Icon;
   @Input() sinkFund: SinkFundData;
 
@@ -184,46 +185,47 @@ export class SinkFundComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private snackbar: MatSnackBar,
     public deactivateService: DeactivateService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.sinkFund = { sink_fund_allocations: [] };
 
-    this.mediaSubscription = this.media.subscribe( () => {
-      this.isSmallScreen = this.media.isActive('xs');
+    this.mediaSubscription = this.media.subscribe(() => {
+      this.isSmallScreen = this.media.isActive("xs");
     });
   }
 
   save() {
-    this.sinkFundService
-        .save(this.sinkFund)
-        .subscribe( result => {
-          this.sinkFund = result;
-          this.isEditMode = false;
-          this.snackbar.open('Sink fund saved', null, {duration: 3000});
-        },
-          error => {
-            this.snackbar.open('Not saved: ' + JSON.stringify(error), null, {duration: 3000});
-          }
-        );
+    this.sinkFundService.save(this.sinkFund).subscribe(
+      result => {
+        this.sinkFund = result;
+        this.isEditMode = false;
+        this.snackbar.open("Sink fund saved", null, { duration: 3000 });
+      },
+      error => {
+        this.snackbar.open("Not saved: " + JSON.stringify(error), null, {
+          duration: 3000
+        });
+      }
+    );
   }
 
   cancel() {
-    this.snackbar.open('Sink fund not saved', null, {duration: 1000});
+    this.snackbar.open("Sink fund not saved", null, { duration: 1000 });
   }
 
-  isAllocationVisible(allocation: any) {
-
-  }
+  isAllocationVisible(allocation: any) {}
 
   showTransferForm() {
-    let dialogRef = this.dialog.open(AddTransferFormComponent, { width: '350px' });
+    let dialogRef = this.dialog.open(AddTransferFormComponent, {
+      width: "350px"
+    });
     dialogRef.componentInstance.sinkFund = this.sinkFund;
     dialogRef.afterClosed().subscribe(isSaved => {
       if (isSaved) {
-        this.snackbar.open('Transfer complete.', null, {duration: 3000});
+        this.snackbar.open("Transfer complete.", null, { duration: 3000 });
       } else {
-        this.snackbar.open('Transfer cancelled.', null, {duration: 1500});
+        this.snackbar.open("Transfer cancelled.", null, { duration: 1500 });
       }
     });
   }
@@ -231,16 +233,23 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   showTransactionsFor(sinkFundAllocation: SinkFundAllocationData) {
     let dialogRef: MatDialogRef<CompactTransactionListComponent>;
     this.transactionService
-        .getTransactionsForSinkFundAllocation(sinkFundAllocation.id)
-        .subscribe(transactions => {
-           dialogRef = this.dialog.open(CompactTransactionListComponent, { width: '500px' });
-           dialogRef.componentInstance.transactions = transactions;
-           dialogRef.componentInstance.itemName = sinkFundAllocation.name;
+      .getTransactionsForSinkFundAllocation(sinkFundAllocation.id)
+      .subscribe(transactions => {
+        dialogRef = this.dialog.open(CompactTransactionListComponent, {
+          width: "500px"
         });
+        dialogRef.componentInstance.transactions = transactions;
+        dialogRef.componentInstance.itemName = sinkFundAllocation.name;
+      });
   }
 
   addObligation() {
-    this.sinkFund.sink_fund_allocations.push({ amount: 0, current_balance: 0, target: 0, unsaved: true });
+    this.sinkFund.sink_fund_allocations.push({
+      amount: 0,
+      current_balance: 0,
+      target: 0,
+      unsaved: true
+    });
   }
 
   ngOnDestroy() {

@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { ApiGateway } from "../../api/api-gateway.service";
 import { AllocationData } from "../transactions/allocation-data.model";
-import {AllocationCategoryData} from "./allocation.model";
+import { AllocationCategoryData } from "./allocation.model";
 import { BudgetData } from "./budget.model";
 
 @Injectable()
@@ -21,12 +21,13 @@ export class BudgetService {
         const closedBudgets = budgets.filter(b => b.status === "closed");
         const currentBudget = openBudgets[openBudgets.length - 1];
 
-      // if we have an open budget, add it to the list
-      if (currentBudget) {
-        closedBudgets.unshift(currentBudget);
-      }
-      return closedBudgets;
-    });
+        // if we have an open budget, add it to the list
+        if (currentBudget) {
+          closedBudgets.unshift(currentBudget);
+        }
+        return closedBudgets;
+      })
+    );
   }
   getFutureBudgets(): Observable<BudgetData[]> {
     return this.apiGateway.get("/budgets/future");
@@ -54,7 +55,7 @@ export class BudgetService {
   }
 
   createBudget(budget: BudgetData) {
-    return this.apiGateway.post('/budgets', budget);
+    return this.apiGateway.post("/budgets", budget);
   }
 
   saveBudget(budget: BudgetData) {
@@ -70,7 +71,6 @@ export class BudgetService {
   }
 
   reopenLastBudget() {
-    return this.apiGateway.post('/budgets/reopen_last_budget');
+    return this.apiGateway.post("/budgets/reopen_last_budget");
   }
-
 }

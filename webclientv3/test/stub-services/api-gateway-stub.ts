@@ -6,5 +6,4 @@ let ApiGatewayStub = {
   put: (url: string, params: any, data?: any) => of([])
 };
 
-export {ApiGatewayStub};
-
+export { ApiGatewayStub };
