@@ -4,5 +4,4 @@ const TransactionServiceStub = {
   getTransactions: (_: any) => of([])
 };
 
-export {TransactionServiceStub};
-
+export { TransactionServiceStub };

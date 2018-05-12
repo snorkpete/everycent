@@ -1,19 +1,17 @@
-import { TestBed, inject } from '@angular/core/testing';
-import {ApiGateway} from "../../api/api-gateway.service";
+import { TestBed, inject } from "@angular/core/testing";
 import { of } from "rxjs";
+import { ApiGateway } from "../../api/api-gateway.service";
 
-import { BankAccountService } from './bank-account.service';
-import {TestConfigModule} from "../../../test/test-config.module";
+import { BankAccountService } from "./bank-account.service";
+import { TestConfigModule } from "../../../test/test-config.module";
 
-describe('BankAccountService', () => {
+describe("BankAccountService", () => {
   let bankAccountService: BankAccountService;
   let apiGateway: ApiGateway;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        TestConfigModule,
-      ],
+      imports: [TestConfigModule],
       providers: [BankAccountService]
     });
   });
@@ -23,11 +21,14 @@ describe('BankAccountService', () => {
     apiGateway = TestBed.get(ApiGateway);
   });
 
-  it('should be created', inject([BankAccountService], (service: BankAccountService) => {
-    expect(service).toBeTruthy();
-  }));
+  it(
+    "should be created",
+    inject([BankAccountService], (service: BankAccountService) => {
+      expect(service).toBeTruthy();
+    })
+  );
 
-  describe('#sinkFundAllocations', () => {
+  describe("#sinkFundAllocations", () => {
     it("calls the gateway with the right parameters", () => {
       let bank_account_id = 10;
       let spy = spyOn(apiGateway, "get").and.returnValue(of([]));
@@ -36,9 +37,8 @@ describe('BankAccountService', () => {
       expect(spy.calls.count()).toEqual(1);
 
       let args = spy.calls.mostRecent().args;
-      expect(args[0]).toEqual('/sink_fund_allocations');
-      expect(args[1]).toEqual({bank_account_id});
+      expect(args[0]).toEqual("/sink_fund_allocations");
+      expect(args[1]).toEqual({ bank_account_id });
     });
-
   });
 });

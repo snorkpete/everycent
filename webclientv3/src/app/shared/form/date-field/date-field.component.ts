@@ -1,12 +1,18 @@
-import {Component, forwardRef, Input, OnInit, Optional} from '@angular/core';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
-import {BudgetData} from "../../../budgets/budget.model";
-import {TransactionDateValidatorDirective} from "../../../transactions/transaction-date-validator.directive";
+import { Component, forwardRef, Input, OnInit, Optional } from "@angular/core";
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR
+} from "@angular/forms";
+import { BudgetData } from "../../../budgets/budget.model";
+import { TransactionDateValidatorDirective } from "../../../transactions/transaction-date-validator.directive";
 
 @Component({
-  selector: 'ec-date-field',
-  styles: [`
-  `],
+  selector: "ec-date-field",
+  styles: [
+    `
+  `
+  ],
   template: `
       <mat-form-field *ngIf="editMode; else textDisplay">
           <input #input matInput type="date" [value]="value" (input)="value=input.value" [formControl]="control" class="value"/>
@@ -17,16 +23,19 @@ import {TransactionDateValidatorDirective} from "../../../transactions/transacti
       </ng-template>
   `,
   providers: [
-    { provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => DateFieldComponent )}
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi: true,
+      useExisting: forwardRef(() => DateFieldComponent)
+    }
   ]
 })
 export class DateFieldComponent implements OnInit, ControlValueAccessor {
-
   @Input() value: Date;
   @Input() editMode: boolean;
   // TODO: this should NOT be needed
   /* tslint:disable no-input-rename */
-  @Input('ecValidateWithinBudget') budget: BudgetData = {};
+  @Input("ecValidateWithinBudget") budget: BudgetData = {};
   @Input() errorMessage: string;
 
   control = new FormControl();
@@ -35,9 +44,8 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
   private onTouch: Function = () => {};
 
   constructor(
-    @Optional()
-    private validator: TransactionDateValidatorDirective
-  ) { }
+    @Optional() private validator: TransactionDateValidatorDirective
+  ) {}
 
   ngOnInit() {
     this.control.valueChanges.subscribe((v: string) => {
@@ -61,7 +69,5 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
     this.onTouch = fn;
   }
 
-  setDisabledState(isDisabled: boolean): void {
-  }
-
+  setDisabledState(isDisabled: boolean): void {}
 }

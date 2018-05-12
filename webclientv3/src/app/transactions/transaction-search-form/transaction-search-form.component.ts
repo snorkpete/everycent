@@ -1,21 +1,30 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {ActivatedRoute, ParamMap, Router} from "@angular/router";
-import {BankAccountData} from "../../account-balances/bank-account.model";
-import {BudgetData} from "../../budgets/budget.model";
-import {TransactionSearchParams} from "./transaction-search-params.model";
-import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {BankAccountService} from "../../bank-accounts/bank-account.service";
-import {BudgetService} from "../../budgets/budget.service";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from "@angular/core";
+import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { Subject, Observable, combineLatest } from "rxjs";
 import { map, take, takeUntil } from "rxjs/operators";
+import { BankAccountData } from "../../account-balances/bank-account.model";
+import { BudgetData } from "../../budgets/budget.model";
+import { TransactionSearchParams } from "./transaction-search-params.model";
+import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import { BankAccountService } from "../../bank-accounts/bank-account.service";
+import { BudgetService } from "../../budgets/budget.service";
 
 @Component({
-  selector: 'ec-transaction-search-form',
-  styles: [`
+  selector: "ec-transaction-search-form",
+  styles: [
+    `
     mat-card {
       padding: 12px;
     }
-  `],
+  `
+  ],
   template: `
     <form (ngSubmit)="onSubmit()" [formGroup]="form">
     <mat-card>
@@ -47,7 +56,6 @@ import { map, take, takeUntil } from "rxjs/operators";
   `
 })
 export class TransactionSearchFormComponent implements OnInit, OnDestroy {
-
   bankAccounts: BankAccountData[] = [];
   budgets: BudgetData[] = [];
   @Output() change = new EventEmitter<TransactionSearchParams>();
@@ -62,7 +70,7 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -75,9 +83,9 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
     // changes to the form are emitted as change events
     this.form.valueChanges
       .pipe(takeUntil(this.componentDestroyed))
-        .subscribe(() => {
-          this.onSubmit();
-        });
+      .subscribe(() => {
+        this.onSubmit();
+      });
   }
 
   loadBudgetsAndBankAccounts() {
@@ -88,7 +96,7 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
         map(this.convertToNumericParams),
         take(1)
       )
-    ).subscribe((results) => {
+    ).subscribe(results => {
       let initialParams;
       [this.bankAccounts, this.budgets, initialParams] = results;
       this.setInitialFormValue(initialParams);
@@ -96,12 +104,12 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
   }
 
   private convertToNumericParams(params: ParamMap): TransactionSearchParams {
-    let budget_id = Number(params.get('budget_id')) || 0;
-    let bank_account_id = Number(params.get('bank_account_id')) || 0;
+    let budget_id = Number(params.get("budget_id")) || 0;
+    let bank_account_id = Number(params.get("bank_account_id")) || 0;
 
     return {
       budget_id,
-      bank_account_id,
+      bank_account_id
     };
   }
 
@@ -111,12 +119,15 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
     this.onSubmit();
   }
 
-  initializeWithDefaultValuesIfNeeded(externalParams: TransactionSearchParams): TransactionSearchParams {
-    let bank_account_id = externalParams.bank_account_id || this.firstBankAccountId();
+  initializeWithDefaultValuesIfNeeded(
+    externalParams: TransactionSearchParams
+  ): TransactionSearchParams {
+    let bank_account_id =
+      externalParams.bank_account_id || this.firstBankAccountId();
     let budget_id = externalParams.budget_id || this.firstBudgetId();
     return {
       bank_account_id,
-      budget_id,
+      budget_id
     };
   }
 
@@ -132,18 +143,27 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
     let searchParams = Object.assign({}, this.form.value);
     this.updateBudgetAndBankAccount(searchParams);
     this.change.emit(searchParams);
-    this.router.navigate([
-      {budget_id: searchParams.budget_id, bank_account_id: searchParams.bank_account_id}
-      ], {relativeTo: this.activatedRoute}
+    this.router.navigate(
+      [
+        {
+          budget_id: searchParams.budget_id,
+          bank_account_id: searchParams.bank_account_id
+        }
+      ],
+      { relativeTo: this.activatedRoute }
     );
   }
 
   private updateBudgetAndBankAccount(searchParams: TransactionSearchParams) {
-    let validBankAccount = this.bankAccounts.find(account => account.id === searchParams.bank_account_id);
+    let validBankAccount = this.bankAccounts.find(
+      account => account.id === searchParams.bank_account_id
+    );
     if (validBankAccount) {
       searchParams.bankAccount = validBankAccount;
     }
-    let validBudget = this.budgets.find(account => account.id === searchParams.budget_id);
+    let validBudget = this.budgets.find(
+      account => account.id === searchParams.budget_id
+    );
     if (validBudget) {
       searchParams.budget = validBudget;
     }

@@ -1,21 +1,21 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
-import {ActivatedRoute, Router} from "@angular/router";
+import { MatDialog, MatDialogRef } from "@angular/material";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { BankAccountData } from "../../bank-accounts/bank-account.model";
+import { BudgetData } from "../../budgets/budget.model";
 import { MessageService } from "../../message-display/message.service";
+import { LoadingIndicator } from "../../shared/loading-indicator/loading-indicator.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { SinkFundAllocationData } from "../../sink-funds/sink-fund-allocation-data.model";
 import { AllocationData } from "../allocation-data.model";
 import { TransactionImporterComponent } from "../importers/transaction-importer/transaction-importer.component";
+import { TransactionData } from "../transaction-data.model";
 import { TransactionDataService } from "../transaction-data.service";
 import { TransactionListComponent } from "../transaction-list/transaction-list.component";
 import { TransactionSearchParams } from "../transaction-search-form/transaction-search-params.model";
-import { LoadingIndicator } from "../../shared/loading-indicator/loading-indicator.service";
-import { TransactionData } from "../transaction-data.model";
 import { TransactionService } from "../transaction.service";
-import { BankAccountData } from "../../bank-accounts/bank-account.model";
-import { BudgetData } from "../../budgets/budget.model";
 
 @Component({
   selector: "ec-transactions",
@@ -109,8 +109,12 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   refreshTransactions(searchParams: TransactionSearchParams = {}) {
     this.loadingIndicator.show();
-    this.bankAccount = searchParams.bankAccount;
-    this.budget = searchParams.budget;
+    if (searchParams.bankAccount) {
+      this.bankAccount = searchParams.bankAccount;
+    }
+    if (searchParams.budget) {
+      this.budget = searchParams.budget;
+    }
     this.transactionDataService.refresh(searchParams);
   }
 
@@ -158,11 +162,13 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   goToBudget() {
-    this.router.navigate(['..', 'budgets', this.budget.id], { relativeTo: this.route.parent });
+    this.router.navigate(["..", "budgets", this.budget.id], {
+      relativeTo: this.route.parent
+    });
   }
 
   goToAccountBalances() {
-    this.router.navigateByUrl('/account-balances');
+    this.router.navigateByUrl("/account-balances");
   }
 
   ngOnDestroy(): void {

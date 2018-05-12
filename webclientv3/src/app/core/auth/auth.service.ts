@@ -1,18 +1,15 @@
 import { throwError as observableThrowError, Observable } from "rxjs";
-import { Injectable } from '@angular/core';
-import {ApiGateway} from '../../../api/api-gateway.service';
+import { Injectable } from "@angular/core";
 import { catchError, map, tap } from "rxjs/operators";
+import { ApiGateway } from "../../../api/api-gateway.service";
 
-import {AuthCredentials} from './auth-credentials';
+import { AuthCredentials } from "./auth-credentials";
 
 @Injectable()
 export class AuthService {
-
   private loggedIn = false;
 
-  constructor(
-    private apiGateway: ApiGateway
-  ) { }
+  constructor(private apiGateway: ApiGateway) {}
 
   logIn(email: string, password: string): Promise<any> {
     return this.apiGateway
@@ -65,19 +62,18 @@ export class AuthService {
   }
 
   private saveCredentials(userCredentials: any): void {
-    localStorage.setItem('access-token', userCredentials['access-token']);
-    localStorage.setItem('client', userCredentials['client']);
-    localStorage.setItem('expiry', userCredentials['expiry']);
-    localStorage.setItem('token-type', userCredentials['token-type']);
-    localStorage.setItem('uid', userCredentials['uid']);
+    localStorage.setItem("access-token", userCredentials["access-token"]);
+    localStorage.setItem("client", userCredentials["client"]);
+    localStorage.setItem("expiry", userCredentials["expiry"]);
+    localStorage.setItem("token-type", userCredentials["token-type"]);
+    localStorage.setItem("uid", userCredentials["uid"]);
   }
 
   private clearCredentials(): void {
-    localStorage.removeItem('access-token');
-    localStorage.removeItem('client');
-    localStorage.removeItem('expiry');
-    localStorage.removeItem('token-type');
-    localStorage.removeItem('uid');
+    localStorage.removeItem("access-token");
+    localStorage.removeItem("client");
+    localStorage.removeItem("expiry");
+    localStorage.removeItem("token-type");
+    localStorage.removeItem("uid");
   }
 }
-

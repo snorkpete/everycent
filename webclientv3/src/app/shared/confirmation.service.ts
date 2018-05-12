@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import {MatDialog} from "@angular/material";
-import {ConfirmationComponent} from "./confirmation/confirmation.component";
+import { Injectable } from "@angular/core";
+import { MatDialog } from "@angular/material";
 import { Observable } from "rxjs";
 import { filter } from "rxjs/operators";
+import { ConfirmationComponent } from "./confirmation/confirmation.component";
 
 export interface ConfirmationConfig {
   title?: string;
@@ -12,16 +12,13 @@ export interface ConfirmationConfig {
 
 @Injectable()
 export class ConfirmationService {
-
   private defaultConfig: ConfirmationConfig = {
-    title: 'Are you sure?',
-    question: 'Are you sure?',
+    title: "Are you sure?",
+    question: "Are you sure?",
     emitNegativeAnswers: true
   };
 
-  constructor(
-    private dialog: MatDialog
-  ) { }
+  constructor(private dialog: MatDialog) {}
 
   ask(confirmationConfig: ConfirmationConfig): Observable<boolean> {
     let config = Object.assign({}, this.defaultConfig, confirmationConfig);

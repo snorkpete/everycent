@@ -1,7 +1,7 @@
 import { TestBed, inject } from "@angular/core/testing";
 import { of } from "rxjs";
 import { ApiGateway } from "../../api/api-gateway.service";
-import {BankAccountData} from "../bank-accounts/bank-account.model";
+import { BankAccountData } from "../bank-accounts/bank-account.model";
 import { BudgetData } from "../budgets/budget.model";
 import { TransactionData } from "./transaction-data.model";
 
@@ -40,7 +40,7 @@ describe("TransactionService", () => {
 
   let bankAccount: BankAccountData = {
     id: 100,
-    name: 'Savings Account'
+    name: "Savings Account"
   };
 
   beforeEach(() => {
@@ -149,7 +149,9 @@ describe("TransactionService", () => {
         "extractValidTransactionsInBudget"
       ).and.returnValue(transactionsToPost);
       let gatewaySpy = spyOn(apiGateway, "post").and.returnValue(of([]));
-      transactionService.save(sampleTransactions, bankAccount, budget).subscribe();
+      transactionService
+        .save(sampleTransactions, bankAccount, budget)
+        .subscribe();
       expect(gatewaySpy.calls.count()).toEqual(1);
       let args = gatewaySpy.calls.mostRecent().args;
       expect(args[0]).toEqual("/transactions");
