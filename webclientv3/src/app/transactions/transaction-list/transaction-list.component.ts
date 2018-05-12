@@ -80,7 +80,7 @@ export class TransactionListComponent implements OnInit {
     this.transactions.push({
       withdrawal_amount: 0,
       deposit_amount: 0,
-      status: "unpaid"
+      status: this.bankAccount.is_credit_card ? "unpaid" : "paid"
     });
   }
 
