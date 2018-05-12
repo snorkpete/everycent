@@ -46,7 +46,7 @@ export class TransactionDataService {
   }
 
   public allocations$() {
-    return this.distinctBudgetId$().pipe(
+    return this.budgetId$().pipe(
       switchMap(p => this.budgetService.getAllocations(p))
     );
   }
