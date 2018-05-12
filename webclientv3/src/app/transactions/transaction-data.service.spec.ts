@@ -151,28 +151,21 @@ describe("TransactionDataService", () => {
       expect(budgetSpy.calls.count()).toBe(2);
     });
 
-    it("doesn't request allocations again if called with same data", () => {
+    it("requests new allocations again if called with same data", () => {
       transactionDataService.allData$().subscribe();
       transactionDataService.refresh(firstRequest);
       transactionDataService.refresh(firstRequest);
-      expect(budgetSpy.calls.count()).toBe(1);
+      expect(budgetSpy.calls.count()).toBe(2);
     });
 
-    it("doesn't request allocations again if called with different object but same data", () => {
-      transactionDataService.allData$().subscribe();
-      transactionDataService.refresh(firstRequest);
-      transactionDataService.refresh({ budget_id: firstRequest.budget_id });
-      expect(budgetSpy.calls.count()).toBe(1);
-    });
-
-    it("doesn't request allocations again if called with different bank_account_id but same budget id", () => {
+    it("requests new again if called with different bank_account_id but same budget id", () => {
       transactionDataService.allData$().subscribe();
       transactionDataService.refresh(firstRequest);
       transactionDataService.refresh({
         budget_id: firstRequest.budget_id,
         bank_account_id: 555
       });
-      expect(budgetSpy.calls.count()).toBe(1);
+      expect(budgetSpy.calls.count()).toBe(2);
     });
 
     it("requests new sinkFundAllocations again if called with different data", () => {
