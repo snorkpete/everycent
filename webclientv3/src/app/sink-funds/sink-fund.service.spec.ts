@@ -5,10 +5,9 @@ import { SinkFundService } from './sink-fund.service';
 import {ApiGateway} from '../../api/api-gateway.service';
 import {ApiGatewayStub} from '../../../test/stub-services/api-gateway-stub';
 import {SampleSinkFundData} from '../../../test/samples/sample-sink-fund-data';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
 
 describe('SinkFundService', () => {
+import { of } from "rxjs";
 
   let sinkFundService: SinkFundService;
   let apiGateway: ApiGateway;
@@ -39,7 +38,7 @@ describe('SinkFundService', () => {
 
     it('calls apiGateway correctly', async(() => {
       let response = SampleSinkFundData;
-      let spy = spyOn(apiGateway, 'get').and.returnValue(Observable.of(response));
+        let spy = spyOn(apiGateway, "get").and.returnValue(of(response));
 
       let sinkFundID = 5;
       sinkFundService.refreshSinkFund(sinkFundID);
@@ -56,7 +55,6 @@ describe('SinkFundService', () => {
 
     it('calls the apiGateway correctly', async(() => {
       let sample = SampleSinkFundData;
-      let spy = spyOn(apiGateway, 'put').and.returnValue(Observable.of(sample));
 
       sinkFundService.save(sample).subscribe(response => {
         expect(spy.calls.any()).toBeTruthy('calls the apiGateway');
@@ -64,6 +62,7 @@ describe('SinkFundService', () => {
         expect(spy.calls.mostRecent().args[1]).toEqual(sample);
         expect(response).toEqual(sample);
       });
+        let spy = spyOn(apiGateway, "put").and.returnValue(of(sample));
 
     }));
   });

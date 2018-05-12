@@ -4,7 +4,6 @@ import {SinkFundAllocationData} from "../../sink-funds/sink-fund-allocation-data
 import {AllocationData} from "../allocation-data.model";
 import {TransactionData} from "../transaction-data.model";
 import {MatTableDataSource} from "@angular/material";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {BankAccountData} from "../../bank-accounts/bank-account.model";
 
 @Component({

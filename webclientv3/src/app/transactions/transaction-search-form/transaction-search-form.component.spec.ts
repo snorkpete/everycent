@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { FormBuilder } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Observable } from "rxjs/Observable";
+import { of } from "rxjs";
 import { ActivatedRouteStub } from "../../../../test/stub-services/activated-route-stub";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { BankAccountData } from "../../bank-accounts/bank-account.model";
@@ -13,12 +13,12 @@ import { SharedModule } from "../../shared/shared.module";
 import { TransactionSearchFormComponent } from "./transaction-search-form.component";
 
 const BankAccountServiceStub = {
-  getBankAccounts: () => Observable.of([])
+  getBankAccounts: () => of([])
 };
 
 const BudgetServiceStub = {
-  getBudgets: () => Observable.of([]),
-  getBudgetsWithTransactions: () => Observable.of([])
+  getBudgets: () => of([]),
+  getBudgetsWithTransactions: () => of([])
 };
 
 describe("TransactionsSearchFormComponent", () => {
@@ -68,13 +68,11 @@ describe("TransactionsSearchFormComponent", () => {
       { id: 4, name: "Third Budget" }
     ];
     spyOn(bankAccountService, "getBankAccounts").and.returnValue(
-      Observable.of(sampleBankAccounts)
+      of(sampleBankAccounts)
     );
-    spyOn(budgetService, "getBudgets").and.returnValue(
-      Observable.of(sampleBudgets)
-    );
+    spyOn(budgetService, "getBudgets").and.returnValue(of(sampleBudgets));
     spyOn(budgetService, "getBudgetsWithTransactions").and.returnValue(
-      Observable.of(sampleBudgets)
+      of(sampleBudgets)
     );
   });
 

@@ -1,22 +1,11 @@
-// module.exports = function () {
-//   return {
-//     files: [
-//       { pattern: 'src/**/*.spec.ts', ignore: true },
-//       { pattern: 'src/**/*.ts', load: false },
-//     ],
-//
-//     tests: [
-//       { pattern: 'src/**/*.spec.ts', load: false }
-//     ]
-//   };
-// };
-
 var wallabyWebpack = require('wallaby-webpack');
 var path = require('path');
 
 var compilerOptions = Object.assign(
   require('./tsconfig.json').compilerOptions,
   require('./src/tsconfig.spec.json').compilerOptions);
+
+compilerOptions.module = 'CommonJs';
 
 module.exports = function (wallaby) {
 
@@ -27,11 +16,11 @@ module.exports = function (wallaby) {
     ],
 
     module: {
-      loaders: [
-        {test: /\.css$/, loader: ['raw-loader', 'css-loader']},
+      rules: [
+        {test: /\.css$/, loader: ['raw-loader']},
         {test: /\.html$/, loader: 'raw-loader'},
         {test: /\.ts$/, loader: '@ngtools/webpack', include: /node_modules/, query: {tsConfigPath: 'tsconfig.json'}},
-        // {test: /\.js$/, loader: 'angular2-template-loader', exclude: /node_modules/},
+        {test: /\.js$/, loader: 'angular2-template-loader', exclude: /node_modules/},
         {test: /\.json$/, loader: 'json-loader'},
         {test: /\.styl$/, loaders: ['raw-loader', 'stylus-loader']},
         {test: /\.less$/, loaders: ['raw-loader', 'less-loader']},
@@ -45,6 +34,7 @@ module.exports = function (wallaby) {
       modules: [
         path.join(wallaby.projectCacheDir, 'src/app'),
         path.join(wallaby.projectCacheDir, 'src'),
+        path.join(wallaby.projectCacheDir, 'test'),
         'node_modules'
       ]
     },

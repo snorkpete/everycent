@@ -2,6 +2,7 @@
 import {async, ComponentFixture, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
+import { of } from "rxjs";
 
 import { SinkFundsComponent } from './sink-funds.component';
 import {SinkFundService} from './sink-fund.service';
@@ -9,8 +10,6 @@ import {ApiGateway} from '../../api/api-gateway.service';
 import {ApiGatewayStub} from '../../../test/stub-services/api-gateway-stub';
 import {SampleSinkFundData} from '../../../test/samples/sample-sink-fund-data';
 
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
 import {TransactionService} from '../transactions/transaction.service';
 import {TestConfigModule} from "../../../test/test-config.module";
 import {MainToolbarService} from "../shared/main-toolbar/main-toolbar.service";
@@ -53,8 +52,8 @@ describe('SinkFundsComponent', () => {
   it('gets the current sink fund', async(() => {
     let response = SampleSinkFundData;
     spyOn(sinkFundService, 'refreshSinkFund').and.returnValue(null);
-    spyOn(sinkFundService, 'getCurrent').and.returnValue(Observable.of(response));
-    spyOn(sinkFundService, 'getSinkFunds').and.returnValue(Observable.of([response]));
+      spyOn(sinkFundService, "getCurrent").and.returnValue(of(response));
+      spyOn(sinkFundService, "getSinkFunds").and.returnValue(of([response]));
 
     fixture.detectChanges();
     expect(component.sinkFund).toEqual(response);

@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
-import { Subject } from "rxjs/Subject";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { MessageService } from "../../message-display/message.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { SinkFundAllocationData } from "../../sink-funds/sink-fund-allocation-data.model";
@@ -97,7 +98,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.transactionDataService.init();
     this.transactionDataService
       .allData$()
-      .takeUntil(this.componentDestroyed)
+      .pipe(takeUntil(this.componentDestroyed))
       .subscribe(([transactions, allocations, sinkFundAllocations]) => {
         this.transactions = transactions;
         this.allocations = allocations;

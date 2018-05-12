@@ -1,6 +1,5 @@
 import {NO_ERRORS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {Observable} from "rxjs/Observable";
 import {TestConfigModule} from "../../../../test/test-config.module";
 import {BankAccountService} from "../../bank-accounts/bank-account.service";
 import {BudgetService} from "../../budgets/budget.service";
@@ -14,6 +13,7 @@ import {TransactionService} from "../transaction.service";
 import {TransactionsComponent} from './transactions.component';
 
 describe('TransactionsComponent', () => {
+import { of } from "rxjs";
   let component: TransactionsComponent;
   let fixture: ComponentFixture<TransactionsComponent>;
 
@@ -58,7 +58,7 @@ describe('TransactionsComponent', () => {
 
   xit('resets properly after save', () => {
     let transactionService = TestBed.get(TransactionService);
-    spyOn(transactionService, "save").and.returnValue(Observable.of([]));
+    spyOn(transactionService, "save").and.returnValue(of([]));
     fixture.detectChanges();
     component.transactionList.isEditMode = true;
     component.save();

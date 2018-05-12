@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import {Observable} from "rxjs/Observable";
+import { of } from "rxjs";
 import { TestConfigModule } from "../../../../../test/test-config.module";
 import {SharedModule} from "../../../shared/shared.module";
 import { AllocationData } from "../../../transactions/allocation-data.model";
@@ -91,7 +91,7 @@ describe("AllocationListComponent", () => {
 
     it("has the correct length", () => {
       let spy = spyOn(budgetService, "getAllocationCategories").and.returnValue(
-        Observable.of(sampleCategories)
+        of(sampleCategories)
       );
 
       fixture.detectChanges();

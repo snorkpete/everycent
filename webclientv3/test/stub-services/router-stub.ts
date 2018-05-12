@@ -1,5 +1,5 @@
 import {NavigationExtras} from "@angular/router";
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from "rxjs";
 
 let RouterStub = {
   navigatedTo: '',

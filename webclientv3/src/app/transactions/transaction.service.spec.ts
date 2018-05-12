@@ -1,5 +1,5 @@
 import { TestBed, inject } from "@angular/core/testing";
-import { Observable } from "rxjs/Observable";
+import { of } from "rxjs";
 import { ApiGateway } from "../../api/api-gateway.service";
 import {BankAccountData} from "../bank-accounts/bank-account.model";
 import { BudgetData } from "../budgets/budget.model";
@@ -148,9 +148,7 @@ describe("TransactionService", () => {
         transactionService,
         "extractValidTransactionsInBudget"
       ).and.returnValue(transactionsToPost);
-      let gatewaySpy = spyOn(apiGateway, "post").and.returnValue(
-        Observable.of([])
-      );
+      let gatewaySpy = spyOn(apiGateway, "post").and.returnValue(of([]));
       transactionService.save(sampleTransactions, bankAccount, budget).subscribe();
       expect(gatewaySpy.calls.count()).toEqual(1);
       let args = gatewaySpy.calls.mostRecent().args;

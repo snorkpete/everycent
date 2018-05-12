@@ -2,6 +2,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {AuthService} from '../../core/auth/auth.service';
 import {Icon} from '../ec-icon/icon.type';
+import { filter } from "rxjs/operators";
 
 export interface MenuItemConfig {
   displayName: string;
@@ -92,7 +93,7 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.router.events
-        .filter(e => e instanceof NavigationEnd)
+      .pipe(filter(e => e instanceof NavigationEnd))
         .subscribe(e => this.menuSelect.emit());
   }
 

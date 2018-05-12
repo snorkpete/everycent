@@ -1,7 +1,7 @@
-import {Observable} from "rxjs/Observable";
+import { of } from "rxjs";
 
 const AccountBalancesServiceStub = {
-  getAccountBalances$: (_) => Observable.of([]),
+  getAccountBalances$: _ => of([]),
   totalAssets: (_) => [],
   totalLiabilities: (_) => [],
   netCurrentCash: (_) => [],

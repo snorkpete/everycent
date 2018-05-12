@@ -1,4 +1,4 @@
-import { Observable } from "rxjs/Observable";
+import { Observable, of } from "rxjs";
 import { SettingsData } from "../../src/app/shared/settings-data.model";
 
 const sample: SettingsData = {
@@ -10,10 +10,10 @@ const sample: SettingsData = {
 
 const SettingsServiceStub = {
   getSettings(): Observable<SettingsData> {
-    return Observable.of(this.sample);
+    return of(this.sample);
   },
   saveSettings(newSettings: SettingsData): Observable<SettingsData> {
-    return Observable.of(this.sample);
+    return of(this.sample);
   }
 };
 

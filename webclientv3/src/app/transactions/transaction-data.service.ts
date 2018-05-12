@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
 import {ApiGateway} from "../../api/api-gateway.service";
 import {BankAccountService} from "../bank-accounts/bank-account.service";
 import {BudgetService} from "../budgets/budget.service";
 import {AllocationData} from "./allocation-data.model";
 import {TransactionSearchParams} from "./transaction-search-form/transaction-search-params.model";
 import {TransactionService} from "./transaction.service";
+import { combineLatest, Subject } from "rxjs";
+import { distinctUntilChanged, map, switchMap } from "rxjs/operators";
 
 @Injectable()
 export class TransactionDataService {
@@ -27,31 +27,37 @@ export class TransactionDataService {
     return this.searchParamsSubject.asObservable();
   }
   private budgetId$() {
-    return this.searchParams$().map(params => params.budget_id);
+    return this.searchParams$().pipe(map(params => params.budget_id));
   }
 
   private bankAccountId$() {
-    return this.searchParams$().map(params => params.bank_account_id);
+    return this.searchParams$().pipe(map(params => params.bank_account_id));
   }
 
   private distinctBankAccountId$() {
-    return this.bankAccountId$().distinctUntilChanged();
+    return this.bankAccountId$().pipe(distinctUntilChanged());
   }
 
   private distinctBudgetId$() {
-    return this.budgetId$().distinctUntilChanged();
+    return this.budgetId$().pipe(distinctUntilChanged());
   }
 
   public transactions$() {
-    return this.searchParams$().switchMap(p => this.transactionService.getTransactions(p));
+    return this.searchParams$().pipe(
+      switchMap(p => this.transactionService.getTransactions(p))
+    );
   }
 
   public allocations$() {
-    return this.distinctBudgetId$().switchMap(p => this.budgetService.getAllocations(p));
+    return this.budgetId$().pipe(
+      switchMap(p => this.budgetService.getAllocations(p))
+    );
   }
 
   public sinkFundAllocation$() {
-    return this.distinctBankAccountId$().switchMap(p => this.bankAccountService.getSinkFundAllocations(p));
+    return this.distinctBankAccountId$().pipe(
+      switchMap(p => this.bankAccountService.getSinkFundAllocations(p))
+    );
   }
 
   public refresh(searchParams: TransactionSearchParams) {
@@ -59,11 +65,14 @@ export class TransactionDataService {
   }
 
   public allData$() {
-    return Observable.combineLatest(this.transactions$(), this.allocations$(), this.sinkFundAllocation$());
+    return combineLatest(
+      this.transactions$(),
+      this.allocations$(),
+      this.sinkFundAllocation$()
+    );
   }
 
   destroy() {
     this.searchParamsSubject.complete();
   }
-
 }

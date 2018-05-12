@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import {Observable} from 'rxjs/Observable';
 import {ApiGateway} from '../../api/api-gateway.service';
 import {SinkFundData} from './sink-fund-data.model';
 import {SinkFundTransferData} from './sink-fund-transfer-data.model';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import { Observable, BehaviorSubject } from "rxjs";
 
 @Injectable()
 export class SinkFundService {
