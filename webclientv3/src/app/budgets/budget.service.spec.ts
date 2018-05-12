@@ -1,5 +1,5 @@
 import { TestBed, inject } from '@angular/core/testing';
-import {Observable} from "rxjs/Observable";
+import { of } from "rxjs";
 
 import { BudgetService } from './budget.service';
 import {ApiGateway} from "../../api/api-gateway.service";
@@ -29,7 +29,7 @@ describe('BudgetsService', () => {
 
   describe("#getAllocations", () => {
     it("calls the gateway with the right parameters", () => {
-      let spy = spyOn(apiGateway, "get").and.returnValue(Observable.of([]));
+      let spy = spyOn(apiGateway, "get").and.returnValue(of([]));
       let budgetId = 1;
       budgetService.getAllocations(budgetId);
       expect(spy.calls.count()).toEqual(1);

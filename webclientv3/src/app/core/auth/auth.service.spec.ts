@@ -4,17 +4,14 @@ import {async, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
 import {TestConfigModule} from "../../../../test/test-config.module";
 import {AuthService} from './auth.service';
 import {ApiGateway} from '../../../api/api-gateway.service';
-import {Observable} from 'rxjs/Observable';
 import 'hammerjs';
 import {Http} from '@angular/http';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/throw';
-import 'rxjs/add/operator/map';
 import {httpStub} from '../../../../test/stub-services/http-stub';
 import {LoadingIndicator} from '../../shared/loading-indicator/loading-indicator.service';
 
 describe('AuthService', () => {
 
+import { of, throwError } from "rxjs";
   let authService: AuthService;
   let apiGateway: ApiGateway;
 
@@ -37,9 +34,11 @@ describe('AuthService', () => {
   }));
 
   describe("logIn()", () => {
+      let spy = spyOn(apiGateway, "postWithoutAuthentication").and.returnValue(
+        of({})
+      );
 
     it('calls apiGateway with the correct parameters', () => {
-      let spy = spyOn(apiGateway, 'postWithoutAuthentication').and.returnValue(Observable.of({}));
 
       const email = 'email';
       const password = 'password';
@@ -52,7 +51,9 @@ describe('AuthService', () => {
 
     it("resolves to the user on successful login", () => {
       let userCredentials = { token: 'token' };
-      spyOn(apiGateway, 'postWithoutAuthentication').and.returnValue(Observable.of(userCredentials));
+      spyOn(apiGateway, "postWithoutAuthentication").and.returnValue(
+        of(userCredentials)
+      );
 
       authService.logIn('good@email', 'password').then((result: any) => {
         expect(result).toEqual(userCredentials);
@@ -61,7 +62,9 @@ describe('AuthService', () => {
 
     it('rejects with an error message on login failure', () => {
       let errorMessage = 'Invalid credentials';
-      spyOn(apiGateway, 'postWithoutAuthentication').and.returnValue(Observable.throw(errorMessage));
+      spyOn(apiGateway, "postWithoutAuthentication").and.returnValue(
+        throwError(errorMessage)
+      );
 
       authService.logIn('good@email', 'password').catch((result: any) => {
         expect(result).toEqual(errorMessage);
@@ -77,7 +80,9 @@ describe('AuthService', () => {
         'token-type': 'myTokenType',
         'uid': 'myUid'
       };
-      spyOn(apiGateway, 'postWithoutAuthentication').and.returnValue(Observable.of(userCredentials));
+      spyOn(apiGateway, "postWithoutAuthentication").and.returnValue(
+        of(userCredentials)
+      );
 
       localStorage.clear();
       authService.logIn('', '').then(() => {
@@ -90,8 +95,9 @@ describe('AuthService', () => {
     });
 
     it('if the gateway returns false, does not save any authentication info', () => {
-
-      spyOn(apiGateway, 'postWithoutAuthentication').and.returnValue(Observable.throw('invalid'));
+      spyOn(apiGateway, "postWithoutAuthentication").and.returnValue(
+        throwError("invalid")
+      );
 
       localStorage.setItem('access-token', 'boo');
       authService.logIn('', '').catch(() => {
@@ -147,7 +153,6 @@ describe('AuthService', () => {
         };
 
         localStorage.setItem('access-token', 'access');
-        let spy = spyOn(apiGateway, 'get').and.returnValue(Observable.of(expectedResponse));
 
         authService.isLoggedIn().then(isLoggedIn => {
           expect(spy.calls.mostRecent().args[0]).toEqual('/auth/validate_token');
@@ -155,7 +160,13 @@ describe('AuthService', () => {
         });
 
       }));
+          let spy = spyOn(apiGateway, "get").and.returnValue(
+            of(expectedResponse)
+          );
 
+          spyOn(apiGateway, "get").and.returnValue(
+            throwError(expectedResponse)
+          );
 
       it("rejects with a FALSE Promise if server says auth info is invalid", async(() => {
 
@@ -172,6 +183,9 @@ describe('AuthService', () => {
           })
           .catch(isLoggedIn => {
             expect(isLoggedIn).toEqual(false);
+          let spy = spyOn(apiGateway, "get").and.returnValue(
+            of(expectedResponse)
+          );
           });
       }));
 
@@ -190,7 +204,6 @@ describe('AuthService', () => {
             "email": "kion.stephen@gmail.com"
           }
         };
-        let spy = spyOn(apiGateway, 'get').and.returnValue(Observable.of(expectedResponse));
         authService.isLoggedIn();
         tick();
 

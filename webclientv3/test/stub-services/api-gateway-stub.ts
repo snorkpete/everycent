@@ -1,9 +1,9 @@
-import {Observable} from "rxjs/Observable";
+import { of } from "rxjs";
 
 let ApiGatewayStub = {
-  get: (url: string, params: any) => Observable.of([]),
-  post: (url: string, params: any, data?: any) => Observable.of([]),
-  put: (url: string, params: any, data?: any) => Observable.of([])
+  get: (url: string, params: any) => of([]),
+  post: (url: string, params: any, data?: any) => of([]),
+  put: (url: string, params: any, data?: any) => of([])
 };
 
 export {ApiGatewayStub};

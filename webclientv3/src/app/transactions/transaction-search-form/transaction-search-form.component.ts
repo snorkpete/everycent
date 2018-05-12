@@ -1,13 +1,13 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ActivatedRoute, ParamMap, Router} from "@angular/router";
-import {Subject} from "rxjs/Subject";
 import {BankAccountData} from "../../account-balances/bank-account.model";
 import {BudgetData} from "../../budgets/budget.model";
 import {TransactionSearchParams} from "./transaction-search-params.model";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
 import {BankAccountService} from "../../bank-accounts/bank-account.service";
 import {BudgetService} from "../../budgets/budget.service";
+import { Subject, Observable, combineLatest } from "rxjs";
+import { map, take, takeUntil } from "rxjs/operators";
 
 @Component({
   selector: 'ec-transaction-search-form',
@@ -74,17 +74,20 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
 
     // changes to the form are emitted as change events
     this.form.valueChanges
-        .takeUntil(this.componentDestroyed)
+      .pipe(takeUntil(this.componentDestroyed))
         .subscribe(() => {
           this.onSubmit();
         });
   }
 
   loadBudgetsAndBankAccounts() {
-    Observable.combineLatest(
+    combineLatest(
       this.bankAccountService.getBankAccounts(),
       this.budgetService.getBudgetsWithTransactions(),
-      this.activatedRoute.paramMap.map(this.convertToNumericParams).take(1)
+      this.activatedRoute.paramMap.pipe(
+        map(this.convertToNumericParams),
+        take(1)
+      )
     ).subscribe((results) => {
       let initialParams;
       [this.bankAccounts, this.budgets, initialParams] = results;

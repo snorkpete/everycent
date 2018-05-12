@@ -128,15 +128,6 @@
       "ec",
       "kebab-case"
     ],
-    "rxjs-add": {
-      "options": [{
-        "allowElsewhere": false,
-        "allowUnused": false,
-        "file": "./src/rxjs-imports.ts"
-      }],
-      "severity": "error"
-    },
-    "rxjs-no-wholesale": { "severity": "error" },
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
     "use-host-property-decorator": true,

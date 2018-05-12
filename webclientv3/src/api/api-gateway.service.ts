@@ -1,7 +1,9 @@
+import { throwError as observableThrowError, Observable, empty } from "rxjs";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
-import { Observable } from "rxjs/Observable";
+import { map } from "rxjs/internal/operators";
+import { catchError, tap } from "rxjs/operators";
 import { AuthCredentials } from "../app/core/auth/auth-credentials";
 import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
 import { BASE_URL } from "./base-url.service";
@@ -20,16 +22,16 @@ export class ApiGateway {
     const fullUrl = `${this.BASE_URL}${url}?${this.urlEncode(params)}`;
 
     this.loadingIndicator.show();
-    return this.http
-      .get(fullUrl, options)
-      .do(() => this.loadingIndicator.hide())
-      .catch(error => {
+    return this.http.get(fullUrl, options).pipe(
+      tap(() => this.loadingIndicator.hide()),
+      catchError(error => {
         // TODO: only catch authentication errors
         //       when doing this redirect
         this.router.navigateByUrl("/login");
         this.loadingIndicator.hide();
-        return Observable.empty();
-      });
+        return empty();
+      })
+    );
   }
 
   post(url: string, data?: any): Observable<any> {
@@ -39,7 +41,7 @@ export class ApiGateway {
     this.loadingIndicator.show();
     return this.http
       .post(fullUrl, data, options)
-      .do(() => this.loadingIndicator.hide());
+      .pipe(tap(() => this.loadingIndicator.hide()));
   }
 
   put(url: string, data?: any): Observable<any> {
@@ -49,7 +51,7 @@ export class ApiGateway {
     this.loadingIndicator.show();
     return this.http
       .put(fullUrl, data, options)
-      .do(() => this.loadingIndicator.hide());
+      .pipe(tap(() => this.loadingIndicator.hide()));
   }
 
   postWithoutAuthentication(url: string, data: any): Observable<any> {
@@ -62,22 +64,24 @@ export class ApiGateway {
     this.loadingIndicator.show();
     return this.http
       .post(fullUrl, data, { headers: headers, observe: "response" })
-      .do(() => this.loadingIndicator.hide())
-      .map(response => {
-        return {
-          "access-token": response.headers.get("access-token"),
-          client: response.headers.get("client"),
-          expiry: response.headers.get("expiry"),
-          "token-type": response.headers.get("token-type"),
-          uid: response.headers.get("uid")
-        };
-      })
-      .catch(errorRes => {
-        console.log(errorRes);
-        this.loadingIndicator.hide();
-        let errorResponse = errorRes.error;
-        return Observable.throw(errorResponse["errors"][0]);
-      });
+      .pipe(
+        tap(() => this.loadingIndicator.hide()),
+        map(response => {
+          return {
+            "access-token": response.headers.get("access-token"),
+            client: response.headers.get("client"),
+            expiry: response.headers.get("expiry"),
+            "token-type": response.headers.get("token-type"),
+            uid: response.headers.get("uid")
+          };
+        }),
+        catchError(errorRes => {
+          console.log(errorRes);
+          this.loadingIndicator.hide();
+          let errorResponse = errorRes.error;
+          return observableThrowError(errorResponse["errors"][0]);
+        })
+      );
   }
 
   private getAuthenticationHeaders(): HttpHeaders {

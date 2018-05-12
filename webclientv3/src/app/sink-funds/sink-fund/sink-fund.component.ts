@@ -2,7 +2,6 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ObservableMedia} from '@angular/flex-layout';
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {Subscription} from 'rxjs/Subscription';
 import {SharedTransactionService} from "../../shared-transactions/shared-transaction.service";
 import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
 import {Icon} from '../../shared/ec-icon/icon.type';
@@ -12,6 +11,7 @@ import {SinkFundAllocationData} from '../sink-fund-allocation-data.model';
 import {SinkFundCalculator} from '../sink-fund-calculator.service';
 import {SinkFundData} from '../sink-fund-data.model';
 import {SinkFundService} from '../sink-fund.service';
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'ec-sink-fund',

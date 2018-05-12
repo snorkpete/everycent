@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs/Observable";
 import {ApiGateway} from "../../api/api-gateway.service";
 import {SettingsData} from "./settings-data.model";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class SettingsService {

@@ -1,7 +1,7 @@
-import {Observable} from "rxjs/Observable";
+import { of } from "rxjs";
 
 const TransactionServiceStub = {
-  getTransactions: (_: any) => Observable.of([])
+  getTransactions: (_: any) => of([])
 };
 
 export {TransactionServiceStub};

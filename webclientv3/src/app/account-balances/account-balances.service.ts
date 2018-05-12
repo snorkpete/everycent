@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ApiGateway } from "../../api/api-gateway.service";
-import { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs";
 import { BankAccountData } from "./bank-account.model";
 
 @Injectable()

@@ -1,8 +1,8 @@
 import { TestBed, inject } from '@angular/core/testing';
-import {Observable} from "rxjs/Observable";
 import {TestConfigModule} from "../../../test/test-config.module";
 import {ApiGateway} from "../../api/api-gateway.service";
 import {SettingsData} from "./settings-data.model";
+import { of } from "rxjs";
 
 import { SettingsService } from './settings.service';
 
@@ -31,7 +31,7 @@ describe('SettingsService', () => {
         husband: 'John',
         wife: 'Sally'
       };
-      let spy = spyOn(apiGateway, "get").and.returnValue(Observable.of(sampleSettings));
+      let spy = spyOn(apiGateway, "get").and.returnValue(of(sampleSettings));
       settingsService.getSettings().subscribe(settings => {
         expect(settings).toEqual(sampleSettings);
       });
@@ -50,7 +50,7 @@ describe('SettingsService', () => {
         husband: 'John',
         wife: 'Sally'
       };
-      let spy = spyOn(apiGateway, "post").and.returnValue(Observable.of(sampleSettings));
+      let spy = spyOn(apiGateway, "post").and.returnValue(of(sampleSettings));
       settingsService.saveSettings(sampleSettings).subscribe(settings => {
         expect(settings).toEqual(sampleSettings);
       });

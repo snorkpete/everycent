@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs/Observable";
 import {ApiGateway} from "../../api/api-gateway.service";
 import {BankAccountData} from "../bank-accounts/bank-account.model";
 import {InstitutionData} from "../bank-accounts/institution.model";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class SetupService {

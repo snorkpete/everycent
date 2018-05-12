@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { EditActionsComponent } from './edit-actions.component';
-import {Subject} from 'rxjs/Subject';
+import { Subject } from "rxjs";
 
 describe('EditActionsComponent', () => {
   let component: EditActionsComponent;

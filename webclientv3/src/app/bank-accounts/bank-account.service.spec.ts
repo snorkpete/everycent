@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
-import {Observable} from "rxjs/Observable";
 import {ApiGateway} from "../../api/api-gateway.service";
+import { of } from "rxjs";
 
 import { BankAccountService } from './bank-account.service';
 import {TestConfigModule} from "../../../test/test-config.module";
@@ -30,7 +30,7 @@ describe('BankAccountService', () => {
   describe('#sinkFundAllocations', () => {
     it("calls the gateway with the right parameters", () => {
       let bank_account_id = 10;
-      let spy = spyOn(apiGateway, "get").and.returnValue(Observable.of([]));
+      let spy = spyOn(apiGateway, "get").and.returnValue(of([]));
       bankAccountService.getSinkFundAllocations(bank_account_id);
 
       expect(spy.calls.count()).toEqual(1);

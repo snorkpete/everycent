@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import {ApiGateway} from '../../api/api-gateway.service';
-import {Observable} from 'rxjs/Observable';
 import {BankAccountData} from "../bank-accounts/bank-account.model";
 import {BudgetData} from "../budgets/budget.model";
 import {TransactionData} from './transaction-data.model';
 import {TransactionSearchParams} from "./transaction-search-form/transaction-search-params.model";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class TransactionService {

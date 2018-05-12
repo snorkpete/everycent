@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { ApiGateway } from "../../api/api-gateway.service";
 import { AllocationData } from "../transactions/allocation-data.model";
 import {AllocationCategoryData} from "./allocation.model";
 import { BudgetData } from "./budget.model";
-import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class BudgetService {
@@ -14,10 +15,11 @@ export class BudgetService {
   }
 
   getBudgetsWithTransactions(): Observable<BudgetData[]> {
-    return this.getBudgets().map(budgets => {
-      const openBudgets = budgets.filter(b => b.status === 'open');
-      const closedBudgets = budgets.filter(b => b.status === 'closed');
-      const currentBudget = openBudgets[openBudgets.length - 1];
+    return this.getBudgets().pipe(
+      map(budgets => {
+        const openBudgets = budgets.filter(b => b.status === "open");
+        const closedBudgets = budgets.filter(b => b.status === "closed");
+        const currentBudget = openBudgets[openBudgets.length - 1];
 
       // if we have an open budget, add it to the list
       if (currentBudget) {
@@ -45,8 +47,10 @@ export class BudgetService {
   }
 
   getCurrentBudgetId() {
-    return this.apiGateway.get('/budgets/current').map(data => data.budget_id);
-                // .switchMap(budgetId => this.getBudget(budgetId));
+    return this.apiGateway
+      .get("/budgets/current")
+      .pipe(map(data => data.budget_id));
+    // .switchMap(budgetId => this.getBudget(budgetId));
   }
 
   createBudget(budget: BudgetData) {

@@ -1,5 +1,4 @@
 import { TestBed, inject } from '@angular/core/testing';
-import {Observable} from "rxjs/Observable";
 import {TestConfigModule} from "../../../test/test-config.module";
 import {BankAccountService} from "../bank-accounts/bank-account.service";
 import {BudgetService} from "../budgets/budget.service";
@@ -12,6 +11,7 @@ import {TransactionSearchParams} from "./transaction-search-form/transaction-sea
 import {TransactionService} from "./transaction.service";
 
 describe('TransactionDataService', () => {
+import { of } from "rxjs";
   let transactionDataService: TransactionDataService;
   let transactionService: TransactionService;
   let budgetService: BudgetService;
@@ -74,9 +74,17 @@ describe('TransactionDataService', () => {
     ];
 
     beforeEach(() => {
-      transactionSpy = spyOn(transactionService, "getTransactions").and.returnValue(Observable.of(sampleTransactions));
-      bankAccountSpy = spyOn(bankAccountService, "getSinkFundAllocations").and.returnValue(Observable.of(sampleSinkFundAllocations));
-      budgetSpy = spyOn(budgetService, "getAllocations").and.returnValue(Observable.of(sampleAllocations));
+      transactionSpy = spyOn(
+        transactionService,
+        "getTransactions"
+      ).and.returnValue(of(sampleTransactions));
+      bankAccountSpy = spyOn(
+        bankAccountService,
+        "getSinkFundAllocations"
+      ).and.returnValue(of(sampleSinkFundAllocations));
+      budgetSpy = spyOn(budgetService, "getAllocations").and.returnValue(
+        of(sampleAllocations)
+      );
     });
 
     it("requests new transactions", () => {

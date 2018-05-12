@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Subject } from "rxjs/Subject";
+import { Subject } from "rxjs";
+import { filter, map, takeUntil } from "rxjs/operators";
 import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
 import { SinkFundData } from "./sink-fund-data.model";
 import { SinkFundSelectorComponent } from "./sink-fund-selector/sink-fund-selector.component";
@@ -42,9 +43,11 @@ export class SinkFundsComponent implements OnInit, OnDestroy {
       this.sinkFunds = sinkFunds;
     });
     this.activatedRoute.paramMap
-      .map(param => Number(param.get("sink_fund_id")))
-      .filter(sinkFundId => sinkFundId > 0)
-      .takeUntil(this.onDestroy$)
+      .pipe(
+        map(param => Number(param.get("sink_fund_id"))),
+        filter(sinkFundId => sinkFundId > 0),
+        takeUntil(this.onDestroy$)
+      )
       .subscribe(sinkFundId => this.selectSinkFund(sinkFundId));
 
     this.toolbarService.setHeading("Sink Fund Obligations");

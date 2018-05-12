@@ -1,6 +1,7 @@
+import { throwError as observableThrowError, Observable } from "rxjs";
 import { Injectable } from '@angular/core';
 import {ApiGateway} from '../../../api/api-gateway.service';
-import {Observable} from 'rxjs/Observable';
+import { catchError, map, tap } from "rxjs/operators";
 
 import {AuthCredentials} from './auth-credentials';
 
@@ -15,17 +16,19 @@ export class AuthService {
 
   logIn(email: string, password: string): Promise<any> {
     return this.apiGateway
-            .postWithoutAuthentication('/auth/sign_in', {email, password})
-            .do(userCredentials => {
-              this.loggedIn = true;
-              this.saveCredentials(userCredentials);
-            })
-            .catch(error => {
-              // On any error, clear the credentials and rethrow the error
-              this.clearCredentials();
-              return Observable.throw(error);
-            })
-            .toPromise();
+      .postWithoutAuthentication("/auth/sign_in", { email, password })
+      .pipe(
+        tap(userCredentials => {
+          this.loggedIn = true;
+          this.saveCredentials(userCredentials);
+        }),
+        catchError(error => {
+          // On any error, clear the credentials and rethrow the error
+          this.clearCredentials();
+          return observableThrowError(error);
+        })
+      )
+      .toPromise();
   }
 
   logOut(): Promise<any> {
@@ -48,13 +51,16 @@ export class AuthService {
       return Promise.resolve(false);
     }
 
-    return this.apiGateway.get('/auth/validate_token')
-      .map(result => result.success)
-      .do(() => this.loggedIn = true)
-      .catch(() => {
-        this.loggedIn = false;
-        return Observable.throw(false);
-      })
+    return this.apiGateway
+      .get("/auth/validate_token")
+      .pipe(
+        map(result => result.success),
+        tap(() => (this.loggedIn = true)),
+        catchError(() => {
+          this.loggedIn = false;
+          return observableThrowError(false);
+        })
+      )
       .toPromise();
   }
 

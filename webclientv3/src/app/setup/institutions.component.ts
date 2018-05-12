@@ -5,6 +5,7 @@ import {MessageService} from "../message-display/message.service";
 import {MainToolbarService} from "../shared/main-toolbar/main-toolbar.service";
 import {InstitutionEditFormComponent} from "./institution-edit-form.component";
 import {SetupService} from "./setup.service";
+import { switchMap } from "rxjs/operators";
 
 @Component({
   selector: 'ec-institutions',

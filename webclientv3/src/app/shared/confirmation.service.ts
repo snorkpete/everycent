@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import {MatDialog} from "@angular/material";
-import {Observable} from "rxjs/Observable";
 import {ConfirmationComponent} from "./confirmation/confirmation.component";
+import { Observable } from "rxjs";
+import { filter } from "rxjs/operators";
 
 export interface ConfirmationConfig {
   title?: string;
@@ -31,7 +32,7 @@ export class ConfirmationService {
     if (config.emitNegativeAnswers) {
       return dialogRef.afterClosed();
     } else {
-      return dialogRef.afterClosed().filter(response => response);
+      return dialogRef.afterClosed().pipe(filter(response => response));
     }
   }
 }
