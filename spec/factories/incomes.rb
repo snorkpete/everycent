@@ -12,7 +12,7 @@
 #  comment         :string
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :income do
     name { Faker::Name.first_name }
     amount 1

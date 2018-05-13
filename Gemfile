@@ -45,7 +45,7 @@ group :development, :test do
   gem 'guard-bundler'
   gem 'guard-rails'
   gem 'rspec-rails'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'guard-rspec'
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
   gem 'ruby_gntp'

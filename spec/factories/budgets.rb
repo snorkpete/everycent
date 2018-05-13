@@ -11,7 +11,7 @@
 #  status     :string           default("open")
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :budget do
     start_date "2015-01-02"
   end

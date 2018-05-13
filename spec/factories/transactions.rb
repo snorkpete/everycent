@@ -20,7 +20,7 @@
 #  brought_forward_status  :string
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :transaction do
     description "MyString"
     bank_ref "MyString"

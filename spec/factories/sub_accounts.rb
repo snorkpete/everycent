@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :sink_fund_allocation do
     name "MyString"
     bank_account_id ""

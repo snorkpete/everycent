@@ -14,7 +14,7 @@
 #  updated_at             :datetime         not null
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :recurring_allocation do
     name 'Random'
     amount 10000
