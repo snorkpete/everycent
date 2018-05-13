@@ -61,7 +61,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   # include factory girl syntax methods to simplify calls to factories
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
 
   # authentication helper methods
   config.include Devise::TestHelpers, type: :controller

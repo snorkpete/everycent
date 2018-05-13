@@ -15,7 +15,7 @@
 #  comment                :string
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :allocation do
     name "MyString"
 amount 1

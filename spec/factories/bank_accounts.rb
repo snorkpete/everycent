@@ -23,7 +23,7 @@
 #  is_cash                    :boolean          default(TRUE)
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :bank_account do
     name "My savings account"
   end
