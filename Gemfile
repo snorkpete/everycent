@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
-ruby '2.2.1'
+ruby '2.2.10'
 
-gem 'rails', '~> 4.2'
+gem 'rails', '4.2.10'
 gem 'puma'
 
 gem 'rails-api'
@@ -12,10 +12,11 @@ group :development do
   gem 'meta_request'
   # log where queries are being generated from in the code base
   gem 'active_record_query_trace'
+  gem 'web-console', '~> 2.0'
 end
 
 # database gem
-gem 'pg'
+gem 'pg', '~> 0.21'
 
 # fix for time
 gem 'tzinfo-data'
@@ -26,7 +27,6 @@ gem 'devise_token_auth'
 
 # json api building
 gem 'active_model_serializers'
-gem 'responders'
 
 gem 'rack-cors', :require => 'rack/cors'
 

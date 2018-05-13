@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
       render json: object
 
     when object.respond_to?('each')
-      render json: ActiveModel::ArraySerializer.new(object, each_serializer: serializer)
+      render json: ActiveModel::Serializer::CollectionSerializer.new(object, each_serializer: serializer)
 
     else
      render json: serializer.new(object, root: false)
