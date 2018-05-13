@@ -12,7 +12,7 @@ describe "ParameterExtraction" do
 
   describe "#extract_income_params" do
     before :each do
-      @params = {"id"=>"1", "name"=>"Jan 04 - Feb 03, 2015", "start_date"=>"2015-01-04", "end_date"=>"2015-02-03",
+      params_hash = {"id"=>"1", "name"=>"Jan 04 - Feb 03, 2015", "start_date"=>"2015-01-04", "end_date"=>"2015-02-03",
                  "incomes"=>[
                    {"id"=>1, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>1,
                     "bank_account_id"=>1,
@@ -34,6 +34,7 @@ describe "ParameterExtraction" do
                  ],
                  "budget"=>{"id"=>"1", "name"=>"Jan 04 - Feb 03, 2015", "start_date"=>"2015-01-04", "end_date"=>"2015-02-03"}
             }
+      @params = ActionController::Parameters.new(params_hash)
     end
 
     it "extracts the income params properly" do

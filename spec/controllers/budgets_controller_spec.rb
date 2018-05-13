@@ -163,36 +163,36 @@ describe BudgetsController do
     end
 
     it "updates each income" do
-      put :update, @params
+      put :update, params: @params
       expect(@budget.incomes.size).to eq 1
     end
 
     it "updates the attributes of the first income" do
-      put :update, @params
+      put :update, params: @params
       expect(@budget.incomes[0].name).to eq "Kion's Salary"
     end
 
     context "when an income is deleted" do
       it "deletes the income from the budget" do
-        put :update, @deleted_params
+        put :update, params: @deleted_params
         expect(@budget.incomes.size).to eq 2
       end
     end
 
 
     it "updates each allocation" do
-      put :update, @params
+      put :update, params: @params
       expect(@budget.allocations.size).to eq 2
     end
 
     it "updates the attributes of the first allocation" do
-      put :update, @params
+      put :update, params: @params
       expect(@budget.allocations[0].name).to eq "Rent"
     end
 
     context "when an allocation is deleted" do
       it "deletes the income from the budget" do
-        put :update, @deleted_params
+        put :update, params: @deleted_params
         expect(@budget.allocations.size).to eq 1
       end
     end

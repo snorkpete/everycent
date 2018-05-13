@@ -21,7 +21,7 @@ class Income < ApplicationRecord
     result = []
 
     params.each do |param|
-      param = HashWithIndifferentAccess.new(param)
+      param = ActiveSupport::HashWithIndifferentAccess.new(param)
       income = update_one_from_params(param)
 
       result << income unless income.nil?

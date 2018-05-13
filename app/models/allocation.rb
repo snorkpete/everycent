@@ -30,7 +30,7 @@ class Allocation < ApplicationRecord
     result = []
 
     params.each do |param|
-      param = HashWithIndifferentAccess.new(param)
+      param = ActiveSupport::HashWithIndifferentAccess.new(param)
       allocation = update_one_from_params(param)
 
       result << allocation unless allocation.nil?
@@ -60,13 +60,13 @@ class Allocation < ApplicationRecord
 
   def spent
     # TODO: to follow up on why summing in the db causes n+1 queries
-    # transactions.sum('withdrawal_amount - deposit_amount')
+    transactions.sum('withdrawal_amount - deposit_amount')
     #
     # Need to sum in Ruby because summing in the db causes N+1 query issue,
     # and :includes does not resolve it
-    transactions.to_a.sum do |transaction|
-      transaction.withdrawal_amount - transaction.deposit_amount
-    end
+    # transactions.to_a.sum do |transaction|
+    #   transaction.withdrawal_amount - transaction.deposit_amount
+    # end
   end
 
   def remaining
