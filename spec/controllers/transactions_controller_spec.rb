@@ -34,7 +34,7 @@ RSpec.describe TransactionsController, :type => :controller do
       #params are always strings
       params = { budget_id: '4', bank_account_id: '10' }
       expect(Transaction).to receive(:for_budget_and_bank).with('4', '10').and_return(Transaction.none)
-      get :index, params
+      get :index, params: params
     end
   end
 
@@ -50,7 +50,7 @@ RSpec.describe TransactionsController, :type => :controller do
     xit 'calls Transaction.update_from_params in the update action' do
       params = { transactions: @transaction_params }
       expect(Transaction).to receive(:update_with_params).with(params).and_return(Transaction.none)
-      put :update_all, params
+      put :update_all, params: params
     end
 
   end
