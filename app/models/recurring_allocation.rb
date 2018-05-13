@@ -14,7 +14,7 @@
 #  updated_at             :datetime         not null
 #
 
-class RecurringAllocation < ActiveRecord::Base
+class RecurringAllocation < ApplicationRecord
   validates :name, presence: true
 
   before_save :fix_name

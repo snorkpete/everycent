@@ -11,7 +11,7 @@
 #  updated_at              :datetime         not null
 #
 
-class Payee < ActiveRecord::Base
+class Payee < ApplicationRecord
 
   def self.update_from_params(params)
     # don't create a new payee if we don't have payee information

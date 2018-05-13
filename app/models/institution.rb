@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class Institution < ActiveRecord::Base
+class Institution < ApplicationRecord
   validates :name,  presence: true,
                     uniqueness: {
                         case_sensitive: false ,

@@ -28,7 +28,7 @@
 #  updated_at             :datetime
 #
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
 
   # do not require email confirmation for new users
