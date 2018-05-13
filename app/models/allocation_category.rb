@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class AllocationCategory < ActiveRecord::Base
+class AllocationCategory < ApplicationRecord
   has_many :recurring_allocations
 
   validates :name,  presence: true,

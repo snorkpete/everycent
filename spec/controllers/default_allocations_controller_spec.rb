@@ -11,6 +11,7 @@ describe DefaultAllocationsController do
   describe '#retrieve' do
     it "allows post requests to index" do
       params = { budget_id: @budget.id.to_s, transactions: [] }
+      expect(Payee).to receive(:default_allocations).with(params[:budget_id], nil).and_return []
       post :retrieve, params
       expect(response).to have_http_status :success
     end

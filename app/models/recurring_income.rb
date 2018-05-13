@@ -11,7 +11,7 @@
 #  updated_at      :datetime         not null
 #
 
-class RecurringIncome < ActiveRecord::Base
+class RecurringIncome < ApplicationRecord
   belongs_to :bank_account
   validates :name, presence: true
 

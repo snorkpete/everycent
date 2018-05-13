@@ -23,7 +23,7 @@
 #  is_cash                    :boolean          default(TRUE)
 #
 
-class BankAccount < ActiveRecord::Base
+class BankAccount < ApplicationRecord
   include CreditCard
 
   belongs_to :user

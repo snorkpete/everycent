@@ -15,7 +15,7 @@
 #  comment                :string
 #
 
-class Allocation < ActiveRecord::Base
+class Allocation < ApplicationRecord
 
   belongs_to :budget
   belongs_to :allocation_category

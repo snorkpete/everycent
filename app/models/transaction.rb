@@ -20,7 +20,7 @@
 #  brought_forward_status  :string
 #
 
-class Transaction < ActiveRecord::Base
+class Transaction < ApplicationRecord
 
   belongs_to :allocation
   belongs_to :bank_account

@@ -9,7 +9,7 @@
 #  updated_at                   :datetime         not null
 #
 
-class Setting < ActiveRecord::Base
+class Setting < ApplicationRecord
 
   def self.primary_budget_account_id=(account_id)
     get_setting_record.update(primary_budget_account_id: account_id)

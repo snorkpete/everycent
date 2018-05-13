@@ -13,7 +13,7 @@
 #
 
 # TODO: rename sink fund allocation to 'Financial Obligation'
-class SinkFundAllocation < ActiveRecord::Base
+class SinkFundAllocation < ApplicationRecord
   belongs_to :bank_account
 
   has_many :transactions
