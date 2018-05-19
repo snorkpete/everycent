@@ -18,6 +18,7 @@ import { BudgetComponent } from "./budget/budget.component";
 import { BudgetsRoutingModule } from "./budgets-routing.module";
 import { BudgetsComponent } from "./budgets/budgets.component";
 import { FutureBudgetsModule } from "./future-budgets/future-budgets.module";
+import { AddBudgetComponent } from "./add-budget/add-budget.component";
 
 @NgModule({
   imports: [
@@ -40,9 +41,9 @@ import { FutureBudgetsModule } from "./future-budgets/future-budgets.module";
     AllocationCategoryRowComponent,
     AllocationListSummaryComponent,
     AllocationListFooterComponent,
+    AddBudgetComponent
   ],
-  providers: [
-    BudgetService,
-  ]
+  entryComponents: [AddBudgetComponent],
+  providers: [BudgetService]
 })
 export class BudgetsModule {}
