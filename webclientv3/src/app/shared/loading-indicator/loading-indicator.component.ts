@@ -5,7 +5,9 @@ import {LoadingIndicator} from './loading-indicator.service';
   selector: 'ec-loading-indicator',
   styles: [`
     mat-progress-bar{
-        position: relative;
+        position: fixed;
+        z-index: 30001;
+        top: 0px;
     }
   `],
   template: `
