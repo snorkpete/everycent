@@ -64,6 +64,6 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   # authentication helper methods
-  config.include Devise::TestHelpers, type: :controller
+  config.include Devise::Test::ControllerHelpers, type: :controller
   config.include AuthHelper
 end
