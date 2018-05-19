@@ -18,7 +18,7 @@ import { Component, OnInit } from "@angular/core";
         z-index: 10000;
       }
       div.holding-container {
-        margin-top: 35px;
+        margin-top: 45px;
       }
   `
   ],
