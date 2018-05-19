@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material";
 import { ActivatedRoute, Router } from "@angular/router";
+import { switchMap } from "rxjs/operators";
 import { MessageService } from "../../message-display/message.service";
 import { ConfirmationService } from "../../shared/confirmation.service";
 import { ConfirmationComponent } from "../../shared/confirmation/confirmation.component";
@@ -30,7 +31,6 @@ import { BudgetService } from "../budget.service";
   styles: []
 })
 export class BudgetsComponent implements OnInit {
-
   budgets: BudgetData[];
 
   constructor(
@@ -39,8 +39,9 @@ export class BudgetsComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private route: ActivatedRoute,
-    private confirmation: ConfirmationService
-  ) { }
+    private confirmation: ConfirmationService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     this.toolbar.setHeading("Budgets");
@@ -54,8 +55,23 @@ export class BudgetsComponent implements OnInit {
   }
 
   addNewBudget() {
-    //TODO: to implement
-    this.messageService.setMessage("Adding not yet implemented - copy previous budget for now");
+    let dialogRef = this.dialog.open(AddBudgetComponent, {});
+
+    const form = dialogRef.componentInstance;
+    form.budget = {};
+    form.save
+      .pipe(switchMap(newBudget => this.budgetService.addBudget(newBudget)))
+      .subscribe(
+        () => {
+          this.messageService.setMessage("Budget created.");
+          this.refresh();
+          dialogRef.close();
+        },
+        error => {
+          this.messageService.setErrorMessage("Budget not created.");
+          this.refresh();
+        }
+      );
   }
 
   reopenLastBudget() {

@@ -58,6 +58,10 @@ export class BudgetService {
     return this.apiGateway.post("/budgets", budget);
   }
 
+  addBudget(budget: BudgetData) {
+    return this.apiGateway.post("/budgets", budget);
+  }
+
   saveBudget(budget: BudgetData) {
     return this.apiGateway.put(`/budgets/${budget.id}`, budget);
   }
