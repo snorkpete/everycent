@@ -1,8 +1,9 @@
 source 'https://rubygems.org'
-ruby '2.2.10'
+ruby '2.5.1'
 
-gem 'rails', '5.1.6'
+gem 'rails', '5.2.0'
 gem 'puma'
+gem 'bootsnap', require: false
 
 gem 'rails-controller-testing'
 #gem 'rails-api'
@@ -13,7 +14,7 @@ group :development do
   gem 'meta_request'
   # log where queries are being generated from in the code base
   gem 'active_record_query_trace'
-  gem 'web-console', '~> 2.0'
+  gem 'web-console'
 end
 
 # database gem
