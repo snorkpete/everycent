@@ -32,10 +32,17 @@ class BankAccount < ApplicationRecord
   has_many :transactions
   has_many :sink_fund_allocations,  -> { order(:status => :desc, :name => :asc) }
 
+  before_create :update_closing_info
 
   validates :name,  presence: true
   validates :statement_day, :numericality => {:only_integer => true, :greater_than => 0, :less_than => 32, :allow_nil => true}
   validates :payment_due_day, :numericality => {:only_integer => true, :greater_than => 0, :less_than => 32, :allow_nil => true}
+
+  def update_closing_info
+    self.closing_balance = opening_balance
+    self.closing_date = Date.today
+    # save
+  end
 
   def statement_day_ordinal
     return '' if statement_day.nil?
@@ -62,8 +69,9 @@ class BankAccount < ApplicationRecord
 
     # initialize closing balance if it hasn't been used yet
     # this happens with new accounts
+    # This should no longer happen and can probably be removed
     if self.closing_balance.nil?
-      self.closing_balance = 0
+      self.closing_balance = opening_balance
     end
     self.closing_balance += total_transaction_amount
     self.closing_date = closing_date
