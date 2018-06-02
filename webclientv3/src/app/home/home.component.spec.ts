@@ -9,19 +9,16 @@ describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        //MaterialModule.forRoot(),
-      ],
-      declarations: [ HomeComponent ],
-      schemas: [NO_ERRORS_SCHEMA],
-      providers: [
-        MainToolbarService,
-      ]
+  beforeEach(
+    async(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule],
+        declarations: [HomeComponent],
+        schemas: [NO_ERRORS_SCHEMA],
+        providers: [MainToolbarService]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeComponent);
