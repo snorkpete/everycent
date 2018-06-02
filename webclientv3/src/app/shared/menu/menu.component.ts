@@ -111,7 +111,7 @@ export class MenuComponent implements OnInit {
       exact: false
     },
     {
-      displayName: "Bank Accounts",
+      displayName: "Bank Accounts (TBD)",
       icon: Icon.BANK_ACCOUNTS,
       route: "/setup/bank-accounts",
       exact: false
