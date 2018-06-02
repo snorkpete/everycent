@@ -36,6 +36,32 @@ RSpec.describe BankAccount, :type => :model do
     end
   end
 
+  context "when created" do
+
+    let(:bank_account) { create(:bank_account, opening_balance: 4000) }
+
+    it "defaults the closing balance to the opening balance" do
+      expect(bank_account.closing_balance).to eq(4000)
+    end
+
+    it "defaults the closing date to the current date" do
+      today = Date.new(2018, 5, 25)
+      expect(Date).to receive(:today).and_return today
+
+      expect(bank_account.closing_date).to eq(today)
+    end
+
+    it "persists these values properly" do
+      today = Date.new(2018, 5, 25)
+      expect(Date).to receive(:today).and_return today
+      same_bank_account = BankAccount.find(bank_account.id)
+
+      expect(same_bank_account.closing_balance).to eq(4000)
+      expect(same_bank_account.closing_date).to eq(today)
+    end
+
+  end
+
   describe "#update_sink_fund" do
     context "with 2 sink_fund_allocation params" do
       before :each do
