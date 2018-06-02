@@ -26,10 +26,11 @@ import {BudgetData} from "../../budget.model";
       <td></td>
     </tr>
   `,
-  styles: [`
+  styles: [
+    `
     .heading {
       font-weight: bold;
-      font-size: 20px;
+      font-size: 18px;
     }
     .total {
       display: flex;
@@ -39,7 +40,7 @@ import {BudgetData} from "../../budget.model";
       border-radius: 5px;
       border: 2px solid grey;
       background-color: darkgrey;
-      font-size: 14px;
+      font-size: 12px;
       color: white;
       padding-left: 5px;
       padding-right: 5px;
