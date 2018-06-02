@@ -27,6 +27,10 @@ mat-card.main, mat-sidenav-container.main {
     background-color: rgba(160, 38, 38, 0.35);
 }
 
+.right {
+  text-align: right;
+}
+
 .deleted:hover{
     background-color: rgba(160, 38, 38, 0.55) !important;
 }

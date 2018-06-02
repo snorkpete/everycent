@@ -107,7 +107,9 @@ import { SinkFundService } from "../sink-fund.service";
                                      class="small">
                             </ec-icon>
                             <span fxFlex></span>
-                            <ec-money-field [value]="allocation.current_balance"></ec-money-field>
+                            <div class="right">
+                              <ec-money-field [value]="allocation.current_balance"></ec-money-field>
+                            </div>
                         </div>
                     </td>
                     <td class="right">
