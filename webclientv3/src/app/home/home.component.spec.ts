@@ -1,11 +1,12 @@
 /* tslint:disable:no-unused-variable */
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { NO_ERRORS_SCHEMA } from "@angular/core";
+import { TestConfigModule } from "../../../test/test-config.module";
 
-import {HomeComponent} from './home.component';
-import {MainToolbarService} from '../shared/main-toolbar/main-toolbar.service';
+import { HomeComponent } from "./home.component";
+import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
 
-describe('HomeComponent', () => {
+describe("HomeComponent", () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
 
@@ -26,7 +27,7 @@ describe('HomeComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

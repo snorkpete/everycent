@@ -1,10 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {total} from "../../../util/total";
-import {AllocationData} from "../../allocation.model";
-import {BudgetData} from "../../budget.model";
+import { Component, Input, OnInit } from "@angular/core";
+import { total } from "../../../util/total";
+import { AllocationData } from "../../allocation.model";
+import { BudgetData } from "../../budget.model";
 
-@Component({ /* tslint:disable component-selector */
-  selector: '[ec-allocation-list-footer]',
+@Component({
+  /* tslint:disable component-selector */
+  selector: "[ec-allocation-list-footer]",
   template: `
     <tr class="heading">
       <td class="total">
@@ -46,29 +47,30 @@ import {BudgetData} from "../../budget.model";
       padding-right: 5px;
       padding-top: 3px;
     }
-  `]
+  `
+  ]
 })
 export class AllocationListFooterComponent implements OnInit {
+  @Input() budget: BudgetData = { incomes: [], allocations: [] };
+  constructor() {}
 
-  @Input() budget: BudgetData = { incomes: [], allocations: []};
-  constructor() { }
-
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   totalAmount(): number {
-    return total(this.budget.allocations, 'amount');
+    return total(this.budget.allocations, "amount");
   }
 
   totalSpent(): number {
-    return total(this.budget.allocations, 'spent');
-
+    return total(this.budget.allocations, "spent");
   }
   totalRemaining(): number {
     return this.totalAmount() - this.totalSpent();
   }
 
   totalDiscretionaryAmount() {
-    return total(this.budget.incomes, 'amount') - total(this.budget.allocations, 'amount');
+    return (
+      total(this.budget.incomes, "amount") -
+      total(this.budget.allocations, "amount")
+    );
   }
 }
