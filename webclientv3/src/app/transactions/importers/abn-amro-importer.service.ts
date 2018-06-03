@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
-import {AbnAmroCreditCardImporterService} from "./abn-amro-credit-card-importer.service";
-import {AbnAmroOldFormatImporterService} from "./abn-amro-old-format-importer.service";
+import { AbnAmroCreditCardImporterService } from "./abn-amro-credit-card-importer.service";
+import { AbnAmroOldFormatImporterService } from "./abn-amro-old-format-importer.service";
+
 interface DateParts {
   year: string;
   month: string;
@@ -14,8 +15,16 @@ export class AbnAmroImporterService {
     private oldImporter: AbnAmroOldFormatImporterService
   ) {}
 
-  convertFromCreditCardFormat(input: string, startDate: string, endDate: string) {
-    return this.creditCardImporter.convertToTransactions(input, startDate, endDate);
+  convertFromCreditCardFormat(
+    input: string,
+    startDate: string,
+    endDate: string
+  ) {
+    return this.creditCardImporter.convertToTransactions(
+      input,
+      startDate,
+      endDate
+    );
   }
 
   convertFromOldBankFormat(input: string, startDate: string, endDate: string) {
@@ -80,7 +89,7 @@ export class AbnAmroImporterService {
           description: currentDescription,
           withdrawal_amount: withdrawalAmount,
           deposit_amount: depositAmount,
-          status: 'paid',
+          status: "paid"
         };
 
         // confirm that the transaction date is within the period
@@ -100,7 +109,16 @@ export class AbnAmroImporterService {
         }
 
         // Convert the transaction date back to a string
-        transaction.transaction_date = transaction.transaction_date.toISOString().substr(0, 10);
+        // but only if we already have a valid date
+        // It's better to get 'something' from the import than nothing
+        if (
+          transaction.transaction_date &&
+          transaction.transaction_date.toISOString
+        ) {
+          transaction.transaction_date = transaction.transaction_date
+            .toISOString()
+            .substr(0, 10);
+        }
         transactions.push(transaction);
         currentDescription = "";
         withdrawalAmount = 0;
@@ -122,7 +140,7 @@ export class AbnAmroImporterService {
     if (!line) {
       return false;
     }
-    if (line === 'today' || line === 'yesterday') {
+    if (line === "today" || line === "yesterday") {
       return true;
     }
     return this.isFormattedDate(line);
@@ -180,11 +198,11 @@ export class AbnAmroImporterService {
       return undefined;
     }
 
-    if (line === 'today') {
+    if (line === "today") {
       return relativeTo;
     }
 
-    if (line === 'yesterday') {
+    if (line === "yesterday") {
       let yesterday = new Date(relativeTo.valueOf());
       yesterday.setDate(yesterday.getDate() - 1);
       return yesterday;
@@ -201,7 +219,10 @@ export class AbnAmroImporterService {
     if (this.isDate(line)) {
       return false;
     }
-    return line.trim().replace(/\./g, '').match(/€([+-]) (\d*,?\d*)/);
+    return line
+      .trim()
+      .replace(/\./g, "")
+      .match(/€([+-]) (\d*,?\d*)/);
   }
 
   extractAmount(line: string): number {
@@ -210,9 +231,9 @@ export class AbnAmroImporterService {
       return 0;
     }
     let [_, sign, amountString] = matches;
-    let amount = Number(amountString.replace(/,/g, '.'));
+    let amount = Number(amountString.replace(/,/g, "."));
     amount = Math.round(amount * 100);
-    if (sign === '-') {
+    if (sign === "-") {
       return amount * -1;
     } else {
       return amount;
@@ -233,11 +254,10 @@ export class AbnAmroImporterService {
   isNumber(line) {
     let firstChar = line.trim().substr(0, 1);
 
-    return firstChar === "-" || firstChar === "+" || firstChar === '€';
+    return firstChar === "-" || firstChar === "+" || firstChar === "€";
   }
 
   isEndOfTransaction(line) {
     return this.isDescription(line);
   }
-
 }
