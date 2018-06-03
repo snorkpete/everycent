@@ -59,12 +59,20 @@ NS- Almere Centr.102 ALM,PAS361
     it('returns true for "12 December 2017"', () => {
       expect(importer.isDate("12 December 2017")).toBeTruthy();
     });
+    it('returns true for "December 12, 2017"', () => {
+      expect(importer.isDate("December 12, 2017")).toBeTruthy();
+    });
   });
 
   describe("#extractDate", () => {
     it('returns "2017-12-23" for "12 December 2017"', () => {
       expect(importer.extractDate("12 December 2017")).toEqual(
         new Date(2017, 11, 12, 10)
+      );
+    });
+    it('returns "2017-12-23" for "December 23, 2017"', () => {
+      expect(importer.extractDate("December 23, 2017")).toEqual(
+        new Date(2017, 11, 23, 10)
       );
     });
     it("returns current date for today", () => {

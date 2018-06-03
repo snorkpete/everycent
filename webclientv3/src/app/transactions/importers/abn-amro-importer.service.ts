@@ -1,6 +1,11 @@
 import { Injectable } from "@angular/core";
 import {AbnAmroCreditCardImporterService} from "./abn-amro-credit-card-importer.service";
 import {AbnAmroOldFormatImporterService} from "./abn-amro-old-format-importer.service";
+interface DateParts {
+  year: string;
+  month: string;
+  day: string;
+}
 
 @Injectable()
 export class AbnAmroImporterService {
@@ -124,29 +129,44 @@ export class AbnAmroImporterService {
   }
 
   isFormattedDate(line) {
-    let matchResult = line.match(/^(\d{1,2}) ([A-z]+) (\d{4})/);
-    if (!matchResult) {
-      return false;
-    }
-
     // convert the month to a number
     const months = {
-      'January': 0,
-      'February': 1,
-      'March': 2,
-      'April': 3,
-      'May': 4,
-      'June': 5,
-      'July': 6,
-      'August': 7,
-      'September': 8,
-      'October': 9,
-      'November': 10,
-      'December': 11,
+      January: 0,
+      February: 1,
+      March: 2,
+      April: 3,
+      May: 4,
+      June: 5,
+      July: 6,
+      August: 7,
+      September: 8,
+      October: 9,
+      November: 10,
+      December: 11
     };
 
-    matchResult[2] = months[matchResult[2]];
-    return matchResult;
+    // first, let's look for dates in format 00 Month year
+    let matchResult = line.match(/^(\d{1,2}) ([A-z]+) (\d{4})/);
+
+    if (matchResult) {
+      return {
+        day: matchResult[1],
+        month: months[matchResult[2]],
+        year: matchResult[3]
+      };
+    }
+
+    // if we don't find it, try again with format Month 00, year
+    matchResult = line.match(/^([A-z]+) (\d{1,2}), (\d{4})/);
+    if (matchResult) {
+      return {
+        month: months[matchResult[1]],
+        day: matchResult[2],
+        year: matchResult[3]
+      };
+    }
+
+    return false;
   }
 
   // This is provided here to provide an easy entry point for mocking the current date
@@ -170,11 +190,11 @@ export class AbnAmroImporterService {
       return yesterday;
     }
 
-    let dateParts = this.isFormattedDate(line);
+    let dateParts: any = this.isFormattedDate(line);
     // the '10' is to force the time to not be midnight
     // the browser is interpreting the time differently
     // and causing an 'off-by-one-day' error
-    return new Date(dateParts[3], dateParts[2], dateParts[1], 10);
+    return new Date(dateParts.year, dateParts.month, dateParts.day, 10);
   }
 
   isAmount(line: string) {
