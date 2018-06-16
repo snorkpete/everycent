@@ -15,6 +15,7 @@ import { InstitutionData } from "../bank-accounts/institution.model";
     <div mat-dialog-actions>
       <ec-edit-actions [(editMode)]="editMode"
                        (save)="saveChanges()"
+                       (cancel)="cancelChanges()"
       >
         <button *ngIf="!editMode" mat-raised-button color="warn" (click)="cancelChanges()">Close</button>
       </ec-edit-actions>
@@ -23,11 +24,10 @@ import { InstitutionData } from "../bank-accounts/institution.model";
   styles: []
 })
 export class InstitutionEditFormComponent implements OnInit {
-
   @Input() institution: InstitutionData = {};
   @Output() save = new EventEmitter<InstitutionData>();
   @Output() cancel = new EventEmitter();
-  editMode = false;
+  editMode = true;
 
   form: FormGroup;
 
