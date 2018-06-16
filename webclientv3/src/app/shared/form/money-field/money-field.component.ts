@@ -1,11 +1,16 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
-import {dollarsToCents} from '../../../util/dollars-to-cents';
-import {centsToDollars} from '../../../util/cents-to-dollars';
+import { Component, forwardRef, Input, OnInit } from "@angular/core";
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR
+} from "@angular/forms";
+import { dollarsToCents } from "../../../util/dollars-to-cents";
+import { centsToDollars } from "../../../util/cents-to-dollars";
 
 @Component({
-  selector: 'ec-money-field',
-  styles: [`
+  selector: "ec-money-field",
+  styles: [
+    `
     .negative {
         color: darkred;
         font-weight: bold;
@@ -13,7 +18,7 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
     input {
         text-align: right;
     }
-     .positive {
+    .positive {
         color: darkgreen;
         font-weight: bold;
     }
@@ -51,7 +56,11 @@ import {centsToDollars} from '../../../util/cents-to-dollars';
       </ng-template>
   `,
   providers: [
-    {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => MoneyFieldComponent)},
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi: true,
+      useExisting: forwardRef(() => MoneyFieldComponent)
+    }
   ]
 })
 export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
@@ -68,7 +77,7 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
   private onChange: Function = (_: any) => {};
   private onTouch: Function = (_: any) => {};
 
-  constructor() { }
+  constructor() {}
 
   @Input()
   get value(): number {
@@ -77,11 +86,12 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
 
   set value(newValueInCents: number) {
     this.valueInCents = newValueInCents;
-    this.control.setValue(centsToDollars(newValueInCents), {emitEvent: false}  );
+    this.control.setValue(centsToDollars(newValueInCents), {
+      emitEvent: false
+    });
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   isNegative(): boolean {
     return this.value < 0;
@@ -115,6 +125,4 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled = isDisabled;
   }
-
-
 }

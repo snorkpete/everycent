@@ -1,6 +1,5 @@
-
-import {UserData} from "./user.model";
-import {InstitutionData} from "./institution.model";
+import { UserData } from "./user.model";
+import { InstitutionData } from "./institution.model";
 
 export interface BankAccountData {
   id?: number;

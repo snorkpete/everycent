@@ -1,17 +1,14 @@
-import {NgModule} from '@angular/core';
-import {SharedModule} from "../shared/shared.module";
-import {InstitutionsComponent} from './institutions.component';
+import { NgModule } from "@angular/core";
+import { SharedModule } from "../shared/shared.module";
+import { InstitutionsComponent } from "./institutions.component";
 
-import {SetupRoutingModule} from './setup-routing.module';
-import {SetupService} from "./setup.service";
-import { InstitutionEditFormComponent } from './institution-edit-form.component';
-import { SettingsComponent } from './settings.component';
+import { SetupRoutingModule } from "./setup-routing.module";
+import { SetupService } from "./setup.service";
+import { InstitutionEditFormComponent } from "./institution-edit-form.component";
+import { SettingsComponent } from "./settings.component";
 
 @NgModule({
-  imports: [
-    SharedModule,
-    SetupRoutingModule
-  ],
+  imports: [SharedModule, SetupRoutingModule],
   declarations: [
     InstitutionsComponent,
     InstitutionEditFormComponent,
@@ -20,8 +17,6 @@ import { SettingsComponent } from './settings.component';
   entryComponents: [
     InstitutionEditFormComponent,
   ],
-  providers: [
-    SetupService
-  ]
+  providers: [SetupService]
 })
-export class SetupModule { }
+export class SetupModule {}
