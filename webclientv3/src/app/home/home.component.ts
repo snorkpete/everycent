@@ -18,13 +18,22 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
-        <li>Indicate that the Setup -> Bank Accounts isn't implemented yet</li>
-        <li>Fix the Account Balances screen for new accounts</li>
+        <li>Implement Setup of Bank Accounts</li>
+        <li>Implement Setup of Allocation Categories</li>
+        <li>Fix bug in Sink Fund screen where you could not add obligations</li>
       </ul>
+
+      <h3>Note</h3>
+      <div>
+        All important features from the 'Old version' have now been implemented.
+        There should be no need to go back to the old version. <br/>
+        Please report if there is anything missing from the new version
+      </div>
 
       <h3>Still outstanding</h3>
       <ul>
-        <li>Implement the Setup of Bank Accounts in the new version</li>
+        <li>Implement mass editing of allocations across multiple budgets</li>
+        <li>Implement 'Big Ticket Item Budgeting'</li>
       </ul>
     </mat-card>
   `,
