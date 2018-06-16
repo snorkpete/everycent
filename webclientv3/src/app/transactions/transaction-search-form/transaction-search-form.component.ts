@@ -46,7 +46,7 @@ import { BudgetService } from "../../budgets/budget.service";
           </mat-form-field>
         </div>
 
-        <div fxFlexLayout="row">
+        <div fxLayout="row" fxLayoutGap="20px">
           <button mat-raised-button type="submit" color="primary">Refresh</button>
         </div>
 
@@ -59,7 +59,6 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
   bankAccounts: BankAccountData[] = [];
   budgets: BudgetData[] = [];
   @Output() change = new EventEmitter<TransactionSearchParams>();
-
   form: FormGroup;
 
   private componentDestroyed = new Subject();
@@ -168,7 +167,6 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
       searchParams.budget = validBudget;
     }
   }
-
   ngOnDestroy(): void {
     this.componentDestroyed.next();
     this.componentDestroyed.complete();

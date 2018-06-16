@@ -28,10 +28,6 @@ import { TransactionService } from "../transaction.service";
   ],
   template: `
     <mat-card class="main">
-      <mat-card-actions fxLayoutGap="10px" align="end">
-        <button mat-raised-button (click)="goToBudget()">&laquo; View Budget</button>
-        <button mat-raised-button (click)="goToAccountBalances()">&laquo; View Balances</button>
-      </mat-card-actions>
       <mat-card-content>
         <ec-transaction-calculator [transactions]="transactions">
         </ec-transaction-calculator>
@@ -87,9 +83,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private loadingIndicator: LoadingIndicator,
     private toolbarService: MainToolbarService,
     private messageService: MessageService,
-    private dialog: MatDialog,
-    private router: Router,
-    private route: ActivatedRoute
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -158,16 +152,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     });
 
     return dialogRef;
-  }
-
-  goToBudget() {
-    this.router.navigate(["..", "budgets", this.budget.id], {
-      relativeTo: this.route.parent
-    });
-  }
-
-  goToAccountBalances() {
-    this.router.navigateByUrl("/account-balances");
   }
 
   ngOnDestroy(): void {
