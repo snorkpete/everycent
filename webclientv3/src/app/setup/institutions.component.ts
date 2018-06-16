@@ -23,7 +23,7 @@ import { SetupService } from "./setup.service";
               <mat-list-item>
                 <div class="list-item-with-action-buttons">
                   <span> {{ institution.name }} </span>
-                  <button mat-raised-button color="primary" (click)="viewDetails(institution)">View</button>
+                  <button mat-raised-button color="primary" (click)="viewDetails(institution)">Edit</button>
                 </div>
               </mat-list-item>
               <mat-divider></mat-divider>
