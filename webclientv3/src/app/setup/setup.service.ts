@@ -31,10 +31,24 @@ export class SetupService {
   }
 
   getBankAccounts(): Observable<BankAccountData[]> {
-    return this.apiGateway.get("/bank-accounts");
+    return this.apiGateway.get("/bank_accounts");
   }
 
   addBankAccount(bankAccount: BankAccountData) {
-    return this.apiGateway.post("/bank-accounts", bankAccount);
+    return this.apiGateway.post("/bank_accounts", bankAccount);
+  }
+
+  saveBankAccount(bankAccount: BankAccountData): Observable<BankAccountData> {
+    return this.apiGateway.put(`/bank_accounts/${bankAccount.id}`, bankAccount);
+  }
+
+  createOrUpdateBankAccount(
+    bankAccount: BankAccountData
+  ): Observable<BankAccountData> {
+    if (bankAccount.id === 0) {
+      return this.addBankAccount(bankAccount);
+    } else {
+      return this.saveBankAccount(bankAccount);
+    }
   }
 }
