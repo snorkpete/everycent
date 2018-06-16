@@ -74,6 +74,7 @@ RSpec.describe BankAccount, :type => :model do
                                  ]
                               }
                             })
+        @sink_fund_params = ActionController::Parameters.new(@sink_fund_params)
       end
 
       it "creates 2 sink_fund_allocations" do

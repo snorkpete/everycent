@@ -138,9 +138,7 @@ class BankAccount < ApplicationRecord
   end
 
   def self.extract_sink_fund_params(input_params)
-    # TODO this doesn't belong here - was added for unit testing, which isnt an appropriate reason
-    params = ActionController::Parameters.new(input_params)
-    params.permit(:sink_fund => [:id, {sink_fund_allocations: [:id, :name, :amount, :target, :comment, :status, :deleted] }]).require(:sink_fund)
+    input_params.permit(:sink_fund => [:id, {sink_fund_allocations: [:id, :name, :amount, :target, :comment, :status, :deleted] }]).require(:sink_fund)
   end
 
   def check_sink_fund_allocation_balance_against_current_balance(new_sink_fund_allocations)
