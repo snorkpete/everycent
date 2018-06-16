@@ -7,10 +7,19 @@ import {
 import { groupBy } from "lodash";
 
 @Component({
-  selector: 'ec-list-field',
-  styles: [`
-    select {
-      width: 100%;
+  selector: "ec-list-field",
+  styles: [
+    `
+     select, .value {
+       width: 100%;
+       font-size: 12px;
+       font-family: Roboto, "Helvetica Neue", sans-serif;
+     }
+     :host.form select, :host.form .value {
+       height: 35px;
+       margin-top: 10px;
+       margin-bottom: 20px;
+       font-size: 16px;
     }
     .text-display {
       display: flex;
@@ -18,10 +27,16 @@ import { groupBy } from "lodash";
     }
     .label {
       font-size: 12px;
-      font-weight: bold;
-      color: purple;
+      font-weight: 400;
+      line-height: 1.125;
+      color: rgba(0,0,0,.54);
+      font-family: Roboto, "Helvetica Neue", sans-serif;
     }
-  `],
+    .text-display:focus-within .label{
+      color: #673ab7;
+    }
+  `
+  ],
   template: `
     <span class="text-display" *ngIf="editMode; else textDisplay">
         <span class="label">{{placeholder}}</span>
