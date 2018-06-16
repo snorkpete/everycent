@@ -43,7 +43,7 @@ export class TransactionImporterComponent implements OnInit {
   input: string;
   @Input() startDate: string;
   @Input() endDate: string;
-  importType = "abn-amro-bank";
+  @Input() importType = "abn-amro-bank";
 
   @Output() import = new EventEmitter();
 

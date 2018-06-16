@@ -151,8 +151,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     });
     dialogRef.componentInstance.startDate = this.budget.start_date;
     dialogRef.componentInstance.endDate = this.budget.end_date;
-    // TODO: read this from the bank account
-    dialogRef.componentInstance.importType = "abn-amro-bank";
+    dialogRef.componentInstance.importType = this.bankAccount.import_format;
 
     dialogRef.afterClosed().subscribe((newTransactions: TransactionData[]) => {
       this.transactions = this.transactions.concat(newTransactions);
