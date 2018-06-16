@@ -49,7 +49,7 @@ describe("MoneyFieldComponent", () => {
     beforeEach(() => {
       component.editMode = true;
       fixture.detectChanges();
-      textEl = fixture.debugElement.query(By.css('input.value')).nativeElement;
+      textEl = fixture.debugElement.query(By.css("input")).nativeElement;
     });
 
     it("displays its value at a two-digit value in a text field", () => {
