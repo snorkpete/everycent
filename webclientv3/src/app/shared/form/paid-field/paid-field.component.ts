@@ -1,10 +1,13 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {MatCheckboxChange} from "@angular/material";
-import {TransactionData} from "../../../transactions/transaction-data.model";
+import { Component, forwardRef, Input, OnInit } from "@angular/core";
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR
+} from "@angular/forms";
+import { MatCheckboxChange } from "@angular/material";
 
 @Component({
-  selector: 'ec-paid-field',
+  selector: "ec-paid-field",
   styles: [],
   template: `
     <mat-checkbox *ngIf="editMode; else textDisplay"
@@ -17,11 +20,14 @@ import {TransactionData} from "../../../transactions/transaction-data.model";
     </ng-template>
   `,
   providers: [
-    { provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => PaidFieldComponent )}
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi: true,
+      useExisting: forwardRef(() => PaidFieldComponent)
+    }
   ]
 })
 export class PaidFieldComponent implements OnInit, ControlValueAccessor {
-
   @Input() editMode = false;
   @Input() innerValue: string;
   control = new FormControl(false);
@@ -30,13 +36,12 @@ export class PaidFieldComponent implements OnInit, ControlValueAccessor {
   private onTouch: Function = () => {};
 
   get paidStatusDisplay() {
-
-    if (this.innerValue === 'paid') {
-      return 'Yes';
-    } else if (this.innerValue === 'unpaid') {
-      return 'No';
+    if (this.innerValue === "paid") {
+      return "Yes";
+    } else if (this.innerValue === "unpaid") {
+      return "No";
     } else {
-      return 'Unknown';
+      return "Unknown";
     }
   }
 
@@ -46,10 +51,10 @@ export class PaidFieldComponent implements OnInit, ControlValueAccessor {
 
   set value(newValue: string) {
     this.innerValue = newValue;
-    this.control.setValue(this.value === 'paid');
+    this.control.setValue(this.value === "paid");
   }
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     // this.control.valueChanges.subscribe((v: boolean) => {
@@ -59,7 +64,7 @@ export class PaidFieldComponent implements OnInit, ControlValueAccessor {
   }
 
   updateInnerValue(changeEvent: MatCheckboxChange) {
-    this.innerValue = changeEvent.checked ? 'paid' : 'unpaid';
+    this.innerValue = changeEvent.checked ? "paid" : "unpaid";
     this.onChange(this.innerValue);
   }
 

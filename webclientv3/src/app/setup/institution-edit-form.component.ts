@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormBuilder, FormGroup} from "@angular/forms";
-import {MatDialogRef} from "@angular/material";
-import {InstitutionData} from "../bank-accounts/institution.model";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FormBuilder, FormGroup } from "@angular/forms";
+import { MatDialogRef } from "@angular/material";
+import { InstitutionData } from "../bank-accounts/institution.model";
 
 @Component({
-  selector: 'ec-institution-edit-form',
+  selector: "ec-institution-edit-form",
   template: `
     <h1 mat-dialog-title>Institution Details</h1>
     <div mat-dialog-content>
@@ -34,7 +34,7 @@ export class InstitutionEditFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<InstitutionEditFormComponent>
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({

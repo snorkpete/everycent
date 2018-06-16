@@ -1,6 +1,10 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {groupBy} from 'lodash';
+import { Component, forwardRef, Input, OnInit } from "@angular/core";
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR
+} from "@angular/forms";
+import { groupBy } from "lodash";
 
 @Component({
   selector: 'ec-list-field',
@@ -19,10 +23,6 @@ import {groupBy} from 'lodash';
     }
   `],
   template: `
-    <!--<select [(ngModel)]="transaction.allocation_id">-->
-      <!--<option [value]=""></option>-->
-      <!--<option *ngFor="let allocation of allocations" [value]="allocation.id">{{allocation.name}}</option>-->
-    <!--</select>-->
     <span class="text-display" *ngIf="editMode; else textDisplay">
         <span class="label">{{placeholder}}</span>
         <select [formControl]="control">
@@ -58,12 +58,17 @@ import {groupBy} from 'lodash';
     </ng-template>
   `,
   providers: [
-    {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => ListFieldComponent)},
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi: true,
+      useExisting: forwardRef(() => ListFieldComponent)
+    }
   ]
 })
 export class ListFieldComponent implements OnInit, ControlValueAccessor {
   private _items: any[] = [];
-  @Input() get items(): any[] {
+  @Input()
+  get items(): any[] {
     return this._items;
   }
 
@@ -73,7 +78,8 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
     this.value = this.value;
   }
 
-  @Input() get groupBy(): string {
+  @Input()
+  get groupBy(): string {
     return this._groupBy;
   }
   set groupBy(newGroupBy: string) {
@@ -84,7 +90,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   private _groupBy: string;
 
   @Input() editMode = false;
-  @Input() placeholder = '';
+  @Input() placeholder = "";
   private _selectedItem: any = {};
 
   groups: any[];
@@ -96,7 +102,9 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   }
   set value(newValue: number) {
     this._value = newValue;
-    this._selectedItem = this.items.find(item => item.id === this._value) || {name: this._value};
+    this._selectedItem = this.items.find(item => item.id === this._value) || {
+      name: this._value
+    };
   }
 
   get displayValue(): string {
@@ -108,7 +116,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   private onChange: Function = (_: any) => {};
   private onTouch: Function = (_: any) => {};
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     this.control.valueChanges.subscribe((v: string) => {
@@ -117,8 +125,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   }
 
   private updateGroupings() {
-
-    if (!this.groupBy || !this.items) { /*? this.groupBy === 'hello' */
+    if (!this.groupBy || !this.items) {
       this.groups = [];
       return;
     }
@@ -146,8 +153,8 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
     // </option>
 
     let groupByIdFieldName = `${this.groupBy}_id`;
-    let groupByFieldName = this.groupBy || 'none'; /*? groupByIdFieldName */
-    let itemsByGroupId = groupBy(this.items, groupByIdFieldName); /*? itemsByGroupId */
+    let groupByFieldName = this.groupBy || "none";
+    let itemsByGroupId = groupBy(this.items, groupByIdFieldName);
     this.groups = Object.keys(itemsByGroupId).map(groupId => {
       let group: any = { id: groupId };
       let items = itemsByGroupId[groupId];
@@ -173,5 +180,4 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   registerOnTouched(fn: any): void {
     this.onTouch = fn;
   }
-
 }
