@@ -105,6 +105,12 @@ export class MenuComponent implements OnInit {
 
   setupMenuItems: MenuItemConfig[] = [
     {
+      displayName: "Allocation Categories",
+      icon: Icon.ALLOCATION_CATEGORIES,
+      route: "/setup/allocation-categories",
+      exact: false
+    },
+    {
       displayName: "Financial Institutions",
       icon: Icon.INSTITUTIONS,
       route: "/setup/institutions",
