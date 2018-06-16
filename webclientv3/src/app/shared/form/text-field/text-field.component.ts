@@ -23,15 +23,31 @@ import {
       display: flex;
       flex-direction: column;
     }
+    .value {
+      font-size: 12px;
+      font-family: Roboto, "Helvetica Neue", sans-serif;
+    }
+    :host.form .value {
+      height: 35px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
     .label {
       font-size: 12px;
-      font-weight: bold;
-      color: purple;
+      font-weight: 400;
+      line-height: 1.125;
+      color: rgba(0,0,0,.54);
+      font-family: Roboto, "Helvetica Neue", sans-serif;
     }
-  `],
+    .text-display:focus-within .label{
+      color: #673ab7;
+    }
+  `
+  ],
   template: `
     <mat-form-field *ngIf="editMode; else textDisplay">
-        <input #input matInput type="text" class="value"
+        <input #input matInput [type]="type"
                (input)="updateValue(input.value)"
                [placeholder]="placeholder"
                [formControl]="control" />

@@ -22,23 +22,38 @@ import { centsToDollars } from "../../../util/cents-to-dollars";
         color: darkgreen;
         font-weight: bold;
     }
-    mat-form-field {
+    mat-form-field, .value {
         width: 100%;
     }
-
+    .value {
+      font-size: 12px;
+      font-family: Roboto, "Helvetica Neue", sans-serif;
+    }
+    :host.form .value {
+      height: 35px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
     .text-display {
       display: flex;
       flex-direction: column;
     }
     .label {
       font-size: 12px;
-      font-weight: bold;
-      color: purple;
+      font-weight: 400;
+      line-height: 1.125;
+      color: rgba(0,0,0,.54);
+      font-family: Roboto, "Helvetica Neue", sans-serif;
     }
-  `],
+    .text-display:focus-within .label{
+      color: #673ab7;
+    }
+  `
+  ],
   template: `
       <mat-form-field *ngIf="editMode; else textDisplay ">
-          <input #input matInput class="value" type="text"
+          <input #input matInput type="text"
                  (input)="updateInnerValue(input.value)"
                  (blur)="formatTextValue()"
                  [placeholder]="placeholder"
@@ -64,7 +79,6 @@ import { centsToDollars } from "../../../util/cents-to-dollars";
   ]
 })
 export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
-
   private valueInCents = 0;
   isDisabled = false;
 
