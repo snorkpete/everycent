@@ -16,6 +16,7 @@ export interface BankAccountData {
   allow_default_allocations?: boolean;
   is_sink_fund?: boolean;
   is_credit_card?: boolean;
+  import_format?: string;
   status?: string;
   statement_day?: number;
   payment_due_day?: number;
