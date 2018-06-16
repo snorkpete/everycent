@@ -3,10 +3,7 @@ import { Observable } from "rxjs";
 import { ApiGateway } from "../../api/api-gateway.service";
 import { BankAccountData } from "../bank-accounts/bank-account.model";
 import { InstitutionData } from "../bank-accounts/institution.model";
-import {
-  AllocationCategoryData,
-  AllocationCategoryData
-} from "../budgets/allocation.model";
+import { AllocationCategoryData } from "../budgets/allocation.model";
 
 @Injectable()
 export class SetupService {
