@@ -23,11 +23,22 @@ import { TransactionData } from "../transaction-data.model";
     .mat-form-field-infix {
       width: 5px;
     }
+    .menu-heading {
+      justify-content: space-between;
+    }
   `
   ],
   template: `
     <mat-card>
-        <mat-card-title>Transactions</mat-card-title>
+        <mat-card-title>
+          <div fxLayout="row" class="menu-heading">
+            <span> Transactions </span>
+            <span fxLayout="row" fxLayoutGap="20px">
+              <button color="primary" mat-raised-button [routerLink]="'/budgets/' + budget.id">Go to Budget</button>
+              <button color="primary" mat-raised-button routerLink="/account-balances">Go to Account Balances</button>
+            </span>
+          </div>
+        </mat-card-title>
         <mat-card-content>
           <div class="table-container">
             <table class="table">
