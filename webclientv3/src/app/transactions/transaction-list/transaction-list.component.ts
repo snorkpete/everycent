@@ -9,7 +9,6 @@ import { TransactionData } from "../transaction-data.model";
   selector: "ec-transaction-list",
   styles: [
     `
-
     ec-money-field {
       text-align: end;
     }
@@ -34,7 +33,7 @@ import { TransactionData } from "../transaction-data.model";
           <div fxLayout="row" class="menu-heading">
             <span> Transactions </span>
             <span fxLayout="row" fxLayoutGap="20px">
-              <button color="primary" mat-raised-button [routerLink]="'/budgets/' + budget.id">Go to Budget</button>
+              <button color="primary" mat-raised-button [routerLink]="linkToBudget()">Go to Budget</button>
               <button color="primary" mat-raised-button routerLink="/account-balances">Go to Account Balances</button>
             </span>
           </div>
@@ -101,5 +100,12 @@ export class TransactionListComponent implements OnInit {
 
   switchToDisplayMode() {
     this.isEditMode = false;
+  }
+
+  linkToBudget() {
+    if (this.budget) {
+      return `/budgets/${this.budget.id}`;
+    }
+    return "/budgets";
   }
 }

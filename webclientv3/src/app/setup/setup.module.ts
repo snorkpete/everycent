@@ -8,6 +8,8 @@ import { SetupService } from "./setup.service";
 import { InstitutionEditFormComponent } from "./institution-edit-form.component";
 import { SettingsComponent } from "./settings.component";
 import { BankAccountEditFormComponent } from "./bank-account-edit-form.component";
+import { AllocationCategoryEditFormComponent } from "./allocation-category-edit-form.component";
+import { AllocationCategoriesComponent } from "./allocation-categories.component";
 
 @NgModule({
   imports: [SharedModule, SetupRoutingModule],
@@ -16,9 +18,15 @@ import { BankAccountEditFormComponent } from "./bank-account-edit-form.component
     InstitutionEditFormComponent,
     SettingsComponent,
     BankAccountsComponent,
-    BankAccountEditFormComponent
+    BankAccountEditFormComponent,
+    AllocationCategoryEditFormComponent,
+    AllocationCategoriesComponent
   ],
-  entryComponents: [InstitutionEditFormComponent, BankAccountEditFormComponent],
+  entryComponents: [
+    InstitutionEditFormComponent,
+    BankAccountEditFormComponent,
+    AllocationCategoryEditFormComponent
+  ],
   providers: [SetupService]
 })
 export class SetupModule {}

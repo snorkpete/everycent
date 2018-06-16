@@ -3,6 +3,10 @@ import { Observable } from "rxjs";
 import { ApiGateway } from "../../api/api-gateway.service";
 import { BankAccountData } from "../bank-accounts/bank-account.model";
 import { InstitutionData } from "../bank-accounts/institution.model";
+import {
+  AllocationCategoryData,
+  AllocationCategoryData
+} from "../budgets/allocation.model";
 
 @Injectable()
 export class SetupService {
@@ -49,6 +53,33 @@ export class SetupService {
       return this.addBankAccount(bankAccount);
     } else {
       return this.saveBankAccount(bankAccount);
+    }
+  }
+
+  getAllocationCategories(): Observable<AllocationCategoryData[]> {
+    return this.apiGateway.get("/allocation_categories");
+  }
+
+  addAllocationCategory(allocationCategory: AllocationCategoryData) {
+    return this.apiGateway.post("/allocation_categories", allocationCategory);
+  }
+
+  saveAllocationCategory(
+    allocationCategory: AllocationCategoryData
+  ): Observable<AllocationCategoryData> {
+    return this.apiGateway.put(
+      `/allocation_categories/${allocationCategory.id}`,
+      allocationCategory
+    );
+  }
+
+  createOrUpdateAllocationCategory(
+    allocationCategory: AllocationCategoryData
+  ): Observable<BankAccountData> {
+    if (allocationCategory.id === 0) {
+      return this.addAllocationCategory(allocationCategory);
+    } else {
+      return this.saveAllocationCategory(allocationCategory);
     }
   }
 }
