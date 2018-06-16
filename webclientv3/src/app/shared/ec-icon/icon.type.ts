@@ -1,4 +1,3 @@
-
 let Icon = {
   HOME: "home",
   BUDGETS: "local_atm",
@@ -10,6 +9,7 @@ let Icon = {
   LOGOUT: "account_circle",
   MENU: "menu",
   SETUP: "settings",
+  ALLOCATION_CATEGORIES: "category",
   INSTITUTIONS: "work",
   BANK_ACCOUNTS: "payment",
   SETTINGS: "settings",
@@ -20,8 +20,7 @@ let Icon = {
   UNDO_DELETE: "refresh",
 
   DEACTIVATE: "archive",
-  ACTIVATE: "unarchive",
+  ACTIVATE: "unarchive"
 };
 
-export {Icon};
-
+export { Icon };

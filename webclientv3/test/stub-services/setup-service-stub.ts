@@ -1,6 +1,7 @@
 import { Observable, of } from "rxjs";
 import { BankAccountData } from "../../src/app/bank-accounts/bank-account.model";
 import { InstitutionData } from "../../src/app/bank-accounts/institution.model";
+import { AllocationCategoryData } from "../../src/app/budgets/allocation.model";
 import { SettingsData } from "../../src/app/shared/settings-data.model";
 
 const SetupServiceStub = {
@@ -27,6 +28,20 @@ const SetupServiceStub = {
   },
 
   addBankAccount(bankAccount: BankAccountData) {
+    return of([]);
+  },
+
+  getAllocationCategories(): Observable<AllocationCategoryData[]> {
+    return of([]);
+  },
+
+  addAllocationCategory(allocationCategory: AllocationCategoryData) {
+    return of([]);
+  },
+
+  saveAllocationCategory(
+    allocationCategory: AllocationCategoryData
+  ): Observable<AllocationCategoryData> {
     return of([]);
   },
 
