@@ -27,7 +27,7 @@ class BankAccountSerializer < ActiveModel::Serializer
   attributes :id, :name, :account_type, :account_type_description, :account_category, :is_cash,
              :account_no,
              :user_id, :institution_id, :opening_balance, :closing_balance,
-             :allow_default_allocations, :is_sink_fund, :is_credit_card, :status,
+             :allow_default_allocations, :is_sink_fund, :is_credit_card, :status, :import_format,
              :statement_day, :payment_due_day,
              :statement_day_ordinal, :payment_due_day_ordinal,
              :current_period_statement_start,
