@@ -23,7 +23,7 @@ const SetupServiceStub = {
     return of([]);
   },
 
-  getBankAccounts(): Observable<BankAccountData[]> {
+  getAllBankAccounts(): Observable<BankAccountData[]> {
     return of([]);
   },
 
