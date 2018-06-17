@@ -7,6 +7,11 @@ export class HighlightDeletedDirective {
   /* tslint:disable no-input-rename */
   @Input("ecHighlightDeletedFor") item: any;
 
+  @HostBinding("class.closed")
+  get isClosed() {
+    return this.item && this.item.status === "closed";
+  }
+
   @HostBinding("class.deleted")
   get isDeleted() {
     return this.item.deleted;

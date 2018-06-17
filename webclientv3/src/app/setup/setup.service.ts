@@ -31,8 +31,8 @@ export class SetupService {
     }
   }
 
-  getBankAccounts(): Observable<BankAccountData[]> {
-    return this.apiGateway.get("/bank_accounts");
+  getAllBankAccounts(): Observable<BankAccountData[]> {
+    return this.apiGateway.get("/bank_accounts", { include_closed: true });
   }
 
   addBankAccount(bankAccount: BankAccountData) {

@@ -4,6 +4,7 @@ import { switchMap } from "rxjs/operators";
 import { BankAccountData } from "../bank-accounts/bank-account.model";
 import { InstitutionData } from "../bank-accounts/institution.model";
 import { MessageService } from "../message-display/message.service";
+import { DeactivateService } from "../shared/deactivate-button/deactivate.service";
 import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
 import { BankAccountEditFormComponent } from "./bank-account-edit-form.component";
 import { SetupService } from "./setup.service";
@@ -15,9 +16,10 @@ import { SetupService } from "./setup.service";
       <mat-card>
         <mat-card-title>Bank Accounts</mat-card-title>
         <mat-card-content>
+          <mat-slide-toggle [(ngModel)]="showClosed" color="primary">Show Closed Accounts?</mat-slide-toggle>
           <mat-list>
             <ng-container *ngFor="let bankAccount of bankAccounts">
-              <mat-list-item>
+              <mat-list-item *ngIf="deactivateService.isItemVisible(bankAccount, showClosed)" [ecHighlightDeletedFor]="bankAccount">
                 <div class="list-item-with-action-buttons">
                   <span> {{ bankAccount.name }} </span>
                   <button mat-raised-button color="primary" (click)="viewDetails(bankAccount)">View</button>
@@ -39,12 +41,14 @@ import { SetupService } from "./setup.service";
 export class BankAccountsComponent implements OnInit {
   bankAccounts: BankAccountData[] = [];
   institutions: InstitutionData[] = [];
+  showClosed = false;
 
   constructor(
     private setupService: SetupService,
     private dialog: MatDialog,
     private toolbar: MainToolbarService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private deactivateService: DeactivateService
   ) {}
 
   ngOnInit() {
@@ -54,7 +58,7 @@ export class BankAccountsComponent implements OnInit {
 
   refresh() {
     this.setupService
-      .getBankAccounts()
+      .getAllBankAccounts()
       .subscribe(bankAccounts => (this.bankAccounts = bankAccounts));
 
     this.setupService
