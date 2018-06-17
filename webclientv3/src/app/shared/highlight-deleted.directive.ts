@@ -1,20 +1,18 @@
-import {Directive, HostBinding, Input} from '@angular/core';
+import { Directive, HostBinding, Input } from "@angular/core";
 
 @Directive({
-  selector: '[ecHighlightDeletedFor]',
+  selector: "[ecHighlightDeletedFor]"
 })
 export class HighlightDeletedDirective {
-
   /* tslint:disable no-input-rename */
-  @Input('ecHighlightDeletedFor')
-  item: any;
+  @Input("ecHighlightDeletedFor") item: any;
 
-  @HostBinding('class.deleted')
+  @HostBinding("class.deleted")
   get isDeleted() {
     return this.item.deleted;
   }
 
-  @HostBinding('class.unpaid')
+  @HostBinding("class.unpaid")
   get isUnpaid() {
     if (this.item.status === undefined) {
       return false;
@@ -22,18 +20,17 @@ export class HighlightDeletedDirective {
 
     // explicitly skip open items -
     // this is used in sink funds to show open sink fund allocations
-    if (this.item.status === 'open' || this.item.status === 'closed') {
+    if (this.item.status === "open" || this.item.status === "closed") {
       return false;
     }
 
-    return this.item.status !== 'paid';
+    return this.item.status !== "paid";
   }
 
-  @HostBinding('class.deactivated')
+  @HostBinding("class.deactivated")
   get isDeactivated() {
     return this.item.deactivated;
   }
 
-  constructor() { }
-
+  constructor() {}
 }
