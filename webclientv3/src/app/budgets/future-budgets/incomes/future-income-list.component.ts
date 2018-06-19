@@ -1,4 +1,3 @@
-import {total} from "../../../util/total";
 import { Component, Input, OnInit } from "@angular/core";
 import { BudgetData } from "../../budget.model";
 import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
@@ -21,7 +20,7 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
       <tr *ngFor="let incomeName of incomeNames">
         <td>{{incomeName}}</td>
         <td *ngFor="let budget of budgets; trackBy: trackById" class="right">
-          {{ displayData[incomeName][budget.name] | ecMoney }}
+          {{ getAmountForIncomeAndBudget(incomeName, budget) | ecMoney }}
         </td>
       </tr>
       <tr class="total">
@@ -34,7 +33,6 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
   styles: []
 })
 export class FutureIncomeListComponent implements OnInit {
-
   @Input()
   get budgets(): BudgetData[] {
     return this._budgets;
@@ -61,11 +59,31 @@ export class FutureIncomeListComponent implements OnInit {
     this.incomeNames = Object.keys(this.displayData);
   }
 
-  totalFor(budgetName: string) {
-    let incomes = Object.keys(this.displayData).map(income => this.displayData[income]);
-    return total(incomes, budgetName);
+  getAmountForIncomeAndBudget(incomeName: string, budget: BudgetData) {
+    let data = (this.displayData[incomeName] &&
+      this.displayData[incomeName][budget.name]) || { id: 0, amount: 0 };
+
+    return data.amount;
   }
 
+  totalFor(budgetName: string) {
+    let incomes = Object.keys(this.displayData).map(
+      income => this.displayData[income]
+    );
+
+    return this.totalByBudget(incomes, budgetName);
+  }
+
+  totalByBudget(incomes, budgetName): number {
+    return incomes.reduce((sum, income) => {
+      // skip any items that don't have the property
+      if (!income[budgetName]) {
+        return sum;
+      }
+
+      return sum + (income[budgetName] && income[budgetName].amount);
+    }, 0);
+  }
 
   trackById(index: number, budget: BudgetData) {
     return budget.id;

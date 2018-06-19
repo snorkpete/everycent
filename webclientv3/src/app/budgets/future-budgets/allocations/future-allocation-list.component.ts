@@ -112,15 +112,31 @@ export class FutureAllocationListComponent implements OnInit {
       return 0;
     }
 
-    return dataForAllocation[budget.name] || 0;
+    return (
+      (dataForAllocation[budget.name] &&
+        dataForAllocation[budget.name].amount) ||
+      0
+    );
   }
 
   totalFor(category, budgetName: string) {
     let categoryData = this.displayData[category.id] || {};
-    let allocations = Object.keys(categoryData).map(allocation => categoryData[allocation] || {});
-    return total(allocations, budgetName);
+    let allocations = Object.keys(categoryData).map(
+      allocation => categoryData[allocation] || {}
+    );
+    return this.totalByBudget(allocations, budgetName);
   }
 
+  totalByBudget(allocations, budgetName): number {
+    return allocations.reduce((sum, allocation) => {
+      // skip any items that don't have the property
+      if (!allocation[budgetName]) {
+        return sum;
+      }
+
+      return sum + (allocation[budgetName] && allocation[budgetName].amount);
+    }, 0);
+  }
   totalForBudget(index: number) {
     let budget = this.budgets[index];
     return total(budget.allocations, "amount");
