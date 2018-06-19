@@ -1,13 +1,12 @@
-import { Injectable } from '@angular/core';
-import {BudgetData} from "../budget.model";
+import { Injectable } from "@angular/core";
+import { BudgetData } from "../budget.model";
 
 @Injectable()
 export class FutureBudgetsDataFormatterService {
-
-  constructor() { }
+  constructor() {}
 
   formatIncomesForDisplay(budgets: BudgetData[]) {
-    let results = { };
+    let results = {};
 
     budgets.forEach(budget => {
       budget.incomes.forEach(income => {
@@ -20,7 +19,7 @@ export class FutureBudgetsDataFormatterService {
   }
 
   formatAllocationsForDisplay(budgets: BudgetData[]) {
-    let results = { };
+    let results = {};
 
     budgets.forEach(budget => {
       budget.allocations.forEach(allocation => {

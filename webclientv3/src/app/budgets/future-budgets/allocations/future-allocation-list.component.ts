@@ -1,12 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {total} from "../../../util/total";
-import {AllocationCategoryData} from "../../allocation.model";
-import {BudgetData} from "../../budget.model";
-import {BudgetService} from "../../budget.service";
-import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatter.service";
+import { Component, Input, OnInit } from "@angular/core";
+import { total } from "../../../util/total";
+import { AllocationCategoryData } from "../../allocation.model";
+import { BudgetData } from "../../budget.model";
+import { BudgetService } from "../../budget.service";
+import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
 
-@Component({ /* tslint:disable component-selector */
-  selector: '[ec-future-allocation-list]',
+@Component({
+  /* tslint:disable component-selector */
+  selector: "[ec-future-allocation-list]",
   template: `
       <tr class="section-heading">
         <td [attr.colspan]="nbrOfColumns()">Allocations</td>
@@ -38,17 +39,18 @@ import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatte
         </th>
       </tr>
   `,
-  styles: [`
+  styles: [
+    `
     .heading {
       font-weight: bold;
       font-size: 16px;
       border-top: 3px solid blue;
       border-bottom: 2px solid blue;
     }
-  `]
+  `
+  ]
 })
 export class FutureAllocationListComponent implements OnInit {
-
   @Input()
   get budgets(): BudgetData[] {
     return this._budgets;
@@ -75,14 +77,13 @@ export class FutureAllocationListComponent implements OnInit {
   constructor(
     private budgetService: BudgetService,
     private formatter: FutureBudgetsDataFormatterService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.budgetService
       .getAllocationCategories()
-      .subscribe(categories => this.allocationCategories = categories);
+      .subscribe(categories => (this.allocationCategories = categories));
   }
-
 
   updateDisplayData() {
     this.displayData = this.formatter.formatAllocationsForDisplay(this.budgets);
@@ -93,7 +94,6 @@ export class FutureAllocationListComponent implements OnInit {
   }
 
   allocationNames(category: AllocationCategoryData) {
-
     let data = this.displayData[category.id];
     if (!data) {
       return [];
@@ -103,7 +103,6 @@ export class FutureAllocationListComponent implements OnInit {
   }
 
   getAmountForAllocationAndBudget(category, allocationName, budget) {
-
     let dataForCategory = this.displayData[category.id];
     if (!dataForCategory) {
       return 0;
@@ -124,7 +123,7 @@ export class FutureAllocationListComponent implements OnInit {
 
   totalForBudget(index: number) {
     let budget = this.budgets[index];
-    return total(budget.allocations, 'amount');
+    return total(budget.allocations, "amount");
   }
 
   trackById(index: number, budget: BudgetData) {
