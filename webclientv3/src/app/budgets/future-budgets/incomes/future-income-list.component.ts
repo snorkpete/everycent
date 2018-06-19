@@ -1,10 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
 import {total} from "../../../util/total";
-import {BudgetData} from "../../budget.model";
-import {FutureBudgetsDataFormatterService} from "../future-budgets-data-formatter.service";
+import { Component, Input, OnInit } from "@angular/core";
+import { BudgetData } from "../../budget.model";
+import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
 
-@Component({ /* tslint:disable component-selector */
-  selector: '[ec-future-income-list]',
+@Component({
+  /* tslint:disable component-selector */
+  selector: "[ec-future-income-list]",
   template: `
       <tr class="section-heading">
         <td [attr.colspan]="nbrOfColumns()">
@@ -47,13 +48,9 @@ export class FutureIncomeListComponent implements OnInit {
   displayData: any = {};
   incomeNames: string[] = [];
 
+  constructor(private formatter: FutureBudgetsDataFormatterService) {}
 
-  constructor(
-    private formatter: FutureBudgetsDataFormatterService
-  ) { }
-
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   nbrOfColumns() {
     return this.budgets.length + 1;
