@@ -137,4 +137,38 @@ describe Budget, :type => :model do
       expect(Budget.current.id).to eq(@open.id)
     end
   end
+
+  describe ".mass_update" do
+    context "when type is 'income'" do
+      before do
+        @params = { type: 'income', allocation: 'Test', amounts: [] }
+      end
+
+      it "calls Income.mass_update" do
+        expect(Income).to receive(:mass_update).with(@params).and_return(true)
+        Budget.mass_update(@params)
+      end
+
+      it "does not call Allocation.mass_update" do
+        expect(Allocation).not_to receive(:mass_update)
+        Budget.mass_update(@params)
+      end
+    end
+
+    context "when type is 'allocation'" do
+      before do
+        @params = { type: 'allocation', income: 'Test', amounts: [] }
+      end
+
+      it "calls Allocation.mass_update" do
+        expect(Allocation).to receive(:mass_update).with(@params).and_return(true)
+        Budget.mass_update(@params)
+      end
+
+      it "does not call Income.mass_update" do
+        expect(Income).not_to receive(:mass_update)
+        Budget.mass_update(@params)
+      end
+    end
+  end
 end

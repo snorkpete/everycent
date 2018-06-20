@@ -57,15 +57,15 @@ RSpec.describe Income, :type => :model do
 
   describe ".mass_update" do
     before do
-      @may_income = create(:income, name: 'Food', amount: 500)
-      @june_income = create(:income, name: 'Food', amount: 500)
-      @july_income = create(:income, name: 'Food', amount: 500)
+      @may_allocation = create(:income, name: 'My Income', amount: 500)
+      @june_income = create(:income, name: 'My Income', amount: 500)
+      @july_income = create(:income, name: 'My Income', amount: 500)
     end
 
     context "when 'name' is blank" do
       before do
         @params = { type: 'income', name: '', amounts:[
-            { id: @may_income.id, amount: 600 },
+            {id: @may_allocation.id, amount: 600 },
         ]}
       end
 
@@ -76,26 +76,26 @@ RSpec.describe Income, :type => :model do
 
       it "doesn't update anything" do
         result = Income.mass_update @params
-        may = Income.find(@may_income.id)
-        expect(may.name).to eq @may_income.name
+        may = Income.find(@may_allocation.id)
+        expect(may.name).to eq @may_allocation.name
       end
     end
 
     it "updates all incomes that already exist" do
-      @params = { type: 'income', name: 'Groceries', amounts:[
-          { id: @may_income.id, amount: 600 },
+      @params = { type: 'income', name: 'Lottery Winnings', amounts:[
+          {id: @may_allocation.id, amount: 600 },
           { id: @june_income.id, amount: 800 },
           { id: @july_income.id, amount: 1000 },
       ]}
       Income.mass_update(@params)
 
-      may = Income.find(@may_income.id)
+      may = Income.find(@may_allocation.id)
       june = Income.find(@june_income.id)
       july = Income.find(@july_income.id)
 
-      expect(may.name).to eq 'Groceries'
-      expect(june.name).to eq 'Groceries'
-      expect(july.name).to eq 'Groceries'
+      expect(may.name).to eq 'Lottery Winnings'
+      expect(june.name).to eq 'Lottery Winnings'
+      expect(july.name).to eq 'Lottery Winnings'
 
       expect(may.amount).to eq 600
       expect(june.amount).to eq 800
@@ -103,19 +103,19 @@ RSpec.describe Income, :type => :model do
     end
 
     it "ignores incomes that are not in the params" do
-      @params = { type: 'income', name: 'Groceries', amounts:[
-          { id: @may_income.id, amount: 600 },
+      @params = { type: 'income', name: 'Lottery Winnings', amounts:[
+          {id: @may_allocation.id, amount: 600 },
       ]}
 
       Income.mass_update(@params)
 
-      may = Income.find(@may_income.id)
+      may = Income.find(@may_allocation.id)
       june = Income.find(@june_income.id)
       july = Income.find(@july_income.id)
 
-      expect(may.name).to eq 'Groceries'
-      expect(june.name).to eq 'Food'
-      expect(july.name).to eq 'Food'
+      expect(may.name).to eq 'Lottery Winnings'
+      expect(june.name).to eq 'My Income'
+      expect(july.name).to eq 'My Income'
 
       expect(may.amount).to eq 600
       expect(june.amount).to eq @june_income.amount
@@ -125,7 +125,7 @@ RSpec.describe Income, :type => :model do
     context "when id is 0" do
 
       it "creates an income for the budget if amount > 0" do
-        @params = { type: 'income', name: 'Groceries', amounts:[
+        @params = { type: 'income', name: 'Lottery Winnings', amounts:[
             { id: 0, amount: 600, budget_id: 10 },
         ]}
         expect do
@@ -133,11 +133,11 @@ RSpec.describe Income, :type => :model do
         end.to change { Income.count }.by(1)
 
         new_income = Income.find_by_budget_id 10
-        expect(new_income.name).to eq 'Groceries'
+        expect(new_income.name).to eq 'Lottery Winnings'
       end
 
       it "does nothing amount is 0" do
-        @params = { type: 'income', name: 'Groceries', amounts:[
+        @params = { type: 'income', name: 'Lottery Winnings', amounts:[
             { id: 0, amount: 0, budget_id: 10 },
         ]}
         expect do
@@ -148,15 +148,15 @@ RSpec.describe Income, :type => :model do
 
 
     it "deletes an income if the id exists and amount is 0" do
-      @params = { type: 'income', name: 'Groceries', amounts:[
-          { id: @may_income.id, amount: 0, budget_id: 10 },
+      @params = { type: 'income', name: 'Lottery Winnings', amounts:[
+          {id: @may_allocation.id, amount: 0, budget_id: 10 },
       ]}
 
       expect do
         Income.mass_update(@params)
       end.to change { Income.count }.by(-1)
 
-      expect(Income.find_by_id @may_income.id).to be_nil
+      expect(Income.find_by_id @may_allocation.id).to be_nil
     end
 
   end

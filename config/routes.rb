@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       get 'current'
       get 'future'
       post 'reopen_last_budget'
+      post 'mass_update'
     end
   end
 

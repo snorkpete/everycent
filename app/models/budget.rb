@@ -43,6 +43,18 @@ class Budget < ActiveRecord::Base
     budget_to_copy.copy
   end
 
+  def self.mass_update(params)
+    case
+    when params[:type] == 'income'
+      return Income.mass_update(params)
+
+    when params[:type] == 'allocation'
+      return Allocation.mass_update(params)
+    end
+
+    return false
+  end
+
   def copy
     Budget.skip_callback :create, :after, :add_associated_data
     new_budget = Budget.create(start_date: self.start_date.next_month)

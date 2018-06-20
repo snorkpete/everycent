@@ -60,6 +60,15 @@ class BudgetsController < ApplicationController
     respond_with(@budget, BudgetSerializer)
   end
 
+  def mass_update
+    result = Budget.mass_update(params)
+    if result
+      render json: { success: true }
+    else
+      render json: { success: false }, status: 400
+    end
+  end
+
   def destroy
     @budget.destroy
     respond_with(@budget, BudgetSerializer)
