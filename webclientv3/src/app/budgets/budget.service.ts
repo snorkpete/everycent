@@ -77,4 +77,8 @@ export class BudgetService {
   reopenLastBudget() {
     return this.apiGateway.post("/budgets/reopen_last_budget");
   }
+
+  massSave(massEditData) {
+    return this.apiGateway.post(`/budgets/mass_update`, massEditData);
+  }
 }

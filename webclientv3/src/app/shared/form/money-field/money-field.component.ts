@@ -15,7 +15,7 @@ import { centsToDollars } from "../../../util/cents-to-dollars";
         color: darkred;
         font-weight: bold;
     }
-    input {
+    input, .value {
         text-align: right;
     }
     .positive {

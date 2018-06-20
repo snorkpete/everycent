@@ -20,7 +20,7 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
       <tr *ngFor="let incomeName of incomeNames">
         <td>{{incomeName}}</td>
         <td *ngFor="let budget of budgets; trackBy: trackById" class="right">
-          {{ getAmountForIncomeAndBudget(incomeName, budget) | ecMoney }}
+          {{ getAmountForIncomeAndBudget(incomeName, budget).amount | ecMoney }}
         </td>
       </tr>
       <tr class="total">
@@ -63,7 +63,7 @@ export class FutureIncomeListComponent implements OnInit {
     let data = (this.displayData[incomeName] &&
       this.displayData[incomeName][budget.name]) || { id: 0, amount: 0 };
 
-    return data.amount;
+    return data;
   }
 
   totalFor(budgetName: string) {

@@ -5,6 +5,7 @@ import { FutureBudgetSummaryComponent } from "./future-budget-summary.component"
 import { FutureBudgetsDataFormatterService } from "./future-budgets-data-formatter.service";
 import { FutureBudgetsComponent } from "./future-budgets.component";
 import { FutureIncomeListComponent } from "./incomes/future-income-list.component";
+import { BudgetMassEditFormComponent } from "./mass-edit/budget-mass-edit-form.component";
 
 @NgModule({
   imports: [SharedModule],
@@ -12,8 +13,10 @@ import { FutureIncomeListComponent } from "./incomes/future-income-list.componen
     FutureBudgetsComponent,
     FutureIncomeListComponent,
     FutureAllocationListComponent,
-    FutureBudgetSummaryComponent
+    FutureBudgetSummaryComponent,
+    BudgetMassEditFormComponent
   ],
   providers: [FutureBudgetsDataFormatterService],
+  entryComponents: [BudgetMassEditFormComponent]
 })
 export class FutureBudgetsModule {}
