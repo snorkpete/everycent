@@ -1,9 +1,11 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatDialog, MatDialogRef } from "@angular/material";
 import { total } from "../../../util/total";
 import { AllocationCategoryData } from "../../allocation.model";
 import { BudgetData } from "../../budget.model";
 import { BudgetService } from "../../budget.service";
 import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
+import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.component";
 
 @Component({
   /* tslint:disable component-selector */
@@ -26,9 +28,9 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
           </td>
         </tr>
         <tr *ngFor="let allocationName of allocationNames(category)">
-          <td>{{allocationName}}</td>
+          <td><a (click)="massEditAllocation(category, allocationName)">{{allocationName}}</a></td>
           <td *ngFor="let budget of budgets; trackBy: trackById" class="right">
-            {{ getAmountForAllocationAndBudget(category, allocationName, budget) | ecMoney }}
+            {{ getAmountForAllocationAndBudget(category, allocationName, budget).amount | ecMoney }}
           </td>
         </tr>
       </ng-container>
@@ -47,10 +49,16 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
       border-top: 3px solid blue;
       border-bottom: 2px solid blue;
     }
+
+    a {
+      cursor: pointer;
+      text-decoration: underline;
+    }
   `
   ]
 })
 export class FutureAllocationListComponent implements OnInit {
+  @Output() save = new EventEmitter();
   @Input()
   get budgets(): BudgetData[] {
     return this._budgets;
@@ -73,10 +81,12 @@ export class FutureAllocationListComponent implements OnInit {
 
   private _allocationCategories: AllocationCategoryData[] = [];
   displayData: any = {};
+  dialogRef: MatDialogRef<BudgetMassEditFormComponent>;
 
   constructor(
     private budgetService: BudgetService,
-    private formatter: FutureBudgetsDataFormatterService
+    private formatter: FutureBudgetsDataFormatterService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -113,9 +123,10 @@ export class FutureAllocationListComponent implements OnInit {
     }
 
     return (
-      (dataForAllocation[budget.name] &&
-        dataForAllocation[budget.name].amount) ||
-      0
+      (dataForAllocation[budget.name] && dataForAllocation[budget.name]) || {
+        id: 0,
+        amount: 0
+      }
     );
   }
 
@@ -144,5 +155,26 @@ export class FutureAllocationListComponent implements OnInit {
 
   trackById(index: number, budget: BudgetData) {
     return budget.id;
+  }
+
+  massEditAllocation(category: AllocationCategoryData, allocationName: string) {
+    this.dialogRef = this.dialog.open(BudgetMassEditFormComponent, {
+      maxHeight: 600
+    });
+
+    const form = this.dialogRef.componentInstance;
+    form.allocationName = allocationName;
+    form.displayData = this.displayData[category.id][allocationName];
+    form.budgets = this.budgets;
+    form.allocation_category_id = category.id;
+    form.createForm();
+
+    form.save.subscribe(massEditData => this.save.emit(massEditData));
+  }
+
+  closeDialog() {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
   }
 }

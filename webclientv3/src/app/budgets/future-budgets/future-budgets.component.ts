@@ -1,10 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
-import {BudgetData} from "../budget.model";
-import {BudgetService} from "../budget.service";
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatDialogRef } from "@angular/material";
+import { MessageService } from "../../message-display/message.service";
+import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
+import { BudgetData } from "../budget.model";
+import { BudgetService } from "../budget.service";
+import { FutureAllocationListComponent } from "./allocations/future-allocation-list.component";
+import { BudgetMassEditFormComponent } from "./mass-edit/budget-mass-edit-form.component";
 
 @Component({
-  selector: 'ec-future-budgets',
+  selector: "ec-future-budgets",
   template: `
     <mat-card class="main">
       <mat-card-content>
@@ -12,7 +16,7 @@ import {BudgetService} from "../budget.service";
           <table class="table">
             <tbody ec-future-income-list [budgets]="budgets">
             </tbody>
-            <tbody ec-future-allocation-list [budgets]="budgets">
+            <tbody ec-future-allocation-list [budgets]="budgets" (save)="massSave($event)">
             </tbody>
             <tfoot ec-future-budget-summary [budgets]="budgets">
             </tfoot>
@@ -24,17 +28,39 @@ import {BudgetService} from "../budget.service";
   styles: []
 })
 export class FutureBudgetsComponent implements OnInit {
-
   budgets: BudgetData[] = [];
+
+  @ViewChild(FutureAllocationListComponent)
+  allocationList: FutureAllocationListComponent;
 
   constructor(
     private toolbar: MainToolbarService,
-    private budgetService: BudgetService
-  ) { }
+    private budgetService: BudgetService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit() {
-    this.toolbar.setHeading('Future Budgets');
-    this.budgetService.getFutureBudgets().subscribe(budgets => this.budgets = budgets);
+    this.toolbar.setHeading("Future Budgets");
+    this.refresh();
   }
 
+  refresh() {
+    this.budgetService
+      .getFutureBudgets()
+      .subscribe(budgets => (this.budgets = budgets));
+  }
+
+  massSave(massEditData: any) {
+    this.budgetService.massSave(massEditData).subscribe(
+      () => {
+        this.messageService.setMessage("Updates saved.");
+        this.refresh();
+        this.allocationList.closeDialog();
+      },
+      error => {
+        this.messageService.setErrorMessage("Updates not saved.");
+        this.refresh();
+      }
+    );
+  }
 }
