@@ -48,4 +48,38 @@ class Income < ApplicationRecord
     income.update(param.except(:deleted))
     income
   end
+
+  def self.mass_update(params)
+    # @params = { type: 'income', name: 'Groceries', amounts:[
+    #     { id: @may_income.id, amount: 600 },
+    #     { id: @june_income.id, amount: 800 },
+    #     { id: @july_income.id, amount: 1000 },
+    # ]}
+    return false if params[:name].blank?
+
+    params[:amounts].each do |amount_data|
+
+      if amount_data[:id] == 0
+        Income.create(
+                  name: params[:name],
+                  amount: amount_data[:amount],
+                  budget_id: amount_data[:budget_id],
+                  bank_account_id: amount_data[:bank_account_id]
+        ) if amount_data[:amount] != 0
+        return
+      end
+
+      income = Income.find_by_id amount_data[:id]
+      return unless income
+
+      if amount_data[:amount] == 0
+        income.destroy
+      else
+        income.update(name: params[:name], amount: amount_data[:amount])
+      end
+    end
+
+    true
+  end
+
 end
