@@ -58,6 +58,39 @@ class Allocation < ApplicationRecord
     allocation
   end
 
+  def self.mass_update(params)
+    # @params = { type: 'allocation', name: 'Groceries', amounts:[
+    #     { id: @may_income.id, amount: 600 },
+    #     { id: @june_income.id, amount: 800 },
+    #     { id: @july_income.id, amount: 1000 },
+    # ]}
+    return false if params[:name].blank?
+
+    params[:amounts].each do |amount_data|
+
+      if amount_data[:id] == 0
+        Allocation.create(
+            name: params[:name],
+            amount: amount_data[:amount],
+            budget_id: amount_data[:budget_id],
+            allocation_category_id: params[:allocation_category_id]
+        ) if amount_data[:amount] != 0
+        next
+      end
+
+      allocation = Allocation.find_by_id amount_data[:id]
+      next unless allocation
+
+      if amount_data[:amount] == 0
+        allocation.destroy
+      else
+        allocation.update(name: params[:name], amount: amount_data[:amount])
+      end
+    end
+
+    true
+  end
+
   def spent
     # TODO: to follow up on why summing in the db causes n+1 queries
     transactions.sum('withdrawal_amount - deposit_amount')
