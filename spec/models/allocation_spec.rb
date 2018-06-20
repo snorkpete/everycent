@@ -46,7 +46,7 @@ RSpec.describe Allocation, :type => :model do
                          "allocation_category"=>nil, "bank_account"=>nil },
                          {"id"=>"", "name"=>"Groceries", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"2",
                          "allocation_category"=>nil, "bank_account"=>nil },
-                         {"id"=>@third.id, "name"=>"deleted", "amount"=>30000, "budget_id"=>@budget.id, 
+                         {"id"=>@third.id, "name"=>"deleted", "amount"=>30000, "budget_id"=>@budget.id,
                           "bank_account_id"=>"1", "deleted"=>true}
       ]
 
@@ -100,5 +100,112 @@ RSpec.describe Allocation, :type => :model do
       create(:transaction, allocation_id: @allocation.id, withdrawal_amount: 0, deposit_amount: 200)
       expect(@allocation.spent).to eq 400
     end
+  end
+
+  describe ".mass_update" do
+    before do
+      @may_allocation = create(:allocation, name: 'Food', amount: 500)
+      @june_allocation = create(:allocation, name: 'Food', amount: 500)
+      @july_allocation = create(:allocation, name: 'Food', amount: 500)
+    end
+
+    context "when 'name' is blank" do
+      before do
+        @params = { type: 'allocation', name: '', amounts:[
+            {id: @may_allocation.id, amount: 600 },
+        ]}
+      end
+
+      it "returns false" do
+        result = Allocation.mass_update @params
+        expect(result).to be false
+      end
+
+      it "doesn't update anything" do
+        result = Allocation.mass_update @params
+        may = Allocation.find(@may_allocation.id)
+        expect(may.name).to eq @may_allocation.name
+      end
+    end
+
+    it "updates all allocations that already exist" do
+      @params = { type: 'allocation', name: 'Groceries', amounts:[
+          {id: @may_allocation.id, amount: 600 },
+          { id: @june_allocation.id, amount: 800 },
+          { id: @july_allocation.id, amount: 1000 },
+      ]}
+      Allocation.mass_update(@params)
+
+      may = Allocation.find(@may_allocation.id)
+      june = Allocation.find(@june_allocation.id)
+      july = Allocation.find(@july_allocation.id)
+
+      expect(may.name).to eq 'Groceries'
+      expect(june.name).to eq 'Groceries'
+      expect(july.name).to eq 'Groceries'
+
+      expect(may.amount).to eq 600
+      expect(june.amount).to eq 800
+      expect(july.amount).to eq 1000
+
+    end
+
+    it "ignores allocations that are not in the params" do
+      @params = { type: 'allocation', name: 'Groceries', amounts:[
+          {id: @may_allocation.id, amount: 600 },
+      ]}
+
+      Allocation.mass_update(@params)
+
+      may = Allocation.find(@may_allocation.id)
+      june = Allocation.find(@june_allocation.id)
+      july = Allocation.find(@july_allocation.id)
+
+      expect(may.name).to eq 'Groceries'
+      expect(june.name).to eq 'Food'
+      expect(july.name).to eq 'Food'
+
+      expect(may.amount).to eq 600
+      expect(june.amount).to eq @june_allocation.amount
+      expect(july.amount).to eq @july_allocation.amount
+    end
+
+    context "when id is 0" do
+
+      it "creates an allocation for the budget if amount > 0" do
+        @params = { type: 'allocation', name: 'Groceries', amounts:[
+            { id: 0, amount: 600, budget_id: 10 },
+        ]}
+        expect do
+          Allocation.mass_update(@params)
+        end.to change { Allocation.count }.by(1)
+
+        new_allocation = Allocation.find_by_budget_id 10
+        expect(new_allocation.name).to eq 'Groceries'
+      end
+
+      it "does nothing amount is 0" do
+        @params = { type: 'allocation', name: 'Groceries', amounts:[
+            { id: 0, amount: 0, budget_id: 10 },
+        ]}
+        expect do
+          Allocation.mass_update(@params)
+        end.to change { Allocation.count }.by(0)
+      end
+    end
+
+
+    it "deletes an allocation if the id exists and amount is 0" do
+      @params = { type: 'allocation', name: 'Groceries', amounts:[
+          {id: @may_allocation.id, amount: 0, budget_id: 10 },
+      ]}
+
+      expect do
+        Allocation.mass_update(@params)
+      end.to change { Allocation.count }.by(-1)
+
+      expect(Allocation.find_by_id @may_allocation.id).to be_nil
+    end
+
   end
 end
