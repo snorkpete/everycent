@@ -30,7 +30,19 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
         </th>
       </tr>
   `,
-  styles: []
+  styles: [
+    `
+    a {
+      cursor: pointer;
+      text-decoration: none;
+      color: rgba(0,0,0,.74);
+    }
+    a:hover {
+      text-decoration: underline;
+      color: blue;
+    }
+  `
+  ]
 })
 export class FutureIncomeListComponent implements OnInit {
   @Input()
