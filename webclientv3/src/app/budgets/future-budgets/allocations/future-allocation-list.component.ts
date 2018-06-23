@@ -49,10 +49,14 @@ import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.
       border-top: 3px solid blue;
       border-bottom: 2px solid blue;
     }
-
     a {
       cursor: pointer;
+      text-decoration: none;
+      color: rgba(0,0,0,.74);
+    }
+    a:hover {
       text-decoration: underline;
+      color: blue;
     }
   `
   ]
