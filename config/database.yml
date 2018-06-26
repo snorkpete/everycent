@@ -14,8 +14,8 @@
 #  database: db/developMent.sqlite3
 default: &default
   adapter: postgresql
-  username: kion
-  password:
+  username: <%= ENV["PG_USER"] %>
+  password: <%= ENV["PG_PASSWORD"] %>
   host: localhost
   encoding: UTF8
   pool: 5
@@ -23,7 +23,7 @@ default: &default
 
 development:
   <<: *default
-  database: everycent_development
+  database: everycent_dev
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
