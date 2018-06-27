@@ -7,7 +7,7 @@ import { BudgetData } from "../../budget.model";
 @Component({
   selector: "ec-budget-mass-edit-form",
   template: `
-    <h1 mat-dialog-title>Mass Edit Allocation</h1>
+    <h1 mat-dialog-title>{{getTitle()}}</h1>
     <div mat-dialog-content>
       <div [formGroup]="form">
         <table class="table">
@@ -28,34 +28,38 @@ import { BudgetData } from "../../budget.model";
                 </div>
               </td>
             </tr>
-            <tr>
-              <td>
-                Total Income
-              </td>
-              <td formArrayName="amounts" *ngFor="let budget of budgets; let i = index;">
-                <div [formGroupName]="i">
-                  <ec-money-field [editMode]="false" formControlName="budgetIncome"></ec-money-field>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Other Allocations
-              </td>
-              <td formArrayName="amounts" *ngFor="let budget of budgets; let i = index;">
-                <div [formGroupName]="i">
-                  <ec-money-field [editMode]="false" formControlName="totalBudgetAllocationsWithoutCurrent"></ec-money-field>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Unallocated
-              </td>
-              <td *ngFor="let budget of budgets; let i = index;">
-                <ec-money-field [editMode]="false" [value]="difference(i)" [highlightPositive]="true"></ec-money-field>
-              </td>
-            </tr>
+
+            <ng-container *ngIf="type === 'allocation'">
+                <tr>
+                  <td>
+                    Total Income
+                  </td>
+                  <td formArrayName="amounts" *ngFor="let budget of budgets; let i = index;">
+                    <div [formGroupName]="i">
+                      <ec-money-field [editMode]="false" formControlName="budgetIncome"></ec-money-field>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Other Allocations
+                  </td>
+                  <td formArrayName="amounts" *ngFor="let budget of budgets; let i = index;">
+                    <div [formGroupName]="i">
+                      <ec-money-field [editMode]="false" formControlName="totalBudgetAllocationsWithoutCurrent"></ec-money-field>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Discretionary Amount
+                  </td>
+                  <td *ngFor="let budget of budgets; let i = index;">
+                    <ec-money-field [editMode]="false" [value]="differenceForAllocation(i)" [highlightPositive]="true"></ec-money-field>
+                  </td>
+                </tr>
+
+            </ng-container>
           </tbody>
         </table>
       </div>
@@ -74,8 +78,10 @@ export class BudgetMassEditFormComponent implements OnInit {
   @Output() save = new EventEmitter();
   @Output() cancel = new EventEmitter();
 
-  allocationName = "";
+  type = "";
+  name = "";
   allocation_category_id = 0;
+  bank_account_id = 0;
   displayData: any = {};
   budgets: BudgetData[] = [];
 
@@ -87,10 +93,52 @@ export class BudgetMassEditFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // this.form = this.fb.group({ name: "" });
   }
 
-  createForm() {
+  getTitle() {
+    if (this.type === "allocation") {
+      return "Mass Edit Allocation";
+    }
+    if (this.type === "income") {
+      return "Mass Edit Income";
+    }
+    else {
+      return "Mass Edit";
+    }
+  }
+
+  createFormForIncomes() {
+    this.type = "income";
+
+    let amountsWithIds = this.budgets.map(budget => {
+      let currentIncomeInfo = this.displayData[budget.name] || {
+        id: 0,
+        amount: 0
+      };
+      currentIncomeInfo.budget_id = budget.id;
+      currentIncomeInfo.originalAmount = currentIncomeInfo.amount;
+      return currentIncomeInfo;
+    });
+    let amounts = amountsWithIds.map((data: any) => {
+      return this.fb.group({
+        id: data.id,
+        amount: data.amount,
+        budget_id: data.budget_id,
+        originalAmount: data.originalAmount,
+      });
+    });
+
+    this.form = this.fb.group({
+      type: "income",
+      name: this.name,
+      bank_account_id: this.bank_account_id,
+      amounts: this.fb.array(amounts)
+    });
+  }
+
+  createFormForAllocations() {
+    this.type = "allocation";
+
     let amountsWithIds = this.budgets.map(budget => {
       let currentAllocationInfo = this.displayData[budget.name] || {
         id: 0,
@@ -117,13 +165,13 @@ export class BudgetMassEditFormComponent implements OnInit {
     });
     this.form = this.fb.group({
       type: "allocation",
-      name: this.allocationName,
+      name: this.name,
       allocation_category_id: this.allocation_category_id,
       amounts: this.fb.array(amounts)
     });
   }
 
-  difference(i: number): number {
+  differenceForAllocation(i: number): number {
     let currentData = this.form.value.amounts[i];
     return (
       currentData.budgetIncome -

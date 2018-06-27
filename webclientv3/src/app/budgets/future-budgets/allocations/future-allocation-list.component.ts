@@ -167,11 +167,11 @@ export class FutureAllocationListComponent implements OnInit {
     });
 
     const form = this.dialogRef.componentInstance;
-    form.allocationName = allocationName;
+    form.name = allocationName;
     form.displayData = this.displayData[category.id][allocationName];
     form.budgets = this.budgets;
     form.allocation_category_id = category.id;
-    form.createForm();
+    form.createFormForAllocations();
 
     form.save.subscribe(massEditData => this.save.emit(massEditData));
   }
