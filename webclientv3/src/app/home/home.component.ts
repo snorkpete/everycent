@@ -18,9 +18,8 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
-        <li>Implement Setup of Bank Accounts</li>
-        <li>Implement Setup of Allocation Categories</li>
-        <li>Fix bug in Sink Fund screen where you could not add obligations</li>
+        <li>Implement mass editing of allocations across multiple budgets</li>
+        <li>Implement mass editing of incomes across multiple budgets</li>
       </ul>
 
       <h3>Note</h3>
@@ -32,7 +31,7 @@ import { HomeService } from "./home.service";
 
       <h3>Still outstanding</h3>
       <ul>
-        <li>Implement mass editing of allocations across multiple budgets</li>
+        <li>Allow adding of new incomes/allocations when editing across multiple budgets</li>
         <li>Implement 'Big Ticket Item Budgeting'</li>
       </ul>
     </mat-card>
