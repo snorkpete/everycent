@@ -1,6 +1,8 @@
-import { Component, Input, OnInit } from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import { BudgetData } from "../../budget.model";
 import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
+import {MatDialog, MatDialogRef} from "@angular/material";
+import {BudgetMassEditFormComponent} from "../mass-edit/budget-mass-edit-form.component";
 
 @Component({
   /* tslint:disable component-selector */
@@ -18,7 +20,7 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
         </th>
       </tr>
       <tr *ngFor="let incomeName of incomeNames">
-        <td>{{incomeName}}</td>
+        <td><a (click)="massEditIncome(incomeName)">{{incomeName}}</a></td>
         <td *ngFor="let budget of budgets; trackBy: trackById" class="right">
           {{ getAmountForIncomeAndBudget(incomeName, budget).amount | ecMoney }}
         </td>
@@ -45,6 +47,7 @@ import { FutureBudgetsDataFormatterService } from "../future-budgets-data-format
   ]
 })
 export class FutureIncomeListComponent implements OnInit {
+  @Output() save = new EventEmitter();
   @Input()
   get budgets(): BudgetData[] {
     return this._budgets;
@@ -57,8 +60,9 @@ export class FutureIncomeListComponent implements OnInit {
   _budgets: BudgetData[] = [];
   displayData: any = {};
   incomeNames: string[] = [];
+  dialogRef: MatDialogRef<BudgetMassEditFormComponent>;
 
-  constructor(private formatter: FutureBudgetsDataFormatterService) {}
+  constructor(private formatter: FutureBudgetsDataFormatterService, private dialog: MatDialog) {}
 
   ngOnInit() {}
 
@@ -99,5 +103,26 @@ export class FutureIncomeListComponent implements OnInit {
 
   trackById(index: number, budget: BudgetData) {
     return budget.id;
+  }
+
+  massEditIncome(incomeName: string) {
+    this.dialogRef = this.dialog.open(BudgetMassEditFormComponent, {
+      maxHeight: 600
+    });
+
+    const form = this.dialogRef.componentInstance;
+    form.name = incomeName;
+    form.displayData = this.displayData[incomeName];
+    form.budgets = this.budgets;
+    form.bank_account_id = 0;
+    form.createFormForIncomes();
+
+    form.save.subscribe(massEditData => this.save.emit(massEditData));
+  }
+
+  closeDialog() {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
   }
 }

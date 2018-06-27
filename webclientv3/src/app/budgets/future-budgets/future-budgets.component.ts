@@ -6,6 +6,7 @@ import { BudgetData } from "../budget.model";
 import { BudgetService } from "../budget.service";
 import { FutureAllocationListComponent } from "./allocations/future-allocation-list.component";
 import { BudgetMassEditFormComponent } from "./mass-edit/budget-mass-edit-form.component";
+import {FutureIncomeListComponent} from "./incomes/future-income-list.component";
 
 @Component({
   selector: "ec-future-budgets",
@@ -14,7 +15,7 @@ import { BudgetMassEditFormComponent } from "./mass-edit/budget-mass-edit-form.c
       <mat-card-content>
         <mat-card>
           <table class="table">
-            <tbody ec-future-income-list [budgets]="budgets">
+            <tbody ec-future-income-list [budgets]="budgets" (save)="massSave($event)">
             </tbody>
             <tbody ec-future-allocation-list [budgets]="budgets" (save)="massSave($event)">
             </tbody>
@@ -29,6 +30,9 @@ import { BudgetMassEditFormComponent } from "./mass-edit/budget-mass-edit-form.c
 })
 export class FutureBudgetsComponent implements OnInit {
   budgets: BudgetData[] = [];
+
+  @ViewChild(FutureIncomeListComponent)
+  incomeList: FutureIncomeListComponent;
 
   @ViewChild(FutureAllocationListComponent)
   allocationList: FutureAllocationListComponent;
@@ -55,6 +59,7 @@ export class FutureBudgetsComponent implements OnInit {
       () => {
         this.messageService.setMessage("Updates saved.");
         this.refresh();
+        this.incomeList.closeDialog();
         this.allocationList.closeDialog();
       },
       error => {
