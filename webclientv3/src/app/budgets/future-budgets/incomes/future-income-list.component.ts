@@ -1,8 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { BudgetData } from "../../budget.model";
 import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
-import {MatDialog, MatDialogRef} from "@angular/material";
-import {BudgetMassEditFormComponent} from "../mass-edit/budget-mass-edit-form.component";
+import { MatDialog, MatDialogRef } from "@angular/material";
+import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.component";
 
 @Component({
   /* tslint:disable component-selector */
@@ -62,7 +62,10 @@ export class FutureIncomeListComponent implements OnInit {
   incomeNames: string[] = [];
   dialogRef: MatDialogRef<BudgetMassEditFormComponent>;
 
-  constructor(private formatter: FutureBudgetsDataFormatterService, private dialog: MatDialog) {}
+  constructor(
+    private formatter: FutureBudgetsDataFormatterService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit() {}
 

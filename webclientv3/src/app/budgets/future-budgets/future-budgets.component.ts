@@ -6,7 +6,7 @@ import { BudgetData } from "../budget.model";
 import { BudgetService } from "../budget.service";
 import { FutureAllocationListComponent } from "./allocations/future-allocation-list.component";
 import { BudgetMassEditFormComponent } from "./mass-edit/budget-mass-edit-form.component";
-import {FutureIncomeListComponent} from "./incomes/future-income-list.component";
+import { FutureIncomeListComponent } from "./incomes/future-income-list.component";
 
 @Component({
   selector: "ec-future-budgets",
@@ -31,8 +31,7 @@ import {FutureIncomeListComponent} from "./incomes/future-income-list.component"
 export class FutureBudgetsComponent implements OnInit {
   budgets: BudgetData[] = [];
 
-  @ViewChild(FutureIncomeListComponent)
-  incomeList: FutureIncomeListComponent;
+  @ViewChild(FutureIncomeListComponent) incomeList: FutureIncomeListComponent;
 
   @ViewChild(FutureAllocationListComponent)
   allocationList: FutureAllocationListComponent;
