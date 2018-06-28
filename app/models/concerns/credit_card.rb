@@ -66,7 +66,7 @@ module CreditCard
     adjustment = Transaction.new withdrawal_amount: withdrawals, deposit_amount: deposits,
                                  description: 'Balance B/F Adj Entry',
                                  transaction_date: end_date.tomorrow,
-                                 status: 'unpaid', brought_forward_status: 'adjustment'
+                                 status: 'paid', brought_forward_status: 'adjustment'
     adjustment
   end
 
