@@ -46,6 +46,7 @@ import { TransactionData } from "../transaction-data.model";
         <ng-template #allocationField>
           <ec-list-field [editMode]="editMode"
                          [items]="allocations"
+                         (change)="updatePaidStatus($event)"
                          groupBy="allocation_category"
                          [(ngModel)]="transaction.allocation_id">
           </ec-list-field>
@@ -80,4 +81,13 @@ export class TransactionListRowComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
+
+  updatePaidStatus(event) {
+    console.log("fired");
+    if (this.transaction.allocation_id > 0) {
+      this.transaction.status = "paid";
+    } else {
+      this.transaction.status = "unpaid";
+    }
+  }
 }
