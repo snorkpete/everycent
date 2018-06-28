@@ -92,8 +92,7 @@ export class BudgetMassEditFormComponent implements OnInit {
     private dialogRef: MatDialogRef<BudgetMassEditFormComponent>
   ) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   getTitle() {
     if (this.type === "allocation") {
@@ -101,8 +100,7 @@ export class BudgetMassEditFormComponent implements OnInit {
     }
     if (this.type === "income") {
       return "Mass Edit Income";
-    }
-    else {
+    } else {
       return "Mass Edit";
     }
   }
@@ -124,7 +122,7 @@ export class BudgetMassEditFormComponent implements OnInit {
         id: data.id,
         amount: data.amount,
         budget_id: data.budget_id,
-        originalAmount: data.originalAmount,
+        originalAmount: data.originalAmount
       });
     });
 
