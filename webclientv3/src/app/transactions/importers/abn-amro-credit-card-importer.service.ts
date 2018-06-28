@@ -11,15 +11,16 @@ export class AbnAmroCreditCardImporterService {
     endDate: string
   ): TransactionData[] {
     let lines = this._convertInputToLines(input);
-    let nbrTransactions = lines.length / 4;
+    const linesPerTransaction = 5;
+    let nbrTransactions = lines.length / linesPerTransaction;
 
     let transactions: TransactionData[] = [];
 
     for (let i = 0; i < nbrTransactions; i++) {
-      let descriptionData = lines[i * 4 + 0];
-      let dateData = lines[i * 4 + 1];
-      let amountData = lines[i * 4 + 2];
-      let extraCardData = lines[i * 4 + 3];
+      let descriptionData = lines[i * linesPerTransaction + 0];
+      let dateData = lines[i * linesPerTransaction + 1];
+      let amountData = lines[i * linesPerTransaction + 2];
+      let extraCardData = lines[i * linesPerTransaction + 3];
 
       let amount = this.extractAmount(amountData);
 
