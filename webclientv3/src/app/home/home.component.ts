@@ -18,6 +18,8 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
+        <li>Fix the import of ABN AMRO credit cards</li>
+        <li>Fix the handling of the paid status when updating transactions</li>
         <li>Implement mass editing of allocations across multiple budgets</li>
         <li>Implement mass editing of incomes across multiple budgets</li>
       </ul>
