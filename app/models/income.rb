@@ -66,7 +66,7 @@ class Income < ApplicationRecord
                   budget_id: amount_data[:budget_id],
                   bank_account_id: amount_data[:bank_account_id]
         ) if amount_data[:amount] != 0
-        return
+        next
       end
 
       income = Income.find_by_id amount_data[:id]
