@@ -35,7 +35,7 @@ class Income < ApplicationRecord
 
     if id == 0
       return nil if param[:deleted]
-      return Income.new(param.except(:deleted))
+      return Income.new(param.except(:id, :deleted))
     end
 
     income = Income.find(id)

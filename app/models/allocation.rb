@@ -44,7 +44,7 @@ class Allocation < ApplicationRecord
 
     if id == 0
       return nil if param[:deleted]
-      return Allocation.new(param.except(:deleted))
+      return Allocation.new(param.except(:id, :deleted))
     end
 
     allocation = Allocation.find(id)
