@@ -71,7 +71,7 @@ class BankAccount < ApplicationRecord
     # this happens with new accounts
     # This should no longer happen and can probably be removed
     if self.closing_balance.nil?
-      self.closing_balance = opening_balance
+      self.closing_balance = opening_balance || 0
     end
     self.closing_balance += total_transaction_amount
     self.closing_date = closing_date
