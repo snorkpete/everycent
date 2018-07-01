@@ -1,8 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BudgetData} from "../budget.model";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { BudgetData } from "../budget.model";
 
 @Component({
-  selector: 'ec-budget-list',
+  selector: "ec-budget-list",
   template: `
     <mat-card>
       <mat-card-content>
@@ -25,16 +25,14 @@ import {BudgetData} from "../budget.model";
   styles: []
 })
 export class BudgetListComponent implements OnInit {
-
-  @Input() budgets: BudgetData;
+  @Input() budgets: BudgetData[];
   @Output() select = new EventEmitter<BudgetData>();
   @Output() close = new EventEmitter<BudgetData>();
   @Output() copy = new EventEmitter<BudgetData>();
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   canCopy(budget: BudgetData): boolean {
     const firstBudget = this.budgets[0];
@@ -42,6 +40,11 @@ export class BudgetListComponent implements OnInit {
   }
 
   canClose(budget: BudgetData): boolean {
-    return budget.status === 'open';
+    const openBudgets = this.budgets.filter(b => b.status === "open");
+    if (openBudgets.length === 0) {
+      return false;
+    }
+    const lastOpenBudget = openBudgets[openBudgets.length - 1];
+    return lastOpenBudget && budget.id === lastOpenBudget.id;
   }
 }
