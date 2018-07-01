@@ -11,6 +11,7 @@ import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login/login.component";
 
 import { SharedModule } from "./shared/shared.module";
+import { AuthShellComponent } from "./auth-shell.component";
 
 @NgModule({
   imports: [
@@ -27,7 +28,12 @@ import { SharedModule } from "./shared/shared.module";
     BankAccountsModule,
     BudgetsModule
   ],
-  declarations: [AppComponent, HomeComponent, LoginComponent],
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    LoginComponent,
+    AuthShellComponent
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })

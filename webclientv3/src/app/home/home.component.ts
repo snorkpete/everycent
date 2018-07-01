@@ -18,6 +18,8 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
+        <li>Allow adding of new incomes/allocations when editing across multiple budgets</li>
+        <li>Fix the display of the login screen (no longer shows the menu)</li>
         <li>Fix the import of ABN AMRO credit cards</li>
         <li>Fix the handling of the paid status when updating transactions</li>
         <li>Implement mass editing of allocations across multiple budgets</li>
@@ -33,7 +35,6 @@ import { HomeService } from "./home.service";
 
       <h3>Still outstanding</h3>
       <ul>
-        <li>Allow adding of new incomes/allocations when editing across multiple budgets</li>
         <li>Implement 'Big Ticket Item Budgeting'</li>
       </ul>
     </mat-card>
