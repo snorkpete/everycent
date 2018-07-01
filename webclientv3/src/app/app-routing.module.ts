@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { PreloadAllModules, RouterModule, Routes } from "@angular/router";
+import { AuthShellComponent } from "./auth-shell.component";
 import { LoginComponent } from "./login/login.component";
 import { HomeComponent } from "./home/home.component";
 import { AuthGuard } from "./core/auth/auth-guard.service";
@@ -9,6 +10,7 @@ const appRoutes: Routes = [
   { path: "logout", redirectTo: "login" },
   {
     path: "",
+    component: AuthShellComponent,
     canActivate: [AuthGuard],
     children: [
       { path: "", component: HomeComponent },

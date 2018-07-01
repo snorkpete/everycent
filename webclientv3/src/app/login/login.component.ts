@@ -8,6 +8,12 @@ import { Router } from "@angular/router";
   selector: "ec-login",
   styles: [
     `
+      :host {
+        width: 100%;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+      }
     mat-card {
         width: 300px;
         margin: auto;
