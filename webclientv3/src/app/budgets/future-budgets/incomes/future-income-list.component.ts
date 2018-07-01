@@ -25,6 +25,11 @@ import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.
           {{ getAmountForIncomeAndBudget(incomeName, budget).amount | ecMoney }}
         </td>
       </tr>
+      <tr>
+        <td [attr.colspan]="nbrOfColumns()">
+          <button mat-raised-button color="primary" (click)="massEditIncome('New Income')">Add New Income</button>
+        </td>
+      </tr>
       <tr class="total">
         <th>Total Income</th>
         <th *ngFor="let budget of budgets" class="right">
@@ -42,6 +47,11 @@ import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.
     a:hover {
       text-decoration: underline;
       color: blue;
+    }
+
+    button[mat-raised-button] {
+      margin-top: 5px;
+      margin-bottom: 5px;
     }
   `
   ]
@@ -115,6 +125,10 @@ export class FutureIncomeListComponent implements OnInit {
 
     const form = this.dialogRef.componentInstance;
     form.name = incomeName;
+
+    // confirm that when adding, we have the available form data initialized
+    this.displayData["New Income"] = {};
+
     form.displayData = this.displayData[incomeName];
     form.budgets = this.budgets;
     form.bank_account_id = 0;
