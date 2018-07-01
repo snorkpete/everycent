@@ -98,7 +98,7 @@ class Budget < ActiveRecord::Base
 
       transactions_before_budget = bank_account.transactions.where('transaction_date < ?', budget.start_date)
       bank_account.closing_balance = transactions_before_budget.sum('deposit_amount - withdrawal_amount') +
-                                     bank_account.opening_balance
+                                     (bank_account.opening_balance || 0)
       bank_account.closing_date = budget.start_date.yesterday
       bank_account.save
       bank_account.remove_brought_forward_transactions(budget.start_date, budget.end_date)
