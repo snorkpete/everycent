@@ -33,6 +33,13 @@ import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.
             {{ getAmountForAllocationAndBudget(category, allocationName, budget).amount | ecMoney }}
           </td>
         </tr>
+        <tr>
+          <td [attr.colspan]="nbrOfColumns()">
+            <button mat-raised-button color="primary" (click)="massEditAllocation(category, 'New Allocation')">
+              Add {{category.name}} Allocation
+            </button>
+          </td>
+        </tr>
       </ng-container>
       <tr class="total">
         <th>Total Allocations</th>
@@ -57,6 +64,10 @@ import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.
     a:hover {
       text-decoration: underline;
       color: blue;
+    }
+    button[mat-raised-button] {
+      margin-top: 5px;
+      margin-bottom: 5px;
     }
   `
   ]
@@ -168,6 +179,11 @@ export class FutureAllocationListComponent implements OnInit {
 
     const form = this.dialogRef.componentInstance;
     form.name = allocationName;
+
+    // confirm that when adding, we have the available form data initialized
+    this.displayData[category.id] = this.displayData[category.id] || {};
+    this.displayData[category.id]["New Allocation"] = {};
+
     form.displayData = this.displayData[category.id][allocationName];
     form.budgets = this.budgets;
     form.allocation_category_id = category.id;
