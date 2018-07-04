@@ -11,7 +11,7 @@ export class AbnAmroCreditCardImporterService {
     endDate: string
   ): TransactionData[] {
     let lines = this._convertInputToLines(input);
-    const linesPerTransaction = 5;
+    const linesPerTransaction = 3;
     let nbrTransactions = lines.length / linesPerTransaction;
 
     let transactions: TransactionData[] = [];
@@ -20,7 +20,6 @@ export class AbnAmroCreditCardImporterService {
       let descriptionData = lines[i * linesPerTransaction + 0];
       let dateData = lines[i * linesPerTransaction + 1];
       let amountData = lines[i * linesPerTransaction + 2];
-      let extraCardData = lines[i * linesPerTransaction + 3];
 
       let amount = this.extractAmount(amountData);
 
@@ -57,7 +56,13 @@ export class AbnAmroCreditCardImporterService {
     if (!input) {
       return [];
     }
-    return input.trim().split(/[\n]/);
+    let lines = input.trim().split(/[\n]/);
+    return lines.filter(
+      line =>
+        line.trim() !== "" &&
+        line.trim() !== "Reserved" &&
+        line.trim() !== "Extra Card"
+    );
   }
 
   // This is provided here to provide an easy entry point for mocking the current date
