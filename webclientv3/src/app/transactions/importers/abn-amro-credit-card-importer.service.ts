@@ -31,8 +31,6 @@ export class AbnAmroCreditCardImporterService {
         status: "unpaid"
       };
 
-      let start = new Date(startDate);
-      let end = new Date(endDate);
       let transactionDate: Date;
       if (transaction.transaction_date instanceof Date) {
         transactionDate = transaction.transaction_date;
@@ -44,7 +42,6 @@ export class AbnAmroCreditCardImporterService {
         transaction.transaction_date >= startDate &&
         transaction.transaction_date <= endDate
       ) {
-        // if (transactionDate >= start && transactionDate <= end) {
         transactions.push(transaction);
       }
     }
