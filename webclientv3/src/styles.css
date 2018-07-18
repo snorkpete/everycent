@@ -11,7 +11,8 @@ mat-card.main, mat-sidenav-container.main {
   background-color: #a5b0ff;
 }
 
-.right {
+.right, th.mat-header-cell.right {
+  padding-right: 5px;
   text-align: right;
 }
 
@@ -31,8 +32,8 @@ mat-card.main, mat-sidenav-container.main {
   background-color: rgba(33, 33, 33, 0.5) !important;
 }
 
-.unpaid {
-  color:rgb(230, 40, 40);
+.unpaid, .unpaid .mat-cell, .unpaid .mat-header-cell, .unpaid .mat-footer-cell  {
+  color:rgb(230, 40, 40) !important;
 }
 
 .deleted {
@@ -59,3 +60,4 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+
