@@ -39,11 +39,13 @@ import { InstitutionData } from "../bank-accounts/institution.model";
                        [items]="statuses" placeholder="Status">
         </ec-list-field>
 
-        <h3>Credit Card Related</h3>
-        <ec-text-field class="form" [(editMode)]="editMode" formControlName="statement_day"
-                       placeholder="Statement Day" type="number"></ec-text-field>
-        <ec-text-field class="form" [(editMode)]="editMode" formControlName="payment_due_day"
+        <ng-container *ngIf="isCreditCard()">
+          <h3>Credit Card Related</h3>
+          <ec-text-field class="form" [(editMode)]="editMode" formControlName="statement_day"
+                         placeholder="Statement Day" type="number"></ec-text-field>
+          <ec-text-field class="form" [(editMode)]="editMode" formControlName="payment_due_day"
                          placeholder="Payment Due Day" type="number"></ec-text-field>
+        </ng-container>
       </div>
     </div>
     <div mat-dialog-actions>
@@ -122,5 +124,9 @@ export class BankAccountEditFormComponent implements OnInit {
     this.cancel.emit();
     this.cancel.complete();
     this.dialogRef.close();
+  }
+
+  isCreditCard() {
+    return this.form.value && this.form.value.account_type === "credit_card";
   }
 }
