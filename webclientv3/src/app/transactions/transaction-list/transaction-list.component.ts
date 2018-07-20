@@ -23,37 +23,42 @@ import { TransactionData } from "../transaction-data.model";
       }
 
       ec-money-field {
-      text-align: end;
-    }
+        text-align: end;
+      }
 
       td[mat-cell] {
         padding-left: 5px;
         padding-right: 5px;
       }
 
-    .table-container {
-      max-height: 400px;
-      overflow-y: scroll;
-    }
-    .mat-form-field-infix {
-      width: 5px;
-    }
-    .menu-heading {
-      justify-content: space-between;
-    }
+      .mat-form-field-infix {
+        width: 5px;
+      }
+      .menu-heading {
+        justify-content: space-between;
+      }
+
+      /* remove the extra spacing around the transaction table */
+      mat-card-content {
+        margin-left: -24px;
+        margin-right: -24px;
+      }
+
+      mat-card {
+        height: calc(100% - 48px);
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      mat-card-content {
+        height: calc(100% - 24px);
+        overflow: auto;
+      }
   `
   ],
   template: `
     <mat-card>
-        <mat-card-title>
-          <div fxLayout="row" class="menu-heading">
-            <span> Transactions </span>
-            <span fxLayout="row" fxLayoutGap="20px">
-              <button color="primary" mat-raised-button [routerLink]="linkToBudget()">Go to Budget</button>
-              <button color="primary" mat-raised-button routerLink="/account-balances">Go to Account Balances</button>
-            </span>
-          </div>
-        </mat-card-title>
         <mat-card-content>
           <div class="table-container">
             <table mat-table [dataSource]="transactions" [trackBy]="trackByFn" class="mat-elevation-z8">

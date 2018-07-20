@@ -9,6 +9,8 @@ div.md-sidenav-content {
 
 mat-card.main, mat-sidenav-container.main {
   background-color: #a5b0ff;
+  height: calc(100% - 50px);
+  overflow: auto;
 }
 
 .right, th.mat-header-cell.right {
@@ -44,10 +46,16 @@ mat-card.main, mat-sidenav-container.main {
     background-color: rgba(160, 38, 38, 0.55) !important;
 }
 
+/* general style reset */
 html, body {
     display: flex;
     height: 100%;
     width: 100%;
+    margin: 0px;
+}
+
+mat-sidenav-content {
+  height: 100%;
 }
 
 body {

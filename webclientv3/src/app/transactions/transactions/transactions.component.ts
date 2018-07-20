@@ -21,9 +21,33 @@ import { TransactionService } from "../transaction.service";
   selector: "ec-transactions",
   styles: [
     `
-    mat-card-content, .container {
-      height: 100%;
-    }
+      mat-card-content, .container {
+        height: 100%;
+        overflow: auto;
+      }
+
+      .container {
+        display: grid;
+        width: 100%;
+        grid-template-areas:
+          "selector summary"
+          "list     list";
+        grid-template-rows: 175px 1fr;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 20px;
+      }
+
+      ec-transaction-search-form {
+        grid-area: selector;
+      }
+      ec-transaction-summary {
+        grid-area: summary;
+      }
+      ec-transaction-list {
+        grid-area: list;
+        overflow: auto;
+      }
+
   `
   ],
   template: `
@@ -31,35 +55,26 @@ import { TransactionService } from "../transaction.service";
       <mat-card-content>
         <ec-transaction-calculator [transactions]="transactions">
         </ec-transaction-calculator>
-        <div fxLayout="column" class="container" fxLayoutGap="20px">
-          <div class="header" fxLayout="row" fxLayoutGap="20px" fxFlex="1 0 auto">
-            <ec-transaction-search-form fxFlex="3 0 auto"
-                                        (change)="refreshTransactions($event)"
-            >
-            </ec-transaction-search-form>
-            <ec-transaction-summary fxFlex="1 0 auto"
-                                    [transactions]="transactions"
-                                    [bankAccount]="bankAccount"
-                                    [allocations]="allocations"
-            >
-            </ec-transaction-summary>
-
-          </div>
-          <div>
-          </div>
-          <div fxFlex="2 0 auto">
-            <ec-transaction-list
-              [transactions]="transactions"
-              [allocations]="allocations"
-              [sinkFundAllocations]="sinkFundAllocations"
-              [bankAccount]="bankAccount"
-              [budget]="budget"
-              (save)="save()"
-              (cancel)="cancel()"
-              (import)="showImportForm()"
-            >
-            </ec-transaction-list>
-          </div>
+        <div class="container">
+          <ec-transaction-search-form (change)="refreshTransactions($event)"
+          >
+          </ec-transaction-search-form>
+          <ec-transaction-summary [transactions]="transactions"
+                                  [bankAccount]="bankAccount"
+                                  [allocations]="allocations"
+          >
+          </ec-transaction-summary>
+          <ec-transaction-list
+            [transactions]="transactions"
+            [allocations]="allocations"
+            [sinkFundAllocations]="sinkFundAllocations"
+            [bankAccount]="bankAccount"
+            [budget]="budget"
+            (save)="save()"
+            (cancel)="cancel()"
+            (import)="showImportForm()"
+          >
+          </ec-transaction-list>
         </div>
       </mat-card-content>
     </mat-card>
