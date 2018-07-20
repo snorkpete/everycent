@@ -46,8 +46,9 @@ import { BudgetService } from "../../budgets/budget.service";
           </mat-form-field>
         </div>
 
-        <div fxLayout="row" fxLayoutGap="20px">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
           <button mat-raised-button type="submit" color="primary">Refresh</button>
+          <a color="primary" [routerLink]="linkToBudget()">Go to Budget</a>
         </div>
 
       </mat-card-content>
@@ -167,6 +168,14 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
       searchParams.budget = validBudget;
     }
   }
+
+  linkToBudget() {
+    if (this.form.value.budget_id) {
+      return `/budgets/${this.form.value.budget_id}`;
+    }
+    return "/budgets";
+  }
+
   ngOnDestroy(): void {
     this.componentDestroyed.next();
     this.componentDestroyed.complete();

@@ -11,7 +11,7 @@ import { Component, OnInit } from "@angular/core";
 
         <mat-sidenav-content>
           <ec-main-toolbar (openMenu)="sideNav.toggle()"> </ec-main-toolbar>
-          <div class="holding-container">
+          <div class="auth-shell-holding-container">
             <ec-loading-indicator></ec-loading-indicator>
             <ec-message-display></ec-message-display>
             <router-outlet></router-outlet>
@@ -35,8 +35,11 @@ import { Component, OnInit } from "@angular/core";
       width: 100%;
       z-index: 10000;
     }
-    div.holding-container {
+    div.auth-shell-holding-container {
       margin-top: 45px;
+      height: calc(100% - 45px);
+      overflow: auto;
+      /*display: flex;*/
     }
   `
   ]
