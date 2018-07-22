@@ -1,54 +1,165 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from "@angular/core";
+import {MatDialog, MatDialogRef, MatTable} from "@angular/material";
+import {CompactTransactionListComponent} from "../../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
+import {SharedTransactionService} from "../../../shared-transactions/shared-transaction.service";
+import {Icon} from "../../../shared/ec-icon/icon.type";
 import {total} from "../../../util/total";
-import {AllocationsByCategory, AllocationCategoryData, AllocationData} from "../../allocation.model";
-import {groupBy} from 'lodash';
+import {AllocationData} from "../../allocation.model";
 import {BudgetData} from "../../budget.model";
 import {BudgetService} from "../../budget.service";
 
 @Component({
-  selector: 'ec-allocation-list',
+  selector: "ec-allocation-list",
   template: `
     <h1>Allocations</h1>
-    <table class="table">
-      <thead ec-allocation-list-header>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let category of allocationsByCategory; trackBy: trackCategory">
-          <tr class="heading">
-            <td>{{category.name}}</td>
-            <td class="right"><ec-money-field [value]="totalAmountFor(category)"></ec-money-field></td>
-            <td class="right"><ec-money-field [value]="totalSpentFor(category)"></ec-money-field></td>
-            <td class="right"><ec-money-field [value]="totalRemainingFor(category)" [highlightPositive]="true"></ec-money-field></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr ec-allocation-category-row
-              *ngFor="let allocation of category.allocations; trackBy: trackAllocation"
-              [allocation]="allocation"
-              [editMode]="editMode"
-              [ecHighlightDeletedFor]="allocation"
-          >
-          </tr>
-          <tr>
-            <td colspan="5">
-              <div class="category-button" *ngIf="editMode">
-                <button mat-raised-button color="primary" (click)="addAllocation(category)">
-                  Add {{category.name}} Allocation
-                </button>
-              </div>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-      <tfoot ec-allocation-list-footer [budget]="budget"></tfoot>
+    <table mat-table [multiTemplateDataRows]="true" [dataSource]="budget.allocations" [trackBy]="trackAllocation" class="mat-elevation-z8">
+
+      <!-- ALLOCATION COLUMNS -->
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef style="width:25%;"> Name </th>
+        <td mat-cell *matCellDef="let allocation">
+          <ec-text-field [(ngModel)]="allocation.name" [editMode]="editMode"></ec-text-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef> Total </td>
+      </ng-container>
+
+      <!-- Amount Column -->
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef style="width:15%;" class="right"> Amount </th>
+        <td mat-cell *matCellDef="let allocation" class="right">
+          <ec-money-field [(ngModel)]="allocation.amount" [editMode]="editMode"></ec-money-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef class="right">
+          <ec-money-field [value]="totalAmount()"></ec-money-field>
+        </td>
+      </ng-container>
+
+      <!-- Spent Column -->
+      <ng-container matColumnDef="spent">
+        <th mat-header-cell *matHeaderCellDef style="width:15%;" class="right"> Spent </th>
+        <td mat-cell *matCellDef="let allocation" class="right">
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <ec-icon [icon]="Icon.SHOW_TRANSACTIONS"
+                     (click)="showTransactionsFor(allocation)"
+                     class="small">
+            </ec-icon>
+            <span fxFlex></span>
+            <ec-money-field [value]="allocation.spent"></ec-money-field>
+          </div>
+        </td>
+        <td mat-footer-cell *matFooterCellDef class="right">
+          <ec-money-field [value]="totalSpent()"></ec-money-field>
+        </td>
+      </ng-container>
+
+      <!-- Remaining Column -->
+      <ng-container matColumnDef="remaining">
+        <th mat-header-cell *matHeaderCellDef style="width:15%;" class="right"> Remaining </th>
+        <td mat-cell *matCellDef="let allocation" class="right">
+          <ec-money-field [value]="allocation.amount - allocation.spent" [highlightPositive]="true"></ec-money-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef class="right">
+          <ec-money-field [value]="totalRemaining()" [highlightPositive]="true"></ec-money-field>
+        </td>
+      </ng-container>
+
+      <!-- Comment Column -->
+      <ng-container matColumnDef="comment">
+        <th mat-header-cell *matHeaderCellDef style="width:25%;"> Comment </th>
+        <td mat-cell *matCellDef="let allocation">
+          <ec-text-field [(ngModel)]="allocation.comment" [editMode]="editMode"></ec-text-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef>
+            <span class="label">
+              Unallocated: {{ totalDiscretionaryAmount() | ecMoney }}
+            </span>
+        </td>
+      </ng-container>
+
+      <!-- Action Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef style="width:5%;"> </th>
+        <td mat-cell *matCellDef="let allocation">
+          <ec-delete-button [item]="allocation" [editMode]="editMode"></ec-delete-button>
+        </td>
+        <td mat-footer-cell *matFooterCellDef> </td>
+      </ng-container>
+
+      <!-- CATEGORY COLUMNS -->
+      <!-- Category Name Column -->
+      <ng-container matColumnDef="categoryName">
+        <td mat-cell *matCellDef="let allocation">{{ allocation.allocationCategory }} </td>
+      </ng-container>
+
+      <!-- Category Amount Column -->
+      <ng-container matColumnDef="categoryAmount">
+        <td mat-cell *matCellDef="let allocation" class="right">
+          <ec-money-field [value]="totalAmountFor(allocation.allocation_category_id)"></ec-money-field>
+        </td>
+      </ng-container>
+
+      <!-- Category Spent Column -->
+      <ng-container matColumnDef="categorySpent">
+        <td mat-cell *matCellDef="let allocation" class="right">
+          <ec-money-field [value]="totalSpentFor(allocation.allocation_category_id)"></ec-money-field>
+        </td>
+      </ng-container>
+
+      <!-- Category Remaining Column -->
+      <ng-container matColumnDef="categoryRemaining">
+        <td mat-cell *matCellDef="let allocation" class="right">
+          <ec-money-field [value]="totalRemainingFor(allocation.allocation_category_id)" [highlightPositive]="true"></ec-money-field>
+        </td>
+      </ng-container>
+
+      <!-- Category Remaining Column -->
+      <ng-container matColumnDef="categoryRest">
+        <td mat-cell *matCellDef="let allocation" class="right" colspan="2">
+        </td>
+      </ng-container>
+
+      <!-- Add Allocation Column -->
+      <ng-container matColumnDef="addAllocation">
+        <td mat-cell *matCellDef="let allocation; let dataIndex=dataIndex;" colspan="6">
+          <div class="category-button" *ngIf="editMode">
+            <button mat-raised-button color="primary"
+                   (click)="addAllocation(allocation.allocation_category_id, dataIndex)">
+              Add {{allocation.allocationCategory}} Allocation
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- ROW definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+
+      <tr mat-row *matRowDef="let allocation; columns: categoryColumns; when: showCategoryRow; " class="heading"></tr>
+      <tr mat-row *matRowDef="let allocation; columns: displayedColumns;" [ecHighlightDeletedFor]="allocation"></tr>
+      <tr mat-row *matRowDef="let allocation; columns: ['addAllocation']; when: showAddAllocationRow;" ></tr>
+
+      <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true" class="footer"></tr>
     </table>
-    <ec-allocation-list-summary [budget]="budget">
-    </ec-allocation-list-summary>
+    <ec-allocation-list-summary [budget]="budget"></ec-allocation-list-summary>
   `,
-  styles: [`
+  styles: [
+    `
+    table {
+      width: 100%;
+      table-layout: fixed;
+    }
+    table td:first-of-type, table th:first-of-type {
+        padding-left: 24px;
+    }
     .heading {
       font-weight: bold;
       font-size: 16px;
+      border-top: 3px solid blue;
+      border-bottom: 2px solid blue;
+    }
+    .heading td.mat-cell {
+      font-weight: bold;
+      font-size: 18px;
       border-top: 3px solid blue;
       border-bottom: 2px solid blue;
     }
@@ -61,47 +172,79 @@ import {BudgetService} from "../../budget.service";
     .category-button {
       margin: 5px;
     }
-  `]
+
+    ec-icon.small /deep/ .material-icons {
+      font-size: 16px;
+      height: 16px;
+      width: 16px;
+      padding-top: 1px;
+      cursor: pointer;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+    }
+    .label {
+      border-radius: 5px;
+      border: 2px solid grey;
+      background-color: darkgrey;
+      font-size: 12px;
+      color: white;
+      padding-left: 5px;
+      padding-right: 5px;
+      padding-top: 3px;
+    }
+
+    th[mat-header-cell], td[mat-footer-cell], td[mat-cell] {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+  `
+  ]
 })
 export class AllocationListComponent implements OnInit {
-
+  Icon = Icon;
   @Input() editMode = false;
-  @Input() get budget(): BudgetData {
-    return this._budget;
-  }
-  set budget(newBudget: BudgetData) {
-    this._budget = newBudget;
-    this.updateGroupings();
-  }
-  _budget: BudgetData = { allocations: [], incomes: [] };
+  @Input() budget: BudgetData;
 
-  get allocationCategories(): AllocationCategoryData[] {
-    return this._allocationCategories;
-  }
+  @ViewChild(MatTable) allocationList: MatTable<AllocationData>;
 
-  set allocationCategories(newCategories: AllocationCategoryData[]) {
-    this._allocationCategories = newCategories;
-    this.updateGroupings();
-  }
+  displayedColumns: string[] = [
+    "name",
+    "amount",
+    "spent",
+    "remaining",
+    "comment",
+    "action"
+  ];
 
-  private _allocationCategories: AllocationCategoryData[] = [];
-  allocationsByCategory: AllocationsByCategory[];
+  categoryColumns: string[] = [
+    "categoryName",
+    "categoryAmount",
+    "categorySpent",
+    "categoryRemaining",
+    "categoryRest"
+  ];
 
   constructor(
-    private budgetService: BudgetService
-  ) { }
+    private budgetService: BudgetService,
+    private transactionService: SharedTransactionService,
+    private dialog: MatDialog
+  ) {}
 
-  ngOnInit() {
-    this.budgetService
-        .getAllocationCategories()
-        .subscribe(categories => this.allocationCategories = categories);
+  ngOnInit() { }
+
+  showCategoryRow(index: number, allocation: AllocationData) {
+    return allocation.firstInCategory;
   }
 
-  trackCategory(index: number, category: AllocationsByCategory) {
-    if (!category) {
-      return 10;
-    }
-    return category.id;
+  showAllocationRow(index: number, allocation: AllocationData) {
+    return !allocation.firstInCategory;
+  }
+
+  showAddAllocationRow(index: number, allocation: AllocationData) {
+    return allocation.lastInCategory;
   }
 
   trackAllocation(index: number, allocation: AllocationData) {
@@ -111,39 +254,76 @@ export class AllocationListComponent implements OnInit {
     return allocation.id;
   }
 
-  updateGroupings() {
-    let groupedCategories = groupBy(this.budget.allocations, 'allocation_category_id');
-    this.allocationsByCategory = this.allocationCategories.map(category => {
-      return {
-        id: category.id,
-        name: category.name,
-        allocations: groupedCategories[category.id] || []
-      };
-    });
-  }
+  addAllocation(categoryId: number, position: number) {
 
-  addAllocation(category: AllocationsByCategory) {
+    // push the new allocation as the last allocation in its category
+    this.budget.allocations[position].lastInCategory = false;
+
     const newAllocation: AllocationData = {
       id: null,
-      name: '',
+      name: "",
       amount: 0,
       spent: 0,
       budget_id: this.budget.id,
-      allocation_category_id: category.id,
+      allocation_category_id: categoryId,
+      lastInCategory: true
     };
-    this.budget.allocations.push(newAllocation);
-    category.allocations.push(newAllocation);
+    this.budget.allocations.splice(position + 1, 0, newAllocation);
+
+    // we need to manually re-render the data table rows since we added a new data item
+    this.allocationList.renderRows();
   }
 
-  totalAmountFor(category: AllocationsByCategory): number {
-    return total(category.allocations, 'amount');
+  totalAmountFor(categoryId: number): number {
+    return total(
+      this.budget.allocations.filter(
+        a => a.allocation_category_id === categoryId
+      ),
+      "amount"
+    );
   }
 
-  totalSpentFor(category: AllocationsByCategory): number {
-    return total(category.allocations, 'spent');
-
+  totalSpentFor(categoryId: number): number {
+    return total(
+      this.budget.allocations.filter(
+        a => a.allocation_category_id === categoryId
+      ),
+      "spent"
+    );
   }
-  totalRemainingFor(category: AllocationsByCategory): number {
-    return this.totalAmountFor(category) - this.totalSpentFor(category);
+
+  totalRemainingFor(categoryId: number): number {
+    return this.totalAmountFor(categoryId) - this.totalSpentFor(categoryId);
+  }
+
+  showTransactionsFor(allocation: AllocationData) {
+    let dialogRef: MatDialogRef<CompactTransactionListComponent>;
+    this.transactionService
+      .transactionsForAllocation(allocation.id)
+      .subscribe(transactions => {
+        dialogRef = this.dialog.open(CompactTransactionListComponent, {
+          width: "500px"
+        });
+        dialogRef.componentInstance.transactions = transactions;
+        dialogRef.componentInstance.itemName = allocation.name;
+      });
+  }
+
+  totalAmount(): number {
+    return total(this.budget.allocations, "amount");
+  }
+
+  totalSpent(): number {
+    return total(this.budget.allocations, "spent");
+  }
+  totalRemaining(): number {
+    return this.totalAmount() - this.totalSpent();
+  }
+
+  totalDiscretionaryAmount() {
+    return (
+      total(this.budget.incomes, "amount") -
+      total(this.budget.allocations, "amount")
+    );
   }
 }

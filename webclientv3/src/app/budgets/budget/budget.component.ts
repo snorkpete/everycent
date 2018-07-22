@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { Observable, Subject } from "rxjs";
-import { filter, map, switchMap, takeUntil } from "rxjs/operators";
-import { MessageService } from "../../message-display/message.service";
-import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
-import { BudgetData } from "../budget.model";
-import { BudgetService } from "../budget.service";
+import {Component, OnDestroy, OnInit} from "@angular/core";
+import {ActivatedRoute, Router} from "@angular/router";
+import {combineLatest, Observable, Subject} from "rxjs";
+import {filter, map, switchMap, takeUntil} from "rxjs/operators";
+import {MessageService} from "../../message-display/message.service";
+import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
+import {AllocationCategoryData} from "../allocation.model";
+import {BudgetData} from "../budget.model";
+import {BudgetService} from "../budget.service";
 
 @Component({
   selector: "ec-budget",
@@ -30,6 +31,7 @@ export class BudgetComponent implements OnInit, OnDestroy {
   budget: BudgetData = {};
   componentDestroyed$ = new Subject();
   editMode = false;
+  allocationCategories: AllocationCategoryData[] = [];
 
   constructor(
     private router: Router,
@@ -61,16 +63,21 @@ export class BudgetComponent implements OnInit, OnDestroy {
   }
 
   private loadBudgetForId(idParam$: Observable<string>) {
-    idParam$
-      .pipe(
-        filter(id => id !== "current"),
-        map(idString => Number(idString)),
-        switchMap(budgetId => this.budgetService.getBudget(budgetId))
-      )
-      .subscribe(budget => {
-        this.budget = budget;
-        this.updateHeading();
-      });
+    let budgetData$ = idParam$
+        .pipe(
+          filter(id => id !== "current"),
+          map(idString => Number(idString)),
+          switchMap(budgetId => this.budgetService.getBudget(budgetId))
+        );
+    let allocationData$ = this.budgetService.getAllocationCategories();
+
+    combineLatest(budgetData$, allocationData$).subscribe(result => {
+      let [budget, allocationCategories] = result;
+      this.allocationCategories = allocationCategories;
+      this.budgetService.sortBudgetAllocationsAndAssignCategoryNames(budget.allocations, this.allocationCategories);
+      this.budget = budget;
+      this.updateHeading();
+    });
   }
 
   private updateHeading() {
@@ -101,6 +108,7 @@ export class BudgetComponent implements OnInit, OnDestroy {
 
   saveBudget() {
     this.budgetService.saveBudget(this.budget).subscribe(budget => {
+      this.budgetService.sortBudgetAllocationsAndAssignCategoryNames(budget.allocations, this.allocationCategories);
       this.budget = budget;
       this.messageService.setMessage("Budget saved.");
       this.editMode = false;
@@ -112,4 +120,5 @@ export class BudgetComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.refresh();
   }
+
 }

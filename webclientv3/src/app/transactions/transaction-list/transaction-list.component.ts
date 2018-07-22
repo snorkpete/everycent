@@ -17,8 +17,7 @@ import { TransactionData } from "../transaction-data.model";
 
 @Component({
   selector: "ec-transaction-list",
-  styles: [
-    `
+  styles: [`
       table {
         width: 100%;
         table-layout: fixed;
@@ -57,8 +56,7 @@ import { TransactionData } from "../transaction-data.model";
         height: calc(100% - 24px);
         overflow: auto;
       }
-  `
-  ],
+  `],
   template: `
     <mat-card>
         <mat-card-content>
@@ -231,7 +229,7 @@ export class TransactionListComponent implements OnInit, OnDestroy {
     } else {
       this.displayedColumns = this.DESKTOP_COLUMNS;
     }
-  };
+  }
 
   constructor(media: MediaMatcher) {
     this.mobileQuery = media.matchMedia("(max-width: 600px)");

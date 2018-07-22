@@ -84,45 +84,4 @@ describe("AllocationListComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  describe("allocation groupings", () => {
-    beforeEach(() => {
-      budgetService = TestBed.get(BudgetService);
-    });
-
-    it("has the correct length", () => {
-      let spy = spyOn(budgetService, "getAllocationCategories").and.returnValue(
-        of(sampleCategories)
-      );
-
-      fixture.detectChanges();
-      expect(spy.calls.count()).toBe(1);
-      component.budget = { allocations: sampleAllocations };
-      expect(component.allocationCategories.length).toEqual(4);
-      expect(component.allocationsByCategory.length).toEqual(4);
-      expect(component.allocationsByCategory[0]).toEqual({
-        id: 10,
-        name: "First Category",
-        allocations: [
-          {
-            id: 1,
-            name: "1",
-            allocation_category_id: 10,
-            allocation_category: {
-              id: 10,
-              name: "First Category"
-            }
-          },
-          {
-            id: 4,
-            name: "4",
-            allocation_category_id: 10,
-            allocation_category: {
-              id: 10,
-              name: "First Category"
-            }
-          }
-        ]
-      });
-    });
-  });
 });
