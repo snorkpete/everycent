@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material";
-import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { BankAccountData } from "../../bank-accounts/bank-account.model";
@@ -37,15 +36,34 @@ import { TransactionService } from "../transaction.service";
         column-gap: 20px;
       }
 
+      @media (max-width: 600px){
+        mat-card.main {
+          height: 100%;
+        }
+        .container {
+          display: grid;
+          width: 100%;
+          grid-template-areas:
+            "selector"
+            "summary"
+            "list";
+          grid-template-rows: 175px 160px 1fr;
+          grid-template-columns: auto;
+        }
+      }
+
       ec-transaction-search-form {
         grid-area: selector;
+        width: 100%;
       }
       ec-transaction-summary {
         grid-area: summary;
+        width: 100%;
       }
       ec-transaction-list {
         grid-area: list;
         overflow: auto;
+        width: 100%;
       }
 
   `

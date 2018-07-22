@@ -1,7 +1,9 @@
+import { MediaMatcher } from "@angular/cdk/layout";
 import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   ViewChild
@@ -163,24 +165,6 @@ import { TransactionData } from "../transaction-data.model";
                 </td>
                 <td mat-footer-cell *matFooterCellDef> </td>
               </ng-container>
-              <!--
-              <thead>
-                <tr class="heading">
-
-                  <th style="width:10%;" class="right"></th>
-                  <th style="width: 5%;" class="center">Paid?</th>
-                  <th style="width: 5%;"></th>
-                </tr>
-              </thead>
-              <tr *ngFor="let transaction of transactions; trackBy: trackByFn"
-                  [ecHighlightDeletedFor]="transaction" >
-                <td>
-                </td>
-                <td>
-
-
-              </tr>
-              -->
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true">
               </tr>
@@ -188,7 +172,6 @@ import { TransactionData } from "../transaction-data.model";
               <tr mat-row *matRowDef="let transaction; columns: displayedColumns;"
                   [ecHighlightDeletedFor]="transaction"></tr>
 
-              <!--<tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>-->
             </table>
           </div>
       </mat-card-content>
@@ -207,7 +190,7 @@ import { TransactionData } from "../transaction-data.model";
     </mat-card>
   `
 })
-export class TransactionListComponent implements OnInit {
+export class TransactionListComponent implements OnInit, OnDestroy {
   @Input() transactions: TransactionData[] = [];
   @Input() allocations: AllocationData[] = [];
   @Input() sinkFundAllocations: SinkFundAllocationData[] = [];
@@ -219,7 +202,7 @@ export class TransactionListComponent implements OnInit {
   @Output() import = new EventEmitter();
   @Output() cancel = new EventEmitter();
 
-  displayedColumns: string[] = [
+  DESKTOP_COLUMNS: string[] = [
     "selection",
     "date",
     "description",
@@ -229,12 +212,35 @@ export class TransactionListComponent implements OnInit {
     "paid",
     "action"
   ];
+  MOBILE_COLUMNS: string[] = [
+    "date",
+    "description",
+    "allocation",
+    "withdrawn",
+    "deposit",
+    "action"
+  ];
+  displayedColumns: string[] = [];
 
   @ViewChild(MatTable) transactionList: MatTable<TransactionData>;
 
-  constructor() {}
+  mobileQuery: MediaQueryList;
+  private _mobileQueryListener: MediaQueryListListener = query => {
+    if (query.matches) {
+      this.displayedColumns = this.MOBILE_COLUMNS;
+    } else {
+      this.displayedColumns = this.DESKTOP_COLUMNS;
+    }
+  };
 
-  ngOnInit() {}
+  constructor(media: MediaMatcher) {
+    this.mobileQuery = media.matchMedia("(max-width: 600px)");
+    this.mobileQuery.addListener(this._mobileQueryListener);
+  }
+
+  ngOnInit() {
+    this._mobileQueryListener(this.mobileQuery);
+  }
 
   addTransaction(): void {
     this.transactions.push({
@@ -274,5 +280,9 @@ export class TransactionListComponent implements OnInit {
     } else {
       transaction.status = "unpaid";
     }
+  }
+
+  ngOnDestroy(): void {
+    this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 }
