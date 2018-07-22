@@ -1,4 +1,4 @@
-import { BankAccountData } from "../bank-accounts/bank-account.model";
+import {BankAccountData} from "../bank-accounts/bank-account.model";
 
 export interface AllocationCategoryData {
   id?: number;
@@ -18,10 +18,9 @@ export interface AllocationData {
   bank_account_id?: number;
   bank_account?: BankAccountData;
   comment?: string;
-}
 
-export interface AllocationsByCategory {
-  id?: number;
-  name?: string;
-  allocations?: AllocationData[];
+  // extra properties used for displaying the allocations in the budget
+  firstInCategory?: boolean;
+  lastInCategory?: boolean;
+  allocationCategory?: string;
 }

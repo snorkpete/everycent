@@ -2,8 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { ApiGateway } from "../../api/api-gateway.service";
-import { AllocationData } from "../transactions/allocation-data.model";
-import { AllocationCategoryData } from "./allocation.model";
+import {AllocationCategoryData, AllocationData} from "./allocation.model";
 import { BudgetData } from "./budget.model";
 
 @Injectable()
@@ -51,7 +50,6 @@ export class BudgetService {
     return this.apiGateway
       .get("/budgets/current")
       .pipe(map(data => data.budget_id));
-    // .switchMap(budgetId => this.getBudget(budgetId));
   }
 
   createBudget(budget: BudgetData) {
@@ -81,4 +79,70 @@ export class BudgetService {
   massSave(massEditData) {
     return this.apiGateway.post(`/budgets/mass_update`, massEditData);
   }
+
+  findCategoryNameFromId(categoryId, allocationCategories) {
+    let found = allocationCategories.find(cat => cat.id === categoryId );
+    if (!found) {
+      return '';
+    } else {
+      return found.name;
+    }
+  }
+
+  sortBudgetAllocationsAndAssignCategoryNames(allocations: AllocationData[], allocationCategories: AllocationCategoryData[]) {
+    if (!allocations) {
+      return;
+    }
+    allocations.sort((a, b) => {
+      let sortValue = 0;
+
+      let aCategoryName = this.findCategoryNameFromId(a.allocation_category_id, allocationCategories);
+      let bCategoryName = this.findCategoryNameFromId(b.allocation_category_id, allocationCategories);
+
+      // ensure that the allocations also contain the category names
+      // Yes, this is not the best use case for sorting - we should not be mutating
+      // the objects in the array while sorting them.
+      // However, doing this prevents us from having to iterate the array a second time
+      // to add the allocation names
+      a.allocationCategory = aCategoryName;
+      b.allocationCategory = bCategoryName;
+
+      if (aCategoryName < bCategoryName) {
+        sortValue = -10;
+      } else if (aCategoryName > bCategoryName) {
+        sortValue = 10;
+      } else {
+        sortValue = 0;
+      }
+
+      if (a.name < b.name) {
+        sortValue -= 1;
+      } else if (a.name > b.name) {
+        sortValue += 1;
+      }
+
+      return sortValue;
+    });
+
+    // going to cheat a bit with reduce - we dont actually want to reduce to a single value
+    // However, reduce gives you an easy way to compare adjacent elements in the array to each other
+    // to determine when the category changes
+    allocations.reduce((acc, current) => {
+      if (acc.allocation_category_id !== current.allocation_category_id) {
+        acc.lastInCategory = true;
+        current.firstInCategory = true;
+      } else {
+        acc.lastInCategory = false;
+        current.firstInCategory = false;
+      }
+
+      return current;
+    });
+
+    // the first element is always first
+    if (allocations.length > 0) {
+      allocations[0].firstInCategory = true;
+    }
+  }
+
 }

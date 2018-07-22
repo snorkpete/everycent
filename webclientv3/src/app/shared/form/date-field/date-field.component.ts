@@ -9,8 +9,10 @@ import { TransactionDateValidatorDirective } from "../../../transactions/transac
 
 @Component({
   selector: "ec-date-field",
-  styles: [
-    `
+  styles: [`
+    mat-form-field, .value {
+        width: 100%;
+    }
   `
   ],
   template: `
