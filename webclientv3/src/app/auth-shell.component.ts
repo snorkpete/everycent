@@ -1,3 +1,4 @@
+import { MediaMatcher } from "@angular/cdk/layout";
 import { Component, OnInit } from "@angular/core";
 
 @Component({
@@ -5,7 +6,9 @@ import { Component, OnInit } from "@angular/core";
   template: `
       <mat-sidenav-container>
 
-        <mat-sidenav #sideNav [opened]="true" mode="side" [fixedInViewport]="true">
+        <mat-sidenav #sideNav [opened]="!mobileQuery.matches"
+                     [mode]="mobileQuery.matches ? 'over' : 'side'"
+                     [fixedInViewport]="true">
           <ec-menu></ec-menu>
         </mat-sidenav>
 
@@ -39,13 +42,16 @@ import { Component, OnInit } from "@angular/core";
       margin-top: 45px;
       height: calc(100% - 45px);
       overflow: auto;
-      /*display: flex;*/
     }
   `
   ]
 })
 export class AuthShellComponent implements OnInit {
-  constructor() {}
+  mobileQuery: MediaQueryList;
+
+  constructor(media: MediaMatcher) {
+    this.mobileQuery = media.matchMedia("(max-width: 600px)");
+  }
 
   ngOnInit() {}
 }

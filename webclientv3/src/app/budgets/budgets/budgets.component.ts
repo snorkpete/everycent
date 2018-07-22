@@ -14,7 +14,6 @@ import { BudgetService } from "../budget.service";
   selector: "ec-budgets",
   template: `
     <mat-card class="main">
-      <mat-card-title>Budgets</mat-card-title>
       <mat-card-content>
         <ec-budget-list [budgets]="budgets"
                         (select)="goToBudget($event)"
