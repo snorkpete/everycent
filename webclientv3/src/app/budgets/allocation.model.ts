@@ -1,5 +1,4 @@
-import {All} from "tslint/lib/rules/completedDocsRule";
-import {BankAccountData} from "../bank-accounts/bank-account.model";
+import { BankAccountData } from "../bank-accounts/bank-account.model";
 
 export interface AllocationCategoryData {
   id?: number;
