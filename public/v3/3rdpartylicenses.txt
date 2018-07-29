@@ -1,4 +1,4 @@
-@angular/material@6.0.1
+@angular/material@6.3.3
 MIT
 The MIT License
 
@@ -68,7 +68,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-rxjs@6.1.0
+rxjs@6.2.2
 Apache-2.0
 Apache License
                          Version 2.0, January 2004
@@ -272,11 +272,11 @@ Apache License
  See the License for the specific language governing permissions and
  limitations under the License.
 
-@angular/core@6.0.0
+@angular/core@6.0.9
 MIT
 MIT
 
-@angular/platform-browser@6.0.0
+@angular/platform-browser@6.0.9
 MIT
 MIT
 
@@ -338,15 +338,23 @@ If the Work includes a "NOTICE" text file as part of its distribution, then any 
 
 END OF TERMS AND CONDITIONS
 
-@angular/common@6.0.0
+@angular/common@6.0.9
 MIT
 MIT
 
-@angular/animations@6.0.0
+@angular/router@6.0.9
 MIT
 MIT
 
-@angular/cdk@6.0.1
+@angular/animations@6.0.9
+MIT
+MIT
+
+@angular/forms@6.0.9
+MIT
+MIT
+
+@angular/flex-layout@6.0.0-beta.15
 MIT
 The MIT License
 
@@ -370,11 +378,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-@angular/forms@6.0.0
-MIT
-MIT
-
-@angular/flex-layout@6.0.0-beta.15
+@angular/cdk@6.3.3
 MIT
 The MIT License
 
@@ -443,7 +447,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
-lodash@4.17.4
+lodash@4.17.10
 MIT
 Copyright JS Foundation and other contributors <https://js.foundation/>
 
@@ -515,7 +519,3 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-@angular/router@6.0.0
-MIT
-MIT
