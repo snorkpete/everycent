@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { ApiGateway } from "../../api/api-gateway.service";
-import {AllocationCategoryData, AllocationData} from "./allocation.model";
+import { AllocationCategoryData, AllocationData } from "./allocation.model";
 import { BudgetData } from "./budget.model";
 
 @Injectable()
@@ -81,23 +81,32 @@ export class BudgetService {
   }
 
   findCategoryNameFromId(categoryId, allocationCategories) {
-    let found = allocationCategories.find(cat => cat.id === categoryId );
+    let found = allocationCategories.find(cat => cat.id === categoryId);
     if (!found) {
-      return '';
+      return "";
     } else {
       return found.name;
     }
   }
 
-  sortBudgetAllocationsAndAssignCategoryNames(allocations: AllocationData[], allocationCategories: AllocationCategoryData[]) {
+  sortBudgetAllocationsAndAssignCategoryNames(
+    allocations: AllocationData[],
+    allocationCategories: AllocationCategoryData[]
+  ) {
     if (!allocations) {
       return;
     }
     allocations.sort((a, b) => {
       let sortValue = 0;
 
-      let aCategoryName = this.findCategoryNameFromId(a.allocation_category_id, allocationCategories);
-      let bCategoryName = this.findCategoryNameFromId(b.allocation_category_id, allocationCategories);
+      let aCategoryName = this.findCategoryNameFromId(
+        a.allocation_category_id,
+        allocationCategories
+      );
+      let bCategoryName = this.findCategoryNameFromId(
+        b.allocation_category_id,
+        allocationCategories
+      );
 
       // ensure that the allocations also contain the category names
       // Yes, this is not the best use case for sorting - we should not be mutating
@@ -144,5 +153,4 @@ export class BudgetService {
       allocations[0].firstInCategory = true;
     }
   }
-
 }

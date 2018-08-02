@@ -1,12 +1,12 @@
-import {Component, Input, OnInit, ViewChild} from "@angular/core";
-import {MatDialog, MatDialogRef, MatTable} from "@angular/material";
-import {CompactTransactionListComponent} from "../../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
-import {SharedTransactionService} from "../../../shared-transactions/shared-transaction.service";
-import {Icon} from "../../../shared/ec-icon/icon.type";
-import {total} from "../../../util/total";
-import {AllocationData} from "../../allocation.model";
-import {BudgetData} from "../../budget.model";
-import {BudgetService} from "../../budget.service";
+import { Component, Input, OnInit, ViewChild } from "@angular/core";
+import { MatDialog, MatDialogRef, MatTable } from "@angular/material";
+import { CompactTransactionListComponent } from "../../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
+import { SharedTransactionService } from "../../../shared-transactions/shared-transaction.service";
+import { Icon } from "../../../shared/ec-icon/icon.type";
+import { total } from "../../../util/total";
+import { AllocationData } from "../../allocation.model";
+import { BudgetData } from "../../budget.model";
+import { BudgetService } from "../../budget.service";
 
 @Component({
   selector: "ec-allocation-list",
@@ -233,7 +233,7 @@ export class AllocationListComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   showCategoryRow(index: number, allocation: AllocationData) {
     return allocation.firstInCategory;
@@ -255,7 +255,6 @@ export class AllocationListComponent implements OnInit {
   }
 
   addAllocation(categoryId: number, position: number) {
-
     // push the new allocation as the last allocation in its category
     this.budget.allocations[position].lastInCategory = false;
 
