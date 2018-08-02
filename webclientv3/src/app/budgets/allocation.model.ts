@@ -23,4 +23,5 @@ export interface AllocationData {
   firstInCategory?: boolean;
   lastInCategory?: boolean;
   allocationCategory?: string;
+  dummyTransaction?: boolean;
 }

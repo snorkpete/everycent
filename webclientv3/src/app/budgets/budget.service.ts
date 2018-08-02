@@ -61,6 +61,11 @@ export class BudgetService {
   }
 
   saveBudget(budget: BudgetData) {
+    // 'dummyTransactions' are an implementation detail of the budget data table
+    // the API shouldn't have to care about this
+    budget.allocations = budget.allocations.filter(
+      allocation => !allocation.dummyTransaction
+    );
     return this.apiGateway.put(`/budgets/${budget.id}`, budget);
   }
 
@@ -96,6 +101,21 @@ export class BudgetService {
     if (!allocations) {
       return;
     }
+
+    allocationCategories.forEach(category => {
+      let found = allocations.find(
+        allocation => category.id === allocation.allocation_category_id
+      );
+
+      if (!found) {
+        allocations.push({
+          name: "",
+          allocation_category_id: category.id,
+          dummyTransaction: true
+        });
+      }
+    });
+
     allocations.sort((a, b) => {
       let sortValue = 0;
 

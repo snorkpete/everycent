@@ -135,7 +135,8 @@ import { BudgetService } from "../../budget.service";
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
 
       <tr mat-row *matRowDef="let allocation; columns: categoryColumns; when: showCategoryRow; " class="heading"></tr>
-      <tr mat-row *matRowDef="let allocation; columns: displayedColumns;" [ecHighlightDeletedFor]="allocation"></tr>
+      <tr mat-row *matRowDef="let allocation; columns: displayedColumns; when: showAllocationRow;"
+          [ecHighlightDeletedFor]="allocation"></tr>
       <tr mat-row *matRowDef="let allocation; columns: ['addAllocation']; when: showAddAllocationRow;" ></tr>
 
       <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true" class="footer"></tr>
@@ -240,7 +241,7 @@ export class AllocationListComponent implements OnInit {
   }
 
   showAllocationRow(index: number, allocation: AllocationData) {
-    return !allocation.firstInCategory;
+    return !allocation.dummyTransaction;
   }
 
   showAddAllocationRow(index: number, allocation: AllocationData) {
