@@ -18,6 +18,8 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
+        <li>Add republic bank imports</li>
+        <li>Add fixed headers to the transaction and budget edit view</li>
         <li>Allow adding of new incomes/allocations when editing across multiple budgets</li>
         <li>Fix the display of the login screen (no longer shows the menu)</li>
         <li>Fix the import of ABN AMRO credit cards</li>
