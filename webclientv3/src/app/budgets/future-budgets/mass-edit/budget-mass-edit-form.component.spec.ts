@@ -20,6 +20,10 @@ describe("BudgetMassEditFormComponent", () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BudgetMassEditFormComponent);
     component = fixture.componentInstance;
+    component.displayData = {};
+    component.budgets = [];
+    component.bank_account_id = 0;
+    component.createFormForIncomes();
     fixture.detectChanges();
   });
 

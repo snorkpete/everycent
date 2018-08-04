@@ -9,7 +9,9 @@ let RouterStub = {
   events: new BehaviorSubject<any>({}),
   navigate(commands: string[], extras: NavigationExtras) {
     return Promise.resolve(commands);
-  }
+  },
+  createUrlTree() {},
+  serializeUrl() {}
 };
 
 RouterStub.navigatedTo = null;
