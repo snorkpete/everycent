@@ -37,7 +37,12 @@ export class TransactionImporterComponent implements OnInit {
     { text: "ABN Amro Credit Card", value: "abn-amro-creditcard" },
     { text: "Scotia Bank Account", value: "new-bank-account" },
     { text: "FCB Bank Account", value: "fc-bank" },
-    { text: "FCB Credit Card (not implemented)", value: "fc-creditcard" }
+    { text: "FCB Credit Card (not implemented)", value: "fc-creditcard" },
+    { text: "Republic Bank Account", value: "republic-bank" },
+    {
+      text: "Republic Credit Card (not implemented)",
+      value: "republic-creditcard"
+    }
   ];
 
   input: string;
