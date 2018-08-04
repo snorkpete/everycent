@@ -118,8 +118,8 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   set value(newValue: number) {
     this._value = newValue;
     this._selectedItem = this.items.find(item => item.id === this._value) || {
-      id: 0,
-      name: ""
+      id: newValue,
+      name: "" + newValue
     };
   }
 

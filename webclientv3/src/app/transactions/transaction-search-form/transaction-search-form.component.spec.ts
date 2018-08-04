@@ -159,6 +159,7 @@ describe("TransactionsSearchFormComponent", () => {
       let thirdAccount = sampleBankAccounts[2];
       let thirdBudget = sampleBudgets[2];
 
+      // setup to check that component.change is called successfully
       let changeEmitCount = 0;
       component.change.subscribe(searchParams => {
         changeEmitCount += 1;
@@ -169,11 +170,15 @@ describe("TransactionsSearchFormComponent", () => {
           budget: thirdBudget
         });
       });
+
+      // action to trigger change
       component.form.setValue({
         budget_id: thirdBudget.id,
         bank_account_id: thirdAccount.id
       });
       fixture.detectChanges();
+
+      // check expectations
       expect(changeEmitCount).toEqual(1);
     });
 

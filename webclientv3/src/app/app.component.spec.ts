@@ -1,26 +1,20 @@
 /* tslint:disable:no-unused-variable */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {AppComponent} from './app.component';
-import {ApiGateway} from '../api/api-gateway.service';
-import {ApiGatewayStub} from '../../test/stub-services/api-gateway-stub';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { AppComponent } from "./app.component";
+import { ApiGateway } from "../api/api-gateway.service";
+import { ApiGatewayStub } from "../../test/stub-services/api-gateway-stub";
+import { NO_ERRORS_SCHEMA } from "@angular/core";
 
-describe('AppComponent', () => {
-
+describe("AppComponent", () => {
   let fixture: ComponentFixture<AppComponent>;
   let app: any;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-      ],
-      declarations: [
-        AppComponent
-      ],
-      providers: [
-        { provide: ApiGateway, useValue: ApiGatewayStub }
-      ],
+      imports: [],
+      declarations: [AppComponent],
+      providers: [{ provide: ApiGateway, useValue: ApiGatewayStub }],
       // we're not gonna instantiate the nested components of AppComponent,
       // so don't bother to error check the template
       schemas: [NO_ERRORS_SCHEMA]
@@ -34,27 +28,18 @@ describe('AppComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create the app', async(() => {
-    expect(app).toBeTruthy();
-  }));
+  it(
+    "should create the app",
+    async(() => {
+      expect(app).toBeTruthy();
+    })
+  );
 
-  it('has a nested menu component', async(() => {
-    const element = fixture.debugElement.nativeElement;
-    expect(element.querySelector('ec-menu')).toBeTruthy();
-  }));
-
-  it('has a nested loading indicator component', async(() => {
-    const element = fixture.debugElement.nativeElement;
-    expect(element.querySelector('ec-loading-indicator')).toBeTruthy();
-  }));
-
-  it('has a nested main toolbar component', async(() => {
-    const element = fixture.debugElement.nativeElement;
-    expect(element.querySelector('ec-main-toolbar')).toBeTruthy();
-  }));
-
-  it('has a nested router outlet', async(() => {
-    const element = fixture.debugElement.nativeElement;
-    expect(element.querySelector('router-outlet')).toBeTruthy();
-  }));
+  it(
+    "has a nested router outlet",
+    async(() => {
+      const element = fixture.debugElement.nativeElement;
+      expect(element.querySelector("router-outlet")).toBeTruthy();
+    })
+  );
 });
