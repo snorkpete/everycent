@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material";
 import { AbnAmroImporterService } from "./abn-amro-importer.service";
 import { FcbImporterService } from "./fcb-importer.service";
+import { RepublicImporterService } from "./republic-importer.service";
 import { ScotiaImporterService } from "./scotia-importer.service";
 
 @Injectable()
@@ -9,7 +10,8 @@ export class TransactionImporterService {
   constructor(
     private fcbImporter: FcbImporterService,
     private abnAmroImporter: AbnAmroImporterService,
-    private scotiaImporter: ScotiaImporterService
+    private scotiaImporter: ScotiaImporterService,
+    private republicImporter: RepublicImporterService
   ) {}
 
   convertToTransactions(input, startDate, endDate, importType) {
@@ -39,6 +41,13 @@ export class TransactionImporterService {
     }
     if (importType === "abn-amro-creditcard") {
       return this.abnAmroImporter.convertFromCreditCardFormat(
+        input,
+        startDate,
+        endDate
+      );
+    }
+    if (importType === "republic-bank") {
+      return this.republicImporter.convertFromBankFormat(
         input,
         startDate,
         endDate

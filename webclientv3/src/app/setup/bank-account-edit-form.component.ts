@@ -83,7 +83,12 @@ export class BankAccountEditFormComponent implements OnInit {
     { name: "ABN Amro Credit Card", id: "abn-amro-creditcard" },
     { name: "Scotia Bank Account", id: "new-bank-account" },
     { name: "FCB Bank Account", id: "fc-bank" },
-    { name: "FCB Credit Card (not implemented)", id: "fc-creditcard" }
+    { name: "FCB Credit Card (not implemented)", id: "fc-creditcard" },
+    { text: "Republic Bank Account", value: "republic-bank" },
+    {
+      text: "Republic Credit Card (not implemented)",
+      value: "republic-creditcard"
+    }
   ];
 
   @Input() institutions: InstitutionData[] = [];
