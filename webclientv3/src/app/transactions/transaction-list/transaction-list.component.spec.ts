@@ -1,13 +1,11 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { TransactionDateValidatorDirective } from "../transaction-date-validator.directive";
-import { TransactionListRowComponent } from "./transaction-list-row.component";
 
 import { TransactionListComponent } from "./transaction-list.component";
 import { SharedModule } from "../../shared/shared.module";
 import { DebugElement } from "@angular/core";
 import { By } from "@angular/platform-browser";
-import { TransactionListHeaderComponent } from "./transaction-list-header.component";
 
 describe("TransactionListComponent", () => {
   let component: TransactionListComponent;
@@ -20,8 +18,6 @@ describe("TransactionListComponent", () => {
         imports: [TestConfigModule, SharedModule.forRoot()],
         declarations: [
           TransactionListComponent,
-          TransactionListHeaderComponent,
-          TransactionListRowComponent,
           TransactionDateValidatorDirective
         ]
       }).compileComponents();
