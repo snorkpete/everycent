@@ -5,7 +5,6 @@ const sample: SettingsData = {
   husband: "Hubby",
   wife: "Wifey",
   primary_budget_account_id: 0,
-  bank_charges_allocation_name: "none"
 };
 
 const SettingsServiceStub = {

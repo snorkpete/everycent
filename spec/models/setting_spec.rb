@@ -4,7 +4,6 @@
 #
 #  id                           :integer          not null, primary key
 #  primary_budget_account_id    :integer
-#  bank_charges_allocation_name :string
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #
@@ -29,20 +28,9 @@ RSpec.describe Setting, type: :model do
     end
 
   end
-  
-  describe "#bank_charges_allocation_name" do
-    it "creates the single settings record if it doesn't exist" do
-      Setting.bank_charges_allocation_name = 'Bank Charges'
-      expect(Setting.count).to eq 1
     end
 
-    it "does not create a second settings record" do
-      Setting.bank_charges_allocation_name = 'Bank Fees'
-      expect(Setting.bank_charges_allocation_name).to eq 'Bank Fees'
 
-      Setting.bank_charges_allocation_name = 'Stupid Fees'
-      expect(Setting.bank_charges_allocation_name).to eq 'Stupid Fees'
-      expect(Setting.count).to eq 1
     end
 
   end
