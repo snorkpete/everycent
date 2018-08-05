@@ -18,6 +18,7 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
+        <li>Add setting to allow for single person usage</li>
         <li>Add republic bank imports</li>
         <li>Add fixed headers to the transaction and budget edit view</li>
         <li>Allow adding of new incomes/allocations when editing across multiple budgets</li>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_06_14_025746) do
+ActiveRecord::Schema.define(version: 2018_08_05_114502) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,6 +132,8 @@ ActiveRecord::Schema.define(version: 2018_06_14_025746) do
     t.datetime "updated_at", null: false
     t.string "husband", default: "Husband"
     t.string "wife", default: "Wife"
+    t.string "family_type", default: "couple"
+    t.string "single_person"
   end
 
   create_table "sink_fund_allocations", id: :serial, force: :cascade do |t|
