@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_05_114502) do
+ActiveRecord::Schema.define(version: 2018_08_05_223606) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.integer "percentage"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "household_id"
+    t.index ["household_id"], name: "index_allocation_categories_on_household_id"
   end
 
   create_table "allocations", id: :serial, force: :cascade do |t|
@@ -33,9 +35,11 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "comment"
+    t.bigint "household_id"
     t.index ["allocation_category_id"], name: "index_allocations_on_allocation_category_id"
     t.index ["bank_account_id"], name: "index_allocations_on_bank_account_id"
     t.index ["budget_id"], name: "index_allocations_on_budget_id"
+    t.index ["household_id"], name: "index_allocations_on_household_id"
     t.index ["name"], name: "index_allocations_on_name"
   end
 
@@ -59,6 +63,8 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.integer "payment_due_day"
     t.boolean "is_cash", default: true
     t.string "import_format", default: ""
+    t.bigint "household_id"
+    t.index ["household_id"], name: "index_bank_accounts_on_household_id"
     t.index ["institution_id"], name: "index_bank_accounts_on_institution_id"
     t.index ["user_id"], name: "index_bank_accounts_on_user_id"
   end
@@ -70,7 +76,15 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status", default: "open"
+    t.bigint "household_id"
+    t.index ["household_id"], name: "index_budgets_on_household_id"
     t.index ["start_date"], name: "index_budgets_on_start_date"
+  end
+
+  create_table "households", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "incomes", id: :serial, force: :cascade do |t|
@@ -81,14 +95,18 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "comment"
+    t.bigint "household_id"
     t.index ["bank_account_id"], name: "index_incomes_on_bank_account_id"
     t.index ["budget_id"], name: "index_incomes_on_budget_id"
+    t.index ["household_id"], name: "index_incomes_on_household_id"
   end
 
   create_table "institutions", id: :serial, force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "household_id"
+    t.index ["household_id"], name: "index_institutions_on_household_id"
   end
 
   create_table "payees", id: :serial, force: :cascade do |t|
@@ -98,7 +116,9 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "household_id"
     t.index ["code"], name: "index_payees_on_code"
+    t.index ["household_id"], name: "index_payees_on_household_id"
   end
 
   create_table "recurring_allocations", id: :serial, force: :cascade do |t|
@@ -111,8 +131,10 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.integer "bank_account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "household_id"
     t.index ["allocation_category_id"], name: "index_recurring_allocations_on_allocation_category_id"
     t.index ["bank_account_id"], name: "index_recurring_allocations_on_bank_account_id"
+    t.index ["household_id"], name: "index_recurring_allocations_on_household_id"
   end
 
   create_table "recurring_incomes", id: :serial, force: :cascade do |t|
@@ -122,7 +144,9 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.integer "bank_account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "household_id"
     t.index ["bank_account_id"], name: "index_recurring_incomes_on_bank_account_id"
+    t.index ["household_id"], name: "index_recurring_incomes_on_household_id"
   end
 
   create_table "settings", id: :serial, force: :cascade do |t|
@@ -134,6 +158,8 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.string "wife", default: "Wife"
     t.string "family_type", default: "couple"
     t.string "single_person"
+    t.bigint "household_id"
+    t.index ["household_id"], name: "index_settings_on_household_id"
   end
 
   create_table "sink_fund_allocations", id: :serial, force: :cascade do |t|
@@ -144,7 +170,9 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.datetime "updated_at", null: false
     t.string "comment"
     t.string "status", default: "open"
+    t.bigint "household_id"
     t.index ["bank_account_id"], name: "index_sink_fund_allocations_on_bank_account_id"
+    t.index ["household_id"], name: "index_sink_fund_allocations_on_household_id"
   end
 
   create_table "transactions", id: :serial, force: :cascade do |t|
@@ -163,8 +191,10 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.integer "sink_fund_allocation_id"
     t.string "status"
     t.string "brought_forward_status"
+    t.bigint "household_id"
     t.index ["allocation_id"], name: "index_transactions_on_allocation_id"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
+    t.index ["household_id"], name: "index_transactions_on_household_id"
     t.index ["transaction_date"], name: "index_transactions_on_transaction_date"
   end
 
@@ -192,9 +222,25 @@ ActiveRecord::Schema.define(version: 2018_08_05_114502) do
     t.text "tokens"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.bigint "household_id"
+    t.boolean "admin", default: false
     t.index ["email"], name: "index_users_on_email"
+    t.index ["household_id"], name: "index_users_on_household_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "allocation_categories", "households"
+  add_foreign_key "allocations", "households"
+  add_foreign_key "bank_accounts", "households"
+  add_foreign_key "budgets", "households"
+  add_foreign_key "incomes", "households"
+  add_foreign_key "institutions", "households"
+  add_foreign_key "payees", "households"
+  add_foreign_key "recurring_allocations", "households"
+  add_foreign_key "recurring_incomes", "households"
+  add_foreign_key "settings", "households"
+  add_foreign_key "sink_fund_allocations", "households"
+  add_foreign_key "transactions", "households"
+  add_foreign_key "users", "households"
 end
