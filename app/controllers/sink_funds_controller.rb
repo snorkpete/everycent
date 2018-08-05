@@ -1,4 +1,5 @@
 class SinkFundsController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_sink_fund, only: [:show, :edit, :update, :destroy, :transfer_allocation]
 
   def index
