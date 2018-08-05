@@ -206,7 +206,7 @@ shared_examples_for "CreditCard" do
     end
 
     it "creates a transaction with status = 'unpaid'" do
-      expect(@adjustment_transaction.status).to eq 'unpaid'
+      expect(@adjustment_transaction.status).to eq 'paid'
     end
 
     it "creates a transaction with brought_forward_status = 'adjustment'" do
