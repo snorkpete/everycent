@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import {BankAccountData} from "../bank-accounts/bank-account.model";
-import {BankAccountService} from "../bank-accounts/bank-account.service";
-import {MessageService} from "../message-display/message.service";
-import {MainToolbarService} from "../shared/main-toolbar/main-toolbar.service";
-import {SettingsData} from "../shared/settings-data.model";
-import {SettingsService} from "../shared/settings.service";
+import { Component, OnInit } from "@angular/core";
+import { BankAccountData } from "../bank-accounts/bank-account.model";
+import { BankAccountService } from "../bank-accounts/bank-account.service";
+import { MessageService } from "../message-display/message.service";
+import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
+import { SettingsData } from "../shared/settings-data.model";
+import { SettingsService } from "../shared/settings.service";
 
 @Component({
-  selector: 'ec-settings',
+  selector: "ec-settings",
   template: `
     <mat-card class="main">
       <mat-card>
@@ -40,11 +40,12 @@ import {SettingsService} from "../shared/settings.service";
       </mat-card>
     </mat-card>
   `,
-  styles: [`
+  styles: [
+    `
     ::ng-deep .text-display {
       margin-bottom: 20px;
     }
-  `]
+  ]
 })
 export class SettingsComponent implements OnInit {
 
@@ -57,11 +58,13 @@ export class SettingsComponent implements OnInit {
     private messageService: MessageService,
     private settingsService: SettingsService,
     private bankAccountService: BankAccountService
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.toolbarService.setHeading('General Settings');
-    this.bankAccountService.getBankAccounts().subscribe(bankAccounts => this.bankAccounts = bankAccounts);
+    this.toolbarService.setHeading("General Settings");
+    this.bankAccountService
+      .getBankAccounts()
+      .subscribe(bankAccounts => (this.bankAccounts = bankAccounts));
     this.refresh();
   }
 
@@ -72,12 +75,14 @@ export class SettingsComponent implements OnInit {
   }
 
   saveSettings() {
-    this.settingsService.saveSettings(this.settings).subscribe(() => {
-      this.messageService.setMessage('Settings saved.');
-      this.editMode = false;
-    },
-    (error) => {
-      this.messageService.setErrorMessage('Settings not saved.');
-    });
+    this.settingsService.saveSettings(this.settings).subscribe(
+      () => {
+        this.messageService.setMessage("Settings saved.");
+        this.editMode = false;
+      },
+      error => {
+        this.messageService.setErrorMessage("Settings not saved.");
+      }
+    );
   }
 }
