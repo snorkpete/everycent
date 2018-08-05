@@ -83,6 +83,14 @@ describe("ListFieldComponent", () => {
       fixture.detectChanges();
       expect(de.nativeElement.textContent).toContain(2000);
     });
+
+    it("displays empty string if nothing is selected", () => {
+      component.items = sampleItems;
+      component.editMode = false;
+      component.value = null;
+      fixture.detectChanges();
+      expect(de.nativeElement.textContent).toEqual("");
+    });
   });
 
   describe("when editMode is true", () => {
