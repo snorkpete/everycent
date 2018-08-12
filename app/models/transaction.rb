@@ -82,7 +82,6 @@ class Transaction < ApplicationRecord
         transaction_params[:bank_account_id] = params[:bank_account_id]
 
         Transaction.create(transaction_params.except(:id))
-        Payee.update_from_params(transaction_params.slice(:payee_name, :payee_code, :allocation_id))
       end
     end
 

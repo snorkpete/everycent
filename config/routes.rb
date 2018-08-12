@@ -9,7 +9,6 @@ Rails.application.routes.draw do
       get 'last_update'
     end
   end
-  resources :payees, except: [:new, :edit]
   resources :budgets, except: [:new, :edit] do
     member do
       put 'copy'
@@ -27,11 +26,6 @@ Rails.application.routes.draw do
   resources :settings, only: [:index, :create]
 
   resources :allocations, only: [:index]
-  resources :default_allocations, only: [:index] do
-    collection do
-      post 'retrieve'
-    end
-  end
 
   resources :account_balances, only: [:index]
   resources :sink_funds, only: [:index, :update, :show] do

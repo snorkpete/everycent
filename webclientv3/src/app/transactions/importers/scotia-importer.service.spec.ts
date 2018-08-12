@@ -71,8 +71,6 @@ describe("ScotiaImporterService", () => {
         expect(result[0].transaction_date).toEqual(new Date("02/23/2015"));
         expect(result[0].withdrawal_amount).toEqual(400);
         expect(result[0].deposit_amount).toEqual(0);
-        expect(result[0].payeeCode).toEqual('0568053');
-        expect(result[0].payeeName).toEqual('MARAVAL ROAD');
         expect(result[0].description).toEqual("SERVICE CHARGE MARAVAL ROAD");
       });
     });
