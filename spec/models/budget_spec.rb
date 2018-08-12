@@ -42,15 +42,10 @@ describe Budget, :type => :model do
 
     describe "incomes" do
       before :each do
-        kion_income = create(:recurring_income, name: "Kion's Salary", amount: 15_000_00)
-        pat_income = create(:recurring_income, name: "Pat's Salary", amount: 20_000_00)
-        aidan_income = create(:recurring_income, name: "Dad's Donation", amount: 400_00)
         @budget = create(:budget, start_date: '2015-01-23')
-      end
-
-      it 'is a list of incomes based on the current recurring incomes' do
-        expect(@budget.incomes.size).to eq(3)
-        expect(@budget.incomes.first.name).to eq "Kion's Salary"
+        kion_income = create(:income, budget: @budget, name: "Kion's Salary", amount: 15_000_00)
+        pat_income = create(:income, budget: @budget, name: "Pat's Salary", amount: 20_000_00)
+        aidan_income = create(:income, budget: @budget, name: "Dad's Donation", amount: 400_00)
       end
 
       it 'has a total income equal to the the sum of all the incomes' do
@@ -60,17 +55,12 @@ describe Budget, :type => :model do
 
     describe "allocations" do
       before :each do
-        rent = create(:recurring_allocation, name: "Rent", amount: 2_200_00)
-        food = create(:recurring_allocation, name: "Food", amount: 2_000_00)
-        savings = create(:recurring_allocation, name: "Savings", amount: 1_400_00)
-        debt = create(:recurring_allocation, name: "Debt", amount: 6_400_00)
-
         @budget = create(:budget, start_date: '2015-01-23')
-      end
+        rent = create(:allocation, budget: @budget, name: "Rent", amount: 2_200_00)
+        food = create(:allocation, budget: @budget, name: "Food", amount: 2_000_00)
+        savings = create(:allocation, budget: @budget, name: "Savings", amount: 1_400_00)
+        debt = create(:allocation, budget: @budget, name: "Debt", amount: 6_400_00)
 
-      it 'is a list of allocations based on the current recurring allocations' do
-        expect(@budget.allocations.size).to eq(4)
-        expect(@budget.allocations.first.name).to eq "Rent"
       end
 
       it 'has a total allocation equal to the the sum of all the allocations' do
@@ -82,16 +72,11 @@ describe Budget, :type => :model do
 
   describe "#copy" do
     before :each do
-      @kion_income = create(:recurring_income, name: "Kion's Salary", amount: 15_000_00)
-      @pat_income = create(:recurring_income, name: "Pat's Salary", amount: 20_000_00)
-      @savings = create(:recurring_allocation, name: "Savings", amount: 1_400_00)
-      @debt = create(:recurring_allocation, name: "Debt", amount: 6_400_00)
-
       @budget = create(:budget, start_date: '2015-01-23')
-
-      @aidan_income = create(:recurring_income, name: "Dad's Donation", amount: 400_00)
-      @rent = create(:recurring_allocation, name: "Rent", amount: 2_200_00)
-      @food = create(:recurring_allocation, name: "Food", amount: 2_000_00)
+      @kion_income = create(:income, budget: @budget, name: "Kion's Salary", amount: 15_000_00)
+      @pat_income = create(:income, budget: @budget, name: "Pat's Salary", amount: 20_000_00)
+      @savings = create(:allocation, budget: @budget, name: "Savings", amount: 1_400_00)
+      @debt = create(:allocation, budget: @budget, name: "Debt", amount: 6_400_00)
 
       @new_budget = @budget.copy
     end
@@ -105,7 +90,7 @@ describe Budget, :type => :model do
       expect(@new_budget.start_date).to eq(Date.parse('2015-02-23'))
     end
 
-    it "only copies incomes from budget (ignores recurring incomes)" do
+    it "only copies incomes from budget" do
       expect(@new_budget.incomes.size).to eq 2
     end
 
@@ -113,7 +98,7 @@ describe Budget, :type => :model do
       expect(@new_budget.incomes.first.name).to eq "Kion's Salary"
     end
 
-    it "only copies allocations from budget (ignores recurring allocations)" do
+    it "only copies allocations from budget" do
       expect(@new_budget.allocations.size).to eq 2
     end
 
