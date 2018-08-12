@@ -9,9 +9,6 @@ export interface TransactionData {
   transaction_date?: string|Date;
   withdrawal_amount?: number;
   deposit_amount?: number;
-  payee_id?: number;
-  payee_code?: string;
-  payee_name?: string;
   allocation_id?: number;
   sink_fund_allocation_id?: number;
   status?: string;

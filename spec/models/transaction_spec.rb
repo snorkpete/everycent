@@ -35,10 +35,10 @@ RSpec.describe Transaction, :type => :model do
         bank_account_id: @bank_account.id,
         transactions: [
           { id: 5, description: 'first', transaction_date: '2015-01-15',
-            withdrawal_amount: 500, deposit_amount:0, payee_name:'first payee', payee_code:'100', allocation_id: 5 },
+            withdrawal_amount: 500, deposit_amount:0, allocation_id: 5 },
 
           { id: 5, description: 'second', transaction_date: '2015-01-09',
-            withdrawal_amount: 0, deposit_amount: 1000, payee_name:'second payee', payee_code:'300', allocation_id: 5 }
+            withdrawal_amount: 0, deposit_amount: 1000, allocation_id: 5 }
         ]
       }
     end
@@ -66,18 +66,6 @@ RSpec.describe Transaction, :type => :model do
 
       #expect(Transaction.all.size).to eq 4
       expect(transactions.size).to eq 2
-    end
-
-    it "calls the Payee#update_from_params method" do
-      expect(Payee).to receive(:update_from_params).with({ payee_name:'first payee', payee_code:'100', allocation_id: 5}).once
-      expect(Payee).to receive(:update_from_params).with({ payee_name:'second payee', payee_code:'300', allocation_id: 5}).once
-      transactions = Transaction.update_with_params(@params)
-    end
-
-    it "updates the payee_code and payee_name fields" do
-      transactions = Transaction.update_with_params(@params)
-      expect(transactions[0].payee_code).to eq '100'
-      expect(transactions[0].payee_name).to eq 'first payee'
     end
 
     describe "when Against Sink Funds" do
@@ -182,8 +170,7 @@ RSpec.describe Transaction, :type => :model do
                                     bank_account_id: 22,
                                     description: 'Expensive Watch',
                                     bank_ref:'xxxx', withdrawal_amount: 30_000,
-                                    deposit_amount: 5_00, allocation_id: 3,
-                                    payee_code: 'A50', payee_name: 'Amazon', payee_id: 40)
+                                    deposit_amount: 5_00, allocation_id: 3)
 
       @date = Date.new(2015, 7, 23)
       @new_transaction = @original_transaction.to_brought_forward_version(@date)
@@ -208,18 +195,6 @@ RSpec.describe Transaction, :type => :model do
 
     it "sets the deposit_amount of the new transaction to the same as the original transaction" do
       expect(@new_transaction.deposit_amount).to eq @original_transaction.deposit_amount
-    end
-
-    it "sets the payee_id of the new transaction to the same as the original transaction" do
-      expect(@new_transaction.payee_id).to eq @original_transaction.payee_id
-    end
-
-    it "sets the payee_code of the new transaction to the same as the original transaction" do
-      expect(@new_transaction.payee_code).to eq @original_transaction.payee_code
-    end
-
-    it "sets the payee_name of the new transaction to the same as the original transaction" do
-      expect(@new_transaction.payee_name).to eq @original_transaction.payee_name
     end
 
     it "sets the allocation of the new transaction to the same as the original transaction" do
