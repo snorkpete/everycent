@@ -43,8 +43,6 @@ Rails.application.routes.draw do
   resources :sink_fund_allocations, only: [:index]
   resources :allocation_categories, except: [:new, :edit]
   resources :institutions, except: [:new, :edit]
-  resources :recurring_allocations, except: [:new, :edit]
-  resources :recurring_incomes, except: [:new, :edit]
   mount_devise_token_auth_for 'User', at: '/auth'
   resources :users, except: [:new, :edit]
 

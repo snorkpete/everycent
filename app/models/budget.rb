@@ -19,7 +19,6 @@ class Budget < ActiveRecord::Base
   validates :start_date, presence: true
 
   before_create :determine_dependent_fields
-  after_create :add_associated_data
 
   def total_income
     incomes.sum(:amount)
@@ -35,7 +34,6 @@ class Budget < ActiveRecord::Base
 
   def self.future
     self.includes(:incomes, :allocations).where(status:'open').order(:start_date)
-    # self.includes(:incomes, :allocations).order(:start_date)
   end
 
   def self.copy(budget_id)
@@ -56,9 +54,7 @@ class Budget < ActiveRecord::Base
   end
 
   def copy
-    Budget.skip_callback :create, :after, :add_associated_data
     new_budget = Budget.create(start_date: self.start_date.next_month)
-    Budget.set_callback :create, :after, :add_associated_data
 
     incomes.each do |income|
       new_budget.incomes << income.dup
@@ -114,11 +110,6 @@ class Budget < ActiveRecord::Base
     determine_name
   end
 
-  def add_associated_data
-    add_incomes
-    add_allocations
-  end
-
   # end date is always one day before the current day in the next month
   def determine_end_date
     self.end_date = start_date.next_month.yesterday
@@ -129,15 +120,4 @@ class Budget < ActiveRecord::Base
     self.name = "#{start_date.strftime('%b %d')} - #{end_date.strftime('%b %d, %Y')}"
   end
 
-  def add_incomes
-    RecurringIncome.all.each do |recurring_income|
-      self.incomes << recurring_income.to_income
-    end
-  end
-
-  def add_allocations
-    RecurringAllocation.all.each do |recurring_allocation|
-      self.allocations << recurring_allocation.to_allocation
-    end
-  end
 end

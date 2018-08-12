@@ -44,8 +44,6 @@ class User < ApplicationRecord
   has_many :budgets, through: :household
   has_many :incomes, through: :household
   has_many :institutions, through: :household
-  has_many :recurring_allocations, through: :household
-  has_many :recurring_incomes, through: :household
   has_many :settings, through: :household
   has_many :sink_fund_allocations, through: :household
   has_many :transactions, through: :household
