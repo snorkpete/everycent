@@ -18,10 +18,13 @@
 #  sink_fund_allocation_id :integer
 #  status                  :string
 #  brought_forward_status  :string
+#  household_id            :bigint(8)
 #
 
 FactoryBot.define do
   factory :transaction do
+    household
+    bank_account
     description "MyString"
     bank_ref "MyString"
     transaction_date "2015-01-19"

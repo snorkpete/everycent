@@ -6,7 +6,6 @@ gem 'puma'
 gem 'bootsnap', require: false
 
 gem 'rails-controller-testing'
-#gem 'rails-api'
 
 group :development do
   gem 'annotate'
@@ -32,6 +31,7 @@ gem 'active_model_serializers'
 
 gem 'rack-cors', :require => 'rack/cors'
 
+gem 'acts_as_tenant'
 
 #for heroku
 group :production do

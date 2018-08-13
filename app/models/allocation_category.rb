@@ -2,14 +2,18 @@
 #
 # Table name: allocation_categories
 #
-#  id         :integer          not null, primary key
-#  name       :string
-#  percentage :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id           :integer          not null, primary key
+#  name         :string
+#  percentage   :integer
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  household_id :bigint(8)
 #
 
 class AllocationCategory < ApplicationRecord
+  # force this model to always require scoping to a household
+  acts_as_tenant :household
+  has_many :recurring_allocations
 
   validates :name,  presence: true,
                     uniqueness: {

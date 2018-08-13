@@ -18,6 +18,7 @@
 #  sink_fund_allocation_id :integer
 #  status                  :string
 #  brought_forward_status  :string
+#  household_id            :bigint(8)
 #
 
 class TransactionSerializer < ActiveModel::Serializer

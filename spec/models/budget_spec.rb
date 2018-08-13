@@ -2,18 +2,24 @@
 #
 # Table name: budgets
 #
-#  id         :integer          not null, primary key
-#  name       :string
-#  start_date :date
-#  end_date   :date
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  status     :string           default("open")
+#  id           :integer          not null, primary key
+#  name         :string
+#  start_date   :date
+#  end_date     :date
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  status       :string           default("open")
+#  household_id :bigint(8)
 #
 
 require 'rails_helper'
 
 describe Budget, :type => :model do
+  before do
+    @household = create(:household)
+    ActsAsTenant.current_tenant = @household
+  end
+
   it 'is valid with a start date' do
     @budget = build(:budget, start_date: '2015-01-01')
     expect(@budget).to be_valid
@@ -69,7 +75,6 @@ describe Budget, :type => :model do
     end
   end
 
-
   describe "#copy" do
     before :each do
       @budget = create(:budget, start_date: '2015-01-23')
@@ -105,7 +110,6 @@ describe Budget, :type => :model do
     it "correctly copies the allocations" do
       expect(@new_budget.allocations.second.name).to eq "Debt"
     end
-
   end
 
   describe ".current" do

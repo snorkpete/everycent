@@ -26,10 +26,13 @@
 #  tokens                 :text
 #  created_at             :datetime
 #  updated_at             :datetime
+#  household_id           :bigint(8)
+#  admin                  :boolean          default(FALSE)
 #
 
 FactoryBot.define do
   factory :user do
+    household
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     email { Faker::Internet.email }

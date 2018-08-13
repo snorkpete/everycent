@@ -10,11 +10,16 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  comment         :string
+#  household_id    :bigint(8)
 #
 
 require 'rails_helper'
 
 RSpec.describe Income, :type => :model do
+  before do
+    @household = create(:household)
+    ActsAsTenant.current_tenant = @household
+  end
 
   describe "#update_from_params" do
     before :each do
@@ -56,10 +61,12 @@ RSpec.describe Income, :type => :model do
   end
 
   describe ".mass_update" do
+
     before do
-      @may_allocation = create(:income, name: 'My Income', amount: 500)
-      @june_income = create(:income, name: 'My Income', amount: 500)
-      @july_income = create(:income, name: 'My Income', amount: 500)
+      bank_account = create(:bank_account)
+      @may_allocation = create(:income, name: 'My Income', amount: 500, bank_account: bank_account)
+      @june_income = create(:income, name: 'My Income', amount: 500, bank_account: bank_account)
+      @july_income = create(:income, name: 'My Income', amount: 500, bank_account: bank_account)
     end
 
     context "when 'name' is blank" do

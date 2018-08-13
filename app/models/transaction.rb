@@ -18,13 +18,16 @@
 #  sink_fund_allocation_id :integer
 #  status                  :string
 #  brought_forward_status  :string
+#  household_id            :bigint(8)
 #
 
 class Transaction < ApplicationRecord
 
-  belongs_to :allocation
+  # force this model to always require scoping to a household
+  acts_as_tenant :household
+  belongs_to :allocation, optional: true
   belongs_to :bank_account
-  belongs_to :sink_fund_allocation
+  belongs_to :sink_fund_allocation, optional: true
 
   before_save :check_status
 

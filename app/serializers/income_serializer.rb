@@ -10,6 +10,7 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  comment         :string
+#  household_id    :bigint(8)
 #
 
 class IncomeSerializer < ActiveModel::Serializer

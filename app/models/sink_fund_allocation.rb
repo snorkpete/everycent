@@ -10,10 +10,13 @@
 #  updated_at      :datetime         not null
 #  comment         :string
 #  status          :string           default("open")
+#  household_id    :bigint(8)
 #
 
 # TODO: rename sink fund allocation to 'Financial Obligation'
 class SinkFundAllocation < ApplicationRecord
+  # force this model to always require scoping to a household
+  acts_as_tenant :household
   belongs_to :bank_account
 
   has_many :transactions

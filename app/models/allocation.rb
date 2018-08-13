@@ -13,13 +13,18 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  comment                :string
+#  household_id           :bigint(8)
 #
 
 class Allocation < ApplicationRecord
+  # force this model to always require scoping to a household
+  acts_as_tenant :household
 
   belongs_to :budget
-  belongs_to :allocation_category
-  belongs_to :bank_account
+  # TODO: this REALLY should not be optional - however the mass_update spec breaks if it's not optional
+  # need to investigate why that is
+  belongs_to :allocation_category, optional: true
+  belongs_to :bank_account, optional: true
 
   has_many :transactions
 

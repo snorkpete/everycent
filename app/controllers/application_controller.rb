@@ -10,6 +10,14 @@ class ApplicationController < ActionController::Base
     Rails.env.production?
   end
 
+  def current_user
+    super
+  end
+
+  def current_household
+    current_user.household
+  end
+
   ##respond_to :json
   def respond_with(object, serializer=nil)
 
