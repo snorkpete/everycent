@@ -10,9 +10,12 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  comment         :string
+#  household_id    :bigint(8)
 #
 
 class Income < ApplicationRecord
+  # force this model to always require scoping to a household
+  acts_as_tenant :household
 
   belongs_to :budget
   belongs_to :bank_account

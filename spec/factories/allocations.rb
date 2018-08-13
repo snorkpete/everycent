@@ -13,17 +13,19 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  comment                :string
+#  household_id           :bigint(8)
 #
 
 FactoryBot.define do
   factory :allocation do
+    household
+    allocation_category
+    bank_account
+    budget
     name "MyString"
-amount 1
-budget_id 1
-allocation_category_id 1
-allocation_type "MyString"
-is_standing_order 1
-bank_account_id 1
+    amount 1
+    allocation_type "MyString"
+    is_standing_order 1
   end
 
 end

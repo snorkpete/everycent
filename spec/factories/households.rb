@@ -8,8 +8,10 @@
 #  updated_at :datetime         not null
 #
 
-require 'rails_helper'
 
-RSpec.describe Household, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+FactoryBot.define do
+  factory :household do
+    name "My Household"
+  end
+
 end

@@ -21,11 +21,17 @@
 #  statement_day              :integer
 #  payment_due_day            :integer
 #  is_cash                    :boolean          default(TRUE)
+#  import_format              :string           default("")
+#  household_id               :bigint(8)
 #
 
 require 'rails_helper'
 
 RSpec.describe BankAccount, :type => :model do
+  before do
+    @household = create(:household)
+    ActsAsTenant.current_tenant = @household
+  end
 
   context "when saved" do
 

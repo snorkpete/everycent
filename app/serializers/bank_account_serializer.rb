@@ -21,6 +21,8 @@
 #  statement_day              :integer
 #  payment_due_day            :integer
 #  is_cash                    :boolean          default(TRUE)
+#  import_format              :string           default("")
+#  household_id               :bigint(8)
 #
 
 class BankAccountSerializer < ActiveModel::Serializer

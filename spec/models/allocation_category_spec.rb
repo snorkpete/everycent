@@ -2,16 +2,21 @@
 #
 # Table name: allocation_categories
 #
-#  id         :integer          not null, primary key
-#  name       :string
-#  percentage :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id           :integer          not null, primary key
+#  name         :string
+#  percentage   :integer
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  household_id :bigint(8)
 #
 
 require 'rails_helper'
 
 describe AllocationCategory do
+  before do
+    @household = create(:household)
+    ActsAsTenant.current_tenant = @household
+  end
   it 'is valid with a name' do
     category = build(:allocation_category)
     expect(category.valid?).to eq(true)

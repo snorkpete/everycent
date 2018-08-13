@@ -10,6 +10,7 @@
 #  updated_at      :datetime         not null
 #  comment         :string
 #  status          :string           default("open")
+#  household_id    :bigint(8)
 #
 
 class SinkFundAllocationSerializer < ActiveModel::Serializer

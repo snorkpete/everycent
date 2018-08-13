@@ -26,6 +26,8 @@
 #  tokens                 :text
 #  created_at             :datetime
 #  updated_at             :datetime
+#  household_id           :bigint(8)
+#  admin                  :boolean          default(FALSE)
 #
 
 class User < ApplicationRecord

@@ -21,13 +21,19 @@
 #  statement_day              :integer
 #  payment_due_day            :integer
 #  is_cash                    :boolean          default(TRUE)
+#  import_format              :string           default("")
+#  household_id               :bigint(8)
 #
 
 class BankAccount < ApplicationRecord
   include CreditCard
 
+  # force this model to always require scoping to a household
+  acts_as_tenant :household
+
   belongs_to :user
-  belongs_to :institution
+  # TODO: temporarily make this optional - debugging broken specs
+  belongs_to :institution, optional: true
 
   has_many :transactions
   has_many :sink_fund_allocations,  -> { order(:status => :desc, :name => :asc) }

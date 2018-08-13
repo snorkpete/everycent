@@ -4,13 +4,23 @@
 #
 #  id                           :integer          not null, primary key
 #  primary_budget_account_id    :integer
+#  bank_charges_allocation_name :string
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  husband                      :string           default("Husband")
+#  wife                         :string           default("Wife")
+#  family_type                  :string           default("couple")
+#  single_person                :string
+#  household_id                 :bigint(8)
 #
 
 require 'rails_helper'
 
 RSpec.describe Setting, type: :model do
+  before do
+    @household = create(:household)
+    ActsAsTenant.current_tenant = @household
+  end
 
   describe "#primary_budget_account_id" do
     it "creates the single settings record if it doesn't exist" do

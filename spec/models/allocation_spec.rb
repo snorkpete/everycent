@@ -13,11 +13,17 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  comment                :string
+#  household_id           :bigint(8)
 #
 
 require 'rails_helper'
 
 RSpec.describe Allocation, :type => :model do
+  before do
+    @household = create(:household)
+    ActsAsTenant.current_tenant = @household
+  end
+
   describe "::update_from_params" do
     before :each do
       @budget = create(:budget)
@@ -77,19 +83,21 @@ RSpec.describe Allocation, :type => :model do
     end
 
     it "does not update the bank account if not a standing order" do
+      original_bank_account_id = @first.bank_account_id
       allocations = Allocation.update_from_params(@params_wihout_standing_order)
       expect(allocations[0].is_standing_order?).to eq false
-      expect(allocations[0].bank_account_id).to eq nil
+      expect(allocations[0].bank_account_id).to eq original_bank_account_id
     end
-
   end
 
   describe "#spent" do
+
     before :each do
-      @allocation = create(:allocation, amount: 1000)
+      @budget = create(:budget)
+      @bank_account = create(:bank_account)
+      @allocation = create(:allocation, budget: @budget, amount: 1000)
       create(:transaction, allocation_id: @allocation.id, withdrawal_amount: 500, deposit_amount: 0)
       create(:transaction, allocation_id: @allocation.id, withdrawal_amount: 100, deposit_amount: 0)
-
     end
 
     it "sums the transactions against that allocation" do
@@ -104,7 +112,7 @@ RSpec.describe Allocation, :type => :model do
 
   describe ".mass_update" do
     before do
-      @may_allocation = create(:allocation, name: 'Food', amount: 500)
+      @may_allocation  = create(:allocation, name: 'Food', amount: 500)
       @june_allocation = create(:allocation, name: 'Food', amount: 500)
       @july_allocation = create(:allocation, name: 'Food', amount: 500)
     end
@@ -173,14 +181,18 @@ RSpec.describe Allocation, :type => :model do
     context "when id is 0" do
 
       it "creates an allocation for the budget if amount > 0" do
+
+        @new_budget = create(:budget)
+        valid_category = AllocationCategory.first
         @params = { type: 'allocation', name: 'Groceries', amounts:[
-            { id: 0, amount: 600, budget_id: 10 },
+            { id: 0, amount: 600, budget_id: @new_budget.id,
+              allocation_category_id: valid_category.id },
         ]}
         expect do
           Allocation.mass_update(@params)
         end.to change { Allocation.count }.by(1)
 
-        new_allocation = Allocation.find_by_budget_id 10
+        new_allocation = Allocation.find_by_budget_id @new_budget.id
         expect(new_allocation.name).to eq 'Groceries'
       end
 

@@ -4,11 +4,19 @@
 #
 #  id                           :integer          not null, primary key
 #  primary_budget_account_id    :integer
+#  bank_charges_allocation_name :string
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  husband                      :string           default("Husband")
+#  wife                         :string           default("Wife")
+#  family_type                  :string           default("couple")
+#  single_person                :string
+#  household_id                 :bigint(8)
 #
 
 class Setting < ApplicationRecord
+  # force this model to always require scoping to a household
+  acts_as_tenant :household
 
   def self.primary_budget_account_id=(account_id)
     get_setting_record.update(primary_budget_account_id: account_id)
