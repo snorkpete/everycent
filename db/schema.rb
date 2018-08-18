@@ -116,9 +116,7 @@ ActiveRecord::Schema.define(version: 2018_08_05_223606) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "household_id"
     t.index ["code"], name: "index_payees_on_code"
-    t.index ["household_id"], name: "index_payees_on_household_id"
   end
 
   create_table "recurring_allocations", id: :serial, force: :cascade do |t|
@@ -131,10 +129,8 @@ ActiveRecord::Schema.define(version: 2018_08_05_223606) do
     t.integer "bank_account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "household_id"
     t.index ["allocation_category_id"], name: "index_recurring_allocations_on_allocation_category_id"
     t.index ["bank_account_id"], name: "index_recurring_allocations_on_bank_account_id"
-    t.index ["household_id"], name: "index_recurring_allocations_on_household_id"
   end
 
   create_table "recurring_incomes", id: :serial, force: :cascade do |t|
@@ -144,9 +140,7 @@ ActiveRecord::Schema.define(version: 2018_08_05_223606) do
     t.integer "bank_account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "household_id"
     t.index ["bank_account_id"], name: "index_recurring_incomes_on_bank_account_id"
-    t.index ["household_id"], name: "index_recurring_incomes_on_household_id"
   end
 
   create_table "settings", id: :serial, force: :cascade do |t|
@@ -236,9 +230,6 @@ ActiveRecord::Schema.define(version: 2018_08_05_223606) do
   add_foreign_key "budgets", "households"
   add_foreign_key "incomes", "households"
   add_foreign_key "institutions", "households"
-  add_foreign_key "payees", "households"
-  add_foreign_key "recurring_allocations", "households"
-  add_foreign_key "recurring_incomes", "households"
   add_foreign_key "settings", "households"
   add_foreign_key "sink_fund_allocations", "households"
   add_foreign_key "transactions", "households"
