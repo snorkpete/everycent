@@ -18,7 +18,7 @@ class Income < ApplicationRecord
   acts_as_tenant :household
 
   belongs_to :budget
-  belongs_to :bank_account
+  belongs_to :bank_account, optional: true
 
   def self.update_from_params(params)
     result = []

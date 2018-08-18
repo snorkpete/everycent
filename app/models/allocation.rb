@@ -21,9 +21,7 @@ class Allocation < ApplicationRecord
   acts_as_tenant :household
 
   belongs_to :budget
-  # TODO: this REALLY should not be optional - however the mass_update spec breaks if it's not optional
-  # need to investigate why that is
-  belongs_to :allocation_category, optional: true
+  belongs_to :allocation_category
   belongs_to :bank_account, optional: true
 
   has_many :transactions
@@ -49,7 +47,7 @@ class Allocation < ApplicationRecord
 
     if id == 0
       return nil if param[:deleted]
-      return Allocation.new(param.except(:id, :deleted))
+      return Allocation.create(param.except(:id, :deleted))
     end
 
     allocation = Allocation.find(id)
