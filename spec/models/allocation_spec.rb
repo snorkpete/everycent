@@ -27,28 +27,34 @@ RSpec.describe Allocation, :type => :model do
   describe "::update_from_params" do
     before :each do
       @budget = create(:budget)
+      @bank_account = create(:bank_account)
+      @allocation_category = create(:allocation_category)
       @first  = @budget.allocations.create(attributes_for(:allocation))
       @second = @budget.allocations.create(attributes_for(:allocation))
       @third  = @budget.allocations.create(attributes_for(:allocation))
 
-      @single_params = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1,
-                        "allocation_category_id" => 1, "allocation_type" => "expense" }]
+      @single_params = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700, "budget_id"=>@budget.id,
+                         "bank_account_id"=>@bank_account.id,
+                        "allocation_category_id" => @allocation_category.id }]
 
       @params_with_standing_order = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700,
-                                      "budget_id"=>@budget.id, "bank_account_id"=>1, "is_standing_order" =>true,
-                                      "allocation_category_id" => 1, "allocation_type" => "expense" }]
+                                      "budget_id"=>@budget.id, "bank_account_id"=>@bank_account.id,
+                                      "is_standing_order" =>true,
+                                      "allocation_category_id" => @allocation_category.id  }]
 
       @params_wihout_standing_order = [{"id"=>@first.id, "name"=>"Rent", "amount"=>15700,
-                                      "budget_id"=>@budget.id, "bank_account_id"=>1, "is_standing_order" =>false,
-                                      "allocation_category_id" => 1, "allocation_type" => "expense" }]
+                                      "budget_id"=>@budget.id, "bank_account_id"=>@bank_account.id,
+                                        "is_standing_order" =>false,
+                                      "allocation_category_id" => @allocation_category.id }]
 
       @two_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id,
-                      "bank_account_id"=>1, "allocation_category_id" => 1, "allocation_type" => "expense" },
+                      "bank_account_id"=>@bank_account.id, "allocation_category_id" => @allocation_category.id },
                     {"id"=>"", "name"=>"Groceries", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"",
-                     "allocation_category_id" => 1, "allocation_type" => "expense" },
+                     "allocation_category_id" => @allocation_category.id },
       ]
 
-      @deleted_params = [{"id"=>@first.id, "name"=>"Renting", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1,
+      @deleted_params = [{"id"=>@first.id, "name"=>"Renting", "amount"=>15700,
+                          "budget_id"=>@budget.id, "bank_account_id"=> @bank_account.id,
                          "allocation_category"=>nil, "bank_account"=>nil },
                          {"id"=>"", "name"=>"Groceries", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"2",
                          "allocation_category"=>nil, "bank_account"=>nil },
@@ -83,10 +89,10 @@ RSpec.describe Allocation, :type => :model do
     end
 
     it "does not update the bank account if not a standing order" do
-      original_bank_account_id = @first.bank_account_id
+      # for non-standing orders, always clear out the bank account if supplied
       allocations = Allocation.update_from_params(@params_wihout_standing_order)
       expect(allocations[0].is_standing_order?).to eq false
-      expect(allocations[0].bank_account_id).to eq original_bank_account_id
+      expect(allocations[0].bank_account_id).to eq nil
     end
   end
 
@@ -184,9 +190,10 @@ RSpec.describe Allocation, :type => :model do
 
         @new_budget = create(:budget)
         valid_category = AllocationCategory.first
-        @params = { type: 'allocation', name: 'Groceries', amounts:[
-            { id: 0, amount: 600, budget_id: @new_budget.id,
-              allocation_category_id: valid_category.id },
+        @params = { type: 'allocation', name: 'Groceries',
+                    allocation_category_id: valid_category.id,
+                    amounts:[
+                      { id: 0, amount: 600, budget_id: @new_budget.id },
         ]}
         expect do
           Allocation.mass_update(@params)
@@ -197,8 +204,12 @@ RSpec.describe Allocation, :type => :model do
       end
 
       it "does nothing amount is 0" do
-        @params = { type: 'allocation', name: 'Groceries', amounts:[
-            { id: 0, amount: 0, budget_id: 10 },
+        @new_budget = create(:budget)
+        valid_category = AllocationCategory.first
+        @params = { type: 'allocation', name: 'Groceries',
+                    allocation_category_id: valid_category.id,
+                    amounts:[
+                      { id: 0, amount: 0, budget_id: @new_budget.id },
         ]}
         expect do
           Allocation.mass_update(@params)

@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe TransactionsController, :type => :controller do
+  before do
+    @household = create(:household)
+    ActsAsTenant.current_tenant = @household
+  end
 
   describe 'authentication' do
 
@@ -13,7 +17,7 @@ RSpec.describe TransactionsController, :type => :controller do
 
     context "when logged in" do
       before :each do
-        user = create(:user)
+        user = create(:user, household: @household)
         auth_request(user)
       end
 

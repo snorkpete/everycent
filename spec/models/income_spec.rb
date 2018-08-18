@@ -132,14 +132,15 @@ RSpec.describe Income, :type => :model do
     context "when id is 0" do
 
       it "creates an income for the budget if amount > 0" do
+        @new_budget = create(:budget)
         @params = { type: 'income', name: 'Lottery Winnings', amounts:[
-            { id: 0, amount: 600, budget_id: 10 },
+            { id: 0, amount: 600, budget_id: @new_budget.id },
         ]}
         expect do
           Income.mass_update(@params)
         end.to change { Income.count }.by(1)
 
-        new_income = Income.find_by_budget_id 10
+        new_income = Income.find_by_budget_id @new_budget.id
         expect(new_income.name).to eq 'Lottery Winnings'
       end
 

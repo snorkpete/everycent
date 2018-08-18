@@ -121,8 +121,8 @@ RSpec.describe BankAccount, :type => :model do
     end
 
     it "reverses the sink_fund_allocation balances" do
-      @sink_fund_allocation = create(:sink_fund_allocation, name: 'First', amount: 2000_00)
-      @sink_fund.sink_fund_allocations << @sink_fund_allocation
+      @sink_fund_allocation = create(:sink_fund_allocation, name: 'First',
+                                     amount: 2000_00, bank_account: @sink_fund)
       transaction = create(:transaction, withdrawal_amount: 500_00, deposit_amount: 0,
                            transaction_date: '2015-01-12',
                            bank_account: @sink_fund,
@@ -132,11 +132,11 @@ RSpec.describe BankAccount, :type => :model do
     end
 
     it "reverses the sink_fund_allocation balances of multiple sink_fund_allocations" do
-      @sink_fund_allocation = create(:sink_fund_allocation, name: 'First', amount: 2000_00)
-      @sink_fund.sink_fund_allocations << @sink_fund_allocation
+      @sink_fund_allocation = create(:sink_fund_allocation, name: 'First',
+                                     amount: 2000_00, bank_account: @sink_fund)
 
-      @second_sink_fund_allocation = create(:sink_fund_allocation, name: 'Second', amount: 1000_00)
-      @sink_fund.sink_fund_allocations << @second_sink_fund_allocation
+      @second_sink_fund_allocation = create(:sink_fund_allocation, name: 'Second',
+                                            amount: 1000_00, bank_account: @sink_fund)
 
       transactions = []
       transactions << create(:transaction, withdrawal_amount: 500_00, deposit_amount: 0,
@@ -166,11 +166,11 @@ RSpec.describe BankAccount, :type => :model do
     end
 
     it "updates the sink_fund_allocation balances of multiple sink_fund_allocations" do
-      @sink_fund_allocation = create(:sink_fund_allocation, name: 'First', amount: 3500_00)
-      @sink_fund.sink_fund_allocations << @sink_fund_allocation
+      @sink_fund_allocation = create(:sink_fund_allocation, name: 'First',
+                                     amount: 3500_00, bank_account: @sink_fund)
 
-      @second_sink_fund_allocation = create(:sink_fund_allocation, name: 'Second', amount: 1200_00)
-      @sink_fund.sink_fund_allocations << @second_sink_fund_allocation
+      @second_sink_fund_allocation = create(:sink_fund_allocation, name: 'Second',
+                                            amount: 1200_00, bank_account: @sink_fund)
 
       transactions = []
       transactions << create(:transaction, withdrawal_amount: 0, deposit_amount: 400_00,
