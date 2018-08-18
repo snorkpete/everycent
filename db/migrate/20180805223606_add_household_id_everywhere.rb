@@ -10,56 +10,56 @@ class AddHouseholdIdEverywhere < ActiveRecord::Migration[5.2]
     # add_foreign_key :uploads, :users
 
     add_reference :allocation_categories, :household, index: true
-    add_foreign_key :allocation_categories, :households
     AllocationCategory.update_all household_id: household_id
+    add_foreign_key :allocation_categories, :households
 
     add_reference :allocations, :household, index: true
-    add_foreign_key :allocations, :households
     Allocation.update_all household_id: household_id
+    add_foreign_key :allocations, :households
 
     add_reference :bank_accounts, :household, index: true
-    add_foreign_key :bank_accounts, :households
     BankAccount.update_all household_id: household_id
+    add_foreign_key :bank_accounts, :households
 
     add_reference :budgets, :household, index: true
-    add_foreign_key :budgets, :households
     Budget.update_all household_id: household_id
+    add_foreign_key :budgets, :households
 
     add_reference :incomes, :household, index: true
-    add_foreign_key :incomes, :households
     Income.update_all household_id: household_id
+    add_foreign_key :incomes, :households
 
     add_reference :institutions, :household, index: true
-    add_foreign_key :institutions, :households
     Institution.update_all household_id: household_id
+    add_foreign_key :institutions, :households
 
-    add_reference :payees, :household, index: true
-    add_foreign_key :payees, :households
-    Payee.update_all household_id: household_id
-
-    add_reference :recurring_allocations, :household, index: true
-    add_foreign_key :recurring_allocations, :households
-    RecurringAllocation.update_all household_id: household_id
-
-    add_reference :recurring_incomes, :household, index: true
-    add_foreign_key :recurring_incomes, :households
-    RecurringIncome.update_all household_id: household_id
+    # add_reference :payees, :household, index: true
+    # Payee.update_all household_id: household_id
+    # add_foreign_key :payees, :households
+    #
+    # add_reference :recurring_allocations, :household, index: true
+    # RecurringAllocation.update_all household_id: household_id
+    # add_foreign_key :recurring_allocations, :households
+    #
+    # add_reference :recurring_incomes, :household, index: true
+    # RecurringIncome.update_all household_id: household_id
+    # add_foreign_key :recurring_incomes, :households
 
     add_reference :settings, :household, index: true
-    add_foreign_key :settings, :households
     Setting.update_all household_id: household_id
+    add_foreign_key :settings, :households
 
     add_reference :sink_fund_allocations, :household, index: true
-    add_foreign_key :sink_fund_allocations, :households
     SinkFundAllocation.update_all household_id: household_id
+    add_foreign_key :sink_fund_allocations, :households
 
     add_reference :transactions, :household, index: true
-    add_foreign_key :transactions, :households
     Transaction.update_all household_id: household_id
+    add_foreign_key :transactions, :households
 
     add_reference :users, :household, index: true
-    add_foreign_key :users, :households
     User.update_all household_id: household_id
+    add_foreign_key :users, :households
 
     # also add the admin column
     add_column :users, :admin, :boolean, default: false
