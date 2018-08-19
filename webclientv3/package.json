@@ -4,11 +4,11 @@
     "ng": "ng",
     "start": "ng serve",
     "start:aot": "ng serve --aot",
-    "build": "ng build --prod --aot --build-optimizer --base-href /v3/",
+    "build": "ng build --prod --aot --build-optimizer --base-href /",
     "test": "ng test --sourcemaps=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "analyze": "ng build --prod --build-optimizer --stats-json && webpack-bundle-analyzer ../public/v3/stats.json"
+    "analyze": "ng build --prod --build-optimizer --stats-json && webpack-bundle-analyzer ../public/stats.json"
   },
   "private": true,
   "dependencies": {
