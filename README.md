@@ -39,3 +39,17 @@ In Dave Ramsey terminology, a sink fund is simply a category of money that is be
 ### History ###
 Everycent was developed after my wife and I started listening to Dave Ramsey and realised we needed to get our finances in order. We changed how we handled our finances and moved to using one shared account for all household spending, and keeping our personal accounts only for our own personal discretionary expenses. Everything else is allocated in the budget and tracked against those budget allocations so we can see how our household spending goes through the month.
 
+### Preparing a Release ###
+Although the backend API for this app is a Rails app, the UI is built using Angular and does not use the asset pipeline.
+As a result, the frontend static assets must be prepared separately.
+
+This is done by:
+  * first ensuring you have a clean working directory (i.e. all changes committed)
+  * then, running `ng run build` in the `webclientv3` folder to create the static assets in `/public`
+  * then building the v1 assets by running `gulp` in the `webclient` folder
+  * copy `webclient/index.html` and `webclient/fonts` to `public/v1`
+  * then, and then committing the build result using `git add . && git commit -m "build of static assets"`
+  
+The order of the steps is important because the Angular build clears out the v1 static assets,
+so they have to be re-added after. Note that the v1 assets will soon be removed permanently,
+but they are being left in place just in case.

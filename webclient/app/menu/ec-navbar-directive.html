@@ -34,9 +34,9 @@
                    <ul class="dropdown-menu" role="menu">
                         <li> <a ng-click="vm.go('institutions');">Institutions</a> </li>
                         <li> <a ng-click="vm.go('bank-accounts');">Bank Accounts</a> </li>
-                        <li> <a ng-click="vm.go('recurring-incomes');">Recurring Incomes</a> </li>
+                        <li> <a ng-click="vm.go('recurring-incomes');">Recurring Incomes (do not use)</a> </li>
                         <li> <a ng-click="vm.go('allocation-categories');">Allocation Categories</a> </li>
-                        <li> <a ng-click="vm.go('recurring-allocations');">Recurring Allocations</a> </li>
+                        <li> <a ng-click="vm.go('recurring-allocations');">Recurring Allocations (do not use)</a> </li>
                         <li> <a ng-click="vm.go('settings');">Settings</a> </li>
                    </ul>
                    <li ng-class="{ active: vm.isActive('budgets.current')}">
@@ -48,7 +48,7 @@
                    <li ng-class="{ active: vm.isActive('transactions')}">
                        <a ng-click="vm.go('transactions');">Transactions</a>
                    </li>
-                    <li> <a href="/v3/#/">New Version</a> </li>
+                    <li> <a href="/">New Version</a> </li>
 
                     <li ng-class="{ open: vm.newOpen }">
                         <a class="dropdown-toggle"

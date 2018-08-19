@@ -7,7 +7,6 @@ var concatCss = require('gulp-concat-css');
 var htmlmin = require('gulp-htmlmin');
 var templateCache = require('gulp-angular-templatecache');
 var livereload = require('gulp-livereload');
-//var runSequence = require('run-sequence');
 
 // Check programming styles
 gulp.task('jshint', function(){
@@ -18,7 +17,9 @@ gulp.task('jshint', function(){
 });
 
 /*
- * Outputs a compiled file name in format:  'to create a js compiled file named * '../public/js/<%= pkg.name %>-<%= type %>-<%= pkg.version %>.min.js':
+ * Outputs a compiled file name in format:
+   * 'to create a js compiled file named *
+    * '../public/js/v1/<%= pkg.name %>-<%= type %>-<%= pkg.version %>.min.js':
  */
 function compiledFileName(type, suffix){
   return pkg.name + '-' + type + '-' + pkg.version + suffix;
@@ -30,7 +31,7 @@ function ecUglify(src, type){
             //    outSourceMap: true
             //  }))
             .pipe(concat(result, {newLine: ';'}))
-            .pipe(gulp.dest('../public/js'))
+            .pipe(gulp.dest('../public/v1/js'))
             .pipe(livereload())
   ;
 }
@@ -78,7 +79,7 @@ gulp.task('css:vendor', function(){
 
   return gulp.src(src)
       .pipe(concat(result))
-      .pipe(gulp.dest('../public/css'))
+      .pipe(gulp.dest('../public/v1/css'))
   ;
 });
 
@@ -93,14 +94,14 @@ gulp.task('css:vendor', function(){
 
   return gulp.src(src)
       .pipe(concat(result))
-      .pipe(gulp.dest('../public/css'));
+      .pipe(gulp.dest('../public/v1/css'));
 });
 
 gulp.task('css:app', function(){
   var result = compiledFileName('app', '.css');
   return gulp.src('app/**/*.css')
           .pipe(concatCss(result))
-          .pipe(gulp.dest('../public/css'))
+          .pipe(gulp.dest('../public/v1/css'))
           .pipe(livereload())
   ;
 });
@@ -113,7 +114,7 @@ gulp.task('html', function(){
                     root: 'app/',
                     module: pkg.name
             }))
-            .pipe(gulp.dest('../public/js'))
+            .pipe(gulp.dest('../public/v1/js'))
             .pipe(livereload())
   ;
 });
@@ -123,7 +124,7 @@ gulp.task('watch', function(){
   livereload.listen();
 
   // watch for changes to templates
-  gulp.watch(['../public/*.html', 'app/**/*.html'], ['html']);
+  gulp.watch(['../public/v1/*.html', 'app/**/*.html'], ['html']);
 
   // watch for changes to js
   gulp.watch(['app/**/*.js'], ['js:app']);

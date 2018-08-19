@@ -30,7 +30,7 @@ export interface MenuItemConfig {
       <mat-divider></mat-divider>
       <mat-list-item>
         <ec-icon [icon]="Icon.HOME"></ec-icon>
-        <a href="/">Go to Old Version </a>
+        <a href="/v1/">Go to Old Version </a>
       </mat-list-item>
       <mat-divider></mat-divider>
 
