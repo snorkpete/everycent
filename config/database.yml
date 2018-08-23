@@ -17,13 +17,14 @@ default: &default
   username: <%= ENV["PG_USER"] %>
   password: <%= ENV["PG_PASSWORD"] %>
   host: localhost
+  port: 5430
   encoding: UTF8
   pool: 5
   timeout: 5000
 
 development:
   <<: *default
-  database: everycent_dev
+  database: everycent
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
