@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_05_223606) do
+ActiveRecord::Schema.define(version: 2018_08_19_123344) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -224,14 +224,26 @@ ActiveRecord::Schema.define(version: 2018_08_05_223606) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
-  add_foreign_key "allocation_categories", "households"
-  add_foreign_key "allocations", "households"
-  add_foreign_key "bank_accounts", "households"
-  add_foreign_key "budgets", "households"
-  add_foreign_key "incomes", "households"
-  add_foreign_key "institutions", "households"
-  add_foreign_key "settings", "households"
-  add_foreign_key "sink_fund_allocations", "households"
-  add_foreign_key "transactions", "households"
-  add_foreign_key "users", "households"
+  add_foreign_key "allocation_categories", "households", on_update: :cascade
+  add_foreign_key "allocations", "allocation_categories", on_update: :cascade
+  add_foreign_key "allocations", "bank_accounts", on_update: :cascade
+  add_foreign_key "allocations", "budgets", on_update: :cascade
+  add_foreign_key "allocations", "households", on_update: :cascade
+  add_foreign_key "bank_accounts", "households", on_update: :cascade
+  add_foreign_key "bank_accounts", "institutions", on_update: :cascade
+  add_foreign_key "bank_accounts", "users", on_update: :cascade
+  add_foreign_key "budgets", "households", on_update: :cascade
+  add_foreign_key "incomes", "bank_accounts", on_update: :cascade
+  add_foreign_key "incomes", "budgets", on_update: :cascade
+  add_foreign_key "incomes", "households", on_update: :cascade
+  add_foreign_key "institutions", "households", on_update: :cascade
+  add_foreign_key "settings", "bank_accounts", column: "primary_budget_account_id", on_update: :cascade
+  add_foreign_key "settings", "households", on_update: :cascade
+  add_foreign_key "sink_fund_allocations", "bank_accounts", on_update: :cascade
+  add_foreign_key "sink_fund_allocations", "households", on_update: :cascade
+  add_foreign_key "transactions", "allocations", on_update: :cascade
+  add_foreign_key "transactions", "bank_accounts", on_update: :cascade
+  add_foreign_key "transactions", "households", on_update: :cascade
+  add_foreign_key "transactions", "sink_fund_allocations", on_update: :cascade
+  add_foreign_key "users", "households", on_update: :cascade
 end
