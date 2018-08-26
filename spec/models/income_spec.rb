@@ -24,16 +24,17 @@ RSpec.describe Income, :type => :model do
   describe "#update_from_params" do
     before :each do
       @budget = create(:budget)
+      @bank_account = create(:bank_account)
       @first  = @budget.incomes.create(attributes_for(:income))
       @second = @budget.incomes.create(attributes_for(:income))
       @third  = @budget.incomes.create(attributes_for(:income))
 
-      @single_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1 }]
+      @single_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>@bank_account.id }]
 
-      @two_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1},
+      @two_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>@bank_account.id},
                     {"id"=>"", "name"=>"Pat's Salary", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>""}]
 
-      @deleted_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>1},
+      @deleted_params = [{"id"=>@first.id, "name"=>"Kion's Salary", "amount"=>15700, "budget_id"=>@budget.id, "bank_account_id"=>@bank_account.id},
                          {"id"=>"", "name"=>"Pat's Salary", "amount"=>22000, "budget_id"=>@budget.id, "bank_account_id"=>"2"},
                          {"id"=>@third.id, "name"=>"deleted", "amount"=>30000, "budget_id"=>@budget.id, "bank_account_id"=>"1", "deleted"=>true}]
 
