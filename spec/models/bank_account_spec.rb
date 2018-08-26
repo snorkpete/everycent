@@ -44,8 +44,8 @@ RSpec.describe BankAccount, :type => :model do
 
   context "when created" do
     before do
-      today = Date.new(2018, 5, 25)
-      expect(Date).to receive(:today).and_return today
+      @today = Date.new(2018, 5, 25)
+      expect(Date).to receive(:today).and_return @today
     end
 
     let(:bank_account) { create(:bank_account, opening_balance: 4000) }
@@ -55,19 +55,14 @@ RSpec.describe BankAccount, :type => :model do
     end
 
     it "defaults the closing date to the current date" do
-      today = Date.new(2018, 5, 25)
-      expect(Date).to receive(:today).and_return today
-
-      expect(bank_account.closing_date).to eq(today)
+      expect(bank_account.closing_date).to eq(@today)
     end
 
     it "persists these values properly" do
-      today = Date.new(2018, 5, 25)
-      expect(Date).to receive(:today).and_return today
       same_bank_account = BankAccount.find(bank_account.id)
 
       expect(same_bank_account.closing_balance).to eq(4000)
-      expect(same_bank_account.closing_date).to eq(today)
+      expect(same_bank_account.closing_date).to eq(@today)
     end
 
   end
@@ -204,7 +199,7 @@ RSpec.describe BankAccount, :type => :model do
     it "calls #adjust_balance for each bank account that exists"
   end
 
-  fdescribe "#manually_adjust_balance" do
+  describe "#manually_adjust_balance" do
 
     before do
       @today = Date.new(2018, 10, 1)
@@ -384,7 +379,7 @@ RSpec.describe BankAccount, :type => :model do
 
     it "returns false if there are no transactions" do
       expect(@bank_account.transactions.count).to eq 0
-      expect(@bank_account.manual_adjustment_transaction_exists?).to be_falsey
+      expect(@bank_account.manual_adjustment_exists?).to be_falsey
     end
 
     it "return false if there are transactions, but none have the is_adjustment flag" do
@@ -392,16 +387,16 @@ RSpec.describe BankAccount, :type => :model do
                                         deposit_amount: 0,
                                         withdrawal_amount: 150,
                                         transaction_date: @day_after_last_account_close_date,
-                                        is_adjustment: false)
-      expect(@bank_account.manual_adjustment_transaction_exists?).to be_falsey
+                                        is_manual_adjustment: false)
+      expect(@bank_account.manual_adjustment_exists?).to be_falsey
     end
     it "returns true if there is a transaction with the is_adjustment flag" do
       @bank_account.transactions.create(description: 'test',
                                         deposit_amount: 0,
                                         withdrawal_amount: 150,
                                         transaction_date: @day_after_last_account_close_date,
-                                        is_adjustment: true)
-      expect(@bank_account.manual_adjustment_transaction_exists?).to be_truthy
+                                        is_manual_adjustment: true)
+      expect(@bank_account.manual_adjustment_exists?).to be_truthy
     end
   end
 
