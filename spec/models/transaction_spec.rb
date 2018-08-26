@@ -33,18 +33,19 @@ RSpec.describe Transaction, :type => :model do
     before :each do
       @budget = create(:budget, start_date: '2015-01-01')
       @bank_account = create(:bank_account)
-      create(:transaction, description:'inside', transaction_date: '2015-01-10', bank_account_id: @bank_account.id)
-      create(:transaction, description:'outside', transaction_date: '2015-03-01', bank_account_id: @bank_account.id)
+      @allocation = create(:allocation, bank_account: @bank_account)
+      @inside = create(:transaction, description:'inside', transaction_date: '2015-01-10', bank_account_id: @bank_account.id)
+      @outside = create(:transaction, description:'outside', transaction_date: '2015-03-01', bank_account_id: @bank_account.id)
 
       @params = {
         budget_id: @budget.id,
         bank_account_id: @bank_account.id,
         transactions: [
-          { id: @bank_account.id, description: 'first', transaction_date: '2015-01-15',
-            withdrawal_amount: 500, deposit_amount:0, allocation_id: 5 },
+          { id: @inside.id, description: 'first', transaction_date: '2015-01-15',
+            withdrawal_amount: 500, deposit_amount:0, allocation_id: @allocation.id },
 
-          { id: @bank_account.id, description: 'second', transaction_date: '2015-01-09',
-            withdrawal_amount: 0, deposit_amount: 1000, allocation_id: 5 }
+          { id: @outside.id, description: 'second', transaction_date: '2015-01-09',
+            withdrawal_amount: 0, deposit_amount: 1000, allocation_id: @allocation.id }
         ]
       }
     end
