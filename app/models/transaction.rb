@@ -19,6 +19,7 @@
 #  status                  :string
 #  brought_forward_status  :string
 #  household_id            :bigint(8)
+#  is_manual_adjustment    :boolean          default(FALSE)
 #
 
 class Transaction < ApplicationRecord
@@ -122,7 +123,9 @@ class Transaction < ApplicationRecord
   end
 
   def net_amount
-    deposit_amount - withdrawal_amount
+    deposit = deposit_amount || 0
+    withdrawal = withdrawal_amount || 0
+    deposit - withdrawal
   end
 
   def deposit?

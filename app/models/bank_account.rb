@@ -112,6 +112,76 @@ class BankAccount < ApplicationRecord
     next_budget_to_close.end_date
   end
 
+  def manual_adjustment
+    transactions.where(is_manual_adjustment: true).first
+  end
+
+  def manual_adjustment_exists?
+    self.transactions.where(is_manual_adjustment: true).exists?
+  end
+
+  def current_balance_without_manual_adjustment
+      transaction_list = transactions
+                             .where('transaction_date > ? and is_manual_adjustment = false', closing_date)
+                              .to_a
+
+      new_transaction_total = transaction_list.sum do |transaction|
+        transaction.deposit_amount - transaction.withdrawal_amount
+      end
+
+      closing_balance.to_i + new_transaction_total
+  end
+
+  def manually_adjust_balance(new_balance)
+    existing_adjustment = transactions.where(is_manual_adjustment: true).first
+    if new_balance == current_balance
+      if existing_adjustment && existing_adjustment.net_amount == 0
+        existing_adjustment.destroy
+      end
+      return
+    end
+
+    if existing_adjustment.nil?
+      withdrawal_for_adjustment = 0
+      deposit_for_adjustment = 0
+
+      diff = new_balance - current_balance
+
+      if diff < 0
+        withdrawal_for_adjustment = -1 * diff
+      else
+        deposit_for_adjustment = diff
+      end
+      new_adjustment = transactions.create(description: 'Manual Adjustment',
+                                           is_manual_adjustment: true,
+                                           withdrawal_amount: withdrawal_for_adjustment,
+                                           deposit_amount: deposit_for_adjustment,
+                                           transaction_date: closing_date + 1
+                                           )
+
+    else
+      diff = new_balance - current_balance_without_manual_adjustment
+      if diff == 0
+        existing_adjustment.destroy
+      else
+
+        withdrawal_for_adjustment = 0
+        deposit_for_adjustment = 0
+        if diff < 0
+          withdrawal_for_adjustment = -1 * diff
+        else
+          deposit_for_adjustment = diff
+        end
+        existing_adjustment.withdrawal_amount = withdrawal_for_adjustment
+        existing_adjustment.deposit_amount = deposit_for_adjustment
+        existing_adjustment.save
+
+      end
+    end
+
+
+  end
+
   ##############################
   ### Sink Fund related functions
   ### TODO: possibly move these into their own concern/module

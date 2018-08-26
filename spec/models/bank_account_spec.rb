@@ -43,6 +43,10 @@ RSpec.describe BankAccount, :type => :model do
   end
 
   context "when created" do
+    before do
+      today = Date.new(2018, 5, 25)
+      expect(Date).to receive(:today).and_return today
+    end
 
     let(:bank_account) { create(:bank_account, opening_balance: 4000) }
 
@@ -191,6 +195,214 @@ RSpec.describe BankAccount, :type => :model do
       expect(@sink_fund.sink_fund_allocations.second.amount).to eq 300_00
     end
 
+  end
+
+  describe ".adjust_balances" do
+
+    it "does nothing if no bank_accounts exists"
+
+    it "calls #adjust_balance for each bank account that exists"
+  end
+
+  fdescribe "#manually_adjust_balance" do
+
+    before do
+      @today = Date.new(2018, 10, 1)
+      expect(Date).to receive(:today).and_return(@today)
+      @day_after_last_account_close_date = Date.new(2018, 10, 14)
+
+      @bank_account = create(:bank_account, opening_balance: 300)
+      @existing_transaction = create(:transaction, bank_account: @bank_account,
+                                     withdrawal_amount: 200,
+                                     deposit_amount: 0,
+                                     transaction_date: @day_after_last_account_close_date)
+    end
+
+    context "when new balance = current balance" do
+
+      context "when no adjustment transaction exists" do
+        it "does NOT create a new adjustment transaction" do
+          expect do
+            new_balance = @bank_account.current_balance
+            @bank_account.manually_adjust_balance(new_balance)
+          end.not_to change { Transaction.count }
+        end
+      end
+
+      context "when adjustment transaction already exists" do
+        it "does nothing if the adjustment transaction balance is not-zero" do
+          @bank_account.transactions.create(description: 'a', withdrawal_amount: 100, deposit_amount: 0,
+                                            transaction_date: @day_after_last_account_close_date,
+                                            is_manual_adjustment: true )
+          new_balance = @bank_account.current_balance
+          expect do
+            @bank_account.manually_adjust_balance(new_balance)
+          end.not_to change { Transaction.count }
+
+        end
+
+        it "removes the adjustment transaction if the transaction net amount is 0 (adjustment transaction is not needed)" do
+          # creating a transaction with 0 net amount
+          @bank_account.transactions.create(description: 'a', withdrawal_amount: 40, deposit_amount: 40,
+                                            transaction_date: @day_after_last_account_close_date,
+                                            is_manual_adjustment: true )
+          new_balance = @bank_account.current_balance
+
+          expect(@bank_account.manual_adjustment_exists?).to be_truthy
+          @bank_account.manually_adjust_balance(new_balance)
+          expect(@bank_account.manual_adjustment_exists?).to be_falsey
+        end
+      end
+
+    end
+
+    context "when new balance is different from current balance" do
+
+      context "when no adjustment transaction exists" do
+        it "creates a new adjustment transaction" do
+          new_balance = @bank_account.current_balance + 500
+
+          expect do
+            @bank_account.manually_adjust_balance(new_balance)
+          end.to change { Transaction.count }.by(1)
+
+          expect(@bank_account.manual_adjustment_exists?).to be_truthy
+          manual_adjustment = @bank_account.manual_adjustment
+          expect(manual_adjustment).not_to be_nil
+        end
+
+        it "makes the adjustment transaction amount = diff between old balance and new balance" do
+          adjustment = 600
+          new_balance = @bank_account.current_balance + adjustment
+          @bank_account.manually_adjust_balance(new_balance)
+
+          expect(@bank_account.manual_adjustment.net_amount).to eq adjustment
+        end
+
+        it "updates the transaction withdrawal amount if the diff is negative" do
+          adjustment = 200
+          new_balance = @bank_account.current_balance - adjustment
+          @bank_account.manually_adjust_balance(new_balance)
+
+          expect(@bank_account.manual_adjustment.withdrawal_amount).to eq adjustment
+          expect(@bank_account.manual_adjustment.deposit_amount).to eq 0
+        end
+
+        it "updates the transaction deposit amount if the diff is positive" do
+          adjustment = 200
+          new_balance = @bank_account.current_balance + adjustment
+          @bank_account.manually_adjust_balance(new_balance)
+
+          expect(@bank_account.manual_adjustment.withdrawal_amount).to eq 0
+          expect(@bank_account.manual_adjustment.deposit_amount).to eq adjustment
+        end
+
+        it "makes the adjustment date equal to day after the closing date" do
+          not_important_value = 4
+          @bank_account.manually_adjust_balance(not_important_value)
+          expect(@bank_account.manual_adjustment.transaction_date).to eq @bank_account.closing_date + 1
+        end
+      end
+
+      context "when adjustment transaction already exists" do
+        before do
+          @manual_adjustment_amount = 60
+          @bank_account.transactions.create(description: 'Manual Adjustment',
+                                            deposit_amount: @manual_adjustment_amount,
+                                            transaction_date: @day_after_last_account_close_date,
+                                            is_manual_adjustment: true )
+        end
+
+        context "diff is equal to adjustment transaction balance" do
+          it "removes the adjustment transaction" do
+            new_balance = @bank_account.current_balance - @manual_adjustment_amount
+            @bank_account.manually_adjust_balance(new_balance)
+            expect(@bank_account.manual_adjustment).to be_nil
+          end
+        end
+
+        context "diff is different to adjustment transaction balance" do
+          it "does not create a new adjustment transaction nor remove the existing transaction" do
+            some_other_random_amount = 35
+            new_balance = @bank_account.current_balance + @manual_adjustment_amount + some_other_random_amount
+
+            expect do
+              @bank_account.manually_adjust_balance(new_balance)
+            end.not_to change { Transaction.count }
+          end
+
+          it "updates the existing transaction amount" do
+            # This setup is a bit confusing, so adding some extra validating expectations
+            # to explain the current status quo
+            #
+            #   current balance without the adjustment is 100,
+            #   manual adjustment is 60
+            #   so current balance is 160
+            expect(@bank_account.current_balance_without_manual_adjustment).to eq 100
+            expect(@bank_account.manual_adjustment.net_amount).to eq 60
+            expect(@bank_account.current_balance).to eq 160
+
+            some_other_random_amount = 35
+            new_balance_difference = some_other_random_amount
+            new_balance = @bank_account.current_balance_without_manual_adjustment + new_balance_difference
+            expect(new_balance).to eq 100 + 35
+
+            @bank_account.manually_adjust_balance(new_balance)
+            expect(@bank_account.manual_adjustment.net_amount).to eq new_balance_difference
+          end
+
+          it "updates the transaction withdrawal amount if the diff < 0" do
+            some_random_amount = 12
+            new_balance = @bank_account.current_balance - some_random_amount
+            @bank_account.manually_adjust_balance(new_balance)
+            expect(@bank_account.manual_adjustment.net_amount).to eq @manual_adjustment_amount - 12
+          end
+
+          it "updates the transaction deposit amount if the diff > 0" do
+            some_random_amount = 13
+            new_balance = @bank_account.current_balance + some_random_amount
+            @bank_account.manually_adjust_balance(new_balance)
+            expect(@bank_account.manual_adjustment.net_amount).to eq @manual_adjustment_amount + 13
+            expect(@bank_account.manual_adjustment.deposit_amount).to eq @manual_adjustment_amount + 13
+            expect(@bank_account.manual_adjustment.withdrawal_amount).to eq 0
+          end
+        end
+      end
+
+    end
+  end
+
+  describe "#adjustment_transaction_exists?" do
+
+    before do
+      @today = Date.new(2018, 10, 1)
+      # expect(Date).to receive(:today).and_return(@today)
+      @day_after_last_account_close_date = Date.new(2018, 10, 14)
+
+      @bank_account = create(:bank_account, opening_balance: 300)
+    end
+
+    it "returns false if there are no transactions" do
+      expect(@bank_account.transactions.count).to eq 0
+      expect(@bank_account.manual_adjustment_transaction_exists?).to be_falsey
+    end
+
+    it "return false if there are transactions, but none have the is_adjustment flag" do
+      @bank_account.transactions.create(description: 'test',
+                                        deposit_amount: 0,
+                                        withdrawal_amount: 150,
+                                        transaction_date: @day_after_last_account_close_date,
+                                        is_adjustment: false)
+      expect(@bank_account.manual_adjustment_transaction_exists?).to be_falsey
+    end
+    it "returns true if there is a transaction with the is_adjustment flag" do
+      @bank_account.transactions.create(description: 'test',
+                                        deposit_amount: 0,
+                                        withdrawal_amount: 150,
+                                        transaction_date: @day_after_last_account_close_date,
+                                        is_adjustment: true)
+      expect(@bank_account.manual_adjustment_transaction_exists?).to be_truthy
+    end
   end
 
   include_examples "CreditCard"
