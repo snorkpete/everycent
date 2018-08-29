@@ -112,6 +112,20 @@ class BankAccount < ApplicationRecord
     next_budget_to_close.end_date
   end
 
+  def self.manually_adjust_balances(adjustments)
+    accounts_to_adjust(adjustments).each_with_index do |account, index|
+      account.manually_adjust_balance(adjustments[index][:new_balance])
+    end
+
+  end
+
+  def self.accounts_to_adjust(adjustments)
+    bank_account_ids = adjustments.map { |a| a[:bank_account_id]}
+    bank_accounts = BankAccount.where(id: bank_account_ids).to_a
+    bank_accounts
+  end
+
+
   def manual_adjustment
     transactions.where(is_manual_adjustment: true).first
   end

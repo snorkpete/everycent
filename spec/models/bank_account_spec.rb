@@ -192,11 +192,69 @@ RSpec.describe BankAccount, :type => :model do
 
   end
 
-  describe ".adjust_balances" do
+  describe ".manually_adjust_balances", focus: true do
 
-    it "does nothing if no bank_accounts exists"
+    before do
+      @today = Date.new(2018, 10, 1)
+      allow(Date).to receive(:today).and_return(@today)
+      @day_after_last_account_close_date = Date.new(2018, 10, 14)
+    end
 
-    it "calls #adjust_balance for each bank account that exists"
+    it "calls #manually_adjust_balance for each bank account in the list" do
+      @first_account = create(:bank_account, opening_balance: 40)
+      @second_account = create(:bank_account, opening_balance: 120)
+
+      params = [
+          { bank_account_id: @first_account.id, new_balance: 200 },
+          { bank_account_id: @second_account.id, new_balance: 80 }
+      ]
+
+      expect(BankAccount).to receive(:accounts_to_adjust)
+                               .with(params)
+                               .and_return([@first_account, @second_account])
+
+      BankAccount.manually_adjust_balances(params)
+      expect(@first_account.current_balance).to eq 200
+      expect(@second_account.current_balance).to eq 80
+    end
+
+    it "handles an empty list without throwing an error" do
+      expect do
+        BankAccount.manually_adjust_balances([])
+      end.not_to raise_error
+    end
+
+    it "handles invalid bank_account_ids without throwing an error" do
+      expect do
+        non_existent_bank_account_id = 333
+        BankAccount.manually_adjust_balances([{ bank_account_id: non_existent_bank_account_id, new_balance: 5}])
+      end.not_to raise_error
+
+    end
+
+  end
+
+  describe "#manually_adjust_balance with no transactions" do
+    before do
+      @today = Date.new(2018, 10, 1)
+      allow(Date).to receive(:today).and_return(@today)
+      @day_after_last_account_close_date = Date.new(2018, 10, 14)
+      @opening_balance = 300
+      @bank_account = create(:bank_account, opening_balance: @opening_balance)
+
+      @new_balance = 500
+      @bank_account.manually_adjust_balance(@new_balance)
+    end
+
+    it "creates a single transaction" do
+      expect(@bank_account.transactions.count).to eq 1
+    end
+
+    it "has a manually adjusted amount equal to difference of new balance and current balance" do
+      expect(@bank_account.current_balance).to eq @new_balance
+      expect(@bank_account.manual_adjustment).to be_truthy
+      expect(@bank_account.manual_adjustment.net_amount).to eq @new_balance - @opening_balance
+    end
   end
 
   describe "#manually_adjust_balance" do
