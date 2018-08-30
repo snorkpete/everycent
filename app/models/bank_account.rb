@@ -117,12 +117,13 @@ class BankAccount < ApplicationRecord
       account.manually_adjust_balance(adjustments[index][:new_balance])
     end
 
+    # TODO: do we collect errors?
+    true
   end
 
   def self.accounts_to_adjust(adjustments)
     bank_account_ids = adjustments.map { |a| a[:bank_account_id]}
-    bank_accounts = BankAccount.where(id: bank_account_ids).to_a
-    bank_accounts
+    BankAccount.where(id: bank_account_ids)
   end
 
 

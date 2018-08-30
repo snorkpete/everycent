@@ -38,6 +38,15 @@ class BankAccountsController < ApplicationController
     respond_with(@bank_account, BankAccountSerializer)
   end
 
+  def manually_adjust_balances
+    result = BankAccount.manually_adjust_balances(params)
+    if result
+      render json: { success: true }
+    else
+      render json: { success: false }, status: 400
+    end
+  end
+
   def destroy
     @bank_account.destroy
     respond_with(@bank_account, BankAccountSerializer)

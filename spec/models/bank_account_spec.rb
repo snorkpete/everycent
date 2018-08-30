@@ -192,7 +192,7 @@ RSpec.describe BankAccount, :type => :model do
 
   end
 
-  describe ".manually_adjust_balances", focus: true do
+  describe ".manually_adjust_balances" do
 
     before do
       @today = Date.new(2018, 10, 1)
