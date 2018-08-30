@@ -27,6 +27,7 @@
 
 require 'rails_helper'
 
+require 'models/shared_examples/credit_card_spec'
 RSpec.describe BankAccount, :type => :model do
   before do
     @household = create(:household)
