@@ -38,7 +38,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :bank_accounts, except: [:new, :edit]
+  resources :bank_accounts, except: [:new, :edit] do
+    collection do
+      post 'manually_adjust_balance'
+    end
+  end
 
   resources :sink_fund_allocations, only: [:index]
   resources :allocation_categories, except: [:new, :edit]
