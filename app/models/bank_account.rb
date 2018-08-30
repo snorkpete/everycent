@@ -54,16 +54,6 @@ class BankAccount < ApplicationRecord
     # save
   end
 
-  def statement_day_ordinal
-    return '' if statement_day.nil?
-    statement_day.ordinalize
-  end
-
-  def payment_due_day_ordinal
-    return '' if payment_due_day.nil?
-    payment_due_day.ordinalize
-  end
-
   def self.account_category_order
     order("CASE when account_category='current' THEN 1 ELSE 2 END, account_category, name")
   end
