@@ -24,16 +24,16 @@ module ManualBalanceAdjustments
 
   # instance methods go here
 
-  def manual_adjustment_transactions
+  def current_manual_adjustment_transactions
     transactions.where('is_manual_adjustment=true and transaction_date > ?', closing_date)
   end
 
-  def manual_adjustment
-    manual_adjustment_transactions.first
+  def current_manual_adjustment
+    current_manual_adjustment_transactions.first
   end
 
-  def manual_adjustment_exists?
-    manual_adjustment_transactions.exists?
+  def current_manual_adjustment_exists?
+    current_manual_adjustment_transactions.exists?
   end
 
   def current_balance_without_manual_adjustment
