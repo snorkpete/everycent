@@ -84,10 +84,13 @@ shared_examples_for "ManualBalanceAdjustments" do
 
       context "when no adjustment transaction exists" do
         it "does NOT create a new adjustment transaction" do
+          new_balance = @bank_account.current_balance
           expect do
-            new_balance = @bank_account.current_balance
-            @bank_account.manually_adjust_balance(new_balance)
+            @bank_account.manually_adjust_balance(new_balance )
           end.not_to change { Transaction.count }
+
+          expect(@bank_account.manual_adjustment).to be_nil
+          expect(@bank_account.current_balance).to eq new_balance
         end
       end
 
