@@ -18,22 +18,18 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
+        <li>Add "Adjust Account Balances" function -> check Account Balances screen</li>
         <li>Add setting to allow for single person usage</li>
         <li>Add republic bank imports</li>
         <li>Add fixed headers to the transaction and budget edit view</li>
         <li>Allow adding of new incomes/allocations when editing across multiple budgets</li>
-        <li>Fix the display of the login screen (no longer shows the menu)</li>
-        <li>Fix the import of ABN AMRO credit cards</li>
-        <li>Fix the handling of the paid status when updating transactions</li>
-        <li>Implement mass editing of allocations across multiple budgets</li>
-        <li>Implement mass editing of incomes across multiple budgets</li>
       </ul>
 
       <h3>Note</h3>
       <div>
         All important features from the 'Old version' have now been implemented.
         There should be no need to go back to the old version. <br/>
-        Please report if there is anything missing from the new version
+        The old version is close to being removed
       </div>
 
       <h3>Still outstanding</h3>
