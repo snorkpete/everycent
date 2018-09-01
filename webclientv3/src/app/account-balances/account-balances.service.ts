@@ -1,6 +1,10 @@
 import { Injectable } from "@angular/core";
 import { ApiGateway } from "../../api/api-gateway.service";
 import { Observable } from "rxjs";
+import {
+  BankAccountAdjustmentData,
+  BankAccountAdjustmentsParams
+} from "./bank-account-adjustment.model";
 import { BankAccountData } from "./bank-account.model";
 
 @Injectable()
@@ -27,6 +31,21 @@ export class AccountBalancesService {
     });
 
     return net;
+  }
+
+  adjustAccountBalances(
+    adjustments: BankAccountAdjustmentsParams
+  ): Observable<boolean> {
+    // TODO: not sure i want to do this here
+    // but there seems to be something weird with the API
+
+    adjustments.adjustments = adjustments.adjustments.filter(
+      a => a.new_balance !== a.currentBalance
+    );
+    return this.apiGateway.post(
+      "/bank_accounts/manually_adjust_balances",
+      adjustments
+    );
   }
 
   totalAssets(bankAccounts: BankAccountData[]) {

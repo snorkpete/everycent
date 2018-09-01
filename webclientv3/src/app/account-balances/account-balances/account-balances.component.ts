@@ -1,6 +1,11 @@
 import { Component, OnInit } from "@angular/core";
+import { MatDialog, MatDialogRef } from "@angular/material";
+import { switchMap } from "rxjs/operators";
+import { BudgetMassEditFormComponent } from "../../budgets/future-budgets/mass-edit/budget-mass-edit-form.component";
+import { MessageService } from "../../message-display/message.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { AccountBalancesService } from "../account-balances.service";
+import { AdjustBalancesComponent } from "../adjust-balances/adjust-balances.component";
 import { BankAccountData } from "../bank-account.model";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 
@@ -15,16 +20,29 @@ import { MatSlideToggleChange } from "@angular/material/slide-toggle";
     ec-account-list {
       margin-bottom: 5px;
     }
+
+      .button-row {
+        margin-top: 15px;
+        margin-bottom: 15px;
+      }
   `
   ],
   template: `
     <mat-card class="main">
       <mat-card-content>
         <div fxLayout="column">
-          <mat-slide-toggle fxFlexAlign="end end" [checked]="false"
-                            (change)="onIncludeClosedChanged($event)">
-            Include Closed Accounts?
-          </mat-slide-toggle>
+          <div class="button-row" fxLayoutAlign="space-between" >
+            <mat-slide-toggle fxFlexAlign="center end" [checked]="false"
+                              (change)="onIncludeClosedChanged($event)">
+              Include Closed Accounts?
+            </mat-slide-toggle>
+            <button mat-raised-button
+                    color="primary"
+                    class="adjust-balances"
+                    (click)="showAdjustAccountBalancesForm()">
+              Adjust Account Balances
+            </button>
+          </div>
           <ec-account-list [bankAccounts]="currentAccounts" heading="Current Accounts"></ec-account-list>
           <ec-account-list [bankAccounts]="cashAssetAccounts" heading="Cash Assets"></ec-account-list>
           <ec-account-list [bankAccounts]="nonCashAssetAccounts" heading="Non Cash Assets"></ec-account-list>
@@ -57,9 +75,13 @@ export class AccountBalancesComponent implements OnInit {
 
   includeClosedAccounts = false;
 
+  dialogRef: MatDialogRef<AdjustBalancesComponent>;
+
   constructor(
     private toolbarService: MainToolbarService,
-    private accountBalancesService: AccountBalancesService
+    public accountBalancesService: AccountBalancesService,
+    public dialog: MatDialog,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -110,5 +132,26 @@ export class AccountBalancesComponent implements OnInit {
         bankAccount.account_category === "liability" && !bankAccount.is_cash
       );
     });
+  }
+
+  showAdjustAccountBalancesForm() {
+    this.dialogRef = this.dialog.open(AdjustBalancesComponent, {
+      maxHeight: 600
+    });
+
+    const form = this.dialogRef.componentInstance;
+    form.bankAccounts = this.bankAccounts;
+
+    form.save
+      .pipe(
+        switchMap(budgetAdjustments =>
+          this.accountBalancesService.adjustAccountBalances(budgetAdjustments)
+        )
+      )
+      .subscribe(result => {
+        this.messageService.setMessage("Balances adjusted.");
+        this.refreshBankAccountList();
+        this.dialogRef.close();
+      });
   }
 }
