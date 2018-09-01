@@ -40,7 +40,7 @@ Rails.application.routes.draw do
 
   resources :bank_accounts, except: [:new, :edit] do
     collection do
-      post 'manually_adjust_balance'
+      post 'manually_adjust_balances'
     end
   end
 

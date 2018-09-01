@@ -39,7 +39,7 @@ class BankAccountsController < ApplicationController
   end
 
   def manually_adjust_balances
-    result = BankAccount.manually_adjust_balances(params)
+    result = BankAccount.manually_adjust_balances(params[:adjustments])
     if result
       render json: { success: true }
     else
