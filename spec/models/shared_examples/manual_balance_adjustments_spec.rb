@@ -241,8 +241,9 @@ shared_examples_for "ManualBalanceAdjustments" do
 
     before do
       @today = Date.new(2018, 10, 1)
-      # expect(Date).to receive(:today).and_return(@today)
+      expect(Date).to receive(:today).and_return(@today)
       @day_after_last_account_close_date = Date.new(2018, 10, 14)
+      @day_before_last_account_close_date = Date.new(2018, 9, 25)
 
       @bank_account = create(:bank_account, opening_balance: 300)
     end
@@ -267,6 +268,14 @@ shared_examples_for "ManualBalanceAdjustments" do
                                         transaction_date: @day_after_last_account_close_date,
                                         is_manual_adjustment: true)
       expect(@bank_account.manual_adjustment_exists?).to be_truthy
+    end
+    it "returns false if there is a transaction with the is_adjustment flag before the closing date" do
+      @bank_account.transactions.create(description: 'test',
+                                        deposit_amount: 0,
+                                        withdrawal_amount: 150,
+                                        transaction_date: @day_before_last_account_close_date,
+                                        is_manual_adjustment: true)
+      expect(@bank_account.manual_adjustment_exists?).to be_falsey
     end
   end
 
