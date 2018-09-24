@@ -1,9 +1,11 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from "@angular/core";
 
 @Injectable()
 export class MainToolbarService {
   private _showToolbar = true;
   private _heading: string;
+
+  private _householdName = "";
 
   isToolbarVisible(): boolean {
     return this._showToolbar;
@@ -25,4 +27,12 @@ export class MainToolbarService {
     return this._heading;
   }
 
+  getHouseholdInfo(): any {
+    return (this._householdName = localStorage.getItem("householdName"));
+  }
+
+  setHouseholdInfo(newInfo: any) {
+    this._householdName = JSON.stringify(newInfo);
+    localStorage.setItem("householdName", this._householdName);
+  }
 }

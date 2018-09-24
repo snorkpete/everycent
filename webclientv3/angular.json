@@ -21,6 +21,7 @@
               "src/favicon.ico"
             ],
             "styles": [
+              "src/assets/fonts/material-icons/material-icons.css",
               "src/styles.css"
             ],
             "scripts": []
