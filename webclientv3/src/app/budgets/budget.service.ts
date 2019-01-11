@@ -102,6 +102,9 @@ export class BudgetService {
       return;
     }
 
+    // ensure that if we don't have any existing allocations for a category,
+    // that we create a 'dummy allocation' that will still allow the category
+    // to be in the list of allocations
     allocationCategories.forEach(category => {
       let found = allocations.find(
         allocation => category.id === allocation.allocation_category_id
