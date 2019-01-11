@@ -18,6 +18,7 @@ import { HomeService } from "./home.service";
 
       <h1>Recent Updates and Fixes</h1>
       <ul>
+        <li>Add Must Have Classification to Allocations</li>
         <li>Add "Adjust Account Balances" function -> check Account Balances screen</li>
         <li>Add setting to allow for single person usage</li>
         <li>Add republic bank imports</li>
