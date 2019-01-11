@@ -69,11 +69,17 @@ import { BudgetService } from "../../budget.service";
         <th mat-header-cell *matHeaderCellDef style="width:10%;" class="center"> Class</th>
         <td mat-cell *matCellDef="let allocation">
 
-          <ec-list-field [editMode]="editMode"
-                         [items]="allocationClasses"
-                         [centerText]="true"
-                         [(ngModel)]="allocation.allocation_class">
-          </ec-list-field>
+          <span class="text-display" *ngIf="editMode; else textDisplay">
+              <select [(ngModel)]="allocation.allocation_class">
+                  <option *ngFor="let item of allocationClasses; trackBy: trackById" [value]="item.id">
+                    {{item.name}}
+                  </option>
+              </select>
+          </span>
+
+          <ng-template #textDisplay>
+              <span class="value">{{ allocation.allocation_class | titlecase }}</span>
+          </ng-template>
         </td>
         <td mat-footer-cell *matFooterCellDef>
         </td>
@@ -217,9 +223,15 @@ import { BudgetService } from "../../budget.service";
       display: flex;
       justify-content: space-between;
     }
+
     .value {
+      width: 100%;
       text-align: center;
+      display: inline-block;
+      font-family: Roboto,"Helvetica Neue",sans-serif;
+      font-size: 12px;
     }
+
     .label {
       border-radius: 5px;
       border: 2px solid grey;
