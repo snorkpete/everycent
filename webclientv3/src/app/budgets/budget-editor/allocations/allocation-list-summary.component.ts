@@ -31,6 +31,34 @@ import { BudgetData } from "../../budget.model";
       </ng-template>
       </tbody>
     </table>
+
+    <h1>Wants Summary</h1>
+    <table class="table">
+      <thead>
+        <tr>
+            <th class="right">Need, Want or Savings</th>
+            <th class="right">Amount</th>
+            <th class="right">Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="right highlight">Needs </td>
+          <td class="right">{{ allocationClassAmount('need') | ecMoney }}</td>
+          <td class="right">{{ allocationClassPercentage('need') | ecMoney }}</td>
+        </tr>
+        <tr>
+          <td class="right highlight">Wants </td>
+          <td class="right">{{ allocationClassAmount('want') | ecMoney }}</td>
+          <td class="right">{{ allocationClassPercentage('want') | ecMoney }}</td>
+        </tr>
+        <tr>
+          <td class="right highlight"> Savings </td>
+          <td class="right">{{ allocationClassAmount('savings') | ecMoney }}</td>
+          <td class="right">{{ allocationClassPercentage('savings') | ecMoney }}</td>
+        </tr>
+      </tbody>
+    </table>
   `,
   styles: [
     `
@@ -64,6 +92,26 @@ export class AllocationListSummaryComponent implements OnInit {
     return (
       total(this.budget.incomes, "amount") -
       total(this.budget.allocations, "amount")
+    );
+  }
+
+  allocationClassAmount(allocationClass: string) {
+    let allocations = (this.budget && this.budget.allocations) || [];
+    return total(
+      allocations.filter(a => a.allocation_class === allocationClass),
+      "amount"
+    );
+  }
+  allocationClassPercentage(allocationClass: string) {
+    let allocations = (this.budget && this.budget.allocations) || [];
+    return (
+      total(
+        allocations.filter(a => a.allocation_class === allocationClass),
+        "amount"
+      ) /
+      total(this.budget.incomes, "amount") *
+      100.0 *
+      100.0
     );
   }
 }
