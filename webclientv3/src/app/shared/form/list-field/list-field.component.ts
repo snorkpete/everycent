@@ -35,6 +35,9 @@ import { groupBy } from "lodash";
     .text-display:focus-within .label{
       color: #673ab7;
     }
+    .center {
+      text-align: center;
+    }
   `
   ],
   template: `
@@ -65,10 +68,10 @@ import { groupBy } from "lodash";
         </select>
     </span>
 
-    <ng-template #textDisplay >
+    <ng-template #textDisplay>
       <span class="text-display">
         <span class="label">{{placeholder}}</span>
-        <span class="value">{{displayValue}}</span>
+        <span class="value" [class.center]="centerText">{{displayValue}}</span>
       </span>
     </ng-template>
   `,
@@ -106,6 +109,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
 
   @Input() editMode = false;
   @Input() placeholder = "";
+  @Input() centerText = false;
   private _selectedItem: any = {};
 
   groups: any[];

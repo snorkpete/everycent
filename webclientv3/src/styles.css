@@ -18,6 +18,10 @@ mat-card.main, mat-sidenav-container.main {
   text-align: right;
 }
 
+.center, th.mat-header-cell.center {
+  text-align: center;
+}
+
 .closed {
   background-color: rgba(33, 33, 33, 0.3);
 }
