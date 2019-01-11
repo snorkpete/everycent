@@ -26,7 +26,7 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Amount Column -->
       <ng-container matColumnDef="amount">
-        <th mat-header-cell *matHeaderCellDef style="width:15%;" class="right"> Amount </th>
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right"> Amount </th>
         <td mat-cell *matCellDef="let allocation" class="right">
           <ec-money-field [(ngModel)]="allocation.amount" [editMode]="editMode"></ec-money-field>
         </td>
@@ -37,7 +37,7 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Spent Column -->
       <ng-container matColumnDef="spent">
-        <th mat-header-cell *matHeaderCellDef style="width:15%;" class="right"> Spent </th>
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right"> Spent </th>
         <td mat-cell *matCellDef="let allocation" class="right">
           <div fxLayout="row" fxLayoutAlign="start center">
             <ec-icon [icon]="Icon.SHOW_TRANSACTIONS"
@@ -55,7 +55,7 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Remaining Column -->
       <ng-container matColumnDef="remaining">
-        <th mat-header-cell *matHeaderCellDef style="width:15%;" class="right"> Remaining </th>
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right"> Remaining </th>
         <td mat-cell *matCellDef="let allocation" class="right">
           <ec-money-field [value]="allocation.amount - allocation.spent" [highlightPositive]="true"></ec-money-field>
         </td>
@@ -64,9 +64,40 @@ import { BudgetService } from "../../budget.service";
         </td>
       </ng-container>
 
+      <!-- Allocation Class Column -->
+      <ng-container matColumnDef="allocationClass">
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="center"> Class</th>
+        <td mat-cell *matCellDef="let allocation">
+
+          <ec-list-field [editMode]="editMode"
+                         [items]="allocationClasses"
+                         [centerText]="true"
+                         [(ngModel)]="allocation.allocation_class">
+          </ec-list-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef>
+        </td>
+      </ng-container>
+
+      <!-- Is Fixed Amount Column -->
+      <ng-container matColumnDef="isFixedAmount">
+        <th mat-header-cell *matHeaderCellDef style="width:5%;" class="center">Fixed Amount?</th>
+        <td mat-cell *matCellDef="let allocation">
+
+          <mat-checkbox *ngIf="editMode; else textDisplay"
+                        color="primary" [(ngModel)]="allocation.is_fixed_amount">
+          </mat-checkbox>
+
+          <ng-template #textDisplay>
+            <span class="value">{{ (allocation.is_fixed_amount ? 'Yes' : 'No') }}</span>
+          </ng-template>
+        </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
       <!-- Comment Column -->
       <ng-container matColumnDef="comment">
-        <th mat-header-cell *matHeaderCellDef style="width:25%;"> Comment </th>
+        <th mat-header-cell *matHeaderCellDef style="width:25%;"> Comment</th>
         <td mat-cell *matCellDef="let allocation">
           <ec-text-field [(ngModel)]="allocation.comment" [editMode]="editMode"></ec-text-field>
         </td>
@@ -79,11 +110,11 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Action Column -->
       <ng-container matColumnDef="action">
-        <th mat-header-cell *matHeaderCellDef style="width:5%;"> </th>
+        <th mat-header-cell *matHeaderCellDef style="width:5%;"></th>
         <td mat-cell *matCellDef="let allocation">
           <ec-delete-button [item]="allocation" [editMode]="editMode"></ec-delete-button>
         </td>
-        <td mat-footer-cell *matFooterCellDef> </td>
+        <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
 
       <!-- CATEGORY COLUMNS -->
@@ -115,16 +146,16 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Category Remaining Column -->
       <ng-container matColumnDef="categoryRest">
-        <td mat-cell *matCellDef="let allocation" class="right" colspan="2">
+        <td mat-cell *matCellDef="let allocation" class="right" colspan="4">
         </td>
       </ng-container>
 
       <!-- Add Allocation Column -->
       <ng-container matColumnDef="addAllocation">
-        <td mat-cell *matCellDef="let allocation; let dataIndex=dataIndex;" colspan="6">
+        <td mat-cell *matCellDef="let allocation; let dataIndex=dataIndex;" colspan="8">
           <div class="category-button" *ngIf="editMode">
             <button mat-raised-button color="primary"
-                   (click)="addAllocation(allocation.allocation_category_id, dataIndex)">
+                    (click)="addAllocation(allocation.allocation_category_id, dataIndex)">
               Add {{allocation.allocationCategory}} Allocation
             </button>
           </div>
@@ -137,7 +168,7 @@ import { BudgetService } from "../../budget.service";
       <tr mat-row *matRowDef="let allocation; columns: categoryColumns; when: showCategoryRow; " class="heading"></tr>
       <tr mat-row *matRowDef="let allocation; columns: displayedColumns; when: showAllocationRow;"
           [ecHighlightDeletedFor]="allocation"></tr>
-      <tr mat-row *matRowDef="let allocation; columns: ['addAllocation']; when: showAddAllocationRow;" ></tr>
+      <tr mat-row *matRowDef="let allocation; columns: ['addAllocation']; when: showAddAllocationRow;"></tr>
 
       <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true" class="footer"></tr>
     </table>
@@ -186,6 +217,9 @@ import { BudgetService } from "../../budget.service";
       display: flex;
       justify-content: space-between;
     }
+    .value {
+      text-align: center;
+    }
     .label {
       border-radius: 5px;
       border: 2px solid grey;
@@ -216,6 +250,8 @@ export class AllocationListComponent implements OnInit {
     "amount",
     "spent",
     "remaining",
+    "allocationClass",
+    "isFixedAmount",
     "comment",
     "action"
   ];
@@ -226,6 +262,12 @@ export class AllocationListComponent implements OnInit {
     "categorySpent",
     "categoryRemaining",
     "categoryRest"
+  ];
+
+  allocationClasses = [
+    { id: "want", name: "Want" },
+    { id: "need", name: "Need" },
+    { id: "savings", name: "Savings" }
   ];
 
   constructor(

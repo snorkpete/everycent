@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_26_175515) do
+ActiveRecord::Schema.define(version: 2019_01_11_054730) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,8 @@ ActiveRecord::Schema.define(version: 2018_08_26_175515) do
     t.datetime "updated_at", null: false
     t.string "comment"
     t.bigint "household_id"
+    t.string "allocation_class", default: "want"
+    t.boolean "is_fixed_amount", default: false
     t.index ["allocation_category_id"], name: "index_allocations_on_allocation_category_id"
     t.index ["bank_account_id"], name: "index_allocations_on_bank_account_id"
     t.index ["budget_id"], name: "index_allocations_on_budget_id"

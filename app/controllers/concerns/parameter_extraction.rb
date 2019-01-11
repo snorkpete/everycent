@@ -14,6 +14,6 @@ module ParameterExtraction
   def extract_allocation_params(input_params)
     input_params.permit(:allocations => [
       :id, :name, :amount, :budget_id, :allocation_category_id, :allocation_type, :is_standing_order,
-      :bank_account_id, :budget_id, :deleted, :comment]).require(:allocations)
+      :bank_account_id, :budget_id, :deleted, :comment, :allocation_class, :is_fixed_amount]).require(:allocations)
   end
 end
