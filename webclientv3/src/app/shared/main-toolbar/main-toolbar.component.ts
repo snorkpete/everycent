@@ -1,13 +1,15 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {MainToolbarService} from './main-toolbar.service';
-import {Icon} from '../ec-icon/icon.type';
+import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { MainToolbarService } from "./main-toolbar.service";
+import { Icon } from "../ec-icon/icon.type";
 
 @Component({
-  selector: 'ec-main-toolbar',
-  styles: [`
+  selector: "ec-main-toolbar",
+  styles: [
+    `
     .heading {
     }
-  `],
+  `
+  ],
   template: `
     <mat-toolbar color="primary" *ngIf="toolbarService.isToolbarVisible()" class="menu-bar">
         <mat-toolbar-row>
@@ -29,19 +31,16 @@ import {Icon} from '../ec-icon/icon.type';
         </mat-toolbar-row>
 
     </mat-toolbar>
-  `,
+  `
 })
 export class MainToolbarComponent implements OnInit {
-
   @Output() openMenu = new EventEmitter();
   Icon = Icon;
 
-  constructor(
-    public toolbarService: MainToolbarService
-  ) { }
+  constructor(public toolbarService: MainToolbarService) {}
 
   ngOnInit() {
-    this.toolbarService.setHeading('Welcome to EveryCent');
+    this.toolbarService.setHeading("Welcome to EveryCent");
   }
 
   getMainHeading(): string {
