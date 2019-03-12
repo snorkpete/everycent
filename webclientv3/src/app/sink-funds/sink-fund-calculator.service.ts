@@ -24,7 +24,12 @@ export class SinkFundCalculator {
   }
 
   totalOutstanding(sinkFund: SinkFundData): number {
-    return this.totalAssignedBalance(sinkFund) - this.totalTarget(sinkFund);
+    return (
+      total(
+        this.sinkFundAllocationsOf(sinkFund).filter(a => a.target > 0),
+        "current_balance"
+      ) - this.totalTarget(sinkFund)
+    );
   }
 
   totalAssignedBalance(sinkFund: SinkFundData): number {
