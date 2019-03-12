@@ -17,7 +17,10 @@ export class SinkFundCalculator {
   }
 
   totalTarget(sinkFund: SinkFundData): number {
-    return total(this.sinkFundAllocationsOf(sinkFund), 'target');
+    return total(
+      this.sinkFundAllocationsOf(sinkFund).filter(a => a.target > 0),
+      "target"
+    );
   }
 
   totalOutstanding(sinkFund: SinkFundData): number {
