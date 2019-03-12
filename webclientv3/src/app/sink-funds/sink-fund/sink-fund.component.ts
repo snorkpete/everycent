@@ -116,7 +116,8 @@ import { SinkFundService } from "../sink-fund.service";
                       <ec-money-field [(ngModel)]="allocation.target" [editMode]="isEditMode"></ec-money-field>
                     </td>
                     <td class="right">
-                      <ec-money-field [value]="allocation.current_balance-allocation.target" highlightPositive="true">
+                      <ec-money-field [value]="allocation.target == 0 ? 0 : allocation.current_balance-allocation.target"
+                                      highlightPositive="true">
                       </ec-money-field>
                     </td>
                     <td>
