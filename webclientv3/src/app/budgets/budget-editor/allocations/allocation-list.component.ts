@@ -1,3 +1,4 @@
+import { MediaMatcher } from "@angular/cdk/layout";
 import { Component, Input, OnInit, ViewChild } from "@angular/core";
 import { MatDialog, MatDialogRef, MatTable } from "@angular/material";
 import { CompactTransactionListComponent } from "../../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
@@ -151,14 +152,20 @@ import { BudgetService } from "../../budget.service";
       </ng-container>
 
       <!-- Category Remaining Column -->
-      <ng-container matColumnDef="categoryRest">
+      <ng-container matColumnDef="categoryRestDesktop">
         <td mat-cell *matCellDef="let allocation" class="right" colspan="4">
+        </td>
+      </ng-container>
+
+      <!-- Category Remaining Column -->
+      <ng-container matColumnDef="categoryRestMobile">
+        <td mat-cell *matCellDef="let allocation" class="right" colspan="1">
         </td>
       </ng-container>
 
       <!-- Add Allocation Column -->
       <ng-container matColumnDef="addAllocation">
-        <td mat-cell *matCellDef="let allocation; let dataIndex=dataIndex;" colspan="8">
+        <td mat-cell *matCellDef="let allocation; let dataIndex=dataIndex;" [attr.colspan]="nbrColumns">
           <div class="category-button" *ngIf="editMode">
             <button mat-raised-button color="primary"
                     (click)="addAllocation(allocation.allocation_category_id, dataIndex)">
@@ -255,9 +262,35 @@ export class AllocationListComponent implements OnInit {
   @Input() editMode = false;
   @Input() budget: BudgetData;
 
+  nbrColumns = 8;
+
   @ViewChild(MatTable) allocationList: MatTable<AllocationData>;
 
-  displayedColumns: string[] = [
+  DESKTOP_CATEGORY_COLUMNS: string[] = [
+    "categoryName",
+    "categoryAmount",
+    "categorySpent",
+    "categoryRemaining",
+    "categoryRestDesktop"
+  ];
+
+  MOBILE_CATEGORY_COLUMNS: string[] = [
+    "categoryName",
+    "categoryAmount",
+    "categorySpent",
+    "categoryRemaining",
+    "categoryRestMobile"
+  ];
+
+  categoryColumns: string[] = [];
+
+  allocationClasses = [
+    { id: "want", name: "Want" },
+    { id: "need", name: "Need" },
+    { id: "savings", name: "Savings" }
+  ];
+
+  DESKTOP_COLUMNS: string[] = [
     "name",
     "amount",
     "spent",
@@ -267,28 +300,35 @@ export class AllocationListComponent implements OnInit {
     "comment",
     "action"
   ];
+  MOBILE_COLUMNS: string[] = ["name", "amount", "spent", "remaining", "action"];
+  displayedColumns: string[] = [];
 
-  categoryColumns: string[] = [
-    "categoryName",
-    "categoryAmount",
-    "categorySpent",
-    "categoryRemaining",
-    "categoryRest"
-  ];
-
-  allocationClasses = [
-    { id: "want", name: "Want" },
-    { id: "need", name: "Need" },
-    { id: "savings", name: "Savings" }
-  ];
+  mobileQuery: MediaQueryList;
+  private _mobileQueryListener: MediaQueryListListener = query => {
+    if (query.matches) {
+      this.displayedColumns = this.MOBILE_COLUMNS;
+      this.categoryColumns = this.MOBILE_CATEGORY_COLUMNS;
+      this.nbrColumns = 5;
+    } else {
+      this.displayedColumns = this.DESKTOP_COLUMNS;
+      this.categoryColumns = this.DESKTOP_CATEGORY_COLUMNS;
+      this.nbrColumns = 8;
+    }
+  };
 
   constructor(
     private budgetService: BudgetService,
     private transactionService: SharedTransactionService,
-    private dialog: MatDialog
-  ) {}
+    private dialog: MatDialog,
+    private media: MediaMatcher
+  ) {
+    this.mobileQuery = media.matchMedia("(max-width: 600px)");
+    this.mobileQuery.addListener(this._mobileQueryListener);
+  }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this._mobileQueryListener(this.mobileQuery);
+  }
 
   showCategoryRow(index: number, allocation: AllocationData) {
     return allocation.firstInCategory;
@@ -379,5 +419,9 @@ export class AllocationListComponent implements OnInit {
       total(this.budget.incomes, "amount") -
       total(this.budget.allocations, "amount")
     );
+  }
+
+  trackById(index: number, allocation: AllocationData) {
+    return allocation.id;
   }
 }
