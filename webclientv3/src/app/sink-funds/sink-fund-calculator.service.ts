@@ -1,13 +1,14 @@
-import {SinkFundData} from './sink-fund-data.model';
-import {total} from '../util/total';
-import {isNullOrUndefined} from 'util';
-import {SinkFundAllocationData} from './sink-fund-allocation-data.model';
+import { SinkFundData } from "./sink-fund-data.model";
+import { total } from "../util/total";
+import { isNullOrUndefined } from "util";
+import { SinkFundAllocationData } from "./sink-fund-allocation-data.model";
 
 export class SinkFundCalculator {
+  constructor() {}
 
-  constructor() { }
-
-  private sinkFundAllocationsOf(sinkFund: SinkFundData): SinkFundAllocationData[] {
+  private sinkFundAllocationsOf(
+    sinkFund: SinkFundData
+  ): SinkFundAllocationData[] {
     if (isNullOrUndefined(sinkFund)) {
       return [];
     }
@@ -24,7 +25,7 @@ export class SinkFundCalculator {
   }
 
   totalAssignedBalance(sinkFund: SinkFundData): number {
-    return total(this.sinkFundAllocationsOf(sinkFund), 'current_balance');
+    return total(this.sinkFundAllocationsOf(sinkFund), "current_balance");
   }
 
   unassignedBalance(sinkFund: SinkFundData): number {
@@ -41,5 +42,4 @@ export class SinkFundCalculator {
     let allocation = sinkFund.sink_fund_allocations[index];
     return allocation.current_balance - allocation.target;
   }
-
 }
