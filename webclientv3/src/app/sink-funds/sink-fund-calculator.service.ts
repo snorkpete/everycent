@@ -1,10 +1,11 @@
+import { DeactivateService } from "../shared/deactivate-button/deactivate.service";
 import { SinkFundData } from "./sink-fund-data.model";
 import { total } from "../util/total";
 import { isNullOrUndefined } from "util";
 import { SinkFundAllocationData } from "./sink-fund-allocation-data.model";
 
 export class SinkFundCalculator {
-  constructor() {}
+  constructor(public deactivateService: DeactivateService) {}
 
   private sinkFundAllocationsOf(
     sinkFund: SinkFundData
@@ -16,19 +17,27 @@ export class SinkFundCalculator {
     return sinkFund.sink_fund_allocations || [];
   }
 
-  totalTarget(sinkFund: SinkFundData): number {
+  totalTarget(sinkFund: SinkFundData, showDeactivated: boolean): number {
     return total(
-      this.sinkFundAllocationsOf(sinkFund).filter(a => a.target > 0),
+      this.sinkFundAllocationsOf(sinkFund)
+        .filter(a => a.target > 0)
+        .filter(allocation =>
+          this.deactivateService.isItemVisible(allocation, showDeactivated)
+        ),
       "target"
     );
   }
 
-  totalOutstanding(sinkFund: SinkFundData): number {
+  totalOutstanding(sinkFund: SinkFundData, showDeactivated: boolean): number {
     return (
       total(
-        this.sinkFundAllocationsOf(sinkFund).filter(a => a.target > 0),
+        this.sinkFundAllocationsOf(sinkFund)
+          .filter(a => a.target > 0)
+          .filter(allocation =>
+            this.deactivateService.isItemVisible(allocation, showDeactivated)
+          ),
         "current_balance"
-      ) - this.totalTarget(sinkFund)
+      ) - this.totalTarget(sinkFund, showDeactivated)
     );
   }
 
