@@ -138,9 +138,9 @@ import { SinkFundService } from "../sink-fund.service";
               <tr class="total">
                   <td>Total</td>
                   <td><ec-money-field [value]="calculator.totalAssignedBalance(sinkFund)"></ec-money-field></td>
-                  <td><ec-money-field [value]="calculator.totalTarget(sinkFund)"></ec-money-field></td>
+                  <td><ec-money-field [value]="calculator.totalTarget(sinkFund, showDeactivated)"></ec-money-field></td>
 
-                  <td><ec-money-field [value]="calculator.totalOutstanding(sinkFund)"></ec-money-field></td>
+                  <td><ec-money-field [value]="calculator.totalOutstanding(sinkFund, showDeactivated)"></ec-money-field></td>
 
                   <td></td>
                   <td></td>
@@ -174,7 +174,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   Icon = Icon;
   @Input() sinkFund: SinkFundData;
 
-  calculator = new SinkFundCalculator();
+  calculator: SinkFundCalculator;
 
   isSmallScreen: boolean;
   isEditMode = false;
@@ -191,6 +191,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.calculator = new SinkFundCalculator(this.deactivateService);
     this.sinkFund = { sink_fund_allocations: [] };
 
     this.mediaSubscription = this.media.subscribe(() => {

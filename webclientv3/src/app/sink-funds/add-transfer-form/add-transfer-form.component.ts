@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialogRef } from "@angular/material/dialog";
+import { DeactivateService } from "../../shared/deactivate-button/deactivate.service";
 import { SinkFundData } from "../sink-fund-data.model";
 import { SinkFundCalculator } from "../sink-fund-calculator.service";
 import { FormBuilder, FormGroup } from "@angular/forms";
@@ -62,16 +63,18 @@ import { SinkFundService } from "../sink-fund.service";
 })
 export class AddTransferFormComponent implements OnInit {
   @Input() sinkFund: SinkFundData;
-  calculator = new SinkFundCalculator();
+  calculator: SinkFundCalculator;
   transfer: FormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<AddTransferFormComponent>,
     private fb: FormBuilder,
-    private sinkFundService: SinkFundService
+    private sinkFundService: SinkFundService,
+    private deactivateService: DeactivateService
   ) {}
 
   ngOnInit() {
+    this.calculator = new SinkFundCalculator(this.deactivateService);
     this.transfer = this.fb.group({
       existing_allocation_id: 0,
       new_allocation_id: 0,
