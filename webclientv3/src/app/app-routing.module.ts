@@ -31,6 +31,10 @@ const appRoutes: Routes = [
         loadChildren:
           "app/account-balances/account-balances.module#AccountBalancesModule"
       },
+      {
+        path: "reports",
+        loadChildren: "app/reporting/reporting.module#ReportingModule"
+      },
       { path: "setup", loadChildren: "app/setup/setup.module#SetupModule" }
     ]
   }
