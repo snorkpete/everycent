@@ -17,7 +17,7 @@ default: &default
   username: <%= ENV["PG_USER"] %>
   password: <%= ENV["PG_PASSWORD"] %>
   host: localhost
-  port: 5430
+  port: 5432
   encoding: UTF8
   pool: 5
   timeout: 5000
