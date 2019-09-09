@@ -38,7 +38,7 @@ class TransactionsController < ApplicationController
   end
 
   def last_update
-    @transaction = Transaction.order(transaction_date: :desc).first
+    @transaction = Transaction.order(transaction_date: :desc).first || Transaction.new( transaction_date: Date.today)
     respond_with(@transaction, TransactionSerializer)
   end
 
