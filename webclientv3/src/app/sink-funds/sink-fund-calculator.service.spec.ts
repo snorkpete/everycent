@@ -1,5 +1,6 @@
 
 import {SampleSinkFundData} from '../../../test/samples/sample-sink-fund-data';
+import {DeactivateService} from "../shared/deactivate-button/deactivate.service";
 import {SinkFundData} from './sink-fund-data.model';
 import {SinkFundCalculator} from './sink-fund-calculator.service';
 
@@ -16,17 +17,17 @@ describe('SinkFundCalculator', () => {
         {target: 400, current_balance: 400},
       ],
     };
-    calculator = new SinkFundCalculator();
+    calculator = new SinkFundCalculator(new DeactivateService());
   });
 
 
   it('calculates the totalTarget', () => {
-    expect(calculator.totalTarget(sample)).toEqual(2400);
+    expect(calculator.totalTarget(sample, true)).toEqual(2400);
   });
 
   it('#totalCurrentBalance ignores deleted items', () => {
     sample.sink_fund_allocations[1].deleted = true;
-    expect(calculator.totalTarget(sample)).toEqual(900);
+    expect(calculator.totalTarget(sample, true)).toEqual(900);
   });
 
   it('#totalAssignedBalance is the sum of all the allocation balances', () => {
@@ -49,7 +50,7 @@ describe('SinkFundCalculator', () => {
   });
 
   it('#totalOutstanding is the sum of all the outstanding amounts', () => {
-    expect(calculator.totalOutstanding(sample)).toEqual(-1600);
+    expect(calculator.totalOutstanding(sample, true)).toEqual(-1600);
   });
 
 });
