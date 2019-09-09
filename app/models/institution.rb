@@ -15,7 +15,8 @@ class Institution < ApplicationRecord
   validates :name,  presence: true,
                     uniqueness: {
                         case_sensitive: false ,
-                        message: 'Institution already exists.'
+                        message: 'Institution already exists.',
+                        scope: :household_id
                     }
 
   before_save :fix_name

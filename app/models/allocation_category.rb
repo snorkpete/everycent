@@ -18,7 +18,8 @@ class AllocationCategory < ApplicationRecord
   validates :name,  presence: true,
                     uniqueness: {
                         case_sensitive: false ,
-                        message: 'Allocation Category already exists.'
+                        message: 'Allocation Category already exists.',
+                        scope: :household_id
                     }
 
   before_save :fix_name
