@@ -15,18 +15,17 @@ export interface MenuItemConfig {
   selector: "ec-menu",
   styles: [
     `
-    .mat-expansion-panel-header {
-      padding: 0 16px;
-      font-size: 16px;
-    }
-    mat-expansion-panel-header ::ng-deep .mat-content{
-      align-items: center;
-    }
-  `
+      .mat-expansion-panel-header {
+        padding: 0 16px;
+        font-size: 16px;
+      }
+      mat-expansion-panel-header ::ng-deep .mat-content {
+        align-items: center;
+      }
+    `
   ],
   template: `
     <mat-nav-list>
-
       <mat-divider></mat-divider>
       <mat-list-item>
         <ec-icon [icon]="Icon.HOME"></ec-icon>
@@ -34,23 +33,40 @@ export interface MenuItemConfig {
       </mat-list-item>
       <mat-divider></mat-divider>
 
-      <ec-menu-item *ngFor="let menuItem of menuItems"
-                    [icon]="menuItem.icon"
-                    [route]="menuItem.route"
-                    [exactRoute]="menuItem.exact === true"
+      <ec-menu-item
+        *ngFor="let menuItem of menuItems"
+        [icon]="menuItem.icon"
+        [route]="menuItem.route"
+        [exactRoute]="menuItem.exact === true"
       >
         {{ menuItem.displayName }}
       </ec-menu-item>
 
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <ec-icon [icon]="Icon.SETUP"></ec-icon>
-            Setup
+          <ec-icon [icon]="Icon.REPORTING"></ec-icon>
+          Reports
         </mat-expansion-panel-header>
-        <ec-menu-item *ngFor="let menuItem of setupMenuItems"
-                      [icon]="menuItem.icon"
-                      [route]="menuItem.route"
-                      [exactRoute]="menuItem.exact === true"
+        <ec-menu-item
+          *ngFor="let menuItem of reportingMenuItems"
+          [icon]="menuItem.icon"
+          [route]="menuItem.route"
+          [exactRoute]="menuItem.exact === true"
+        >
+          {{ menuItem.displayName }}
+        </ec-menu-item>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <ec-icon [icon]="Icon.SETUP"></ec-icon>
+          Setup
+        </mat-expansion-panel-header>
+        <ec-menu-item
+          *ngFor="let menuItem of setupMenuItems"
+          [icon]="menuItem.icon"
+          [route]="menuItem.route"
+          [exactRoute]="menuItem.exact === true"
         >
           {{ menuItem.displayName }}
         </ec-menu-item>
@@ -126,6 +142,15 @@ export class MenuComponent implements OnInit {
       displayName: "Settings",
       icon: Icon.SETTINGS,
       route: "/setup/settings",
+      exact: false
+    }
+  ];
+
+  reportingMenuItems: MenuItemConfig[] = [
+    {
+      displayName: "Net Worth Report",
+      icon: Icon.NET_WORTH,
+      route: "/reports/net-worth",
       exact: false
     }
   ];

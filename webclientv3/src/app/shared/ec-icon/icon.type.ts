@@ -9,6 +9,10 @@ let Icon = {
   LOGOUT: "account_circle",
   MENU: "menu",
   SETUP: "settings",
+
+  REPORTING: "account_tree",
+  NET_WORTH: "money",
+
   ALLOCATION_CATEGORIES: "category",
   INSTITUTIONS: "work",
   BANK_ACCOUNTS: "payment",
