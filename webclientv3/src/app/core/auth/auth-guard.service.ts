@@ -29,6 +29,7 @@ export class AuthGuard implements CanActivate {
         if (isLoggedIn) {
           return isLoggedIn;
         }
+        throw new Error("not logged in");
       })
       .catch(error => {
         this.messageService.setErrorMessage("Not logged in");
