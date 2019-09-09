@@ -26,9 +26,20 @@ describe AllocationCategory do
     category = build(:allocation_category, name: nil)
     expect(category.valid?).to eq(false)
   end
+
   it 'uppercases the first letter of its name' do
     pending "not yet implemented"
     category = create(:allocation_category, name: 'food')
     expect(category.name).to eq('Food')
+  end
+
+  it 'is unique per household' do
+    food_for_first_household = create(:allocation_category, name: 'food')
+
+    second_household = create(:household)
+    ActsAsTenant.current_tenant = second_household
+
+    food_for_second_household = create(:allocation_category, name: 'food')
+    expect(food_for_second_household).to be_valid
   end
 end
