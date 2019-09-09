@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {DeactivateService} from "../../shared/deactivate-button/deactivate.service";
 
 import { AddTransferFormComponent } from './add-transfer-form.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -25,6 +26,7 @@ describe('AddTransferFormComponent', () => {
       declarations: [ AddTransferFormComponent, LoginComponent ],
       providers: [
         SinkFundService,
+        DeactivateService,
         { provide: ApiGateway, useValue: ApiGatewayStub },
         { provide: MatDialogRef, useValue: MatDialogRefStub }
       ]
