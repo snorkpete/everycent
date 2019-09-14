@@ -23,6 +23,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :reports, only: [] do
+    collection do
+      get 'net_worth'
+    end
+  end
+
   resources :settings, only: [:index, :create]
 
   resources :allocations, only: [:index]

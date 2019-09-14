@@ -1,9 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs/internal/Observable";
+import { ApiGateway } from "../../api/api-gateway.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class ReportingService {
+  constructor(private apiGateway: ApiGateway) {}
 
-  constructor() { }
+  getNetWorth(): Observable<any[]> {
+    return this.apiGateway.get("/reports/net_worth");
+  }
 }

@@ -1,0 +1,2 @@
+class NetWorthReportController < ApplicationController
+end

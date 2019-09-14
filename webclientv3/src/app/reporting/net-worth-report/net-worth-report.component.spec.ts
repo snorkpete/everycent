@@ -1,4 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { TestConfigModule } from "../../../../test/test-config.module";
+import { SharedModule } from "../../shared/shared.module";
+import { ReportingModule } from "../reporting.module";
 
 import { NetWorthReportComponent } from "./net-worth-report.component";
 
@@ -8,7 +11,7 @@ describe("NetWorthReportComponent", () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [NetWorthReportComponent]
+      imports: [TestConfigModule, SharedModule.forRoot(), ReportingModule]
     }).compileComponents();
   }));
 
