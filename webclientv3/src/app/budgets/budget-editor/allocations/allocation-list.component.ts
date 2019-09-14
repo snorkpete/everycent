@@ -13,23 +13,36 @@ import { BudgetService } from "../../budget.service";
   selector: "ec-allocation-list",
   template: `
     <h1>Allocations</h1>
-    <table mat-table [multiTemplateDataRows]="true" [dataSource]="budget.allocations" [trackBy]="trackAllocation" class="mat-elevation-z8">
-
+    <table
+      mat-table
+      [multiTemplateDataRows]="true"
+      [dataSource]="budget.allocations"
+      [trackBy]="trackAllocation"
+      class="mat-elevation-z8"
+    >
       <!-- ALLOCATION COLUMNS -->
       <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef style="width:25%;"> Name </th>
+        <th mat-header-cell *matHeaderCellDef style="width:25%;">Name</th>
         <td mat-cell *matCellDef="let allocation">
-          <ec-text-field [(ngModel)]="allocation.name" [editMode]="editMode"></ec-text-field>
+          <ec-text-field
+            [(ngModel)]="allocation.name"
+            [editMode]="editMode"
+          ></ec-text-field>
         </td>
-        <td mat-footer-cell *matFooterCellDef> Total </td>
+        <td mat-footer-cell *matFooterCellDef>Total</td>
       </ng-container>
 
       <!-- Amount Column -->
       <ng-container matColumnDef="amount">
-        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right"> Amount </th>
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right">
+          Amount
+        </th>
         <td mat-cell *matCellDef="let allocation" class="right">
-          <ec-money-field [(ngModel)]="allocation.amount" [editMode]="editMode"></ec-money-field>
+          <ec-money-field
+            [(ngModel)]="allocation.amount"
+            [editMode]="editMode"
+          ></ec-money-field>
         </td>
         <td mat-footer-cell *matFooterCellDef class="right">
           <ec-money-field [value]="totalAmount()"></ec-money-field>
@@ -38,12 +51,16 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Spent Column -->
       <ng-container matColumnDef="spent">
-        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right"> Spent </th>
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right">
+          Spent
+        </th>
         <td mat-cell *matCellDef="let allocation" class="right">
           <div fxLayout="row" fxLayoutAlign="start center">
-            <ec-icon [icon]="Icon.SHOW_TRANSACTIONS"
-                     (click)="showTransactionsFor(allocation)"
-                     class="small">
+            <ec-icon
+              [icon]="Icon.SHOW_TRANSACTIONS"
+              (click)="showTransactionsFor(allocation)"
+              class="small"
+            >
             </ec-icon>
             <span fxFlex></span>
             <ec-money-field [value]="allocation.spent"></ec-money-field>
@@ -56,47 +73,66 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Remaining Column -->
       <ng-container matColumnDef="remaining">
-        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right"> Remaining </th>
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right">
+          Remaining
+        </th>
         <td mat-cell *matCellDef="let allocation" class="right">
-          <ec-money-field [value]="allocation.amount - allocation.spent" [highlightPositive]="true"></ec-money-field>
+          <ec-money-field
+            [value]="allocation.amount - allocation.spent"
+            [highlightPositive]="true"
+          ></ec-money-field>
         </td>
         <td mat-footer-cell *matFooterCellDef class="right">
-          <ec-money-field [value]="totalRemaining()" [highlightPositive]="true"></ec-money-field>
+          <ec-money-field
+            [value]="totalRemaining()"
+            [highlightPositive]="true"
+          ></ec-money-field>
         </td>
       </ng-container>
 
       <!-- Allocation Class Column -->
       <ng-container matColumnDef="allocationClass">
-        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="center"> Class</th>
+        <th mat-header-cell *matHeaderCellDef style="width:10%;" class="center">
+          Class
+        </th>
         <td mat-cell *matCellDef="let allocation">
-
           <span class="text-display" *ngIf="editMode; else textDisplay">
-              <select [(ngModel)]="allocation.allocation_class">
-                  <option *ngFor="let item of allocationClasses; trackBy: trackById" [value]="item.id">
-                    {{item.name}}
-                  </option>
-              </select>
+            <select [(ngModel)]="allocation.allocation_class">
+              <option
+                *ngFor="let item of allocationClasses; trackBy: trackById"
+                [value]="item.id"
+              >
+                {{ item.name }}
+              </option>
+            </select>
           </span>
 
           <ng-template #textDisplay>
-              <span class="value">{{ allocation.allocation_class | titlecase }}</span>
+            <span class="value">{{
+              allocation.allocation_class | titlecase
+            }}</span>
           </ng-template>
         </td>
-        <td mat-footer-cell *matFooterCellDef>
-        </td>
+        <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
 
       <!-- Is Fixed Amount Column -->
       <ng-container matColumnDef="isFixedAmount">
-        <th mat-header-cell *matHeaderCellDef style="width:5%;" class="center">Fixed Amount?</th>
+        <th mat-header-cell *matHeaderCellDef style="width:5%;" class="center">
+          Fixed Amount?
+        </th>
         <td mat-cell *matCellDef="let allocation">
-
-          <mat-checkbox *ngIf="editMode; else textDisplay"
-                        color="primary" [(ngModel)]="allocation.is_fixed_amount">
+          <mat-checkbox
+            *ngIf="editMode; else textDisplay"
+            color="primary"
+            [(ngModel)]="allocation.is_fixed_amount"
+          >
           </mat-checkbox>
 
           <ng-template #textDisplay>
-            <span class="value">{{ (allocation.is_fixed_amount ? 'Yes' : 'No') }}</span>
+            <span class="value">{{
+              allocation.is_fixed_amount ? "Yes" : "No"
+            }}</span>
           </ng-template>
         </td>
         <td mat-footer-cell *matFooterCellDef></td>
@@ -104,14 +140,17 @@ import { BudgetService } from "../../budget.service";
 
       <!-- Comment Column -->
       <ng-container matColumnDef="comment">
-        <th mat-header-cell *matHeaderCellDef style="width:25%;"> Comment</th>
+        <th mat-header-cell *matHeaderCellDef style="width:25%;">Comment</th>
         <td mat-cell *matCellDef="let allocation">
-          <ec-text-field [(ngModel)]="allocation.comment" [editMode]="editMode"></ec-text-field>
+          <ec-text-field
+            [(ngModel)]="allocation.comment"
+            [editMode]="editMode"
+          ></ec-text-field>
         </td>
         <td mat-footer-cell *matFooterCellDef>
-            <span class="label">
-              Unallocated: {{ totalDiscretionaryAmount() | ecMoney }}
-            </span>
+          <span class="label">
+            Unallocated: {{ totalDiscretionaryAmount() | ecMoney }}
+          </span>
         </td>
       </ng-container>
 
@@ -119,7 +158,10 @@ import { BudgetService } from "../../budget.service";
       <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef style="width:5%;"></th>
         <td mat-cell *matCellDef="let allocation">
-          <ec-delete-button [item]="allocation" [editMode]="editMode"></ec-delete-button>
+          <ec-delete-button
+            [item]="allocation"
+            [editMode]="editMode"
+          ></ec-delete-button>
         </td>
         <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
@@ -127,49 +169,75 @@ import { BudgetService } from "../../budget.service";
       <!-- CATEGORY COLUMNS -->
       <!-- Category Name Column -->
       <ng-container matColumnDef="categoryName">
-        <td mat-cell *matCellDef="let allocation">{{ allocation.allocationCategory }} </td>
+        <td mat-cell *matCellDef="let allocation">
+          {{ allocation.allocationCategory }}
+        </td>
       </ng-container>
 
       <!-- Category Amount Column -->
       <ng-container matColumnDef="categoryAmount">
         <td mat-cell *matCellDef="let allocation" class="right">
-          <ec-money-field [value]="totalAmountFor(allocation.allocation_category_id)"></ec-money-field>
+          <ec-money-field
+            [value]="totalAmountFor(allocation.allocation_category_id)"
+          ></ec-money-field>
         </td>
       </ng-container>
 
       <!-- Category Spent Column -->
       <ng-container matColumnDef="categorySpent">
         <td mat-cell *matCellDef="let allocation" class="right">
-          <ec-money-field [value]="totalSpentFor(allocation.allocation_category_id)"></ec-money-field>
+          <ec-money-field
+            [value]="totalSpentFor(allocation.allocation_category_id)"
+          ></ec-money-field>
         </td>
       </ng-container>
 
       <!-- Category Remaining Column -->
       <ng-container matColumnDef="categoryRemaining">
         <td mat-cell *matCellDef="let allocation" class="right">
-          <ec-money-field [value]="totalRemainingFor(allocation.allocation_category_id)" [highlightPositive]="true"></ec-money-field>
+          <ec-money-field
+            [value]="totalRemainingFor(allocation.allocation_category_id)"
+            [highlightPositive]="true"
+          ></ec-money-field>
         </td>
       </ng-container>
 
       <!-- Category Remaining Column -->
       <ng-container matColumnDef="categoryRestDesktop">
-        <td mat-cell *matCellDef="let allocation" class="right" colspan="4">
-        </td>
+        <td
+          mat-cell
+          *matCellDef="let allocation"
+          class="right"
+          colspan="4"
+        ></td>
       </ng-container>
 
       <!-- Category Remaining Column -->
       <ng-container matColumnDef="categoryRestMobile">
-        <td mat-cell *matCellDef="let allocation" class="right" colspan="1">
-        </td>
+        <td
+          mat-cell
+          *matCellDef="let allocation"
+          class="right"
+          colspan="1"
+        ></td>
       </ng-container>
 
       <!-- Add Allocation Column -->
       <ng-container matColumnDef="addAllocation">
-        <td mat-cell *matCellDef="let allocation; let dataIndex=dataIndex;" [attr.colspan]="nbrColumns">
+        <td
+          mat-cell
+          *matCellDef="let allocation; let dataIndex = dataIndex"
+          [attr.colspan]="nbrColumns"
+        >
           <div class="category-button" *ngIf="editMode">
-            <button mat-raised-button color="primary"
-                    (click)="addAllocation(allocation.allocation_category_id, dataIndex)">
-              Add {{allocation.allocationCategory}} Allocation
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="
+                addAllocation(allocation.allocation_category_id, dataIndex)
+              "
+            >
+              Add {{ allocation.allocationCategory }} Allocation
             </button>
           </div>
         </td>
@@ -178,83 +246,113 @@ import { BudgetService } from "../../budget.service";
       <!-- ROW definitions -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
 
-      <tr mat-row *matRowDef="let allocation; columns: categoryColumns; when: showCategoryRow; " class="heading"></tr>
-      <tr mat-row *matRowDef="let allocation; columns: displayedColumns; when: showAllocationRow;"
-          [ecHighlightDeletedFor]="allocation"></tr>
-      <tr mat-row *matRowDef="let allocation; columns: ['addAllocation']; when: showAddAllocationRow;"></tr>
+      <tr
+        mat-row
+        *matRowDef="
+          let allocation;
+          columns: categoryColumns;
+          when: showCategoryRow
+        "
+        class="heading"
+      ></tr>
+      <tr
+        mat-row
+        *matRowDef="
+          let allocation;
+          columns: displayedColumns;
+          when: showAllocationRow
+        "
+        [ecHighlightDeletedFor]="allocation"
+      ></tr>
+      <tr
+        mat-row
+        *matRowDef="
+          let allocation;
+          columns: ['addAllocation'];
+          when: showAddAllocationRow
+        "
+      ></tr>
 
-      <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true" class="footer"></tr>
+      <tr
+        mat-footer-row
+        *matFooterRowDef="displayedColumns; sticky: true"
+        class="footer"
+      ></tr>
     </table>
+
     <ec-allocation-list-summary [budget]="budget"></ec-allocation-list-summary>
   `,
   styles: [
     `
-    table {
-      width: 100%;
-      table-layout: fixed;
-    }
-    table td:first-of-type, table th:first-of-type {
+      table {
+        width: 100%;
+        table-layout: fixed;
+      }
+      table td:first-of-type,
+      table th:first-of-type {
         padding-left: 24px;
-    }
-    .heading {
-      font-weight: bold;
-      font-size: 16px;
-      border-top: 3px solid blue;
-      border-bottom: 2px solid blue;
-    }
-    .heading td.mat-cell {
-      font-weight: bold;
-      font-size: 18px;
-      border-top: 3px solid blue;
-      border-bottom: 2px solid blue;
-    }
-    .footer {
-      font-weight: bold;
-      font-size: 18px;
-      border-top: 2px solid grey;
-      border-bottom: 2px solid grey;
-    }
-    .category-button {
-      margin: 5px;
-    }
+      }
+      .heading {
+        font-weight: bold;
+        font-size: 16px;
+        border-top: 3px solid blue;
+        border-bottom: 2px solid blue;
+      }
+      .heading td.mat-cell {
+        font-weight: bold;
+        font-size: 18px;
+        border-top: 3px solid blue;
+        border-bottom: 2px solid blue;
+      }
+      .footer {
+        font-weight: bold;
+        font-size: 18px;
+        border-top: 2px solid grey;
+        border-bottom: 2px solid grey;
+      }
+      .category-button {
+        margin: 5px;
+      }
 
-    ec-icon.small /deep/ .material-icons {
-      font-size: 16px;
-      height: 16px;
-      width: 16px;
-      padding-top: 1px;
-      cursor: pointer;
-    }
+      ec-icon.small /deep/ .material-icons {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        padding-top: 1px;
+        cursor: pointer;
+      }
 
-    .total {
-      display: flex;
-      justify-content: space-between;
-    }
+      .total {
+        display: flex;
+        justify-content: space-between;
+      }
 
-    .value {
-      width: 100%;
-      text-align: center;
-      display: inline-block;
-      font-family: Roboto,"Helvetica Neue",sans-serif;
-      font-size: 12px;
-    }
+      .value {
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+        font-size: 12px;
+      }
 
-    .label {
-      border-radius: 5px;
-      border: 2px solid grey;
-      background-color: darkgrey;
-      font-size: 12px;
-      color: white;
-      padding-left: 5px;
-      padding-right: 5px;
-      padding-top: 3px;
-    }
+      .label {
+        border-radius: 5px;
+        border: 2px solid grey;
+        background-color: darkgrey;
+        font-size: 12px;
+        color: white;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 3px;
+      }
 
-    th[mat-header-cell], td[mat-footer-cell], td[mat-cell] {
-      padding-left: 5px;
-      padding-right: 5px;
-    }
-  `
+      th[mat-header-cell],
+      td[mat-footer-cell],
+      td[mat-cell] {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+    `
   ]
 })
 export class AllocationListComponent implements OnInit {
