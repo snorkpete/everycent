@@ -51,9 +51,11 @@ class BankAccount < ApplicationRecord
   validates :payment_due_day, :numericality => {:only_integer => true, :greater_than => 0, :less_than => 32, :allow_nil => true}
 
   def update_closing_info
-    self.closing_balance = opening_balance
-    self.closing_date = Date.today
-    # save
+    self.closing_balance = opening_balance || 0
+
+    next_budget_to_close = Budget.where(status: 'open').order(:start_date).first
+    new_closing_date = if next_budget_to_close.nil? then Date.today else next_budget_to_close.start_date end
+    self.closing_date = new_closing_date
   end
 
   def self.account_category_order
