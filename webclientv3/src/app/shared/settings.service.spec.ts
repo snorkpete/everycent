@@ -27,7 +27,8 @@ describe("SettingsService", () => {
         primary_budget_account_id: 5,
         bank_charges_allocation_name: "Bank Charges",
         husband: "John",
-        wife: "Sally"
+        wife: "Sally",
+        family_type: "couple"
       };
       let spy = spyOn(apiGateway, "get").and.returnValue(of(sampleSettings));
       settingsService.getSettings().subscribe(settings => {
@@ -46,7 +47,8 @@ describe("SettingsService", () => {
         primary_budget_account_id: 5,
         bank_charges_allocation_name: "Bank Charges",
         husband: "John",
-        wife: "Sally"
+        wife: "Sally",
+        family_type: "couple"
       };
       let spy = spyOn(apiGateway, "post").and.returnValue(of(sampleSettings));
       settingsService.saveSettings(sampleSettings).subscribe(settings => {
