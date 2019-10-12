@@ -50,6 +50,34 @@ This is done by:
   * copy `webclient/index.html` and `webclient/fonts` to `public/v1`
   * then, and then committing the build result using `git add . && git commit -m "build of static assets"`
   
+  Note that if you're unable to run gulp, you can just checkout the previously built v1 assets
+  
+   `git checkout -- public/v1`
+   
 The order of the steps is important because the Angular build clears out the v1 static assets,
 so they have to be re-added after. Note that the v1 assets will soon be removed permanently,
 but they are being left in place just in case.
+
+### PG Installation Issues
+
+Getting the `pg` gem up and running on a new machine, or with a different version of Postgres is a pain in the ass.
+Assuming you're using the Postgres.app for an easy installation of Postgres, then you have to ensure that you compile the pg gem
+against that version of Postgres.
+
+So, let's say you're running version 10 of Postgres through Postgres.app.
+
+To install the `pg` gem,
+
+````
+gem install pg -v '0.21.0' -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/10/bin/pg_config
+
+````
+
+Of course, nothing is ever so simple. The `spring` preloader that comes with rails can give you some grief,
+so make sure you kill it first, before attempting the above.
+
+
+We'll have to go through the same song and dance above when we change Postgres versions.
+ 
+
+

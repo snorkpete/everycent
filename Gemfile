@@ -18,6 +18,7 @@ end
 
 # database gem
 gem 'pg', '~> 0.21'
+# gem 'pg'
 
 # fix for time
 gem 'tzinfo-data'
@@ -51,6 +52,8 @@ group :development, :test do
   gem 'guard-rspec'
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
   gem 'ruby_gntp'
+  gem 'terminal-notifier-guard'
+
 end
 
 group :test do
