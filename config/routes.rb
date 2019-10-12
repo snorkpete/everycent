@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   resources :reports, only: [] do
     collection do
       get 'net_worth'
+      get 'category_spending'
     end
   end
 

@@ -27,11 +27,6 @@ export interface MenuItemConfig {
   template: `
     <mat-nav-list>
       <mat-divider></mat-divider>
-      <mat-list-item>
-        <ec-icon [icon]="Icon.HOME"></ec-icon>
-        <a href="/v1/">Go to Old Version </a>
-      </mat-list-item>
-      <mat-divider></mat-divider>
 
       <ec-menu-item
         *ngFor="let menuItem of menuItems"
@@ -151,6 +146,12 @@ export class MenuComponent implements OnInit {
       displayName: "Net Worth Report",
       icon: Icon.NET_WORTH,
       route: "/reports/net-worth",
+      exact: false
+    },
+    {
+      displayName: "Category Spending Report",
+      icon: Icon.CATEGORY_SPENDING,
+      route: "/reports/category-spending",
       exact: false
     }
   ];

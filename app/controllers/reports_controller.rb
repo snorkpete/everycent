@@ -10,7 +10,12 @@ class ReportsController < ApplicationController
   end
 
   def net_worth
-    result = Report.net_worth
+    result = Report.net_worth(current_household)
+    render json: result
+  end
+
+  def category_spending
+    result = Report.category_spending(current_household)
     render json: result
   end
 

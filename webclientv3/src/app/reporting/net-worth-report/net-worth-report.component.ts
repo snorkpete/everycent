@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { ReportingService } from "../reporting.service";
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -78,6 +79,17 @@ import * as am4charts from "@amcharts/amcharts4/charts";
         flex: 1;
         margin: 20px;
       }
+
+      /* On screens that are 600px or less */
+      @media screen and (max-width: 600px) {
+        .data-display {
+          flex-direction: column;
+        }
+
+        #chartdiv {
+          height: 400px;
+        }
+      }
     `
   ]
 })
@@ -86,9 +98,13 @@ export class NetWorthReportComponent implements OnInit, OnDestroy {
   fields: string[] = [];
   chart: am4charts.XYChart;
 
-  constructor(private reportingService: ReportingService) {}
+  constructor(
+    private reportingService: ReportingService,
+    private toolbarService: MainToolbarService
+  ) {}
 
   ngOnInit() {
+    this.toolbarService.setHeading("Net Worth Report");
     this.reportingService.getNetWorth().subscribe((data: any) => {
       this.data = data.data;
       this.fields = data.fields;
