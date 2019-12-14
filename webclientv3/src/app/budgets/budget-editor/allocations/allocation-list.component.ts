@@ -429,7 +429,7 @@ export class AllocationListComponent implements OnInit {
   }
 
   showCategoryRow(index: number, allocation: AllocationData) {
-    return allocation.firstInCategory;
+    return allocation.isCategoryHeaderRow && allocation.dummyTransaction;
   }
 
   showAllocationRow(index: number, allocation: AllocationData) {
@@ -437,7 +437,7 @@ export class AllocationListComponent implements OnInit {
   }
 
   showAddAllocationRow(index: number, allocation: AllocationData) {
-    return allocation.lastInCategory;
+    return allocation.isAllocationButtonRow && allocation.dummyTransaction;
   }
 
   trackAllocation(index: number, allocation: AllocationData) {
@@ -448,19 +448,15 @@ export class AllocationListComponent implements OnInit {
   }
 
   addAllocation(categoryId: number, position: number) {
-    // push the new allocation as the last allocation in its category
-    this.budget.allocations[position].lastInCategory = false;
-
     const newAllocation: AllocationData = {
       id: null,
       name: "",
       amount: 0,
       spent: 0,
       budget_id: this.budget.id,
-      allocation_category_id: categoryId,
-      lastInCategory: true
+      allocation_category_id: categoryId
     };
-    this.budget.allocations.splice(position + 1, 0, newAllocation);
+    this.budget.allocations.splice(position, 0, newAllocation);
 
     // we need to manually re-render the data table rows since we added a new data item
     this.allocationList.renderRows();
