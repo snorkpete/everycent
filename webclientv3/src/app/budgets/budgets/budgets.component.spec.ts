@@ -11,13 +11,11 @@ describe("BudgetsComponent", () => {
   let fixture: ComponentFixture<BudgetsComponent>;
   let de: DebugElement;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [TestConfigModule, BudgetsModule, SharedModule.forRoot()]
-      });
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [TestConfigModule, BudgetsModule, SharedModule.forRoot()]
+    });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(BudgetsComponent);

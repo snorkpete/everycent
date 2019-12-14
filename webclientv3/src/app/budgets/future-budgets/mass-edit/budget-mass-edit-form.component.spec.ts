@@ -8,14 +8,12 @@ describe("BudgetMassEditFormComponent", () => {
   let component: BudgetMassEditFormComponent;
   let fixture: ComponentFixture<BudgetMassEditFormComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [TestConfigModule, SharedModule.forRoot()],
-        declarations: [BudgetMassEditFormComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [TestConfigModule, SharedModule.forRoot()],
+      declarations: [BudgetMassEditFormComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(BudgetMassEditFormComponent);

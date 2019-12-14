@@ -4,30 +4,38 @@ import { TransactionImporterService } from "../transaction-importer.service";
 
 @Component({
   selector: "ec-transaction-importer",
-  styles: [
-    `
-  `
-  ],
+  styles: [``],
   template: `
-      <h1 mat-dialog-title>Import Transactions</h1>
-      <mat-dialog-content>
-        <div fxLayout="column" fxFlex>
-          <textarea rows="5" cols="10"
-                  placeholder="Copy the transactions from your bank here"
-                  [(ngModel)]="input"
-          >
-          </textarea>
-          <mat-form-field>
-            <mat-select [(ngModel)]="importType" placeholder="Import Format">
-              <mat-option *ngFor="let option of options" [value]="option.value">{{option.text}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </mat-dialog-content>
-      <mat-dialog-actions>
-        <button mat-raised-button color="primary" type="submit" (click)="importTransactions()">Import</button>
-        <button mat-raised-button mat-dialog-close>Cancel</button>
-      </mat-dialog-actions>
+    <h1 mat-dialog-title>Import Transactions</h1>
+    <mat-dialog-content>
+      <div fxLayout="column" fxFlex>
+        <textarea
+          rows="5"
+          cols="10"
+          placeholder="Copy the transactions from your bank here"
+          [(ngModel)]="input"
+        >
+        </textarea>
+        <mat-form-field>
+          <mat-select [(ngModel)]="importType" placeholder="Import Format">
+            <mat-option *ngFor="let option of options" [value]="option.value">{{
+              option.text
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        (click)="importTransactions()"
+      >
+        Import
+      </button>
+      <button mat-raised-button mat-dialog-close>Cancel</button>
+    </mat-dialog-actions>
   `
 })
 export class TransactionImporterComponent implements OnInit {

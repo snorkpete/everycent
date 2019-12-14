@@ -10,49 +10,111 @@ import { InstitutionData } from "../bank-accounts/institution.model";
     <h1 mat-dialog-title>Bank Account Details</h1>
     <div mat-dialog-content>
       <div [formGroup]="form">
-        <ec-text-field class="form" [(editMode)]="editMode" formControlName="name" placeholder="Name"></ec-text-field>
-        <ec-list-field class="form" [(editMode)]="editMode" formControlName="account_type"
-                       [items]="accountFeatureTypes" placeholder="Account Features">
+        <ec-text-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="name"
+          placeholder="Name"
+        ></ec-text-field>
+        <ec-list-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="account_type"
+          [items]="accountFeatureTypes"
+          placeholder="Account Features"
+        >
         </ec-list-field>
-        <ec-text-field class="form" [(editMode)]="editMode" formControlName="account_type_description"
-                       placeholder="Account Type Description">
+        <ec-text-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="account_type_description"
+          placeholder="Account Type Description"
+        >
         </ec-text-field>
-        <ec-list-field class="form" [(editMode)]="editMode" formControlName="account_category"
-                       [items]="accountCategories" placeholder="Account Category">
+        <ec-list-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="account_category"
+          [items]="accountCategories"
+          placeholder="Account Category"
+        >
         </ec-list-field>
-        <ec-list-field class="form" [(editMode)]="editMode" formControlName="is_cash"
-                       [items]="yesNoList" placeholder="Is Cash Account?">
+        <ec-list-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="is_cash"
+          [items]="yesNoList"
+          placeholder="Is Cash Account?"
+        >
         </ec-list-field>
-        <ec-list-field class="form" [(editMode)]="editMode" formControlName="institution_id"
-                       [items]="institutions" placeholder="Financial Institution">
+        <ec-list-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="institution_id"
+          [items]="institutions"
+          placeholder="Financial Institution"
+        >
         </ec-list-field>
-        <ec-text-field class="form" [(editMode)]="editMode" formControlName="account_no"
-                       placeholder="Official Account #">
+        <ec-text-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="account_no"
+          placeholder="Official Account #"
+        >
         </ec-text-field>
-        <ec-money-field class="form" [(editMode)]="editMode" formControlName="opening_balance"
-                        placeholder="Opening Balance">
+        <ec-money-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="opening_balance"
+          placeholder="Opening Balance"
+        >
         </ec-money-field>
-        <ec-list-field class="form" [(editMode)]="editMode" formControlName="import_format"
-                       [items]="importFormats" placeholder="Bank Account Import Format">
+        <ec-list-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="import_format"
+          [items]="importFormats"
+          placeholder="Bank Account Import Format"
+        >
         </ec-list-field>
-        <ec-list-field class="form" [(editMode)]="editMode" formControlName="status"
-                       [items]="statuses" placeholder="Status">
+        <ec-list-field
+          class="form"
+          [(editMode)]="editMode"
+          formControlName="status"
+          [items]="statuses"
+          placeholder="Status"
+        >
         </ec-list-field>
 
         <ng-container *ngIf="isCreditCard()">
           <h3>Credit Card Related</h3>
-          <ec-text-field class="form" [(editMode)]="editMode" formControlName="statement_day"
-                         placeholder="Statement Day" type="number"></ec-text-field>
-          <ec-text-field class="form" [(editMode)]="editMode" formControlName="payment_due_day"
-                         placeholder="Payment Due Day" type="number"></ec-text-field>
+          <ec-text-field
+            class="form"
+            [(editMode)]="editMode"
+            formControlName="statement_day"
+            placeholder="Statement Day"
+            type="number"
+          ></ec-text-field>
+          <ec-text-field
+            class="form"
+            [(editMode)]="editMode"
+            formControlName="payment_due_day"
+            placeholder="Payment Due Day"
+            type="number"
+          ></ec-text-field>
         </ng-container>
       </div>
     </div>
     <div mat-dialog-actions>
-      <ec-edit-actions [(editMode)]="editMode"
-                       (save)="saveChanges()"
-      >
-        <button *ngIf="!editMode" mat-raised-button color="warn" (click)="cancelChanges()">Close</button>
+      <ec-edit-actions [(editMode)]="editMode" (save)="saveChanges()">
+        <button
+          *ngIf="!editMode"
+          mat-raised-button
+          color="warn"
+          (click)="cancelChanges()"
+        >
+          Close
+        </button>
       </ec-edit-actions>
     </div>
   `,

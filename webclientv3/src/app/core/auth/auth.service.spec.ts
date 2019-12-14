@@ -19,15 +19,13 @@ describe("AuthService", () => {
     });
   });
 
-  beforeEach(
-    inject(
-      [AuthService, ApiGateway],
-      (service: AuthService, gateway: ApiGateway) => {
-        authService = service;
-        apiGateway = gateway;
-      }
-    )
-  );
+  beforeEach(inject(
+    [AuthService, ApiGateway],
+    (service: AuthService, gateway: ApiGateway) => {
+      authService = service;
+      apiGateway = gateway;
+    }
+  ));
 
   describe("logIn()", () => {
     it("calls apiGateway with the correct parameters", () => {
@@ -111,126 +109,109 @@ describe("AuthService", () => {
   });
 
   describe("logOut()", () => {
-    it(
-      "clears the authentication info in local storage",
-      async(() => {
-        localStorage.setItem("access-token", "boo");
-        localStorage.setItem("uid", "uid");
+    it("clears the authentication info in local storage", async(() => {
+      localStorage.setItem("access-token", "boo");
+      localStorage.setItem("uid", "uid");
 
-        authService.logOut().then(() => {
-          expect(localStorage.getItem("access-token")).toEqual(null);
-          expect(localStorage.getItem("uid")).toEqual(null);
-        });
-      })
-    );
+      authService.logOut().then(() => {
+        expect(localStorage.getItem("access-token")).toEqual(null);
+        expect(localStorage.getItem("uid")).toEqual(null);
+      });
+    }));
   });
 
   describe("isLoggedIn()", () => {
     describe("if localStorage is empty", () => {
-      it(
-        "returns FALSE promise",
-        async(() => {
-          localStorage.clear();
+      it("returns FALSE promise", async(() => {
+        localStorage.clear();
 
-          authService.isLoggedIn().then(isLoggedIn => {
-            expect(isLoggedIn).toEqual(false, "not logged in");
-          });
-        })
-      );
+        authService.isLoggedIn().then(isLoggedIn => {
+          expect(isLoggedIn).toEqual(false, "not logged in");
+        });
+      }));
     });
 
     describe("if localStorage has auth info", () => {
-      it(
-        "checks the auth info against the server and resolves to true if auth info is valid",
-        async(() => {
-          let expectedResponse = {
-            success: true,
-            data: {
-              id: 2,
-              provider: "email",
-              uid: "kion.stephen@gmail.com",
-              first_name: "Kion",
-              last_name: "Stephen",
-              nickname: "",
-              image: "",
-              email: "kion.stephen@gmail.com"
-            }
-          };
+      it("checks the auth info against the server and resolves to true if auth info is valid", async(() => {
+        let expectedResponse = {
+          success: true,
+          data: {
+            id: 2,
+            provider: "email",
+            uid: "kion.stephen@gmail.com",
+            first_name: "Kion",
+            last_name: "Stephen",
+            nickname: "",
+            image: "",
+            email: "kion.stephen@gmail.com"
+          }
+        };
 
-          localStorage.setItem("access-token", "access");
-          let spy = spyOn(apiGateway, "get").and.returnValue(
-            of(expectedResponse)
+        localStorage.setItem("access-token", "access");
+        let spy = spyOn(apiGateway, "get").and.returnValue(
+          of(expectedResponse)
+        );
+
+        authService.isLoggedIn().then(isLoggedIn => {
+          expect(spy.calls.mostRecent().args[0]).toEqual(
+            "/auth/validate_token"
           );
+          expect(isLoggedIn).toEqual(true);
+        });
+      }));
 
-          authService.isLoggedIn().then(isLoggedIn => {
-            expect(spy.calls.mostRecent().args[0]).toEqual(
-              "/auth/validate_token"
+      it("rejects with a FALSE Promise if server says auth info is invalid", async(() => {
+        let expectedResponse = {
+          success: false,
+          errors: ["Invalid login credentials"]
+        };
+        spyOn(apiGateway, "get").and.returnValue(throwError(expectedResponse));
+        authService
+          .isLoggedIn()
+          .then(isLoggedIn => {
+            expect(isLoggedIn).toEqual(
+              false,
+              "should NOT get here - expect a rejected promise"
             );
-            expect(isLoggedIn).toEqual(true);
+          })
+          .catch(isLoggedIn => {
+            expect(isLoggedIn).toEqual(false);
           });
-        })
-      );
+      }));
 
-      it(
-        "rejects with a FALSE Promise if server says auth info is invalid",
-        async(() => {
-          let expectedResponse = {
-            success: false,
-            errors: ["Invalid login credentials"]
-          };
-          spyOn(apiGateway, "get").and.returnValue(
-            throwError(expectedResponse)
-          );
-          authService
-            .isLoggedIn()
-            .then(isLoggedIn => {
-              expect(isLoggedIn).toEqual(
-                false,
-                "should NOT get here - expect a rejected promise"
-              );
-            })
-            .catch(isLoggedIn => {
-              expect(isLoggedIn).toEqual(false);
-            });
-        })
-      );
+      xit("caches the authentication state (no further server validation needed)", fakeAsync(() => {
+        let expectedResponse = {
+          success: true,
+          data: {
+            id: 2,
+            provider: "email",
+            uid: "kion.stephen@gmail.com",
+            first_name: "Kion",
+            last_name: "Stephen",
+            nickname: "",
+            image: "",
+            email: "kion.stephen@gmail.com"
+          }
+        };
 
-      xit(
-        "caches the authentication state (no further server validation needed)",
-        fakeAsync(() => {
-          let expectedResponse = {
-            success: true,
-            data: {
-              id: 2,
-              provider: "email",
-              uid: "kion.stephen@gmail.com",
-              first_name: "Kion",
-              last_name: "Stephen",
-              nickname: "",
-              image: "",
-              email: "kion.stephen@gmail.com"
-            }
-          };
+        // expect(authService.isLoggedIn()).toEqual(false);
+        let spy = spyOn(apiGateway, "get").and.returnValue(
+          of(expectedResponse)
+        );
+        authService.logOut();
+        authService.isLoggedIn().then(result => {
+          expect(result).toEqual(false);
+        });
+        tick();
 
-          // expect(authService.isLoggedIn()).toEqual(false);
-          let spy = spyOn(apiGateway, "get").and.returnValue(
-            of(expectedResponse)
-          );
-          authService.logOut();
-          authService.isLoggedIn().then(result => {
-            expect(result).toEqual(false);
-          });
-          tick();
+        authService.isLoggedIn();
+        tick();
 
-          authService.isLoggedIn();
-          tick();
+        authService.isLoggedIn();
+        tick();
 
-          authService.isLoggedIn();
-          tick();
-
-          expect(spy.calls.count()).toEqual(1, "only one call to the api");
-        })
-      );
+        expect(spy.calls.count()).toEqual(1, "only one call to the api");
+      }));
     });
   });
 });

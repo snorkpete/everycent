@@ -11,7 +11,7 @@ import { HomeService } from "./home.service";
         <div>
           <strong>Last transaction entered:</strong>
           <span class="details">
-            {{ lastUpdate.transaction_date | date:'fullDate' }}
+            {{ lastUpdate.transaction_date | date: "fullDate" }}
           </span>
         </div>
       </div>
@@ -19,17 +19,23 @@ import { HomeService } from "./home.service";
       <h1>Recent Updates and Fixes</h1>
       <ul>
         <li>Add Must Have Classification to Allocations</li>
-        <li>Add "Adjust Account Balances" function -> check Account Balances screen</li>
+        <li>
+          Add "Adjust Account Balances" function -> check Account Balances
+          screen
+        </li>
         <li>Add setting to allow for single person usage</li>
         <li>Add republic bank imports</li>
         <li>Add fixed headers to the transaction and budget edit view</li>
-        <li>Allow adding of new incomes/allocations when editing across multiple budgets</li>
+        <li>
+          Allow adding of new incomes/allocations when editing across multiple
+          budgets
+        </li>
       </ul>
 
       <h3>Note</h3>
       <div>
         All important features from the 'Old version' have now been implemented.
-        There should be no need to go back to the old version. <br/>
+        There should be no need to go back to the old version. <br />
         The old version is close to being removed
       </div>
 
@@ -53,7 +59,7 @@ import { HomeService } from "./home.service";
       .details {
         border-bottom: 1px solid black;
       }
-  `
+    `
   ]
 })
 export class HomeComponent implements OnInit {

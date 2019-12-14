@@ -6,30 +6,35 @@ import { Icon } from "../ec-icon/icon.type";
   selector: "ec-main-toolbar",
   styles: [
     `
-    .heading {
-    }
-  `
+      .heading {
+      }
+    `
   ],
   template: `
-    <mat-toolbar color="primary" *ngIf="toolbarService.isToolbarVisible()" class="menu-bar">
-        <mat-toolbar-row>
-          <ec-icon iconType="button"
-                   [icon]="Icon.MENU"
-                   class="open-menu-button"
-                   (click)="openMenu.emit()">
-          </ec-icon>
+    <mat-toolbar
+      color="primary"
+      *ngIf="toolbarService.isToolbarVisible()"
+      class="menu-bar"
+    >
+      <mat-toolbar-row>
+        <ec-icon
+          iconType="button"
+          [icon]="Icon.MENU"
+          class="open-menu-button"
+          (click)="openMenu.emit()"
+        >
+        </ec-icon>
 
-          EveryCent V3
+        EveryCent V3
 
-            <span *ngIf="getMainHeading()" fxHide.xs class="heading">
-                -- {{ getMainHeading() }}
-            </span>
-        </mat-toolbar-row>
+        <span *ngIf="getMainHeading()" fxHide.xs class="heading">
+          -- {{ getMainHeading() }}
+        </span>
+      </mat-toolbar-row>
 
-        <mat-toolbar-row fxHide.gt-xs>
-           {{ getMainHeading() }}
-        </mat-toolbar-row>
-
+      <mat-toolbar-row fxHide.gt-xs>
+        {{ getMainHeading() }}
+      </mat-toolbar-row>
     </mat-toolbar>
   `
 })

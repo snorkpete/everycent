@@ -15,17 +15,11 @@ describe("AccountBalancesComponent", () => {
   let fixture: ComponentFixture<AccountBalancesComponent>;
   let de: DebugElement;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          SharedModule.forRoot(),
-          TestConfigModule,
-          AccountBalancesModule
-        ]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [SharedModule.forRoot(), TestConfigModule, AccountBalancesModule]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AccountBalancesComponent);

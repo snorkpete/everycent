@@ -13,17 +13,25 @@ import { SettingsService } from "../shared/settings.service";
       <mat-card>
         <mat-card-title>Settings</mat-card-title>
         <mat-card-content>
-          <ec-list-field [editMode]="editMode"
-                         [items]="bankAccounts"
-                         placeholder="Primary Budget Account"
-                         [(ngModel)]="settings.primary_budget_account_id"
+          <ec-list-field
+            [editMode]="editMode"
+            [items]="bankAccounts"
+            placeholder="Primary Budget Account"
+            [(ngModel)]="settings.primary_budget_account_id"
           >
           </ec-list-field>
 
           <ng-container *ngIf="editMode; else displayFamilyType">
             <mat-form-field>
-              <mat-select [(ngModel)]="settings.family_type" placeholder="Type of Household">
-                <mat-option *ngFor="let option of familyTypeOptions" [value]="option.value">{{option.text}}</mat-option>
+              <mat-select
+                [(ngModel)]="settings.family_type"
+                placeholder="Type of Household"
+              >
+                <mat-option
+                  *ngFor="let option of familyTypeOptions"
+                  [value]="option.value"
+                  >{{ option.text }}</mat-option
+                >
               </mat-select>
             </mat-form-field>
           </ng-container>
@@ -35,32 +43,37 @@ import { SettingsService } from "../shared/settings.service";
             </span>
           </ng-template>
 
-          <ng-container *ngIf="settings.family_type === 'single'; else coupleFields">
-            <ec-text-field [editMode]="editMode"
-                           [(ngModel)]="settings.single_person"
-                           placeholder="Person's Name"
+          <ng-container
+            *ngIf="settings.family_type === 'single'; else coupleFields"
+          >
+            <ec-text-field
+              [editMode]="editMode"
+              [(ngModel)]="settings.single_person"
+              placeholder="Person's Name"
             >
             </ec-text-field>
           </ng-container>
 
           <ng-template #coupleFields>
-            <ec-text-field [editMode]="editMode"
-                           [(ngModel)]="settings.husband"
-                           placeholder="Husband's Name"
+            <ec-text-field
+              [editMode]="editMode"
+              [(ngModel)]="settings.husband"
+              placeholder="Husband's Name"
             >
             </ec-text-field>
-            <ec-text-field [editMode]="editMode"
-                           [(ngModel)]="settings.wife"
-                           placeholder="Wife's Name"
+            <ec-text-field
+              [editMode]="editMode"
+              [(ngModel)]="settings.wife"
+              placeholder="Wife's Name"
             >
             </ec-text-field>
           </ng-template>
-
         </mat-card-content>
         <mat-card-actions>
-          <ec-edit-actions [(editMode)]="editMode"
-                           (save)="saveSettings()"
-                           (cancel)="refresh()"
+          <ec-edit-actions
+            [(editMode)]="editMode"
+            (save)="saveSettings()"
+            (cancel)="refresh()"
           >
           </ec-edit-actions>
         </mat-card-actions>
@@ -69,33 +82,34 @@ import { SettingsService } from "../shared/settings.service";
   `,
   styles: [
     `
-    ::ng-deep .text-display {
-      margin-bottom: 20px;
-    }
-    /* TODO: figure out how to not need this here */
-    .value {
-      width: 100%;
-      font-size: 12px;
-      font-family: Roboto, "Helvetica Neue", sans-serif;
-    }
-    :host.form mat-form-field, :host.form .value {
-      height: 35px;
-      margin-top: 10px;
-      margin-bottom: 20px;
-      font-size: 16px;
-    }
-    .text-display {
-      display: flex;
-      flex-direction: column;
-    }
-    .label {
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 1.125;
-      color: rgba(0,0,0,.54);
-      font-family: Roboto, "Helvetica Neue", sans-serif;
-    }
-  `
+      ::ng-deep .text-display {
+        margin-bottom: 20px;
+      }
+      /* TODO: figure out how to not need this here */
+      .value {
+        width: 100%;
+        font-size: 12px;
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+      }
+      :host.form mat-form-field,
+      :host.form .value {
+        height: 35px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        font-size: 16px;
+      }
+      .text-display {
+        display: flex;
+        flex-direction: column;
+      }
+      .label {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.125;
+        color: rgba(0, 0, 0, 0.54);
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+      }
+    `
   ]
 })
 export class SettingsComponent implements OnInit {

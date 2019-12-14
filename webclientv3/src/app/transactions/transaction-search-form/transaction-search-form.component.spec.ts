@@ -32,20 +32,18 @@ describe("TransactionsSearchFormComponent", () => {
   let sampleBankAccounts: BankAccountData[];
   let sampleBudgets: BudgetData[];
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [TestConfigModule, SharedModule],
-        declarations: [TransactionSearchFormComponent],
-        schemas: [],
-        providers: [
-          { provide: BankAccountService, useValue: BankAccountServiceStub },
-          { provide: BudgetService, useValue: BudgetServiceStub },
-          FormBuilder
-        ]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [TestConfigModule, SharedModule],
+      declarations: [TransactionSearchFormComponent],
+      schemas: [],
+      providers: [
+        { provide: BankAccountService, useValue: BankAccountServiceStub },
+        { provide: BudgetService, useValue: BudgetServiceStub },
+        FormBuilder
+      ]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionSearchFormComponent);

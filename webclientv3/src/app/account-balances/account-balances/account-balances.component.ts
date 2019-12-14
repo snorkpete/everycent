@@ -13,46 +13,68 @@ import { MatSlideToggleChange } from "@angular/material/slide-toggle";
   selector: "ec-account-balances",
   styles: [
     `
-    .total {
-      margin-right: 25px;
-    }
+      .total {
+        margin-right: 25px;
+      }
 
-    ec-account-list {
-      margin-bottom: 5px;
-    }
+      ec-account-list {
+        margin-bottom: 5px;
+      }
 
       .button-row {
         margin-top: 15px;
         margin-bottom: 15px;
       }
-  `
+    `
   ],
   template: `
     <mat-card class="main">
       <mat-card-content>
         <div fxLayout="column">
-          <div class="button-row" fxLayoutAlign="space-between" >
-            <mat-slide-toggle fxFlexAlign="center end" [checked]="false"
-                              (change)="onIncludeClosedChanged($event)">
+          <div class="button-row" fxLayoutAlign="space-between">
+            <mat-slide-toggle
+              fxFlexAlign="center end"
+              [checked]="false"
+              (change)="onIncludeClosedChanged($event)"
+            >
               Include Closed Accounts?
             </mat-slide-toggle>
-            <button mat-raised-button
-                    color="primary"
-                    class="adjust-balances"
-                    (click)="showAdjustAccountBalancesForm()">
+            <button
+              mat-raised-button
+              color="primary"
+              class="adjust-balances"
+              (click)="showAdjustAccountBalancesForm()"
+            >
               Adjust Account Balances
             </button>
           </div>
-          <ec-account-list [bankAccounts]="currentAccounts" heading="Current Accounts"></ec-account-list>
-          <ec-account-list [bankAccounts]="cashAssetAccounts" heading="Cash Assets"></ec-account-list>
-          <ec-account-list [bankAccounts]="nonCashAssetAccounts" heading="Non Cash Assets"></ec-account-list>
+          <ec-account-list
+            [bankAccounts]="currentAccounts"
+            heading="Current Accounts"
+          ></ec-account-list>
+          <ec-account-list
+            [bankAccounts]="cashAssetAccounts"
+            heading="Cash Assets"
+          ></ec-account-list>
+          <ec-account-list
+            [bankAccounts]="nonCashAssetAccounts"
+            heading="Non Cash Assets"
+          ></ec-account-list>
           <div class="total" fxLayoutAlign="end">
             <h3>Total Assets: {{ totalAssets | ecMoney }}</h3>
           </div>
-          <ec-account-list [bankAccounts]="creditCardAccounts" heading="Credit Cards"></ec-account-list>
-          <ec-account-list [bankAccounts]="loanAccounts" heading="Loans"></ec-account-list>
+          <ec-account-list
+            [bankAccounts]="creditCardAccounts"
+            heading="Credit Cards"
+          ></ec-account-list>
+          <ec-account-list
+            [bankAccounts]="loanAccounts"
+            heading="Loans"
+          ></ec-account-list>
 
-          <ec-account-balance-totals [bankAccounts]="bankAccounts"></ec-account-balance-totals>
+          <ec-account-balance-totals
+            [bankAccounts]="bankAccounts"
+          ></ec-account-balance-totals>
         </div>
       </mat-card-content>
     </mat-card>
