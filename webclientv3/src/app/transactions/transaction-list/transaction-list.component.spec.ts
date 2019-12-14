@@ -12,17 +12,15 @@ describe("TransactionListComponent", () => {
   let fixture: ComponentFixture<TransactionListComponent>;
   let de: DebugElement;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [TestConfigModule, SharedModule.forRoot()],
-        declarations: [
-          TransactionListComponent,
-          TransactionDateValidatorDirective
-        ]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [TestConfigModule, SharedModule.forRoot()],
+      declarations: [
+        TransactionListComponent,
+        TransactionDateValidatorDirective
+      ]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionListComponent);

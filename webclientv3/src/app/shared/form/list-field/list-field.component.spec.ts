@@ -13,14 +13,12 @@ describe("ListFieldComponent", () => {
   let sampleItems: any[];
   let selected: number;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [FormsModule, ReactiveFormsModule, TestConfigModule],
-        declarations: [ListFieldComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [FormsModule, ReactiveFormsModule, TestConfigModule],
+      declarations: [ListFieldComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ListFieldComponent);

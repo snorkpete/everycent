@@ -1,27 +1,34 @@
-import {Component, OnDestroy, OnInit} from "@angular/core";
-import {ActivatedRoute, Router} from "@angular/router";
-import {combineLatest, Observable, Subject} from "rxjs";
-import {filter, map, switchMap, takeUntil} from "rxjs/operators";
-import {MessageService} from "../../message-display/message.service";
-import {MainToolbarService} from "../../shared/main-toolbar/main-toolbar.service";
-import {AllocationCategoryData} from "../allocation.model";
-import {BudgetData} from "../budget.model";
-import {BudgetService} from "../budget.service";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { combineLatest, Observable, Subject } from "rxjs";
+import { filter, map, switchMap, takeUntil } from "rxjs/operators";
+import { MessageService } from "../../message-display/message.service";
+import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
+import { AllocationCategoryData } from "../allocation.model";
+import { BudgetData } from "../budget.model";
+import { BudgetService } from "../budget.service";
 
 @Component({
   selector: "ec-budget",
   template: `
     <mat-card class="main">
       <mat-card-actions fxLayoutGap="10px" align="end">
-        <button mat-raised-button (click)="goToBudgetList()">&laquo; Back to Budget List</button>
-        <button mat-raised-button (click)="goToTransactions()">View Transactions</button>
+        <button mat-raised-button (click)="goToBudgetList()">
+          &laquo; Back to Budget List
+        </button>
+        <button mat-raised-button (click)="goToTransactions()">
+          View Transactions
+        </button>
       </mat-card-actions>
       <mat-card-content>
         <ec-budget-editor [budget]="budget" [editMode]="editMode">
-
         </ec-budget-editor>
       </mat-card-content>
-      <ec-edit-actions [(editMode)]="editMode" (save)="saveBudget()" (cancel)="cancel()">
+      <ec-edit-actions
+        [(editMode)]="editMode"
+        (save)="saveBudget()"
+        (cancel)="cancel()"
+      >
       </ec-edit-actions>
     </mat-card>
   `,
@@ -63,12 +70,11 @@ export class BudgetComponent implements OnInit, OnDestroy {
   }
 
   private loadBudgetForId(idParam$: Observable<string>) {
-    let budgetData$ = idParam$
-        .pipe(
-          filter(id => id !== "current"),
-          map(idString => Number(idString)),
-          switchMap(budgetId => this.budgetService.getBudget(budgetId))
-        );
+    let budgetData$ = idParam$.pipe(
+      filter(id => id !== "current"),
+      map(idString => Number(idString)),
+      switchMap(budgetId => this.budgetService.getBudget(budgetId))
+    );
     let allocationData$ = this.budgetService.getAllocationCategories();
 
     combineLatest(budgetData$, allocationData$).subscribe(result => {

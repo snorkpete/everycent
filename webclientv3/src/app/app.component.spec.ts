@@ -28,18 +28,12 @@ describe("AppComponent", () => {
     fixture.detectChanges();
   });
 
-  it(
-    "should create the app",
-    async(() => {
-      expect(app).toBeTruthy();
-    })
-  );
+  it("should create the app", async(() => {
+    expect(app).toBeTruthy();
+  }));
 
-  it(
-    "has a nested router outlet",
-    async(() => {
-      const element = fixture.debugElement.nativeElement;
-      expect(element.querySelector("router-outlet")).toBeTruthy();
-    })
-  );
+  it("has a nested router outlet", async(() => {
+    const element = fixture.debugElement.nativeElement;
+    expect(element.querySelector("router-outlet")).toBeTruthy();
+  }));
 });

@@ -10,68 +10,82 @@ import { groupBy } from "lodash";
   selector: "ec-list-field",
   styles: [
     `
-     select, .value {
-       width: 100%;
-       font-size: 12px;
-       font-family: Roboto, "Helvetica Neue", sans-serif;
-     }
-     :host.form select, :host.form .value {
-       height: 35px;
-       margin-top: 10px;
-       margin-bottom: 20px;
-       font-size: 16px;
-    }
-    .text-display {
-      display: flex;
-      flex-direction: column;
-    }
-    .label {
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 1.125;
-      color: rgba(0,0,0,.54);
-      font-family: Roboto, "Helvetica Neue", sans-serif;
-    }
-    .text-display:focus-within .label{
-      color: #673ab7;
-    }
-    .center {
-      text-align: center;
-    }
-  `
+      select,
+      .value {
+        width: 100%;
+        font-size: 12px;
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+      }
+      :host.form select,
+      :host.form .value {
+        height: 35px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        font-size: 16px;
+      }
+      .text-display {
+        display: flex;
+        flex-direction: column;
+      }
+      .label {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.125;
+        color: rgba(0, 0, 0, 0.54);
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+      }
+      .text-display:focus-within .label {
+        color: #673ab7;
+      }
+      .center {
+        text-align: center;
+      }
+    `
   ],
   template: `
     <span class="text-display" *ngIf="editMode; else textDisplay">
-        <span class="label">{{placeholder}}</span>
-        <select [formControl]="control">
-          <option [value]="0"></option>
+      <span class="label">{{ placeholder }}</span>
+      <select [formControl]="control">
+        <option [value]="0"></option>
 
-          <!-- options go here -->
-          <ng-container *ngIf="groupBy; then groupedOptions else normalOptions "></ng-container>
+        <!-- options go here -->
+        <ng-container
+          *ngIf="groupBy; then groupedOptions; else normalOptions"
+        ></ng-container>
 
-          <!-- grouped options -->
-          <ng-template #groupedOptions>
-            <optgroup [label]="group.name" *ngFor="let group of groups; trackBy: trackById">
-              <option *ngFor="let item of group.items; trackById" [value]="item.id">
-                {{item.name}}
-              </option>
-            </optgroup>
-          </ng-template>
-
-          <!-- ungrouped options -->
-          <ng-template #normalOptions>
-            <option *ngFor="let item of items; trackBy: trackById" [value]="item.id">
-              {{item.name}}
+        <!-- grouped options -->
+        <ng-template #groupedOptions>
+          <optgroup
+            [label]="group.name"
+            *ngFor="let group of groups; trackBy: trackById"
+          >
+            <option
+              *ngFor="let item of group.items; trackById"
+              [value]="item.id"
+            >
+              {{ item.name }}
             </option>
-          </ng-template>
+          </optgroup>
+        </ng-template>
 
-        </select>
+        <!-- ungrouped options -->
+        <ng-template #normalOptions>
+          <option
+            *ngFor="let item of items; trackBy: trackById"
+            [value]="item.id"
+          >
+            {{ item.name }}
+          </option>
+        </ng-template>
+      </select>
     </span>
 
     <ng-template #textDisplay>
       <span class="text-display">
-        <span class="label">{{placeholder}}</span>
-        <span class="value" [class.center]="centerText">{{displayValue}}</span>
+        <span class="label">{{ placeholder }}</span>
+        <span class="value" [class.center]="centerText">{{
+          displayValue
+        }}</span>
       </span>
     </ng-template>
   `,

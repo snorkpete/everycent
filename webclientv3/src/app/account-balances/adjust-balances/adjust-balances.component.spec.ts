@@ -8,14 +8,12 @@ describe("AdjustBalancesComponent", () => {
   let component: AdjustBalancesComponent;
   let fixture: ComponentFixture<AdjustBalancesComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [SharedModule.forRoot(), TestConfigModule],
-        declarations: [AdjustBalancesComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [SharedModule.forRoot(), TestConfigModule],
+      declarations: [AdjustBalancesComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AdjustBalancesComponent);

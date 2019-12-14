@@ -15,40 +15,55 @@ import { BankAccountData } from "../bank-account.model";
       <div [formGroup]="form">
         <table class="table">
           <thead>
-          <tr>
-            <th>Bank Account</th>
-            <th *ngFor="let bankAccount of bankAccounts;">{{ bankAccount.name }}</th>
-          </tr>
+            <tr>
+              <th>Bank Account</th>
+              <th *ngFor="let bankAccount of bankAccounts">
+                {{ bankAccount.name }}
+              </th>
+            </tr>
           </thead>
           <tbody>
-          <tr>
-            <td>
-              Current Balance
-            </td>
-            <td formArrayName="adjustments" *ngFor="let bankAccount of bankAccounts; let i = index;">
-              <div [formGroupName]="i">
-                <ec-money-field [editMode]="false" formControlName="currentBalance"></ec-money-field>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              New Account Balance
-            </td>
-            <td formArrayName="adjustments" *ngFor="let bankAccount of bankAccounts; let i = index;">
-              <div [formGroupName]="i">
-                <ec-money-field [editMode]="true" formControlName="new_balance"></ec-money-field>
-              </div>
-            </td>
-          </tr>
+            <tr>
+              <td>
+                Current Balance
+              </td>
+              <td
+                formArrayName="adjustments"
+                *ngFor="let bankAccount of bankAccounts; let i = index"
+              >
+                <div [formGroupName]="i">
+                  <ec-money-field
+                    [editMode]="false"
+                    formControlName="currentBalance"
+                  ></ec-money-field>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                New Account Balance
+              </td>
+              <td
+                formArrayName="adjustments"
+                *ngFor="let bankAccount of bankAccounts; let i = index"
+              >
+                <div [formGroupName]="i">
+                  <ec-money-field
+                    [editMode]="true"
+                    formControlName="new_balance"
+                  ></ec-money-field>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
     <div mat-dialog-actions>
-      <ec-edit-actions [editMode]="true"
-                       (save)="saveChanges()"
-                       (cancel)="cancelChanges()"
+      <ec-edit-actions
+        [editMode]="true"
+        (save)="saveChanges()"
+        (cancel)="cancelChanges()"
       >
       </ec-edit-actions>
     </div>

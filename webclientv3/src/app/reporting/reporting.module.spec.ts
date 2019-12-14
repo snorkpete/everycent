@@ -1,13 +1,13 @@
-import { ReportingModule } from './reporting.module';
+import { ReportingModule } from "./reporting.module";
 
-describe('ReportingModule', () => {
+describe("ReportingModule", () => {
   let reportingModule: ReportingModule;
 
   beforeEach(() => {
     reportingModule = new ReportingModule();
   });
 
-  it('should create an instance', () => {
+  it("should create an instance", () => {
     expect(reportingModule).toBeTruthy();
   });
 });
