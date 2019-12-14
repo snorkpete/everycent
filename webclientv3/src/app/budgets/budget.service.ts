@@ -95,85 +95,37 @@ export class BudgetService {
   }
 
   sortBudgetAllocationsAndAssignCategoryNames(
-    allocations: AllocationData[],
+    budget: BudgetData,
     allocationCategories: AllocationCategoryData[]
   ) {
-    if (!allocations) {
-      return;
-    }
+    const newAllocationList = [];
 
-    // ensure that if we don't have any existing allocations for a category,
-    // that we create a 'dummy allocation' that will still allow the category
-    // to be in the list of allocations
     allocationCategories.forEach(category => {
-      let found = allocations.find(
-        allocation => category.id === allocation.allocation_category_id
-      );
+      const categoryRow: AllocationData = {
+        name: "",
+        allocationCategory: category.name,
+        allocation_category_id: category.id,
+        dummyTransaction: true,
+        isCategoryHeaderRow: true
+      };
 
-      if (!found) {
-        allocations.push({
-          name: "",
-          allocation_category_id: category.id,
-          dummyTransaction: true
-        });
-      }
+      const addAllocationRow: AllocationData = {
+        name: "",
+        allocationCategory: category.name,
+        allocation_category_id: category.id,
+        dummyTransaction: true,
+        isAllocationButtonRow: true
+      };
+
+      const allocationsForCategory = budget.allocations
+        .filter(allocation => allocation.allocation_category_id === category.id)
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      newAllocationList.push(categoryRow);
+      newAllocationList.push(...allocationsForCategory);
+      newAllocationList.push(addAllocationRow);
     });
 
-    allocations.sort((a, b) => {
-      let sortValue = 0;
-
-      let aCategoryName = this.findCategoryNameFromId(
-        a.allocation_category_id,
-        allocationCategories
-      );
-      let bCategoryName = this.findCategoryNameFromId(
-        b.allocation_category_id,
-        allocationCategories
-      );
-
-      // ensure that the allocations also contain the category names
-      // Yes, this is not the best use case for sorting - we should not be mutating
-      // the objects in the array while sorting them.
-      // However, doing this prevents us from having to iterate the array a second time
-      // to add the allocation names
-      a.allocationCategory = aCategoryName;
-      b.allocationCategory = bCategoryName;
-
-      if (aCategoryName < bCategoryName) {
-        sortValue = -10;
-      } else if (aCategoryName > bCategoryName) {
-        sortValue = 10;
-      } else {
-        sortValue = 0;
-      }
-
-      if (a.name < b.name) {
-        sortValue -= 1;
-      } else if (a.name > b.name) {
-        sortValue += 1;
-      }
-
-      return sortValue;
-    });
-
-    // going to cheat a bit with reduce - we dont actually want to reduce to a single value
-    // However, reduce gives you an easy way to compare adjacent elements in the array to each other
-    // to determine when the category changes
-    allocations.reduce((acc, current) => {
-      if (acc.allocation_category_id !== current.allocation_category_id) {
-        acc.lastInCategory = true;
-        current.firstInCategory = true;
-      } else {
-        acc.lastInCategory = false;
-        current.firstInCategory = false;
-      }
-
-      return current;
-    });
-
-    // the first element is always first
-    if (allocations.length > 0) {
-      allocations[0].firstInCategory = true;
-    }
+    budget.allocations = newAllocationList;
   }
 }

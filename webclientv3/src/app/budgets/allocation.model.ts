@@ -26,4 +26,8 @@ export interface AllocationData {
   lastInCategory?: boolean;
   allocationCategory?: string;
   dummyTransaction?: boolean;
+
+  // new extra properties used to display the allocations
+  isCategoryHeaderRow?: boolean;
+  isAllocationButtonRow?: boolean;
 }

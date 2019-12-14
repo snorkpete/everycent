@@ -80,7 +80,10 @@ export class BudgetComponent implements OnInit, OnDestroy {
     combineLatest(budgetData$, allocationData$).subscribe(result => {
       let [budget, allocationCategories] = result;
       this.allocationCategories = allocationCategories;
-      this.budgetService.sortBudgetAllocationsAndAssignCategoryNames(budget.allocations, this.allocationCategories);
+      this.budgetService.sortBudgetAllocationsAndAssignCategoryNames(
+        budget,
+        this.allocationCategories
+      );
       this.budget = budget;
       this.updateHeading();
     });
@@ -114,7 +117,10 @@ export class BudgetComponent implements OnInit, OnDestroy {
 
   saveBudget() {
     this.budgetService.saveBudget(this.budget).subscribe(budget => {
-      this.budgetService.sortBudgetAllocationsAndAssignCategoryNames(budget.allocations, this.allocationCategories);
+      this.budgetService.sortBudgetAllocationsAndAssignCategoryNames(
+        budget,
+        this.allocationCategories
+      );
       this.budget = budget;
       this.messageService.setMessage("Budget saved.");
       this.editMode = false;
@@ -126,5 +132,4 @@ export class BudgetComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.refresh();
   }
-
 }
