@@ -17,7 +17,8 @@ import { TransactionData } from "../transaction-data.model";
 
 @Component({
   selector: "ec-transaction-list",
-  styles: [`
+  styles: [
+    `
       table {
         width: 100%;
         table-layout: fixed;
@@ -56,131 +57,196 @@ import { TransactionData } from "../transaction-data.model";
         height: calc(100% - 24px);
         overflow: auto;
       }
-  `],
+    `
+  ],
   template: `
     <mat-card>
-        <mat-card-content>
-          <div class="table-container">
-            <table mat-table [dataSource]="transactions" [trackBy]="trackByFn" class="mat-elevation-z8">
+      <mat-card-content>
+        <div class="table-container">
+          <table
+            mat-table
+            [dataSource]="transactions"
+            [trackBy]="trackByFn"
+            class="mat-elevation-z8"
+          >
+            <!-- selection Column -->
+            <ng-container matColumnDef="selection">
+              <th mat-header-cell *matHeaderCellDef style="width:5%;"></th>
+              <td mat-cell *matCellDef="let transaction">
+                {{ transaction.item }}
+                <mat-checkbox
+                  color="primary"
+                  [(ngModel)]="transaction.selected"
+                ></mat-checkbox>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-              <!-- selection Column -->
-              <ng-container matColumnDef="selection">
-                <th mat-header-cell *matHeaderCellDef style="width:5%;"></th>
-                <td mat-cell *matCellDef="let transaction">
-                  {{transaction.item}}
-                  <mat-checkbox color="primary" [(ngModel)]="transaction.selected"></mat-checkbox>
-                </td>
-                <td mat-footer-cell *matFooterCellDef>  </td>
-              </ng-container>
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let transaction" style="width:15%;">
+                <ec-date-field
+                  [editMode]="isEditMode"
+                  [(ngModel)]="transaction.transaction_date"
+                  [ecValidateWithinBudget]="budget"
+                  [errorMessage]="'test'"
+                >
+                </ec-date-field>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-              <!-- Date Column -->
-              <ng-container matColumnDef="date">
-                <th mat-header-cell *matHeaderCellDef> Date </th>
-                <td mat-cell *matCellDef="let transaction" style="width:15%;">
-                  <ec-date-field
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef style="width:30%;">
+                Description
+              </th>
+              <td mat-cell *matCellDef="let transaction">
+                <ec-text-field
+                  [editMode]="isEditMode"
+                  [(ngModel)]="transaction.description"
+                ></ec-text-field>
+              </td>
+              <td mat-footer-cell *matFooterCellDef>Total</td>
+            </ng-container>
+
+            <!-- Allocation Column -->
+            <ng-container matColumnDef="allocation">
+              <th mat-header-cell *matHeaderCellDef style="width:20%;">
+                {{ allocationHeaderName() }}
+              </th>
+              <td mat-cell *matCellDef="let transaction">
+                <ng-container
+                  *ngIf="
+                    bankAccount?.is_sink_fund;
+                    then sinkFundAllocationField;
+                    else allocationField
+                  "
+                >
+                </ng-container>
+
+                <ng-template #sinkFundAllocationField>
+                  <ec-list-field
                     [editMode]="isEditMode"
-                    [(ngModel)]="transaction.transaction_date"
-                    [ecValidateWithinBudget]="budget"
-                    [errorMessage]="'test'"
+                    [items]="sinkFundAllocations"
+                    [(ngModel)]="transaction.sink_fund_allocation_id"
                   >
-                  </ec-date-field>
-                </td>
-                <td mat-footer-cell *matFooterCellDef>  </td>
-              </ng-container>
+                  </ec-list-field>
+                </ng-template>
 
-              <!-- Description Column -->
-              <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef style="width:30%;">Description</th>
-                <td mat-cell *matCellDef="let transaction">
-                  <ec-text-field [editMode]="isEditMode" [(ngModel)]="transaction.description"></ec-text-field>
-                </td>
-                <td mat-footer-cell *matFooterCellDef> Total </td>
-              </ng-container>
+                <ng-template #allocationField>
+                  <ec-list-field
+                    [editMode]="isEditMode"
+                    [items]="allocations"
+                    (change)="updatePaidStatus(transaction)"
+                    groupBy="allocation_category"
+                    [(ngModel)]="transaction.allocation_id"
+                  >
+                  </ec-list-field>
+                </ng-template>
+              </td>
 
-              <!-- Allocation Column -->
-              <ng-container matColumnDef="allocation">
-                <th mat-header-cell *matHeaderCellDef style="width:20%;">
-                  {{ allocationHeaderName() }}
-                </th>
-                <td mat-cell *matCellDef="let transaction">
+              <td mat-footer-cell *matFooterCellDef>Allocation</td>
+            </ng-container>
 
-                  <ng-container *ngIf="bankAccount?.is_sink_fund; then sinkFundAllocationField else allocationField">
-                  </ng-container>
+            <!-- Withdrawn Column -->
+            <ng-container matColumnDef="withdrawn">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                style="width:10%;"
+                class="right"
+              >
+                Withdrawn
+              </th>
+              <td mat-cell *matCellDef="let transaction" class="right">
+                <ec-money-field
+                  [editMode]="isEditMode"
+                  [(ngModel)]="transaction.withdrawal_amount"
+                ></ec-money-field>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-                  <ng-template #sinkFundAllocationField>
-                    <ec-list-field [editMode]="isEditMode"
-                                   [items]="sinkFundAllocations"
-                                   [(ngModel)]="transaction.sink_fund_allocation_id">
-                    </ec-list-field>
-                  </ng-template>
+            <!-- Deposit Column -->
+            <ng-container matColumnDef="deposit">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                style="width:10%;"
+                class="right"
+              >
+                Deposited
+              </th>
+              <td mat-cell *matCellDef="let transaction" class="right">
+                <ec-money-field
+                  [editMode]="isEditMode"
+                  [(ngModel)]="transaction.deposit_amount"
+                ></ec-money-field>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-                  <ng-template #allocationField>
-                    <ec-list-field [editMode]="isEditMode"
-                                   [items]="allocations"
-                                   (change)="updatePaidStatus(transaction)"
-                                   groupBy="allocation_category"
-                                   [(ngModel)]="transaction.allocation_id">
-                    </ec-list-field>
-                  </ng-template>
+            <!-- Status Column -->
+            <ng-container matColumnDef="paid">
+              <th mat-header-cell *matHeaderCellDef style="width:5%;">Paid?</th>
+              <td mat-cell *matCellDef="let transaction" class="center">
+                <ec-paid-field
+                  [editMode]="isEditMode"
+                  [(ngModel)]="transaction.status"
+                ></ec-paid-field>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-                </td>
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef style="width:5%;">
+                Action
+              </th>
+              <td mat-cell *matCellDef="let transaction" class="center">
+                <ec-delete-button
+                  [editMode]="isEditMode"
+                  [item]="transaction"
+                ></ec-delete-button>
+              </td>
+              <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
 
-                <td mat-footer-cell *matFooterCellDef> Allocation </td>
-              </ng-container>
+            <tr
+              mat-header-row
+              *matHeaderRowDef="displayedColumns; sticky: true"
+            ></tr>
 
-              <!-- Withdrawn Column -->
-              <ng-container matColumnDef="withdrawn">
-                <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right">Withdrawn</th>
-                <td mat-cell *matCellDef="let transaction" class="right">
-                  <ec-money-field [editMode]="isEditMode" [(ngModel)]="transaction.withdrawal_amount"></ec-money-field>
-                </td>
-                <td mat-footer-cell *matFooterCellDef></td>
-              </ng-container>
-
-              <!-- Deposit Column -->
-              <ng-container matColumnDef="deposit">
-                <th mat-header-cell *matHeaderCellDef style="width:10%;" class="right">Deposited</th>
-                <td mat-cell *matCellDef="let transaction" class="right">
-                  <ec-money-field [editMode]="isEditMode" [(ngModel)]="transaction.deposit_amount"></ec-money-field>
-                </td>
-                <td mat-footer-cell *matFooterCellDef></td>
-              </ng-container>
-
-              <!-- Status Column -->
-              <ng-container matColumnDef="paid">
-                <th mat-header-cell *matHeaderCellDef style="width:5%;">Paid?</th>
-                <td mat-cell *matCellDef="let transaction" class="center">
-                  <ec-paid-field [editMode]="isEditMode" [(ngModel)]="transaction.status"></ec-paid-field>
-                </td>
-                <td mat-footer-cell *matFooterCellDef></td>
-              </ng-container>
-
-              <!-- Action Column -->
-              <ng-container matColumnDef="action">
-                <th mat-header-cell *matHeaderCellDef style="width:5%;">Action</th>
-                <td mat-cell *matCellDef="let transaction" class="center">
-                  <ec-delete-button [editMode]="isEditMode" [item]="transaction"></ec-delete-button>
-                </td>
-                <td mat-footer-cell *matFooterCellDef> </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true">
-              </tr>
-
-              <tr mat-row *matRowDef="let transaction; columns: displayedColumns;"
-                  [ecHighlightDeletedFor]="transaction"></tr>
-
-            </table>
-          </div>
+            <tr
+              mat-row
+              *matRowDef="let transaction; columns: displayedColumns"
+              [ecHighlightDeletedFor]="transaction"
+            ></tr>
+          </table>
+        </div>
       </mat-card-content>
       <mat-card-actions>
-        <ec-edit-actions [(editMode)]="isEditMode"
-                         (save)="save.emit(transactions)"
-                         (cancel)="cancel.emit()">
-          <button *ngIf="isEditMode" mat-raised-button color="primary" (click)="addTransaction()">
+        <ec-edit-actions
+          [(editMode)]="isEditMode"
+          (save)="save.emit(transactions)"
+          (cancel)="cancel.emit()"
+        >
+          <button
+            *ngIf="isEditMode"
+            mat-raised-button
+            color="primary"
+            (click)="addTransaction()"
+          >
             Add New Transaction
           </button>
-          <button *ngIf="isEditMode" mat-raised-button color="accent" (click)="import.emit()">
+          <button
+            *ngIf="isEditMode"
+            mat-raised-button
+            color="accent"
+            (click)="import.emit()"
+          >
             Import Transactions
           </button>
         </ec-edit-actions>

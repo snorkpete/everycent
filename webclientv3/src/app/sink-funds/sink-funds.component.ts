@@ -9,15 +9,14 @@ import { SinkFundService } from "./sink-fund.service";
 
 @Component({
   selector: "ec-sink-funds",
-  styles: [
-    `
-  `
-  ],
+  styles: [``],
   template: `
     <mat-card class="main">
-      <ec-sink-fund-selector #selector
-                             [sinkFunds]="sinkFunds"
-                             (change)="onSinkFundSelect($event)">
+      <ec-sink-fund-selector
+        #selector
+        [sinkFunds]="sinkFunds"
+        (change)="onSinkFundSelect($event)"
+      >
       </ec-sink-fund-selector>
 
       <ec-sink-fund [sinkFund]="sinkFund"></ec-sink-fund>

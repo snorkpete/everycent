@@ -20,7 +20,8 @@ import { TransactionService } from "../transaction.service";
   selector: "ec-transactions",
   styles: [
     `
-      mat-card-content, .container {
+      mat-card-content,
+      .container {
         height: 100%;
         overflow: auto;
       }
@@ -36,7 +37,7 @@ import { TransactionService } from "../transaction.service";
         column-gap: 20px;
       }
 
-      @media (max-width: 600px){
+      @media (max-width: 600px) {
         mat-card.main {
           height: 100%;
         }
@@ -65,8 +66,7 @@ import { TransactionService } from "../transaction.service";
         overflow: auto;
         width: 100%;
       }
-
-  `
+    `
   ],
   template: `
     <mat-card class="main">
@@ -74,12 +74,12 @@ import { TransactionService } from "../transaction.service";
         <ec-transaction-calculator [transactions]="transactions">
         </ec-transaction-calculator>
         <div class="container">
-          <ec-transaction-search-form (change)="refreshTransactions($event)"
-          >
+          <ec-transaction-search-form (change)="refreshTransactions($event)">
           </ec-transaction-search-form>
-          <ec-transaction-summary [transactions]="transactions"
-                                  [bankAccount]="bankAccount"
-                                  [allocations]="allocations"
+          <ec-transaction-summary
+            [transactions]="transactions"
+            [bankAccount]="bankAccount"
+            [allocations]="allocations"
           >
           </ec-transaction-summary>
           <ec-transaction-list

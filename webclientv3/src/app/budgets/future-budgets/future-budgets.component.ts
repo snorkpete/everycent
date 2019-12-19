@@ -15,12 +15,17 @@ import { FutureIncomeListComponent } from "./incomes/future-income-list.componen
       <mat-card-content>
         <mat-card>
           <table class="table">
-            <tbody ec-future-income-list [budgets]="budgets" (save)="massSave($event)">
-            </tbody>
-            <tbody ec-future-allocation-list [budgets]="budgets" (save)="massSave($event)">
-            </tbody>
-            <tfoot ec-future-budget-summary [budgets]="budgets">
-            </tfoot>
+            <tbody
+              ec-future-income-list
+              [budgets]="budgets"
+              (save)="massSave($event)"
+            ></tbody>
+            <tbody
+              ec-future-allocation-list
+              [budgets]="budgets"
+              (save)="massSave($event)"
+            ></tbody>
+            <tfoot ec-future-budget-summary [budgets]="budgets"></tfoot>
           </table>
         </mat-card>
       </mat-card-content>
