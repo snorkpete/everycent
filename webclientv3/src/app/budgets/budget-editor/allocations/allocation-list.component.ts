@@ -362,7 +362,9 @@ export class AllocationListComponent implements OnInit {
 
   nbrColumns = 8;
 
-  @ViewChild(MatTable) allocationList: MatTable<AllocationData>;
+  @ViewChild(MatTable, { static: true }) allocationList: MatTable<
+    AllocationData
+  >;
 
   DESKTOP_CATEGORY_COLUMNS: string[] = [
     "categoryName",
@@ -402,7 +404,7 @@ export class AllocationListComponent implements OnInit {
   displayedColumns: string[] = [];
 
   mobileQuery: MediaQueryList;
-  private _mobileQueryListener: MediaQueryListListener = query => {
+  private _mobileQueryListener = query => {
     if (query.matches) {
       this.displayedColumns = this.MOBILE_COLUMNS;
       this.categoryColumns = this.MOBILE_CATEGORY_COLUMNS;

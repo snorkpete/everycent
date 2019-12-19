@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import "./polyfills";
 
 import "zone.js/dist/zone-testing";

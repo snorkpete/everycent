@@ -113,7 +113,7 @@ export class CategorySpendingReportComponent implements OnInit {
 
   selectedCategory = "";
   selectedCategoryForm = new FormControl("");
-  @ViewChild(MatTable) table: MatTable<any>;
+  @ViewChild(MatTable, { static: true }) table: MatTable<any>;
 
   constructor(
     private toolbarService: MainToolbarService,
