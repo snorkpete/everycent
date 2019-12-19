@@ -16,13 +16,24 @@ import { SetupService } from "./setup.service";
       <mat-card>
         <mat-card-title>Bank Accounts</mat-card-title>
         <mat-card-content>
-          <mat-slide-toggle [(ngModel)]="showClosed" color="primary">Show Closed Accounts?</mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="showClosed" color="primary"
+            >Show Closed Accounts?</mat-slide-toggle
+          >
           <mat-list>
             <ng-container *ngFor="let bankAccount of bankAccounts">
-              <mat-list-item *ngIf="deactivateService.isItemVisible(bankAccount, showClosed)" [ecHighlightDeletedFor]="bankAccount">
+              <mat-list-item
+                *ngIf="deactivateService.isItemVisible(bankAccount, showClosed)"
+                [ecHighlightDeletedFor]="bankAccount"
+              >
                 <div class="list-item-with-action-buttons">
                   <span> {{ bankAccount.name }} </span>
-                  <button mat-raised-button color="primary" (click)="viewDetails(bankAccount)">View</button>
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="viewDetails(bankAccount)"
+                  >
+                    View
+                  </button>
                 </div>
               </mat-list-item>
               <mat-divider></mat-divider>
@@ -30,7 +41,9 @@ import { SetupService } from "./setup.service";
           </mat-list>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-raised-button color="primary" (click)="addBankAccount()">Add Bank Account</button>
+          <button mat-raised-button color="primary" (click)="addBankAccount()">
+            Add Bank Account
+          </button>
           <button mat-raised-button (click)="refresh()">Refresh</button>
         </mat-card-actions>
       </mat-card>

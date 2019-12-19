@@ -1,24 +1,35 @@
 /* tslint:disable:no-unused-variable */
-import {async, ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
-import {Component, ElementRef, NO_ERRORS_SCHEMA, OnInit, ViewChild} from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick
+} from "@angular/core/testing";
+import { By } from "@angular/platform-browser";
+import {
+  Component,
+  ElementRef,
+  NO_ERRORS_SCHEMA,
+  OnInit,
+  ViewChild
+} from "@angular/core";
 
-import {TextFieldComponent} from './text-field.component';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {SharedModule} from "../../shared.module";
-import {EcMaterialModule} from "../../ec-material/ec-material.module";
+import { TextFieldComponent } from "./text-field.component";
+import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { SharedModule } from "../../shared.module";
+import { EcMaterialModule } from "../../ec-material/ec-material.module";
 
 @Component({
-  selector: 'ec-form-tester',
+  selector: "ec-form-tester",
   template: `
     <div [formGroup]="form">
-        <ec-text-field #first [editMode]="true"></ec-text-field>
-        <input #last type="text" formControlName="last" />
+      <ec-text-field #first [editMode]="true"></ec-text-field>
+      <input #last type="text" formControlName="last" />
     </div>
   `
 })
 class FormTesterComponent implements OnInit {
-
   form: FormGroup;
 
   @ViewChild(TextFieldComponent, /* TODO: add static flag */ {})
@@ -27,24 +38,24 @@ class FormTesterComponent implements OnInit {
   @ViewChild("last", /* TODO: add static flag */ {})
   last: ElementRef;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      first: 'first',
-      last: 'last',
+      first: "first",
+      last: "last"
     });
   }
 }
 
-describe('TextFieldComponent', () => {
+describe("TextFieldComponent", () => {
   let component: TextFieldComponent;
   let fixture: ComponentFixture<TextFieldComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [EcMaterialModule, ReactiveFormsModule],
-      declarations: [ TextFieldComponent, FormTesterComponent ],
+      declarations: [TextFieldComponent, FormTesterComponent]
       //schemas: [NO_ERRORS_SCHEMA],
     });
   }));
@@ -55,47 +66,45 @@ describe('TextFieldComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 
-  describe('NON-EDIT-MODE', () => {
-
+  describe("NON-EDIT-MODE", () => {
     beforeEach(() => {
       component.editMode = false;
-      component.value = 'Hello';
+      component.value = "Hello";
       fixture.detectChanges();
     });
 
-    it('displays its value as plain text', () => {
-      let textEl = fixture.debugElement.query(By.css('span.value'));
-      expect(textEl.nativeElement.textContent).toEqual('Hello');
+    it("displays its value as plain text", () => {
+      let textEl = fixture.debugElement.query(By.css("span.value"));
+      expect(textEl.nativeElement.textContent).toEqual("Hello");
     });
 
-    it('does NOT display the editable text field', () => {
+    it("does NOT display the editable text field", () => {
       // must use the native element to test for null values
       // the debugElement version hangs up when testing null values
-      let el = fixture.nativeElement.querySelector('input.value');
+      let el = fixture.nativeElement.querySelector("input.value");
       expect(el).toBeNull("text field view doesn't exist");
     });
   });
 
-  describe('EDIT-MODE', () => {
-    it('displays a text field containing the value', async(() => {
+  describe("EDIT-MODE", () => {
+    it("displays a text field containing the value", async(() => {
       component.editMode = true;
-      component.value = 'Hello';
+      component.value = "Hello";
       //fixture.detectChanges();
 
       //let inputEl = fixture.debugElement.query(By.css('input.value'));
       //expect(inputEl.nativeElement.value).toEqual('Hello', 'sets the input field properly');
 
-//      let el = fixture.nativeElement.querySelector('span.value');
-//      expect(el).toBeNull('span not visible');
+      //      let el = fixture.nativeElement.querySelector('span.value');
+      //      expect(el).toBeNull('span not visible');
     }));
   });
 
-  describe('Form Handling', () => {
-
+  describe("Form Handling", () => {
     let testHarnessFixture: ComponentFixture<FormTesterComponent>;
     let testHarnessComponent: FormTesterComponent;
 
@@ -105,32 +114,26 @@ describe('TextFieldComponent', () => {
       //testHarnessFixture.detectChanges();
     });
 
-    it('sanity check that test harness is configured properly', () => {
+    it("sanity check that test harness is configured properly", () => {
       //let lastEl = testHarnessComponent.last.nativeElement;
       //lastEl.value = 'my value';
       //lastEl.dispatchEvent(new Event('input'));
       //expect(testHarnessComponent.form.value).toEqual({first: 'first', last: 'my value'});
     });
 
-    it('check that the form send values to the text field', fakeAsync(() => {
+    it("check that the form send values to the text field", fakeAsync(() => {
       //testHarnessFixture.detectChanges();
       //tick();
       //testHarnessComponent.form.setValue({ first: 'Hello', last: 'World' });
       //expect(testHarnessComponent.form.controls['first'].value).toEqual('Hello');
-
       //expect(testHarnessComponent.last.nativeElement.value).toEqual('World');
       //expect(testHarnessComponent.first.value).toEqual('World');
       //expect(testHarnessComponent.form.value).toEqual({ first: "Hello", last: "World"});
-
       //expect(testHarnessComponent.first.value).toEqual('Hello');
       //testHarnessFixture.detectChanges();
-
       // seems like detectChanges() isn't needed - dispatch event properly updates the form without it
       // testFixture.detechChanges();
-
       //expect(testHarnessComponent.form.value).toEqual({first: 'a new value', last: 'my value'});
-
     }));
-
   });
 });
