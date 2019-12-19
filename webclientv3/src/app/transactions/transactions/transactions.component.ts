@@ -181,7 +181,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     dialogRef.componentInstance.importType = this.bankAccount.import_format;
 
     dialogRef.afterClosed().subscribe((newTransactions: TransactionData[]) => {
-      this.transactions = this.transactions.concat(newTransactions);
+      if (newTransactions.length > 0) {
+        this.transactions = this.transactions.concat(newTransactions);
+      }
     });
 
     return dialogRef;
