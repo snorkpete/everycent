@@ -31,9 +31,10 @@ import { FutureIncomeListComponent } from "./incomes/future-income-list.componen
 export class FutureBudgetsComponent implements OnInit {
   budgets: BudgetData[] = [];
 
-  @ViewChild(FutureIncomeListComponent) incomeList: FutureIncomeListComponent;
+  @ViewChild(FutureIncomeListComponent, { static: true })
+  incomeList: FutureIncomeListComponent;
 
-  @ViewChild(FutureAllocationListComponent)
+  @ViewChild(FutureAllocationListComponent, { static: true })
   allocationList: FutureAllocationListComponent;
 
   constructor(

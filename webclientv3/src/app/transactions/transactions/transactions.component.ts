@@ -105,7 +105,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   bankAccount: BankAccountData = {};
   budget: BudgetData = {};
 
-  @ViewChild(TransactionListComponent)
+  @ViewChild(TransactionListComponent, { static: true })
   transactionList: TransactionListComponent;
 
   componentDestroyed = new Subject();

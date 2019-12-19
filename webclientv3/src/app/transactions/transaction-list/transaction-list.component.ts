@@ -220,16 +220,18 @@ export class TransactionListComponent implements OnInit, OnDestroy {
   ];
   displayedColumns: string[] = [];
 
-  @ViewChild(MatTable) transactionList: MatTable<TransactionData>;
+  @ViewChild(MatTable, { static: true }) transactionList: MatTable<
+    TransactionData
+  >;
 
   mobileQuery: MediaQueryList;
-  private _mobileQueryListener: MediaQueryListListener = query => {
+  private _mobileQueryListener = query => {
     if (query.matches) {
       this.displayedColumns = this.MOBILE_COLUMNS;
     } else {
       this.displayedColumns = this.DESKTOP_COLUMNS;
     }
-  }
+  };
 
   constructor(media: MediaMatcher) {
     this.mobileQuery = media.matchMedia("(max-width: 600px)");

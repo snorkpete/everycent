@@ -114,7 +114,7 @@ describe("ListFieldComponent", () => {
 
     describe("with grouping", () => {
       beforeEach(() => {
-        component.groupBy = "group"; /*? component.groupBy */
+        component.groupBy = "group";
       });
 
       it("has the correct number of option groups", () => {

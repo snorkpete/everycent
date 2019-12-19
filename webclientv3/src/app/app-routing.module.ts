@@ -16,26 +16,40 @@ const appRoutes: Routes = [
       { path: "", component: HomeComponent },
       {
         path: "budgets",
-        loadChildren: "app/budgets/budgets.module#BudgetsModule"
+        loadChildren: () =>
+          import("app/budgets/budgets.module").then(m => m.BudgetsModule)
       },
       {
         path: "transactions",
-        loadChildren: "app/transactions/transactions.module#TransactionsModule"
+        loadChildren: () =>
+          import("app/transactions/transactions.module").then(
+            m => m.TransactionsModule
+          )
       },
       {
         path: "sink-funds",
-        loadChildren: "app/sink-funds/sink-funds.module#SinkFundsModule"
+        loadChildren: () =>
+          import("app/sink-funds/sink-funds.module").then(
+            m => m.SinkFundsModule
+          )
       },
       {
         path: "account-balances",
-        loadChildren:
-          "app/account-balances/account-balances.module#AccountBalancesModule"
+        loadChildren: () =>
+          import("app/account-balances/account-balances.module").then(
+            m => m.AccountBalancesModule
+          )
       },
       {
         path: "reports",
-        loadChildren: "app/reporting/reporting.module#ReportingModule"
+        loadChildren: () =>
+          import("app/reporting/reporting.module").then(m => m.ReportingModule)
       },
-      { path: "setup", loadChildren: "app/setup/setup.module#SetupModule" }
+      {
+        path: "setup",
+        loadChildren: () =>
+          import("app/setup/setup.module").then(m => m.SetupModule)
+      }
     ]
   }
 ];

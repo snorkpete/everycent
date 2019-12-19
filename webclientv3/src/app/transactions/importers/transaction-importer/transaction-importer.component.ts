@@ -58,6 +58,7 @@ export class TransactionImporterComponent implements OnInit {
   @Input() endDate: string;
   @Input() importType = "abn-amro-bank";
 
+  // provided for easier testing of this component
   @Output() import = new EventEmitter();
 
   constructor(
