@@ -21,10 +21,10 @@ class FormTesterComponent implements OnInit {
 
   form: FormGroup;
 
-  @ViewChild(TextFieldComponent)
+  @ViewChild(TextFieldComponent, /* TODO: add static flag */ {})
   first: TextFieldComponent;
 
-  @ViewChild('last')
+  @ViewChild("last", /* TODO: add static flag */ {})
   last: ElementRef;
 
   constructor(private fb: FormBuilder) { }
