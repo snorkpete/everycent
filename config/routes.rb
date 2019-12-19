@@ -49,6 +49,10 @@ Rails.application.routes.draw do
     collection do
       post 'manually_adjust_balances'
     end
+
+    member do
+      post 'transfer'
+    end
   end
 
   resources :sink_fund_allocations, only: [:index]

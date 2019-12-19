@@ -29,6 +29,7 @@ class BankAccount < ApplicationRecord
   include CreditCard
   include SinkFund
   include ManualBalanceAdjustments
+  include Transfers
 
   # force this model to always require scoping to a household
   acts_as_tenant :household

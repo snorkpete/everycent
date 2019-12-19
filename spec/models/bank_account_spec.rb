@@ -30,6 +30,7 @@ require 'rails_helper'
 require 'models/shared_examples/credit_card_spec'
 require 'models/shared_examples/sink_fund_spec'
 require 'models/shared_examples/manual_balance_adjustments_spec'
+require 'models/shared_examples/transfers_spec'
 
 RSpec.describe BankAccount, :type => :model do
   before do
@@ -74,5 +75,6 @@ RSpec.describe BankAccount, :type => :model do
   include_examples "CreditCard"
   include_examples "SinkFund"
   include_examples "ManualBalanceAdjustments"
+  include_examples "Transfers"
 
 end
