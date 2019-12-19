@@ -66,12 +66,13 @@ export class BankAccountsComponent implements OnInit {
       .subscribe(institutions => (this.institutions = institutions));
   }
 
-  viewDetails(bankAccount: BankAccountData) {
+  viewDetails(bankAccount: BankAccountData, openInEditMode = false) {
     let dialogRef = this.dialog.open(BankAccountEditFormComponent, {});
 
     const form = dialogRef.componentInstance;
     form.bankAccount = bankAccount;
     form.institutions = this.institutions;
+    form.editMode = openInEditMode;
     form.save
       .pipe(
         switchMap(updatedBankAccount =>
@@ -92,6 +93,6 @@ export class BankAccountsComponent implements OnInit {
   }
 
   addBankAccount() {
-    this.viewDetails({ id: 0, name: "" });
+    this.viewDetails({ id: 0, name: "" }, true);
   }
 }
