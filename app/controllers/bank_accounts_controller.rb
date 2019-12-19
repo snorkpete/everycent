@@ -47,6 +47,16 @@ class BankAccountsController < ApplicationController
     end
   end
 
+  def transfer
+    result = BankAccount.transfer(params)
+
+    if result[:success]
+      render json: result
+    else
+      render json: result, status: 400
+    end
+  end
+
   def destroy
     @bank_account.destroy
     respond_with(@bank_account, BankAccountSerializer)
