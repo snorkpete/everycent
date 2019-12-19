@@ -29,7 +29,7 @@ export class SinkFundsComponent implements OnInit, OnDestroy {
   sinkFunds: SinkFundData[];
   onDestroy$ = new Subject();
 
-  @ViewChild("selector") selector: SinkFundSelectorComponent;
+  @ViewChild("selector", { static: true }) selector: SinkFundSelectorComponent;
 
   constructor(
     private sinkFundService: SinkFundService,

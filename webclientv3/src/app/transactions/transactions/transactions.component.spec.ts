@@ -1,15 +1,18 @@
 import { NO_ERRORS_SCHEMA } from "@angular/core";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { BrowserDynamicTestingModule } from "@angular/platform-browser-dynamic/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { BankAccountService } from "../../bank-accounts/bank-account.service";
 import { BudgetService } from "../../budgets/budget.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { SharedModule } from "../../shared/shared.module";
+import { TransactionImporterComponent } from "../importers/transaction-importer/transaction-importer.component";
 import { TransactionDataService } from "../transaction-data.service";
 import { TransactionListComponent } from "../transaction-list/transaction-list.component";
 import { TransactionSearchParams } from "../transaction-search-form/transaction-search-params.model";
 import { TransactionService } from "../transaction.service";
+import { TransactionsModule } from "../transactions.module";
 
 import { TransactionsComponent } from "./transactions.component";
 
@@ -17,21 +20,29 @@ describe("TransactionsComponent", () => {
   let component: TransactionsComponent;
   let fixture: ComponentFixture<TransactionsComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        imports: [SharedModule.forRoot(), TestConfigModule],
-        declarations: [TransactionsComponent, TransactionListComponent],
-        schemas: [NO_ERRORS_SCHEMA],
-        providers: [
-          TransactionDataService,
-          BudgetService,
-          BankAccountService,
-          TransactionService
-        ]
-      }).compileComponents();
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [SharedModule.forRoot(), TestConfigModule, TransactionsModule],
+      // declarations: [
+      //   TransactionsComponent,
+      //   TransactionListComponent,
+      //   TransactionImporterComponent
+      // ],
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        TransactionDataService,
+        BudgetService,
+        BankAccountService,
+        TransactionService
+      ]
     })
-  );
+      .overrideModule(BrowserDynamicTestingModule, {
+        set: {
+          entryComponents: [TransactionImporterComponent]
+        }
+      })
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionsComponent);
@@ -49,7 +60,7 @@ describe("TransactionsComponent", () => {
     expect(toolbarService.getHeading()).toBe("Transactions");
   });
 
-  xit("resets properly after save", () => {
+  it("resets properly after save", () => {
     let transactionService = TestBed.get(TransactionService);
     spyOn(transactionService, "save").and.returnValue(of([]));
     fixture.detectChanges();
@@ -58,4 +69,18 @@ describe("TransactionsComponent", () => {
     fixture.detectChanges();
     expect(component.transactionList.isEditMode).toBe(false);
   });
+
+  // this doesn't work - the dialog never triggers the subscribe
+  xit("shows the dialog", () =>
+    async(() => {
+      component.transactions = [];
+      let dialog = component.showImportForm();
+
+      dialog.close([{ name: "new transaction result" }]);
+
+      fixture.whenStable().then(() => {
+        fixture.detectChanges();
+        expect(component.transactions.length).toEqual(2);
+      });
+    }));
 });

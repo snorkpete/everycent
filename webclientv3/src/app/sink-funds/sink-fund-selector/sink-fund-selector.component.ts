@@ -13,18 +13,26 @@ import { SinkFundData } from "../sink-fund-data.model";
   selector: "ec-sink-fund-selector",
   styles: [
     `
-    mat-form-field {
-      width: 100%;
-    }
-  `
+      mat-form-field {
+        width: 100%;
+      }
+    `
   ],
   template: `
     <mat-card>
       <mat-card-content>
         <mat-form-field>
-          <mat-select #field color="primary" placeholder="Select a sink fund" (selectionChange)="change.emit($event)">
-            <mat-option *ngFor="let sinkFund of sinkFunds" [value]="sinkFund.id">
-              {{sinkFund.name}}
+          <mat-select
+            #field
+            color="primary"
+            placeholder="Select a sink fund"
+            (selectionChange)="change.emit($event)"
+          >
+            <mat-option
+              *ngFor="let sinkFund of sinkFunds"
+              [value]="sinkFund.id"
+            >
+              {{ sinkFund.name }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -36,7 +44,7 @@ export class SinkFundSelectorComponent implements OnInit {
   @Input() sinkFunds: SinkFundData[] = [];
   @Output() change = new EventEmitter();
 
-  @ViewChild("field") field: MatSelect;
+  @ViewChild("field", { static: true }) field: MatSelect;
 
   get value() {
     if (this.field) {

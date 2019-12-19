@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
-import { ObservableMedia } from "@angular/flex-layout";
+import { MediaObserver } from "@angular/flex-layout";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Subscription } from "rxjs";
@@ -251,7 +251,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
   mediaSubscription: Subscription;
 
   constructor(
-    private media: ObservableMedia,
+    private media: MediaObserver,
     private sinkFundService: SinkFundService,
     private transactionService: SharedTransactionService,
     private dialog: MatDialog,
@@ -263,7 +263,7 @@ export class SinkFundComponent implements OnInit, OnDestroy {
     this.calculator = new SinkFundCalculator(this.deactivateService);
     this.sinkFund = { sink_fund_allocations: [] };
 
-    this.mediaSubscription = this.media.subscribe(() => {
+    this.mediaSubscription = this.media.asObservable().subscribe(() => {
       this.isSmallScreen = this.media.isActive("xs");
     });
   }
