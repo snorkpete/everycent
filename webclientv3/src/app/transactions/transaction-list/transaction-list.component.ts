@@ -249,6 +249,16 @@ import { TransactionData } from "../transaction-data.model";
           >
             Import Transactions
           </button>
+
+          <button
+            *ngIf="isEditMode"
+            mat-raised-button
+            class="transfer"
+            color="accent"
+            (click)="transfer.emit()"
+          >
+            Transfer
+          </button>
         </ec-edit-actions>
       </mat-card-actions>
     </mat-card>
@@ -263,6 +273,7 @@ export class TransactionListComponent implements OnInit, OnDestroy {
   @Input() isEditMode = false;
 
   @Output() save = new EventEmitter<TransactionData[]>();
+  @Output() transfer = new EventEmitter();
   @Output() import = new EventEmitter();
   @Output() cancel = new EventEmitter();
 

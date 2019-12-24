@@ -13,6 +13,7 @@ import { TransactionListComponent } from "../transaction-list/transaction-list.c
 import { TransactionSearchParams } from "../transaction-search-form/transaction-search-params.model";
 import { TransactionService } from "../transaction.service";
 import { TransactionsModule } from "../transactions.module";
+import { TransactionTransferModule } from "../transfer/transaction-transfer.module";
 
 import { TransactionsComponent } from "./transactions.component";
 
@@ -22,12 +23,12 @@ describe("TransactionsComponent", () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule.forRoot(), TestConfigModule, TransactionsModule],
-      // declarations: [
-      //   TransactionsComponent,
-      //   TransactionListComponent,
-      //   TransactionImporterComponent
-      // ],
+      imports: [
+        SharedModule.forRoot(),
+        TestConfigModule,
+        TransactionsModule,
+        TransactionTransferModule
+      ],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         TransactionDataService,
@@ -83,4 +84,21 @@ describe("TransactionsComponent", () => {
         expect(component.transactions.length).toEqual(2);
       });
     }));
+
+  describe("#showTransferForm", () => {
+    it("gets its allocations from the currently selected budget", () => {
+      // first run of change detection to ensure ngInit fires
+      fixture.detectChanges();
+
+      component.allocations = [{ id: 2, name: "Test" }];
+      let dialog = component.showTransferForm();
+      const transferFormComponent = dialog.componentInstance;
+      fixture.detectChanges();
+
+      expect(transferFormComponent.allocations).toEqual(component.allocations);
+
+      // fixture.whenStable().then(() => {
+      // });
+    });
+  });
 });
