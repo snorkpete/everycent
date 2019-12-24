@@ -15,6 +15,7 @@ import { TransactionDataService } from "../transaction-data.service";
 import { TransactionListComponent } from "../transaction-list/transaction-list.component";
 import { TransactionSearchParams } from "../transaction-search-form/transaction-search-params.model";
 import { TransactionService } from "../transaction.service";
+import { TransferFormComponent } from "../transfer/transfer-form/transfer-form.component";
 
 @Component({
   selector: "ec-transactions",
@@ -91,6 +92,7 @@ import { TransactionService } from "../transaction.service";
             (save)="save()"
             (cancel)="cancel()"
             (import)="showImportForm()"
+            (transfer)="showTransferForm()"
           >
           </ec-transaction-list>
         </div>
@@ -185,6 +187,17 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.transactions = this.transactions.concat(newTransactions);
       }
     });
+
+    return dialogRef;
+  }
+
+  // TODO: move this to a service
+  showTransferForm(): MatDialogRef<TransferFormComponent> {
+    let dialogRef = this.dialog.open(TransferFormComponent, {
+      width: "350px"
+    });
+
+    dialogRef.componentInstance.allocations = this.allocations;
 
     return dialogRef;
   }

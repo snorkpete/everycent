@@ -11,12 +11,14 @@ import { TransactionService } from "./transaction.service";
 import { TransactionsRoutingModule } from "./transactions-routing.module";
 import { TransactionsComponent } from "./transactions/transactions.component";
 import { TransactionCalculatorComponent } from "./transaction-calculator/transaction-calculator.component";
+import { TransactionTransferModule } from "./transfer/transaction-transfer.module";
 
 @NgModule({
   imports: [
     SharedModule,
     SharedTransactionsModule,
     TransactionImporterModule,
+    TransactionTransferModule,
     TransactionsRoutingModule
   ],
   declarations: [

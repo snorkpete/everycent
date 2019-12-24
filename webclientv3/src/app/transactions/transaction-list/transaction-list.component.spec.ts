@@ -42,4 +42,20 @@ describe("TransactionListComponent", () => {
     component.switchToDisplayMode();
     expect(component.isEditMode).toBe(false);
   });
+
+  describe("Transfer", () => {
+    it("has no Transfer button when in view mode", () => {
+      component.isEditMode = false;
+      fixture.detectChanges();
+      let editButton = de.query(By.css("button.transfer"));
+      expect(editButton).toBe(null);
+    });
+
+    it("has a Transfer button when in edit mode", () => {
+      component.isEditMode = true;
+      fixture.detectChanges();
+      let editButton = de.query(By.css("button.transfer"));
+      expect(editButton).toBeTruthy();
+    });
+  });
 });

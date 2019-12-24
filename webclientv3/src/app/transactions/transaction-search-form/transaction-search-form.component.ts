@@ -20,39 +20,49 @@ import { BudgetService } from "../../budgets/budget.service";
   selector: "ec-transaction-search-form",
   styles: [
     `
-    mat-card {
-      padding: 12px;
-    }
-  `
+      mat-card {
+        padding: 12px;
+      }
+    `
   ],
   template: `
     <form (ngSubmit)="onSubmit()" [formGroup]="form">
-    <mat-card>
+      <mat-card>
+        <mat-card-title>Select Transactions to View</mat-card-title>
+        <mat-card-content>
+          <div fxLayout="row" fxLayoutGap="20px">
+            <mat-form-field fxFlex="2 0 auto">
+              <mat-select
+                placeholder="Bank Account"
+                formControlName="bank_account_id"
+              >
+                <mat-option
+                  *ngFor="let bankAccount of bankAccounts"
+                  [value]="bankAccount.id"
+                  >{{ bankAccount.name }}</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
 
-      <mat-card-title>Select Transactions to View</mat-card-title>
-      <mat-card-content>
-        <div fxLayout="row" fxLayoutGap="20px">
+            <mat-form-field fxFlex="2 0 auto">
+              <mat-select placeholder="Budget" formControlName="budget_id">
+                <mat-option
+                  *ngFor="let budget of budgets"
+                  [value]="budget.id"
+                  >{{ budget.name }}</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
+          </div>
 
-          <mat-form-field fxFlex="2 0 auto">
-            <mat-select placeholder="Bank Account" formControlName="bank_account_id">
-              <mat-option *ngFor="let bankAccount of bankAccounts" [value]="bankAccount.id">{{bankAccount.name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field fxFlex="2 0 auto">
-            <mat-select placeholder="Budget" formControlName="budget_id">
-              <mat-option *ngFor="let budget of budgets" [value]="budget.id">{{budget.name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div fxLayout="row" fxLayoutAlign="space-between center">
-          <button mat-raised-button type="submit" color="primary">Refresh</button>
-          <a color="primary" [routerLink]="linkToBudget()">Go to Budget</a>
-        </div>
-
-      </mat-card-content>
-    </mat-card>
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <button mat-raised-button type="submit" color="primary">
+              Refresh
+            </button>
+            <a color="primary" [routerLink]="linkToBudget()">Go to Budget</a>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </form>
   `
 })
@@ -89,14 +99,14 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
   }
 
   loadBudgetsAndBankAccounts() {
-    combineLatest(
+    combineLatest([
       this.bankAccountService.getBankAccounts(),
       this.budgetService.getBudgetsWithTransactions(),
       this.activatedRoute.paramMap.pipe(
         map(this.convertToNumericParams),
         take(1)
       )
-    ).subscribe(results => {
+    ]).subscribe(results => {
       let initialParams;
       [this.bankAccounts, this.budgets, initialParams] = results;
       this.setInitialFormValue(initialParams);
