@@ -15,7 +15,7 @@ import { TransactionDataService } from "../transaction-data.service";
 import { TransactionListComponent } from "../transaction-list/transaction-list.component";
 import { TransactionSearchParams } from "../transaction-search-form/transaction-search-params.model";
 import { TransactionService } from "../transaction.service";
-import { TransferFormComponent } from "../transfer/transfer-form/transfer-form.component";
+import { AccountTransferFormComponent } from "../transfer/account-transfer-form.component";
 
 @Component({
   selector: "ec-transactions",
@@ -192,12 +192,17 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   // TODO: move this to a service
-  showTransferForm(): MatDialogRef<TransferFormComponent> {
-    let dialogRef = this.dialog.open(TransferFormComponent, {
+  showTransferForm(): MatDialogRef<AccountTransferFormComponent> {
+    let dialogRef = this.dialog.open(AccountTransferFormComponent, {
       width: "350px"
     });
 
-    dialogRef.componentInstance.allocations = this.allocations;
+    this.budget.allocations = this.allocations;
+    dialogRef.componentInstance.setBudget(this.budget);
+    // dialogRef.componentInstance.budget = this.budget;
+    dialogRef.afterClosed().subscribe(() => {
+      this.refresh();
+    });
 
     return dialogRef;
   }

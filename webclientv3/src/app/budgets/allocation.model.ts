@@ -4,6 +4,7 @@ export interface AllocationCategoryData {
   id?: number;
   name?: string;
   percentage?: number;
+  allocations?: AllocationData[];
 }
 
 export interface AllocationData {
@@ -20,6 +21,8 @@ export interface AllocationData {
   comment?: string;
   allocation_class?: string;
   is_fixed_amount?: boolean;
+
+  allocations?: AllocationData[];
 
   // extra properties used for displaying the allocations in the budget
   firstInCategory?: boolean;

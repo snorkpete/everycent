@@ -31,12 +31,14 @@ shared_examples_for "Transfers" do
     before do
       @from_account = create(:bank_account)
       @to_account = create(:bank_account)
+      @budget = create(:budget, start_date: Date.new(2019, 12, 1))
+      @today = Date.new(2019, 12, 25).to_s
     end
 
     describe "the 'from' transaction when transferring 500" do
       before do
-        @today = Date.new(2018, 5, 25)
-        @result = @from_account.transfer to: @to_account.id, amount: 500, description: 'money for rent', date: @today
+        @result = @from_account.transfer to: @to_account.id, amount: 500, description: 'money for rent', date: @today,
+                                         budget_id: @budget.id
         @from_transaction = @from_account.transactions.last
       end
 
@@ -61,7 +63,7 @@ shared_examples_for "Transfers" do
       end
 
       it "has the date matching today" do
-        expect(@from_transaction.transaction_date).to eq @today
+        expect(@from_transaction.transaction_date).to eq Date.parse @today
       end
 
       it "has a status of paid" do
@@ -76,8 +78,8 @@ shared_examples_for "Transfers" do
 
     describe "the 'to' transaction when transferring 200" do
       before do
-        @today = Date.new(2018, 5, 30)
-        @from_account.transfer to: @to_account.id, amount: 200, description: 'payback', date: @today
+        @from_account.transfer to: @to_account.id, amount: 200, description: 'payback', date: @today,
+                               budget_id: @budget.id
         @to_transaction = @to_account.transactions.last
       end
 
@@ -98,7 +100,7 @@ shared_examples_for "Transfers" do
       end
 
       it "has the date matching today" do
-        expect(@to_transaction.transaction_date).to eq @today
+        expect(@to_transaction.transaction_date).to eq Date.parse @today
       end
 
       it "has a status of paid" do
@@ -112,7 +114,6 @@ shared_examples_for "Transfers" do
 
     context "when includes allocation" do
       before do
-        @today = Date.new(2018, 5, 30)
         @from_allocation = create(:allocation, name: 'From')
         @to_allocation = create(:allocation, name: 'To')
         @from_sink_fund_allocation = create(:sink_fund_allocation)
@@ -122,6 +123,7 @@ shared_examples_for "Transfers" do
             amount: 200,
             description: 'payback',
             date: @today,
+            budget_id: @budget.id
         }
       end
 
@@ -220,6 +222,19 @@ shared_examples_for "Transfers" do
         result = @from_account.transfer to: @to_account.id, amount: 100, description: ''
         expect(result[:success]).to eq false
         expect(result[:reason]).to eq "Description can't be blank"
+      end
+
+      it "returns an error if we don't have a valid budget" do
+        result = @from_account.transfer to: @to_account.id, amount: 100, description: 'done', date: @today
+        expect(result[:success]).to eq false
+        expect(result[:reason]).to eq "Budget doesn't exist"
+      end
+
+      it "returns an error if the transaction date is outside the budget range" do
+        result = @from_account.transfer to: @to_account.id, amount: 100, description: 'done',
+                                        date: Date.new(2018, 10, 31), budget_id: @budget.id
+        expect(result[:success]).to eq false
+        expect(result[:reason]).to eq "Transaction date is outside the budget period"
       end
 
       it "doesn't allow both from sink fund allocation and from allocation at the same time" do

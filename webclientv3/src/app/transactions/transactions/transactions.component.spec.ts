@@ -90,12 +90,14 @@ describe("TransactionsComponent", () => {
       // first run of change detection to ensure ngInit fires
       fixture.detectChanges();
 
-      component.allocations = [{ id: 2, name: "Test" }];
+      component.budget = { allocations: [{ id: 2, name: "Test" }] };
       let dialog = component.showTransferForm();
       const transferFormComponent = dialog.componentInstance;
       fixture.detectChanges();
 
-      expect(transferFormComponent.allocations).toEqual(component.allocations);
+      expect(transferFormComponent.allocations).toEqual(
+        component.budget.allocations
+      );
 
       // fixture.whenStable().then(() => {
       // });

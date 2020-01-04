@@ -12,6 +12,12 @@ export class BankAccountService {
     return this.apiGateway.get("/bank_accounts");
   }
 
+  getBankAccountsWithBalances(): Observable<BankAccountData[]> {
+    return this.apiGateway.get("/bank_accounts", {
+      include_current_balance: true
+    });
+  }
+
   getSinkFundAllocations(
     bankAccountId: number
   ): Observable<SinkFundAllocationData[]> {

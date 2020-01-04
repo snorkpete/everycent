@@ -13,6 +13,7 @@ export interface BankAccountData {
   institution_id?: number;
   opening_balance?: number;
   closing_balance?: number;
+  current_balance?: number;
   allow_default_allocations?: boolean;
   is_sink_fund?: boolean;
   is_credit_card?: boolean;

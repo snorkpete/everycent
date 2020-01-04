@@ -3,7 +3,7 @@ module Transfers
 
   module ClassMethods
     def transfer(params)
-      from_account = find_by(params[:from])
+      from_account = find_by(id: params[:from])
       return { success: false, reason: "From account doesn't exist" } unless from_account
 
       from_account.transfer(params)
@@ -25,6 +25,14 @@ module Transfers
 
     to_account = BankAccount.find_by(id: params[:to])
     return { success: false, reason: "To account doesn't exist" } unless to_account
+
+    budget = Budget.find_by(id: params[:budget_id])
+    return { success: false, reason: "Budget doesn't exist" } unless budget
+
+    transaction_date = params[:date].respond_to?(:strftime) ? params[:date] : Date.parse(params[:date])
+    if transaction_date > budget.end_date || transaction_date < budget.start_date
+      return { success: false, reason: "Transaction date is outside the budget period" }
+    end
 
     from_transaction = Transaction.new(
       description: "Withdrawal - " + params[:description],

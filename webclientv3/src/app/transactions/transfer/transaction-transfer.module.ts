@@ -1,10 +1,11 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { TransferFormComponent } from "./transfer-form/transfer-form.component";
+import { SharedModule } from "../../shared/shared.module";
+import { AccountTransferFormComponent } from "./account-transfer-form.component";
 
 @NgModule({
-  declarations: [TransferFormComponent],
-  entryComponents: [TransferFormComponent],
-  imports: [CommonModule]
+  imports: [SharedModule.forRoot()],
+  declarations: [AccountTransferFormComponent],
+  entryComponents: [AccountTransferFormComponent]
 })
 export class TransactionTransferModule {}

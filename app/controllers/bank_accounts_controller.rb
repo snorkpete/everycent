@@ -10,9 +10,14 @@ class BankAccountsController < ApplicationController
   before_action :set_bank_account, only: [:show, :edit, :update, :destroy]
 
   def index
-    @bank_accounts = BankAccount.includes(:institution, :user).account_category_order
-    @bank_accounts = @bank_accounts.where(status:'open') unless params[:include_closed] == 'true'
-    respond_with(@bank_accounts, BankAccountSerializer)
+    if params[:include_current_balance]
+      @bank_accounts = BankAccount.includes(:transactions).where(status: 'open').order(:name)
+      respond_with(@bank_accounts, BankAccountWithBalanceSerializer)
+    else
+      @bank_accounts = BankAccount.includes(:institution, :user).account_category_order
+      @bank_accounts = @bank_accounts.where(status:'open') unless params[:include_closed] == 'true'
+      respond_with(@bank_accounts, BankAccountSerializer)
+    end
   end
 
   def show
