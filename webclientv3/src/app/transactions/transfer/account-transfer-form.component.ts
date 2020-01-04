@@ -48,7 +48,7 @@ import { AccountTransferService } from "./account-transfer.service";
         <ng-template #sinkFundAllocationFrom>
           <mat-select
             placeholder="From Sink Fund Allocation"
-            [(ngModel)]="accountTransfer.from_sink_fund_allocation_id"
+            [(ngModel)]="accountTransfer.from_sink_fund_allocation"
           >
             <mat-option [value]="0"></mat-option>
 
@@ -63,7 +63,7 @@ import { AccountTransferService } from "./account-transfer.service";
         <ng-template #allocationFrom>
           <mat-select
             placeholder="From Allocation"
-            [(ngModel)]="accountTransfer.from_allocation_id"
+            [(ngModel)]="accountTransfer.from_allocation"
           >
             <mat-option [value]="0"></mat-option>
 
@@ -112,7 +112,7 @@ import { AccountTransferService } from "./account-transfer.service";
         <ng-template #sinkFundAllocationTo>
           <mat-select
             placeholder="To Sink Fund Allocation"
-            [(ngModel)]="accountTransfer.to_sink_fund_allocation_id"
+            [(ngModel)]="accountTransfer.to_sink_fund_allocation"
           >
             <mat-option [value]="0"></mat-option>
             <mat-option
@@ -126,7 +126,7 @@ import { AccountTransferService } from "./account-transfer.service";
         <ng-template #allocationTo>
           <mat-select
             placeholder="To Allocation"
-            [(ngModel)]="accountTransfer.to_allocation_id"
+            [(ngModel)]="accountTransfer.to_allocation"
           >
             <mat-option [value]="0"></mat-option>
 
