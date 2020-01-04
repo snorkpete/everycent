@@ -1,15 +1,15 @@
 import { Injectable } from "@angular/core";
 import { ApiGateway } from "../../../api/api-gateway.service";
-import { BankTransferData } from "./bank-transfer-data.model";
+import { AccountTransferData } from "./account-transfer-data.model";
 
 @Injectable({
   providedIn: "root"
 })
-export class BankTransferService {
+export class AccountTransferService {
   constructor(private apiGateway: ApiGateway) {}
 
-  transfer(bankTransferData: BankTransferData) {
-    const url = `/bank-accounts/${bankTransferData.from}/transfer`;
+  transfer(bankTransferData: AccountTransferData) {
+    const url = `/bank_accounts/${bankTransferData.from}/transfer`;
     return this.apiGateway.post(url, bankTransferData);
   }
 }

@@ -1,4 +1,4 @@
-export interface BankTransferData {
+export interface AccountTransferData {
   to: number;
   from: number;
   from_allocation_id?: number;
@@ -8,4 +8,5 @@ export interface BankTransferData {
   amount: number;
   description?: string;
   date?: string | Date;
+  budget_id?: number;
 }

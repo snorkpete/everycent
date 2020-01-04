@@ -1,19 +1,15 @@
 import { TestBed } from "@angular/core/testing";
-import { of } from "rxjs/internal/observable/of";
+import { of } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { ApiGateway } from "../../../api/api-gateway.service";
-import { BankAccountData } from "../../bank-accounts/bank-account.model";
-import { BudgetData } from "../../budgets/budget.model";
-import { BankTransferData } from "./bank-transfer-data.model";
+import { AccountTransferData } from "./account-transfer-data.model";
 
-import { BankTransferService } from "./bank-transfer.service";
-import { TransactionData } from "../transaction-data.model";
-import { TransactionService } from "../transaction.service";
+import { AccountTransferService } from "./account-transfer.service";
 
 describe("BankTransferService", () => {
-  let bankTransferService: BankTransferService;
+  let bankTransferService: AccountTransferService;
   let apiGateway: ApiGateway;
-  let sampleData: BankTransferData = {
+  let sampleData: AccountTransferData = {
     from: 1,
     to: 2,
     amount: 400,
@@ -27,7 +23,7 @@ describe("BankTransferService", () => {
   );
 
   beforeEach(() => {
-    bankTransferService = TestBed.get(BankTransferService);
+    bankTransferService = TestBed.get(AccountTransferService);
     apiGateway = TestBed.get(ApiGateway);
   });
 
@@ -47,7 +43,7 @@ describe("BankTransferService", () => {
       bankTransferService.transfer(sampleData).subscribe();
       expect(apiSpy.calls.count()).toEqual(1);
       let args = apiSpy.calls.mostRecent().args;
-      expect(args[0]).toEqual("/bank-accounts/1/transfer");
+      expect(args[0]).toEqual("/bank_accounts/1/transfer");
       expect(args[1]).toEqual(sampleData);
     });
   });

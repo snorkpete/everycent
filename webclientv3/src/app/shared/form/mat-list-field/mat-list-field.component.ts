@@ -7,7 +7,7 @@ import {
 import { groupBy } from "lodash";
 
 @Component({
-  selector: "ec-list-field",
+  selector: "ec-mat-list-field",
   styles: [
     `
       select,
@@ -43,10 +43,9 @@ import { groupBy } from "lodash";
     `
   ],
   template: `
-    <span class="text-display" *ngIf="editMode; else textDisplay">
-      <span class="label">{{ placeholder }}</span>
-      <select [formControl]="control">
-        <option [value]="0"></option>
+    <mat-form-field *ngIf="editMode; else textDisplay">
+      <mat-select [placeholder]="placeholder" [formControl]="control">
+        <mat-option [value]="0"></mat-option>
 
         <!-- options go here -->
         <ng-container
@@ -55,30 +54,30 @@ import { groupBy } from "lodash";
 
         <!-- grouped options -->
         <ng-template #groupedOptions>
-          <optgroup
+          <mat-optgroup
             [label]="group.name"
             *ngFor="let group of groups; trackBy: trackById"
           >
             <option
-              *ngFor="let item of group.items; trackById"
+              *ngFor="let item of group.items; trackBy: trackById"
               [value]="item.id"
             >
               {{ item.name }}
             </option>
-          </optgroup>
+          </mat-optgroup>
         </ng-template>
 
         <!-- ungrouped options -->
         <ng-template #normalOptions>
-          <option
+          <mat-option
             *ngFor="let item of items; trackBy: trackById"
             [value]="item.id"
           >
             {{ item.name }}
-          </option>
+          </mat-option>
         </ng-template>
-      </select>
-    </span>
+      </mat-select>
+    </mat-form-field>
 
     <ng-template #textDisplay>
       <span class="text-display">
@@ -93,11 +92,11 @@ import { groupBy } from "lodash";
     {
       provide: NG_VALUE_ACCESSOR,
       multi: true,
-      useExisting: forwardRef(() => ListFieldComponent)
+      useExisting: forwardRef(() => MatListFieldComponent)
     }
   ]
 })
-export class ListFieldComponent implements OnInit, ControlValueAccessor {
+export class MatListFieldComponent implements OnInit, ControlValueAccessor {
   private _items: any[] = [];
   @Input()
   get items(): any[] {
@@ -189,15 +188,13 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
     let groupByIdFieldName = `${this.groupBy}_id`;
     let groupByFieldName = this.groupBy || "none";
     let itemsByGroupId = groupBy(this.items, groupByIdFieldName);
-    this.groups = Object.keys(itemsByGroupId)
-      .map(groupId => {
-        let group: any = { id: groupId };
-        let items = itemsByGroupId[groupId];
-        group.name = items[0][groupByFieldName].name;
-        group.items = items;
-        return group;
-      })
-      .sort((a, b) => String(a.name).localeCompare(b.name));
+    this.groups = Object.keys(itemsByGroupId).map(groupId => {
+      let group: any = { id: groupId };
+      let items = itemsByGroupId[groupId];
+      group.name = items[0][groupByFieldName].name;
+      group.items = items;
+      return group;
+    });
   }
 
   trackById(index: number, item: any) {
