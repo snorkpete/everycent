@@ -153,6 +153,12 @@ export class MenuComponent implements OnInit {
       icon: Icon.CATEGORY_SPENDING,
       route: "/reports/category-spending",
       exact: false
+    },
+    {
+      displayName: "Needs vs Wants Report",
+      icon: Icon.NEEDS_VS_WANTS,
+      route: "/reports/needs-vs-wants",
+      exact: false
     }
   ];
 

@@ -19,4 +19,9 @@ class ReportsController < ApplicationController
     render json: result
   end
 
+  def needs_vs_wants
+    result = Report.needs_vs_wants(current_household)
+    render json: result
+  end
+
 end

@@ -13,6 +13,7 @@ let Icon = {
   REPORTING: "account_tree",
   NET_WORTH: "money",
   CATEGORY_SPENDING: "money",
+  NEEDS_VS_WANTS: "money",
 
   ALLOCATION_CATEGORIES: "category",
   INSTITUTIONS: "work",

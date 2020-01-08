@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     collection do
       get 'net_worth'
       get 'category_spending'
+      get 'needs_vs_wants'
     end
   end
 

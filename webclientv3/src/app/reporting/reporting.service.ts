@@ -15,4 +15,8 @@ export class ReportingService {
   getCategorySpending(): Observable<any[]> {
     return this.apiGateway.get("/reports/category_spending");
   }
+
+  getNeedsVsWants(): Observable<any[]> {
+    return this.apiGateway.get("/reports/needs_vs_wants");
+  }
 }
