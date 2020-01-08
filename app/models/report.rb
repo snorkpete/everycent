@@ -64,4 +64,61 @@ class Report
                         { name: 'diff', label: 'Difference', numeric: true}
                     ])
   end
+
+  def self.needs_vs_wants(household)
+    sql = "
+      with data as (
+          select to_char(b.end_date, 'yyyy-mm')                                   as period,
+                 (select sum(amount) from incomes where budget_id = b.id) / 100.0 as income,
+                 coalesce((select sum(amount) from allocations where budget_id = b.id and allocation_class = 'need'), 0) /
+                 100.0                                                            as budgeted_needs,
+                 coalesce((select sum(withdrawal_amount - deposit_amount)
+                           from transactions
+                           where allocation_id in
+                                 (select id from allocations where budget_id = b.id and allocation_class = 'need')), 0) /
+                 100.0                                                            as actual_needs,
+                 coalesce((select sum(amount) from allocations where budget_id = b.id and allocation_class = 'savings'), 0) /
+                 100.0                                                            as budgeted_savings,
+                 coalesce((select sum(withdrawal_amount - deposit_amount)
+                           from transactions
+                           where allocation_id in
+                                 (select id from allocations where budget_id = b.id and allocation_class = 'savings')), 0) /
+                 100.0                                                            as actual_savings
+          from budgets b
+          where b.household_id = 96
+      --         where b.household_id = 879
+      )
+      select period,
+             budgeted_needs,
+             actual_needs,
+             income - budgeted_needs - budgeted_savings as budgeted_wants,
+             income - actual_needs - actual_savings as actual_wants,
+             budgeted_savings,
+             actual_savings,
+             round(budgeted_needs / income  * 100) as budgeted_needs_pct,
+             round((income - budgeted_needs - budgeted_savings) / income  * 100) as budgeted_wants_pct,
+             round(budgeted_savings / income  * 100) as budgeted_savings_pct,
+             round(actual_needs / income  * 100) as actual_needs_pct,
+             round((income - actual_needs - actual_savings) / income  * 100) as actual_wants_pct,
+             round(actual_savings / income  * 100) as actual_savings_pct
+      from data
+      order by period
+    "
+    generate_report(sql,
+                    [
+                        { name: 'period', label: 'Period', numeric: false, class: 'all'},
+                        { name: 'budgeted_needs', label: 'Budgeted Needs', numeric: true},
+                        { name: 'actual_needs', label: 'Actual Needs', numeric: true},
+                        { name: 'budgeted_wants', label: 'Budgeted Wants', numeric: true},
+                        { name: 'actual_wants', label: 'Actual Wants', numeric: true},
+                        { name: 'budgeted_savings', label: 'Budgeted Savings', numeric: true},
+                        { name: 'actual_savings', label: 'Actual Savings', numeric: true},
+                        { name: 'budgeted_needs_pct', label: 'Budgeted Needs %', numeric: false, class: 'budgeted'},
+                        { name: 'budgeted_wants_pct', label: 'Budgeted Wants %', numeric: false, class: 'budgeted'},
+                        { name: 'budgeted_savings_pct', label: 'Budgeted Savings %', numeric: false, class: 'budgeted'},
+                        { name: 'actual_needs_pct', label: 'Actual Needs %', numeric: false, class: 'actual'},
+                        { name: 'actual_wants_pct', label: 'Actual Wants %', numeric: false, class: 'actual'},
+                        { name: 'actual_savings_pct', label: 'Actual Savings %', numeric: false, class: 'actual'},
+                    ])
+  end
 end
