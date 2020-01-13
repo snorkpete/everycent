@@ -17,6 +17,7 @@
 #
 
 require 'rails_helper'
+require 'models/shared_examples/weekly_budget_spec'
 
 RSpec.describe Allocation, :type => :model do
   before do
@@ -230,5 +231,10 @@ RSpec.describe Allocation, :type => :model do
       expect(Allocation.find_by_id @may_allocation.id).to be_nil
     end
 
+  end
+
+
+  context "focused", focus: true do
+  include_examples "Weekly"
   end
 end

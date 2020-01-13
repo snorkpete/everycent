@@ -13,6 +13,8 @@
 #
 
 class Budget < ActiveRecord::Base
+  include WeeklyBudget
+
   # force this model to always require scoping to a household
   acts_as_tenant :household
 
