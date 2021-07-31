@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     collection do
       get 'current'
       get 'future'
+      get 'weekly'
       post 'reopen_last_budget'
       post 'mass_update'
     end

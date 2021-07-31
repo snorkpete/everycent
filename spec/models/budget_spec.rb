@@ -13,6 +13,7 @@
 #
 
 require 'rails_helper'
+require 'models/shared_examples/weekly_budget_spec'
 
 describe Budget, :type => :model do
   before do
@@ -160,4 +161,6 @@ describe Budget, :type => :model do
       end
     end
   end
+
+  include_examples "WeeklyBudget"
 end

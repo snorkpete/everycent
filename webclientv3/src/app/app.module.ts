@@ -12,6 +12,7 @@ import { LoginComponent } from "./login/login.component";
 
 import { SharedModule } from "./shared/shared.module";
 import { AuthShellComponent } from "./auth-shell.component";
+import { WeeklyBudgetComponent } from "./budgets/weekly-budget/weekly-budget.component";
 
 @NgModule({
   imports: [

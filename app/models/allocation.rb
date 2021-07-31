@@ -17,6 +17,8 @@
 #
 
 class Allocation < ApplicationRecord
+  include CumulativeAllocation
+
   # force this model to always require scoping to a household
   acts_as_tenant :household
 

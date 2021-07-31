@@ -101,6 +101,12 @@ export class MenuComponent implements OnInit {
       route: "/budgets/future",
       exact: true
     },
+    // {
+    //   displayName: "Weekly Budget(WIP)",
+    //   icon: Icon.BUDGETS_WEEKLY,
+    //   route: "/budgets/weekly",
+    //   exact: true
+    // },
     {
       displayName: "Transactions",
       icon: Icon.TRANSACTIONS,
