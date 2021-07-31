@@ -6,6 +6,7 @@
     "start:aot": "ng serve --aot",
     "build": "ng build --prod --aot --build-optimizer --base-href /",
     "build-charts": "ng build --prod --aot --base-href /",
+    "cypress": "cypress open",
     "test": "ng test --sourcemaps=false",
     "lint": "ng lint",
     "e2e": "ng e2e",

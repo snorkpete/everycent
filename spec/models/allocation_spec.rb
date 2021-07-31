@@ -17,7 +17,7 @@
 #
 
 require 'rails_helper'
-require 'models/shared_examples/weekly_budget_spec'
+require 'models/shared_examples/cumulative_allocation_spec'
 
 RSpec.describe Allocation, :type => :model do
   before do
@@ -233,8 +233,6 @@ RSpec.describe Allocation, :type => :model do
 
   end
 
+  include_examples "CumulativeAllocation"
 
-  context "focused", focus: true do
-  include_examples "Weekly"
-  end
 end

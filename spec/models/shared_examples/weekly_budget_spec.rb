@@ -1,5 +1,5 @@
 
-shared_examples_for "Weekly" do
+shared_examples_for "WeeklyBudget" do
 
   describe "#WeeklyBudget" do
     before do
@@ -33,7 +33,7 @@ shared_examples_for "Weekly" do
       end
 
       it "has weighting of 3/31" do
-        expect(@budget.weighting_for_week(1)).to eq 3/31
+        expect(@budget.weighting_for_week(1)).to eq 3/31.0
       end
 
       it "counts week 2 as starting from Saturday after budget start to following Friday" do
