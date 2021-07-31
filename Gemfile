@@ -7,6 +7,9 @@ gem 'bootsnap', require: false
 
 gem 'rails-controller-testing'
 
+# fix for deprecated/removed mimemagic 3.2
+gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
+
 group :development do
   gem 'annotate'
   gem 'lol_dba'
