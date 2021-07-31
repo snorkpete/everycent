@@ -13,13 +13,13 @@ class Report
   def self.net_worth(household)
     sql = "
    with data as (
-        select to_char(b.start_date, 'yyyy-mm') as period, sum((deposit_amount - withdrawal_amount)) as net
+        select to_char(b.end_date, 'yyyy-mm') as period, sum((deposit_amount - withdrawal_amount)) as net
         from transactions t
                  inner join budgets b
                             on t.transaction_date between b.start_date and b.end_date and b.household_id = t.household_id
         where t.household_id = #{household.id}
-        group by to_char(b.start_date, 'yyyy-mm')
-        order by to_char(b.start_date, 'yyyy-mm')
+        group by to_char(b.end_date, 'yyyy-mm')
+        order by to_char(b.end_date, 'yyyy-mm')
     )
 
     select

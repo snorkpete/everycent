@@ -33,7 +33,7 @@ class Transaction < ApplicationRecord
   before_save :check_status
 
   def self.preloaded
-    includes({ allocation: :allocation_category }, { bank_account: :institution })
+    includes({ allocation: :allocation_category }, { bank_account: :institution } )
   end
 
   def self.for_budget_and_bank(budget_id, bank_account_id)
