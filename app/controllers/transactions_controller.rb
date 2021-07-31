@@ -27,7 +27,10 @@ class TransactionsController < ApplicationController
 
   def by_sink_fund_allocation
     @transactions = Transaction.by_sink_fund_allocation(params[:sink_fund_allocation_id]).preloaded
-                               .order(:transaction_date).limit(25)
+                               .order(transaction_date: :desc)
+                        # .limit(25)
+                        # # TODO: should we remove this limit? with it, the transactions may not be accurate
+                        # Without it, we run the risk of trying to load too much data
     respond_with(@transactions, TransactionSerializer)
   end
 
