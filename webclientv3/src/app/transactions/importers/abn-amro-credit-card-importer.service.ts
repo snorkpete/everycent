@@ -10,7 +10,7 @@ export class AbnAmroCreditCardImporterService {
     startDate: string,
     endDate: string
   ): TransactionData[] {
-    let lines = this._convertInputToLines(input);
+    let lines = this.convertInputToLines(input);
     const linesPerTransaction = 3;
     let nbrTransactions = lines.length / linesPerTransaction;
 
@@ -25,7 +25,7 @@ export class AbnAmroCreditCardImporterService {
 
       let transaction: TransactionData = {
         transaction_date: this.extractDate(dateData),
-        description: descriptionData,
+        description: descriptionData.trim(),
         withdrawal_amount: amount < 0 ? amount * -1 : 0,
         deposit_amount: amount > 0 ? amount : 0,
         status: "unpaid"
@@ -49,12 +49,27 @@ export class AbnAmroCreditCardImporterService {
     return transactions;
   }
 
-  private _convertInputToLines(input) {
+  convertInputToLines(input) {
     if (!input) {
       return [];
     }
-    let lines = input.trim().split(/[\n]/);
-    return lines.filter(
+    let originalLines = input.trim().split(/[\n]/);
+    let linesWithSplits = [];
+
+    // if any lines combine both dates and amounts, we need to split them
+    for (let i = 0; i < originalLines.length; i++) {
+      let parts = originalLines[i].match(/(\d+ [A-z]{3})(€.*(Credit|Debit))/);
+      if (parts) {
+        let [_, dateData, amountData] = parts;
+        // the extractDate logic expects a time part to the date, so let's add it
+        const dateWithTime = `${dateData} | 12:00`;
+        linesWithSplits.push(dateWithTime, amountData);
+      } else {
+        linesWithSplits.push(originalLines[i]);
+      }
+    }
+
+    return linesWithSplits.filter(
       line =>
         line.trim() !== "" &&
         line.trim() !== "Reserved" &&
@@ -72,6 +87,8 @@ export class AbnAmroCreditCardImporterService {
     let currentYear = this.currentDate().getFullYear(); /*? monthAndDay */
     let dateParts = monthAndDay.match(/(\d+) ([A-z]{3}) | .+/);
     let [_, day, month] = dateParts; /*? dateParts */
+
+    const paddedDay = day.padStart(2, "0");
     let months = {
       Jan: "01",
       Feb: "02",
@@ -86,13 +103,15 @@ export class AbnAmroCreditCardImporterService {
       Nov: "11",
       Dec: "12"
     };
-    return `${currentYear}-${months[month]}-${day}`;
+    return `${currentYear}-${months[month]}-${paddedDay}`;
   }
 
   extractAmount(amountText: string): number {
     let parts = amountText.match(/€(.*)(Credit|Debit)/);
     let [_, numberPart, sign] = parts;
-    let amount = Math.floor(Number(numberPart.replace(",", ".")) * 100);
+    let amount = Math.floor(
+      Number(numberPart.replace(".", "").replace(",", ".")) * 100
+    );
     if (sign === "Credit") {
       return amount;
     } else {
