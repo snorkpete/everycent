@@ -60,7 +60,7 @@ class BankAccount < ApplicationRecord
   end
 
   def self.account_category_order
-    order("CASE when account_category='current' THEN 1 ELSE 2 END, account_category, name")
+    order(Arel.sql("CASE when account_category='current' THEN 1 ELSE 2 END, account_category, name"))
   end
 
   def update_balance(budget_id, closing_date)
