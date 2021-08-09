@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.6.8'
 
-gem 'rails', '6.0.4'
+gem 'rails', '6.1.4'
 gem 'puma'
 gem 'bootsnap', require: false
 
@@ -10,18 +10,24 @@ gem 'rails-controller-testing'
 # fix for deprecated/removed mimemagic 3.2
 gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
 
+
 group :development do
   gem 'annotate'
   gem 'lol_dba'
-  gem 'meta_request'
+  # fix for SystemStackError: stack level too deep with Rails 6.1
+  # See: https://github.com/dejan/rails_panel/issues/178#issuecomment-879994647
+  gem 'meta_request', github: 'dejan/rails_panel', branch: 'master', glob: 'meta_request/meta_request.gemspec'
+  # gem 'meta_request'
   # log where queries are being generated from in the code base
   gem 'active_record_query_trace'
   gem 'web-console'
 end
 
 # database gem
-gem 'pg', '~> 0.21'
-# gem 'pg'
+# Previously locked to pg 0.21 because current versions of pg gem had segfault issues
+# Trying to use latest released pg gem
+# gem 'pg', '~> 0.21'
+gem 'pg'
 
 # fix for time
 gem 'tzinfo-data'
