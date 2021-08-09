@@ -11,6 +11,6 @@
 
 FactoryBot.define do
   factory :institution do
-    name "My Bank Institution"
+    name { "My Bank Institution" }
   end
 end

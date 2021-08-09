@@ -23,6 +23,8 @@
 #
 
 class TransactionSerializer < ActiveModel::Serializer
+  type "transaction"
+
   attributes :id, :description, :bank_ref, :bank_account_id, :transaction_date,
              :withdrawal_amount, :deposit_amount,
              :allocation_id, :sink_fund_allocation_id, :status, :paid, :net_amount,

@@ -17,8 +17,8 @@
 FactoryBot.define do
   factory :setting do
     household
-    primary_budget_account_id 1
-    bank_charges_allocation_name "MyString"
+    primary_budget_account_id { 1 }
+    bank_charges_allocation_name { "MyString" }
   end
 
 end

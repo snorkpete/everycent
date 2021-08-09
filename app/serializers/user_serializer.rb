@@ -31,6 +31,8 @@
 #
 
 class UserSerializer < ActiveModel::Serializer
+  type 'user'
+
   attributes :id, :name, :first_name, :last_name, :nickname, :email
 
   def name

@@ -11,7 +11,7 @@
 
 FactoryBot.define do
   factory :household do
-    name "My Household"
+    name { "My Household" }
   end
 
 end

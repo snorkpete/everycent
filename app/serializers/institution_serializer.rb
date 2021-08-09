@@ -10,5 +10,7 @@
 #
 
 class InstitutionSerializer < ActiveModel::Serializer
+  type 'institution'
+
   attributes :id, :name
 end

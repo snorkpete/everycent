@@ -11,5 +11,7 @@
 #
 
 class AllocationCategorySerializer < ActiveModel::Serializer
+  type 'allocation_category'
+
   attributes :id, :name, :percentage
 end

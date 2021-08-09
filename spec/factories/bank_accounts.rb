@@ -29,7 +29,7 @@ FactoryBot.define do
   factory :bank_account do
     household
     user
-    name "My savings account"
+    name {"My savings account"}
   end
 
 end

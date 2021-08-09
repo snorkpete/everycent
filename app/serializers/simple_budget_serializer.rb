@@ -12,6 +12,8 @@
 #
 
 class SimpleBudgetSerializer < ActiveModel::Serializer
+  type 'budget'
+
   attributes :id, :name, :start_date, :end_date, :status
 end
 

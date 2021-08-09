@@ -14,6 +14,8 @@
 #
 
 class SinkFundAllocationSerializer < ActiveModel::Serializer
+  type 'sink_fund_allocation'
+
   attributes :id, :name, :amount, :bank_account_id, :comment, :spent, :remaining, :status,
               # new attributes
              :target, :current_balance, :difference

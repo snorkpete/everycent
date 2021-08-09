@@ -15,9 +15,9 @@
 
 FactoryBot.define do
   factory :sink_fund_allocation do
-    name "MyString"
+    name { "MyString" }
     bank_account
-    amount 1
+    amount { 1 }
   end
 
 end

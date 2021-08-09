@@ -14,6 +14,8 @@
 #
 
 class IncomeSerializer < ActiveModel::Serializer
+  type 'income'
+
   attributes :id, :name, :amount, :budget_id, :bank_account_id, :comment
 
   has_one :bank_account
