@@ -26,6 +26,8 @@
 #
 
 class BankAccountWithBalanceSerializer < ActiveModel::Serializer
+  type 'bank_account'
+
   attributes :id, :name, :account_type, :account_type_description, :account_category, :is_cash,
              :account_no,
              :user_id, :institution_id, :opening_balance, :closing_balance, :current_balance,

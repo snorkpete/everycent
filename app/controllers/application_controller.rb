@@ -4,12 +4,6 @@ class ApplicationController < ActionController::Base
   include ActionController::ImplicitRender
   include ActionController::Serialization
 
-  force_ssl if: :ssl_configured?
-
-  def ssl_configured?
-    Rails.env.production?
-  end
-
   def current_user
     super
   end
@@ -18,7 +12,6 @@ class ApplicationController < ActionController::Base
     current_user.household
   end
 
-  ##respond_to :json
   def respond_with(object, serializer=nil)
 
     if object.respond_to?('invalid?') and object.invalid?
@@ -31,7 +24,7 @@ class ApplicationController < ActionController::Base
       render json: object
 
     when object.respond_to?('each')
-      render json: ActiveModel::Serializer::CollectionSerializer.new(object, serializer: serializer)
+      render json: ActiveModel::Serializer::CollectionSerializer.new(object, serializer: serializer, root: false)
 
     else
      render json: serializer.new(object, root: false)

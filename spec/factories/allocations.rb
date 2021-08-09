@@ -22,10 +22,10 @@ FactoryBot.define do
     allocation_category
     bank_account
     budget
-    name "MyString"
-    amount 1
-    allocation_type "MyString"
-    is_standing_order 1
+    name {"MyString"}
+    amount { 1 }
+    allocation_type {"MyString"}
+    is_standing_order { 1 }
   end
 
 end

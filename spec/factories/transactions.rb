@@ -26,18 +26,18 @@ FactoryBot.define do
   factory :transaction do
     household
     bank_account
-    description "MyString"
-    bank_ref "MyString"
-    transaction_date "2015-01-19"
-    withdrawal_amount 1
-    deposit_amount 1
+    description { "MyString" }
+    bank_ref { "MyString" }
+    transaction_date { "2015-01-19" }
+    withdrawal_amount { 1 }
+    deposit_amount { 1 }
 
     factory :unpaid_transaction do
-      status 'unpaid'
+      status { 'unpaid' }
     end
 
     factory :paid_transaction do
-      status 'paid'
+      status { 'paid' }
     end
   end
 

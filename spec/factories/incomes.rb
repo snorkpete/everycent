@@ -17,7 +17,7 @@ FactoryBot.define do
   factory :income do
     household
     name { Faker::Name.first_name }
-    amount 1
+    amount { 1 }
     budget
     bank_account
   end

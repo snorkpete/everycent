@@ -16,6 +16,8 @@
 #
 
 class FutureAllocationSerializer < ActiveModel::Serializer
+  type "allocation"
+
   attributes :id, :name, :amount, :budget_id,
              :allocation_category_id,
              :allocation_type, :is_standing_order,

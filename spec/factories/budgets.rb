@@ -15,7 +15,7 @@
 FactoryBot.define do
   factory :budget do
     household
-    start_date "2015-01-02"
+    start_date {"2015-01-02"}
   end
 
 end
