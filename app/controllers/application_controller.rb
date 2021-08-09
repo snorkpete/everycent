@@ -4,6 +4,14 @@ class ApplicationController < ActionController::Base
   include ActionController::ImplicitRender
   include ActionController::Serialization
 
+  # fix for Devise, when logging in and out with device_token_auth after switching to rails 6 config defaults
+  # Over-simplifying but,
+  # By default, logging out deletes the CSRF token, which then causes grief when trying to log in again
+  # because the CSRF token doesn't exist, so Rails can't create a new session
+  # This change allows the login to proceed by creating a new null_session
+  # See: https://github.com/lynndylanhurley/devise_token_auth/issues/398#issuecomment-185324707
+  protect_from_forgery with: :null_session
+
   def current_user
     super
   end
