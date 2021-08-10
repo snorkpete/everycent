@@ -17,7 +17,7 @@ describe('MessageService', () => {
   }));
 
   beforeEach(() => {
-    messageService = TestBed.get(MessageService);
+    messageService = TestBed.inject(MessageService);
   });
 
   it('has a getMessage() method', () => {

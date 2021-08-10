@@ -19,8 +19,8 @@ describe("BudgetsService", () => {
   });
 
   beforeEach(() => {
-    budgetService = TestBed.get(BudgetService);
-    apiGateway = TestBed.get(ApiGateway);
+    budgetService = TestBed.inject(BudgetService);
+    apiGateway = TestBed.inject(ApiGateway);
   });
 
   it(

@@ -13,7 +13,7 @@ describe("RepublicImporterService", () => {
   });
 
   beforeEach(() => {
-    importer = TestBed.get(RepublicImporterService);
+    importer = TestBed.inject(RepublicImporterService);
   });
 
   /* tslint:disable:no-trailing-whitespace */

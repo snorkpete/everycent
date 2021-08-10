@@ -5,7 +5,6 @@ import { AccountTransferFormComponent } from "./account-transfer-form.component"
 
 @NgModule({
   imports: [SharedModule.forRoot()],
-  declarations: [AccountTransferFormComponent],
-  entryComponents: [AccountTransferFormComponent]
+  declarations: [AccountTransferFormComponent]
 })
 export class TransactionTransferModule {}

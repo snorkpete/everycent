@@ -23,8 +23,8 @@ describe("BankTransferService", () => {
   );
 
   beforeEach(() => {
-    bankTransferService = TestBed.get(AccountTransferService);
-    apiGateway = TestBed.get(ApiGateway);
+    bankTransferService = TestBed.inject(AccountTransferService);
+    apiGateway = TestBed.inject(ApiGateway);
   });
 
   it("should be created", () => {

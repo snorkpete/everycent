@@ -12,7 +12,7 @@ describe("ScotiaImporterService", () => {
   });
 
   beforeEach(() => {
-    scotiaImporter = TestBed.get(ScotiaImporterService);
+    scotiaImporter = TestBed.inject(ScotiaImporterService);
   });
 
   it("should be created", () => {

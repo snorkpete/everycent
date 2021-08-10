@@ -15,7 +15,7 @@ describe("AbnAmroImporterService", () => {
   });
 
   beforeEach(() => {
-    importer = TestBed.get(AbnAmroImporterService);
+    importer = TestBed.inject(AbnAmroImporterService);
   });
 
   let sample = `

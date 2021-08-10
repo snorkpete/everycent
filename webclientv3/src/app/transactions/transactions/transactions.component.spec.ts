@@ -36,13 +36,7 @@ describe("TransactionsComponent", () => {
         BankAccountService,
         TransactionService
       ]
-    })
-      .overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [TransactionImporterComponent]
-        }
-      })
-      .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -57,12 +51,12 @@ describe("TransactionsComponent", () => {
 
   it("sets up the page heading properly", () => {
     fixture.detectChanges();
-    let toolbarService: MainToolbarService = TestBed.get(MainToolbarService);
+    let toolbarService: MainToolbarService = TestBed.inject(MainToolbarService);
     expect(toolbarService.getHeading()).toBe("Transactions");
   });
 
   it("resets properly after save", () => {
-    let transactionService = TestBed.get(TransactionService);
+    let transactionService = TestBed.inject(TransactionService);
     spyOn(transactionService, "save").and.returnValue(of([]));
     fixture.detectChanges();
     component.transactionList.isEditMode = true;

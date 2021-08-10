@@ -16,7 +16,6 @@ import { BudgetMassEditFormComponent } from "./mass-edit/budget-mass-edit-form.c
     FutureBudgetSummaryComponent,
     BudgetMassEditFormComponent
   ],
-  providers: [FutureBudgetsDataFormatterService],
-  entryComponents: [BudgetMassEditFormComponent]
+  providers: [FutureBudgetsDataFormatterService]
 })
 export class FutureBudgetsModule {}

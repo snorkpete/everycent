@@ -22,11 +22,6 @@ import { AllocationCategoriesComponent } from "./allocation-categories.component
     AllocationCategoryEditFormComponent,
     AllocationCategoriesComponent
   ],
-  entryComponents: [
-    InstitutionEditFormComponent,
-    BankAccountEditFormComponent,
-    AllocationCategoryEditFormComponent
-  ],
   providers: [SetupService]
 })
 export class SetupModule {}

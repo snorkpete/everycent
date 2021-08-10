@@ -48,10 +48,12 @@ describe("TransactionsSearchFormComponent", () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionSearchFormComponent);
     component = fixture.componentInstance;
-    route = TestBed.get(ActivatedRoute);
-    router = TestBed.get(Router);
-    bankAccountService = TestBed.get(BankAccountService);
-    budgetService = TestBed.get(BudgetService);
+    // TODO: don't like this casting - revisit this later to see if we can do this by
+    //  updating the ActivatedRouteStub to better match ActivatedRoute
+    route = (TestBed.inject(ActivatedRoute) as unknown) as ActivatedRouteStub;
+    router = TestBed.inject(Router);
+    bankAccountService = TestBed.inject(BankAccountService);
+    budgetService = TestBed.inject(BudgetService);
   });
 
   beforeEach(() => {

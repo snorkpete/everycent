@@ -35,7 +35,7 @@ describe("TransferFormComponent", () => {
 
   it("gets its bankAccounts", async(() => {
     const sampleBankAccounts = [{ id: 100, name: "First Bank" }];
-    const bankAccountService = TestBed.get(BankAccountService);
+    const bankAccountService = TestBed.inject(BankAccountService);
     const spy = spyOn(
       bankAccountService,
       "getBankAccountsWithBalances"
@@ -56,7 +56,7 @@ describe("TransferFormComponent", () => {
     ];
 
     beforeEach(() => {
-      const bankAccountService = TestBed.get(BankAccountService);
+      const bankAccountService = TestBed.inject(BankAccountService);
       const spy = spyOn(
         bankAccountService,
         "getBankAccountsWithBalances"
@@ -73,7 +73,7 @@ describe("TransferFormComponent", () => {
     }));
 
     it("updates the list of sink funds if the account is a sink fund", async(() => {
-      const bankAccountService = TestBed.get(BankAccountService);
+      const bankAccountService = TestBed.inject(BankAccountService);
       const sampleSinkFundAllocations = [
         { id: 1, name: "Savings" },
         { id: 2, name: "Future Debt" }
@@ -97,7 +97,7 @@ describe("TransferFormComponent", () => {
     }));
 
     it("clears list of sink funds if the account is NOT a sink fund", async(() => {
-      const bankAccountService = TestBed.get(BankAccountService);
+      const bankAccountService = TestBed.inject(BankAccountService);
       const sampleSinkFundAllocations = [
         { id: 1, name: "Savings" },
         { id: 2, name: "Future Debt" }

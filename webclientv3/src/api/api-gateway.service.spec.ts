@@ -34,9 +34,9 @@ describe("ApiGateway", () => {
   });
 
   beforeEach(() => {
-    apiGateway = TestBed.get(ApiGateway);
-    http = TestBed.get(HttpClient);
-    httpTestingController = TestBed.get(HttpTestingController);
+    apiGateway = TestBed.inject(ApiGateway);
+    http = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   describe("get()", () => {

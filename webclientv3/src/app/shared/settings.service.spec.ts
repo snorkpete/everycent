@@ -17,12 +17,12 @@ describe("SettingsService", () => {
   });
 
   beforeEach(() => {
-    settingsService = TestBed.get(SettingsService);
+    settingsService = TestBed.inject(SettingsService);
   });
 
   describe("#getSettings", () => {
     it("calls the apiGateway properly", () => {
-      let apiGateway: ApiGateway = TestBed.get(ApiGateway);
+      let apiGateway: ApiGateway = TestBed.inject(ApiGateway);
       let sampleSettings: SettingsData = {
         primary_budget_account_id: 5,
         bank_charges_allocation_name: "Bank Charges",
@@ -42,7 +42,7 @@ describe("SettingsService", () => {
 
   describe("#saveSettings", () => {
     it("calls the apiGateway properly", () => {
-      let apiGateway: ApiGateway = TestBed.get(ApiGateway);
+      let apiGateway: ApiGateway = TestBed.inject(ApiGateway);
       let sampleSettings: SettingsData = {
         primary_budget_account_id: 5,
         bank_charges_allocation_name: "Bank Charges",

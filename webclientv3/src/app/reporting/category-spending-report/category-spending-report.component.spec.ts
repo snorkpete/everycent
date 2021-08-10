@@ -21,7 +21,7 @@ describe("CategorySpendingReportComponent", () => {
   }));
 
   beforeEach(() => {
-    reportingService = TestBed.get(ReportingService);
+    reportingService = TestBed.inject(ReportingService);
     spy = spyOn(reportingService, "getCategorySpending").and.returnValue(
       of({
         data: [],
