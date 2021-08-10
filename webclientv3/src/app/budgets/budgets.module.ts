@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core";
 import { SharedTransactionsModule } from "../shared-transactions/shared-transactions.module";
 import { SharedModule } from "../shared/shared.module";
+import { AddBudgetComponent } from "./add-budget/add-budget.component";
 import { AllocationCategoryRowComponent } from "./budget-editor/allocations/allocation-category-row.component";
 import { AllocationListFooterComponent } from "./budget-editor/allocations/allocation-list-footer.component";
 import { AllocationListHeaderComponent } from "./budget-editor/allocations/allocation-list-header.component";
@@ -18,7 +19,6 @@ import { BudgetComponent } from "./budget/budget.component";
 import { BudgetsRoutingModule } from "./budgets-routing.module";
 import { BudgetsComponent } from "./budgets/budgets.component";
 import { FutureBudgetsModule } from "./future-budgets/future-budgets.module";
-import { AddBudgetComponent } from "./add-budget/add-budget.component";
 import { WeeklyBudgetComponent } from "./weekly-budget/weekly-budget.component";
 
 @NgModule({

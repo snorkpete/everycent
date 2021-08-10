@@ -1,9 +1,9 @@
-import { TestBed, inject } from "@angular/core/testing";
+import { inject, TestBed } from "@angular/core/testing";
 import { of } from "rxjs";
+import { ApiGatewayStub } from "../../../test/stub-services/api-gateway-stub";
+import { ApiGateway } from "../../api/api-gateway.service";
 
 import { BudgetService } from "./budget.service";
-import { ApiGateway } from "../../api/api-gateway.service";
-import { ApiGatewayStub } from "../../../test/stub-services/api-gateway-stub";
 
 describe("BudgetsService", () => {
   let budgetService: BudgetService;
@@ -23,12 +23,9 @@ describe("BudgetsService", () => {
     apiGateway = TestBed.inject(ApiGateway);
   });
 
-  it(
-    "should be created",
-    inject([BudgetService], (service: BudgetService) => {
-      expect(service).toBeTruthy();
-    })
-  );
+  it("should be created", inject([BudgetService], (service: BudgetService) => {
+    expect(service).toBeTruthy();
+  }));
 
   describe("#getAllocations", () => {
     it("calls the gateway with the right parameters", () => {

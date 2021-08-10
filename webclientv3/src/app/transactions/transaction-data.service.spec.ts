@@ -1,4 +1,4 @@
-import { TestBed, inject } from "@angular/core/testing";
+import { inject, TestBed } from "@angular/core/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../test/test-config.module";
 import { BankAccountService } from "../bank-accounts/bank-account.service";
@@ -36,12 +36,12 @@ describe("TransactionDataService", () => {
     bankAccountService = TestBed.inject(BankAccountService);
   });
 
-  it(
-    "should be created",
-    inject([TransactionDataService], (service: TransactionDataService) => {
+  it("should be created", inject(
+    [TransactionDataService],
+    (service: TransactionDataService) => {
       expect(service).toBeTruthy();
-    })
-  );
+    }
+  ));
 
   describe("#refreshData", () => {
     let firstRequest: TransactionSearchParams = {

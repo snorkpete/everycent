@@ -1,6 +1,5 @@
-import { TestBed, inject } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { TransactionData } from "../transaction-data.model";
-import { AbnAmroCreditCardImporterService } from "./abn-amro-credit-card-importer.service";
 
 import { AbnAmroImporterService } from "./abn-amro-importer.service";
 import { TRANSACTION_IMPORTER_PROVIDERS } from "./transaction-importer.module";

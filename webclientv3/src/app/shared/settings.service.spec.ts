@@ -1,4 +1,4 @@
-import { TestBed, inject } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../test/test-config.module";
 import { ApiGateway } from "../../api/api-gateway.service";

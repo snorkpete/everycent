@@ -1,16 +1,12 @@
 import { NO_ERRORS_SCHEMA } from "@angular/core";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { BrowserDynamicTestingModule } from "@angular/platform-browser-dynamic/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { BankAccountService } from "../../bank-accounts/bank-account.service";
 import { BudgetService } from "../../budgets/budget.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { SharedModule } from "../../shared/shared.module";
-import { TransactionImporterComponent } from "../importers/transaction-importer/transaction-importer.component";
 import { TransactionDataService } from "../transaction-data.service";
-import { TransactionListComponent } from "../transaction-list/transaction-list.component";
-import { TransactionSearchParams } from "../transaction-search-form/transaction-search-params.model";
 import { TransactionService } from "../transaction.service";
 import { TransactionsModule } from "../transactions.module";
 import { TransactionTransferModule } from "../transfer/transaction-transfer.module";

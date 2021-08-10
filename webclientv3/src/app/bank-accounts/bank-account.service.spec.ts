@@ -1,9 +1,9 @@
-import { TestBed, inject } from "@angular/core/testing";
+import { inject, TestBed } from "@angular/core/testing";
 import { of } from "rxjs";
+import { TestConfigModule } from "../../../test/test-config.module";
 import { ApiGateway } from "../../api/api-gateway.service";
 
 import { BankAccountService } from "./bank-account.service";
-import { TestConfigModule } from "../../../test/test-config.module";
 
 describe("BankAccountService", () => {
   let bankAccountService: BankAccountService;
@@ -21,12 +21,12 @@ describe("BankAccountService", () => {
     apiGateway = TestBed.inject(ApiGateway);
   });
 
-  it(
-    "should be created",
-    inject([BankAccountService], (service: BankAccountService) => {
+  it("should be created", inject(
+    [BankAccountService],
+    (service: BankAccountService) => {
       expect(service).toBeTruthy();
-    })
-  );
+    }
+  ));
 
   describe("#sinkFundAllocations", () => {
     it("calls the gateway with the right parameters", () => {

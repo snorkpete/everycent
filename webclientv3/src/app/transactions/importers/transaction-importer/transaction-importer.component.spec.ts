@@ -1,14 +1,10 @@
-import { OverlayContainer, OverlayModule } from "@angular/cdk/overlay";
+import { OverlayContainer } from "@angular/cdk/overlay";
 import { DebugElement } from "@angular/core";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { TestConfigModule } from "../../../../../test/test-config.module";
 import { SharedModule } from "../../../shared/shared.module";
 import { TransactionData } from "../../transaction-data.model";
-import { FcbImporterService } from "../fcb-importer.service";
-import {
-  TRANSACTION_IMPORTER_PROVIDERS,
-  TransactionImporterModule
-} from "../transaction-importer.module";
+import { TransactionImporterModule } from "../transaction-importer.module";
 import { TransactionImporterService } from "../transaction-importer.service";
 
 import { TransactionImporterComponent } from "./transaction-importer.component";

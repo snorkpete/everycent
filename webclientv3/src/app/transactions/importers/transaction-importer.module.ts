@@ -1,12 +1,12 @@
-import {NgModule} from '@angular/core';
-import {SharedModule} from "../../shared/shared.module";
-import {AbnAmroCreditCardImporterService} from "./abn-amro-credit-card-importer.service";
-import {AbnAmroImporterService} from "./abn-amro-importer.service";
-import {AbnAmroOldFormatImporterService} from "./abn-amro-old-format-importer.service";
-import {FcbImporterService} from "./fcb-importer.service";
-import {ScotiaImporterService} from "./scotia-importer.service";
-import {TransactionImporterService} from "./transaction-importer.service";
-import {TransactionImporterComponent} from "./transaction-importer/transaction-importer.component";
+import { NgModule } from "@angular/core";
+import { SharedModule } from "../../shared/shared.module";
+import { AbnAmroCreditCardImporterService } from "./abn-amro-credit-card-importer.service";
+import { AbnAmroImporterService } from "./abn-amro-importer.service";
+import { AbnAmroOldFormatImporterService } from "./abn-amro-old-format-importer.service";
+import { FcbImporterService } from "./fcb-importer.service";
+import { ScotiaImporterService } from "./scotia-importer.service";
+import { TransactionImporterService } from "./transaction-importer.service";
+import { TransactionImporterComponent } from "./transaction-importer/transaction-importer.component";
 
 let TRANSACTION_IMPORTER_PROVIDERS = [
   TransactionImporterService,
@@ -14,20 +14,14 @@ let TRANSACTION_IMPORTER_PROVIDERS = [
   ScotiaImporterService,
   AbnAmroImporterService,
   AbnAmroOldFormatImporterService,
-  AbnAmroCreditCardImporterService,
+  AbnAmroCreditCardImporterService
 ];
 
-export {TRANSACTION_IMPORTER_PROVIDERS};
+export { TRANSACTION_IMPORTER_PROVIDERS };
 
 @NgModule({
-  imports: [
-    SharedModule,
-  ],
-  declarations: [
-    TransactionImporterComponent,
-  ],
-  providers: [
-    ...TRANSACTION_IMPORTER_PROVIDERS,
-  ]
+  imports: [SharedModule],
+  declarations: [TransactionImporterComponent],
+  providers: [...TRANSACTION_IMPORTER_PROVIDERS]
 })
-export class TransactionImporterModule { }
+export class TransactionImporterModule {}

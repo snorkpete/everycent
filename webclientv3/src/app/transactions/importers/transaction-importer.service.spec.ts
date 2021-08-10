@@ -1,9 +1,6 @@
-import { TestBed, inject } from "@angular/core/testing";
-import { MatDialog, MatDialogRef } from "@angular/material";
+import { inject, TestBed } from "@angular/core/testing";
+import { MatDialog } from "@angular/material";
 import { TransactionData } from "../transaction-data.model";
-import { AbnAmroImporterService } from "./abn-amro-importer.service";
-import { FcbImporterService } from "./fcb-importer.service";
-import { ScotiaImporterService } from "./scotia-importer.service";
 import { TransactionImporterModule } from "./transaction-importer.module";
 
 import { TransactionImporterService } from "./transaction-importer.service";
@@ -22,15 +19,12 @@ describe("TransactionImporterService", () => {
     importer = TestBed.inject(TransactionImporterService);
   });
 
-  xit(
-    "should be created",
-    inject(
-      [TransactionImporterService],
-      (service: TransactionImporterService) => {
-        expect(service).toBeTruthy();
-      }
-    )
-  );
+  xit("should be created", inject(
+    [TransactionImporterService],
+    (service: TransactionImporterService) => {
+      expect(service).toBeTruthy();
+    }
+  ));
 
   xdescribe("#showForm", () => {
     it("exists", () => {

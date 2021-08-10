@@ -1,4 +1,4 @@
-import { TestBed, inject } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { TransactionData } from "../transaction-data.model";
 
 import { RepublicImporterService } from "./republic-importer.service";
@@ -18,14 +18,14 @@ describe("RepublicImporterService", () => {
 
   /* tslint:disable:no-trailing-whitespace */
   let sample = `
-1	30-07-2018 00:01:00		ABM- WDL SERVICE CHARGE	Debit  	TTD	-4.0		
-2	30-07-2018 00:01:00		POS- RIK SERVICES LIMITED	Debit  	TTD	-290.15		
-3	30-07-2018 00:01:00		POS- H. WILLIAMS BOOK STORE	Debit  	TTD	-207.99		
-4	30-07-2018 00:01:00		POS- INK STOP LTD	Debit  	TTD	-207.9		
-5	30-07-2018 00:01:00		POS- CELLMASTER	Debit  	TTD	-99.0		
-6	30-07-2018 00:01:00		POS- STARBUCKS	Debit  	TTD	-92.0		
-7	10-07-2018 00:01:00		POS- RITUALS COFFEE SHOP	Debit  	TTD	-21.0		
-8	30-08-2018 00:01:00		ABM- RBL PROMENADE #1	Debit  	TTD	-2500.0	
+1	30-07-2018 00:01:00		ABM- WDL SERVICE CHARGE	Debit  	TTD	-4.0
+2	30-07-2018 00:01:00		POS- RIK SERVICES LIMITED	Debit  	TTD	-290.15
+3	30-07-2018 00:01:00		POS- H. WILLIAMS BOOK STORE	Debit  	TTD	-207.99
+4	30-07-2018 00:01:00		POS- INK STOP LTD	Debit  	TTD	-207.9
+5	30-07-2018 00:01:00		POS- CELLMASTER	Debit  	TTD	-99.0
+6	30-07-2018 00:01:00		POS- STARBUCKS	Debit  	TTD	-92.0
+7	10-07-2018 00:01:00		POS- RITUALS COFFEE SHOP	Debit  	TTD	-21.0
+8	30-08-2018 00:01:00		ABM- RBL PROMENADE #1	Debit  	TTD	-2500.0
   `;
 
   describe("#convertFromBankFormat", () => {
