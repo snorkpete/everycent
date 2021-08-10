@@ -221,47 +221,41 @@ describe("ApiGateway", () => {
       );
     });
 
-    it(
-      "sends the authentication response headers as the output on success",
-      async(() => {
-        apiGateway.postWithoutAuthentication("test", {}).subscribe(result => {
-          expect(result["access-token"]).toEqual("a");
-          expect(result["client"]).toEqual("c");
-          expect(result["expiry"]).toEqual("e");
-          expect(result["token-type"]).toEqual("t");
-          expect(result["uid"]).toEqual("u");
-        });
+    it("sends the authentication response headers as the output on success", async(() => {
+      apiGateway.postWithoutAuthentication("test", {}).subscribe(result => {
+        expect(result["access-token"]).toEqual("a");
+        expect(result["client"]).toEqual("c");
+        expect(result["expiry"]).toEqual("e");
+        expect(result["token-type"]).toEqual("t");
+        expect(result["uid"]).toEqual("u");
+      });
 
-        let headers = new HttpHeaders({
-          "access-token": "a",
-          client: "c",
-          expiry: "e",
-          "token-type": "t",
-          uid: "u"
-        });
+      let headers = new HttpHeaders({
+        "access-token": "a",
+        client: "c",
+        expiry: "e",
+        "token-type": "t",
+        uid: "u"
+      });
 
-        const req = checkRequest("test");
-        req.flush("", { headers: headers });
-      })
-    );
+      const req = checkRequest("test");
+      req.flush("", { headers: headers });
+    }));
 
-    it(
-      "sends the error message as the response if the request fails",
-      async(() => {
-        let errorJSON = { errors: ["Authentication failed"] };
-        apiGateway.postWithoutAuthentication("test", {}).subscribe({
-          error: error => {
-            expect(error).toEqual("Authentication failed");
-          }
-        });
+    it("sends the error message as the response if the request fails", async(() => {
+      let errorJSON = { errors: ["Authentication failed"] };
+      apiGateway.postWithoutAuthentication("test", {}).subscribe({
+        error: error => {
+          expect(error).toEqual("Authentication failed");
+        }
+      });
 
-        const req = checkRequest("test");
-        req.flush(errorJSON, {
-          status: 401,
-          statusText: "Authentication Failed"
-        });
-      })
-    );
+      const req = checkRequest("test");
+      req.flush(errorJSON, {
+        status: 401,
+        statusText: "Authentication Failed"
+      });
+    }));
   });
 
   afterEach(() => {

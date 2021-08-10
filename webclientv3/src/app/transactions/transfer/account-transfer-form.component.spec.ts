@@ -3,10 +3,9 @@ import { of } from "rxjs/internal/observable/of";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { BankAccountService } from "../../bank-accounts/bank-account.service";
 import { SharedModule } from "../../shared/shared.module";
-import { TransactionsModule } from "../transactions.module";
-import { TransactionTransferModule } from "./transaction-transfer.module";
 
 import { AccountTransferFormComponent } from "./account-transfer-form.component";
+import { TransactionTransferModule } from "./transaction-transfer.module";
 
 describe("TransferFormComponent", () => {
   let component: AccountTransferFormComponent;

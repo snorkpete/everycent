@@ -1,7 +1,6 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
-import { ApiGateway } from "../../../api/api-gateway.service";
 import { SharedModule } from "../../shared/shared.module";
 import { ReportingModule } from "../reporting.module";
 import { ReportingService } from "../reporting.service";

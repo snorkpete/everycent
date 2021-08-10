@@ -1,12 +1,12 @@
-import { TestBed, inject } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { of } from "rxjs";
+import { TestConfigModule } from "../../../test/test-config.module";
 import { ApiGateway } from "../../api/api-gateway.service";
 import { BankAccountData } from "../bank-accounts/bank-account.model";
 import { BudgetData } from "../budgets/budget.model";
 import { TransactionData } from "./transaction-data.model";
 
 import { TransactionService } from "./transaction.service";
-import { TestConfigModule } from "../../../test/test-config.module";
 
 describe("TransactionService", () => {
   let transactionService: TransactionService;
