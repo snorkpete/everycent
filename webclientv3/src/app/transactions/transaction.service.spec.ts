@@ -51,8 +51,8 @@ describe("TransactionService", () => {
   });
 
   beforeEach(() => {
-    transactionService = TestBed.get(TransactionService);
-    apiGateway = TestBed.get(ApiGateway);
+    transactionService = TestBed.inject(TransactionService);
+    apiGateway = TestBed.inject(ApiGateway);
   });
 
   describe("#extractValidTransactionsInBudget", () => {

@@ -13,7 +13,7 @@ describe("AbnAmroCreditCardImporter.ServiceService", () => {
   });
 
   beforeEach(() => {
-    importer = TestBed.get(AbnAmroCreditCardImporterService);
+    importer = TestBed.inject(AbnAmroCreditCardImporterService);
   });
 
   describe("convertInputToLines", () => {

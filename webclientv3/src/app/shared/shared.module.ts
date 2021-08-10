@@ -60,7 +60,6 @@ import { ConfirmationComponent } from "./confirmation/confirmation.component";
     TextFieldComponent,
     ConfirmationComponent
   ],
-  entryComponents: [ConfirmationComponent],
   exports: [
     CommonModule,
     FormsModule,

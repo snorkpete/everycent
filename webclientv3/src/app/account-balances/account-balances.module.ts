@@ -16,7 +16,6 @@ import { AdjustBalancesComponent } from "./adjust-balances/adjust-balances.compo
     AccountBalanceTotalsComponent,
     AdjustBalancesComponent
   ],
-  entryComponents: [AdjustBalancesComponent],
   providers: [AccountBalancesService]
 })
 export class AccountBalancesModule {}

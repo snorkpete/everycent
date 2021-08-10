@@ -36,8 +36,6 @@ xdescribe("TransactionImporterComponent", () => {
     component = fixture.componentInstance;
     de = fixture.debugElement;
 
-    // oc = TestBed.get(OverlayContainer);
-    // ocEl = oc.getContainerElement();
     fixture.detectChanges();
   });
 
@@ -75,7 +73,7 @@ xdescribe("TransactionImporterComponent", () => {
       { id: 1, description: "First" },
       { id: 2, description: "Second" }
     ];
-    let importerService: TransactionImporterService = TestBed.get(
+    let importerService: TransactionImporterService = TestBed.inject(
       TransactionImporterService
     );
     let spy = spyOn(importerService, "convertToTransactions").and.returnValue(

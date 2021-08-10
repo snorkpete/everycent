@@ -23,9 +23,6 @@ import { SinkFundSelectorComponent } from './sink-fund-selector/sink-fund-select
     AddTransferFormComponent,
     SinkFundSelectorComponent,
   ],
-  entryComponents: [
-    AddTransferFormComponent,
-  ],
   providers: [
     SinkFundService,
   ]

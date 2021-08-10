@@ -12,7 +12,7 @@ describe('FutureBudgetsDataFormatterService', () => {
   });
 
   beforeEach(() => {
-    formatter = TestBed.get(FutureBudgetsDataFormatterService);
+    formatter = TestBed.inject(FutureBudgetsDataFormatterService);
   });
 
   it('should be created', () => {

@@ -13,9 +13,6 @@ import {SharedTransactionService} from "./shared-transaction.service";
   exports: [
     CompactTransactionListComponent,
   ],
-  entryComponents: [
-    CompactTransactionListComponent,
-  ],
   providers: [
     SharedTransactionService,
   ]

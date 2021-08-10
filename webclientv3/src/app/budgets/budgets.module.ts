@@ -45,7 +45,6 @@ import { WeeklyBudgetComponent } from "./weekly-budget/weekly-budget.component";
     AddBudgetComponent,
     WeeklyBudgetComponent
   ],
-  entryComponents: [AddBudgetComponent],
   providers: [BudgetService]
 })
 export class BudgetsModule {}

@@ -26,9 +26,6 @@ export {TRANSACTION_IMPORTER_PROVIDERS};
   declarations: [
     TransactionImporterComponent,
   ],
-  entryComponents: [
-    TransactionImporterComponent,
-  ],
   providers: [
     ...TRANSACTION_IMPORTER_PROVIDERS,
   ]

@@ -17,8 +17,8 @@ describe("BankAccountService", () => {
   });
 
   beforeEach(() => {
-    bankAccountService = TestBed.get(BankAccountService);
-    apiGateway = TestBed.get(ApiGateway);
+    bankAccountService = TestBed.inject(BankAccountService);
+    apiGateway = TestBed.inject(ApiGateway);
   });
 
   it(

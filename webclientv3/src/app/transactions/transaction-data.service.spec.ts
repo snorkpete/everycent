@@ -30,10 +30,10 @@ describe("TransactionDataService", () => {
   });
 
   beforeEach(() => {
-    transactionDataService = TestBed.get(TransactionDataService);
-    transactionService = TestBed.get(TransactionService);
-    budgetService = TestBed.get(BudgetService);
-    bankAccountService = TestBed.get(BankAccountService);
+    transactionDataService = TestBed.inject(TransactionDataService);
+    transactionService = TestBed.inject(TransactionService);
+    budgetService = TestBed.inject(BudgetService);
+    bankAccountService = TestBed.inject(BankAccountService);
   });
 
   it(
