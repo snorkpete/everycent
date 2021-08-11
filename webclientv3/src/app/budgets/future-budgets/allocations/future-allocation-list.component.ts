@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatDialog, MatDialogRef } from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { total } from "../../../util/total";
 import { AllocationCategoryData } from "../../allocation.model";
 import { BudgetData } from "../../budget.model";

@@ -6,7 +6,7 @@ import {
   Output,
   ViewChild
 } from "@angular/core";
-import { MatSelect } from "@angular/material";
+import { MatSelect } from "@angular/material/select";
 import { SinkFundData } from "../sink-fund-data.model";
 
 @Component({

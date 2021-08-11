@@ -8,7 +8,7 @@ import {
   Output,
   ViewChild
 } from "@angular/core";
-import { MatTable } from "@angular/material";
+import { MatTable } from "@angular/material/table";
 import { BankAccountData } from "../../bank-accounts/bank-account.model";
 import { BudgetData } from "../../budgets/budget.model";
 import { SinkFundAllocationData } from "../../sink-funds/sink-fund-allocation-data.model";

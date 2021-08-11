@@ -1,7 +1,7 @@
 import { LocationStrategy } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { NgModule } from "@angular/core";
-import { MatDialogRef } from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { SetupService } from "../src/app/setup/setup.service";
 import { SettingsService } from "../src/app/shared/settings.service";

@@ -1,6 +1,7 @@
 import { MediaMatcher } from "@angular/cdk/layout";
 import { Component, Input, OnInit, ViewChild } from "@angular/core";
-import { MatDialog, MatDialogRef, MatTable } from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatTable } from "@angular/material/table";
 import { CompactTransactionListComponent } from "../../../shared-transactions/compact-transaction-list/compact-transaction-list.component";
 import { SharedTransactionService } from "../../../shared-transactions/shared-transaction.service";
 import { Icon } from "../../../shared/ec-icon/icon.type";

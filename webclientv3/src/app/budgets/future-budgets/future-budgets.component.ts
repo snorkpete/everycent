@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatDialogRef } from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import { MessageService } from "../../message-display/message.service";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { BudgetData } from "../budget.model";

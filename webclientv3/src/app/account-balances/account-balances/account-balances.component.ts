@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatDialog, MatDialogRef } from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { switchMap } from "rxjs/operators";
 import { BudgetMassEditFormComponent } from "../../budgets/future-budgets/mass-edit/budget-mass-edit-form.component";
 import { MessageService } from "../../message-display/message.service";

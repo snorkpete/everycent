@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { BudgetData } from "../../budget.model";
 import { FutureBudgetsDataFormatterService } from "../future-budgets-data-formatter.service";
-import { MatDialog, MatDialogRef } from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { BudgetMassEditFormComponent } from "../mass-edit/budget-mass-edit-form.component";
 
 @Component({

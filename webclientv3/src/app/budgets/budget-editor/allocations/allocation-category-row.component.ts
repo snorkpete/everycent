@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MatDialog, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import {SharedTransactionService} from "../../../shared-transactions/shared-transaction.service";
 import {Icon} from "../../../shared/ec-icon/icon.type";
 import {CompactTransactionListComponent} from "../../../shared-transactions/compact-transaction-list/compact-transaction-list.component";

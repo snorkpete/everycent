@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
 import { switchMap } from "rxjs/operators";
 import { AllocationCategoryData } from "../budgets/allocation.model";
 import { MessageService } from "../message-display/message.service";

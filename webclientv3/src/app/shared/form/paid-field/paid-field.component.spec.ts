@@ -1,7 +1,7 @@
 import {DebugElement} from "@angular/core";
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule} from "@angular/forms";
-import {MatCheckbox} from "@angular/material";
+import { MatCheckbox } from "@angular/material/checkbox";
 import {By} from "@angular/platform-browser";
 import {EcMaterialModule} from "../../ec-material/ec-material.module";
 

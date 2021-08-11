@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
 
 import { async, fakeAsync, inject, TestBed, tick } from "@angular/core/testing";
-import "hammerjs";
+// import "hammerjs";
 import { of, throwError } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { ApiGateway } from "../../../api/api-gateway.service";
