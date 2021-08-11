@@ -1,24 +1,23 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
+import { ReactiveFormsModule } from "@angular/forms";
+import { By } from "@angular/platform-browser";
+import { EcMaterialModule } from "../../ec-material/ec-material.module";
 
-import { DateFieldComponent } from './date-field.component';
-import {ReactiveFormsModule} from '@angular/forms';
-import {SharedModule} from "../../shared.module";
-import {EcMaterialModule} from "../../ec-material/ec-material.module";
+import { DateFieldComponent } from "./date-field.component";
 
-describe('DateFieldComponent', () => {
+describe("DateFieldComponent", () => {
   let component: DateFieldComponent;
   let fixture: ComponentFixture<DateFieldComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [EcMaterialModule, ReactiveFormsModule],
-      declarations: [ DateFieldComponent ]
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [EcMaterialModule, ReactiveFormsModule],
+        declarations: [DateFieldComponent]
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(DateFieldComponent);
@@ -26,7 +25,17 @@ describe('DateFieldComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  describe("In NON-EDIT-MODE", () => {
+    it("displays its value as a formatted date", () => {
+      component.editMode = false;
+      component.value = new Date("2020-10-01");
+      let displayEl = fixture.debugElement.query(By.css("span.value"));
+      fixture.detectChanges();
+      expect(displayEl.nativeElement.textContent.trim()).toEqual("Oct 1, 2020");
+    });
   });
 });

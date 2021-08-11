@@ -9,7 +9,7 @@ import { ApiGatewayStub } from "../../../../test/stub-services/api-gateway-stub"
 import { SinkFundService } from "../sink-fund.service";
 import { LoginComponent } from "../../login/login.component";
 import { EcMaterialModule } from "../../shared/ec-material/ec-material.module";
-import { MatDialogRef } from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import { SampleSinkFundData } from "../../../../test/samples/sample-sink-fund-data";
 import { TestConfigModule } from "../../../../test/test-config.module";
 

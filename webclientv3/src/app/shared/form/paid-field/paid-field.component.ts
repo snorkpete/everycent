@@ -4,7 +4,7 @@ import {
   FormControl,
   NG_VALUE_ACCESSOR
 } from "@angular/forms";
-import { MatCheckboxChange } from "@angular/material";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "ec-paid-field",

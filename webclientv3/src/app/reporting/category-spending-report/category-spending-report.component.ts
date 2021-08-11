@@ -3,11 +3,11 @@ import * as am4core from "@amcharts/amcharts4/core";
 import { DataSource } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { MatTable, MatTableDataSource } from "@angular/material";
+import { MatTable, MatTableDataSource } from "@angular/material/table";
+import { uniq } from "lodash-es";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { ReportFieldConfig } from "../ReportFieldConfig";
 import { ReportingService } from "../reporting.service";
-import { uniq } from "lodash";
 
 @Component({
   selector: "ec-category-spending-report",

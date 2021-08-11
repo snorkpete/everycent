@@ -1,12 +1,10 @@
 import * as am4charts from "@amcharts/amcharts4/charts";
 import * as am4core from "@amcharts/amcharts4/core";
-import am4themes_kelly from "@amcharts/amcharts4/themes/kelly";
 
 import { DataSource } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { MatTable, MatTableDataSource } from "@angular/material";
-import { uniq } from "lodash";
+import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { ReportFieldConfig } from "../ReportFieldConfig";
 import { ReportingService } from "../reporting.service";

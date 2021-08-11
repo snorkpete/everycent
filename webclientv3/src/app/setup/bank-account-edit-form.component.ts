@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { MatDialogRef } from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import { BankAccountData } from "../bank-accounts/bank-account.model";
 import { InstitutionData } from "../bank-accounts/institution.model";
 

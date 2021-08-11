@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatDialogRef } from "@angular/material/dialog";
-import { groupBy } from "lodash";
+import { groupBy } from "lodash-es";
 import { BankAccountData } from "../../bank-accounts/bank-account.model";
 import { BankAccountService } from "../../bank-accounts/bank-account.service";
 import { AllocationCategoryData } from "../../budgets/allocation.model";

@@ -4,7 +4,7 @@ import {
   FormControl,
   NG_VALUE_ACCESSOR
 } from "@angular/forms";
-import { groupBy } from "lodash";
+import { groupBy } from "lodash-es";
 
 @Component({
   selector: "ec-mat-list-field",

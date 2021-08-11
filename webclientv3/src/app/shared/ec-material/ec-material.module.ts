@@ -1,7 +1,7 @@
-import 'hammerjs';
+
 import { NgModule } from '@angular/core';
 import {FlexLayoutModule} from "@angular/flex-layout";
-import {MatExpansionModule} from "@angular/material";
+import { MatExpansionModule } from "@angular/material/expansion";
 import {MatButtonModule} from "@angular/material/button";
 import {MatCardModule} from "@angular/material/card";
 import {MatCheckboxModule} from "@angular/material/checkbox";
