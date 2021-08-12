@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import {BudgetsModule} from "../../budgets.module";
 
 import { AllocationListFooterComponent } from './allocation-list-footer.component';
@@ -7,7 +7,7 @@ describe('AllocationListFooterComponent', () => {
   let component: AllocationListFooterComponent;
   let fixture: ComponentFixture<AllocationListFooterComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         BudgetsModule,

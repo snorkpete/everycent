@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import {async, ComponentFixture, inject, TestBed} from '@angular/core/testing';
+import { ComponentFixture, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
@@ -12,7 +12,7 @@ describe('LoadingIndicatorComponent', () => {
   let el: DebugElement;
   let loadingIndicator: LoadingIndicator;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       //imports: [MaterialModule.forRoot()],
       declarations: [ LoadingIndicatorComponent ],
@@ -38,7 +38,7 @@ describe('LoadingIndicatorComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('shows and hides based on loading indicator', async(() => {
+  it('shows and hides based on loading indicator', waitForAsync(() => {
     loadingIndicator.show();
     fixture.detectChanges();
     let visible = el.query(By.css('.loader'));

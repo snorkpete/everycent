@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { SharedModule } from "../../shared/shared.module";
 
@@ -8,7 +8,7 @@ describe("AdjustBalancesComponent", () => {
   let component: AdjustBalancesComponent;
   let fixture: ComponentFixture<AdjustBalancesComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [SharedModule.forRoot(), TestConfigModule],
       declarations: [AdjustBalancesComponent]

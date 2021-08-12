@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import {async, ComponentFixture, fakeAsync, inject, TestBed} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 import {TestConfigModule} from "../../../../test/test-config.module";
@@ -14,7 +14,7 @@ describe('MessageDisplayComponent', () => {
   let el: DebugElement;
   let messageService: MessageService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         TestConfigModule, SharedModule.forRoot(),

@@ -1,5 +1,5 @@
 import { DebugElement } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { SharedModule } from "../../shared/shared.module";
 import { BudgetsModule } from "../budgets.module";
@@ -11,7 +11,7 @@ describe("BudgetsComponent", () => {
   let fixture: ComponentFixture<BudgetsComponent>;
   let de: DebugElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, BudgetsModule, SharedModule.forRoot()]
     });

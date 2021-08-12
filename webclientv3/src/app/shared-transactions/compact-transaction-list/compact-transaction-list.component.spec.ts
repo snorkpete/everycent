@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { CompactTransactionListComponent } from './compact-transaction-list.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -8,7 +8,7 @@ describe('CompactTransactionListComponent', () => {
   let component: CompactTransactionListComponent;
   let fixture: ComponentFixture<CompactTransactionListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule],
       declarations: [ CompactTransactionListComponent ],

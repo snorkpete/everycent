@@ -1,12 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import {
-  async,
-  ComponentFixture,
-  fakeAsync,
-  inject,
-  TestBed,
-  tick
-} from "@angular/core/testing";
+import { ComponentFixture, fakeAsync, inject, TestBed, tick, waitForAsync } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { DebugElement, NO_ERRORS_SCHEMA } from "@angular/core";
 import { of } from "rxjs";
@@ -29,7 +22,7 @@ describe("SinkFundsComponent", () => {
   let apiGateway: ApiGateway;
 
   beforeEach(
-    async(() => {
+    waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [TestConfigModule],
         declarations: [SinkFundsComponent],
@@ -58,7 +51,7 @@ describe("SinkFundsComponent", () => {
 
   it(
     "gets the current sink fund",
-    async(() => {
+    waitForAsync(() => {
       let response = SampleSinkFundData;
       spyOn(sinkFundService, "refreshSinkFund").and.returnValue(null);
       spyOn(sinkFundService, "getCurrent").and.returnValue(of(response));

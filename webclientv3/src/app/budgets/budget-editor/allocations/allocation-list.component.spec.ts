@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../../../test/test-config.module";
 import { SharedModule } from "../../../shared/shared.module";
@@ -67,7 +67,7 @@ describe("AllocationListComponent", () => {
   ];
 
   beforeEach(
-    async(() => {
+    waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [TestConfigModule, SharedModule.forRoot(), BudgetsModule]
         // declarations: [ AllocationListComponent ]

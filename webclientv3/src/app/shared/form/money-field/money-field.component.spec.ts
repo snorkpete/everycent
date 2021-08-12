@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { DebugElement } from "@angular/core";
 
@@ -15,7 +15,7 @@ describe("MoneyFieldComponent", () => {
   let fixture: ComponentFixture<MoneyFieldComponent>;
 
   beforeEach(
-    async(() => {
+    waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [NoopAnimationsModule, EcMaterialModule, ReactiveFormsModule],
         declarations: [MoneyFieldComponent, MoneyPipe]

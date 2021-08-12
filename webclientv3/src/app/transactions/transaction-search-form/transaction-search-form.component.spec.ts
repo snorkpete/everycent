@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormBuilder } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { of } from "rxjs";
@@ -32,7 +32,7 @@ describe("TransactionsSearchFormComponent", () => {
   let sampleBankAccounts: BankAccountData[];
   let sampleBudgets: BudgetData[];
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule],
       declarations: [TransactionSearchFormComponent],

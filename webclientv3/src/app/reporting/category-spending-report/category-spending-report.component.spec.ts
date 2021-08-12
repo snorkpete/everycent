@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { SharedModule } from "../../shared/shared.module";
@@ -13,7 +13,7 @@ describe("CategorySpendingReportComponent", () => {
   let reportingService: ReportingService;
   let spy;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule.forRoot(), ReportingModule]
     }).compileComponents();

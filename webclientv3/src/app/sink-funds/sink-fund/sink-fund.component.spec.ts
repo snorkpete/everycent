@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import {TestConfigModule} from "../../../../test/test-config.module";
 import {SharedTransactionService} from "../../shared-transactions/shared-transaction.service";
 import {SharedModule} from '../../shared/shared.module';
@@ -10,7 +10,7 @@ describe('SinkFundComponent', () => {
   let component: SinkFundComponent;
   let fixture: ComponentFixture<SinkFundComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule.forRoot()],
       declarations: [ SinkFundComponent ],

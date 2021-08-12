@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { async, fakeAsync, inject, TestBed, tick } from "@angular/core/testing";
+import { fakeAsync, inject, TestBed, tick, waitForAsync } from "@angular/core/testing";
 // import "hammerjs";
 import { of, throwError } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
@@ -109,7 +109,7 @@ describe("AuthService", () => {
   });
 
   describe("logOut()", () => {
-    it("clears the authentication info in local storage", async(() => {
+    it("clears the authentication info in local storage", waitForAsync(() => {
       localStorage.setItem("access-token", "boo");
       localStorage.setItem("uid", "uid");
 
@@ -122,7 +122,7 @@ describe("AuthService", () => {
 
   describe("isLoggedIn()", () => {
     describe("if localStorage is empty", () => {
-      it("returns FALSE promise", async(() => {
+      it("returns FALSE promise", waitForAsync(() => {
         localStorage.clear();
 
         authService.isLoggedIn().then(isLoggedIn => {
@@ -132,7 +132,7 @@ describe("AuthService", () => {
     });
 
     describe("if localStorage has auth info", () => {
-      it("checks the auth info against the server and resolves to true if auth info is valid", async(() => {
+      it("checks the auth info against the server and resolves to true if auth info is valid", waitForAsync(() => {
         let expectedResponse = {
           success: true,
           data: {
@@ -160,7 +160,7 @@ describe("AuthService", () => {
         });
       }));
 
-      it("rejects with a FALSE Promise if server says auth info is invalid", async(() => {
+      it("rejects with a FALSE Promise if server says auth info is invalid", waitForAsync(() => {
         let expectedResponse = {
           success: false,
           errors: ["Invalid login credentials"]

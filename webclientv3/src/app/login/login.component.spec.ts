@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import {async, ComponentFixture, inject, TestBed} from '@angular/core/testing';
+import { ComponentFixture, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {TestConfigModule} from "../../../test/test-config.module";
@@ -22,7 +22,7 @@ describe('LoginComponent', () => {
   let messageService: MessageService;
   let router: any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         TestConfigModule,
@@ -56,7 +56,7 @@ describe('LoginComponent', () => {
   });
 
 
-  it('calls AuthService#login when the Log In button is clicked', async(() => {
+  it('calls AuthService#login when the Log In button is clicked', waitForAsync(() => {
     let spy = spyOn(authService, 'logIn').and.returnValue(Promise.resolve({}));
 
     component.email = 'myemail';
@@ -70,7 +70,7 @@ describe('LoginComponent', () => {
       expect(spy.calls.mostRecent().args[1]).toEqual('pass');
   }));
 
-  it('navigates to the "home" route when login is successful', async(() => {
+  it('navigates to the "home" route when login is successful', waitForAsync(() => {
     spyOn(authService, 'logIn').and.returnValue(Promise.resolve('success'));
 
     component.login().then(() => {
@@ -78,7 +78,7 @@ describe('LoginComponent', () => {
     });
   }));
 
-  it('shows the error from AuthService if one is returned', async(() => {
+  it('shows the error from AuthService if one is returned', waitForAsync(() => {
     spyOn(authService, 'logIn').and.returnValue(Promise.reject({errors: ['Bad']}));
 
     component.login().catch((error) => {

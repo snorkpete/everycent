@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async, inject } from "@angular/core/testing";
+import { TestBed, inject, waitForAsync } from "@angular/core/testing";
 import { of } from "rxjs";
 import { SinkFundService } from "./sink-fund.service";
 import { ApiGateway } from "../../api/api-gateway.service";
@@ -37,14 +37,14 @@ describe("SinkFundService", () => {
   describe("#getCurrent()", () => {
     it(
       "exists",
-      async(() => {
+      waitForAsync(() => {
         expect(sinkFundService.getCurrent).toBeDefined();
       })
     );
 
     it(
       "calls apiGateway correctly",
-      async(() => {
+      waitForAsync(() => {
         let response = SampleSinkFundData;
         let spy = spyOn(apiGateway, "get").and.returnValue(of(response));
 
@@ -65,7 +65,7 @@ describe("SinkFundService", () => {
   describe("#save()", () => {
     it(
       "calls the apiGateway correctly",
-      async(() => {
+      waitForAsync(() => {
         let sample = SampleSinkFundData;
         let spy = spyOn(apiGateway, "put").and.returnValue(of(sample));
 

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import {TestConfigModule} from "../../../../../test/test-config.module";
 import {SharedModule} from "../../../shared/shared.module";
 import {FutureBudgetsModule} from "../future-budgets.module";
@@ -9,7 +9,7 @@ describe('FutureIncomeListComponent', () => {
   let component: FutureIncomeListComponent;
   let fixture: ComponentFixture<FutureIncomeListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         TestConfigModule, SharedModule, FutureBudgetsModule

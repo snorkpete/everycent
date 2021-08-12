@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { AppComponent } from "./app.component";
 import { ApiGateway } from "../api/api-gateway.service";
 import { ApiGatewayStub } from "../../test/stub-services/api-gateway-stub";
@@ -28,11 +28,11 @@ describe("AppComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create the app", async(() => {
+  it("should create the app", waitForAsync(() => {
     expect(app).toBeTruthy();
   }));
 
-  it("has a nested router outlet", async(() => {
+  it("has a nested router outlet", waitForAsync(() => {
     const element = fixture.debugElement.nativeElement;
     expect(element.querySelector("router-outlet")).toBeTruthy();
   }));

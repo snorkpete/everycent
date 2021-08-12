@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { of } from "rxjs/internal/observable/of";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { BankAccountService } from "../../bank-accounts/bank-account.service";
@@ -11,7 +11,7 @@ describe("TransferFormComponent", () => {
   let component: AccountTransferFormComponent;
   let fixture: ComponentFixture<AccountTransferFormComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         SharedModule.forRoot(),
@@ -32,7 +32,7 @@ describe("TransferFormComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  it("gets its bankAccounts", async(() => {
+  it("gets its bankAccounts", waitForAsync(() => {
     const sampleBankAccounts = [{ id: 100, name: "First Bank" }];
     const bankAccountService = TestBed.inject(BankAccountService);
     const spy = spyOn(
@@ -62,7 +62,7 @@ describe("TransferFormComponent", () => {
       ).and.returnValue(of(sampleBankAccounts));
     });
 
-    it("updates the selected bank account", async(() => {
+    it("updates the selected bank account", waitForAsync(() => {
       fixture.detectChanges();
       fixture.whenStable().then(() => {
         component.accountTransfer.from = sampleBankAccounts[0].id;
@@ -71,7 +71,7 @@ describe("TransferFormComponent", () => {
       });
     }));
 
-    it("updates the list of sink funds if the account is a sink fund", async(() => {
+    it("updates the list of sink funds if the account is a sink fund", waitForAsync(() => {
       const bankAccountService = TestBed.inject(BankAccountService);
       const sampleSinkFundAllocations = [
         { id: 1, name: "Savings" },
@@ -95,7 +95,7 @@ describe("TransferFormComponent", () => {
       });
     }));
 
-    it("clears list of sink funds if the account is NOT a sink fund", async(() => {
+    it("clears list of sink funds if the account is NOT a sink fund", waitForAsync(() => {
       const bankAccountService = TestBed.inject(BankAccountService);
       const sampleSinkFundAllocations = [
         { id: 1, name: "Savings" },
