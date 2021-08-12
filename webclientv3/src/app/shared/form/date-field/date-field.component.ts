@@ -23,8 +23,7 @@ import { TransactionDateValidatorDirective } from "../../../transactions/transac
         #input
         matInput
         type="date"
-        [value]="value"
-        (input)="updateValueFromDateText(value)"
+        (input)="updateValueFromDateText(input.value)"
         [formControl]="control"
       />
       <mat-error>Date is outside of budget range</mat-error>
@@ -42,7 +41,8 @@ import { TransactionDateValidatorDirective } from "../../../transactions/transac
   ]
 })
 export class DateFieldComponent implements OnInit, ControlValueAccessor {
-  @Input() value: Date;
+  private innerValue: string = null;
+
   @Input() editMode: boolean;
   // TODO: this should NOT be needed
   /* tslint:disable no-input-rename */
@@ -54,6 +54,19 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
   private onChange: Function = (_: any) => {};
   private onTouch: Function = () => {};
 
+  @Input()
+  get value(): string {
+    return this.innerValue;
+  }
+
+  set value(newDateValue: string | null) {
+    this.innerValue = newDateValue;
+    // update the Date field in the UI to reflect the date sent via ngModel
+    this.control.setValue(newDateValue, {
+      emitEvent: false
+    });
+  }
+
   constructor(
     @Optional() private validator: TransactionDateValidatorDirective
   ) {}
@@ -64,15 +77,15 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
         let errors = this.validator.validate(this.control);
         this.control.setErrors(errors);
       }
-      this.onChange(v);
     });
   }
 
   updateValueFromDateText(dateValue: string): void {
-    this.value = new Date(dateValue);
+    this.value = dateValue;
+    this.onChange(this.value);
   }
 
-  writeValue(newValue: Date): void {
+  writeValue(newValue: string): void {
     this.value = newValue;
   }
 
