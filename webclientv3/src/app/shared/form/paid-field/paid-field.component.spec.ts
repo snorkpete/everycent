@@ -1,5 +1,5 @@
 import {DebugElement} from "@angular/core";
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import {ReactiveFormsModule} from "@angular/forms";
 import { MatCheckbox } from "@angular/material/checkbox";
 import {By} from "@angular/platform-browser";
@@ -12,7 +12,7 @@ describe('PaidFieldComponent', () => {
   let fixture: ComponentFixture<PaidFieldComponent>;
   let de: DebugElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         EcMaterialModule, ReactiveFormsModule,

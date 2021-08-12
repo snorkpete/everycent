@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { AccountBalancesModule } from "../account-balances.module";
 import { AdjustBalancesComponent } from "../adjust-balances/adjust-balances.component";
 
@@ -15,7 +15,7 @@ describe("AccountBalancesComponent", () => {
   let fixture: ComponentFixture<AccountBalancesComponent>;
   let de: DebugElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [SharedModule.forRoot(), TestConfigModule, AccountBalancesModule]
     }).compileComponents();

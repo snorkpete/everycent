@@ -1,11 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import {
-  async,
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from "@angular/core/testing";
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import {
   Component,
@@ -52,7 +46,7 @@ describe("TextFieldComponent", () => {
   let component: TextFieldComponent;
   let fixture: ComponentFixture<TextFieldComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [EcMaterialModule, ReactiveFormsModule],
       declarations: [TextFieldComponent, FormTesterComponent]
@@ -91,7 +85,7 @@ describe("TextFieldComponent", () => {
   });
 
   describe("EDIT-MODE", () => {
-    it("displays a text field containing the value", async(() => {
+    it("displays a text field containing the value", waitForAsync(() => {
       component.editMode = true;
       component.value = "Hello";
       //fixture.detectChanges();

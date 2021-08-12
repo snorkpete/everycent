@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DeactivateButtonComponent } from './deactivate-button.component';
 import {SharedModule} from '../shared.module';
@@ -11,7 +11,7 @@ describe('DeactivateButtonComponent', () => {
   let component: DeactivateButtonComponent;
   let fixture: ComponentFixture<DeactivateButtonComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [EcMaterialModule],
       declarations: [ DeactivateButtonComponent, EcIconComponent ]

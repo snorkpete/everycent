@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import {SharedModule} from "../../../shared/shared.module";
 
 import { IncomeListFooterComponent } from './income-list-footer.component';
@@ -7,7 +7,7 @@ describe('IncomeListFooterComponent', () => {
   let component: IncomeListFooterComponent;
   let fixture: ComponentFixture<IncomeListFooterComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         SharedModule,

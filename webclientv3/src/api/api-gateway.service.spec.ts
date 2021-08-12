@@ -4,7 +4,7 @@ import {
   HttpTestingController,
   TestRequest
 } from "@angular/common/http/testing";
-import { async, TestBed } from "@angular/core/testing";
+import { TestBed, waitForAsync } from "@angular/core/testing";
 import { Router } from "@angular/router";
 import { RouterStub } from "../../test/stub-services/router-stub";
 import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
@@ -221,7 +221,7 @@ describe("ApiGateway", () => {
       );
     });
 
-    it("sends the authentication response headers as the output on success", async(() => {
+    it("sends the authentication response headers as the output on success", waitForAsync(() => {
       apiGateway.postWithoutAuthentication("test", {}).subscribe(result => {
         expect(result["access-token"]).toEqual("a");
         expect(result["client"]).toEqual("c");
@@ -242,7 +242,7 @@ describe("ApiGateway", () => {
       req.flush("", { headers: headers });
     }));
 
-    it("sends the error message as the response if the request fails", async(() => {
+    it("sends the error message as the response if the request fails", waitForAsync(() => {
       let errorJSON = { errors: ["Authentication failed"] };
       apiGateway.postWithoutAuthentication("test", {}).subscribe({
         error: error => {

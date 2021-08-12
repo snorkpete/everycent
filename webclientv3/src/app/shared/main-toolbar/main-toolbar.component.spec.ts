@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import {async, ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
 
@@ -12,7 +12,7 @@ describe('MainToolbarComponent', () => {
   let component: MainToolbarComponent;
   let fixture: ComponentFixture<MainToolbarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [EcMaterialModule],
       declarations: [ MainToolbarComponent ],
@@ -34,7 +34,7 @@ describe('MainToolbarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('has an "open sidebar" button', async(() => {
+  it('has an "open sidebar" button', waitForAsync(() => {
     let button = fixture.debugElement.query(By.css('.open-menu-button'));
     expect(button).toBeTruthy('open sidebar button exists');
     //button.click();

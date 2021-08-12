@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { TestConfigModule } from "../../../../../test/test-config.module";
 import { SharedModule } from "../../../shared/shared.module";
 import { BudgetService } from "../../budget.service";
@@ -11,7 +11,7 @@ describe("FutureAllocationListComponent", () => {
   let fixture: ComponentFixture<FutureAllocationListComponent>;
 
   beforeEach(
-    async(() => {
+    waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [TestConfigModule, SharedModule.forRoot()],
         declarations: [FutureAllocationListComponent],

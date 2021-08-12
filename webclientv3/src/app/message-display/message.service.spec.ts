@@ -1,13 +1,13 @@
 /* tslint:disable:no-unused-variable */
 
-import { async, fakeAsync, TestBed, tick } from "@angular/core/testing";
+import { fakeAsync, TestBed, tick, waitForAsync } from "@angular/core/testing";
 import { TestConfigModule } from "../../../test/test-config.module";
 import { SharedModule } from "../shared/shared.module";
 import { MessageService, MessageType } from "./message.service";
 
 describe("MessageService", () => {
   let messageService: MessageService;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule.forRoot()],
       providers: [MessageService]

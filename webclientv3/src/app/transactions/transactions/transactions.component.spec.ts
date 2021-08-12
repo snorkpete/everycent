@@ -1,5 +1,5 @@
 import { NO_ERRORS_SCHEMA } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { of } from "rxjs";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { BankAccountService } from "../../bank-accounts/bank-account.service";
@@ -17,7 +17,7 @@ describe("TransactionsComponent", () => {
   let component: TransactionsComponent;
   let fixture: ComponentFixture<TransactionsComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         SharedModule.forRoot(),
@@ -63,7 +63,7 @@ describe("TransactionsComponent", () => {
 
   // this doesn't work - the dialog never triggers the subscribe
   xit("shows the dialog", () =>
-    async(() => {
+    waitForAsync(() => {
       component.transactions = [];
       let dialog = component.showImportForm();
 

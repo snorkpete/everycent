@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { DeactivateService } from "../../shared/deactivate-button/deactivate.service";
 
 import { AddTransferFormComponent } from "./add-transfer-form.component";
@@ -20,7 +20,7 @@ describe("AddTransferFormComponent", () => {
   const MatDialogRefStub = {
     close: () => {}
   };
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule],
       declarations: [AddTransferFormComponent, LoginComponent],

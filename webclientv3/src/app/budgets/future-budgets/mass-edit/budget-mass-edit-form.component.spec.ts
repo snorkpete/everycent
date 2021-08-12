@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { TestConfigModule } from "../../../../../test/test-config.module";
 import { SharedModule } from "../../../shared/shared.module";
 
@@ -8,7 +8,7 @@ describe("BudgetMassEditFormComponent", () => {
   let component: BudgetMassEditFormComponent;
   let fixture: ComponentFixture<BudgetMassEditFormComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule.forRoot()],
       declarations: [BudgetMassEditFormComponent]

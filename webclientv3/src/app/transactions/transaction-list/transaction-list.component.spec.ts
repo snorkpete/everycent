@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { TestConfigModule } from "../../../../test/test-config.module";
 import { TransactionDateValidatorDirective } from "../transaction-date-validator.directive";
 
@@ -12,7 +12,7 @@ describe("TransactionListComponent", () => {
   let fixture: ComponentFixture<TransactionListComponent>;
   let de: DebugElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule.forRoot()],
       declarations: [

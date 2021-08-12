@@ -1,5 +1,5 @@
 import { DebugElement } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import {TestConfigModule} from "../../../../test/test-config.module";
 import {EcMaterialModule} from "../../shared/ec-material/ec-material.module";
@@ -13,7 +13,7 @@ describe("SinkFundSelectorComponent", () => {
   let de: DebugElement;
 
   beforeEach(
-    async(() => {
+    waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           TestConfigModule,

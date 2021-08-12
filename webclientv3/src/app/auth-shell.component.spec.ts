@@ -1,5 +1,5 @@
 import { NO_ERRORS_SCHEMA } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 
 import { AuthShellComponent } from "./auth-shell.component";
 
@@ -7,7 +7,7 @@ describe("AuthShellComponent", () => {
   let component: AuthShellComponent;
   let fixture: ComponentFixture<AuthShellComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AuthShellComponent],
       // we're not gonna instantiate the nested components of AuthShellComponent,
@@ -26,17 +26,17 @@ describe("AuthShellComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  it("has a nested menu component", async(() => {
+  it("has a nested menu component", waitForAsync(() => {
     const element = fixture.debugElement.nativeElement;
     expect(element.querySelector("ec-menu")).toBeTruthy();
   }));
 
-  it("has a nested loading indicator component", async(() => {
+  it("has a nested loading indicator component", waitForAsync(() => {
     const element = fixture.debugElement.nativeElement;
     expect(element.querySelector("ec-loading-indicator")).toBeTruthy();
   }));
 
-  it("has a nested main toolbar component", async(() => {
+  it("has a nested main toolbar component", waitForAsync(() => {
     const element = fixture.debugElement.nativeElement;
     expect(element.querySelector("ec-main-toolbar")).toBeTruthy();
   }));
