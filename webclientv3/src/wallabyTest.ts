@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import "./polyfills";
 
-import "zone.js/dist/zone-testing";
+import "zone.js/testing";
 
 import "./rxjs-imports";
 
