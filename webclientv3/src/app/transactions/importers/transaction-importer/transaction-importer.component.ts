@@ -4,7 +4,7 @@ import { TransactionImporterService } from "../transaction-importer.service";
 
 @Component({
   selector: "ec-transaction-importer",
-  styles: [``],
+  styles: [],
   template: `
     <h1 mat-dialog-title>Import Transactions</h1>
     <mat-dialog-content>

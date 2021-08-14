@@ -10,17 +10,17 @@ const SetupServiceStub = {
   },
 
   addInstitution(institution: InstitutionData): Observable<InstitutionData> {
-    return of([]);
+    return of({});
   },
 
   saveInstitution(institution: InstitutionData): Observable<InstitutionData> {
-    return of([]);
+    return of({});
   },
 
   createOrUpdateInstitution(
     institution: InstitutionData
   ): Observable<InstitutionData> {
-    return of([]);
+    return of({});
   },
 
   getAllBankAccounts(): Observable<BankAccountData[]> {
@@ -28,7 +28,7 @@ const SetupServiceStub = {
   },
 
   addBankAccount(bankAccount: BankAccountData) {
-    return of([]);
+    return of({});
   },
 
   getAllocationCategories(): Observable<AllocationCategoryData[]> {
@@ -36,20 +36,20 @@ const SetupServiceStub = {
   },
 
   addAllocationCategory(allocationCategory: AllocationCategoryData) {
-    return of([]);
+    return of({});
   },
 
   saveAllocationCategory(
     allocationCategory: AllocationCategoryData
   ): Observable<AllocationCategoryData> {
-    return of([]);
+    return of({});
   },
 
   getSettings(): Observable<SettingsData> {
-    return of([]);
+    return of({ family_type: "single" });
   },
   saveSettings(newSettings: SettingsData): Observable<SettingsData> {
-    return of([]);
+    return of({ family_type: "couple" });
   }
 };
 

@@ -8,15 +8,15 @@ import { ApiGateway } from "../../api/api-gateway.service";
 export class ReportingService {
   constructor(private apiGateway: ApiGateway) {}
 
-  getNetWorth(): Observable<any[]> {
+  getNetWorth(): Observable<any> {
     return this.apiGateway.get("/reports/net_worth");
   }
 
-  getCategorySpending(): Observable<any[]> {
+  getCategorySpending(): Observable<any> {
     return this.apiGateway.get("/reports/category_spending");
   }
 
-  getNeedsVsWants(): Observable<any[]> {
+  getNeedsVsWants(): Observable<any> {
     return this.apiGateway.get("/reports/needs_vs_wants");
   }
 }

@@ -1,9 +1,8 @@
-import { throwError as observableThrowError, Observable, empty } from "rxjs";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
-import { map } from "rxjs/internal/operators";
-import { catchError, tap } from "rxjs/operators";
+import { empty, Observable, throwError as observableThrowError } from "rxjs";
+import { catchError, map, tap } from "rxjs/operators";
 import { AuthCredentials } from "../app/core/auth/auth-credentials";
 import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
 import { BASE_URL } from "./base-url.service";
