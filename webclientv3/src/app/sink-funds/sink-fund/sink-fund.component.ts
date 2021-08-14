@@ -43,7 +43,7 @@ import { SinkFundService } from "../sink-fund.service";
         border-bottom: 2px solid black;
       }
 
-      ec-icon.small /deep/ .material-icons {
+      ec-icon.small ::ng-deep .material-icons {
         font-size: 16px;
         height: 16px;
         width: 16px;

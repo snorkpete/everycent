@@ -315,7 +315,7 @@ import { BudgetService } from "../../budget.service";
         margin: 5px;
       }
 
-      ec-icon.small /deep/ .material-icons {
+      ec-icon.small ::ng-deep .material-icons {
         font-size: 16px;
         height: 16px;
         width: 16px;
