@@ -1,25 +1,28 @@
+import { DebugElement } from "@angular/core";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
+import { TestConfigModule } from "../../../../test/test-config.module";
+import { SharedModule } from "../../shared/shared.module";
 import { AccountBalancesModule } from "../account-balances.module";
 import { AdjustBalancesComponent } from "../adjust-balances/adjust-balances.component";
 
 import { AccountBalancesComponent } from "./account-balances.component";
-import { DebugElement, NO_ERRORS_SCHEMA } from "@angular/core";
-import { SharedModule } from "../../shared/shared.module";
-import { AccountBalancesService } from "../account-balances.service";
-import { ApiGateway } from "../../../api/api-gateway.service";
-import { ApiGatewayStub } from "../../../../test/stub-services/api-gateway-stub";
-import { TestConfigModule } from "../../../../test/test-config.module";
 
 describe("AccountBalancesComponent", () => {
   let component: AccountBalancesComponent;
   let fixture: ComponentFixture<AccountBalancesComponent>;
   let de: DebugElement;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [SharedModule.forRoot(), TestConfigModule, AccountBalancesModule]
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          SharedModule.forRoot(),
+          TestConfigModule,
+          AccountBalancesModule
+        ]
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AccountBalancesComponent);
@@ -80,10 +83,10 @@ describe("AccountBalancesComponent", () => {
     });
 
     xit("wires up the AdjustBalances component to pass save events to the AccountBalances service", () => {
-      let serviceSpy = spyOn(
-        component.accountBalancesService,
-        "adjustAccountBalances"
-      ).and.returnValue(true);
+      // let serviceSpy = spyOn(
+      //   component.accountBalancesService,
+      //   "adjustAccountBalances"
+      // ).and.returnValue(true);
 
       // TODO: figure out how to test this
       // let closeDialogSpy = spyOn(component.dialogRef, "close").and.callThrough();

@@ -32,7 +32,8 @@ describe("DateFieldComponent", () => {
   describe("In NON-EDIT-MODE", () => {
     it("displays its value as a formatted date", () => {
       component.editMode = false;
-      component.value = new Date("2020-10-01");
+      // component.value = new Date("2020-10-01");
+      component.value = "2020-10-01";
       let displayEl = fixture.debugElement.query(By.css("span.value"));
       fixture.detectChanges();
       expect(displayEl.nativeElement.textContent.trim()).toEqual("Oct 1, 2020");

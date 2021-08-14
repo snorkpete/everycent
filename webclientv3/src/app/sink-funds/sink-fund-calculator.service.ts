@@ -1,8 +1,7 @@
 import { DeactivateService } from "../shared/deactivate-button/deactivate.service";
-import { SinkFundData } from "./sink-fund-data.model";
 import { total } from "../util/total";
-import { isNullOrUndefined } from "util";
 import { SinkFundAllocationData } from "./sink-fund-allocation-data.model";
+import { SinkFundData } from "./sink-fund-data.model";
 
 export class SinkFundCalculator {
   constructor(public deactivateService: DeactivateService) {}
@@ -10,7 +9,7 @@ export class SinkFundCalculator {
   private sinkFundAllocationsOf(
     sinkFund: SinkFundData
   ): SinkFundAllocationData[] {
-    if (isNullOrUndefined(sinkFund)) {
+    if (sinkFund === null && sinkFund === undefined) {
       return [];
     }
 
@@ -46,14 +45,14 @@ export class SinkFundCalculator {
   }
 
   unassignedBalance(sinkFund: SinkFundData): number {
-    if (isNullOrUndefined(sinkFund)) {
+    if (sinkFund === null && sinkFund === undefined) {
       return 0;
     }
     return sinkFund.current_balance - this.totalAssignedBalance(sinkFund);
   }
 
   allocationOutstandingAt(sinkFund: SinkFundData, index: number): number {
-    if (isNullOrUndefined(sinkFund)) {
+    if (sinkFund === null && sinkFund === undefined) {
       return 0;
     }
     let allocation = sinkFund.sink_fund_allocations[index];

@@ -13,11 +13,13 @@ describe("CategorySpendingReportComponent", () => {
   let reportingService: ReportingService;
   let spy;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [TestConfigModule, SharedModule.forRoot(), ReportingModule]
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [TestConfigModule, SharedModule.forRoot(), ReportingModule]
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     reportingService = TestBed.inject(ReportingService);

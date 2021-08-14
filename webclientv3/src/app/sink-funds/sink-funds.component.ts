@@ -9,7 +9,6 @@ import { SinkFundService } from "./sink-fund.service";
 
 @Component({
   selector: "ec-sink-funds",
-  styles: [``],
   template: `
     <mat-card class="main">
       <ec-sink-fund-selector
