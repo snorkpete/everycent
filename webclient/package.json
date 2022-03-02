@@ -12,7 +12,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "karma": "^0.13.x",
+    "karma": "^6.3.x",
     "karma-chrome-launcher": "^0.2.x",
     "karma-jasmine": "^0.3.4",
     "karma-growl-reporter": "^0.1.1",
