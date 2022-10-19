@@ -1,15 +1,15 @@
 GIT
-  remote: git://github.com/dejan/rails_panel.git
-  revision: 847ea41f9944402ccaa9db8a623a4425f9f7c8b9
+  remote: https://github.com/dejan/rails_panel.git
+  revision: 6374dbe8f8d4c59a23dac60a07c88b3315e12817
   branch: master
   glob: meta_request/meta_request.gemspec
   specs:
-    meta_request (0.7.2)
+    meta_request (0.7.3)
       rack-contrib (>= 1.1, < 3)
       railties (>= 3.0.0, < 7)
 
 GIT
-  remote: git://github.com/mimemagicrb/mimemagic.git
+  remote: https://github.com/mimemagicrb/mimemagic.git
   revision: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
   ref: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
   specs:
@@ -173,14 +173,14 @@ GEM
     marcel (1.0.1)
     method_source (1.0.0)
     mini_mime (1.1.0)
-    mini_portile2 (2.6.1)
+    mini_portile2 (2.8.0)
     minitest (5.14.4)
     msgpack (1.4.2)
     nenv (0.3.0)
     newrelic_rpm (7.2.0)
     nio4r (2.5.8)
-    nokogiri (1.12.2)
-      mini_portile2 (~> 2.6.1)
+    nokogiri (1.13.9)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -197,7 +197,7 @@ GEM
     public_suffix (4.0.6)
     puma (5.4.0)
       nio4r (~> 2.0)
-    racc (1.5.2)
+    racc (1.6.0)
     rack (2.2.3)
     rack-contrib (2.3.0)
       rack (~> 2.0)
