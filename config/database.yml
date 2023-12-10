@@ -24,7 +24,7 @@ default: &default
 
 development:
   <<: *default
-  database: everycent
+  database: everycent_dev
   gssencmode: disable
 
 # Warning: The database defined as "test" will be erased and
