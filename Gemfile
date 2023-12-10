@@ -1,9 +1,10 @@
 source 'https://rubygems.org'
-ruby '2.6.8'
+ruby '3.0.3'
 
 gem 'rails', '6.1.4'
 gem 'puma'
-gem 'bootsnap', require: false
+# gem 'bootsnap', require: false
+gem 'bootsnap', '>= 1.8.1', require: false
 
 gem 'rails-controller-testing'
 

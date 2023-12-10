@@ -1,15 +1,15 @@
 GIT
-  remote: git://github.com/dejan/rails_panel.git
-  revision: 847ea41f9944402ccaa9db8a623a4425f9f7c8b9
+  remote: https://github.com/dejan/rails_panel.git
+  revision: de081f78ca318dde69e284243f18ab959c7ecdbe
   branch: master
   glob: meta_request/meta_request.gemspec
   specs:
-    meta_request (0.7.2)
+    meta_request (0.7.3)
       rack-contrib (>= 1.1, < 3)
-      railties (>= 3.0.0, < 7)
+      railties (>= 3.0.0, < 7.1)
 
 GIT
-  remote: git://github.com/mimemagicrb/mimemagic.git
+  remote: https://github.com/mimemagicrb/mimemagic.git
   revision: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
   ref: 01f92d86d15d85cfd0f20dabd025dcbd36a8a60f
   specs:
@@ -93,8 +93,8 @@ GEM
       rake (>= 10.4, < 14.0)
     bcrypt (3.1.16)
     bindex (0.8.1)
-    bootsnap (1.7.7)
-      msgpack (~> 1.0)
+    bootsnap (1.17.0)
+      msgpack (~> 1.2)
     builder (3.2.4)
     case_transform (0.2)
       activesupport
@@ -175,7 +175,7 @@ GEM
     mini_mime (1.1.0)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
-    msgpack (1.4.2)
+    msgpack (1.7.2)
     nenv (0.3.0)
     newrelic_rpm (7.2.0)
     nio4r (2.5.8)
@@ -199,8 +199,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
-    rack-contrib (2.3.0)
-      rack (~> 2.0)
+    rack-contrib (2.4.0)
+      rack (< 4)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
     rack-protection (2.1.0)
@@ -310,7 +310,7 @@ DEPENDENCIES
   active_record_query_trace
   acts_as_tenant
   annotate
-  bootsnap
+  bootsnap (>= 1.8.1)
   database_cleaner
   devise_token_auth
   factory_bot_rails
@@ -339,7 +339,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 2.6.8p205
+   ruby 3.0.3p157
 
 BUNDLED WITH
-   1.17.2
+   2.4.22
