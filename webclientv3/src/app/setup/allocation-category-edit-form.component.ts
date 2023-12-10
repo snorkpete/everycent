@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { AllocationCategoryData } from "../budgets/allocation.model";
 
@@ -29,10 +29,10 @@ export class AllocationCategoryEditFormComponent implements OnInit {
   @Output() cancel = new EventEmitter();
   editMode = true;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private dialogRef: MatDialogRef<AllocationCategoryEditFormComponent>
   ) {}
 

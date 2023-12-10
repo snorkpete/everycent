@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { total } from "../../../util/total";
 import { BudgetData } from "../../budget.model";
@@ -85,10 +85,10 @@ export class BudgetMassEditFormComponent implements OnInit {
   displayData: any = {};
   budgets: BudgetData[] = [];
 
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private dialogRef: MatDialogRef<BudgetMassEditFormComponent>
   ) {}
 

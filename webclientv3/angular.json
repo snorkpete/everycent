@@ -113,7 +113,6 @@
       }
     }
   },
-  "defaultProject": "everycent",
   "schematics": {
     "@schematics/angular:component": {
       "inlineStyle": true,

@@ -3,7 +3,7 @@ import * as am4core from "@amcharts/amcharts4/core";
 
 import { DataSource } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { MainToolbarService } from "../../shared/main-toolbar/main-toolbar.service";
 import { ReportFieldConfig } from "../ReportFieldConfig";
@@ -117,7 +117,7 @@ export class NeedsVsWantsReportComponent implements OnInit {
   actualSavings: am4charts.Series;
   dataSource: DataSource<any>;
 
-  budgetedVsActualForm = new FormControl("");
+  budgetedVsActualForm = new UntypedFormControl("");
   @ViewChild(MatTable, { static: true }) table: MatTable<any>;
 
   constructor(

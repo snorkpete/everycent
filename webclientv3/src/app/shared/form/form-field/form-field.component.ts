@@ -1,5 +1,5 @@
 import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {ControlValueAccessor, UntypedFormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
 
 let FormType = {
   TEXT: 'text',
@@ -31,7 +31,7 @@ export class FormFieldComponent implements OnInit, ControlValueAccessor {
   @Input() editMode: boolean;
   @Input() type: string;
 
-  control = new FormControl();
+  control = new UntypedFormControl();
 
   private onChange: Function = (_: any) => {};
   private onTouch: Function = () => {};

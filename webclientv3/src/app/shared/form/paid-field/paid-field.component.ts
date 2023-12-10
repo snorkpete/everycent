@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input, OnInit } from "@angular/core";
 import {
   ControlValueAccessor,
-  FormControl,
+  UntypedFormControl,
   NG_VALUE_ACCESSOR
 } from "@angular/forms";
 import { MatCheckboxChange } from "@angular/material/checkbox";
@@ -30,7 +30,7 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 export class PaidFieldComponent implements OnInit, ControlValueAccessor {
   @Input() editMode = false;
   @Input() innerValue: string;
-  control = new FormControl(false);
+  control = new UntypedFormControl(false);
 
   private onChange: Function = (_: any) => {};
   private onTouch: Function = () => {};

@@ -1,4 +1,4 @@
-import { AbstractControl, FormControl } from "@angular/forms";
+import { AbstractControl, UntypedFormControl } from "@angular/forms";
 import { TransactionDateValidatorDirective } from "./transaction-date-validator.directive";
 
 describe("TransactionDateValidatorDirective", () => {
@@ -7,7 +7,7 @@ describe("TransactionDateValidatorDirective", () => {
 
   beforeEach(() => {
     validator = new TransactionDateValidatorDirective();
-    control = new FormControl();
+    control = new UntypedFormControl();
   });
 
   it("should create an instance", () => {
