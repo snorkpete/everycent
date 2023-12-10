@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 
 import { TextFieldComponent } from "./text-field.component";
-import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, ReactiveFormsModule } from "@angular/forms";
 import { SharedModule } from "../../shared.module";
 import { EcMaterialModule } from "../../ec-material/ec-material.module";
 
@@ -24,7 +24,7 @@ import { EcMaterialModule } from "../../ec-material/ec-material.module";
   `
 })
 class FormTesterComponent implements OnInit {
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   @ViewChild(TextFieldComponent, /* TODO: add static flag */ {})
   first: TextFieldComponent;
@@ -32,7 +32,7 @@ class FormTesterComponent implements OnInit {
   @ViewChild("last", /* TODO: add static flag */ {})
   last: ElementRef;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({

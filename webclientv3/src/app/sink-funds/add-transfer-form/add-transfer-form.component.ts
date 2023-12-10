@@ -3,7 +3,7 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { DeactivateService } from "../../shared/deactivate-button/deactivate.service";
 import { SinkFundData } from "../sink-fund-data.model";
 import { SinkFundCalculator } from "../sink-fund-calculator.service";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { SinkFundService } from "../sink-fund.service";
 
 @Component({
@@ -90,11 +90,11 @@ import { SinkFundService } from "../sink-fund.service";
 export class AddTransferFormComponent implements OnInit {
   @Input() sinkFund: SinkFundData;
   calculator: SinkFundCalculator;
-  transfer: FormGroup;
+  transfer: UntypedFormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<AddTransferFormComponent>,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private sinkFundService: SinkFundService,
     private deactivateService: DeactivateService
   ) {}

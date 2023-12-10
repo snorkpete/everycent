@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import {
   ControlValueAccessor,
-  FormControl,
+  UntypedFormControl,
   NG_VALUE_ACCESSOR
 } from "@angular/forms";
 
@@ -74,7 +74,7 @@ export class TextFieldComponent
   @Input() placeholder: string;
   @Input() type = "text";
 
-  control = new FormControl("");
+  control = new UntypedFormControl("");
 
   private onChange: Function = (_: any) => {};
   private onTouch: Function = () => {};

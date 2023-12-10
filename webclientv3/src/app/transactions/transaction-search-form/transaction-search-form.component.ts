@@ -12,7 +12,7 @@ import { map, take, takeUntil } from "rxjs/operators";
 import { BankAccountData } from "../../account-balances/bank-account.model";
 import { BudgetData } from "../../budgets/budget.model";
 import { TransactionSearchParams } from "./transaction-search-params.model";
-import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
+import {UntypedFormBuilder, FormControl, UntypedFormGroup, FormGroup} from "@angular/forms";
 import { BankAccountService } from "../../bank-accounts/bank-account.service";
 import { BudgetService } from "../../budgets/budget.service";
 
@@ -70,14 +70,17 @@ export class TransactionSearchFormComponent implements OnInit, OnDestroy {
   bankAccounts: BankAccountData[] = [];
   budgets: BudgetData[] = [];
   @Output() change = new EventEmitter<TransactionSearchParams>();
-  form: FormGroup;
+  form: FormGroup<{
+    budget_id: FormControl<number>,
+    bank_account_id: FormControl<number>
+  }>;
 
   private componentDestroyed = new Subject();
 
   constructor(
     private bankAccountService: BankAccountService,
     private budgetService: BudgetService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {}

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { BudgetData } from "../budget.model";
 
@@ -27,10 +27,10 @@ export class AddBudgetComponent implements OnInit {
   @Output() save = new EventEmitter<BudgetData>();
   @Output() cancel = new EventEmitter();
   editMode = false;
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private dialogRef: MatDialogRef<AddBudgetComponent>
   ) {}
 

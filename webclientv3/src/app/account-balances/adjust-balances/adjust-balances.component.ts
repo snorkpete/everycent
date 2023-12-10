@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import {
   BankAccountAdjustmentData,
@@ -75,9 +75,9 @@ export class AdjustBalancesComponent implements OnInit {
   @Output() save = new EventEmitter<BankAccountAdjustmentsParams>();
   @Output() cancel = new EventEmitter();
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private dialogRef: MatDialogRef<AdjustBalancesComponent>
   ) {}
 

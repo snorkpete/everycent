@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input, OnInit, Optional } from "@angular/core";
 import {
   ControlValueAccessor,
-  FormControl,
+  UntypedFormControl,
   NG_VALUE_ACCESSOR
 } from "@angular/forms";
 import { BudgetData } from "../../../budgets/budget.model";
@@ -49,7 +49,7 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
   @Input("ecValidateWithinBudget") budget: BudgetData = {};
   @Input() errorMessage: string;
 
-  control = new FormControl();
+  control = new UntypedFormControl();
 
   private onChange: Function = (_: any) => {};
   private onTouch: Function = () => {};

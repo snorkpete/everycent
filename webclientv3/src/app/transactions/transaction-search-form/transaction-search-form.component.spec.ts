@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { of } from "rxjs";
 import { ActivatedRouteStub } from "../../../../test/stub-services/activated-route-stub";
@@ -40,7 +40,7 @@ describe("TransactionsSearchFormComponent", () => {
       providers: [
         { provide: BankAccountService, useValue: BankAccountServiceStub },
         { provide: BudgetService, useValue: BudgetServiceStub },
-        FormBuilder
+        UntypedFormBuilder
       ]
     }).compileComponents();
   }));

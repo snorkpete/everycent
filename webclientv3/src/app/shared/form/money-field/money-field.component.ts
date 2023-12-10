@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input, OnInit } from "@angular/core";
 import {
   ControlValueAccessor,
-  FormControl,
+  UntypedFormControl,
   NG_VALUE_ACCESSOR
 } from "@angular/forms";
 import { dollarsToCents } from "../../../util/dollars-to-cents";
@@ -86,7 +86,7 @@ export class MoneyFieldComponent implements OnInit, ControlValueAccessor {
   @Input() highlightPositive: false;
   @Input() placeholder: string;
 
-  control = new FormControl(0);
+  control = new UntypedFormControl(0);
 
   private onChange: Function = (_: any) => {};
   private onTouch: Function = (_: any) => {};
