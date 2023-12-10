@@ -35,6 +35,7 @@ typings/
 node_modules/
 webclient/node_modules/
 webclientv3/node_modules/
+webclientv3/.angular/
 
 webclient/.idea/
 webclientv3/.idea/
