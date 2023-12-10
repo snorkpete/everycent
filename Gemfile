@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 ruby '3.0.3'
 
+gem 'bundler'
 gem 'rails', '6.1.4'
 gem 'puma'
 # gem 'bootsnap', require: false

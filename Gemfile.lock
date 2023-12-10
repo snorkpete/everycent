@@ -314,6 +314,7 @@ DEPENDENCIES
   acts_as_tenant
   annotate
   bootsnap (>= 1.8.1)
+  bundler
   database_cleaner
   devise_token_auth
   factory_bot_rails
