@@ -33,20 +33,30 @@ export class AbnAmroImporterService {
 
   convertFromBankFormat(input: string, startDate: string, endDate: string) {
     // SAMPLE DATA
-    // today
-    //
-    // €- 33,80
-    // Stichting Cent. Bureau R
-    //
-    // €- 33,80
-    // Stichting Cent. Bureau R
-    // yesterday
-    //
-    // €- 34,08
-    // Albert Heijn Fr.8642 ALM,PAS361
-    //
-    // €+ 28,40
-    // DOMINOS NL BY ADYEN
+
+    // TM
+    // Yesterday
+    // TM
+    // TMC*G-ALM-Metr619,PAS363
+    // Saturday, December 9 • Betaalpas
+    // - 7.90
+    // FS
+    // Febo Almere Stationspl,PAS363
+    // Saturday, December 9 • Betaalpas
+    // - 20.95
+    // December 2023
+    // AS
+    // Amazon Payments Europe S
+    // Friday, December 8 • iDEAL
+    // + 6.99
+    // AS
+    // Amazon Payments Europe S
+    // Friday, December 8 • iDEAL
+    // - 30.59
+    // TM
+    // TMC*G-ALM-Stadh608,PAS363
+    // Friday, December 8 • Betaalpas
+    // - 1.53
 
     let start = new Date(startDate);
     let end = new Date(endDate);
@@ -57,9 +67,18 @@ export class AbnAmroImporterService {
 
     // first split into lines
     let lines = this._convertInputToLines(input);
+    console.log(lines)
     lines.forEach(line => {
       // skip blank lines
       if (this.isBlank(line)) {
+        return;
+      }
+      console.log(line)
+      if (this.isSkippableText(line)) {
+        return;
+      }
+      if (this.isDescription(line)) {
+        currentDescription = line;
         return;
       }
       if (this.isDate(line)) {
@@ -76,14 +95,8 @@ export class AbnAmroImporterService {
           withdrawalAmount = 0;
           depositAmount = amount;
         }
-        return;
-      }
 
-      if (this.isDescription(line)) {
-        currentDescription = line;
-      }
-
-      if (this.isEndOfTransaction(line)) {
+        // we've gotten to the end - let's create the transaction now
         transaction = {
           transaction_date: currentDate,
           description: currentDescription,
@@ -117,7 +130,7 @@ export class AbnAmroImporterService {
         ) {
           transaction.transaction_date = transaction.transaction_date
             .toISOString()
-            .substr(0, 10);
+            .substring(0, 10);
         }
         transactions.push(transaction);
         currentDescription = "";
@@ -129,14 +142,16 @@ export class AbnAmroImporterService {
     return transactions;
   }
 
-  private _convertInputToLines(input) {
+  private _convertInputToLines(input: string | null): string[] {
     if (!input) {
       return [];
     }
     return input.split(/[\n]/);
   }
 
-  isDate(line) {
+
+
+  isDate(line: string) {
     if (!line) {
       return false;
     }
@@ -146,7 +161,7 @@ export class AbnAmroImporterService {
     return this.isFormattedDate(line);
   }
 
-  isFormattedDate(line) {
+  isFormattedDate(line: string) {
     // convert the month to a number
     const months = {
       January: 0,
@@ -163,14 +178,16 @@ export class AbnAmroImporterService {
       December: 11
     };
 
+    //   Friday, November 17 • ABN AMRO Bank N.V.
+
     // first, let's look for dates in format 00 Month year
-    let matchResult = line.match(/^(\d{1,2}) ([A-z]+) (\d{4})/);
+    let matchResult = line.match(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), ([A-z]+) (\d{1,2})/);
 
     if (matchResult) {
       return {
-        day: matchResult[1],
+        day: matchResult[3],
         month: months[matchResult[2]],
-        year: matchResult[3]
+        year: this.currentDate().getFullYear()
       };
     }
 
@@ -221,8 +238,8 @@ export class AbnAmroImporterService {
     }
     return line
       .trim()
-      .replace(/\./g, "")
-      .match(/€([+-]) (\d*,?\d*)/);
+      .replace(/\,/g, "")
+      .match(/([+-]) (\d*.?\d*)/);
   }
 
   extractAmount(line: string): number {
@@ -231,8 +248,8 @@ export class AbnAmroImporterService {
       return 0;
     }
     let [_, sign, amountString] = matches;
-    let amount = Number(amountString.replace(/,/g, "."));
-    amount = Math.round(amount * 100);
+    let amount = Number(amountString);
+    amount = Math.ceil(amount * 100);
     if (sign === "-") {
       return amount * -1;
     } else {
@@ -247,17 +264,32 @@ export class AbnAmroImporterService {
     return line.trim() === "";
   }
 
-  isDescription(input: string) {
-    return !this.isBlank(input) && !this.isDate(input) && !this.isAmount(input);
+  isSkippableText(line: string): boolean {
+    if (line.length === 2) {
+      return true;
+    }
+    if (line.match(/^(Yesterday|Today|January|February|March|April|May|June|July|August|September|October|November|December)/)) {
+      return true;
+    }
+
+    if (this.isDate(line))  {
+      return false;
+    }
+
+    return false;
   }
 
-  isNumber(line) {
-    let firstChar = line.trim().substr(0, 1);
+  isDescription(input: string) {
+    return !this.isBlank(input) && !this.isDate(input) && !this.isAmount(input) && input.length > 2;
+  }
+
+  isNumber(line: string) {
+    let firstChar = line.trim().substring(0, 1);
 
     return firstChar === "-" || firstChar === "+" || firstChar === "€";
   }
 
-  isEndOfTransaction(line) {
-    return this.isDescription(line);
+  isEndOfTransaction(line: string) {
+    return this.isAmount(line);
   }
 }

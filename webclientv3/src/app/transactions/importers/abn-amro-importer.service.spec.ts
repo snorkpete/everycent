@@ -17,34 +17,6 @@ describe("AbnAmroImporterService", () => {
     importer = TestBed.inject(AbnAmroImporterService);
   });
 
-  let sample = `
-today
-
-€- 33,80
-Stichting Cent. Bureau R
-
-€- 33,80
-Stichting Cent. Bureau R
-yesterday
-
-€- 34,08
-Albert Heijn Fr.8642 ALM,PAS361
-
-€+ 28,40
-DOMINOS NL BY ADYEN
-12 December 2017
-
-€- 1,87
-ABN AMRO Bank N.V.
-
-€- 25,15
-McDonald's Almere Ce ALM,PAS361
-
-€- 10,00
-NS- Almere Centr.102 ALM,PAS361
-
-`;
-
   describe("#isDate", () => {
     it('returns false for "other text"', () => {
       expect(importer.isDate("other text")).toBeFalsy();
@@ -55,23 +27,15 @@ NS- Almere Centr.102 ALM,PAS361
     it('returns true for "yesterday"', () => {
       expect(importer.isDate("yesterday")).toBeTruthy();
     });
-    it('returns true for "12 December 2017"', () => {
-      expect(importer.isDate("12 December 2017")).toBeTruthy();
-    });
-    it('returns true for "December 12, 2017"', () => {
-      expect(importer.isDate("December 12, 2017")).toBeTruthy();
+    it('returns true for "December 12, 2017"',() => {
+      expect(importer.isDate("Saturday, December 9 • Betaalpas")).toBeTruthy();
     });
   });
 
   describe("#extractDate", () => {
-    it('returns "2017-12-23" for "12 December 2017"', () => {
-      expect(importer.extractDate("12 December 2017")).toEqual(
-        new Date(2017, 11, 12, 10)
-      );
-    });
-    it('returns "2017-12-23" for "December 23, 2017"', () => {
-      expect(importer.extractDate("December 23, 2017")).toEqual(
-        new Date(2017, 11, 23, 10)
+    it('returns "2023-12-09" for "Saturday, December 9 • Betaalpas"', () => {
+      expect(importer.extractDate("Saturday, December 9 • Betaalpas")).toEqual(
+        new Date(2023, 11, 9, 10)
       );
     });
     it("returns current date for today", () => {
@@ -87,14 +51,14 @@ NS- Almere Centr.102 ALM,PAS361
   });
 
   describe("#isAmount", () => {
-    it('returns true for "€+ 410,00"', () => {
-      expect(importer.isAmount("€+ 410,00")).toBeTruthy();
+    it('returns true for "+ 410,00"', () => {
+      expect(importer.isAmount("+ 410,00")).toBeTruthy();
     });
-    it('returns true for "€- 10,00"', () => {
-      expect(importer.isAmount("€- 10,00")).toBeTruthy();
+    it('returns true for "- 10,00"', () => {
+      expect(importer.isAmount("- 10,00")).toBeTruthy();
     });
-    it('returns true for "€+ 4.110,00"', () => {
-      expect(importer.isAmount("€+ 4.110,00")).toBeTruthy();
+    it('returns true for "+ 4.110,00"', () => {
+      expect(importer.isAmount("+ 4.110,00")).toBeTruthy();
     });
     it('returns false for "description"', () => {
       expect(importer.isAmount("description")).toBeFalsy();
@@ -108,14 +72,17 @@ NS- Almere Centr.102 ALM,PAS361
   });
 
   describe("#extractAmount", () => {
-    it('returns true for "€+ 410,00"', () => {
-      expect(importer.extractAmount("€+ 410,00")).toEqual(41000);
+    it('returns true for "+ 410.00"', () => {
+      expect(importer.extractAmount("+ 410.00")).toEqual(41000);
     });
-    it('returns true for "€- 10,00"', () => {
-      expect(importer.extractAmount("€- 10,00")).toEqual(-1000);
+    it('returns true for "- 7.90"', () => {
+      expect(importer.extractAmount("- 7.90")).toEqual(-790);
     });
-    it('returns true for "€+ 4.110,00"', () => {
-      expect(importer.extractAmount("€+ 4.110,00")).toEqual(411000);
+    it('returns true for "- 10.00"', () => {
+      expect(importer.extractAmount("- 10.00")).toEqual(-1000);
+    });
+    it('returns true for "+ 4,110.00"', () => {
+      expect(importer.extractAmount("+ 4,110.00")).toEqual(411000);
     });
     it("handles non amounts without errors", () => {
       expect(importer.extractAmount("test")).toEqual(0);
@@ -138,35 +105,96 @@ NS- Almere Centr.102 ALM,PAS361
     it("returns false for dates", () => {
       expect(importer.isDescription("today")).toBeFalsy();
       expect(importer.isDescription("yesterday")).toBeFalsy();
-      expect(importer.isDescription("4 May 2018")).toBeFalsy();
+      expect(importer.isDescription("May 4, 2018")).toBeFalsy();
     });
     it("returns false for numbers", () => {
       expect(importer.isDescription("€+ 4.110,00")).toBeFalsy();
     });
   });
 
+  describe('#isSkippableText', () => {
+    // Yesterday
+    // TM
+    // TMC*G-ALM-Metr619,PAS363
+    // Saturday, December 9 • Betaalpas
+    // - 7.90
+    // December 2023
+    it('returns true for yesterday headings', () => {
+      expect(importer.isSkippableText('Yesterday')).toBeTruthy();
+    });
+    it('returns true for today headings', () => {
+      expect(importer.isSkippableText('Today')).toBeTruthy();
+    });
+    it('returns true for other date headings', () => {
+      expect(importer.isSkippableText('December 2023')).toBeTruthy();
+    });
+    it('returns true for short two letter things', () => {
+      expect(importer.isSkippableText('MX')).toBeTruthy();
+    });
+    it('returns false for dates', () => {
+      expect(importer.isSkippableText('Saturday, December 9')).toBeFalse();
+    });
+    it('returns false for amounts', () => {
+      expect(importer.isSkippableText('- 7.90')).toBeFalse();
+    });
+    it('returns false for decriptions', () => {
+      expect(importer.isSkippableText('somethign else')).toBeFalse();
+    });
+  })
+
   describe("#convertFromBankFormat", () => {
     it("gets 5 transactions from the sample", () => {
       // simple fix to force the relative dates to have known values
-      spyOn(importer, "currentDate").and.returnValue(new Date("2017-12-30"));
+      spyOn(importer, "currentDate").and.returnValue(new Date("2023-12-30"));
 
+      let sample = `
+Yesterday
+TM
+TMC*G-ALM-Metr619,PAS363
+Saturday, December 9 • Betaalpas
+- 7.90
+FS
+Febo Almere Stationspl,PAS363
+Saturday, December 9 • Betaalpas
+- 20.95
+December 2023
+AS
+Amazon Payments Europe S
+Friday, December 8 • iDEAL
++ 6.99
+AS
+Amazon Payments Europe S
+Friday, December 8 • iDEAL
+- 30.59
+TM
+TMC*G-ALM-Stadh608,PAS363
+Friday, December 8 • Betaalpas
+- 1.53
+`;
       let result: TransactionData[] = importer.convertFromBankFormat(
         sample,
-        "2017-12-28",
-        "2017-12-31"
+        "2023-12-01",
+        "2023-12-24"
       );
-      expect(result.length).toEqual(7);
+      expect(result.length).toEqual(5);
 
+      console.log(result);
       let first = result[0];
-      expect(first.transaction_date).toEqual("2017-12-30");
-      expect(first.withdrawal_amount).toEqual(3380);
+      expect(first.transaction_date).toEqual("2023-12-09");
+      expect(first.withdrawal_amount).toEqual(790);
       expect(first.deposit_amount).toEqual(0);
 
-      let fourth = result[3];
-      expect(fourth.transaction_date).toEqual("2017-12-29");
-      expect(fourth.withdrawal_amount).toEqual(0);
-      expect(fourth.deposit_amount).toEqual(2840);
-      expect(fourth.description).toEqual("DOMINOS NL BY ADYEN");
+      let third = result[2];
+      expect(third.transaction_date).toEqual("2023-12-08");
+      expect(third.withdrawal_amount).toEqual(0);
+      expect(third.deposit_amount).toEqual(699);
+      expect(third.description).toEqual('Amazon Payments Europe S');
+
+      let fifth = result[4];
+      expect(fifth.transaction_date).toEqual("2023-12-08");
+      expect(fifth.withdrawal_amount).toEqual(153);
+      expect(fifth.deposit_amount).toEqual(0);
+      expect(fifth.description).toEqual("TMC*G-ALM-Stadh608,PAS363");
     });
   });
 });
