@@ -27,15 +27,15 @@ describe("AbnAmroImporterService", () => {
     it('returns true for "yesterday"', () => {
       expect(importer.isDate("yesterday")).toBeTruthy();
     });
-    it('returns true for "December 12, 2017"',() => {
-      expect(importer.isDate("Saturday, December 9 • Betaalpas")).toBeTruthy();
+    it('returns true for "Fri, 8 Mar • OUR REF: SW0803003306452"',() => {
+      expect(importer.isDate("Fri, 8 Mar • OUR REF: SW0803003306452")).toBeTruthy();
     });
   });
 
   describe("#extractDate", () => {
-    it('returns "2023-12-09" for "Saturday, December 9 • Betaalpas"', () => {
-      expect(importer.extractDate("Saturday, December 9 • Betaalpas")).toEqual(
-        new Date(2023, 11, 9, 10)
+    it('returns "2023-12-09" for "Fri, 8 Mar • OUR REF: SW0803003306452"', () => {
+      expect(importer.extractDate("Fri, 8 Mar • OUR REF: SW0803003306452")).toEqual(
+        new Date(2024, 2, 8, 10)
       );
     });
     it("returns current date for today", () => {
@@ -51,14 +51,11 @@ describe("AbnAmroImporterService", () => {
   });
 
   describe("#isAmount", () => {
-    it('returns true for "+ 410,00"', () => {
-      expect(importer.isAmount("+ 410,00")).toBeTruthy();
+    it('returns true for "- 50.00"', () => {
+      expect(importer.isAmount("- 50.00")).toBeTruthy();
     });
-    it('returns true for "- 10,00"', () => {
-      expect(importer.isAmount("- 10,00")).toBeTruthy();
-    });
-    it('returns true for "+ 4.110,00"', () => {
-      expect(importer.isAmount("+ 4.110,00")).toBeTruthy();
+    it('returns true for "+ 15,295.01"', () => {
+      expect(importer.isAmount("+ 15,295.01")).toBeTruthy();
     });
     it('returns false for "description"', () => {
       expect(importer.isAmount("description")).toBeFalsy();
@@ -72,17 +69,11 @@ describe("AbnAmroImporterService", () => {
   });
 
   describe("#extractAmount", () => {
-    it('returns true for "+ 410.00"', () => {
-      expect(importer.extractAmount("+ 410.00")).toEqual(41000);
+    it('returns true for "- 50.00"', () => {
+      expect(importer.extractAmount("- 50.00")).toEqual(-5000);
     });
-    it('returns true for "- 7.90"', () => {
-      expect(importer.extractAmount("- 7.90")).toEqual(-790);
-    });
-    it('returns true for "- 10.00"', () => {
-      expect(importer.extractAmount("- 10.00")).toEqual(-1000);
-    });
-    it('returns true for "+ 4,110.00"', () => {
-      expect(importer.extractAmount("+ 4,110.00")).toEqual(411000);
+    it('returns true for "+ 15,295.01"', () => {
+      expect(importer.extractAmount("+ 15,295.01")).toEqual(1529501);
     });
     it("handles non amounts without errors", () => {
       expect(importer.extractAmount("test")).toEqual(0);
@@ -105,19 +96,22 @@ describe("AbnAmroImporterService", () => {
     it("returns false for dates", () => {
       expect(importer.isDescription("today")).toBeFalsy();
       expect(importer.isDescription("yesterday")).toBeFalsy();
-      expect(importer.isDescription("May 4, 2018")).toBeFalsy();
+      expect(importer.isDescription("Fri, 8 Mar • OUR REF: SW0803003306452")).toBeFalsy();
     });
     it("returns false for numbers", () => {
-      expect(importer.isDescription("€+ 4.110,00")).toBeFalsy();
+      expect(importer.isDescription("+ 15,295.01")).toBeFalsy();
     });
   });
 
   describe('#isSkippableText', () => {
+    // Today
+    // March 2024
+    // SL
+    // Stichting Beheer Loterij
+    // Wed, 27 Mar • Incasso algemeen doorlopend
+    // - 25.00
     // Yesterday
     // TM
-    // TMC*G-ALM-Metr619,PAS363
-    // Saturday, December 9 • Betaalpas
-    // - 7.90
     // December 2023
     it('returns true for yesterday headings', () => {
       expect(importer.isSkippableText('Yesterday')).toBeTruthy();
@@ -132,10 +126,10 @@ describe("AbnAmroImporterService", () => {
       expect(importer.isSkippableText('MX')).toBeTruthy();
     });
     it('returns false for dates', () => {
-      expect(importer.isSkippableText('Saturday, December 9')).toBeFalse();
+      expect(importer.isSkippableText('Wed, 27 Mar • Incasso algemeen doorlopend')).toBeFalse();
     });
     it('returns false for amounts', () => {
-      expect(importer.isSkippableText('- 7.90')).toBeFalse();
+      expect(importer.isSkippableText('- 25.00')).toBeFalse();
     });
     it('returns false for decriptions', () => {
       expect(importer.isSkippableText('somethign else')).toBeFalse();
@@ -145,56 +139,56 @@ describe("AbnAmroImporterService", () => {
   describe("#convertFromBankFormat", () => {
     it("gets 5 transactions from the sample", () => {
       // simple fix to force the relative dates to have known values
-      spyOn(importer, "currentDate").and.returnValue(new Date("2023-12-30"));
+      spyOn(importer, "currentDate").and.returnValue(new Date("2024-04-19"));
 
       let sample = `
-Yesterday
-TM
-TMC*G-ALM-Metr619,PAS363
-Saturday, December 9 • Betaalpas
-- 7.90
-FS
-Febo Almere Stationspl,PAS363
-Saturday, December 9 • Betaalpas
-- 20.95
-December 2023
-AS
-Amazon Payments Europe S
-Friday, December 8 • iDEAL
-+ 6.99
-AS
-Amazon Payments Europe S
-Friday, December 8 • iDEAL
-- 30.59
-TM
-TMC*G-ALM-Stadh608,PAS363
-Friday, December 8 • Betaalpas
-- 1.53
+March 2024
+SL
+Stichting Beheer Loterij
+Wed, 27 Mar • Incasso algemeen doorlopend
+- 25.00
+OS
+OUR REF: SW0803003306452
+Fri, 8 Mar • OUR REF: SW0803003306452
++ 15,295.01
+KC
+KJ STEPHEN CJ
+Mon, 4 Mar • Overboeking
++ 75.00
+February 2024
+CV
+Coffeeshop Vondel,PAS362
+Sat, 24 Feb • Betaalpas
+- 50.00
+BO
+Best Friends Zuid Oost,PAS362
+Thu, 1 Feb • Betaalpas
+- 22.50
 `;
       let result: TransactionData[] = importer.convertFromBankFormat(
         sample,
-        "2023-12-01",
-        "2023-12-24"
+        "2024-02-01",
+        "2024-03-31"
       );
       expect(result.length).toEqual(5);
 
       console.log(result);
       let first = result[0];
-      expect(first.transaction_date).toEqual("2023-12-09");
-      expect(first.withdrawal_amount).toEqual(790);
+      expect(first.transaction_date).toEqual("2024-03-27");
+      expect(first.withdrawal_amount).toEqual(2500);
       expect(first.deposit_amount).toEqual(0);
 
       let third = result[2];
-      expect(third.transaction_date).toEqual("2023-12-08");
+      expect(third.transaction_date).toEqual("2024-03-04");
       expect(third.withdrawal_amount).toEqual(0);
-      expect(third.deposit_amount).toEqual(699);
-      expect(third.description).toEqual('Amazon Payments Europe S');
+      expect(third.deposit_amount).toEqual(7500);
+      expect(third.description).toEqual('KJ STEPHEN CJ');
 
       let fifth = result[4];
-      expect(fifth.transaction_date).toEqual("2023-12-08");
-      expect(fifth.withdrawal_amount).toEqual(153);
+      expect(fifth.transaction_date).toEqual("2024-02-01");
+      expect(fifth.withdrawal_amount).toEqual(2250);
       expect(fifth.deposit_amount).toEqual(0);
-      expect(fifth.description).toEqual("TMC*G-ALM-Stadh608,PAS363");
+      expect(fifth.description).toEqual("Best Friends Zuid Oost,PAS362");
     });
   });
 });
