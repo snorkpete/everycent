@@ -34,29 +34,28 @@ export class AbnAmroImporterService {
   convertFromBankFormat(input: string, startDate: string, endDate: string) {
     // SAMPLE DATA
 
-    // TM
-    // Yesterday
-    // TM
-    // TMC*G-ALM-Metr619,PAS363
-    // Saturday, December 9 • Betaalpas
-    // - 7.90
-    // FS
-    // Febo Almere Stationspl,PAS363
-    // Saturday, December 9 • Betaalpas
-    // - 20.95
-    // December 2023
-    // AS
-    // Amazon Payments Europe S
-    // Friday, December 8 • iDEAL
-    // + 6.99
-    // AS
-    // Amazon Payments Europe S
-    // Friday, December 8 • iDEAL
-    // - 30.59
-    // TM
-    // TMC*G-ALM-Stadh608,PAS363
-    // Friday, December 8 • Betaalpas
-    // - 1.53
+    // March 2024
+    // SL
+    // Stichting Beheer Loterij
+    // Wed, 27 Mar • Incasso algemeen doorlopend
+    // - 25.00
+    // OS
+    // OUR REF: SW0803003306452
+    // Fri, 8 Mar • OUR REF: SW0803003306452
+    // + 15,295.01
+    // KC
+    // KJ STEPHEN CJ
+    // Mon, 4 Mar • Overboeking
+    // + 75.00
+    // February 2024
+    // CV
+    // Coffeeshop Vondel,PAS362
+    // Sat, 24 Feb • Betaalpas
+    // - 50.00
+    // BO
+    // Best Friends Zuid Oost,PAS362
+    // Thu, 1 Feb • Betaalpas
+    // - 22.50
 
     let start = new Date(startDate);
     let end = new Date(endDate);
@@ -164,29 +163,30 @@ export class AbnAmroImporterService {
   isFormattedDate(line: string) {
     // convert the month to a number
     const months = {
-      January: 0,
-      February: 1,
-      March: 2,
-      April: 3,
+      Jan: 0,
+      Feb: 1,
+      Mar: 2,
+      Apr: 3,
       May: 4,
-      June: 5,
-      July: 6,
-      August: 7,
-      September: 8,
-      October: 9,
-      November: 10,
-      December: 11
+      Jun: 5,
+      Jul: 6,
+      Aug: 7,
+      Sep: 8,
+      Oct: 9,
+      Nov: 10,
+      Dec: 11
     };
 
-    //   Friday, November 17 • ABN AMRO Bank N.V.
+    // old version -to delete //   Friday, November 17 • ABN AMRO Bank N.V.
+    // Fri, 8 Mar • OUR REF: SW0803003306452
 
-    // first, let's look for dates in format 00 Month year
-    let matchResult = line.match(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), ([A-z]+) (\d{1,2})/);
+    // first, let's look for dates in format Day, 00 Mon
+    let matchResult = line.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{1,2}) ([A-z]{3}) /);
 
     if (matchResult) {
       return {
-        day: matchResult[3],
-        month: months[matchResult[2]],
+        day: matchResult[2],
+        month: months[matchResult[3]],
         year: this.currentDate().getFullYear()
       };
     }
