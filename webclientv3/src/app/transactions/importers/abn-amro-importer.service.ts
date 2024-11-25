@@ -239,6 +239,7 @@ export class AbnAmroImporterService {
     return line
       .trim()
       .replace(/\,/g, "")
+      .replace('Amount:', '')
       .match(/([+-]) (\d*.?\d*)/);
   }
 
@@ -286,6 +287,9 @@ export class AbnAmroImporterService {
   isNumber(line: string) {
     let firstChar = line.trim().substring(0, 1);
 
+    if (line.trim().startsWith(`Amount:`)) {
+      return true;
+    }
     return firstChar === "-" || firstChar === "+" || firstChar === "€";
   }
 
