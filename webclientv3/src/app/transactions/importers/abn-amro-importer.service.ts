@@ -34,28 +34,32 @@ export class AbnAmroImporterService {
   convertFromBankFormat(input: string, startDate: string, endDate: string) {
     // SAMPLE DATA
 
-    // March 2024
-    // SL
-    // Stichting Beheer Loterij
-    // Wed, 27 Mar • Incasso algemeen doorlopend
-    // - 25.00
-    // OS
-    // OUR REF: SW0803003306452
-    // Fri, 8 Mar • OUR REF: SW0803003306452
-    // + 15,295.01
-    // KC
-    // KJ STEPHEN CJ
-    // Mon, 4 Mar • Overboeking
-    // + 75.00
-    // February 2024
-    // CV
-    // Coffeeshop Vondel,PAS362
-    // Sat, 24 Feb • Betaalpas
-    // - 50.00
-    // BO
-    // Best Friends Zuid Oost,PAS362
-    // Thu, 1 Feb • Betaalpas
-    // - 22.50
+    // April 2025
+    // IS
+    // INT CARD SERVICES
+    // Fr 25 Apr • iDEAL
+    // Amount:- 351.58
+    // Account: Sink Fund Account, Description: Overboeking ,
+    //   SA
+    // Sink Fund Account
+    // Fr 25 Apr • Overboeking
+    // Amount:+ 200.00
+    // Account: Zalando Payments GmbH, Description: iDEAL ,
+    //   OC
+    // OLYMPIC CATERING,PAS352
+    // Th 24 Apr • Betaalpas
+    // Amount:- 12.50
+    // Account: PICNIC BY BUCKAROO, Description: Incasso algemeen doorlopend,
+    //   PB
+    // PICNIC BY BUCKAROO
+    // Th 24 Apr • Incasso algemeen doorlopend
+    // Amount:- 65.74
+    // Account: Simpel, Description: Incasso algemeen doorlopend,
+    //   LM
+    // LYTTOS B MINI MARKET,PAS363
+    // We 23 Apr • Betaalpas
+    // Amount:- 24.09
+    // Account: Sink Fund Account, Description: Overboeking ,
 
     let start = new Date(startDate);
     let end = new Date(endDate);
@@ -177,11 +181,21 @@ export class AbnAmroImporterService {
       Dec: 11
     };
 
-    // old version -to delete //   Friday, November 17 • ABN AMRO Bank N.V.
     // Fri, 8 Mar • OUR REF: SW0803003306452
 
     // first, let's look for dates in format Day, 00 Mon
     let matchResult = line.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{1,2}) ([A-z]{3}) /);
+
+    if (matchResult) {
+      return {
+        day: matchResult[2],
+        month: months[matchResult[3]],
+        year: this.currentDate().getFullYear()
+      };
+    }
+
+    // if that doesn't work, let's try with the shorter date format (Dy 00 Mon)
+    matchResult = line.match(/^(Mo|Tu|We|Th|Fr|Sa|Su) (\d{1,2}) ([A-z]{3}) /);
 
     if (matchResult) {
       return {
@@ -239,7 +253,6 @@ export class AbnAmroImporterService {
     return line
       .trim()
       .replace(/\,/g, "")
-      .replace('Amount:', '')
       .match(/([+-]) (\d*.?\d*)/);
   }
 
@@ -270,6 +283,10 @@ export class AbnAmroImporterService {
       return true;
     }
     if (line.match(/^(Yesterday|Today|January|February|March|April|May|June|July|August|September|October|November|December)/)) {
+      return true;
+    }
+
+    if (line.startsWith('Account: ')) {
       return true;
     }
 

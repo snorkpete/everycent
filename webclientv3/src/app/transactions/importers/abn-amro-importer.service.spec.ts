@@ -75,6 +75,9 @@ describe("AbnAmroImporterService", () => {
     it('returns true for "+ 15,295.01"', () => {
       expect(importer.extractAmount("+ 15,295.01")).toEqual(1529501);
     });
+    it('returns true for "Amount:+ 15,295.01"', () => {
+      expect(importer.extractAmount("Amount:+ 15,295.01")).toEqual(1529501);
+    });
     it("handles non amounts without errors", () => {
       expect(importer.extractAmount("test")).toEqual(0);
     });
@@ -113,6 +116,7 @@ describe("AbnAmroImporterService", () => {
     // Yesterday
     // TM
     // December 2023
+    // Account: Zalando Payments GmbH, Description: iDEAL ,
     it('returns true for yesterday headings', () => {
       expect(importer.isSkippableText('Yesterday')).toBeTruthy();
     });
@@ -124,6 +128,9 @@ describe("AbnAmroImporterService", () => {
     });
     it('returns true for short two letter things', () => {
       expect(importer.isSkippableText('MX')).toBeTruthy();
+    });
+    it('returns true for account+description lines', () => {
+      expect(importer.isSkippableText('Account: Simpel, Description: Incasso algemeen doorlopend, ')).toBeTruthy();
     });
     it('returns false for dates', () => {
       expect(importer.isSkippableText('Wed, 27 Mar • Incasso algemeen doorlopend')).toBeFalse();
@@ -139,56 +146,72 @@ describe("AbnAmroImporterService", () => {
   describe("#convertFromBankFormat", () => {
     it("gets 5 transactions from the sample", () => {
       // simple fix to force the relative dates to have known values
-      spyOn(importer, "currentDate").and.returnValue(new Date("2024-04-19"));
+      spyOn(importer, "currentDate").and.returnValue(new Date("2025-04-19"));
 
       let sample = `
-March 2024
-SL
-Stichting Beheer Loterij
-Wed, 27 Mar • Incasso algemeen doorlopend
-- 25.00
-OS
-OUR REF: SW0803003306452
-Fri, 8 Mar • OUR REF: SW0803003306452
-+ 15,295.01
-KC
-KJ STEPHEN CJ
-Mon, 4 Mar • Overboeking
-+ 75.00
-February 2024
-CV
-Coffeeshop Vondel,PAS362
-Sat, 24 Feb • Betaalpas
-- 50.00
-BO
-Best Friends Zuid Oost,PAS362
-Thu, 1 Feb • Betaalpas
-- 22.50
+April 2025
+IS
+INT CARD SERVICES
+Fr 25 Apr • iDEAL
+Amount:- 351.58
+Account: Sink Fund Account, Description: Overboeking ,
+SA
+Sink Fund Account
+Fr 25 Apr • Overboeking
+Amount:+ 200.00
+Account: Zalando Payments GmbH, Description: iDEAL ,
+OC
+OLYMPIC CATERING,PAS352
+Th 24 Apr • Betaalpas
+Amount:- 12.50
+Account: PICNIC BY BUCKAROO, Description: Incasso algemeen doorlopend,
+PB
+PICNIC BY BUCKAROO
+Th 24 Apr • Incasso algemeen doorlopend
+Amount:- 65.74
+Account: Simpel, Description: Incasso algemeen doorlopend,
+LM
+LYTTOS B MINI MARKET,PAS363
+We 23 Apr • Betaalpas
+Amount:- 24.09
+Account: Sink Fund Account, Description: Overboeking ,
 `;
+
       let result: TransactionData[] = importer.convertFromBankFormat(
         sample,
-        "2024-02-01",
-        "2024-03-31"
+        "2025-04-01",
+        "2025-04-31"
       );
       expect(result.length).toEqual(5);
 
       console.log(result);
       let first = result[0];
-      expect(first.transaction_date).toEqual("2024-03-27");
-      expect(first.withdrawal_amount).toEqual(2500);
+      expect(first).toBeDefined();
+      expect(first.transaction_date).toEqual("2025-04-25");
+      expect(first.withdrawal_amount).toEqual(35158);
       expect(first.deposit_amount).toEqual(0);
+      expect(first.description).toEqual('INT CARD SERVICES');
+
+      let second = result[1];
+      expect(second).toBeDefined();
+      expect(second.transaction_date).toEqual("2025-04-25");
+      expect(second.withdrawal_amount).toEqual(0);
+      expect(second.deposit_amount).toEqual(20000);
+      expect(second.description).toEqual('Sink Fund Account');
 
       let third = result[2];
-      expect(third.transaction_date).toEqual("2024-03-04");
-      expect(third.withdrawal_amount).toEqual(0);
-      expect(third.deposit_amount).toEqual(7500);
-      expect(third.description).toEqual('KJ STEPHEN CJ');
+      expect(third).toBeDefined();
+      expect(third.transaction_date).toEqual("2025-04-24");
+      expect(third.withdrawal_amount).toEqual(1250);
+      expect(third.deposit_amount).toEqual(0);
+      expect(third.description).toEqual('OLYMPIC CATERING,PAS352');
 
       let fifth = result[4];
-      expect(fifth.transaction_date).toEqual("2024-02-01");
-      expect(fifth.withdrawal_amount).toEqual(2250);
+      expect(fifth).toBeDefined();
+      expect(fifth.transaction_date).toEqual("2025-04-23");
+      expect(fifth.withdrawal_amount).toEqual(2409);
       expect(fifth.deposit_amount).toEqual(0);
-      expect(fifth.description).toEqual("Best Friends Zuid Oost,PAS362");
+      expect(fifth.description).toEqual("LYTTOS B MINI MARKET,PAS363");
     });
   });
 });
