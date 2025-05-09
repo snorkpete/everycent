@@ -2,12 +2,14 @@ source 'https://rubygems.org'
 ruby '3.2.3'
 
 gem 'bundler'
-gem 'rails', '~> 6.1.7'
+gem 'rails', '~> 7.0.8'
 gem 'puma'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
 gem 'nio4r', '~> 2.7.0'
 
+# Add responders gem since it's no longer included in Rails 7
+gem 'responders'
 gem 'rails-controller-testing'
 
 # fix for deprecated/removed mimemagic 3.2
@@ -37,7 +39,8 @@ gem 'tzinfo-data'
 
 # authentication - omniauth is a dependency of devise_token_auth
 gem 'omniauth'
-gem 'devise_token_auth'
+gem 'devise', '~> 4.9.0'
+gem 'devise_token_auth', '~> 1.2.2'
 
 # json api building
 gem 'active_model_serializers'
