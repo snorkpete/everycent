@@ -1,11 +1,12 @@
 source 'https://rubygems.org'
-ruby '3.0.3'
+ruby '3.2.3'
 
 gem 'bundler'
-gem 'rails', '6.1.4'
+gem 'rails', '~> 6.1.7'
 gem 'puma'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
+gem 'nio4r', '~> 2.7.0'
 
 gem 'rails-controller-testing'
 
@@ -29,7 +30,7 @@ end
 # Previously locked to pg 0.21 because current versions of pg gem had segfault issues
 # Trying to use latest released pg gem
 # gem 'pg', '~> 0.21'
-gem 'pg'
+gem 'pg', '~> 1.5.0'
 
 # fix for time
 gem 'tzinfo-data'
@@ -68,7 +69,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'faker'
+  gem 'faker', '~> 3.2.0'
   #gem 'capybara'
   gem 'database_cleaner'
   gem 'launchy'
