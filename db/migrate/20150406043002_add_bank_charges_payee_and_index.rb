@@ -1,4 +1,4 @@
-class AddBankChargesPayeeAndIndex < ActiveRecord::Migration
+class AddBankChargesPayeeAndIndex < ActiveRecord::Migration[7.1]
   def change
 
     # will be searching by payee code and allocation name

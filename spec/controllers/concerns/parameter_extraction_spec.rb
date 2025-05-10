@@ -1,5 +1,8 @@
+require 'rails_helper'
 
 describe "ParameterExtraction" do
+  render_views false
+
   before :all do
     @parameter_extraction_class = Class.new do
         include ParameterExtraction

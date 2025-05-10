@@ -1,4 +1,4 @@
-class CreateSettings < ActiveRecord::Migration
+class CreateSettings < ActiveRecord::Migration[7.1]
   def change
     create_table :settings do |t|
       t.integer :primary_budget_account_id

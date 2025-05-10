@@ -1,4 +1,4 @@
-class AddStatusToTransactions < ActiveRecord::Migration
+class AddStatusToTransactions < ActiveRecord::Migration[7.1]
   def change
     add_column :transactions, :status, :string, index: true
 

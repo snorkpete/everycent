@@ -1,4 +1,4 @@
-class AddCashFlagToBankAccounts < ActiveRecord::Migration
+class AddCashFlagToBankAccounts < ActiveRecord::Migration[7.1]
   def change
     add_column :bank_accounts, :is_cash, :boolean, :default => true
 

@@ -26,7 +26,6 @@
 #
 
 require 'rails_helper'
-
 require 'models/shared_examples/credit_card_spec'
 require 'models/shared_examples/sink_fund_spec'
 require 'models/shared_examples/manual_balance_adjustments_spec'
@@ -39,7 +38,6 @@ RSpec.describe BankAccount, :type => :model do
   end
 
   context "when saved" do
-
     let(:bank_account) { BankAccount.create }
 
     it "has an account_category" do
@@ -69,12 +67,10 @@ RSpec.describe BankAccount, :type => :model do
       expect(same_bank_account.closing_balance).to eq(4000)
       expect(same_bank_account.closing_date).to eq(@today)
     end
-
   end
 
   include_examples "CreditCard"
   include_examples "SinkFund"
   include_examples "ManualBalanceAdjustments"
   include_examples "Transfers"
-
 end

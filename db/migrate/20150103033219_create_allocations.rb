@@ -1,4 +1,4 @@
-class CreateAllocations < ActiveRecord::Migration
+class CreateAllocations < ActiveRecord::Migration[7.1]
   def change
     create_table :allocations do |t|
       t.string :name

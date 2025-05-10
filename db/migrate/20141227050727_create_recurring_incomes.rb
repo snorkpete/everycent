@@ -1,4 +1,4 @@
-class CreateRecurringIncomes < ActiveRecord::Migration
+class CreateRecurringIncomes < ActiveRecord::Migration[7.1]
   def change
     create_table :recurring_incomes do |t|
       t.string :name
