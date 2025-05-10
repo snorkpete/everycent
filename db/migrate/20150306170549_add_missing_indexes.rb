@@ -1,4 +1,4 @@
-class AddMissingIndexes < ActiveRecord::Migration
+class AddMissingIndexes < ActiveRecord::Migration[7.1]
   def change
     add_index :transactions, :allocation_id
     add_index :transactions, :bank_account_id

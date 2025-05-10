@@ -1,4 +1,4 @@
-class CreateRecurringAllocations < ActiveRecord::Migration
+class CreateRecurringAllocations < ActiveRecord::Migration[7.1]
   def change
     create_table :recurring_allocations do |t|
       t.string :name, :null => false

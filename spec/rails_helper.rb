@@ -33,7 +33,7 @@ module AuthHelper
 end
 
 # require any shared_examples - used to test concerns
-# Dir[Rails.root.join("spec/models/shared_examples/**/*.rb")].each {|f| require f}
+Dir[Rails.root.join("spec/models/shared_examples/**/*.rb")].each {|f| require f}
 Dir[Rails.root.join("spec/controllers/shared_examples/**/*.rb")].each {|f| require f}
 
 RSpec.configure do |config|
@@ -66,4 +66,24 @@ RSpec.configure do |config|
   # authentication helper methods
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include AuthHelper
+
+  # Rails 7.1 compatibility
+  config.before(:each, type: :controller) do
+    @request.env['devise.mapping'] = Devise.mappings[:user]
+  end
+
+  # Handle ActionController::Parameters in tests
+  config.before(:each) do
+    ActionController::Parameters.permit_all_parameters = true
+  end
+
+  # Rails 7.1 view path handling
+  config.before(:each, type: :controller) do |example|
+    if example.metadata[:render_views] && defined?(@controller) && @controller.respond_to?(:prepend_view_path)
+      @controller.prepend_view_path(Rails.root.join('app/views'))
+    end
+  end
+
+  # Explicitly disable view rendering globally
+  config.render_views = false
 end

@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   before_action do
     set_current_tenant current_household
   end
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :set_user, only: [:show, :update, :destroy]
 
   respond_to :json
 

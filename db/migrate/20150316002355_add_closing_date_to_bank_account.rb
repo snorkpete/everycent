@@ -1,4 +1,4 @@
-class AddClosingDateToBankAccount < ActiveRecord::Migration
+class AddClosingDateToBankAccount < ActiveRecord::Migration[7.1]
   def change
     add_column :bank_accounts, :closing_date, :date
 

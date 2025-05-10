@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe TransactionsController, :type => :controller do
+  render_views false
+
   before do
     @household = create(:household)
     ActsAsTenant.current_tenant = @household

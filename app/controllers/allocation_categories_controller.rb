@@ -8,7 +8,7 @@ class AllocationCategoriesController < ApplicationController
     set_current_tenant current_household
   end
 
-  before_action :set_allocation_category, only: [:show, :edit, :update, :destroy]
+  before_action :set_allocation_category, only: [:show, :update, :destroy]
 
   respond_to :json
 

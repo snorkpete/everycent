@@ -1,4 +1,4 @@
-class AddDefaultAllocationFlagToBankAccounts < ActiveRecord::Migration
+class AddDefaultAllocationFlagToBankAccounts < ActiveRecord::Migration[7.1]
   def change
     add_column :bank_accounts, :allow_default_allocations, :boolean, default: false
 

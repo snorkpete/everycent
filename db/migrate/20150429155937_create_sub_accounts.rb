@@ -1,4 +1,4 @@
-class CreateSubAccounts < ActiveRecord::Migration
+class CreateSubAccounts < ActiveRecord::Migration[7.1]
   def change
     create_table :sub_accounts do |t|
       t.string :name

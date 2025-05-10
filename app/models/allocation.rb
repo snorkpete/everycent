@@ -72,7 +72,6 @@ class Allocation < ApplicationRecord
     return false if params[:name].blank?
 
     params[:amounts].each do |amount_data|
-
       if amount_data[:id] == 0
         Allocation.create(
             name: params[:name],
@@ -83,7 +82,7 @@ class Allocation < ApplicationRecord
         next
       end
 
-      allocation = Allocation.find_by_id amount_data[:id]
+      allocation = Allocation.find_by(id: amount_data[:id])
       next unless allocation
 
       if amount_data[:amount] == 0

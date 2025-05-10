@@ -47,15 +47,13 @@ class Budget < ActiveRecord::Base
   end
 
   def self.mass_update(params)
-    case
-    when params[:type] == 'income'
+    case params[:type]
+    when 'income'
       return Income.mass_update(params)
-
-    when params[:type] == 'allocation'
+    when 'allocation'
       return Allocation.mass_update(params)
     end
-
-    return false
+    false
   end
 
   def copy

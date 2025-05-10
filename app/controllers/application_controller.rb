@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include ActionController::MimeResponds
   include ActionController::ImplicitRender
   include ActionController::Serialization
+  include Responders
 
   # fix for Devise, when logging in and out with device_token_auth after switching to rails 6 config defaults
   # Over-simplifying but,

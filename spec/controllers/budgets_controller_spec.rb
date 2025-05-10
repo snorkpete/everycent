@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 describe BudgetsController do
+  render_views false
+
   before do
     @household = create(:household)
     ActsAsTenant.current_tenant = @household

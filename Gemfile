@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby '3.2.3'
 
 gem 'bundler'
-gem 'rails', '~> 7.0.8'
+gem 'rails', '~> 7.1.3'
 gem 'puma'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
@@ -15,14 +15,11 @@ gem 'rails-controller-testing'
 # fix for deprecated/removed mimemagic 3.2
 gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
 
-
 group :development do
   gem 'annotate'
   gem 'lol_dba'
-  # fix for SystemStackError: stack level too deep with Rails 6.1
-  # See: https://github.com/dejan/rails_panel/issues/178#issuecomment-879994647
-  gem 'meta_request', github: 'dejan/rails_panel', branch: 'master', glob: 'meta_request/meta_request.gemspec'
-  # gem 'meta_request'
+  # Remove meta_request as it's not compatible with Rails 7.1
+  # gem 'meta_request', github: 'dejan/rails_panel', branch: 'master', glob: 'meta_request/meta_request.gemspec'
   # log where queries are being generated from in the code base
   gem 'active_record_query_trace'
   gem 'web-console'
@@ -62,7 +59,7 @@ group :development, :test do
 
   gem 'guard-bundler'
   gem 'guard-rails'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 7.1'
   gem 'factory_bot_rails'
   gem 'guard-rspec'
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
@@ -74,7 +71,7 @@ end
 group :test do
   gem 'faker', '~> 3.2.0'
   #gem 'capybara'
-  gem 'database_cleaner'
+  gem 'database_cleaner-active_record', '~> 2.1.0'
   gem 'launchy'
   #gem 'selenium-webdriver'
 end

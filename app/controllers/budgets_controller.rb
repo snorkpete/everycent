@@ -9,7 +9,7 @@ class BudgetsController < ApplicationController
   before_action do
     set_current_tenant current_household
   end
-  before_action :set_budget, only: [:show, :edit, :update, :destroy]
+  before_action :set_budget, only: [:show, :update, :destroy]
 
   def index
     @budgets = Budget.all.order(start_date: :desc)
