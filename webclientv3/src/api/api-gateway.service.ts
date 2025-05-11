@@ -53,6 +53,16 @@ export class ApiGateway {
       .pipe(tap(() => this.loadingIndicator.hide()));
   }
 
+  delete(url: string): Observable<any> {
+    const options = { headers: this.getAuthenticationHeaders() };
+    const fullUrl = `${this.BASE_URL}${url}`;
+
+    this.loadingIndicator.show();
+    return this.http
+      .delete(fullUrl, options)
+      .pipe(tap(() => this.loadingIndicator.hide()));
+  }
+
   postWithoutAuthentication(url: string, data: any): Observable<any> {
     const headers = new HttpHeaders({
       "Content-Type": "application/json"

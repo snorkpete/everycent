@@ -17,7 +17,7 @@ let Icon = {
   CATEGORY_SPENDING: "money",
   NEEDS_VS_WANTS: "money",
 
-  ALLOCATION_CATEGORIES: "category",
+  ALLOCATION_CATEGORIES: "groups",
   INSTITUTIONS: "work",
   BANK_ACCOUNTS: "payment",
   SETTINGS: "settings",

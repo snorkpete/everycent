@@ -4,6 +4,7 @@ import { ApiGateway } from "../../api/api-gateway.service";
 import { BankAccountData } from "../bank-accounts/bank-account.model";
 import { InstitutionData } from "../bank-accounts/institution.model";
 import { AllocationCategoryData } from "../budgets/allocation.model";
+import { SpecialEventData } from "./special-events.component";
 
 @Injectable()
 export class SetupService {
@@ -78,5 +79,31 @@ export class SetupService {
     } else {
       return this.saveAllocationCategory(allocationCategory);
     }
+  }
+
+  getSpecialEvents(): Observable<SpecialEventData[]> {
+    return this.apiGateway.get("/special_events");
+  }
+
+  addSpecialEvent(specialEvent: SpecialEventData): Observable<SpecialEventData> {
+    return this.apiGateway.post("/special_events", specialEvent);
+  }
+
+  saveSpecialEvent(specialEvent: SpecialEventData): Observable<SpecialEventData> {
+    return this.apiGateway.put(`/special_events/${specialEvent.id}`, specialEvent);
+  }
+
+  createOrUpdateSpecialEvent(
+    specialEvent: SpecialEventData
+  ): Observable<SpecialEventData> {
+    if (specialEvent.id === 0) {
+      return this.addSpecialEvent(specialEvent);
+    } else {
+      return this.saveSpecialEvent(specialEvent);
+    }
+  }
+
+  deleteSpecialEvent(id: number): Observable<void> {
+    return this.apiGateway.delete(`/special_events/${id}`);
   }
 }
