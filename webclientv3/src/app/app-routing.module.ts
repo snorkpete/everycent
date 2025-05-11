@@ -49,6 +49,13 @@ const appRoutes: Routes = [
         path: "setup",
         loadChildren: () =>
           import("app/setup/setup.module").then(m => m.SetupModule)
+      },
+      {
+        path: "special-events",
+        loadChildren: () =>
+          import("app/special-events/special-events.module").then(
+            m => m.SpecialEventsModule
+          )
       }
     ]
   }

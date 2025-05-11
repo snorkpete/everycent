@@ -117,6 +117,11 @@ export class MenuComponent implements OnInit {
       displayName: "Account Balances",
       icon: Icon.ACCOUNT_BALANCES,
       route: "/account-balances"
+    },
+    {
+      displayName: "Special Events",
+      icon: Icon.SPECIAL_EVENTS,
+      route: "/special-events"
     }
   ];
 
