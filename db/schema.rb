@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_09_021210) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_11_062813) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -41,11 +41,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_09_021210) do
     t.string "allocation_class", default: "want"
     t.boolean "is_fixed_amount", default: false
     t.boolean "is_cumulative", default: false
+    t.bigint "special_event_id"
     t.index ["allocation_category_id"], name: "index_allocations_on_allocation_category_id"
     t.index ["bank_account_id"], name: "index_allocations_on_bank_account_id"
     t.index ["budget_id"], name: "index_allocations_on_budget_id"
     t.index ["household_id"], name: "index_allocations_on_household_id"
     t.index ["name"], name: "index_allocations_on_name"
+    t.index ["special_event_id"], name: "index_allocations_on_special_event_id"
   end
 
   create_table "bank_accounts", id: :serial, force: :cascade do |t|
@@ -174,6 +176,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_09_021210) do
     t.index ["household_id"], name: "index_sink_fund_allocations_on_household_id"
   end
 
+  create_table "special_events", force: :cascade do |t|
+    t.string "name"
+    t.integer "budget_amount", default: 0, null: false
+    t.integer "actual_amount", default: 0, null: false
+    t.bigint "household_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["household_id"], name: "index_special_events_on_household_id"
+  end
+
   create_table "transactions", id: :serial, force: :cascade do |t|
     t.string "description"
     t.string "bank_ref"
@@ -232,12 +244,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_09_021210) do
 
   add_foreign_key "allocation_categories", "households", on_update: :cascade
   add_foreign_key "allocations", "households", on_update: :cascade
+  add_foreign_key "allocations", "special_events"
   add_foreign_key "bank_accounts", "households", on_update: :cascade
   add_foreign_key "budgets", "households", on_update: :cascade
   add_foreign_key "incomes", "households", on_update: :cascade
   add_foreign_key "institutions", "households", on_update: :cascade
   add_foreign_key "settings", "households", on_update: :cascade
   add_foreign_key "sink_fund_allocations", "households", on_update: :cascade
+  add_foreign_key "special_events", "households"
   add_foreign_key "transactions", "households", on_update: :cascade
   add_foreign_key "users", "households", on_update: :cascade
 end

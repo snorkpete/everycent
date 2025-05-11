@@ -25,6 +25,7 @@ class Allocation < ApplicationRecord
   belongs_to :budget
   belongs_to :allocation_category
   belongs_to :bank_account, optional: true
+  belongs_to :special_event, optional: true
 
   has_many :transactions
 
