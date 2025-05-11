@@ -7,7 +7,7 @@ class SinkFundsController < ApplicationController
   before_action do
     set_current_tenant current_household
   end
-  before_action :set_sink_fund, only: [:show, :update, :destroy, :transfer_allocation]
+  before_action :set_sink_fund, only: [:show, :update, :transfer_allocation]
 
   def index
     @sink_funds = BankAccount.sink_funds.includes(:institution, { :sink_fund_allocations => :transactions }).order(:name)
