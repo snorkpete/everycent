@@ -10,6 +10,9 @@ import { SettingsComponent } from "./settings.component";
 
 import { SetupRoutingModule } from "./setup-routing.module";
 import { SetupService } from "./setup.service";
+import { SpecialEventsComponent } from "./special-events.component";
+import { SpecialEventEditFormComponent } from "./special-event-edit-form.component";
+
 
 @NgModule({
   imports: [SharedModule, SetupRoutingModule],
@@ -17,6 +20,8 @@ import { SetupService } from "./setup.service";
     InstitutionsComponent,
     InstitutionEditFormComponent,
     SettingsComponent,
+    SpecialEventsComponent,
+    SpecialEventEditFormComponent,
     BankAccountsComponent,
     BankAccountEditFormComponent,
     AllocationCategoryEditFormComponent,

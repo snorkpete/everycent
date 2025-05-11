@@ -1,13 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { SetupService } from "../setup/setup.service";
-import { SpecialEventData } from "../setup/special-events.component";
-import { SpecialEventEditFormComponent } from "../setup/special-event-edit-form.component";
-import { MessageService } from "../message-display/message.service";
 import { switchMap } from "rxjs/operators";
+import { MessageService } from "../message-display/message.service";
+import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
+import { SpecialEventEditFormComponent } from "./special-event-edit-form.component";
+import { SetupService } from "./setup.service";
+
+export interface SpecialEventData {
+  id: number;
+  name: string;
+  budget_amount: number;
+}
 
 @Component({
-  selector: 'ec-special-events',
+  selector: "ec-special-events",
   template: `
     <mat-card class="main">
       <mat-card>
@@ -22,7 +28,8 @@ import { switchMap } from "rxjs/operators";
                     <span class="event-amount">Budget: {{ event.budget_amount | currency }}</span>
                   </div>
                   <div class="action-buttons">
-                    <button mat-raised-button color="primary" (click)="editEvent(event)">Edit</button>
+                    <button mat-raised-button color="primary" (click)="viewDetails(event)">Edit</button>
+                    <button mat-raised-button color="warn" (click)="deleteEvent(event)">Delete</button>
                   </div>
                 </div>
               </mat-list-item>
@@ -70,6 +77,7 @@ export class SpecialEventsComponent implements OnInit {
   constructor(
     private setupService: SetupService,
     private dialog: MatDialog,
+    private toolbar: MainToolbarService,
     private messageService: MessageService
   ) {}
 
@@ -86,15 +94,19 @@ export class SpecialEventsComponent implements OnInit {
       );
   }
 
-  editEvent(event: SpecialEventData) {
-    const dialogRef = this.dialog.open(SpecialEventEditFormComponent, {});
+  viewDetails(specialEvent: SpecialEventData) {
+    const dialogRef = this.dialog.open(SpecialEventEditFormComponent, {
+      data: { specialEvent }
+    });
+
     const form = dialogRef.componentInstance;
-    form.specialEvent = event;
-    
+    form.specialEvent = specialEvent;
     form.save
       .pipe(
-        switchMap(updatedEvent =>
-          this.setupService.createOrUpdateSpecialEvent(updatedEvent)
+        switchMap(updatedSpecialEvent =>
+          this.setupService.createOrUpdateSpecialEvent(
+            updatedSpecialEvent as SpecialEventData
+          )
         )
       )
       .subscribe(
@@ -110,7 +122,21 @@ export class SpecialEventsComponent implements OnInit {
       );
   }
 
-  addSpecialEvent() {
-    this.editEvent({ id: 0, name: "", budget_amount: 0 });
+  deleteEvent(event: SpecialEventData) {
+    if (confirm(`Are you sure you want to delete "${event.name}"?`)) {
+      this.setupService.deleteSpecialEvent(event.id).subscribe(
+        () => {
+          this.messageService.setMessage("Special Event deleted.");
+          this.refresh();
+        },
+        error => {
+          this.messageService.setErrorMessage("Failed to delete Special Event.");
+        }
+      );
+    }
   }
-}
+
+  addSpecialEvent() {
+    this.viewDetails({ id: 0, name: "", budget_amount: 0 });
+  }
+} 

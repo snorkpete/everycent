@@ -145,6 +145,12 @@ export class MenuComponent implements OnInit {
       exact: false
     },
     {
+      displayName: "Special Events",
+      icon: Icon.SPECIAL_EVENTS,
+      route: "/setup/special-events",
+      exact: false
+    },
+    {
       displayName: "Settings",
       icon: Icon.SETTINGS,
       route: "/setup/settings",
