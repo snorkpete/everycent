@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from "@angular/material/dialog";
+import { Router } from '@angular/router';
 import { SetupService } from "../setup/setup.service";
 import { SpecialEventData } from "../setup/special-events.component";
 import { SpecialEventEditFormComponent } from "../setup/special-event-edit-form.component";
@@ -22,7 +23,7 @@ import { switchMap } from "rxjs/operators";
                     <span class="event-amount">Budget: {{ event.budget_amount | currency }}</span>
                   </div>
                   <div class="action-buttons">
-                    <button mat-raised-button color="primary" (click)="editEvent(event)">Edit</button>
+                    <button mat-raised-button color="primary" (click)="viewEvent(event)">View</button>
                   </div>
                 </div>
               </mat-list-item>
@@ -70,7 +71,8 @@ export class SpecialEventsComponent implements OnInit {
   constructor(
     private setupService: SetupService,
     private dialog: MatDialog,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -86,31 +88,11 @@ export class SpecialEventsComponent implements OnInit {
       );
   }
 
-  editEvent(event: SpecialEventData) {
-    const dialogRef = this.dialog.open(SpecialEventEditFormComponent, {});
-    const form = dialogRef.componentInstance;
-    form.specialEvent = event;
-    
-    form.save
-      .pipe(
-        switchMap(updatedEvent =>
-          this.setupService.createOrUpdateSpecialEvent(updatedEvent)
-        )
-      )
-      .subscribe(
-        () => {
-          this.messageService.setMessage("Special Event saved.");
-          this.refresh();
-          dialogRef.close();
-        },
-        error => {
-          this.messageService.setErrorMessage("Special Event not saved.");
-          this.refresh();
-        }
-      );
+  viewEvent(event: SpecialEventData) {
+    this.router.navigate(['/special-events', event.id]);
   }
 
   addSpecialEvent() {
-    this.editEvent({ id: 0, name: "", budget_amount: 0 });
+    this.router.navigate(['/setup/special-events']);
   }
 }
