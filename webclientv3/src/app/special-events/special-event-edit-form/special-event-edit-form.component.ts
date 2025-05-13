@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { SelectionModel } from '@angular/cdk/collections';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTable } from '@angular/material/table';
 import { BudgetService } from '../../budgets/budget.service';
 import { BudgetData } from '../../budgets/budget.model';
 import { AllocationCategoryData, AllocationData } from '../../budgets/allocation.model';
@@ -22,21 +22,37 @@ import { takeUntil } from 'rxjs/operators';
       <mat-card>
         <mat-card-title>{{ specialEvent?.name }}</mat-card-title>
         <mat-card-content>
-          <table mat-table [dataSource]="specialEvent?.allocations" class="mat-elevation-z8">
+          <table mat-table #specialEventAllocationsTable [dataSource]="specialEvent?.allocations" class="mat-elevation-z8">
             <!-- Name Column -->
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>Name</th>
               <td mat-cell *matCellDef="let allocation">{{ allocation.name }}</td>
             </ng-container>
 
-            <!-- Amount Column -->
+            <!-- Budgeted Column -->
             <ng-container matColumnDef="amount">
-              <th mat-header-cell *matHeaderCellDef>Amount</th>
+              <th mat-header-cell *matHeaderCellDef>Budgeted</th>
               <td mat-cell *matCellDef="let allocation">{{ allocation.amount | ecMoney }}</td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="['name', 'amount']"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['name', 'amount'];"></tr>
+            <!-- Amount Column -->
+            <ng-container matColumnDef="spent">
+              <th mat-header-cell *matHeaderCellDef>Spent</th>
+              <td mat-cell *matCellDef="let allocation">{{ allocation.spent | ecMoney }}</td>
+            </ng-container>
+
+            <!-- Remove Column -->
+            <ng-container matColumnDef="remove">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let allocation">
+                <button mat-icon-button color="warn" (click)="removeAllocation(allocation)">
+                  <mat-icon>remove_circle</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['name', 'amount', 'spent', 'remove']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['name', 'amount', 'spent', 'remove'];"></tr>
           </table>
         </mat-card-content>
       </mat-card>
@@ -64,25 +80,7 @@ import { takeUntil } from 'rxjs/operators';
               </mat-form-field>
             </div>
 
-            <table mat-table [dataSource]="groupedAllocations" [multiTemplateDataRows]="true" class="mat-elevation-z8">
-              <!-- Checkbox Column -->
-              <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef>
-                  <mat-checkbox
-                    (change)="$event ? toggleAllAllocations() : null"
-                    [checked]="allocationSelection.hasValue() && isAllSelected()"
-                    [indeterminate]="allocationSelection.hasValue() && !isAllSelected()">
-                  </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let allocation">
-                  <mat-checkbox
-                    (click)="$event.stopPropagation()"
-                    (change)="$event ? toggleAllocation(allocation) : null"
-                    [checked]="allocationSelection.isSelected(allocation)">
-                  </mat-checkbox>
-                </td>
-              </ng-container>
-
+            <table mat-table #addNewAllocationsTable [dataSource]="groupedAllocations" [multiTemplateDataRows]="true" class="mat-elevation-z8">
               <!-- Name Column -->
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -91,14 +89,30 @@ import { takeUntil } from 'rxjs/operators';
 
               <!-- Amount Column -->
               <ng-container matColumnDef="amount">
-                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <th mat-header-cell *matHeaderCellDef>Budgeted</th>
                 <td mat-cell *matCellDef="let allocation">{{ allocation.amount | ecMoney }}</td>
+              </ng-container>
+
+              <!-- Spent Column -->
+              <ng-container matColumnDef="spent">
+                <th mat-header-cell *matHeaderCellDef>Spent</th>
+                <td mat-cell *matCellDef="let allocation">{{ allocation.spent | ecMoney }}</td>
               </ng-container>
 
               <!-- Category Column -->
               <ng-container matColumnDef="category">
                 <th mat-header-cell *matHeaderCellDef>Category</th>
                 <td mat-cell *matCellDef="let allocation">{{ allocation.allocation_category?.name }}</td>
+              </ng-container>
+
+              <!-- Add Column -->
+              <ng-container matColumnDef="add">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let allocation">
+                  <button mat-icon-button color="primary" (click)="addAllocation(allocation)" [disabled]="isAllocationAssigned(allocation)">
+                    <mat-icon>add_circle</mat-icon>
+                  </button>
+                </td>
               </ng-container>
 
               <!-- Category Header Row -->
@@ -136,10 +150,6 @@ import { takeUntil } from 'rxjs/operators';
     .mat-table {
       width: 100%;
     }
-    .mat-column-select {
-      width: 48px;
-      text-align: center;
-    }
     .mat-column-name {
       flex: 2;
     }
@@ -147,8 +157,16 @@ import { takeUntil } from 'rxjs/operators';
       flex: 1;
       text-align: right;
     }
+    .mat-column-spent {
+      flex: 1;
+      text-align: right;
+    }
     .mat-column-category {
       flex: 1;
+    }
+    .mat-column-add, .mat-column-remove {
+      width: 48px;
+      text-align: center;
     }
     .category-header {
       font-weight: bold;
@@ -158,13 +176,14 @@ import { takeUntil } from 'rxjs/operators';
   `]
 })
 export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
+  @ViewChild('specialEventAllocationsTable') specialEventAllocationsTable: MatTable<any>;
+  @ViewChild('addNewAllocationsTable') addNewAllocationsTable: MatTable<any>;
   specialEvent: SpecialEventData;
   budgets: BudgetData[] = [];
   allocations: AllocationData[] = [];
   allocationCategories: AllocationCategoryData[] = [];
   groupedAllocations: any[] = [];
-  displayedColumns: string[] = ['select', 'name', 'amount', 'category'];
-  allocationSelection = new SelectionModel<AllocationData>(true, []);
+  displayedColumns: string[] = ['name', 'amount', 'spent', 'category', 'add'];
   private componentDestroyed = new Subject();
 
   form: FormGroup<{
@@ -182,8 +201,8 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.form = this.fb.group({
-      budget_id: [0],
-      allocation_category_id: [null as number | null]
+      budget_id: 0,
+      allocation_category_id: 0,
     });
 
     this.loadBudgets();
@@ -194,8 +213,8 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
       if (params['id']) {
         this.setupService.getSpecialEvents().subscribe(specialEvents => {
           this.specialEvent = specialEvents.find(event => event.id === +params['id']);
-          if (this.specialEvent?.allocations) {
-            this.allocationSelection.select(...this.specialEvent.allocations);
+          if (!this.specialEvent.allocations) {
+            this.specialEvent.allocations = [];
           }
         });
       }
@@ -299,27 +318,30 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
   isCategoryRow = (index: number, item: any) => item.name && !item.amount;
   isAllocationRow = (index: number, item: any) => !item.name || item.amount;
 
-  isAllSelected() {
-    const numSelected = this.allocationSelection.selected.length;
-    const numRows = this.allocations.length;
-    return numSelected === numRows;
+  isAllocationAssigned(allocation: AllocationData): boolean {
+    return this.specialEvent?.allocations?.some(a => a.id === allocation.id) || false;
   }
 
-  toggleAllAllocations() {
-    if (this.isAllSelected()) {
-      this.allocationSelection.clear();
-    } else {
-      this.allocationSelection.select(...this.allocations);
+  addAllocation(allocation: AllocationData) {
+    if (!this.specialEvent.allocations) {
+      this.specialEvent.allocations = [];
+    }
+    if (!this.isAllocationAssigned(allocation)) {
+      this.specialEvent.allocations.push(allocation);
+      this.specialEventAllocationsTable?.renderRows();
     }
   }
 
-  toggleAllocation(allocation: AllocationData) {
-    this.allocationSelection.toggle(allocation);
+  removeAllocation(allocation: AllocationData) {
+    if (this.specialEvent.allocations) {
+      this.specialEvent.allocations = this.specialEvent.allocations.filter(a => a.id !== allocation.id);
+      this.specialEventAllocationsTable?.renderRows();
+    }
   }
 
   save() {
     // TODO: Implement save functionality
-    console.log('Selected allocations:', this.allocationSelection.selected);
+    console.log('Special event allocations:', this.specialEvent.allocations);
   }
 
   cancel() {
