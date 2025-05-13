@@ -5,11 +5,13 @@ import { MessageService } from "../message-display/message.service";
 import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
 import { SpecialEventEditFormComponent } from "./special-event-edit-form.component";
 import { SetupService } from "./setup.service";
+import { AllocationData } from "../budgets/allocation.model";
 
 export interface SpecialEventData {
   id: number;
   name: string;
   budget_amount: number;
+  allocations?: AllocationData[];
 }
 
 @Component({

@@ -14,4 +14,5 @@ export interface AllocationData {
   comment?: string;
   allocation_category?: AllocationCategoryData;
   bank_account?: BankAccountData;
+  special_event_id?: number;
 }
