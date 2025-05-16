@@ -10,7 +10,7 @@ import { SpecialEventData } from "./special-events.component";
     <div mat-dialog-content>
       <div [formGroup]="form">
         <ec-text-field [(editMode)]="editMode" formControlName="name" placeholder="Name"></ec-text-field>
-        <ec-text-field [(editMode)]="editMode" formControlName="budget_amount" placeholder="Budget Amount" type="number"></ec-text-field>
+        <ec-money-field [(editMode)]="editMode" formControlName="budget_amount" placeholder="Budget Amount"></ec-money-field>
       </div>
     </div>
     <div mat-dialog-actions>

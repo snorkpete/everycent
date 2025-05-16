@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from "@angular/material/dialog";
-import { Router } from '@angular/router';
 import { SetupService } from "../setup/setup.service";
 import { SpecialEventData } from "../setup/special-events.component";
-import { SpecialEventEditFormComponent } from "../setup/special-event-edit-form.component";
-import { MessageService } from "../message-display/message.service";
-import { switchMap } from "rxjs/operators";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ec-special-events',
@@ -20,11 +16,12 @@ import { switchMap } from "rxjs/operators";
                 <div class="list-item-with-action-buttons">
                   <div class="event-details">
                     <span class="event-name">{{ event.name }}</span>
-                    <span class="event-amount">Budget: {{ event.budget_amount | currency }}</span>
+                    <div class="event-amount-container">
+                      <span class="event-amount">Budget: {{ event.budget_amount | ecMoney }}</span>
+                      <span class="event-amount">Actual: {{ event.actual_amount | ecMoney }}</span>
+                    </div>
                   </div>
-                  <div class="action-buttons">
-                    <button mat-raised-button color="primary" (click)="viewEvent(event)">View</button>
-                  </div>
+                  <button mat-raised-button color="primary" (click)="viewDetails(event)">View Details</button>
                 </div>
               </mat-list-item>
               <mat-divider></mat-divider>
@@ -49,6 +46,11 @@ import { switchMap } from "rxjs/operators";
         font-size: 16px;
         font-weight: 500;
       }
+      .event-amount-container {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+      }
       .event-amount {
         color: rgba(0, 0, 0, 0.54);
       }
@@ -58,10 +60,6 @@ import { switchMap } from "rxjs/operators";
         align-items: center;
         width: 100%;
       }
-      .action-buttons {
-        display: flex;
-        gap: 8px;
-      }
     `
   ]
 })
@@ -70,8 +68,6 @@ export class SpecialEventsComponent implements OnInit {
 
   constructor(
     private setupService: SetupService,
-    private dialog: MatDialog,
-    private messageService: MessageService,
     private router: Router
   ) {}
 
@@ -88,7 +84,7 @@ export class SpecialEventsComponent implements OnInit {
       );
   }
 
-  viewEvent(event: SpecialEventData) {
+  viewDetails(event: SpecialEventData) {
     this.router.navigate(['/special-events', event.id]);
   }
 

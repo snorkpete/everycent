@@ -8,7 +8,7 @@ class SpecialEventsController < ApplicationController
     set_current_tenant current_household
   end
 
-  before_action :set_special_event, only: [:show, :update, :destroy]
+  before_action :set_special_event, only: [:show, :update, :destroy, :allocations]
 
   respond_to :json
 
@@ -37,6 +37,14 @@ class SpecialEventsController < ApplicationController
     respond_with(@special_event, SpecialEventSerializer)
   end
 
+  def allocations
+    if @special_event.update(allocations_params)
+      respond_with(@special_event, SpecialEventSerializer)
+    else
+      render json: @special_event.errors, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_special_event
@@ -45,5 +53,9 @@ class SpecialEventsController < ApplicationController
 
   def special_event_params
     params.fetch(:special_event, {}).permit(:name, :budget_amount, :actual_amount)
+  end
+
+  def allocations_params
+    params.require(:special_event).permit(:actual_amount, allocation_ids: [])
   end
 end

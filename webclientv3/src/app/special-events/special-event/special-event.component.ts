@@ -13,6 +13,10 @@ import { AllocationData } from '../../transactions/allocation-data.model';
     <mat-card class="main">
       <mat-card>
         <mat-card-title>{{ specialEvent?.name }}</mat-card-title>
+        <mat-card-subtitle>
+          Budgeted: {{ specialEvent?.budget_amount | ecMoney }} | 
+          Actual: {{ specialEvent?.actual_amount | ecMoney }}
+        </mat-card-subtitle>
         <mat-card-content>
           <table mat-table [dataSource]="allocations" class="mat-elevation-z8">
             <!-- Name Column -->
@@ -24,7 +28,13 @@ import { AllocationData } from '../../transactions/allocation-data.model';
             <!-- Amount Column -->
             <ng-container matColumnDef="amount">
               <th mat-header-cell *matHeaderCellDef>Amount</th>
-              <td mat-cell *matCellDef="let allocation">{{ allocation.amount | currency }}</td>
+              <td mat-cell *matCellDef="let allocation">{{ allocation.amount | ecMoney }}</td>
+            </ng-container>
+
+            <!-- Spent Column -->
+            <ng-container matColumnDef="spent">
+              <th mat-header-cell *matHeaderCellDef>Spent</th>
+              <td mat-cell *matCellDef="let allocation">{{ allocation.spent | ecMoney }}</td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -50,12 +60,16 @@ import { AllocationData } from '../../transactions/allocation-data.model';
       flex: 1;
       text-align: right;
     }
+    .mat-column-spent {
+      flex: 1;
+      text-align: right;
+    }
   `]
 })
 export class SpecialEventComponent implements OnInit {
   specialEvent: SpecialEventData;
   allocations: AllocationData[] = [];
-  displayedColumns: string[] = ['name', 'amount'];
+  displayedColumns: string[] = ['name', 'amount', 'spent'];
 
   constructor(
     private route: ActivatedRoute,

@@ -11,6 +11,7 @@ export interface SpecialEventData {
   id: number;
   name: string;
   budget_amount: number;
+  actual_amount?: number;
   allocations?: AllocationData[];
 }
 
@@ -27,7 +28,10 @@ export interface SpecialEventData {
                 <div class="list-item-with-action-buttons">
                   <div class="event-details">
                     <span class="event-name">{{ event.name }}</span>
-                    <span class="event-amount">Budget: {{ event.budget_amount | currency }}</span>
+                    <div class="event-amounts">
+                      <span class="event-amount">Budget: {{ event.budget_amount | ecMoney }}</span>
+                      <span class="event-amount">Actual: {{ event.actual_amount | ecMoney }}</span>
+                    </div>
                   </div>
                   <div class="action-buttons">
                     <button mat-raised-button color="primary" (click)="viewDetails(event)">Edit</button>
@@ -52,6 +56,11 @@ export interface SpecialEventData {
         display: flex;
         flex-direction: column;
         gap: 4px;
+      }
+      .event-amounts {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
       }
       .event-name {
         font-size: 16px;
