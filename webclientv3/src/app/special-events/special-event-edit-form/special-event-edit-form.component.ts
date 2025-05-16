@@ -11,9 +11,13 @@ import { BudgetData } from '../../budgets/budget.model';
 import { AllocationCategoryData, AllocationData } from '../../budgets/allocation.model';
 import { SpecialEventData } from '../../setup/special-events.component';
 import { SetupService } from '../../setup/setup.service';
+import { SpecialEventsService } from '../special-events.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MessageService } from '../../message-display/message.service';
+import { LoadingIndicator } from '../../shared/loading-indicator/loading-indicator.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'ec-special-event-edit-form',
@@ -21,6 +25,10 @@ import { takeUntil } from 'rxjs/operators';
     <mat-card class="main">
       <mat-card>
         <mat-card-title>{{ specialEvent?.name }}</mat-card-title>
+        <mat-card-subtitle>
+          Budgeted: {{ specialEvent?.budget_amount | ecMoney }} | 
+          Actual: {{ calculateActualAmount() | ecMoney }}
+        </mat-card-subtitle>
         <mat-card-content>
           <table mat-table #specialEventAllocationsTable [dataSource]="specialEvent?.allocations" class="mat-elevation-z8">
             <!-- Name Column -->
@@ -195,8 +203,11 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private budgetService: BudgetService,
     private setupService: SetupService,
+    private specialEventsService: SpecialEventsService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService,
+    private loadingIndicator: LoadingIndicator
   ) {}
 
   ngOnInit() {
@@ -339,13 +350,35 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
     }
   }
 
+  calculateActualAmount(): number {
+    if (!this.specialEvent?.allocations) {
+      return 0;
+    }
+    return this.specialEvent.allocations.reduce((sum, allocation) => sum + (allocation.spent || 0), 0);
+  }
+
   save() {
-    // TODO: Implement save functionality
-    console.log('Special event allocations:', this.specialEvent.allocations);
+    this.loadingIndicator.show();
+    const allocationIds = this.specialEvent.allocations.map(allocation => allocation.id);
+    
+    this.specialEventsService.updateSpecialEventAllocations(this.specialEvent.id, {
+      allocation_ids: allocationIds,
+      actual_amount: this.calculateActualAmount()
+    }).subscribe({
+      next: (updatedEvent) => {
+        this.loadingIndicator.hide();
+        this.specialEvent = updatedEvent;
+        this.messageService.setMessage('Special event updated successfully.', 5000);
+      },
+      error: (error) => {
+        this.loadingIndicator.hide();
+        this.messageService.setMessage('Error updating special event.', 5000);
+        console.error('Error updating special event:', error);
+      }
+    });
   }
 
   cancel() {
-    // TODO: Implement cancel functionality
-    console.log('Cancel clicked');
+    this.router.navigate(['/special-events']);
   }
 } 
