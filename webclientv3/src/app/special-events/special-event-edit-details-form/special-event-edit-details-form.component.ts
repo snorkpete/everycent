@@ -11,6 +11,7 @@ import { SpecialEventData } from '../special-event-data.model';
       <mat-dialog-content>
         <ec-text-field [(editMode)]="editMode" formControlName="name" placeholder="Name"></ec-text-field>
         <ec-money-field [(editMode)]="editMode" formControlName="budget_amount" placeholder="Budget Amount"></ec-money-field>
+        <ec-date-field [(editMode)]="editMode" formControlName="start_date" placeholder="Start Date"></ec-date-field>
       </mat-dialog-content>
 
       <mat-dialog-actions align="end">
@@ -39,7 +40,8 @@ export class SpecialEventEditDetailsFormComponent {
   ) {
     this.form = this.fb.group({
       name: [data?.name || '', Validators.required],
-      budget_amount: [data?.budget_amount || 0, [Validators.required, Validators.min(0)]]
+      budget_amount: [data?.budget_amount || 0, [Validators.required, Validators.min(0)]],
+      start_date: [data?.start_date || null]
     });
   }
 

@@ -25,6 +25,7 @@ import { TransactionDateValidatorDirective } from "../../../transactions/transac
         type="date"
         (input)="updateValueFromDateText(input.value)"
         [formControl]="control"
+        [placeholder]="placeholder"
       />
       <mat-error>Date is outside of budget range</mat-error>
     </mat-form-field>
@@ -48,6 +49,7 @@ export class DateFieldComponent implements OnInit, ControlValueAccessor {
   /* tslint:disable no-input-rename */
   @Input("ecValidateWithinBudget") budget: BudgetData = {};
   @Input() errorMessage: string;
+  @Input() placeholder: string;
 
   control = new UntypedFormControl();
 

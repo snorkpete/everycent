@@ -20,7 +20,7 @@ import { SpecialEventsAllocationsTableComponent } from './special-events-allocat
   imports: [
     SharedModule,
     CommonModule,
-    SpecialEventsRoutingModule,
+    SpecialEventsRoutingModule
   ],
   providers: [
     SpecialEventsService

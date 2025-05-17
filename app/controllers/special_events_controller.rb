@@ -13,7 +13,7 @@ class SpecialEventsController < ApplicationController
   respond_to :json
 
   def index
-    @special_events = SpecialEvent.all.order(:name)
+    @special_events = SpecialEvent.all.order(Arel.sql('start_date DESC NULLS LAST'))
     respond_with(@special_events, SpecialEventSerializer)
   end
 
@@ -52,7 +52,7 @@ class SpecialEventsController < ApplicationController
   end
 
   def special_event_params
-    params.fetch(:special_event, {}).permit(:name, :budget_amount, :actual_amount)
+    params.fetch(:special_event, {}).permit(:name, :budget_amount, :actual_amount, :start_date)
   end
 
   def allocations_params
