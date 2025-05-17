@@ -12,6 +12,7 @@ import {MessageService} from '../../message-display/message.service';
 import {LoadingIndicator} from '../../shared/loading-indicator/loading-indicator.service';
 import { SpecialEventData } from '../special-event-data.model';
 import { SettingsService } from '../../shared/settings.service';
+import { SpecialEventsAllocationsTableComponent } from '../special-events-allocations-table/special-events-allocations-table.component';
 
 @Component({
   selector: 'ec-special-event-edit-allocations',
@@ -26,6 +27,7 @@ import { SettingsService } from '../../shared/settings.service';
         <mat-card-content>
           <h3>Allocations</h3>
           <ec-special-events-allocations-table
+            #specialEventAllocationsTable
             [allocations]="specialEvent?.allocations"
             [showActionColumn]="true"
             [actionButtonIcon]="'delete'"
@@ -157,7 +159,7 @@ import { SettingsService } from '../../shared/settings.service';
   `]
 })
 export class SpecialEventEditAllocationsComponent implements OnInit, OnDestroy {
-  @ViewChild('specialEventAllocationsTable') specialEventAllocationsTable: MatTable<any>;
+  @ViewChild('specialEventAllocationsTable') specialEventAllocationsTable: SpecialEventsAllocationsTableComponent;
   @ViewChild('addNewAllocationsTable') addNewAllocationsTable: MatTable<any>;
   specialEvent: SpecialEventData;
   budgets: BudgetData[] = [];
@@ -205,38 +207,6 @@ export class SpecialEventEditAllocationsComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Load initial values from URL
-    this.route.queryParams.pipe(takeUntil(this.componentDestroyed)).subscribe(params => {
-      const budgetId = Number(params['budget_id']) || 0;
-      const categoryId = params['allocation_category_id'] ? Number(params['allocation_category_id']) : null;
-
-      // If no budget_id in URL, get current budget
-      if (!budgetId) {
-        this.budgetService.getCurrentBudgetId().subscribe(currentBudgetId => {
-          this.form.patchValue({
-            budget_id: currentBudgetId,
-            allocation_category_id: categoryId
-          });
-        });
-      } else {
-        this.form.patchValue({
-          budget_id: budgetId,
-          allocation_category_id: categoryId
-        });
-      }
-
-      // If no allocation_category_id in URL, get default from settings
-      if (!categoryId) {
-        this.settingsService.getSettings().subscribe(settings => {
-          if (settings.default_allocation_category_id_for_special_events) {
-            this.form.patchValue({
-              allocation_category_id: settings.default_allocation_category_id_for_special_events
-            });
-          }
-        });
-      }
-    });
-
     // Subscribe to form changes and update URL
     this.form.valueChanges.pipe(takeUntil(this.componentDestroyed)).subscribe(() => {
       const budgetId = this.form.get('budget_id').value;
@@ -255,6 +225,17 @@ export class SpecialEventEditAllocationsComponent implements OnInit, OnDestroy {
           allocation_category_id: this.form.get('allocation_category_id').value
         },
         queryParamsHandling: 'merge'
+      });
+    });
+
+    // Load initial values from URL
+    this.route.queryParams.pipe(takeUntil(this.componentDestroyed)).subscribe(params => {
+      const budgetId = Number(params['budget_id']) || 0;
+      const categoryId = params['allocation_category_id'] ? Number(params['allocation_category_id']) : null;
+
+      this.form.patchValue({
+        budget_id: budgetId,
+        allocation_category_id: categoryId
       });
     });
   }
@@ -334,14 +315,14 @@ export class SpecialEventEditAllocationsComponent implements OnInit, OnDestroy {
     }
     if (!this.isAllocationAssigned(allocation)) {
       this.specialEvent.allocations.push(allocation);
-      this.specialEventAllocationsTable?.renderRows();
+      this.specialEventAllocationsTable.refresh();
     }
   }
 
   removeAllocation(allocation: AllocationData) {
     if (this.specialEvent.allocations) {
       this.specialEvent.allocations = this.specialEvent.allocations.filter(a => a.id !== allocation.id);
-      this.specialEventAllocationsTable?.renderRows();
+      this.specialEventAllocationsTable.refresh();
     }
   }
 
