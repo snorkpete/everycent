@@ -154,7 +154,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
 
   ngOnInit() {
     this.control.valueChanges.subscribe((v: string) => {
-      this.onChange(v);
+      this.onChange(Number(v));
     });
   }
 
