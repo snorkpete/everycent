@@ -3,20 +3,25 @@ import { CommonModule } from '@angular/common';
 import { SpecialEventsRoutingModule } from './special-events-routing.module';
 import { SpecialEventsComponent } from './special-events.component';
 import { SpecialEventComponent } from './special-event/special-event.component';
-import { SetupService } from '../setup/setup.service';
+import { SpecialEventEditAllocationsComponent } from './special-event-edit-allocations/special-event-edit-allocations.component';
+import { SpecialEventEditDetailsFormComponent } from './special-event-edit-details-form/special-event-edit-details-form.component';
+import { SpecialEventsService } from './special-events.service';
 import { SharedModule } from '../shared/shared.module';
-import { SpecialEventEditFormComponent } from './special-event-edit-form/special-event-edit-form.component';
+
 @NgModule({
   declarations: [
     SpecialEventsComponent,
     SpecialEventComponent,
-    SpecialEventEditFormComponent,
+    SpecialEventEditAllocationsComponent,
+    SpecialEventEditDetailsFormComponent
   ],
   imports: [
     SharedModule,
     CommonModule,
     SpecialEventsRoutingModule,
   ],
-  providers: [SetupService]
+  providers: [
+    SpecialEventsService
+  ]
 })
 export class SpecialEventsModule { }

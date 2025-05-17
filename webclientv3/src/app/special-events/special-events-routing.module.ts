@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from '../core/auth/auth-guard.service';
 import { SpecialEventsComponent } from './special-events.component';
 import { SpecialEventComponent } from './special-event/special-event.component';
-import { SpecialEventEditFormComponent } from './special-event-edit-form/special-event-edit-form.component';
+import { SpecialEventEditAllocationsComponent } from './special-event-edit-allocations/special-event-edit-allocations.component';
 const routes: Routes = [
   {
     path: '',
@@ -11,7 +11,7 @@ const routes: Routes = [
     children: [
       { path: '', component: SpecialEventsComponent },
       { path: ':id', component: SpecialEventComponent },
-      { path: ':id/edit', component: SpecialEventEditFormComponent }
+      { path: ':id/allocations', component: SpecialEventEditAllocationsComponent }
     ]
   }
 ];

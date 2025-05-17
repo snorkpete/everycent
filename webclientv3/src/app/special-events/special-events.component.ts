@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { SetupService } from "../setup/setup.service";
-import { SpecialEventData } from "../setup/special-events.component";
 import { Router } from '@angular/router';
+import { SpecialEventsService } from './special-events.service';
+import { SpecialEventData } from './special-event-data.model';
+import { MatDialog } from '@angular/material/dialog';
+import { MessageService } from '../message-display/message.service';
+import { LoadingIndicator } from '../shared/loading-indicator/loading-indicator.service';
+import { SpecialEventEditDetailsFormComponent } from './special-event-edit-details-form/special-event-edit-details-form.component';
 
 @Component({
   selector: 'ec-special-events',
@@ -21,7 +25,12 @@ import { Router } from '@angular/router';
                       <span class="event-amount">Actual: {{ event.actual_amount | ecMoney }}</span>
                     </div>
                   </div>
-                  <button mat-raised-button color="primary" (click)="viewDetails(event)">View Details</button>
+                  <div class="action-buttons">
+                    <button mat-raised-button color="primary" (click)="viewDetails(event)">View Details</button>
+                    <button mat-icon-button color="warn" (click)="deleteEvent(event)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </mat-list-item>
               <mat-divider></mat-divider>
@@ -29,7 +38,7 @@ import { Router } from '@angular/router';
           </mat-list>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-raised-button color="primary" (click)="addSpecialEvent()">Add Special Event</button>
+          <button mat-raised-button color="primary" (click)="openAddDialog()">Add Special Event</button>
           <button mat-raised-button (click)="refresh()">Refresh</button>
         </mat-card-actions>
       </mat-card>
@@ -60,6 +69,11 @@ import { Router } from '@angular/router';
         align-items: center;
         width: 100%;
       }
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
     `
   ]
 })
@@ -67,8 +81,11 @@ export class SpecialEventsComponent implements OnInit {
   specialEvents: SpecialEventData[] = [];
 
   constructor(
-    private setupService: SetupService,
-    private router: Router
+    private specialEventsService: SpecialEventsService,
+    private router: Router,
+    private dialog: MatDialog,
+    private messageService: MessageService,
+    private loadingIndicator: LoadingIndicator
   ) {}
 
   ngOnInit() {
@@ -76,19 +93,53 @@ export class SpecialEventsComponent implements OnInit {
   }
 
   refresh() {
-    this.setupService
-      .getSpecialEvents()
-      .subscribe(
-        specialEvents =>
-          (this.specialEvents = specialEvents)
-      );
+    this.specialEventsService.getSpecialEvents()
+      .subscribe(specialEvents => this.specialEvents = specialEvents);
   }
 
   viewDetails(event: SpecialEventData) {
     this.router.navigate(['/special-events', event.id]);
   }
 
-  addSpecialEvent() {
-    this.router.navigate(['/setup/special-events']);
+  deleteEvent(event: SpecialEventData) {
+    if (confirm(`Are you sure you want to delete "${event.name}"?`)) {
+      this.loadingIndicator.show();
+      this.specialEventsService.deleteSpecialEvent(event.id).subscribe({
+        next: () => {
+          this.loadingIndicator.hide();
+          this.messageService.setMessage('Special event deleted successfully.', 5000);
+          this.refresh();
+        },
+        error: (error) => {
+          this.loadingIndicator.hide();
+          this.messageService.setMessage('Error deleting special event.', 5000);
+          console.error('Error deleting special event:', error);
+        }
+      });
+    }
+  }
+
+  openAddDialog() {
+    const dialogRef = this.dialog.open(SpecialEventEditDetailsFormComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadingIndicator.show();
+        this.specialEventsService.createSpecialEvent(result).subscribe({
+          next: () => {
+            this.loadingIndicator.hide();
+            this.messageService.setMessage('Special event created successfully.', 5000);
+            this.refresh();
+          },
+          error: (error) => {
+            this.loadingIndicator.hide();
+            this.messageService.setMessage('Error creating special event.', 5000);
+            console.error('Error creating special event:', error);
+          }
+        });
+      }
+    });
   }
 }

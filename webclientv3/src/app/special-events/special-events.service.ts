@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiGateway } from '../../api/api-gateway.service';
 import { Observable } from 'rxjs';
-import { SpecialEventData } from '../setup/special-events.component';
+import { SpecialEventData } from './special-event-data.model';
 
 export interface SpecialEvent {
   id: number;

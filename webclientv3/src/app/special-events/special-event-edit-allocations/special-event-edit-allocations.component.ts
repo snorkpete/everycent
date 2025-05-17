@@ -1,36 +1,30 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTable } from '@angular/material/table';
-import { BudgetService } from '../../budgets/budget.service';
-import { BudgetData } from '../../budgets/budget.model';
-import { AllocationCategoryData, AllocationData } from '../../budgets/allocation.model';
-import { SpecialEventData } from '../../setup/special-events.component';
-import { SetupService } from '../../setup/setup.service';
-import { SpecialEventsService } from '../special-events.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { MessageService } from '../../message-display/message.service';
-import { LoadingIndicator } from '../../shared/loading-indicator/loading-indicator.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {MatTable} from '@angular/material/table';
+import {BudgetService} from '../../budgets/budget.service';
+import {BudgetData} from '../../budgets/budget.model';
+import {AllocationCategoryData, AllocationData} from '../../budgets/allocation.model';
+import {SpecialEventsService} from '../special-events.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {MessageService} from '../../message-display/message.service';
+import {LoadingIndicator} from '../../shared/loading-indicator/loading-indicator.service';
+import { SpecialEventData } from '../special-event-data.model';
 
 @Component({
-  selector: 'ec-special-event-edit-form',
+  selector: 'ec-special-event-edit-allocations',
   template: `
     <mat-card class="main">
       <mat-card>
         <mat-card-title>{{ specialEvent?.name }}</mat-card-title>
         <mat-card-subtitle>
-          Budgeted: {{ specialEvent?.budget_amount | ecMoney }} | 
+          Budgeted: {{ specialEvent?.budget_amount | ecMoney }} |
           Actual: {{ calculateActualAmount() | ecMoney }}
         </mat-card-subtitle>
         <mat-card-content>
-          <table mat-table #specialEventAllocationsTable [dataSource]="specialEvent?.allocations" class="mat-elevation-z8">
+          <h3>Allocations</h3>
+          <table mat-table #specialEventAllocationsTable [dataSource]="specialEvent?.allocations" class="mat-elevation-z1">
             <!-- Name Column -->
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -88,7 +82,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               </mat-form-field>
             </div>
 
-            <table mat-table #addNewAllocationsTable [dataSource]="groupedAllocations" [multiTemplateDataRows]="true" class="mat-elevation-z8">
+            <table mat-table #addNewAllocationsTable [dataSource]="groupedAllocations" [multiTemplateDataRows]="true" class="mat-elevation-z1">
               <!-- Name Column -->
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -183,7 +177,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
   `]
 })
-export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
+export class SpecialEventEditAllocationsComponent implements OnInit, OnDestroy {
   @ViewChild('specialEventAllocationsTable') specialEventAllocationsTable: MatTable<any>;
   @ViewChild('addNewAllocationsTable') addNewAllocationsTable: MatTable<any>;
   specialEvent: SpecialEventData;
@@ -191,7 +185,7 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
   allocations: AllocationData[] = [];
   allocationCategories: AllocationCategoryData[] = [];
   groupedAllocations: any[] = [];
-  displayedColumns: string[] = ['name', 'amount', 'spent', 'category', 'add'];
+  displayedColumns: string[] = ['name', 'amount', 'spent', 'add'];
   private componentDestroyed = new Subject();
 
   form: FormGroup<{
@@ -202,7 +196,6 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private budgetService: BudgetService,
-    private setupService: SetupService,
     private specialEventsService: SpecialEventsService,
     private route: ActivatedRoute,
     private router: Router,
@@ -222,8 +215,9 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
     // Load special event data and URL parameters
     this.route.params.pipe(takeUntil(this.componentDestroyed)).subscribe(params => {
       if (params['id']) {
-        this.setupService.getSpecialEvents().subscribe(specialEvents => {
-          this.specialEvent = specialEvents.find(event => event.id === +params['id']);
+        const id = Number(params['id']);
+        this.specialEventsService.getSpecialEvent(id).subscribe(specialEvent => {
+          this.specialEvent = specialEvent;
           if (!this.specialEvent.allocations) {
             this.specialEvent.allocations = [];
           }
@@ -256,7 +250,7 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
     this.route.queryParams.pipe(takeUntil(this.componentDestroyed)).subscribe(params => {
       const budgetId = Number(params['budget_id']) || 0;
       const categoryId = params['allocation_category_id'] ? Number(params['allocation_category_id']) : null;
-      
+
       this.form.patchValue({
         budget_id: budgetId,
         allocation_category_id: categoryId
@@ -291,7 +285,7 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
   groupAllocationsByCategory() {
     const categories = new Map<string, any>();
     const selectedCategoryId = this.form.get('allocation_category_id').value;
-    
+
     // Filter allocations by selected category if one is selected
     const filteredAllocations = selectedCategoryId
       ? this.allocations.filter(allocation => allocation.allocation_category_id === selectedCategoryId)
@@ -360,7 +354,7 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
   save() {
     this.loadingIndicator.show();
     const allocationIds = this.specialEvent.allocations.map(allocation => allocation.id);
-    
+
     this.specialEventsService.updateSpecialEventAllocations(this.specialEvent.id, {
       allocation_ids: allocationIds,
       actual_amount: this.calculateActualAmount()
@@ -381,4 +375,4 @@ export class SpecialEventEditFormComponent implements OnInit, OnDestroy {
   cancel() {
     this.router.navigate(['/special-events']);
   }
-} 
+}
