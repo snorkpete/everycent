@@ -26,6 +26,14 @@ class Setting < ApplicationRecord
     get_setting_record.primary_budget_account_id
   end
 
+  def self.default_allocation_category_id_for_special_events=(category_id)
+    get_setting_record.update(default_allocation_category_id_for_special_events: category_id)
+  end
+
+  def self.default_allocation_category_id_for_special_events
+    get_setting_record.default_allocation_category_id_for_special_events
+  end
+
   def self.husband
     get_setting_record.husband
   end
@@ -68,14 +76,16 @@ class Setting < ApplicationRecord
       return {
           primary_budget_account_id: setting_record.primary_budget_account_id,
           family_type: setting_record.family_type,
-          single_person: setting_record.single_person
+          single_person: setting_record.single_person,
+          default_allocation_category_id_for_special_events: setting_record.default_allocation_category_id_for_special_events
       }
     else
       return {
           primary_budget_account_id: setting_record.primary_budget_account_id,
           husband: setting_record.husband,
           wife: setting_record.wife,
-          family_type: setting_record.family_type
+          family_type: setting_record.family_type,
+          default_allocation_category_id_for_special_events: setting_record.default_allocation_category_id_for_special_events
       }
     end
   end
