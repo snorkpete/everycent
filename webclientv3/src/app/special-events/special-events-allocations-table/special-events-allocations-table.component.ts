@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { MatTable } from '@angular/material/table';
 import { AllocationData } from '../../budgets/allocation.model';
 import { SharedTransactionService } from '../../shared-transactions/shared-transaction.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -110,6 +111,7 @@ import { Icon } from '../../shared/ec-icon/icon.type';
   `]
 })
 export class SpecialEventsAllocationsTableComponent {
+  @ViewChild(MatTable) table: MatTable<any>;
   Icon = Icon;
   @Input() allocations: AllocationData[] = [];
   @Input() showActionColumn = false;
@@ -128,6 +130,10 @@ export class SpecialEventsAllocationsTableComponent {
       columns.push('action');
     }
     return columns;
+  }
+
+  refresh() {
+    this.table?.renderRows();
   }
 
   onAction(allocation: AllocationData): void {
