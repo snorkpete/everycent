@@ -19,6 +19,7 @@ import { SpecialEventEditDetailsFormComponent } from '../special-event-edit-deta
         <mat-card-subtitle>
           Budgeted: {{ specialEvent?.budget_amount | ecMoney }} |
           Actual: {{ specialEvent?.actual_amount | ecMoney }}
+          <span *ngIf="specialEvent?.start_date">| Start: {{ specialEvent?.start_date | date }}</span>
         </mat-card-subtitle>
         <mat-card-content>
           <button mat-button color="primary" (click)="back()">

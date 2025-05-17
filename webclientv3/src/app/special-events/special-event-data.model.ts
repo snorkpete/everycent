@@ -5,5 +5,6 @@ export interface SpecialEventData {
     name: string;
     budget_amount: number;
     actual_amount?: number;
+    start_date?: string;
     allocations?: AllocationData[];
 }
