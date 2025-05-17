@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { SpecialEventsService } from '../special-events.service';
@@ -22,32 +21,11 @@ import { SpecialEventEditDetailsFormComponent } from '../special-event-edit-deta
           Actual: {{ specialEvent?.actual_amount | ecMoney }}
         </mat-card-subtitle>
         <mat-card-content>
-          <table mat-table [dataSource]="allocations" class="mat-elevation-z8">
-            <!-- Name Column -->
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Name</th>
-              <td mat-cell *matCellDef="let allocation">{{ allocation.name }}</td>
-            </ng-container>
-
-            <!-- Amount Column -->
-            <ng-container matColumnDef="amount">
-              <th mat-header-cell *matHeaderCellDef>Amount</th>
-              <td mat-cell *matCellDef="let allocation">{{ allocation.amount | ecMoney }}</td>
-            </ng-container>
-
-            <!-- Spent Column -->
-            <ng-container matColumnDef="spent">
-              <th mat-header-cell *matHeaderCellDef>Spent</th>
-              <td mat-cell *matCellDef="let allocation">{{ allocation.spent | ecMoney }}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
+          <ec-special-events-allocations-table [allocations]="allocations"></ec-special-events-allocations-table>
         </mat-card-content>
         <mat-card-actions>
           <button mat-raised-button color="primary" (click)="adjustAllocations()">Adjust Allocations</button>
-          <button mat-raised-button color="accent" (click)="edit()">Edit Details</button>
+          <button mat-raised-button color="primary" (click)="edit()">Edit Details</button>
           <button mat-raised-button (click)="refresh()">Refresh</button>
         </mat-card-actions>
       </mat-card>
@@ -58,23 +36,11 @@ import { SpecialEventEditDetailsFormComponent } from '../special-event-edit-deta
       width: 100%;
       margin-top: 16px;
     }
-    .mat-column-name {
-      flex: 2;
-    }
-    .mat-column-amount {
-      flex: 1;
-      text-align: right;
-    }
-    .mat-column-spent {
-      flex: 1;
-      text-align: right;
-    }
   `]
 })
 export class SpecialEventComponent implements OnInit {
   specialEvent: SpecialEventData;
   allocations: AllocationData[] = [];
-  displayedColumns: string[] = ['name', 'amount', 'spent'];
 
   constructor(
     private route: ActivatedRoute,

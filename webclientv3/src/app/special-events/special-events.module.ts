@@ -7,13 +7,15 @@ import { SpecialEventEditAllocationsComponent } from './special-event-edit-alloc
 import { SpecialEventEditDetailsFormComponent } from './special-event-edit-details-form/special-event-edit-details-form.component';
 import { SpecialEventsService } from './special-events.service';
 import { SharedModule } from '../shared/shared.module';
+import { SpecialEventsAllocationsTableComponent } from './special-events-allocations-table/special-events-allocations-table.component';
 
 @NgModule({
   declarations: [
     SpecialEventsComponent,
     SpecialEventComponent,
     SpecialEventEditAllocationsComponent,
-    SpecialEventEditDetailsFormComponent
+    SpecialEventEditDetailsFormComponent,
+    SpecialEventsAllocationsTableComponent
   ],
   imports: [
     SharedModule,

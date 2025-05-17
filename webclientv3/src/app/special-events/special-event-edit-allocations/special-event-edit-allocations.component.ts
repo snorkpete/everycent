@@ -20,42 +20,17 @@ import { SpecialEventData } from '../special-event-data.model';
         <mat-card-title>{{ specialEvent?.name }}</mat-card-title>
         <mat-card-subtitle>
           Budgeted: {{ specialEvent?.budget_amount | ecMoney }} |
-          Actual: {{ calculateActualAmount() | ecMoney }}
+          <span class="highlighted">*</span>Actual: {{ calculateActualAmount() | ecMoney }}
         </mat-card-subtitle>
         <mat-card-content>
           <h3>Allocations</h3>
-          <table mat-table #specialEventAllocationsTable [dataSource]="specialEvent?.allocations" class="mat-elevation-z1">
-            <!-- Name Column -->
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Name</th>
-              <td mat-cell *matCellDef="let allocation">{{ allocation.name }}</td>
-            </ng-container>
-
-            <!-- Budgeted Column -->
-            <ng-container matColumnDef="amount">
-              <th mat-header-cell *matHeaderCellDef>Budgeted</th>
-              <td mat-cell *matCellDef="let allocation">{{ allocation.amount | ecMoney }}</td>
-            </ng-container>
-
-            <!-- Amount Column -->
-            <ng-container matColumnDef="spent">
-              <th mat-header-cell *matHeaderCellDef>Spent</th>
-              <td mat-cell *matCellDef="let allocation">{{ allocation.spent | ecMoney }}</td>
-            </ng-container>
-
-            <!-- Remove Column -->
-            <ng-container matColumnDef="remove">
-              <th mat-header-cell *matHeaderCellDef></th>
-              <td mat-cell *matCellDef="let allocation">
-                <button mat-icon-button color="warn" (click)="removeAllocation(allocation)">
-                  <mat-icon>remove_circle</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="['name', 'amount', 'spent', 'remove']"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['name', 'amount', 'spent', 'remove'];"></tr>
-          </table>
+          <ec-special-events-allocations-table
+            [allocations]="specialEvent?.allocations"
+            [showActionColumn]="true"
+            [actionButtonIcon]="'delete'"
+            [actionButtonColor]="'warn'"
+            (action)="removeAllocation($event)">
+          </ec-special-events-allocations-table>
         </mat-card-content>
       </mat-card>
 
@@ -174,6 +149,9 @@ import { SpecialEventData } from '../special-event-data.model';
       font-weight: bold;
       background-color: #f5f5f5;
       padding: 8px 16px;
+    }
+    .highlighted {
+      color: red;
     }
   `]
 })
@@ -373,6 +351,6 @@ export class SpecialEventEditAllocationsComponent implements OnInit, OnDestroy {
   }
 
   cancel() {
-    this.router.navigate(['/special-events']);
+    this.router.navigate(['/special-events', this.specialEvent.id]);
   }
 }
