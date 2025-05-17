@@ -7,12 +7,8 @@ import { BankAccountsComponent } from "./bank-accounts.component";
 import { InstitutionEditFormComponent } from "./institution-edit-form.component";
 import { InstitutionsComponent } from "./institutions.component";
 import { SettingsComponent } from "./settings.component";
-
 import { SetupRoutingModule } from "./setup-routing.module";
 import { SetupService } from "./setup.service";
-import { SpecialEventsComponent } from "./special-events.component";
-import { SpecialEventEditFormComponent } from "./special-event-edit-form.component";
-
 
 @NgModule({
   imports: [SharedModule, SetupRoutingModule],
@@ -20,8 +16,6 @@ import { SpecialEventEditFormComponent } from "./special-event-edit-form.compone
     InstitutionsComponent,
     InstitutionEditFormComponent,
     SettingsComponent,
-    SpecialEventsComponent,
-    SpecialEventEditFormComponent,
     BankAccountsComponent,
     BankAccountEditFormComponent,
     AllocationCategoryEditFormComponent,
