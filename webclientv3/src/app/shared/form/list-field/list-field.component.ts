@@ -205,7 +205,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(newValue: number): void {
-    this.value = newValue;
+    this.value = Number(newValue);
     this.control.setValue(this.value);
   }
 

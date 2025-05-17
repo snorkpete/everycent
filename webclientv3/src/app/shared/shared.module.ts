@@ -30,6 +30,7 @@ import { MenuComponent } from "./menu/menu.component";
 import { MessageDisplayComponent } from "./message-display/message-display.component";
 import { MoneyPipe } from "./money.pipe";
 import { SettingsService } from "./settings.service";
+import { AllocationCategoryService } from "./allocation-category.service";
 
 @NgModule({
   imports: [
@@ -85,6 +86,15 @@ import { SettingsService } from "./settings.service";
     MoneyPipe,
     PaidFieldComponent,
     TextFieldComponent
+  ],
+  providers: [
+    ConfirmationService,
+    DeactivateService,
+    LoadingIndicator,
+    MainToolbarService,
+    MessageService,
+    SettingsService,
+    AllocationCategoryService
   ]
 })
 export class SharedModule {

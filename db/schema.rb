@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_17_115200) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_17_121750) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -160,6 +160,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_17_115200) do
     t.string "family_type", default: "couple"
     t.string "single_person"
     t.bigint "household_id"
+    t.integer "default_allocation_category_id_for_special_events"
     t.index ["household_id"], name: "index_settings_on_household_id"
   end
 

@@ -5,4 +5,5 @@ export interface SettingsData {
   husband?: string;
   wife?: string;
   single_person?: string;
+  default_allocation_category_id_for_special_events?: number;
 }

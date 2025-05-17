@@ -5,6 +5,8 @@ import { MessageService } from "../message-display/message.service";
 import { MainToolbarService } from "../shared/main-toolbar/main-toolbar.service";
 import { SettingsData } from "../shared/settings-data.model";
 import { SettingsService } from "../shared/settings.service";
+import { AllocationCategoryData } from "../shared/allocation-category-data.model";
+import { AllocationCategoryService } from "../shared/allocation-category.service";
 
 @Component({
   selector: "ec-settings",
@@ -18,6 +20,14 @@ import { SettingsService } from "../shared/settings.service";
             [items]="bankAccounts"
             placeholder="Primary Budget Account"
             [(ngModel)]="settings.primary_budget_account_id"
+          >
+          </ec-list-field>
+
+          <ec-list-field
+            [editMode]="editMode"
+            [items]="allocationCategories"
+            placeholder="Default Allocation Category for Special Events"
+            [(ngModel)]="settings.default_allocation_category_id_for_special_events"
           >
           </ec-list-field>
 
@@ -115,6 +125,7 @@ import { SettingsService } from "../shared/settings.service";
 export class SettingsComponent implements OnInit {
   settings: SettingsData = { family_type: "couple" };
   bankAccounts: BankAccountData[] = [];
+  allocationCategories: AllocationCategoryData[] = [];
   editMode = false;
 
   familyTypeOptions = [
@@ -126,7 +137,8 @@ export class SettingsComponent implements OnInit {
     private toolbarService: MainToolbarService,
     private messageService: MessageService,
     private settingsService: SettingsService,
-    private bankAccountService: BankAccountService
+    private bankAccountService: BankAccountService,
+    private allocationCategoryService: AllocationCategoryService
   ) {}
 
   ngOnInit() {
@@ -134,6 +146,9 @@ export class SettingsComponent implements OnInit {
     this.bankAccountService
       .getBankAccounts()
       .subscribe(bankAccounts => (this.bankAccounts = bankAccounts));
+    this.allocationCategoryService
+      .getAllocationCategories()
+      .subscribe(categories => (this.allocationCategories = categories));
     this.refresh();
   }
 

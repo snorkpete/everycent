@@ -16,6 +16,7 @@ class SettingsController < ApplicationController
 
   def create
     Setting.primary_budget_account_id = params[:primary_budget_account_id]
+    Setting.default_allocation_category_id_for_special_events = params[:default_allocation_category_id_for_special_events]
 
     if params[:family_type] == 'single'
       Setting.update_family_type_to_single
