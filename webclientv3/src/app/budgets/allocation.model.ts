@@ -21,6 +21,8 @@ export interface AllocationData {
   comment?: string;
   allocation_class?: string;
   is_fixed_amount?: boolean;
+  budget_name?: string;
+  allocation_category_name?: string;
 
   allocations?: AllocationData[];
 

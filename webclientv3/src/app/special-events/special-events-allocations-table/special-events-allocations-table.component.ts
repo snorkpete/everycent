@@ -11,9 +11,23 @@ import { Icon } from '../../shared/ec-icon/icon.type';
     <table mat-table [dataSource]="allocations" class="mat-elevation-z8">
       <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <th mat-header-cell *matHeaderCellDef>Allocation</th>
         <td mat-cell *matCellDef="let allocation">{{ allocation.name }}</td>
         <td mat-footer-cell *matFooterCellDef class="bold">Total</td>
+      </ng-container>
+
+      <!-- Budget Column -->
+      <ng-container matColumnDef="budget">
+        <th mat-header-cell *matHeaderCellDef>Budget</th>
+        <td mat-cell *matCellDef="let allocation">{{ allocation.budget_name }}</td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Category Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef>Category</th>
+        <td mat-cell *matCellDef="let allocation">{{ allocation.allocation_category_name }}</td>
+        <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
 
       <!-- Amount Column -->
@@ -61,6 +75,12 @@ import { Icon } from '../../shared/ec-icon/icon.type';
     .mat-column-name {
       flex: 2;
     }
+    .mat-column-budget {
+      flex: 1;
+    }
+    .mat-column-category {
+      flex: 1;
+    }
     .mat-column-amount {
       flex: 1;
       text-align: right;
@@ -103,7 +123,7 @@ export class SpecialEventsAllocationsTableComponent {
   ) {}
 
   get displayedColumns(): string[] {
-    const columns = ['name', 'amount', 'spent'];
+    const columns = ['name', 'budget', 'category', 'amount', 'spent'];
     if (this.showActionColumn) {
       columns.push('action');
     }

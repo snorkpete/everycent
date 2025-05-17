@@ -48,7 +48,7 @@ class SpecialEventsController < ApplicationController
   private
 
   def set_special_event
-    @special_event = SpecialEvent.find(params[:id])
+    @special_event = SpecialEvent.preloaded.find(params[:id])
   end
 
   def special_event_params

@@ -20,4 +20,8 @@ class SpecialEvent < ApplicationRecord
   validates :name, presence: true
   validates :budget_amount, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :actual_amount, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
+  def self.preloaded
+    includes({ allocations: [:budget, :allocation_category, :transactions] } )
+  end
 end
