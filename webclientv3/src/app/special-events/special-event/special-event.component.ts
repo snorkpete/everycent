@@ -21,6 +21,10 @@ import { SpecialEventEditDetailsFormComponent } from '../special-event-edit-deta
           Actual: {{ specialEvent?.actual_amount | ecMoney }}
         </mat-card-subtitle>
         <mat-card-content>
+          <button mat-button color="primary" (click)="back()">
+            <mat-icon>arrow_back</mat-icon>
+            Back to Special Events
+          </button>
           <ec-special-events-allocations-table [allocations]="allocations"></ec-special-events-allocations-table>
         </mat-card-content>
         <mat-card-actions>
@@ -35,6 +39,9 @@ import { SpecialEventEditDetailsFormComponent } from '../special-event-edit-deta
     .mat-table {
       width: 100%;
       margin-top: 16px;
+    }
+    button[mat-button] {
+      margin-bottom: 16px;
     }
   `]
 })
@@ -58,6 +65,10 @@ export class SpecialEventComponent implements OnInit {
         this.loadSpecialEvent(id);
       }
     });
+  }
+
+  back() {
+    this.router.navigate(['/special-events']);
   }
 
   loadSpecialEvent(id: number) {

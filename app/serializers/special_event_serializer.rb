@@ -16,5 +16,5 @@ class SpecialEventSerializer < ActiveModel::Serializer
 
   attributes :id, :name, :budget_amount, :actual_amount
 
-  has_many :allocations
+  has_many :allocations, serializer: SpecialEventAllocationSerializer
 end
