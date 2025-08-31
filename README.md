@@ -81,3 +81,16 @@ We'll have to go through the same song and dance above when we change Postgres v
  
 
 
+
+### Special Events TODO
+* add a link to transactions from the special event
+* remove allocation amount (useless)
+* default the budget filter to current budget
+* default the category filter to default_special_event_category_id
+* add a setting for default special category
+* add a date to special events 
+* sort the list of special events
+
+
+### TO FIX:  
+* the heading is not updating when calling `toolbarService.updateHeading` - value is updated in service but not in component
