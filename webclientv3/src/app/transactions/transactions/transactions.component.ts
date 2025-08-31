@@ -33,9 +33,10 @@ import { AccountTransferFormComponent } from "../transfer/account-transfer-form.
         grid-template-areas:
           "selector summary"
           "list     list";
-        grid-template-rows: 175px 1fr;
+        grid-template-rows: 160px 1fr;
         grid-template-columns: 1fr 1fr;
-        column-gap: 20px;
+        column-gap: 10px;
+        row-gap: 0;
       }
 
       @media (max-width: 600px) {
