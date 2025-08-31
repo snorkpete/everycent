@@ -9,7 +9,8 @@ div.md-sidenav-content {
 
 mat-card.main, mat-sidenav-container.main {
   background-color: #a5b0ff;
-  height: calc(100% - 50px);
+  /*height: calc(100% - 50px);*/
+  height: calc(100% - 5px);
   overflow: auto;
 }
 
