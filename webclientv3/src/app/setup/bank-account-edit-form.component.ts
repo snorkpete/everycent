@@ -22,6 +22,7 @@ import { InstitutionData } from "../bank-accounts/institution.model";
           formControlName="account_type"
           [items]="accountFeatureTypes"
           placeholder="Account Features"
+          [isNumeric]="false"
         >
         </ec-list-field>
         <ec-text-field
@@ -37,6 +38,7 @@ import { InstitutionData } from "../bank-accounts/institution.model";
           formControlName="account_category"
           [items]="accountCategories"
           placeholder="Account Category"
+          [isNumeric]="false"
         >
         </ec-list-field>
         <ec-list-field
@@ -45,6 +47,7 @@ import { InstitutionData } from "../bank-accounts/institution.model";
           formControlName="is_cash"
           [items]="yesNoList"
           placeholder="Is Cash Account?"
+          [isNumeric]="false"
         >
         </ec-list-field>
         <ec-list-field
@@ -75,6 +78,7 @@ import { InstitutionData } from "../bank-accounts/institution.model";
           formControlName="import_format"
           [items]="importFormats"
           placeholder="Bank Account Import Format"
+          [isNumeric]="false"
         >
         </ec-list-field>
         <ec-list-field
@@ -83,6 +87,7 @@ import { InstitutionData } from "../bank-accounts/institution.model";
           formControlName="status"
           [items]="statuses"
           placeholder="Status"
+          [isNumeric]="false"
         >
         </ec-list-field>
 

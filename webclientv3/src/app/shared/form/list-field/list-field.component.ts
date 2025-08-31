@@ -124,6 +124,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   @Input() editMode = false;
   @Input() placeholder = "";
   @Input() centerText = false;
+  @Input() isNumeric = true;
   private _selectedItem: any = {};
 
   groups: any[];
@@ -154,7 +155,8 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
 
   ngOnInit() {
     this.control.valueChanges.subscribe((v: string) => {
-      this.onChange(Number(v));
+      const newValue = this.isNumeric? Number(v) : v;
+      this.onChange(newValue);
     });
   }
 
@@ -205,7 +207,7 @@ export class ListFieldComponent implements OnInit, ControlValueAccessor {
   }
 
   writeValue(newValue: number): void {
-    this.value = Number(newValue);
+    this.value = this.isNumeric ? Number(newValue): newValue;
     this.control.setValue(this.value);
   }
 
