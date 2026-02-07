@@ -11,7 +11,7 @@
 - **Axios** for HTTP
 
 ### Conventions
-- Types live in `.type.ts` files within their feature folder (e.g. `features/auth/auth.type.ts`)
+- Types live in `.types.ts` files within their feature folder (e.g. `features/auth/auth.type.ts`)
 - Feature-folder structure: each domain groups its components, stores, composables, types, and routes
 - API calls are separated from stores — plain functions in `src/api/`
 - Components never call the API directly; they go through Pinia stores
@@ -19,8 +19,8 @@
 
 ### Auth Strategy
 - Rails backend uses `devise_token_auth`
-- Angular app uses an angular-token library (exact one TBD — check `webclientv3/package.json`)
-- Token rotation is likely **disabled** on the server (`change_headers_on_each_request: false`)
+- Angular app configures auth through webclientv3/src/app/core/auth
+- Token rotation is **disabled** on the server (`change_headers_on_each_request: false`)
 - The Vue app must **read and write the same localStorage keys** as the Angular app so sessions are shared seamlessly between the two apps during migration
 - **First task**: inspect what the Angular token library actually stores in localStorage, then replicate that exact format in the Vue auth layer
 
