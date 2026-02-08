@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import LoginPage from '../auth/LoginPage.vue';
 import { useAuthStore } from '../auth/authStore';
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/login',

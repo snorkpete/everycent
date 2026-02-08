@@ -1,7 +1,10 @@
 <template>
   <header v-if="authStore.loggedIn" class="top-bar">
     <span class="app-title">EveryCent</span>
-    <Button label="Log Out" severity="secondary" size="small" @click="logout" />
+    <div class="header-actions">
+      <a href="/#/" class="old-version-link">Old Version</a>
+      <Button label="Log Out" severity="secondary" size="small" @click="logout" />
+    </div>
   </header>
   <router-view />
 </template>
@@ -32,5 +35,21 @@ function logout() {
 .app-title {
   font-size: 1.25rem;
   font-weight: bold;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.old-version-link {
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.old-version-link:hover {
+  text-decoration: underline;
 }
 </style>
