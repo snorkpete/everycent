@@ -132,4 +132,5 @@ describe('api-gateway', () => {
       expect(result).toBe(response);
     });
   });
+
 });

@@ -1,5 +1,6 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
 import { AUTH_HEADER_KEYS } from '../auth/auth.types';
+import { useLoadingIndicatorStore } from '../app/loading/loadingIndicatorStore';
 
 const BASE_URL = import.meta.env.PROD ? '' : 'http://localhost:3000';
 
@@ -33,6 +34,21 @@ export function saveAuthHeaders(response: AxiosResponse) {
 }
 
 apiGateway.interceptors.request.use(attachAuthHeaders);
+apiGateway.interceptors.request.use((config) => {
+  useLoadingIndicatorStore().startRequest();
+  return config;
+});
+
 apiGateway.interceptors.response.use(saveAuthHeaders);
+apiGateway.interceptors.response.use(
+  (response) => {
+    useLoadingIndicatorStore().finishRequest();
+    return response;
+  },
+  (error) => {
+    useLoadingIndicatorStore().finishRequest();
+    return Promise.reject(error);
+  },
+);
 
 export default apiGateway;

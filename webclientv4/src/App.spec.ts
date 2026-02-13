@@ -36,11 +36,6 @@ describe('App', () => {
         plugins: [pinia],
         stubs: {
           RouterView: { template: '<div class="router-view" />' },
-          Button: {
-            template:
-              '<button data-testid="logout-button" @click="$emit(\'click\')">{{ label }}</button>',
-            props: ['label'],
-          },
         },
       },
     });
@@ -82,5 +77,13 @@ describe('App', () => {
     const wrapper = mountApp(false);
 
     expect(wrapper.find('.router-view').exists()).toBe(true);
+  });
+
+  it('always renders the loading indicator', () => {
+    const wrapper = mountApp(false);
+
+    expect(
+      wrapper.findComponent({ name: 'LoadingIndicator' }).exists(),
+    ).toBe(true);
   });
 });

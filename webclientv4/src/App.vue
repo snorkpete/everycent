@@ -6,6 +6,9 @@
       <Button label="Log Out" severity="secondary" size="small" data-testid="logout-button" @click="logout" />
     </div>
   </header>
+
+  <LoadingIndicator />
+
   <router-view />
 </template>
 
@@ -13,6 +16,7 @@
 import { useAuthStore } from './auth/authStore';
 import { useRouter } from 'vue-router';
 import Button from 'primevue/button';
+import LoadingIndicator from './app/loading/LoadingIndicator.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
