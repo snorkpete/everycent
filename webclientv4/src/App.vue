@@ -1,9 +1,9 @@
 <template>
-  <header v-if="authStore.loggedIn" class="top-bar">
-    <span class="app-title">EveryCent</span>
+  <header v-if="authStore.loggedIn" class="top-bar" data-testid="top-bar">
+    <span class="app-title" data-testid="app-title">EveryCent</span>
     <div class="header-actions">
-      <a href="/#/" class="old-version-link">Old Version</a>
-      <Button label="Log Out" severity="secondary" size="small" @click="logout" />
+      <a href="/#/" class="old-version-link" data-testid="old-version-link">Old Version</a>
+      <Button label="Log Out" severity="secondary" size="small" data-testid="logout-button" @click="logout" />
     </div>
   </header>
   <router-view />

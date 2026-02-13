@@ -312,15 +312,77 @@ The `expose` array is critical — without it, the browser won't let JavaScript 
 
 ---
 
-## What This Plan Does NOT Cover Yet
+## Phase 2: Infrastructure & Standards
 
-These will be tackled incrementally after auth is working:
+### Step 1: Testing Setup
+- Install **Vitest** + **Vue Test Utils** (`@vue/test-utils`)
+- Configure Vitest (inline in `vite.config.ts` or separate `vitest.config.ts`)
+- Add `npm test` script to `package.json`
+- Write a sample test for `authStore` to establish the testing pattern
+- All subsequent code should have accompanying unit tests
+
+### Step 2: Loading Indicator
+- Create `loadingIndicatorStore` (Pinia) with `isLoading` boolean and internal request counter
+- Add Axios request/response interceptors in `api-gateway.ts` that increment/decrement the counter and toggle `isLoading`
+- Handle concurrent requests: `isLoading` stays true until all in-flight requests complete
+- Add a global **progress bar** (PrimeVue ProgressBar, indeterminate mode) in `App.vue`, shown when `isLoading` is true
+- Write tests for the store and interceptor logic
+
+### Step 3: Menu System
+- Build a responsive sidebar matching the Angular app's pattern:
+  - PrimeVue **Sidebar** + **PanelMenu** or **Accordion** for expandable sections
+  - "Side" mode on desktop, overlay with hamburger toggle on mobile
+- Menu items defined as a config array (mirrors Angular's `MenuItemConfig[]` pattern)
+- Include the "Old Version" link and logout action in the sidebar
+- Update `App.vue` layout: toolbar + sidenav + `<router-view>`
+- Write tests for the menu component
+
+### Step 4: Common Form Components
+
+All form components share an `editMode` boolean prop:
+- `editMode=false` → display the value as formatted plain text with a label
+- `editMode=true` → display the PrimeVue form input
+
+All components use `v-model` for two-way binding (Vue's equivalent of ControlValueAccessor).
+
+#### ec-text-field
+- **v-model type**: `string`
+- **Props**: `editMode`, `label`, `type` (default `"text"`, supports `"email"`, `"password"`, etc.)
+- **Wraps**: PrimeVue `InputText`
+- **Read-only**: label + plain text value
+
+#### ec-money-field
+- **v-model type**: `number` (integer cents — e.g. `1550` = $15.50)
+- **Props**: `editMode`, `label`, `highlightPositive` (default `false`)
+- **Wraps**: PrimeVue `InputNumber` or text input with manual formatting
+- **Edit mode**: user types in dollars (e.g. `15.50`), component converts to/from cents internally via `Math.round(dollars * 100)`
+- **Read-only**: label + formatted dollar string with thousand separators (e.g. `"1,234.56"`). Negative values styled in dark red. Positive values styled in dark green when `highlightPositive=true`.
+
+#### ec-date-field
+- **v-model type**: `string` (ISO date, e.g. `"2024-12-25"`)
+- **Props**: `editMode`, `label`
+- **Wraps**: PrimeVue `DatePicker`
+- **Read-only**: label + human-readable formatted date (e.g. `"Dec 25, 2024"`)
+
+#### ec-list-field
+- **v-model type**: `number` (selected item's `id`)
+- **Props**: `editMode`, `label`, `items` (array of `{ id, name, ... }`), `groupBy` (optional string)
+- **Wraps**: PrimeVue `Select`
+- **Grouping**: when `groupBy="category"` is set, groups items by `category_id` and uses `category.name` as the group label (derived from item data, not a separate structure)
+- **Read-only**: label + selected item's name
+
+Each component gets unit tests. Components live in `src/shared/components/`.
+
+---
+
+## Phase 3: Feature Migration
+
+These will be tackled incrementally after infrastructure is in place:
 
 - Budget list/detail screens
 - Transaction management and import
 - Account management
 - Sink funds
 - Settings/configuration
-- Production build pipeline and Rails route setup for `/v4/`
 
-Each of these follows the same pattern: types → API → store → components → routes.
+Each feature follows the same pattern: types → API → store → components → routes.

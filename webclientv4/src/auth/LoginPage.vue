@@ -1,18 +1,18 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h2>EveryCent - Log In</h2>
-      <form @submit.prevent="login">
+      <h2 data-testid="login-heading">EveryCent - Log In</h2>
+      <form data-testid="login-form" @submit.prevent="login">
         <div class="field">
           <label for="email">Email</label>
-          <InputText id="email" v-model="email" type="text" class="w-full" />
+          <InputText id="email" v-model="email" type="text" class="w-full" data-testid="email-input" />
         </div>
         <div class="field">
           <label for="password">Password</label>
-          <Password id="password" v-model="password" :feedback="false" toggle-mask class="w-full" />
+          <Password id="password" v-model="password" :feedback="false" toggle-mask class="w-full" data-testid="password-input" />
         </div>
-        <p v-if="authStore.error" class="error">{{ authStore.error }}</p>
-        <Button type="submit" label="Log In" :loading="loading" class="w-full" />
+        <p v-if="authStore.error" class="error" data-testid="error-message">{{ authStore.error }}</p>
+        <Button type="submit" label="Log In" :loading="loading" class="w-full" data-testid="login-button" />
       </form>
     </div>
   </div>

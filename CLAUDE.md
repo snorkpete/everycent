@@ -79,6 +79,12 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 2. Build v1 legacy: `cd webclient && gulp` (outputs to /public/v1)
 3. Commit: `git add . && git commit -m "build of static assets"`
 
+## Testing (Vue App - webclientv4)
+- Use test-driven development (TDD). Write tests before implementation.
+- Aim for 100% test coverage on all new code. Every function, branch, and edge case should be tested.
+- If 100% coverage is not feasible for a specific piece of code, do not silently skip it — confirm with the user first and document the reason.
+- Run tests after every change to ensure nothing is broken.
+
 ## Migration Context
 There is a planned migration from Angular 14 to Vue 3 + Vite + PrimeVue 4 + Pinia.
 See `MIGRATION_PLAN.md` for details. New frontend will live in `webclientv4/`.

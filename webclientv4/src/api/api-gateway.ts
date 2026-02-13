@@ -11,7 +11,7 @@ const apiGateway = axios.create({
 });
 
 // Attach auth tokens from localStorage to every request
-apiGateway.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+export function attachAuthHeaders(config: InternalAxiosRequestConfig) {
   for (const key of AUTH_HEADER_KEYS) {
     const value = localStorage.getItem(key);
     if (value) {
@@ -19,10 +19,10 @@ apiGateway.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     }
   }
   return config;
-});
+}
 
 // Capture auth tokens from responses and save to localStorage
-apiGateway.interceptors.response.use((response: AxiosResponse) => {
+export function saveAuthHeaders(response: AxiosResponse) {
   for (const key of AUTH_HEADER_KEYS) {
     const value = response.headers[key];
     if (value) {
@@ -30,6 +30,9 @@ apiGateway.interceptors.response.use((response: AxiosResponse) => {
     }
   }
   return response;
-});
+}
+
+apiGateway.interceptors.request.use(attachAuthHeaders);
+apiGateway.interceptors.response.use(saveAuthHeaders);
 
 export default apiGateway;
