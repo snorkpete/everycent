@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
+    "@vueuse/core": "^14.2.1",
     "axios": "^1.13.4",
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",

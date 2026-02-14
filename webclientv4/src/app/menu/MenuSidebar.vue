@@ -19,7 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch } from 'vue';
+import { useBreakpoints, breakpointsPrimeFlex } from '@vueuse/core';
 import PanelMenu from 'primevue/panelmenu';
 import Button from 'primevue/button';
 import Drawer from 'primevue/drawer';
@@ -27,26 +28,17 @@ import { useAuthStore } from '../../auth/authStore';
 import { useRouter } from 'vue-router';
 import { buildMenuItems } from './menuItems';
 
-const DESKTOP_BREAKPOINT = '(min-width: 1024px)';
+const breakpoints = useBreakpoints(breakpointsPrimeFlex);
+const isDesktop = breakpoints.greaterOrEqual('lg');
 
 const authStore = useAuthStore();
 const router = useRouter();
 const drawerVisible = ref(false);
-const isDesktop = ref(window.matchMedia(DESKTOP_BREAKPOINT).matches);
 
-function onBreakpointChange(e: MediaQueryListEvent) {
-  isDesktop.value = e.matches;
-  if (e.matches) {
+watch(isDesktop, (desktop) => {
+  if (desktop) {
     drawerVisible.value = false;
   }
-}
-
-onMounted(() => {
-  window.matchMedia(DESKTOP_BREAKPOINT).addEventListener('change', onBreakpointChange);
-});
-
-onUnmounted(() => {
-  window.matchMedia(DESKTOP_BREAKPOINT).removeEventListener('change', onBreakpointChange);
 });
 
 function logout() {

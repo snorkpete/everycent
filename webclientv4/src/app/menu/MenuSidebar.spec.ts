@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import { ref, nextTick } from 'vue';
 import { createPinia, setActivePinia } from 'pinia';
 import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
@@ -20,17 +20,13 @@ vi.mock('../../auth/authApi', () => ({
   },
 }));
 
-function mockMatchMedia(matches: boolean) {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches,
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })),
-  });
-}
+const isDesktop = ref(true);
+vi.mock('@vueuse/core', () => ({
+  useBreakpoints: () => ({
+    greaterOrEqual: () => isDesktop,
+  }),
+  breakpointsPrimeFlex: {},
+}));
 
 describe('MenuSidebar', () => {
   let pinia: Pinia;
@@ -57,9 +53,9 @@ describe('MenuSidebar', () => {
     return wrapper;
   }
 
-  describe('desktop (≥1024px)', () => {
+  describe('desktop (≥992px)', () => {
     beforeEach(() => {
-      mockMatchMedia(true);
+      isDesktop.value = true;
     });
 
     it('renders a static sidebar', () => {
@@ -85,9 +81,9 @@ describe('MenuSidebar', () => {
     });
   });
 
-  describe('mobile (<1024px)', () => {
+  describe('mobile (<992px)', () => {
     beforeEach(() => {
-      mockMatchMedia(false);
+      isDesktop.value = false;
     });
 
     it('does not render the static sidebar', () => {
