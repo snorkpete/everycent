@@ -5,7 +5,16 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useHeadingStore } from './app/toolbar/headingStore';
+
+const headingStore = useHeadingStore();
+
+onMounted(() => {
+  headingStore.setHeading('Home');
+});
+</script>
 
 <style scoped>
 .home {
