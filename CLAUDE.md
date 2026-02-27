@@ -85,6 +85,11 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 - If 100% coverage is not feasible for a specific piece of code, do not silently skip it — confirm with the user first and document the reason.
 - Run tests after every change to ensure nothing is broken.
 
+## Code Review (Vue App - webclientv4)
+- Before committing any changes, run the `senior-code-reviewer` agent over all modified files.
+- Apply any feedback from the review before committing.
+- Display a summary of what was changed as a result of the review feedback.
+
 ## Migration Context
 There is a planned migration from Angular 14 to Vue 3 + Vite + PrimeVue 4 + Pinia.
 See `MIGRATION_PLAN.md` for details. New frontend will live in `webclientv4/`.
