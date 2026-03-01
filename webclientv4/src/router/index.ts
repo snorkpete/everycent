@@ -15,6 +15,11 @@ const router = createRouter({
       name: 'home',
       component: () => import('../HomePage.vue'),
     },
+    {
+      path: '/setup/bank-accounts',
+      name: 'setup-bank-accounts',
+      component: () => import('../app/bank-accounts/BankAccountsPage.vue'),
+    },
   ],
 });
 

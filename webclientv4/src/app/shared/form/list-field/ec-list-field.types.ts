@@ -1,5 +1,5 @@
 export interface ListItem {
-  id: number;
+  id: number | string | boolean;
   name: string;
   [key: string]: unknown;
 }

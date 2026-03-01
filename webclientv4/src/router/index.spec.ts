@@ -42,4 +42,15 @@ describe('router', () => {
 
     expect(router.currentRoute.value.name).toBe('home');
   });
+
+  it('routes /setup/bank-accounts to setup-bank-accounts when authenticated', async () => {
+    localStorage.setItem('access-token', 'valid-token');
+    vi.mocked(authApi.validateToken).mockResolvedValue({
+      data: { success: true },
+    } as any);
+
+    await router.push('/setup/bank-accounts');
+
+    expect(router.currentRoute.value.name).toBe('setup-bank-accounts');
+  });
 });

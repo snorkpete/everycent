@@ -99,6 +99,63 @@ describe('EcListField', () => {
     });
   });
 
+  describe('string and boolean ids', () => {
+    const stringItems: ListItem[] = [
+      { id: 'normal', name: 'Normal Features' },
+      { id: 'credit_card', name: 'Credit Card Features' },
+    ];
+
+    const boolItems: ListItem[] = [
+      { id: true, name: 'Yes' },
+      { id: false, name: 'No' },
+    ];
+
+    it('displays selected item name for a string id in read-only mode', () => {
+      const selectedItem = stringItems[0];
+      const wrapper = mountComponent({ items: stringItems, modelValue: selectedItem.id });
+
+      expect(wrapper.find('.value').text()).toBe(selectedItem.name);
+    });
+
+    it('displays selected item name for a boolean id in read-only mode', () => {
+      const selectedItem = boolItems[1]; // false / No
+      const wrapper = mountComponent({ items: boolItems, modelValue: selectedItem.id });
+
+      expect(wrapper.find('.value').text()).toBe(selectedItem.name);
+    });
+
+    it('passes a string modelValue to the Select in edit mode', () => {
+      const selectedId = 'credit_card';
+      const wrapper = mountComponent({ editMode: true, items: stringItems, modelValue: selectedId });
+
+      expect(wrapper.findComponent(Select).props('modelValue')).toBe(selectedId);
+    });
+
+    it('passes a boolean modelValue to the Select in edit mode', () => {
+      const wrapper = mountComponent({ editMode: true, items: boolItems, modelValue: false });
+
+      expect(wrapper.findComponent(Select).props('modelValue')).toBe(false);
+    });
+
+    it('emits a string value when selection changes', async () => {
+      const wrapper = mountComponent({ editMode: true, items: stringItems, modelValue: null });
+
+      wrapper.findComponent(Select).vm.$emit('update:modelValue', 'normal');
+      await nextTick();
+
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['normal']);
+    });
+
+    it('emits a boolean value when selection changes', async () => {
+      const wrapper = mountComponent({ editMode: true, items: boolItems, modelValue: null });
+
+      wrapper.findComponent(Select).vm.$emit('update:modelValue', true);
+      await nextTick();
+
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true]);
+    });
+  });
+
   describe('grouping', () => {
     const foodCategoryId = 10;
     const transportCategoryId = 20;
