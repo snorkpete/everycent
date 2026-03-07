@@ -1,31 +1,28 @@
 <template>
-  <Toolbar data-testid="toolbar">
-    <template #start>
-      <span class="app-title" data-testid="app-title">EveryCent</span>
-      <span v-if="headingStore.heading" class="page-heading" data-testid="page-heading">
-        {{ headingStore.heading }}
-      </span>
-    </template>
-  </Toolbar>
+  <div class="page-header" data-testid="page-header">
+    <h1 v-if="headingStore.heading" class="page-title" data-testid="page-title">
+      {{ headingStore.heading }}
+    </h1>
+  </div>
 </template>
 
 <script setup lang="ts">
-import Toolbar from 'primevue/toolbar';
 import { useHeadingStore } from './headingStore';
 
 const headingStore = useHeadingStore();
 </script>
 
 <style scoped>
-.app-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-left: 0.5rem;
+.page-header {
+  padding: 1.1rem 1.5rem 0;
+  min-height: 2rem;
 }
 
-.page-heading {
-  margin-left: 1.5rem;
-  font-size: 1rem;
-  color: var(--p-text-muted-color, #6b7280);
+.page-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.3;
 }
 </style>

@@ -23,25 +23,25 @@ describe('AppToolbar', () => {
     });
   }
 
-  it('displays the app title', () => {
+  it('renders the page header container', () => {
     const wrapper = mountToolbar();
 
-    expect(wrapper.find('[data-testid="app-title"]').text()).toBe('EveryCent');
+    expect(wrapper.find('[data-testid="page-header"]').exists()).toBe(true);
   });
 
-  it('shows page heading when set', () => {
+  it('shows the page title when heading is set', () => {
     const headingStore = useHeadingStore();
     const heading = 'Current Budget';
     headingStore.setHeading(heading);
 
     const wrapper = mountToolbar();
 
-    expect(wrapper.find('[data-testid="page-heading"]').text()).toBe(heading);
+    expect(wrapper.find('[data-testid="page-title"]').text()).toBe(heading);
   });
 
-  it('hides page heading when empty', () => {
+  it('hides the page title when heading is empty', () => {
     const wrapper = mountToolbar();
 
-    expect(wrapper.find('[data-testid="page-heading"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="page-title"]').exists()).toBe(false);
   });
 });

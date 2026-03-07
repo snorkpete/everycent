@@ -6,6 +6,7 @@ import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import MenuSidebar from './MenuSidebar.vue';
+import { useAuthStore } from '../../auth/authStore';
 
 const mockPush = vi.fn();
 vi.mock('vue-router', () => ({
@@ -71,6 +72,12 @@ describe('MenuSidebar', () => {
       expect(document.querySelector('[data-testid="mobile-drawer"]')).toBeNull();
     });
 
+    it('renders the EveryCent brand header', () => {
+      mountComponent();
+
+      expect(wrapper.find('[data-testid="desktop-sidebar"]').text()).toContain('EveryCent');
+    });
+
     it('renders menu items', () => {
       mountComponent();
 
@@ -78,6 +85,21 @@ describe('MenuSidebar', () => {
       expect(wrapper.text()).toContain('Reports');
       expect(wrapper.text()).toContain('Setup');
       expect(wrapper.text()).toContain('Log Out');
+    });
+
+    it('calls logOut and navigates to /login when Log Out is clicked', async () => {
+      const authStore = useAuthStore();
+      const logOutSpy = vi.spyOn(authStore, 'logOut');
+
+      mountComponent();
+
+      const links = wrapper.findAll('.p-panelmenu-header-link');
+      const logoutLink = links.find((link) => link.text().includes('Log Out'));
+      expect(logoutLink).toBeDefined();
+      await logoutLink!.trigger('click');
+
+      expect(logOutSpy).toHaveBeenCalled();
+      expect(mockPush).toHaveBeenCalledWith('/login');
     });
   });
 

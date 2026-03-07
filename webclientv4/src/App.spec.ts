@@ -37,21 +37,22 @@ describe('App', () => {
         stubs: {
           RouterView: { template: '<div class="router-view" />' },
           MenuSidebar: { template: '<div data-testid="menu-sidebar" />' },
+          Toast: { template: '<div />' },
         },
       },
     });
   }
 
-  it('shows the toolbar when logged in', () => {
+  it('shows the page header when logged in', () => {
     const wrapper = mountApp(true);
 
-    expect(wrapper.find('[data-testid="toolbar"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="page-header"]').exists()).toBe(true);
   });
 
-  it('hides the toolbar when not logged in', () => {
+  it('hides the page header when not logged in', () => {
     const wrapper = mountApp(false);
 
-    expect(wrapper.find('[data-testid="toolbar"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="page-header"]').exists()).toBe(false);
   });
 
   it('renders the menu sidebar when logged in', () => {

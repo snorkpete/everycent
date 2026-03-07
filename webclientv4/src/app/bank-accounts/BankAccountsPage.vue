@@ -1,8 +1,6 @@
 <template>
   <div class="bank-accounts-page">
-    <div v-if="store.error" class="error-message" data-testid="error-message">{{ store.error }}</div>
-
-    <div class="controls" data-testid="page-heading">
+    <div class="controls" data-testid="controls">
       <label class="toggle-label">
         <ToggleSwitch
           v-model="showClosed"
@@ -18,11 +16,20 @@
         v-for="account in visibleAccounts"
         :key="account.id"
         class="account-item"
+        :class="{ 'account-item--closed': account.status === 'closed' }"
       >
         <span class="account-name">{{ account.name }}</span>
+        <Tag
+          v-if="account.status === 'closed'"
+          value="Closed"
+          severity="secondary"
+          class="status-tag"
+          data-testid="closed-tag"
+        />
         <Button
           label="View"
           size="small"
+          class="view-btn"
           :data-testid="`view-btn-${account.id}`"
           @click="viewAccount(account)"
         />
@@ -48,14 +55,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
+import Tag from 'primevue/tag';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useBankAccountStore } from './bankAccountStore';
+import { useNotifications } from '../notifications/useNotifications';
 import BankAccountEditDialog from './BankAccountEditDialog.vue';
 import type { BankAccountData } from './bankAccount.types';
 
 const store = useBankAccountStore();
 const headingStore = useHeadingStore();
+const notifications = useNotifications();
 
 const showClosed = ref(false);
 const dialogVisible = ref(false);
@@ -93,19 +103,20 @@ function addAccount() {
 async function onSave(account: BankAccountData) {
   try {
     await store.save(account);
+    notifications.success('Bank account saved');
     dialogVisible.value = false;
   } catch {
-    // store.error is set by the store; dialog stays open so the user can retry
+    notifications.error(store.error ?? 'Failed to save bank account');
   }
 }
 </script>
 
 <style scoped>
 .bank-accounts-page {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .controls {
@@ -126,25 +137,41 @@ async function onSave(account: BankAccountData) {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .account-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--p-surface-200);
+  gap: 0.5rem;
+}
+
+.account-item:last-child {
+  border-bottom: none;
+}
+
+.account-item--closed {
+  background-color: var(--p-surface-50);
+}
+
+.account-item--closed .account-name {
+  color: var(--p-text-muted-color);
 }
 
 .account-name {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
-.error-message {
-  color: var(--p-red-600);
-  font-size: 0.875rem;
+.status-tag {
+  font-size: 0.75rem;
+}
+
+.view-btn {
+  margin-left: auto;
 }
 
 .page-actions {

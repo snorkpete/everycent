@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, reactive } from 'vue';
 import { mount } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
@@ -11,19 +11,28 @@ vi.mock('../toolbar/headingStore', () => ({
   useHeadingStore: () => ({ setHeading: mockSetHeading }),
 }));
 
+const mockNotifyError = vi.fn();
+const mockNotifySuccess = vi.fn();
+vi.mock('../notifications/useNotifications', () => ({
+  useNotifications: () => ({
+    error: mockNotifyError,
+    success: mockNotifySuccess,
+    info: vi.fn(),
+  }),
+}));
+
 const openAccount: BankAccountData = { id: 1, name: 'Savings Account', status: 'open' };
 const closedAccount: BankAccountData = { id: 2, name: 'Old Account', status: 'closed' };
 
-// Use plain values (not refs) — Pinia's auto-unwrapping doesn't apply to plain mocks
-const mockStore = {
-  bankAccounts: [openAccount, closedAccount],
-  institutions: [],
+const mockStore = reactive({
+  bankAccounts: [openAccount, closedAccount] as BankAccountData[],
+  institutions: [] as unknown[],
   loading: false,
   error: null as string | null,
   fetchAll: vi.fn().mockResolvedValue(undefined),
   fetchInstitutions: vi.fn().mockResolvedValue(undefined),
   save: vi.fn().mockResolvedValue(undefined),
-};
+});
 
 vi.mock('./bankAccountStore', () => ({
   useBankAccountStore: () => mockStore,
@@ -96,11 +105,50 @@ describe('BankAccountsPage', () => {
     it('shows closed accounts when the toggle is on', async () => {
       const wrapper = mountPage();
 
-      // ToggleSwitch renders a checkbox input; setValue triggers the v-model update
       const toggleInput = wrapper.find('[data-testid="show-closed-toggle"] input');
       await toggleInput.setValue(true);
 
       expect(wrapper.text()).toContain(closedAccount.name);
+    });
+  });
+
+  describe('closed account display', () => {
+    it('applies the closed class to closed account rows', async () => {
+      const wrapper = mountPage();
+      await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
+
+      const items = wrapper.findAll('.account-item');
+      const closedItem = items.find((item) => item.text().includes(closedAccount.name!));
+
+      expect(closedItem!.classes()).toContain('account-item--closed');
+    });
+
+    it('does not apply the closed class to open account rows', () => {
+      const wrapper = mountPage();
+
+      const items = wrapper.findAll('.account-item');
+      const openItem = items.find((item) => item.text().includes(openAccount.name!));
+
+      expect(openItem!.classes()).not.toContain('account-item--closed');
+    });
+
+    it('shows a Closed tag for closed accounts', async () => {
+      const wrapper = mountPage();
+      await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
+
+      const items = wrapper.findAll('.account-item');
+      const closedItem = items.find((item) => item.text().includes(closedAccount.name!));
+
+      expect(closedItem!.find('[data-testid="closed-tag"]').exists()).toBe(true);
+    });
+
+    it('does not show a Closed tag for open accounts', () => {
+      const wrapper = mountPage();
+
+      const items = wrapper.findAll('.account-item');
+      const openItem = items.find((item) => item.text().includes(openAccount.name!));
+
+      expect(openItem!.find('[data-testid="closed-tag"]').exists()).toBe(false);
     });
   });
 
@@ -171,7 +219,7 @@ describe('BankAccountsPage', () => {
       expect(mockStore.save).toHaveBeenCalledWith(openAccount);
     });
 
-    it('closes the dialog after a successful save', async () => {
+    it('closes the dialog and shows a success toast after a successful save', async () => {
       const wrapper = mountPage();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
@@ -180,10 +228,15 @@ describe('BankAccountsPage', () => {
       await nextTick();
 
       expect(dialog.props('visible')).toBe(false);
+      expect(mockNotifySuccess).toHaveBeenCalledWith('Bank account saved');
     });
 
-    it('keeps the dialog open when save fails', async () => {
-      mockStore.save.mockRejectedValue(new Error('Server error'));
+    it('keeps the dialog open and shows an error toast when save fails', async () => {
+      const errorMessage = 'Save failed';
+      mockStore.save.mockImplementation(async () => {
+        mockStore.error = errorMessage;
+        throw new Error('Server error');
+      });
       const wrapper = mountPage();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
@@ -192,23 +245,14 @@ describe('BankAccountsPage', () => {
       await nextTick();
 
       expect(dialog.props('visible')).toBe(true);
-    });
-  });
-
-  describe('error display', () => {
-    it('shows the error message when the store has an error', () => {
-      mockStore.error = 'Failed to load bank accounts';
-      const wrapper = mountPage();
-
-      expect(wrapper.find('[data-testid="error-message"]').text()).toBe(
-        'Failed to load bank accounts',
-      );
+      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
     });
 
-    it('does not show the error message when there is no error', () => {
-      const wrapper = mountPage();
+    it('does not show an error toast on a clean mount', async () => {
+      mountPage();
+      await nextTick();
 
-      expect(wrapper.find('[data-testid="error-message"]').exists()).toBe(false);
+      expect(mockNotifyError).not.toHaveBeenCalled();
     });
   });
 });
