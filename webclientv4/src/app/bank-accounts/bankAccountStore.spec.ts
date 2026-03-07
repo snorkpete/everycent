@@ -111,13 +111,37 @@ describe('bankAccountStore', () => {
       expect(bankAccountApi.create).not.toHaveBeenCalled();
     });
 
-    it('sets error message on save failure', async () => {
+    it('sets error message and re-throws on save failure', async () => {
       vi.mocked(bankAccountApi.update).mockRejectedValue(new Error('Server error'));
+
+      const store = useBankAccountStore();
+      await expect(store.save({ id: 5, name: 'Account' })).rejects.toThrow('Server error');
+
+      expect(store.error).toBe('Server error');
+    });
+
+    it('sets loading to true during save and false after', async () => {
+      let loadingDuringSave = false;
+      vi.mocked(bankAccountApi.update).mockImplementation(async () => {
+        loadingDuringSave = useBankAccountStore().loading;
+        return { id: 5 };
+      });
+      vi.mocked(bankAccountApi.getAll).mockResolvedValue([]);
 
       const store = useBankAccountStore();
       await store.save({ id: 5, name: 'Account' });
 
-      expect(store.error).toBe('Server error');
+      expect(loadingDuringSave).toBe(true);
+      expect(store.loading).toBe(false);
+    });
+
+    it('resets loading to false on save failure', async () => {
+      vi.mocked(bankAccountApi.update).mockRejectedValue(new Error('fail'));
+
+      const store = useBankAccountStore();
+      await store.save({ id: 5, name: 'Account' }).catch(() => {});
+
+      expect(store.loading).toBe(false);
     });
 
     it('refreshes bank accounts after save', async () => {

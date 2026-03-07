@@ -3,6 +3,7 @@ import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import PrimeVue from 'primevue/config';
 import EcListField from '../shared/form/list-field/EcListField.vue';
+import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import BankAccountEditDialog from './BankAccountEditDialog.vue';
 import type { BankAccountData, InstitutionData } from './bankAccount.types';
 
@@ -130,6 +131,22 @@ describe('BankAccountEditDialog', () => {
       expect(labels).toContain('Make Changes');
     });
 
+    it('resets form data to original values for an existing account', async () => {
+      const wrapper = mountDialog({ initialEditMode: true });
+
+      const nameField = wrapper.findAllComponents(EcTextField)[0];
+      await nameField.vm.$emit('update:modelValue', 'Modified Name');
+      await nextTick();
+
+      const cancelBtn = wrapper.findAll('button').find((b) => b.text() === 'Cancel')!;
+      await cancelBtn.trigger('click');
+      await nextTick();
+
+      // In view mode now — name renders as text
+      expect(wrapper.text()).toContain(existingAccount.name);
+      expect(wrapper.text()).not.toContain('Modified Name');
+    });
+
     it('closes the dialog for a new account (no id)', async () => {
       const wrapper = mountDialog({ bankAccount: { name: '' }, initialEditMode: true });
 
@@ -161,6 +178,19 @@ describe('BankAccountEditDialog', () => {
       const emitted = wrapper.emitted('save');
       expect(emitted).toBeTruthy();
       expect(emitted![0][0]).toMatchObject({ id: existingAccount.id, name: existingAccount.name });
+    });
+
+    it('converts statement_day and payment_due_day from strings to numbers for a credit card account', async () => {
+      const wrapper = mountDialog({ bankAccount: creditCardAccount, initialEditMode: true });
+
+      const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
+      await saveBtn.trigger('click');
+
+      const emitted = wrapper.emitted('save');
+      expect(emitted![0][0]).toMatchObject({
+        statement_day: creditCardAccount.statement_day,
+        payment_due_day: creditCardAccount.payment_due_day,
+      });
     });
   });
 

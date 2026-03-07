@@ -10,7 +10,7 @@
       <EcTextField v-model="formData.name" label="Name" :edit-mode="editMode" />
 
       <EcListField
-        :model-value="formData.account_type ?? null"
+        :model-value="formData.account_type"
         label="Account Features"
         :edit-mode="editMode"
         :items="accountFeatureTypes"
@@ -24,7 +24,7 @@
       />
 
       <EcListField
-        :model-value="formData.account_category ?? null"
+        :model-value="formData.account_category"
         label="Account Category"
         :edit-mode="editMode"
         :items="accountCategories"
@@ -32,7 +32,7 @@
       />
 
       <EcListField
-        :model-value="formData.is_cash ?? null"
+        :model-value="formData.is_cash"
         label="Is Cash Account?"
         :edit-mode="editMode"
         :items="yesNoList"
@@ -40,7 +40,7 @@
       />
 
       <EcListField
-        :model-value="formData.institution_id ?? null"
+        :model-value="formData.institution_id"
         label="Financial Institution"
         :edit-mode="editMode"
         :items="institutionItems"
@@ -52,7 +52,7 @@
       <EcMoneyField v-model="formData.opening_balance" label="Opening Balance" :edit-mode="editMode" />
 
       <EcListField
-        :model-value="formData.import_format ?? null"
+        :model-value="formData.import_format"
         label="Bank Account Import Format"
         :edit-mode="editMode"
         :items="importFormats"
@@ -60,7 +60,7 @@
       />
 
       <EcListField
-        :model-value="formData.status ?? null"
+        :model-value="formData.status"
         label="Status"
         :edit-mode="editMode"
         :items="statuses"

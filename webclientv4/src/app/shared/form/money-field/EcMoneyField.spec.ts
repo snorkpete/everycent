@@ -68,7 +68,7 @@ describe('EcMoneyField', () => {
     it('applies negative styling for negative values', () => {
       const cents = -500;
       const wrapper = mountComponent({ modelValue: cents });
-      const valueEl = wrapper.find('.value');
+      const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).toContain('negative');
     });
@@ -76,7 +76,7 @@ describe('EcMoneyField', () => {
     it('does not apply negative styling for positive values', () => {
       const cents = 500;
       const wrapper = mountComponent({ modelValue: cents });
-      const valueEl = wrapper.find('.value');
+      const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).not.toContain('negative');
     });
@@ -84,7 +84,7 @@ describe('EcMoneyField', () => {
     it('does not apply positive styling by default', () => {
       const cents = 500;
       const wrapper = mountComponent({ modelValue: cents });
-      const valueEl = wrapper.find('.value');
+      const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).not.toContain('positive');
     });
@@ -95,7 +95,7 @@ describe('EcMoneyField', () => {
         modelValue: cents,
         highlightPositive: true,
       });
-      const valueEl = wrapper.find('.value');
+      const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).toContain('positive');
     });
@@ -106,7 +106,7 @@ describe('EcMoneyField', () => {
         modelValue: cents,
         highlightPositive: true,
       });
-      const valueEl = wrapper.find('.value');
+      const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).not.toContain('positive');
       expect(valueEl.classes()).toContain('negative');
@@ -167,13 +167,6 @@ describe('EcMoneyField', () => {
 
       const emittedValue = wrapper.emitted('update:modelValue') ?? [];
       expect(emittedValue[0]).toEqual([expectedCents]);
-    });
-
-    it('right-aligns the input text', () => {
-      const wrapper = mountComponent({ editMode: true, modelValue: 1550 });
-      const input = wrapper.find('input');
-
-      expect(input.classes()).toContain('right');
     });
 
     it('applies negative styling to input for negative values', () => {

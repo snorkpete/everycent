@@ -72,7 +72,7 @@ async function login() {
 }
 
 .error {
-  color: red;
+  color: var(--p-red-600);
   margin-bottom: 1rem;
 }
 

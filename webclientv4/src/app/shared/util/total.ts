@@ -1,28 +1,27 @@
+export interface SummableItem {
+  deleted?: boolean;
+  deposit_amount?: number;
+  withdrawal_amount?: number;
+  [key: string]: unknown;
+}
 
-let total = (items: any[] = [], fieldToSum: string): number => {
-
+const total = (items: SummableItem[] = [], fieldToSum: string): number => {
   return items.reduce((sum, item) => {
-
-    // don't include deleted items
-    // ---------------------------
     if (item.deleted) {
       return sum;
     }
 
-    // handle 'net_amount' specially -
-    // net amount totaling is deposit - withdrawal
     if (fieldToSum === 'net_amount') {
-      return sum + (item.deposit_amount - item.withdrawal_amount);
+      return sum + ((item.deposit_amount ?? 0) - (item.withdrawal_amount ?? 0));
     }
 
-    // skip any items that don't have the property
-    if (!item[fieldToSum]) {
+    const value = item[fieldToSum];
+    if (!value || typeof value !== 'number') {
       return sum;
     }
 
-    return sum + item[fieldToSum];
-
+    return sum + value;
   }, 0);
 };
 
-export {total};
+export { total };

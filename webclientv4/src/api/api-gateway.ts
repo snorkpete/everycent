@@ -39,6 +39,17 @@ apiGateway.interceptors.request.use((config) => {
   return config;
 });
 
+export function handle401(error: unknown): Promise<never> {
+  const status = (error as { response?: { status?: number } }).response?.status;
+  if (status === 401 && window.location.hash !== '#/login') {
+    for (const key of AUTH_HEADER_KEYS) {
+      localStorage.removeItem(key);
+    }
+    window.location.replace('/#/login');
+  }
+  return Promise.reject(error);
+}
+
 apiGateway.interceptors.response.use(saveAuthHeaders);
 apiGateway.interceptors.response.use(
   (response) => {
@@ -47,7 +58,7 @@ apiGateway.interceptors.response.use(
   },
   (error) => {
     useLoadingIndicatorStore().finishRequest();
-    return Promise.reject(error);
+    return handle401(error);
   },
 );
 

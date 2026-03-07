@@ -55,6 +55,12 @@ describe('EcListField', () => {
       expect(wrapper.find('.value').text()).toBe('');
     });
 
+    it('displays an empty string when modelValue is undefined', () => {
+      const wrapper = mountComponent({ modelValue: undefined });
+
+      expect(wrapper.find('.value').text()).toBe('');
+    });
+
     it('does not display a Select component', () => {
       const wrapper = mountComponent();
 

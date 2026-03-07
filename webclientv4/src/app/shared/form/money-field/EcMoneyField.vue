@@ -4,52 +4,47 @@
       <label :for="inputId">{{ label }}</label>
       <InputText
         :id="inputId"
-        v-model="model"
+        v-model="displayValue"
         type="text"
         :class="['money-input', moneyDisplayClasses]"
       />
     </template>
     <template v-else>
       <span class="label">{{ label }}</span>
-      <span :class="['money-display', moneyDisplayClasses]">{{ model }}</span>
+      <span :class="['money-display', moneyDisplayClasses]">{{ displayValue }}</span>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import {computed, useId} from 'vue';
+import { computed, useId } from 'vue';
 import InputText from 'primevue/inputtext';
-import {dollarsToCents} from "../../util/dollars-to-cents.ts";
-import {centsToDollars} from "../../util/cents-to-dollars.ts";
+import { dollarsToCents } from '../../util/dollars-to-cents';
+import { centsToDollars } from '../../util/cents-to-dollars';
 
-const {label = '', modelValue = 0, highlightPositive = false}  = defineProps<{
-    modelValue: number;
-    label: string;
-    editMode: boolean;
-    type?: string;
-    highlightPositive?: boolean;
-  }>();
+const props = defineProps<{
+  label: string;
+  editMode: boolean;
+  highlightPositive?: boolean;
+}>();
 
-const model = defineModel( 'modelValue', {
-  get(valueInCents: number): string {
-    return centsToDollars(valueInCents);
+const model = defineModel<number>({ default: 0 });
+
+const displayValue = computed({
+  get: () => centsToDollars(model.value),
+  set: (v: string) => {
+    model.value = dollarsToCents(v);
   },
-  set(newValue: string): number {
-    return dollarsToCents(newValue);
-  }
 });
 
-const isPositive = computed(() =>   modelValue > 0);
+const isPositive = computed(() => model.value > 0);
 
 const moneyDisplayClasses = computed(() => ({
-  positive: highlightPositive && isPositive.value,
+  positive: props.highlightPositive && isPositive.value,
   negative: !isPositive.value,
-  right: true,
-  value: true
 }));
 
 const inputId = useId();
-
 </script>
 
 <style scoped>
@@ -69,8 +64,16 @@ const inputId = useId();
   color: rgba(0, 0, 0, 0.54);
 }
 
-.value {
+.money-display {
   font-size: 14px;
   text-align: right;
+}
+
+.negative {
+  color: var(--p-red-600);
+}
+
+.positive {
+  color: var(--p-green-600);
 }
 </style>

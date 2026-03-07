@@ -49,6 +49,9 @@ describe('BankAccountsPage', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
+    mockStore.bankAccounts = [openAccount, closedAccount];
+    mockStore.institutions = [];
+    mockStore.error = null;
     mockStore.fetchAll.mockResolvedValue(undefined);
     mockStore.fetchInstitutions.mockResolvedValue(undefined);
     mockStore.save.mockResolvedValue(undefined);
@@ -177,6 +180,35 @@ describe('BankAccountsPage', () => {
       await nextTick();
 
       expect(dialog.props('visible')).toBe(false);
+    });
+
+    it('keeps the dialog open when save fails', async () => {
+      mockStore.save.mockRejectedValue(new Error('Server error'));
+      const wrapper = mountPage();
+      await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
+
+      const dialog = wrapper.findComponent({ name: 'BankAccountEditDialog' });
+      await dialog.vm.$emit('save', openAccount);
+      await nextTick();
+
+      expect(dialog.props('visible')).toBe(true);
+    });
+  });
+
+  describe('error display', () => {
+    it('shows the error message when the store has an error', () => {
+      mockStore.error = 'Failed to load bank accounts';
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="error-message"]').text()).toBe(
+        'Failed to load bank accounts',
+      );
+    });
+
+    it('does not show the error message when there is no error', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="error-message"]').exists()).toBe(false);
     });
   });
 });

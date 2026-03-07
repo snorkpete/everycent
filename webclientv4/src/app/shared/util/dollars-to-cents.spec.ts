@@ -1,4 +1,5 @@
-import {dollarsToCents} from './dollars-to-cents';
+import { describe, it, expect } from 'vitest';
+import { dollarsToCents } from './dollars-to-cents';
 
 describe('#dollarsToCents', () => {
 
@@ -14,10 +15,12 @@ describe('#dollarsToCents', () => {
     expect(dollarsToCents('add')).toEqual(0);
   });
 
-  it('converts undefined and null to 0 cents', () => {
-    let notDefined;
-    expect(dollarsToCents(notDefined)).toEqual(0);
+  it('returns 0 for null', () => {
     expect(dollarsToCents(null)).toEqual(0);
+  });
+
+  it('returns 0 for undefined', () => {
+    expect(dollarsToCents(undefined)).toEqual(0);
   });
 
   it('rounds to the nearest cent', () => {

@@ -1,5 +1,7 @@
 <template>
   <div class="bank-accounts-page">
+    <div v-if="store.error" class="error-message" data-testid="error-message">{{ store.error }}</div>
+
     <div class="controls" data-testid="page-heading">
       <label class="toggle-label">
         <ToggleSwitch
@@ -89,8 +91,12 @@ function addAccount() {
 }
 
 async function onSave(account: BankAccountData) {
-  await store.save(account);
-  dialogVisible.value = false;
+  try {
+    await store.save(account);
+    dialogVisible.value = false;
+  } catch {
+    // store.error is set by the store; dialog stays open so the user can retry
+  }
 }
 </script>
 
@@ -134,6 +140,11 @@ async function onSave(account: BankAccountData) {
 
 .account-name {
   font-size: 1rem;
+}
+
+.error-message {
+  color: var(--p-red-600);
+  font-size: 0.875rem;
 }
 
 .page-actions {

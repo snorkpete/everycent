@@ -26,7 +26,7 @@ import Select from 'primevue/select';
 import type { ListItem, ListGroup } from './ec-list-field.types';
 
 const props = defineProps<{
-  modelValue: number | string | boolean | null;
+  modelValue: number | string | boolean | null | undefined;
   label: string;
   editMode: boolean;
   items: ListItem[];

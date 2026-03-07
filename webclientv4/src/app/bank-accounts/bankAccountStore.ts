@@ -30,6 +30,7 @@ export const useBankAccountStore = defineStore('bankAccounts', () => {
   }
 
   async function save(account: BankAccountData) {
+    loading.value = true;
     error.value = null;
     try {
       if (account.id) {
@@ -40,6 +41,9 @@ export const useBankAccountStore = defineStore('bankAccounts', () => {
       await fetchAll();
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to save bank account';
+      throw e;
+    } finally {
+      loading.value = false;
     }
   }
 
