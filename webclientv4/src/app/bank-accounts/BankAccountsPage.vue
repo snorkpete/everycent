@@ -22,7 +22,8 @@
         <Tag
           v-if="account.status === 'closed'"
           value="Closed"
-          severity="secondary"
+          severity="warn"
+          icon="pi pi-ban"
           class="status-tag"
           data-testid="closed-tag"
         />

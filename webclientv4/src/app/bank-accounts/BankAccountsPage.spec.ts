@@ -138,8 +138,11 @@ describe('BankAccountsPage', () => {
 
       const items = wrapper.findAll('.account-item');
       const closedItem = items.find((item) => item.text().includes(closedAccount.name!));
+      const tag = closedItem!.findComponent({ name: 'Tag' });
 
-      expect(closedItem!.find('[data-testid="closed-tag"]').exists()).toBe(true);
+      expect(tag.exists()).toBe(true);
+      expect(tag.props('severity')).toBe('warn');
+      expect(tag.props('icon')).toBe('pi pi-ban');
     });
 
     it('does not show a Closed tag for open accounts', () => {
