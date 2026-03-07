@@ -25,6 +25,11 @@ const router = createRouter({
       name: 'setup-allocation-categories',
       component: () => import('../app/allocation-categories/AllocationCategoriesPage.vue'),
     },
+    {
+      path: '/setup/institutions',
+      name: 'setup-institutions',
+      component: () => import('../app/institutions/InstitutionsPage.vue'),
+    },
   ],
 });
 

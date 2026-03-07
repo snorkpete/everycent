@@ -1,3 +1,7 @@
+import type { InstitutionData } from '../institutions/institution.types';
+
+export type { InstitutionData };
+
 export interface BankAccountData {
   id?: number;
   name?: string;
@@ -28,11 +32,6 @@ export interface BankAccountData {
   current_period_payment_due?: number;
   previous_period_payment_due?: number;
   institution?: InstitutionData;
-}
-
-export interface InstitutionData {
-  id?: number;
-  name?: string;
 }
 
 /**
