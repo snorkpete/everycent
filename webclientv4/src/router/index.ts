@@ -30,6 +30,11 @@ const router = createRouter({
       name: 'setup-institutions',
       component: () => import('../app/institutions/InstitutionsPage.vue'),
     },
+    {
+      path: '/setup/settings',
+      name: 'setup-settings',
+      component: () => import('../app/settings/SettingsPage.vue'),
+    },
   ],
 });
 

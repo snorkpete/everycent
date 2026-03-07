@@ -75,4 +75,15 @@ describe('router', () => {
 
     expect(router.currentRoute.value.name).toBe('setup-institutions');
   });
+
+  it('routes /setup/settings to setup-settings when authenticated', async () => {
+    localStorage.setItem('access-token', 'valid-token');
+    vi.mocked(authApi.validateToken).mockResolvedValue({
+      data: { success: true },
+    } as any);
+
+    await router.push('/setup/settings');
+
+    expect(router.currentRoute.value.name).toBe('setup-settings');
+  });
 });
