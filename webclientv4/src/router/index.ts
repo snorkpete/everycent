@@ -20,6 +20,11 @@ const router = createRouter({
       name: 'setup-bank-accounts',
       component: () => import('../app/bank-accounts/BankAccountsPage.vue'),
     },
+    {
+      path: '/setup/allocation-categories',
+      name: 'setup-allocation-categories',
+      component: () => import('../app/allocation-categories/AllocationCategoriesPage.vue'),
+    },
   ],
 });
 

@@ -53,4 +53,15 @@ describe('router', () => {
 
     expect(router.currentRoute.value.name).toBe('setup-bank-accounts');
   });
+
+  it('routes /setup/allocation-categories to setup-allocation-categories when authenticated', async () => {
+    localStorage.setItem('access-token', 'valid-token');
+    vi.mocked(authApi.validateToken).mockResolvedValue({
+      data: { success: true },
+    } as any);
+
+    await router.push('/setup/allocation-categories');
+
+    expect(router.currentRoute.value.name).toBe('setup-allocation-categories');
+  });
 });
