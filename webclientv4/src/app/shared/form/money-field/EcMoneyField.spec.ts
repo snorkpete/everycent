@@ -81,6 +81,14 @@ describe('EcMoneyField', () => {
       expect(valueEl.classes()).not.toContain('negative');
     });
 
+    it('does not apply negative styling for zero value', () => {
+      const cents = 0;
+      const wrapper = mountComponent({ modelValue: cents });
+      const valueEl = wrapper.find('.money-display');
+
+      expect(valueEl.classes()).not.toContain('negative');
+    });
+
     it('does not apply positive styling by default', () => {
       const cents = 500;
       const wrapper = mountComponent({ modelValue: cents });
@@ -165,8 +173,36 @@ describe('EcMoneyField', () => {
 
       await wrapper.find('input').setValue(dollarInput);
 
-      const emittedValue = wrapper.emitted('update:modelValue') ?? [];
-      expect(emittedValue[0]).toEqual([expectedCents]);
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expectedCents]);
+    });
+
+    it('selects all text when focused', async () => {
+      const cents = 1550;
+      const wrapper = mountComponent({ editMode: true, modelValue: cents });
+      const inputEl = wrapper.find('input').element as HTMLInputElement;
+
+      await wrapper.find('input').trigger('focus');
+
+      expect(inputEl.selectionStart).toBe(0);
+      expect(inputEl.selectionEnd).toBe(inputEl.value.length);
+    });
+
+    it('reformats the display value after the user commits a partial amount', async () => {
+      const wrapper = mountComponent({ editMode: true, modelValue: 0 });
+      const partialInput = '15.5';
+      const expectedDisplay = '15.50';
+
+      await wrapper.find('input').setValue(partialInput);
+
+      expect(wrapper.find('input').element.value).toBe(expectedDisplay);
+    });
+
+    it('does not apply negative styling for zero value', () => {
+      const cents = 0;
+      const wrapper = mountComponent({ editMode: true, modelValue: cents });
+      const input = wrapper.find('.money-input');
+
+      expect(input.classes()).not.toContain('negative');
     });
 
     it('applies negative styling to input for negative values', () => {

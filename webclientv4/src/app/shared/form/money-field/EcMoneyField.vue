@@ -2,11 +2,21 @@
   <div class="ec-money-field">
     <template v-if="editMode">
       <label :for="inputId">{{ label }}</label>
-      <InputText
+      <!--
+        Native <input> is used instead of PrimeVue's InputText component intentionally.
+        We rely on native @focus (select-all) and @change (parse/format on commit) events.
+        PrimeVue components only guarantee their own 'update:modelValue' custom event, which
+        fires on every keystroke — that would reformat the value mid-type. Native DOM events
+        like 'change' are not reliably forwarded through the PrimeVue component layer.
+        The p-inputtext class replicates the visual styling InputText would normally apply.
+      -->
+      <input
         :id="inputId"
-        v-model="displayValue"
+        :value="displayValue"
         type="text"
-        :class="['money-input', moneyDisplayClasses]"
+        :class="['p-inputtext', 'money-input', moneyDisplayClasses]"
+        @focus="onFocus"
+        @change="onInputChange"
       />
     </template>
     <template v-else>
@@ -18,7 +28,6 @@
 
 <script setup lang="ts">
 import { computed, useId } from 'vue';
-import InputText from 'primevue/inputtext';
 import { dollarsToCents } from '../../util/dollars-to-cents';
 import { centsToDollars } from '../../util/cents-to-dollars';
 
@@ -41,10 +50,18 @@ const isPositive = computed(() => model.value > 0);
 
 const moneyDisplayClasses = computed(() => ({
   positive: props.highlightPositive && isPositive.value,
-  negative: !isPositive.value,
+  negative: model.value < 0,
 }));
 
 const inputId = useId();
+
+function onFocus(event: Event) {
+  (event.target as HTMLInputElement).select();
+}
+
+function onInputChange(event: Event) {
+  displayValue.value = (event.target as HTMLInputElement).value;
+}
 </script>
 
 <style scoped>
