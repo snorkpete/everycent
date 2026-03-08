@@ -13,7 +13,10 @@
     "format": "prettier --write \"src/**/*.{ts,vue,css}\" \"*.{ts,js,json}\"",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "cypress:seed-db": "tsx cypress/scripts/seed-cypress-db.ts"
+    "cypress:seed-db": "tsx cypress/scripts/seed-cypress-db.ts",
+    "cypress:seed-dev-db": "tsx cypress/scripts/seed-dev-db.ts",
+    "cypress:run:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress run",
+    "cypress:open:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress open"
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",

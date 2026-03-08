@@ -31,7 +31,7 @@ describe('Institutions', () => {
     cy.get('.p-dialog').should('be.visible');
 
     cy.contains('.p-dialog label', 'Name').invoke('attr', 'for').then((id) => {
-      cy.get(`#${id}`).clear().type('Republic Bank');
+      cy.get(`#${id}`).type('Republic Bank');
     });
 
     cy.get('[data-testid="save-btn"]').click();

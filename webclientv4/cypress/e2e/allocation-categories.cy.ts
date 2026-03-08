@@ -31,7 +31,7 @@ describe('Allocation Categories', () => {
     cy.get('.p-dialog').should('be.visible');
 
     cy.contains('.p-dialog label', 'Name').invoke('attr', 'for').then((id) => {
-      cy.get(`#${id}`).clear().type('Transport');
+      cy.get(`#${id}`).type('Transport');
     });
 
     cy.get('[data-testid="save-btn"]').click();

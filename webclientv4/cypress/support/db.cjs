@@ -2,8 +2,11 @@ const { Pool } = require('pg');
 
 const HOUSEHOLD_NAME = 'Cypress Test Household';
 
+// Support both separate cypress DB and shared dev DB via env var
+const DATABASE_NAME = process.env.CYPRESS_DATABASE_NAME || 'everycent_cypress';
+
 const pool = new Pool({
-  database: 'everycent_cypress',
+  database: DATABASE_NAME,
   host: 'localhost',
   port: 5432,
 });
@@ -27,8 +30,9 @@ async function getHouseholdId() {
     [HOUSEHOLD_NAME],
   );
   if (rows.length === 0) {
+    const seedScript = process.env.CYPRESS_DATABASE_NAME ? 'cypress:seed-dev-db' : 'cypress:seed-db';
     throw new Error(
-      `Test household "${HOUSEHOLD_NAME}" not found. Run: npm run cypress:seed-db`,
+      `Test household "${HOUSEHOLD_NAME}" not found. Run: npm run ${seedScript}`,
     );
   }
   return rows[0].id;
@@ -39,9 +43,14 @@ const dbTasks = {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(
-        `TRUNCATE ${DATA_TABLES.join(', ')} RESTART IDENTITY CASCADE`,
-      );
+      const householdId = await getHouseholdId();
+      // Delete data for the test household only (safe for shared databases)
+      for (const table of DATA_TABLES) {
+        await client.query(
+          `DELETE FROM ${table} WHERE household_id = $1`,
+          [householdId],
+        );
+      }
       await client.query('COMMIT');
     } catch (err) {
       await client.query('ROLLBACK');

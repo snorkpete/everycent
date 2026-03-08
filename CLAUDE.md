@@ -93,3 +93,6 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 ## Migration Context
 There is a planned migration from Angular 14 to Vue 3 + Vite + PrimeVue 4 + Pinia.
 See `MIGRATION_PLAN.md` for details. New frontend will live in `webclientv4/`.
+
+## Cypress E2E Tests
+See `webclientv4/cypress/CLAUDE.md` for E2E test rules (typing into PrimeVue inputs, DB setup).

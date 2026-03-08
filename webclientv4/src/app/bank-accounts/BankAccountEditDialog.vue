@@ -87,12 +87,12 @@
     <template #footer>
       <div class="dialog-footer">
         <template v-if="editMode">
-          <Button label="Save" @click="saveChanges" />
-          <Button label="Cancel" severity="secondary" @click="cancel" />
+          <Button label="Save" data-testid="save-btn" @click="saveChanges" />
+          <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="cancel" />
         </template>
         <template v-else>
-          <Button label="Make Changes" @click="editMode = true" />
-          <Button label="Close" severity="secondary" @click="close" />
+          <Button label="Make Changes" data-testid="edit-btn" @click="editMode = true" />
+          <Button label="Close" severity="secondary" data-testid="close-btn" @click="close" />
         </template>
       </div>
     </template>

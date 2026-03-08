@@ -56,7 +56,7 @@ describe('Bank Accounts', () => {
 
     // Find the Name field by its label to avoid positional fragility
     cy.contains('.p-dialog label', 'Name').invoke('attr', 'for').then((id) => {
-      cy.get(`#${id}`).clear().type('New Checking');
+      cy.get(`#${id}`).type('New Checking');
     });
 
     cy.get('[data-testid="save-btn"]').click();
