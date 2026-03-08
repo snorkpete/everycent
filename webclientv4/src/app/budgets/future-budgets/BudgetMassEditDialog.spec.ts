@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetMassEditDialog from './BudgetMassEditDialog.vue';
 import type { FutureBudgetData } from './futureBudgets.types';
+import { centsToDollars } from '../../shared/util/cents-to-dollars';
 
 const makeBudget = (overrides: Partial<FutureBudgetData> = {}): FutureBudgetData => ({
   id: 1,
@@ -224,6 +225,55 @@ describe('BudgetMassEditDialog', () => {
 
       expect(wrapper.text()).toContain('Jan 2025');
       expect(wrapper.text()).toContain('Feb 2025');
+    });
+  });
+
+  describe('dynamic totaling', () => {
+    it('updates Discretionary Amount live when the amount input changes', async () => {
+      const income = 200000;
+      const rentAllocation = 50000;
+      const initialFoodAllocation = 30000;
+      const updatedFoodAllocation = 40000;
+
+      const budget = makeBudget({
+        id: 1,
+        incomes: [{ id: 1, name: 'Salary', amount: income, budget_id: 1, bank_account_id: 1 }],
+        allocations: [
+          { id: 1, name: 'Rent', amount: rentAllocation, budget_id: 1, allocation_category_id: 1 },
+          {
+            id: 2,
+            name: 'Food',
+            amount: initialFoodAllocation,
+            budget_id: 1,
+            allocation_category_id: 1,
+          },
+        ],
+      });
+
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Food',
+        budgets: [budget],
+        amountsPerBudget: { 1: { id: 2, amount: initialFoodAllocation } },
+      });
+
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const discretionaryCell = wrapper.find('[data-testid="discretionary-display-0"]');
+      // Initial: income - rent - initialFood = 200000 - 50000 - 30000 = 120000 → $1,200.00
+      const initialDiscretionary = income - rentAllocation - initialFoodAllocation;
+      expect(discretionaryCell.text()).toContain(centsToDollars(initialDiscretionary));
+
+      const amountInput = wrapper.find('[data-testid="amount-input-0"] input');
+      await amountInput.setValue('400.00');
+      await amountInput.trigger('change');
+      await nextTick();
+
+      // After: income - rent - updatedFood = 200000 - 50000 - 40000 = 110000 → $1,100.00
+      const updatedDiscretionary = income - rentAllocation - updatedFoodAllocation;
+      expect(discretionaryCell.text()).toContain(centsToDollars(updatedDiscretionary));
     });
   });
 });

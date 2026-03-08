@@ -54,7 +54,11 @@
             </tr>
             <tr class="info-row">
               <td class="info-label">Discretionary Amount</td>
-              <td v-for="(row, i) in amounts" :key="i">
+              <td
+                v-for="(row, i) in amounts"
+                :key="i"
+                :data-testid="`discretionary-display-${i}`"
+              >
                 <EcMoneyField
                   :model-value="
                     row.budgetIncome - row.totalAllocationsWithoutCurrent - row.amount
@@ -192,11 +196,15 @@ function saveChanges() {
 }
 
 .name-col {
-  min-width: 10rem;
+  min-width: 14rem;
 }
 
 .amount-col {
-  min-width: 8rem;
+  min-width: 6rem;
+}
+
+th.amount-col {
+  text-align: right;
 }
 
 .name-input {
