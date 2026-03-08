@@ -35,6 +35,11 @@ const router = createRouter({
       name: 'setup-settings',
       component: () => import('../app/settings/SettingsPage.vue'),
     },
+    {
+      path: '/budgets/future',
+      name: 'future-budgets',
+      component: () => import('../app/budgets/future-budgets/FutureBudgetsPage.vue'),
+    },
   ],
 });
 

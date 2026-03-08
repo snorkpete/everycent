@@ -5,7 +5,7 @@ const mainItems: MenuItem[] = [
   { label: 'Home', icon: Icon.HOME, url: '/v4/#/' },
   { label: '* Current Budget', icon: Icon.BUDGETS_CURRENT, url: '/#/budgets/current' },
   { label: '* Budgets', icon: Icon.BUDGETS, url: '/#/budgets' },
-  { label: '* Future Budgets', icon: Icon.BUDGETS_FUTURE, url: '/#/budgets/future' },
+  { label: 'Future Budgets', icon: Icon.BUDGETS_FUTURE, url: '/v4/#/budgets/future' },
   { label: '* Transactions', icon: Icon.TRANSACTIONS, url: '/#/transactions' },
   { label: '* Sink Funds', icon: Icon.SINK_FUND, url: '/#/sink-funds' },
   { label: '* Account Balances', icon: Icon.ACCOUNT_BALANCES, url: '/#/account-balances' },
