@@ -3,22 +3,22 @@ import { Icon } from './menuIcons';
 
 const mainItems: MenuItem[] = [
   { label: 'Home', icon: Icon.HOME, url: '/v4/#/' },
-  { label: 'Current Budget', icon: Icon.BUDGETS_CURRENT, url: '/#/budgets/current' },
-  { label: 'Budgets', icon: Icon.BUDGETS, url: '/#/budgets' },
-  { label: 'Future Budgets', icon: Icon.BUDGETS_FUTURE, url: '/#/budgets/future' },
-  { label: 'Transactions', icon: Icon.TRANSACTIONS, url: '/#/transactions' },
-  { label: 'Sink Funds', icon: Icon.SINK_FUND, url: '/#/sink-funds' },
-  { label: 'Account Balances', icon: Icon.ACCOUNT_BALANCES, url: '/#/account-balances' },
-  { label: 'Special Events', icon: Icon.SPECIAL_EVENTS, url: '/#/special-events' },
+  { label: '* Current Budget', icon: Icon.BUDGETS_CURRENT, url: '/#/budgets/current' },
+  { label: '* Budgets', icon: Icon.BUDGETS, url: '/#/budgets' },
+  { label: '* Future Budgets', icon: Icon.BUDGETS_FUTURE, url: '/#/budgets/future' },
+  { label: '* Transactions', icon: Icon.TRANSACTIONS, url: '/#/transactions' },
+  { label: '* Sink Funds', icon: Icon.SINK_FUND, url: '/#/sink-funds' },
+  { label: '* Account Balances', icon: Icon.ACCOUNT_BALANCES, url: '/#/account-balances' },
+  { label: '* Special Events', icon: Icon.SPECIAL_EVENTS, url: '/#/special-events' },
 ];
 
 const reportsSection: MenuItem = {
-  label: 'Reports',
+  label: '* Reports',
   icon: Icon.REPORTING,
   items: [
-    { label: 'Net Worth Report', icon: Icon.NET_WORTH, url: '/#/reports/net-worth' },
-    { label: 'Category Spending Report', icon: Icon.CATEGORY_SPENDING, url: '/#/reports/category-spending' },
-    { label: 'Needs vs Wants Report', icon: Icon.NEEDS_VS_WANTS, url: '/#/reports/needs-vs-wants' },
+    { label: '* Net Worth Report', icon: Icon.NET_WORTH, url: '/#/reports/net-worth' },
+    { label: '* Category Spending Report', icon: Icon.CATEGORY_SPENDING, url: '/#/reports/category-spending' },
+    { label: '* Needs vs Wants Report', icon: Icon.NEEDS_VS_WANTS, url: '/#/reports/needs-vs-wants' },
   ],
 };
 
