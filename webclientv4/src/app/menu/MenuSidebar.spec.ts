@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils';
-import { ref, nextTick } from 'vue';
+import { ref, reactive, nextTick } from 'vue';
 import { createPinia, setActivePinia } from 'pinia';
 import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
@@ -9,8 +9,10 @@ import MenuSidebar from './MenuSidebar.vue';
 import { useAuthStore } from '../../auth/authStore';
 
 const mockPush = vi.fn();
+const mockRoute = reactive({ path: '/' });
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
+  useRoute: () => mockRoute,
 }));
 
 vi.mock('../../auth/authApi', () => ({
@@ -37,6 +39,7 @@ describe('MenuSidebar', () => {
     pinia = createPinia();
     setActivePinia(pinia);
     mockPush.mockReset();
+    mockRoute.path = '/';
   });
 
   afterEach(() => {
@@ -49,6 +52,7 @@ describe('MenuSidebar', () => {
       attachTo: document.body,
       global: {
         plugins: [pinia, [PrimeVue, { theme: { preset: Aura } }]],
+        stubs: { RouterLink: { template: '<a><slot /></a>' } },
       },
     });
     return wrapper;
@@ -100,6 +104,43 @@ describe('MenuSidebar', () => {
 
       expect(logOutSpy).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith('/login');
+    });
+  });
+
+  describe('active menu and auto-expand', () => {
+    beforeEach(() => {
+      isDesktop.value = true;
+    });
+
+    function setupHeader() {
+      const headers = wrapper.findAll('.p-panelmenu-header');
+      return headers.find((h) => h.text().includes('Setup'));
+    }
+
+    it('auto-expands the Setup section when mounted on a setup route', () => {
+      mockRoute.path = '/setup/institutions';
+      mountComponent();
+
+      expect(setupHeader()!.attributes('aria-expanded')).toBe('true');
+    });
+
+    it('does not auto-expand Setup when mounted on a non-setup route', () => {
+      mockRoute.path = '/';
+      mountComponent();
+
+      // PrimeVue omits aria-expanded entirely when the panel is collapsed (undefined = not expanded)
+      expect(setupHeader()!.attributes('aria-expanded')).toBeUndefined();
+    });
+
+    it('expands the Setup section when navigating to a setup route', async () => {
+      mockRoute.path = '/';
+      mountComponent();
+      expect(setupHeader()!.attributes('aria-expanded')).toBeUndefined(); // collapsed = attribute absent
+
+      mockRoute.path = '/setup/bank-accounts';
+      await nextTick();
+
+      expect(setupHeader()!.attributes('aria-expanded')).toBe('true');
     });
   });
 

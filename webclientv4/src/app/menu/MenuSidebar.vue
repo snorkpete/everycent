@@ -1,7 +1,7 @@
 <template>
   <aside v-if="isDesktop" class="desktop-sidebar" data-testid="desktop-sidebar">
     <div class="brand">EveryCent</div>
-    <PanelMenu :model="menuItems" />
+    <PanelMenu :model="activeMenuItems" v-model:expandedKeys="expandedKeys" />
   </aside>
 
   <template v-else>
@@ -14,26 +14,28 @@
       @click="drawerVisible = true"
     />
     <Drawer v-model:visible="drawerVisible" data-testid="mobile-drawer">
-      <PanelMenu :model="menuItems" />
+      <PanelMenu :model="activeMenuItems" v-model:expandedKeys="expandedKeys" />
     </Drawer>
   </template>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useBreakpoints, breakpointsPrimeFlex } from '@vueuse/core';
 import PanelMenu from 'primevue/panelmenu';
 import Button from 'primevue/button';
 import Drawer from 'primevue/drawer';
 import { useAuthStore } from '../../auth/authStore';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { buildMenuItems } from './menuItems';
+import type { AppMenuItem } from './menuItems';
 
 const breakpoints = useBreakpoints(breakpointsPrimeFlex);
 const isDesktop = breakpoints.greaterOrEqual('lg');
 
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const drawerVisible = ref(false);
 
 watch(isDesktop, (desktop) => {
@@ -47,7 +49,45 @@ function logout() {
   router.push('/login');
 }
 
-const menuItems = buildMenuItems(logout);
+const menuItems = buildMenuItems(logout, (path) => router.push(path));
+
+// PanelMenu uses different props for active class depending on item depth:
+//   depth 0 (top-level panel headers) → headerClass → targets .p-panelmenu-header
+//   depth 1+ (sub-items rendered by PanelMenuList) → class → targets .p-panelmenu-item
+function applyActiveClass(items: AppMenuItem[], currentPath: string, depth = 0): AppMenuItem[] {
+  return items.map((item) => {
+    if (item.separator) return item;
+    if (item.items) {
+      return { ...item, items: applyActiveClass(item.items, currentPath, depth + 1) };
+    }
+    if (!item.routePath || item.routePath !== currentPath) return item;
+    return depth === 0 ? { ...item, headerClass: 'ec-active' } : { ...item, class: 'ec-active' };
+  });
+}
+
+const activeMenuItems = computed(() => applyActiveClass(menuItems, route.path));
+
+function activeExpandedKeys(currentPath: string): Record<string, boolean> {
+  const keys: Record<string, boolean> = {};
+  for (const item of menuItems) {
+    if (item.key && item.items) {
+      if (item.items.some((child: AppMenuItem) => child.routePath === currentPath)) {
+        keys[item.key] = true;
+      }
+    }
+  }
+  return keys;
+}
+
+const expandedKeys = ref<Record<string, boolean>>(activeExpandedKeys(route.path));
+
+watch(
+  () => route.path,
+  (newPath) => {
+    // Merge rather than replace so manually-expanded groups remain open
+    expandedKeys.value = { ...expandedKeys.value, ...activeExpandedKeys(newPath) };
+  },
+);
 </script>
 
 <style scoped>
@@ -119,9 +159,10 @@ const menuItems = buildMenuItems(logout);
   color: #e2e8f0;
 }
 
-/* Active route */
-:deep(.p-panelmenu-header-link.router-link-exact-active),
-:deep(.p-panelmenu-item-link.router-link-exact-active) {
+/* Active route — top-level leaf items; headerClass lands on .p-panelmenu-header */
+:deep(.p-panelmenu-header.ec-active .p-panelmenu-header-link),
+/* Active route — sub-items; class lands on .p-panelmenu-item (li) */
+:deep(.p-panelmenu-item.ec-active .p-panelmenu-item-link) {
   background: rgba(20, 184, 166, 0.15);
   color: #2dd4bf;
 }
