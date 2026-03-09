@@ -187,14 +187,65 @@ describe('EcMoneyField', () => {
       expect(inputEl.selectionEnd).toBe(inputEl.value.length);
     });
 
-    it('reformats the display value after the user commits a partial amount', async () => {
+    it('reformats the display via the watcher when input is committed without a prior focus', async () => {
       const wrapper = mountComponent({ editMode: true, modelValue: 0 });
-      const partialInput = '15.5';
-      const expectedDisplay = '15.50';
 
-      await wrapper.find('input').setValue(partialInput);
+      await wrapper.find('input').setValue('15.5');
 
-      expect(wrapper.find('input').element.value).toBe(expectedDisplay);
+      expect(wrapper.find('input').element.value).toBe('15.50');
+    });
+
+    it('updates the model value immediately on input', async () => {
+      const wrapper = mountComponent({ editMode: true, modelValue: 0 });
+      const input = wrapper.find('input');
+
+      await input.trigger('focus');
+      input.element.value = '1500';
+      await input.trigger('input');
+
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([150000]);
+    });
+
+    it('does not reformat the display when the model is updated externally while focused', async () => {
+      const wrapper = mountComponent({ editMode: true, modelValue: 0 });
+      const input = wrapper.find('input');
+
+      await input.trigger('focus');
+      input.element.value = '1500';
+      await input.trigger('input');
+
+      await wrapper.setProps({ modelValue: 99999 });
+
+      expect(input.element.value).toBe('1500');
+    });
+
+    it('resumes accepting external model updates after the user blurs', async () => {
+      const wrapper = mountComponent({ editMode: true, modelValue: 0 });
+      const input = wrapper.find('input');
+
+      await input.trigger('focus');
+      input.element.value = '1500';
+      await input.trigger('input');
+      await input.trigger('blur');
+
+      await wrapper.setProps({ modelValue: 50000 });
+
+      expect(input.element.value).toBe('500.00');
+    });
+
+    it('reformats the display value on blur', async () => {
+      const wrapper = mountComponent({ editMode: true, modelValue: 0 });
+      const input = wrapper.find('input');
+
+      await input.trigger('focus');
+      input.element.value = '15.5';
+      await input.trigger('input');
+
+      expect(input.element.value).toBe('15.5');
+
+      await input.trigger('blur');
+
+      expect(input.element.value).toBe('15.50');
     });
 
     it('does not apply negative styling for zero value', () => {

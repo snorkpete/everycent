@@ -4,30 +4,37 @@
       <label :for="inputId">{{ label }}</label>
       <!--
         Native <input> is used instead of PrimeVue's InputText component intentionally.
-        We rely on native @focus (select-all) and @change (parse/format on commit) events.
-        PrimeVue components only guarantee their own 'update:modelValue' custom event, which
-        fires on every keystroke — that would reformat the value mid-type. Native DOM events
-        like 'change' are not reliably forwarded through the PrimeVue component layer.
-        The p-inputtext class replicates the visual styling InputText would normally apply.
+        We rely on native @focus (select-all), @input (live model update), and @blur
+        (display reformat) — events that are not reliably forwarded through the PrimeVue
+        component layer. The p-inputtext class replicates InputText's visual styling.
+
+        Pattern (mirrors the Angular implementation):
+        - @input: parse raw text → update model value immediately, leave display alone
+        - @blur:  reformat displayText ref → Vue re-renders input with formatted value
+
+        displayText is a plain ref, not a computed. It only changes on blur or when the
+        model is updated externally (while the input is not focused). This prevents Vue
+        from overwriting the user's raw typed text on every keystroke.
       -->
       <input
         :id="inputId"
-        :value="displayValue"
+        :value="displayText"
         type="text"
         :class="['p-inputtext', 'money-input', moneyDisplayClasses]"
         @focus="onFocus"
-        @change="onInputChange"
+        @input="onInput"
+        @blur="onBlur"
       />
     </template>
     <template v-else>
       <span class="label">{{ label }}</span>
-      <span :class="['money-display', moneyDisplayClasses]">{{ displayValue }}</span>
+      <span :class="['money-display', moneyDisplayClasses]">{{ formattedValue }}</span>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, useId } from 'vue';
+import { ref, computed, watch, useId } from 'vue';
 import { dollarsToCents } from '../../util/dollars-to-cents';
 import { centsToDollars } from '../../util/cents-to-dollars';
 
@@ -39,12 +46,18 @@ const props = defineProps<{
 
 const model = defineModel<number>({ default: 0 });
 
-const displayValue = computed({
-  get: () => centsToDollars(model.value),
-  set: (v: string) => {
-    model.value = dollarsToCents(v);
-  },
+// Separate display state from model state so Vue doesn't overwrite the user's
+// raw input during typing. Updated only on blur or on external model changes.
+const displayText = ref(centsToDollars(model.value));
+const isEditing = ref(false);
+
+watch(model, (newVal) => {
+  if (!isEditing.value) {
+    displayText.value = centsToDollars(newVal);
+  }
 });
+
+const formattedValue = computed(() => centsToDollars(model.value));
 
 const isPositive = computed(() => model.value > 0);
 
@@ -56,11 +69,19 @@ const moneyDisplayClasses = computed(() => ({
 const inputId = useId();
 
 function onFocus(event: Event) {
+  isEditing.value = true;
   (event.target as HTMLInputElement).select();
 }
 
-function onInputChange(event: Event) {
-  displayValue.value = (event.target as HTMLInputElement).value;
+function onInput(event: Event) {
+  const raw = (event.target as HTMLInputElement).value;
+  displayText.value = raw; // keep bound value in sync with DOM so Vue doesn't overwrite it
+  model.value = dollarsToCents(raw);
+}
+
+function onBlur() {
+  isEditing.value = false;
+  displayText.value = centsToDollars(model.value);
 }
 </script>
 
