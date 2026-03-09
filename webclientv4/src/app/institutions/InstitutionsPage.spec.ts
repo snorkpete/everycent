@@ -57,6 +57,7 @@ describe('InstitutionsPage', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     mockStore.institutions = [institution1, institution2];
+    mockStore.loading = false;
     mockStore.error = null;
     mockStore.fetchAll.mockResolvedValue(undefined);
     mockStore.save.mockResolvedValue(undefined);
@@ -143,6 +144,22 @@ describe('InstitutionsPage', () => {
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
 
       expect(mockStore.fetchAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
+    });
+
+    it('is disabled while the store is loading', () => {
+      mockStore.loading = true;
+      const wrapper = mountPage();
+
+      const refreshBtn = wrapper.find('[data-testid="refresh-btn"]');
+      expect(refreshBtn.attributes('disabled')).toBeDefined();
+    });
+
+    it('is enabled when the store is not loading', () => {
+      mockStore.loading = false;
+      const wrapper = mountPage();
+
+      const refreshBtn = wrapper.find('[data-testid="refresh-btn"]');
+      expect(refreshBtn.attributes('disabled')).toBeUndefined();
     });
   });
 

@@ -19,7 +19,7 @@
 
     <div class="page-actions">
       <Button label="Add Institution" data-testid="add-btn" @click="addInstitution" />
-      <Button label="Refresh" severity="secondary" data-testid="refresh-btn" @click="refresh" />
+      <Button label="Refresh" severity="secondary" data-testid="refresh-btn" :loading="store.loading" @click="refresh" />
     </div>
 
     <InstitutionEditDialog
