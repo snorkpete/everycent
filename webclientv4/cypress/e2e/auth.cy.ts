@@ -14,11 +14,11 @@ describe('Authentication', () => {
 
   it('logs in with valid credentials and redirects to home', () => {
     cy.visit(loginPath);
-    cy.get('[data-testid="email-input"]').type(Cypress.env('testUser').email);
-    // PrimeVue Password wraps the real <input> — target the descendant input directly
-    cy.get('[data-testid="password-input"] input').type(
-      Cypress.env('testUser').password,
-    );
+    cy.env(['testUser']).then(({ testUser }) => {
+      cy.get('[data-testid="email-input"]').type(testUser.email);
+      // PrimeVue Password wraps the real <input> — target the descendant input directly
+      cy.get('[data-testid="password-input"] input').type(testUser.password);
+    });
     cy.get('[data-testid="login-button"]').click();
     cy.url().should('include', homePath).and('not.include', 'login');
     cy.get('[data-testid="welcome-heading"]').should('be.visible');
