@@ -5,6 +5,7 @@ import ToastService from 'primevue/toastservice';
 import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 import 'primeicons/primeicons.css';
+import './style.css';
 import router from './router';
 import App from './App.vue';
 

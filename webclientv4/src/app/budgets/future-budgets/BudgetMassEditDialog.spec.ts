@@ -50,16 +50,16 @@ describe('BudgetMassEditDialog', () => {
   });
 
   describe('dialog title', () => {
-    it('shows "Mass Edit Income" for income type', () => {
-      const wrapper = mountDialog({ type: 'income' });
+    it('shows the income/allocation name as the dialog title', () => {
+      const wrapper = mountDialog({ type: 'income', name: 'Salary' });
       const dialog = wrapper.findComponent({ name: 'Dialog' });
-      expect(dialog.props('header')).toBe('Mass Edit Income');
+      expect(dialog.props('header')).toBe('Salary');
     });
 
-    it('shows "Mass Edit Allocation" for allocation type', () => {
-      const wrapper = mountDialog({ type: 'allocation' });
+    it('shows the allocation name for allocation type', () => {
+      const wrapper = mountDialog({ type: 'allocation', name: 'Groceries' });
       const dialog = wrapper.findComponent({ name: 'Dialog' });
-      expect(dialog.props('header')).toBe('Mass Edit Allocation');
+      expect(dialog.props('header')).toBe('Groceries');
     });
   });
 
@@ -125,15 +125,15 @@ describe('BudgetMassEditDialog', () => {
       const wrapper = mountDialog({ type: 'income' });
 
       expect(wrapper.text()).not.toContain('Total Income');
-      expect(wrapper.text()).not.toContain('Other Allocations');
+      expect(wrapper.text()).not.toContain('Already Allocated');
       expect(wrapper.text()).not.toContain('Discretionary Amount');
     });
 
-    it('shows Total Income, Other Allocations, and Discretionary Amount for allocation type', () => {
+    it('shows Total Income, Already Allocated, and Discretionary Amount for allocation type', () => {
       const wrapper = mountDialog({ type: 'allocation' });
 
       expect(wrapper.text()).toContain('Total Income');
-      expect(wrapper.text()).toContain('Other Allocations');
+      expect(wrapper.text()).toContain('Already Allocated');
       expect(wrapper.text()).toContain('Discretionary Amount');
     });
   });

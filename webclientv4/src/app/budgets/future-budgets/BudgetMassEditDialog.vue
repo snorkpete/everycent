@@ -3,29 +3,30 @@
     :visible="visible"
     :header="dialogTitle"
     modal
-    :style="{ width: '56rem', maxWidth: '95vw' }"
+    :style="{ width: '72rem', maxWidth: '95vw' }"
     @update:visible="$emit('update:visible', $event)"
   >
     <div class="dialog-body">
-      <table class="mass-edit-table">
+      <table class="mass-edit-table" :style="tableStyle">
         <thead>
           <tr>
-            <th class="name-col">Name</th>
+            <th class="name-col sticky-col">Name</th>
             <th v-for="budget in budgets" :key="budget.id" class="amount-col">
-              {{ budget.name }}
+              <span class="budget-header-main">{{ budgetHeaderLines(budget.name)[0] }}</span>
+              <span class="budget-header-year">{{ budgetHeaderLines(budget.name)[1] }}</span>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>
+            <td class="sticky-col">
               <InputText
                 v-model="formName"
                 class="name-input"
                 data-testid="name-input"
               />
             </td>
-            <td v-for="(row, i) in amounts" :key="i">
+            <td v-for="(_, i) in amounts" :key="amounts[i].budget_id">
               <EcMoneyField
                 v-model="amounts[i].amount"
                 label=""
@@ -36,15 +37,15 @@
           </tr>
 
           <template v-if="type === 'allocation'">
-            <tr class="info-row">
-              <td class="info-label">Total Income</td>
-              <td v-for="(row, i) in amounts" :key="i">
+            <tr class="info-row info-row--first">
+              <td class="info-label sticky-col">Total Income</td>
+              <td v-for="row in amounts" :key="row.budget_id">
                 <EcMoneyField :model-value="row.budgetIncome" label="" :edit-mode="false" />
               </td>
             </tr>
             <tr class="info-row">
-              <td class="info-label">Other Allocations</td>
-              <td v-for="(row, i) in amounts" :key="i">
+              <td class="info-label sticky-col">Already Allocated</td>
+              <td v-for="row in amounts" :key="row.budget_id">
                 <EcMoneyField
                   :model-value="row.totalAllocationsWithoutCurrent"
                   label=""
@@ -53,10 +54,10 @@
               </td>
             </tr>
             <tr class="info-row">
-              <td class="info-label">Discretionary Amount</td>
+              <td class="info-label sticky-col">Discretionary Amount</td>
               <td
                 v-for="(row, i) in amounts"
-                :key="i"
+                :key="row.budget_id"
                 :data-testid="`discretionary-display-${i}`"
               >
                 <EcMoneyField
@@ -94,6 +95,7 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import EcMoneyField from '../../shared/form/money-field/EcMoneyField.vue';
+import { budgetHeaderLines } from './budgetHeaderLines';
 import type { AmountRow, FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 
 const props = defineProps<{
@@ -110,9 +112,13 @@ const emit = defineEmits<{
   save: [payload: MassUpdatePayload];
 }>();
 
-const dialogTitle = computed(() =>
-  props.type === 'income' ? 'Mass Edit Income' : 'Mass Edit Allocation',
-);
+const dialogTitle = computed(() => props.name);
+
+// Name col 18rem + each budget col 8rem — forces the table to overflow the dialog body
+// so only ~6 columns are visible before horizontal scrolling kicks in.
+const tableStyle = computed(() => ({
+  width: `calc(18rem + ${props.budgets.length} * 9rem)`,
+}));
 
 const formName = ref('');
 const amounts = ref<AmountRow[]>([]);
@@ -177,8 +183,8 @@ function saveChanges() {
 }
 
 .mass-edit-table {
-  width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .mass-edit-table th,
@@ -196,15 +202,29 @@ function saveChanges() {
 }
 
 .name-col {
-  min-width: 14rem;
+  min-width: 18rem;
 }
 
 .amount-col {
-  min-width: 6rem;
+  min-width: 9rem;
+  width: 9rem;
 }
 
-th.amount-col {
+.mass-edit-table th.amount-col,
+.mass-edit-table td.amount-col {
   text-align: right;
+}
+
+.budget-header-main {
+  display: block;
+  font-size: 0.8rem;
+}
+
+.budget-header-year {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--p-text-muted-color);
 }
 
 .name-input {
@@ -213,6 +233,11 @@ th.amount-col {
 
 .info-row td {
   background-color: var(--p-surface-50);
+}
+
+.info-row--first td {
+  border-top: 2px solid var(--p-surface-300);
+  padding-top: 0.6rem;
 }
 
 .info-label {
@@ -224,5 +249,25 @@ th.amount-col {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+}
+
+/* Amount inputs fill their fixed column width */
+.amount-col :deep(input) {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Sticky first column — th and td share the class */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: var(--p-surface-0);
+}
+
+/* info rows use a tinted background — carry it through on sticky cells */
+.info-row .sticky-col {
+  background-color: var(--p-surface-50);
 }
 </style>

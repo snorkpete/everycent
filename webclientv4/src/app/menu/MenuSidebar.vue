@@ -98,6 +98,9 @@ watch(
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
 
   /* Override PrimeVue hover/focus tokens for dark sidebar */
   --p-panelmenu-item-focus-background: rgba(255, 255, 255, 0.07);
