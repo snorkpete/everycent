@@ -377,12 +377,53 @@ Each component gets unit tests. Components live in `src/shared/components/`.
 
 ## Phase 3: Feature Migration
 
-These will be tackled incrementally after infrastructure is in place:
+Priority order based on usage frequency:
 
-- Budget list/detail screens
-- Transaction management and import
-- Account management
-- Sink funds
-- Settings/configuration
+1. **Transactions** — next up (see Phase 4 below)
+2. **Current Budget / Budget list** — most-used screens after transactions
+3. **Sink Funds**
+4. **Account Balances**
+5. **Special Events**
+6. **Reports** (Net Worth, Category Spending, Needs vs Wants)
 
 Each feature follows the same pattern: types → API → store → components → routes.
+
+---
+
+## Phase 4: Transactions
+
+### Port (match Angular behaviour)
+Migrate the existing Angular transactions screen to Vue. Cover the full feature set:
+listing, filtering, pagination, manual entry, import, categorisation, edit/delete.
+
+### Ideas (needs refinement before implementation)
+These are improvement ideas beyond what exists in the Angular app. They are NOT tasks —
+each needs scoping and design before any implementation begins.
+
+Ideas are tracked in [`.domus/ideas/ideas.jsonl`](.domus/ideas/ideas.jsonl). Each entry links to a
+detailed file in `.domus/ideas/`. To see all ideas, their status, and which need refinement,
+read the index — one JSON object per line.
+
+---
+
+## Periodic Refactoring Process
+
+Before tackling each new feature migration, run a structured refactoring pass over the
+existing Vue codebase. The goal is to keep the codebase easy to maintain as it grows,
+and to surface reuse opportunities before adding more code on top of existing patterns.
+
+### Process (draft — to be refined into a repeatable skill)
+
+1. **Inventory shared patterns** — scan all feature folders for duplicated logic, types,
+   API shapes, or UI patterns that appear in 2+ places.
+2. **Identify extraction candidates** — things likely to be needed by the next feature
+   (e.g. a new screen needs a list+edit pattern that already exists elsewhere).
+3. **Propose changes** — write up specific refactors with rationale before touching code.
+   Get confirmation before implementing.
+4. **Apply & test** — make changes, run Wallaby to confirm no regressions.
+5. **Update MIGRATION_PLAN** — note what was extracted and where it lives.
+
+### Goal: `/refactor` skill
+Once this process has been run 2–3 times and the steps are stable, extract it into a
+Claude Code skill (`.claude/commands/refactor.md`) so it can be triggered on demand
+and refined over time without requiring a long prompt.
