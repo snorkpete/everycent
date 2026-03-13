@@ -338,6 +338,7 @@ async function onSave(payload: MassUpdatePayload) {
   background-color: var(--p-surface-100);
   border-top: 3px solid var(--p-surface-400);
   border-bottom: none;
+  padding-bottom: 10px;
 }
 
 /* ────────────────────────────

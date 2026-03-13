@@ -125,6 +125,51 @@ const dbTasks = {
     return ids;
   },
 
+  'db:seed:budgets': async (budgets) => {
+    const householdId = await getHouseholdId();
+    const now = new Date().toISOString();
+    const ids = [];
+    for (const budget of budgets) {
+      const { rows } = await pool.query(
+        `INSERT INTO budgets (name, start_date, end_date, status, household_id, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING id`,
+        [budget.name, budget.start_date, budget.end_date, budget.status ?? 'open', householdId, now],
+      );
+      ids.push(rows[0].id);
+    }
+    return ids;
+  },
+
+  'db:seed:incomes': async (incomes) => {
+    const householdId = await getHouseholdId();
+    const now = new Date().toISOString();
+    const ids = [];
+    for (const income of incomes) {
+      const { rows } = await pool.query(
+        `INSERT INTO incomes (name, amount, budget_id, household_id, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $5) RETURNING id`,
+        [income.name, income.amount, income.budget_id, householdId, now],
+      );
+      ids.push(rows[0].id);
+    }
+    return ids;
+  },
+
+  'db:seed:allocations': async (allocations) => {
+    const householdId = await getHouseholdId();
+    const now = new Date().toISOString();
+    const ids = [];
+    for (const allocation of allocations) {
+      const { rows } = await pool.query(
+        `INSERT INTO allocations (name, amount, budget_id, allocation_category_id, household_id, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING id`,
+        [allocation.name, allocation.amount, allocation.budget_id, allocation.allocation_category_id, householdId, now],
+      );
+      ids.push(rows[0].id);
+    }
+    return ids;
+  },
+
   'db:seed:settings': async (settings) => {
     const householdId = await getHouseholdId();
     const now = new Date().toISOString();
