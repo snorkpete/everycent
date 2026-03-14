@@ -92,8 +92,91 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 - Display a summary of what was changed as a result of the review feedback.
 
 ## Migration Context
-There is a planned migration from Angular 14 to Vue 3 + Vite + PrimeVue 4 + Pinia.
-See `MIGRATION_PLAN.md` for details. New frontend will live in `webclientv4/`.
+Active migration from Angular 14 to Vue 3 + Vite + PrimeVue 4 + Pinia. New frontend lives in `webclientv4/`.
+
+**Completed:** Auth, infrastructure (testing, loading indicator, menu, form components), setup screens (allocation-categories, institutions, settings), future budgets + mass edit dialog, bank accounts.
+
+**Remaining features** (tracked as domus tasks): transactions, current budget/budget list, sink funds, account balances, special events, reports.
+
+## Vue 3 Patterns (webclientv4)
+
+### Services → API + Store + Composable
+
+```
+Angular Service               →  Vue 3 Equivalent
+─────────────────────────────────────────────────
+HTTP calls                    →  api/someApi.ts (plain functions)
+Shared reactive state         →  Pinia store (defineStore)
+Shared logic without state    →  composable (useSomething.ts)
+```
+
+### Component Pattern
+
+```vue
+<script setup lang="ts">
+import { onMounted, computed } from 'vue'
+import { useSomeStore } from './stores/someStore'
+
+const store = useSomeStore()
+
+const props = defineProps<{ budgetId: number }>()
+const emit = defineEmits<{ saved: [id: number] }>()
+
+onMounted(() => { store.fetchData(props.budgetId) })
+
+const total = computed(() =>
+  store.items.reduce((sum, item) => sum + item.amount, 0)
+)
+</script>
+
+<template>
+  <!-- Use PrimeVue components + v-model, v-for, v-if -->
+</template>
+
+<style scoped>
+/* Component-scoped styles */
+</style>
+```
+
+### Store Pattern
+
+```typescript
+export const useSomeStore = defineStore('some', () => {
+  const items = ref<Item[]>([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  const activeItems = computed(() => items.value.filter(i => i.active))
+
+  async function fetchItems() {
+    loading.value = true
+    error.value = null
+    try {
+      items.value = await someApi.getAll()
+    } catch (e: any) {
+      error.value = e.message
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return { items, loading, error, activeItems, fetchItems }
+})
+```
+
+### API Pattern
+
+```typescript
+// Plain functions, no framework dependency, easy to test
+import apiClient from '@/api/client'
+import type { Item } from '@/features/some/some.type'
+
+export const someApi = {
+  getAll: () => apiClient.get<Item[]>('/api/items').then(r => r.data),
+  getById: (id: number) => apiClient.get<Item>(`/api/items/${id}`).then(r => r.data),
+  save: (item: Item) => apiClient.put<Item>(`/api/items/${item.id}`, { item }).then(r => r.data),
+}
+```
 
 ## Capturing Knowledge for Future Sessions
 
@@ -108,7 +191,6 @@ capture it before that happens. Use the right destination:
   quirks not visible from the codebase
 - **CLAUDE.md** — only when new behavioral rules emerged that should govern every
   future session (be conservative)
-- **MIGRATION_PLAN.md** — phase/step completion and migration-specific decisions
 
 Prefer domus over memory whenever the information is "what we decided or what needs doing."
 

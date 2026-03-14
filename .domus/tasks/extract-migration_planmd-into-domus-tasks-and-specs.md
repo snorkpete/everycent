@@ -1,7 +1,7 @@
 # Task: Extract MIGRATION_PLAN.md into domus tasks and specs
 
 **ID:** extract-migration_planmd-into-domus-tasks-and-specs
-**Status:** open
+**Status:** done
 **Refinement:** raw
 **Priority:** normal
 **Captured:** 2026-03-14
