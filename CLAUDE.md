@@ -87,7 +87,8 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 
 ## Code Review (Vue App - webclientv4)
 - Before committing any changes, run the `senior-code-reviewer` agent over all modified files.
-- Apply any feedback from the review before committing.
+- Before acting on any review feedback, run `domus task list` and check whether the feedback point is already captured as an open task. If it is, note it as already tracked and do not act on it now.
+- Apply any remaining feedback from the review before committing.
 - Display a summary of what was changed as a result of the review feedback.
 
 ## Migration Context
@@ -95,57 +96,78 @@ There is a planned migration from Angular 14 to Vue 3 + Vite + PrimeVue 4 + Pini
 See `MIGRATION_PLAN.md` for details. New frontend will live in `webclientv4/`.
 
 ## Capturing Knowledge for Future Sessions
-Proactively identify information that would be lost when a session closes and suggest
-capturing it before that happens. Good candidates include:
-- Design decisions and the reasoning behind them
-- Open questions about a feature or idea that need answering before work can start
-- New ideas that emerge during conversation (see Ideas workflow below)
-- Patterns or conventions established during a session that aren't yet in CLAUDE.md
-- Anything that would cause a future session to have to re-derive or re-discuss something
 
-When something qualifies, suggest where it should be captured (MIGRATION_PLAN.md,
-CLAUDE.md, or a memory file) and do it proactively rather than waiting to be asked.
+Proactively identify information that would be lost when a session closes and
+capture it before that happens. Use the right destination:
+
+- **Ideas** (`domus idea add`) — concepts not yet decided, open questions, directions
+  worth exploring. When in doubt: idea = "should we do this?"
+- **Tasks** (`domus task add`) — decided, concrete work that needs doing.
+  When in doubt: task = "we've decided to do this."
+- **Memory** — orientation only: what's actively in progress, non-obvious setup
+  quirks not visible from the codebase
+- **CLAUDE.md** — only when new behavioral rules emerged that should govern every
+  future session (be conservative)
+- **MIGRATION_PLAN.md** — phase/step completion and migration-specific decisions
+
+Prefer domus over memory whenever the information is "what we decided or what needs doing."
+
+## Domus Data Access Rules
+
+**Never read or write `.domus/**/*.jsonl` or `.domus/**/*.md` frontmatter directly.**
+All domus data must go through the CLI (`domus task`, `domus idea`). The CLI keeps the JSONL index and the markdown detail file in sync atomically — direct edits break that invariant silently.
+
+If you find yourself about to touch a JSONL or MD frontmatter directly, stop and:
+1. Check `domus <command> --help` — the capability may already exist.
+2. If it genuinely doesn't exist, tell the user explicitly: what you needed to do, why the CLI couldn't do it, and what command or flag would close the gap. Then capture a task for it.
+3. Do not proceed with direct file access without the user's explicit approval.
+
+If the user approves direct access as a one-off workaround, you **must** update both files together — the JSONL index entry and the corresponding `.md` frontmatter — or the workspace will be left in an inconsistent state.
+
+The complement: you **can and should** directly edit the body content of `.domus/**/*.md` files (below the frontmatter) — that's where execution context, notes, and decisions live. The CLI owns the frontmatter; Claude owns the body.
 
 ## Ideas Workflow
 
-Ideas are tracked in two places:
-- `.domus/ideas/ideas.jsonl` — the index (one JSON object per line, I am the primary consumer)
-- `.domus/ideas/<id>.md` — full detail file for each idea
+Ideas live in `.domus/ideas/`. Managed via `domus idea` CLI. Skills: `/capture-idea`, `/idea-refined`.
+CLI lives at `~/code/domus`, linked globally via `bun link`. In Bash, use full path: `/Users/kion/.bun/bin/domus`.
 
-### JSONL schema
-```json
-{
-  "id": "kebab-case-slug",
-  "title": "Human Readable Title",
-  "file": ".domus/ideas/<id>.md",
-  "date_captured": "YYYY-MM-DD or null",
-  "status": "raw | refined | scoped | implemented | abandoned | deferred",
-  "tags": ["<controlled vocab — see below>"],
-  "summary": "One or two sentence description.",
-  "needs_refinement": true,
-  "date_status_changed": "YYYY-MM-DD or null",
-  "date_implemented": "YYYY-MM-DD or null",
-  "outcome_note": "Brief note when status is abandoned or deferred, else null"
-}
-```
+**Status lifecycle:** `raw` → `refined` → `scoped` → `implemented` | `abandoned` | `deferred`
+- **raw** — captured, open questions unresolved
+- **refined** — well understood, decided worth pursuing
+- **scoped** — concrete plan exists; create task(s) to execute it. Convention: one
+  top-level task per idea, broken into sub-tasks if the work warrants it.
+- **implemented / abandoned / deferred** — terminal states; add `--note` for context
 
-### Status lifecycle
-`raw` → `refined` → `scoped` → `implemented` | `abandoned` | `deferred`
-- **raw** — just captured, open questions unresolved
-- **refined** — open questions answered, idea well understood
-- **scoped** — concrete implementation plan exists, ready to become tasks
-- **implemented** — done; set `date_implemented`
-- **abandoned** — evaluated and not worth pursuing; explain in `outcome_note`
-- **deferred** — consciously parked; not dead but not ready
+**Tags:** See `.domus/tags/shared.md` and `.domus/tags/ideas.md` — read when tagging, not otherwise.
 
-### Tag vocabulary
-See `.domus/ideas/tags.md`. Read that file when you need to tag an idea — do not load it otherwise.
+**Cross-project targeting:** When capturing an idea about the domus tool itself (CLI commands, workflow, the domus system), use `domus --root /Users/kion/code/domus idea <subcommand>`. Everycent ideas (budgeting app, Vue migration, Rails, Angular) use the default (no flag).
 
-### When to update the index
-- **New idea captured** — create the `.md` file AND add a line to `ideas.jsonl`
-- **Idea discussed or refined** — update `needs_refinement`, `status`, `date_status_changed` in the index
-- **Idea implemented** — set `status: implemented` and `date_implemented`
-- **Idea abandoned/deferred** — set status and write `outcome_note`
+**When to update:**
+- New idea → `domus idea add --title "..." --summary "..."` (or `/capture-idea`)
+- Discussed/refined → `domus idea status <id> refined` (or `/idea-refined`)
+- Scoped → `domus idea status <id> scoped` + create task(s)
+- Implemented → `domus idea status <id> implemented`
+- Abandoned/deferred → `domus idea status <id> abandoned|deferred --note "<reason>"`
+
+## Tasks Workflow
+
+Tasks live in `.domus/tasks/`. Managed via `domus task` CLI. Skills: `/capture-task`, `/update-task-status`, `/task-ready`.
+CLI lives at `~/code/domus`, linked globally via `bun link`. In Bash, use full path: `/Users/kion/.bun/bin/domus`.
+
+**Refinement levels:** `raw` → `refined` → `autonomous`
+- **raw** — open questions, not ready to execute
+- **refined** — well understood, needs human oversight during execution
+- **autonomous** — fully specified, Claude can execute end-to-end
+
+**Tags:** See `.domus/tags/shared.md` and `.domus/tags/tasks.md` — read when tagging, not otherwise.
+
+**Cross-project targeting:** When capturing a task about the domus tool itself (CLI commands, workflow, the domus system), use `domus --root /Users/kion/code/domus task <subcommand>`. Everycent tasks (budgeting app, Vue migration, Rails, Angular) use the default (no flag).
+
+**Reading task data:** Use `domus task list` for day-to-day use. Icons: `○` open `◑` in-progress `●` done `✕` cancelled `⏸` deferred. Use `--json` when you need fields not shown in the list (summary, tags, dependencies, dates, outcome notes).
+
+**When to update:**
+- New task → `domus task add --title "..." --summary "..." --refinement raw|refined|autonomous` (or `/capture-task`)
+- Status change → `domus task status <id> <status>`
 
 ## Cypress E2E Tests
 See `webclientv4/cypress/CLAUDE.md` for E2E test rules (typing into PrimeVue inputs, DB setup).
