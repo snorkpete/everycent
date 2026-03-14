@@ -6,7 +6,7 @@
 **Priority:** normal
 **Captured:** 2026-03-14
 **Parent:** none
-**Depends on:** none
+**Depends on:** repair-existing-idea-md-files-to-current-format
 **Idea:** none
 **Spec refs:** none
 
