@@ -1,7 +1,7 @@
 # Idea: Migrate Auth to Google OAuth
 
-**Date:** 2026-03-11
-**Project:** Everycent Migration
+**Captured:** 2026-03-11
+**Status:** raw
 
 ---
 

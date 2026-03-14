@@ -1,7 +1,7 @@
 # Idea: Resilient / Format-Agnostic Transaction Import
 
-**Date:** unknown
-**Project:** Everycent Migration
+**Captured:** unknown
+**Status:** raw
 
 ---
 

@@ -1,7 +1,7 @@
 # Idea: Auto-Categorisation on Import
 
-**Date:** unknown
-**Project:** Everycent Migration
+**Captured:** unknown
+**Status:** raw
 
 ---
 

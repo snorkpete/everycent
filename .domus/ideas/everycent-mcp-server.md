@@ -1,7 +1,7 @@
 # Idea: Everycent MCP Server
 
-**Date:** 2026-03-10
-**Project:** Everycent Migration
+**Captured:** 2026-03-10
+**Status:** raw
 
 ---
 

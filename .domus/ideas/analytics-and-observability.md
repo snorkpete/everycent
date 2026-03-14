@@ -1,7 +1,7 @@
 # Idea: Analytics, Logging, and Observability
 
-**Date:** 2026-03-11
-**Project:** Everycent Migration
+**Captured:** 2026-03-11
+**Status:** raw
 
 ---
 
