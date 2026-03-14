@@ -14,7 +14,7 @@ function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
     { label: '* Current Budget', icon: Icon.BUDGETS_CURRENT, url: '/#/budgets/current' },
     { label: '* Budgets', icon: Icon.BUDGETS, url: '/#/budgets' },
     { label: 'Future Budgets', icon: Icon.BUDGETS_FUTURE, command: () => navigate('/budgets/future'), routePath: '/budgets/future' },
-    { label: '* Transactions', icon: Icon.TRANSACTIONS, url: '/#/transactions' },
+    { label: 'Transactions', icon: Icon.TRANSACTIONS, command: () => navigate('/transactions'), routePath: '/transactions' },
     { label: '* Sink Funds', icon: Icon.SINK_FUND, url: '/#/sink-funds' },
     { label: '* Account Balances', icon: Icon.ACCOUNT_BALANCES, url: '/#/account-balances' },
     { label: '* Special Events', icon: Icon.SPECIAL_EVENTS, url: '/#/special-events' },

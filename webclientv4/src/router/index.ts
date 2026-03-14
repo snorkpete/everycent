@@ -40,6 +40,11 @@ const router = createRouter({
       name: 'future-budgets',
       component: () => import('../app/budgets/future-budgets/FutureBudgetsPage.vue'),
     },
+    {
+      path: '/transactions',
+      name: 'transactions',
+      component: () => import('../app/transactions/TransactionsPage.vue'),
+    },
   ],
 });
 

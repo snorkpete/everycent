@@ -95,4 +95,25 @@ describe('bankAccountApi', () => {
       expect(result).toEqual(account);
     });
   });
+
+  describe('getWithBalances', () => {
+    it('gets /bank_accounts with include_current_balance param', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
+
+      await bankAccountApi.getWithBalances();
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/bank_accounts', {
+        params: { include_current_balance: true },
+      });
+    });
+
+    it('returns the response data', async () => {
+      const accounts = [{ id: 1, name: 'Savings', current_balance: 100000 }];
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: accounts });
+
+      const result = await bankAccountApi.getWithBalances();
+
+      expect(result).toEqual(accounts);
+    });
+  });
 });

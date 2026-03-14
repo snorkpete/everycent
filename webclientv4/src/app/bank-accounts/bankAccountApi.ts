@@ -17,4 +17,9 @@ export const bankAccountApi = {
     apiGateway
       .put<BankAccountData>(`/bank_accounts/${account.id}`, account)
       .then((r) => r.data),
+
+  getWithBalances: () =>
+    apiGateway
+      .get<BankAccountData[]>('/bank_accounts', { params: { include_current_balance: true } })
+      .then((r) => r.data),
 };

@@ -21,6 +21,17 @@ describe('menuItems', () => {
     expect(budgets!.url).toBe('/#/budgets');
   });
 
+  it('includes Transactions with command-based Vue navigation and routePath', () => {
+    const navigate = vi.fn();
+    const items = buildMenuItems(vi.fn(), navigate);
+    const transactions = items.find((item) => item.label === 'Transactions');
+
+    expect(transactions!.routePath).toBe('/transactions');
+    expect(transactions!.url).toBeUndefined();
+    transactions!.command!({ originalEvent: new Event('click'), item: transactions! });
+    expect(navigate).toHaveBeenCalledWith('/transactions');
+  });
+
   it('includes Future Budgets with command-based Vue navigation and routePath', () => {
     const navigate = vi.fn();
     const items = buildMenuItems(vi.fn(), navigate);
