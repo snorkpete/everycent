@@ -97,22 +97,22 @@ describe('EcMoneyField', () => {
       expect(valueEl.classes()).not.toContain('positive');
     });
 
-    it('applies positive styling when highlightPositive is true', () => {
+    it('applies positive styling when highlightMode is positive', () => {
       const cents = 500;
       const wrapper = mountComponent({
         modelValue: cents,
-        highlightPositive: true,
+        highlightMode: 'positive',
       });
       const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).toContain('positive');
     });
 
-    it('does not apply positive styling for negative values even when highlightPositive is true', () => {
+    it('does not apply positive styling for negative values even when highlightMode is positive', () => {
       const cents = -500;
       const wrapper = mountComponent({
         modelValue: cents,
-        highlightPositive: true,
+        highlightMode: 'positive',
       });
       const valueEl = wrapper.find('.money-display');
 
@@ -262,6 +262,76 @@ describe('EcMoneyField', () => {
       const input = wrapper.find('.money-input');
 
       expect(input.classes()).toContain('negative');
+    });
+  });
+
+  describe('highlightMode: zero', () => {
+    describe('read-only mode', () => {
+      it('applies positive styling when value is zero', () => {
+        const wrapper = mountComponent({ modelValue: 0, highlightMode: 'zero' });
+        const valueEl = wrapper.find('.money-display');
+
+        expect(valueEl.classes()).toContain('positive');
+        expect(valueEl.classes()).not.toContain('negative');
+      });
+
+      it('applies negative styling when value is positive', () => {
+        const wrapper = mountComponent({ modelValue: 500, highlightMode: 'zero' });
+        const valueEl = wrapper.find('.money-display');
+
+        expect(valueEl.classes()).toContain('negative');
+        expect(valueEl.classes()).not.toContain('positive');
+      });
+
+      it('applies negative styling when value is negative', () => {
+        const wrapper = mountComponent({ modelValue: -500, highlightMode: 'zero' });
+        const valueEl = wrapper.find('.money-display');
+
+        expect(valueEl.classes()).toContain('negative');
+        expect(valueEl.classes()).not.toContain('positive');
+      });
+
+      it('does not affect default behaviour when absent', () => {
+        const wrapper = mountComponent({ modelValue: 0 });
+        const valueEl = wrapper.find('.money-display');
+
+        expect(valueEl.classes()).not.toContain('positive');
+        expect(valueEl.classes()).not.toContain('negative');
+      });
+    });
+
+    describe('edit mode', () => {
+      it('applies positive styling to input when value is zero', () => {
+        const wrapper = mountComponent({ editMode: true, modelValue: 0, highlightMode: 'zero' });
+        const input = wrapper.find('.money-input');
+
+        expect(input.classes()).toContain('positive');
+        expect(input.classes()).not.toContain('negative');
+      });
+
+      it('applies negative styling to input when value is positive', () => {
+        const wrapper = mountComponent({ editMode: true, modelValue: 500, highlightMode: 'zero' });
+        const input = wrapper.find('.money-input');
+
+        expect(input.classes()).toContain('negative');
+        expect(input.classes()).not.toContain('positive');
+      });
+
+      it('applies negative styling to input when value is negative', () => {
+        const wrapper = mountComponent({ editMode: true, modelValue: -500, highlightMode: 'zero' });
+        const input = wrapper.find('.money-input');
+
+        expect(input.classes()).toContain('negative');
+        expect(input.classes()).not.toContain('positive');
+      });
+
+      it('does not affect default behaviour when absent', () => {
+        const wrapper = mountComponent({ editMode: true, modelValue: 0 });
+        const input = wrapper.find('.money-input');
+
+        expect(input.classes()).not.toContain('positive');
+        expect(input.classes()).not.toContain('negative');
+      });
     });
   });
 });

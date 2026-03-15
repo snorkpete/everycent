@@ -41,7 +41,7 @@ import { centsToDollars } from '../../util/cents-to-dollars';
 const props = defineProps<{
   label: string;
   editMode: boolean;
-  highlightPositive?: boolean;
+  highlightMode?: 'positive' | 'zero';
 }>();
 
 const model = defineModel<number>({ default: 0 });
@@ -59,11 +59,10 @@ watch(model, (newVal) => {
 
 const formattedValue = computed(() => centsToDollars(model.value));
 
-const isPositive = computed(() => model.value > 0);
-
 const moneyDisplayClasses = computed(() => ({
-  positive: props.highlightPositive && isPositive.value,
-  negative: model.value < 0,
+  positive: props.highlightMode === 'positive' ? model.value > 0 : props.highlightMode === 'zero' ? model.value === 0 : false,
+  // default (no highlightMode): negatives are always red
+  negative: props.highlightMode === 'zero' ? model.value !== 0 : model.value < 0,
 }));
 
 const inputId = useId();
