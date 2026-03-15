@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
-import { mount } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import TransactionList from './TransactionList.vue';
-import type { TransactionData, AllocationData, SinkFundAllocationData, BudgetData } from './transaction.types';
+import { useTransactionStore } from './transactionStore';
+import type { TransactionData, AllocationData, SinkFundAllocationData } from './transaction.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
 // Selectors
@@ -18,9 +19,7 @@ const TRANSACTION_ROW = '[data-testid="transaction-row"]';
 const ALLOCATION_HEADER = '[data-testid="allocation-header"]';
 
 const checkingAccount: BankAccountData = { id: 1, name: 'Checking', is_sink_fund: false, is_credit_card: false };
-const creditCardAccount: BankAccountData = { id: 2, name: 'Credit Card', is_sink_fund: false, is_credit_card: true };
 const sinkFundAccount: BankAccountData = { id: 3, name: 'Sink Fund', is_sink_fund: true, is_credit_card: false };
-const jan2025: BudgetData = { id: 1, name: 'Jan 2025', status: 'open', start_date: '2025-01-01', end_date: '2025-01-31' };
 
 const sampleTransactions: TransactionData[] = [
   { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', transaction_date: '2025-01-05', deleted: false },
@@ -35,30 +34,27 @@ const sampleSinkFundAllocations: SinkFundAllocationData[] = [
   { id: 10, name: 'Holiday Fund', amount: 50000 },
 ];
 
-function createWrapper(props: {
-  transactions?: TransactionData[];
-  allocations?: AllocationData[];
-  sinkFundAllocations?: SinkFundAllocationData[];
-  bankAccount?: BankAccountData;
-  budget?: BudgetData;
-} = {}) {
+let pinia: Pinia;
+let store: ReturnType<typeof useTransactionStore>;
+
+function createWrapper(): VueWrapper {
   return mount(TransactionList, {
-    props: {
-      transactions: props.transactions ?? sampleTransactions,
-      allocations: props.allocations ?? sampleAllocations,
-      sinkFundAllocations: props.sinkFundAllocations ?? [],
-      bankAccount: props.bankAccount ?? checkingAccount,
-      budget: props.budget ?? jan2025,
-    },
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
     },
   });
 }
 
 describe('TransactionList', () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
+    store = useTransactionStore();
+    store.draftTransactions = [...sampleTransactions];
+    store.isEditMode = false;
+    store.allocations = sampleAllocations;
+    store.sinkFundAllocations = sampleSinkFundAllocations;
+    store.selectedBankAccount = checkingAccount;
     vi.clearAllMocks();
   });
 
@@ -88,169 +84,55 @@ describe('TransactionList', () => {
 
       expect(wrapper.find(ADD_BTN).exists()).toBe(false);
     });
+
+    it('shows correct number of transaction rows', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.findAll(TRANSACTION_ROW)).toHaveLength(sampleTransactions.length);
+    });
   });
 
   describe('edit mode', () => {
-    it('switches to edit mode when Edit button is clicked', async () => {
+    it('shows Save, Cancel, and Add buttons when store.isEditMode is true', async () => {
+      store.isEditMode = true;
       const wrapper = createWrapper();
-
-      await wrapper.find(EDIT_BTN).trigger('click');
+      await nextTick();
 
       expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
       expect(wrapper.find(CANCEL_BTN).exists()).toBe(true);
-    });
-
-    it('shows Add New Transaction button in edit mode', async () => {
-      const wrapper = createWrapper();
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-
       expect(wrapper.find(ADD_BTN).exists()).toBe(true);
     });
 
-    it('adds a new transaction row when Add New Transaction is clicked', async () => {
-      const wrapper = createWrapper({ transactions: sampleTransactions });
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find(ADD_BTN).trigger('click');
-      await nextTick();
-
-      const rows = wrapper.findAll(TRANSACTION_ROW);
-      expect(rows.length).toBe(sampleTransactions.length + 1);
-    });
-
-    it('adds new transaction with status "unpaid" for credit card accounts', async () => {
-      const wrapper = createWrapper({ bankAccount: creditCardAccount, transactions: [] });
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find(ADD_BTN).trigger('click');
-      await nextTick();
-      await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
-
-      const emitted = wrapper.emitted('save')!;
-      const [savedTransactions] = emitted[0] as [TransactionData[]];
-      expect(savedTransactions[0].status).toBe('unpaid');
-    });
-
-    it('adds new transaction with status "paid" for non-credit-card accounts', async () => {
-      const wrapper = createWrapper({ bankAccount: checkingAccount, transactions: [] });
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find(ADD_BTN).trigger('click');
-      await nextTick();
-      await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
-
-      const emitted = wrapper.emitted('save')!;
-      const [savedTransactions] = emitted[0] as [TransactionData[]];
-      expect(savedTransactions[0].status).toBe('paid');
-    });
-  });
-
-  describe('save event', () => {
-    it('emits save with the current transactions when Save is clicked', async () => {
-      const transactions = [...sampleTransactions];
-      const wrapper = createWrapper({ transactions });
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
-
-      const emitted = wrapper.emitted('save');
-      expect(emitted).toBeTruthy();
-      const [firstEmit] = emitted!;
-      const [savedTransactions] = firstEmit as [TransactionData[]];
-      expect(savedTransactions).toEqual(transactions);
-    });
-
-    it('switches back to display mode after save', async () => {
+    it('hides Edit button when store.isEditMode is true', async () => {
+      store.isEditMode = true;
       const wrapper = createWrapper();
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find(SAVE_BTN).trigger('click');
       await nextTick();
 
-      expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
-      expect(wrapper.find(SAVE_BTN).exists()).toBe(false);
-    });
-  });
-
-  describe('cancel event', () => {
-    it('emits cancel when Cancel is clicked', async () => {
-      const wrapper = createWrapper();
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find(CANCEL_BTN).trigger('click');
-      await nextTick();
-
-      expect(wrapper.emitted('cancel')).toBeTruthy();
-    });
-
-    it('switches back to display mode on cancel', async () => {
-      const wrapper = createWrapper();
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find(CANCEL_BTN).trigger('click');
-      await nextTick();
-
-      expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
-      expect(wrapper.find(SAVE_BTN).exists()).toBe(false);
+      expect(wrapper.find(EDIT_BTN).exists()).toBe(false);
     });
   });
 
   describe('allocation column header', () => {
     it('shows "Allocation" header for normal accounts', () => {
-      const wrapper = createWrapper({ bankAccount: checkingAccount });
+      store.selectedBankAccount = checkingAccount;
+      const wrapper = createWrapper();
 
       expect(wrapper.find(ALLOCATION_HEADER).text()).toBe('Allocation');
     });
 
     it('shows "Sink Fund Allocation" header for sink fund accounts', () => {
-      const wrapper = createWrapper({ bankAccount: sinkFundAccount });
+      store.selectedBankAccount = sinkFundAccount;
+      const wrapper = createWrapper();
 
       expect(wrapper.find(ALLOCATION_HEADER).text()).toBe('Sink Fund Allocation');
     });
   });
 
-  describe('delete transaction', () => {
-    it('marks a transaction as deleted when delete button is clicked', async () => {
-      const transactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
-      ];
-      const wrapper = createWrapper({ transactions });
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find('[data-testid="delete-btn-0"]').trigger('click');
-      await nextTick();
-
-      const rows = wrapper.findAll(TRANSACTION_ROW);
-      expect(rows[0].classes()).toContain('transaction-row--deleted');
-    });
-
-    it('includes deleted transaction in save payload with deleted: true', async () => {
-      const transactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
-      ];
-      const wrapper = createWrapper({ transactions });
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-      await wrapper.find('[data-testid="delete-btn-0"]').trigger('click');
-      await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
-
-      const emitted = wrapper.emitted('save');
-      expect(emitted).toBeTruthy();
-      const [savedTransactions] = emitted![0] as [TransactionData[]];
-      expect(savedTransactions[0].deleted).toBe(true);
-    });
-  });
-
   describe('Import and Transfer buttons', () => {
     it('shows Import button in edit mode (disabled)', async () => {
+      store.isEditMode = true;
       const wrapper = createWrapper();
-
-      await wrapper.find(EDIT_BTN).trigger('click');
+      await nextTick();
 
       const importBtn = wrapper.find(IMPORT_BTN);
       expect(importBtn.exists()).toBe(true);
@@ -258,13 +140,85 @@ describe('TransactionList', () => {
     });
 
     it('shows Transfer button in edit mode (disabled)', async () => {
+      store.isEditMode = true;
       const wrapper = createWrapper();
-
-      await wrapper.find(EDIT_BTN).trigger('click');
+      await nextTick();
 
       const transferBtn = wrapper.find(TRANSFER_BTN);
       expect(transferBtn.exists()).toBe(true);
       expect(transferBtn.attributes('disabled')).toBeDefined();
+    });
+  });
+
+  describe('delegation to store actions', () => {
+    it('calls store.enterEditMode when Edit button is clicked', async () => {
+      const wrapper = createWrapper();
+      vi.spyOn(store, 'enterEditMode');
+
+      await wrapper.find(EDIT_BTN).trigger('click');
+
+      expect(store.enterEditMode).toHaveBeenCalled();
+    });
+
+    it('calls store.addTransaction when Add New Transaction is clicked', async () => {
+      store.isEditMode = true;
+      const wrapper = createWrapper();
+      await nextTick();
+      vi.spyOn(store, 'addTransaction');
+
+      await wrapper.find(ADD_BTN).trigger('click');
+
+      expect(store.addTransaction).toHaveBeenCalled();
+    });
+
+    it('calls store.deleteTransaction with the transaction when delete button is clicked', async () => {
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+      vi.spyOn(store, 'deleteTransaction');
+
+      await wrapper.find('[data-testid="delete-btn-0"]').trigger('click');
+
+      expect(store.deleteTransaction).toHaveBeenCalledWith(store.draftTransactions[0]);
+    });
+
+    it('emits save signal (no data) when Save button is clicked', async () => {
+      store.isEditMode = true;
+      const wrapper = createWrapper();
+      await nextTick();
+
+      await wrapper.find(SAVE_BTN).trigger('click');
+
+      expect(wrapper.emitted('save')).toBeTruthy();
+      expect(wrapper.emitted('save')![0]).toEqual([]);
+    });
+
+    it('emits cancel signal (no data) when Cancel button is clicked', async () => {
+      store.isEditMode = true;
+      const wrapper = createWrapper();
+      await nextTick();
+
+      await wrapper.find(CANCEL_BTN).trigger('click');
+
+      expect(wrapper.emitted('cancel')).toBeTruthy();
+      expect(wrapper.emitted('cancel')![0]).toEqual([]);
+    });
+  });
+
+  describe('deleted transaction display', () => {
+    it('applies deleted class to rows where deleted is true', async () => {
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const rows = wrapper.findAll(TRANSACTION_ROW);
+      expect(rows[0].classes()).toContain('transaction-row--deleted');
     });
   });
 });

@@ -1,7 +1,7 @@
 # Task: Refactor transactions screen components before UX redesign
 
 **ID:** refactor-transactions-screen-components-before-ux-redesign
-**Status:** open
+**Status:** done
 **Refinement:** autonomous
 **Priority:** normal
 **Captured:** 2026-03-15
@@ -20,17 +20,25 @@ The broader direction: components should be thin presentation layers; app logic 
 
 **Spec work completed 2026-03-15:** TransactionList.spec and TransactionSearchForm.spec were cleaned up (createWrapper convention, selector constants, substantive paid/unpaid assertions, failing rendering tests fixed). The architectural refactor is the remaining work.
 
+**Refactor completed 2026-03-15:**
+- `isEditMode`, `draftTransactions`, `enterEditMode`, `exitEditMode`, `cancelEdit`, `addTransaction`, `deleteTransaction`, `onAllocationChange` added to transactionStore
+- `fetch()` now syncs `draftTransactions` from `transactions` after loading, and clears `sinkFundAllocations` before loading (prevents stale data on account switch)
+- `TransactionList` is now prop-free; reads all state from store
+- `TransactionsPage` drives save via `store.save(store.draftTransactions)` + `store.exitEditMode()`, cancel via `store.cancelEdit()`
+- All specs updated; TransactionList.spec restructured around delegation and display tests
+- Senior code reviewer ran; two additional fixes applied: `exitEditMode` action (vs direct mutation), `sinkFundAllocations` cleared in `fetch`
+
 ---
 
 ## Acceptance Criteria
 
-- [ ] `isEditMode` moved to transactionStore
-- [ ] `draftTransactions` (local edit copy) moved to transactionStore
-- [ ] `enterEditMode`, `addTransaction`, `deleteTransaction`, `onAllocationChange` moved to transactionStore
-- [ ] `TransactionList` is a pure display component: reads store.draftTransactions, calls store actions for mutations — no local edit state
-- [ ] `TransactionsPage` handles save/cancel coordination (already does this today; just needs to drive edit mode via store)
-- [ ] All specs updated to match the new structure
-- [ ] Run senior-code-reviewer before committing
+- [x] `isEditMode` moved to transactionStore
+- [x] `draftTransactions` (local edit copy) moved to transactionStore
+- [x] `enterEditMode`, `addTransaction`, `deleteTransaction`, `onAllocationChange` moved to transactionStore
+- [x] `TransactionList` is a pure display component: reads store.draftTransactions, calls store actions for mutations — no local edit state
+- [x] `TransactionsPage` handles save/cancel coordination (already does this today; just needs to drive edit mode via store)
+- [x] All specs updated to match the new structure
+- [x] Run senior-code-reviewer before committing
 
 ---
 

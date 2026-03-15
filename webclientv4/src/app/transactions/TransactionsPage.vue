@@ -9,15 +9,7 @@
           :allocations="store.allocations"
         />
       </div>
-      <TransactionList
-        :transactions="store.transactions"
-        :allocations="store.allocations"
-        :sink-fund-allocations="store.sinkFundAllocations"
-        :bank-account="store.selectedBankAccount ?? undefined"
-        :budget="store.selectedBudget ?? undefined"
-        @save="onSave"
-        @cancel="onCancel"
-      />
+      <TransactionList @save="onSave" @cancel="onCancel" />
     </div>
   </div>
 </template>
@@ -30,7 +22,6 @@ import { useNotifications } from '../notifications/useNotifications';
 import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
 import TransactionSummary from './TransactionSummary.vue';
-import type { TransactionData } from './transaction.types';
 
 const store = useTransactionStore();
 const headingStore = useHeadingStore();
@@ -45,17 +36,18 @@ function onFetch(params: { budgetId: number; bankAccountId: number }) {
   store.fetch(params);
 }
 
-async function onSave(transactions: TransactionData[]) {
+async function onSave() {
   try {
-    await store.save(transactions);
+    await store.save(store.draftTransactions);
+    store.exitEditMode();
     notifications.success('Transactions saved');
   } catch {
     notifications.error(store.error ?? 'Failed to save transactions');
   }
 }
 
-async function onCancel() {
-  await store.refresh();
+function onCancel() {
+  store.cancelEdit();
 }
 </script>
 

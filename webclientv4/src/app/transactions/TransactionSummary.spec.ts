@@ -61,7 +61,7 @@ function mountSummary(props: {
 } = {}) {
   return mount(TransactionSummary, {
     props: {
-      bankAccount: props.bankAccount ?? primaryAccount,
+      bankAccount: 'bankAccount' in props ? props.bankAccount : primaryAccount,
       transactions: props.transactions ?? transactions,
       allocations: props.allocations ?? allocations,
     },

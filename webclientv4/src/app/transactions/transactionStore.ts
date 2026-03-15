@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue';
+import { ref, computed, toRaw } from 'vue';
 import { defineStore } from 'pinia';
 import { transactionApi } from './transactionApi';
 import { budgetApi } from '../budgets/budgetApi';
@@ -9,6 +9,8 @@ import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref<TransactionData[]>([]);
+  const draftTransactions = ref<TransactionData[]>([]);
+  const isEditMode = ref(false);
   const allocations = ref<AllocationData[]>([]);
   const sinkFundAllocations = ref<SinkFundAllocationData[]>([]);
   const budgets = ref<BudgetData[]>([]);
@@ -45,6 +47,7 @@ export const useTransactionStore = defineStore('transactions', () => {
   async function fetch(params: { budgetId: number; bankAccountId: number }) {
     loading.value = true;
     error.value = null;
+    sinkFundAllocations.value = [];
     try {
       const account = bankAccounts.value.find((a) => a.id === params.bankAccountId) ?? null;
       const budget = budgets.value.find((b) => b.id === params.budgetId) ?? null;
@@ -70,6 +73,7 @@ export const useTransactionStore = defineStore('transactions', () => {
       }
 
       await Promise.all(promises);
+      draftTransactions.value = structuredClone(toRaw(transactions.value));
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load transactions';
     } finally {
@@ -102,6 +106,34 @@ export const useTransactionStore = defineStore('transactions', () => {
     }
   }
 
+  function enterEditMode() {
+    draftTransactions.value = structuredClone(toRaw(transactions.value));
+    isEditMode.value = true;
+  }
+
+  function exitEditMode() {
+    isEditMode.value = false;
+  }
+
+  function cancelEdit() {
+    draftTransactions.value = structuredClone(toRaw(transactions.value));
+    isEditMode.value = false;
+  }
+
+  function addTransaction() {
+    const status = selectedBankAccount.value?.is_credit_card ? 'unpaid' : 'paid';
+    draftTransactions.value.push({ withdrawal_amount: 0, deposit_amount: 0, status });
+  }
+
+  function deleteTransaction(transaction: TransactionData) {
+    transaction.deleted = true;
+  }
+
+  function onAllocationChange(transaction: TransactionData, allocationId: number) {
+    transaction.allocation_id = allocationId;
+    transaction.status = allocationId > 0 ? 'paid' : 'unpaid';
+  }
+
   async function refresh() {
     if (!selectedBankAccount.value || !selectedBudget.value) {
       return;
@@ -114,6 +146,8 @@ export const useTransactionStore = defineStore('transactions', () => {
 
   return {
     transactions,
+    draftTransactions,
+    isEditMode,
     allocations,
     sinkFundAllocations,
     budgets,
@@ -127,5 +161,11 @@ export const useTransactionStore = defineStore('transactions', () => {
     fetch,
     save,
     refresh,
+    enterEditMode,
+    exitEditMode,
+    cancelEdit,
+    addTransaction,
+    deleteTransaction,
+    onAllocationChange,
   };
 });

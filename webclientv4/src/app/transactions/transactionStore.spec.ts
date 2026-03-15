@@ -42,6 +42,16 @@ describe('transactionStore', () => {
       expect(store.transactions).toEqual([]);
     });
 
+    it('has empty draftTransactions', () => {
+      const store = useTransactionStore();
+      expect(store.draftTransactions).toEqual([]);
+    });
+
+    it('has isEditMode false', () => {
+      const store = useTransactionStore();
+      expect(store.isEditMode).toBe(false);
+    });
+
     it('has empty allocations', () => {
       const store = useTransactionStore();
       expect(store.allocations).toEqual([]);
@@ -176,6 +186,38 @@ describe('transactionStore', () => {
 
       expect(store.sinkFundAllocations).toEqual(sinkAllocations);
       expect(transactionApi.getSinkFundAllocations).toHaveBeenCalledWith(5);
+    });
+
+    it('clears sinkFundAllocations at the start of every fetch', async () => {
+      const bankAccount = { id: 2, name: 'Checking', is_sink_fund: false };
+      const budget = { id: 3, name: 'Jan 2025' };
+
+      vi.mocked(transactionApi.getAll).mockResolvedValue([]);
+      vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
+
+      const store = useTransactionStore();
+      store.sinkFundAllocations = [{ id: 1, name: 'Holiday Fund', amount: 50000 }];
+      store.bankAccounts = [bankAccount];
+      store.budgets = [budget];
+      await store.fetch({ budgetId: 3, bankAccountId: 2 });
+
+      expect(store.sinkFundAllocations).toEqual([]);
+    });
+
+    it('syncs draftTransactions with loaded transactions', async () => {
+      const transactions = [{ id: 1, description: 'Groceries' }];
+      const bankAccount = { id: 2, name: 'Checking', is_sink_fund: false };
+      const budget = { id: 3, name: 'Jan 2025' };
+
+      vi.mocked(transactionApi.getAll).mockResolvedValue(transactions);
+      vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
+
+      const store = useTransactionStore();
+      store.bankAccounts = [bankAccount];
+      store.budgets = [budget];
+      await store.fetch({ budgetId: 3, bankAccountId: 2 });
+
+      expect(store.draftTransactions).toEqual(transactions);
     });
 
     it('sets selectedBankAccount and selectedBudget from loaded data', async () => {
@@ -351,6 +393,167 @@ describe('transactionStore', () => {
     });
   });
 
+  describe('exitEditMode', () => {
+    it('sets isEditMode to false', () => {
+      const store = useTransactionStore();
+      store.isEditMode = true;
+
+      store.exitEditMode();
+
+      expect(store.isEditMode).toBe(false);
+    });
+
+    it('does not reset draftTransactions', () => {
+      const draft = [{ id: 1, description: 'Draft', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      const store = useTransactionStore();
+      store.isEditMode = true;
+      store.draftTransactions = draft;
+
+      store.exitEditMode();
+
+      expect(store.draftTransactions).toEqual(draft);
+    });
+  });
+
+  describe('enterEditMode', () => {
+    it('sets isEditMode to true', () => {
+      const store = useTransactionStore();
+      store.transactions = [{ id: 1, description: 'Test', withdrawal_amount: 100, deposit_amount: 0, status: 'paid' }];
+
+      store.enterEditMode();
+
+      expect(store.isEditMode).toBe(true);
+    });
+
+    it('creates a deep copy of transactions into draftTransactions', () => {
+      const transaction = { id: 1, description: 'Original', withdrawal_amount: 100, deposit_amount: 0, status: 'paid' };
+      const store = useTransactionStore();
+      store.transactions = [transaction];
+
+      store.enterEditMode();
+
+      expect(store.draftTransactions).toEqual([transaction]);
+      store.draftTransactions[0].description = 'Mutated';
+      expect(store.transactions[0].description).toBe('Original');
+    });
+  });
+
+  describe('cancelEdit', () => {
+    it('sets isEditMode to false', () => {
+      const store = useTransactionStore();
+      store.isEditMode = true;
+
+      store.cancelEdit();
+
+      expect(store.isEditMode).toBe(false);
+    });
+
+    it('resets draftTransactions from transactions', () => {
+      const store = useTransactionStore();
+      store.transactions = [{ id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      store.draftTransactions = [{ id: 1, description: 'Draft edit', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      store.isEditMode = true;
+
+      store.cancelEdit();
+
+      expect(store.draftTransactions).toEqual(store.transactions);
+    });
+
+    it('creates a deep copy so draft is independent of transactions', () => {
+      const store = useTransactionStore();
+      store.transactions = [{ id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+
+      store.cancelEdit();
+      store.draftTransactions[0].description = 'Mutated';
+
+      expect(store.transactions[0].description).toBe('Server');
+    });
+  });
+
+  describe('addTransaction', () => {
+    it('appends a new transaction to draftTransactions', () => {
+      const store = useTransactionStore();
+      store.selectedBankAccount = { id: 1, name: 'Checking', is_credit_card: false };
+      store.draftTransactions = [];
+
+      store.addTransaction();
+
+      expect(store.draftTransactions).toHaveLength(1);
+    });
+
+    it('adds new transaction with status "paid" for non-credit-card accounts', () => {
+      const store = useTransactionStore();
+      store.selectedBankAccount = { id: 1, name: 'Checking', is_credit_card: false };
+
+      store.addTransaction();
+
+      expect(store.draftTransactions[0].status).toBe('paid');
+    });
+
+    it('adds new transaction with status "unpaid" for credit card accounts', () => {
+      const store = useTransactionStore();
+      store.selectedBankAccount = { id: 2, name: 'Credit Card', is_credit_card: true };
+
+      store.addTransaction();
+
+      expect(store.draftTransactions[0].status).toBe('unpaid');
+    });
+
+    it('adds new transaction with zero withdrawal and deposit amounts', () => {
+      const store = useTransactionStore();
+      store.selectedBankAccount = { id: 1, name: 'Checking', is_credit_card: false };
+
+      store.addTransaction();
+
+      expect(store.draftTransactions[0].withdrawal_amount).toBe(0);
+      expect(store.draftTransactions[0].deposit_amount).toBe(0);
+    });
+  });
+
+  describe('deleteTransaction', () => {
+    it('sets deleted to true on the transaction', () => {
+      const store = useTransactionStore();
+      const transaction = { id: 1, description: 'Groceries', withdrawal_amount: 100, deposit_amount: 0, status: 'paid', deleted: false };
+      store.draftTransactions = [transaction];
+
+      store.deleteTransaction(store.draftTransactions[0]);
+
+      expect(store.draftTransactions[0].deleted).toBe(true);
+    });
+  });
+
+  describe('onAllocationChange', () => {
+    it('sets allocation_id on the transaction', () => {
+      const store = useTransactionStore();
+      const transaction = { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'unpaid' };
+      store.draftTransactions = [transaction];
+
+      store.onAllocationChange(store.draftTransactions[0], 5);
+
+      expect(store.draftTransactions[0].allocation_id).toBe(5);
+    });
+
+    it('sets status to "paid" when allocationId is greater than 0', () => {
+      const store = useTransactionStore();
+      const transaction = { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'unpaid' };
+      store.draftTransactions = [transaction];
+
+      store.onAllocationChange(store.draftTransactions[0], 3);
+
+      expect(store.draftTransactions[0].status).toBe('paid');
+    });
+
+    it('sets status to "unpaid" when allocationId is 0', () => {
+      const store = useTransactionStore();
+      const transaction = { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' };
+      store.draftTransactions = [transaction];
+
+      store.onAllocationChange(store.draftTransactions[0], 0);
+
+      expect(store.draftTransactions[0].status).toBe('unpaid');
+    });
+  });
+
   describe('budgetsForDropdown computed', () => {
     it('includes the last open budget and all closed budgets', () => {
       const store = useTransactionStore();
@@ -362,7 +565,7 @@ describe('transactionStore', () => {
       ];
 
       expect(store.budgetsForDropdown).toEqual([
-        { id: 3, name: 'Jan 2025', status: 'open' },
+        { id: 4, name: 'Feb 2025', status: 'open' },
         { id: 1, name: 'Nov 2024', status: 'closed' },
         { id: 2, name: 'Dec 2024', status: 'closed' },
       ]);

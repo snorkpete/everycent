@@ -33,6 +33,8 @@ const sampleAllocations: AllocationData[] = [
 
 const mockStore = reactive({
   transactions: sampleTransactions as TransactionData[],
+  draftTransactions: sampleTransactions as TransactionData[],
+  isEditMode: false,
   allocations: sampleAllocations as AllocationData[],
   sinkFundAllocations: [] as unknown[],
   budgets: [jan2025] as BudgetData[],
@@ -46,6 +48,12 @@ const mockStore = reactive({
   fetch: vi.fn().mockResolvedValue(undefined),
   save: vi.fn().mockResolvedValue(undefined),
   refresh: vi.fn().mockResolvedValue(undefined),
+  cancelEdit: vi.fn(),
+  exitEditMode: vi.fn(),
+  enterEditMode: vi.fn(),
+  addTransaction: vi.fn(),
+  deleteTransaction: vi.fn(),
+  onAllocationChange: vi.fn(),
 });
 
 vi.mock('./transactionStore', () => ({
@@ -61,7 +69,6 @@ const SearchFormStub = {
 const ListStub = {
   name: 'TransactionList',
   template: '<div data-testid="transaction-list" />',
-  props: ['transactions', 'allocations', 'sinkFundAllocations', 'bankAccount', 'budget'],
   emits: ['save', 'cancel'],
 };
 
@@ -89,6 +96,8 @@ describe('TransactionsPage', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     mockStore.transactions = sampleTransactions;
+    mockStore.draftTransactions = sampleTransactions;
+    mockStore.isEditMode = false;
     mockStore.allocations = sampleAllocations;
     mockStore.sinkFundAllocations = [];
     mockStore.selectedBankAccount = checkingAccount;
@@ -158,52 +167,33 @@ describe('TransactionsPage', () => {
     });
   });
 
-  describe('TransactionList props', () => {
-    it('passes transactions to TransactionList', () => {
-      const wrapper = mountPage();
-
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      expect(list.props('transactions')).toEqual(sampleTransactions);
-    });
-
-    it('passes allocations to TransactionList', () => {
-      const wrapper = mountPage();
-
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      expect(list.props('allocations')).toEqual(sampleAllocations);
-    });
-
-    it('passes bankAccount to TransactionList', () => {
-      const wrapper = mountPage();
-
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      expect(list.props('bankAccount')).toEqual(checkingAccount);
-    });
-
-    it('passes budget to TransactionList', () => {
-      const wrapper = mountPage();
-
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      expect(list.props('budget')).toEqual(jan2025);
-    });
-  });
-
   describe('save event from TransactionList', () => {
-    it('calls store.save with the transactions', async () => {
+    it('calls store.save with draftTransactions', async () => {
       const wrapper = mountPage();
+      const draftTransactions = mockStore.draftTransactions;
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('save', sampleTransactions);
+      await list.vm.$emit('save');
       await nextTick();
 
-      expect(mockStore.save).toHaveBeenCalledWith(sampleTransactions);
+      expect(mockStore.save).toHaveBeenCalledWith(draftTransactions);
+    });
+
+    it('calls store.exitEditMode after saving', async () => {
+      const wrapper = mountPage();
+
+      const list = wrapper.findComponent({ name: 'TransactionList' });
+      await list.vm.$emit('save');
+      await nextTick();
+
+      expect(mockStore.exitEditMode).toHaveBeenCalled();
     });
 
     it('shows a success notification after saving', async () => {
       const wrapper = mountPage();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('save', sampleTransactions);
+      await list.vm.$emit('save');
       await nextTick();
 
       expect(mockNotifySuccess).toHaveBeenCalledWith('Transactions saved');
@@ -218,7 +208,7 @@ describe('TransactionsPage', () => {
       const wrapper = mountPage();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('save', sampleTransactions);
+      await list.vm.$emit('save');
       await nextTick();
 
       expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
@@ -226,14 +216,14 @@ describe('TransactionsPage', () => {
   });
 
   describe('cancel event from TransactionList', () => {
-    it('calls store.refresh on cancel', async () => {
+    it('calls store.cancelEdit on cancel', async () => {
       const wrapper = mountPage();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
       await list.vm.$emit('cancel');
       await nextTick();
 
-      expect(mockStore.refresh).toHaveBeenCalled();
+      expect(mockStore.cancelEdit).toHaveBeenCalled();
     });
   });
 
