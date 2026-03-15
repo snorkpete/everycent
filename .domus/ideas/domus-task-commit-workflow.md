@@ -19,4 +19,7 @@ _To be filled in._
 
 ## Open Questions / Things to Explore
 
-- _Add open questions here_
+- Should domus state be bundled with the related code commit (e.g. mark task done in the same commit as the code that completes it), or kept separate? Bundling keeps context together; separating keeps code commits clean and domus commits auditable on their own.
+- End-of-session batch commit is simple but means domus state can lag behind reality mid-session — if a session is interrupted, work is untracked.
+- Per-transition commit (commit whenever a task changes status or a spec is finalised) is more precise but adds ceremony and requires remembering to do it.
+- Is there a hybrid? e.g. code + status-change in one commit, but spec/body edits batched at end of session.

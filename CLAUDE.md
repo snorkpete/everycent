@@ -239,7 +239,11 @@ CLI lives at `~/code/domus`, linked globally via `bun link`. In Bash, use full p
 **Refinement levels:** `raw` → `refined` → `autonomous`
 - **raw** — open questions, not ready to execute
 - **refined** — well understood, needs human oversight during execution
-- **autonomous** — fully specified, Claude can execute end-to-end
+- **autonomous** — a cold agent with no prior context can read this task, orient, execute, and resume from any recorded state
+
+**Refining to `autonomous`:** Before promoting a task to autonomous, ask: "Should we do a critical review of this spec?" If yes, put on the Linus hat — read the task details carefully, call out ambiguities, missing edge cases, potential bugs in the approach, or unanswered questions. No softening. Work through the feedback and re-refine until the spec is tight. This step can be skipped intentionally but should never be skipped by accident.
+
+**Task bodies as execution logs:** When executing an autonomous task, write progress back to the task body progressively — not as a summary at the end. After each meaningful step: what was done, what was verified, what failed and why, where execution stopped. This is what makes retry a real strategy (not a restart) and keeps the task list a live view of system state rather than a static to-do list.
 
 **Tags:** See `.domus/tags/shared.md` and `.domus/tags/tasks.md` — read when tagging, not otherwise.
 

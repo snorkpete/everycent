@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
+import {mount, type VueWrapper} from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import TransactionSearchForm from './TransactionSearchForm.vue';
@@ -29,7 +29,7 @@ vi.mock('./transactionStore', () => ({
   useTransactionStore: () => mockStore,
 }));
 
-function createWrapper() {
+function createWrapper(): VueWrapper {
   return mount(TransactionSearchForm, {
     global: {
       plugins: [PrimeVue, createPinia()],
