@@ -1,5 +1,6 @@
 # Task: Extract MIGRATION_PLAN.md into domus tasks and specs
 
+**Status:** done
 **ID:** extract-migration_planmd-into-domus-tasks-and-specs
 **Status:** done
 **Refinement:** raw

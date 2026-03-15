@@ -1,5 +1,7 @@
 # Task: Repair existing idea MD files to current format
 
+**Status:** done
+**Status:** done
 **ID:** repair-existing-idea-md-files-to-current-format
 **Status:** done
 **Refinement:** autonomous

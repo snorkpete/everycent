@@ -1,4 +1,4 @@
-# Task: Migrate current budget and budget list screens to Vue
+# Task: Migrate budget list screen to Vue
 
 **ID:** migrate-current-budget-and-budget-list-screens-to-vue
 **Status:** open
