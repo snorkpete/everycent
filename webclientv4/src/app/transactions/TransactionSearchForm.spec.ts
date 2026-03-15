@@ -29,7 +29,7 @@ vi.mock('./transactionStore', () => ({
   useTransactionStore: () => mockStore,
 }));
 
-function mountForm() {
+function createWrapper() {
   return mount(TransactionSearchForm, {
     global: {
       plugins: [PrimeVue, createPinia()],
@@ -50,21 +50,21 @@ describe('TransactionSearchForm', () => {
 
   describe('rendering', () => {
     it('renders bank account options from store', () => {
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
 
-      expect(wrapper.text()).toContain('Checking');
-      expect(wrapper.text()).toContain('Savings');
+      const bankAccountSelect = wrapper.findComponent('[data-testid="bank-account-select"]');
+      expect(bankAccountSelect.props('options')).toEqual([checkingAccount, savingsAccount]);
     });
 
     it('renders budget options from store', () => {
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
 
-      expect(wrapper.text()).toContain('Jan 2025');
-      expect(wrapper.text()).toContain('Dec 2024');
+      const budgetSelect = wrapper.findComponent('[data-testid="budget-select"]');
+      expect(budgetSelect.props('options')).toEqual([jan2025, dec2024]);
     });
 
     it('shows a "Go to Budget" link', () => {
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
 
       const link = wrapper.find('[data-testid="go-to-budget-link"]');
       expect(link.exists()).toBe(true);
@@ -75,7 +75,7 @@ describe('TransactionSearchForm', () => {
     it('links to /budgets when no bank account/budget are selected yet', async () => {
       mockStore.bankAccounts = [];
       mockStore.budgetsForDropdown = [];
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
       await nextTick();
 
       const link = wrapper.find('[data-testid="go-to-budget-link"]');
@@ -83,7 +83,7 @@ describe('TransactionSearchForm', () => {
     });
 
     it('links to the selected budget after initialisation', async () => {
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
       await nextTick();
 
       const link = wrapper.find('[data-testid="go-to-budget-link"]');
@@ -93,29 +93,32 @@ describe('TransactionSearchForm', () => {
 
   describe('auto-fetch on initial bank account load', () => {
     it('emits fetch with first account and first budget when bankAccounts load', async () => {
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
       await nextTick();
 
       const fetchEmissions = wrapper.emitted('fetch');
       expect(fetchEmissions).toBeTruthy();
-      const emitted = fetchEmissions![0][0] as { budgetId: number; bankAccountId: number };
-      expect(emitted.bankAccountId).toBe(checkingAccount.id);
-      expect(emitted.budgetId).toBe(jan2025.id);
+      const [params] = fetchEmissions![0] as [{ budgetId: number; bankAccountId: number }];
+      expect(params.bankAccountId).toBe(checkingAccount.id);
+      expect(params.budgetId).toBe(jan2025.id);
     });
 
     it('does not emit fetch when bankAccounts are empty', async () => {
       mockStore.bankAccounts = [];
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.emitted('fetch')).toBeFalsy();
     });
 
-    it('only initialises once even if bankAccounts changes again', async () => {
-      const wrapper = mountForm();
+    // The initialised guard prevents re-fetching when bankAccounts is re-assigned
+    // (e.g. after a store refresh). The watcher is a one-time startup trigger, not
+    // a subscription to bank account changes.
+    it('only initialises once even if bankAccounts is re-assigned', async () => {
+      const wrapper = createWrapper();
       await nextTick();
 
-      mockStore.bankAccounts = [...mockStore.bankAccounts]; // trigger watcher again
+      mockStore.bankAccounts = [...mockStore.bankAccounts];
       await nextTick();
 
       const fetchEmissions = wrapper.emitted('fetch');
@@ -126,46 +129,44 @@ describe('TransactionSearchForm', () => {
   describe('URL params on mount', () => {
     it('uses URL query params to select bank account and budget', async () => {
       mockRoute.query = { budget_id: '9', bank_account_id: '2' };
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
       await nextTick();
 
       const fetchEmissions = wrapper.emitted('fetch');
       expect(fetchEmissions).toBeTruthy();
-      const emitted = fetchEmissions![0][0] as { budgetId: number; bankAccountId: number };
-      expect(emitted.bankAccountId).toBe(2);
-      expect(emitted.budgetId).toBe(9);
+      const [params] = fetchEmissions![0] as [{ budgetId: number; bankAccountId: number }];
+      expect(params.bankAccountId).toBe(2);
+      expect(params.budgetId).toBe(9);
     });
   });
 
   describe('fetch event on dropdown change', () => {
     it('emits fetch with updated bankAccountId when bank account changes', async () => {
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
       await nextTick();
 
-      const selects = wrapper.findAllComponents({ name: 'Select' });
-      const bankAccountSelect = selects[0];
+      const bankAccountSelect = wrapper.findComponent('[data-testid="bank-account-select"]');
       await bankAccountSelect.vm.$emit('update:modelValue', savingsAccount.id);
       await nextTick();
 
       const fetchEmissions = wrapper.emitted('fetch');
       expect(fetchEmissions).toBeTruthy();
-      const lastEmit = fetchEmissions![fetchEmissions!.length - 1][0] as { budgetId: number; bankAccountId: number };
-      expect(lastEmit.bankAccountId).toBe(savingsAccount.id);
+      const [lastParams] = fetchEmissions!.at(-1)! as [{ budgetId: number; bankAccountId: number }];
+      expect(lastParams.bankAccountId).toBe(savingsAccount.id);
     });
 
     it('emits fetch with updated budgetId when budget changes', async () => {
-      const wrapper = mountForm();
+      const wrapper = createWrapper();
       await nextTick();
 
-      const selects = wrapper.findAllComponents({ name: 'Select' });
-      const budgetSelect = selects[1];
+      const budgetSelect = wrapper.findComponent('[data-testid="budget-select"]');
       await budgetSelect.vm.$emit('update:modelValue', dec2024.id);
       await nextTick();
 
       const fetchEmissions = wrapper.emitted('fetch');
       expect(fetchEmissions).toBeTruthy();
-      const lastEmit = fetchEmissions![fetchEmissions!.length - 1][0] as { budgetId: number; bankAccountId: number };
-      expect(lastEmit.budgetId).toBe(dec2024.id);
+      const [lastParams] = fetchEmissions!.at(-1)! as [{ budgetId: number; bankAccountId: number }];
+      expect(lastParams.budgetId).toBe(dec2024.id);
     });
   });
 });
