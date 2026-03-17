@@ -1,16 +1,16 @@
 <template>
   <div class="transaction-list">
-    <div class="table-wrapper">
-      <table class="transactions-table">
+    <table class="transactions-table">
         <thead>
           <tr>
+            <th :class="['col-calculator', { 'col-calculator--active': showCalculatorColumn }]" />
             <th class="col-date">Date</th>
             <th class="col-description">Description</th>
             <th data-testid="allocation-header" class="col-allocation">{{ allocationHeaderName }}</th>
             <th class="col-money right">Withdrawn</th>
             <th class="col-money right">Deposited</th>
-            <th class="col-paid">Paid?</th>
-            <th class="col-action">Action</th>
+            <th class="col-paid">Paid</th>
+            <th class="col-action" />
           </tr>
         </thead>
         <tbody>
@@ -20,6 +20,15 @@
             data-testid="transaction-row"
             :class="{ 'transaction-row--deleted': transaction.deleted }"
           >
+            <td :class="['col-calculator', { 'col-calculator--active': showCalculatorColumn }]">
+              <Checkbox
+                v-if="showCalculatorColumn"
+                :model-value="false"
+                binary
+                :data-testid="`calculator-checkbox-${index}`"
+                class="calculator-checkbox"
+              />
+            </td>
             <td class="col-date">
               <EcDateField
                 label=""
@@ -28,7 +37,7 @@
                 @update:model-value="transaction.transaction_date = $event"
               />
             </td>
-            <td class="col-description">
+            <td :class="['col-description', wrapDescriptions ? 'col-description--wrap' : 'col-description--truncate']">
               <EcTextField
                 label=""
                 :edit-mode="store.isEditMode"
@@ -82,7 +91,11 @@
                 />
               </template>
               <template v-else>
-                <span>{{ transaction.status === 'paid' ? 'Yes' : 'No' }}</span>
+                <i
+                  v-if="transaction.status === 'paid'"
+                  class="pi pi-check paid-icon"
+                  data-testid="paid-icon"
+                />
               </template>
             </td>
             <td class="col-action">
@@ -98,49 +111,20 @@
             </td>
           </tr>
         </tbody>
-      </table>
-    </div>
-
-    <div class="list-actions">
-      <template v-if="!store.isEditMode">
-        <Button
-          label="Edit"
-          data-testid="edit-btn"
-          @click="store.enterEditMode()"
-        />
-      </template>
-      <template v-else>
-        <Button
-          label="Save"
-          data-testid="save-btn"
-          @click="onSave"
-        />
-        <Button
-          label="Cancel"
-          severity="secondary"
-          data-testid="cancel-btn"
-          @click="onCancel"
-        />
-        <Button
-          label="Add New Transaction"
-          severity="secondary"
-          data-testid="add-btn"
-          @click="store.addTransaction()"
-        />
-        <Button
-          label="Import"
-          severity="secondary"
-          disabled
-          data-testid="import-btn"
-        />
-        <Button
-          label="Transfer"
-          severity="secondary"
-          disabled
-          data-testid="transfer-btn"
-        />
-      </template>
-    </div>
+        <tfoot v-if="store.isEditMode">
+          <tr>
+            <td :colspan="8" class="table-footer">
+              <Button
+                label="Add New Transaction"
+                severity="secondary"
+                size="small"
+                data-testid="add-btn"
+                @click="store.addTransaction()"
+              />
+            </td>
+          </tr>
+        </tfoot>
+    </table>
   </div>
 </template>
 
@@ -155,12 +139,12 @@ import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
 import { useTransactionStore } from './transactionStore';
 
-const store = useTransactionStore();
-
-const emit = defineEmits<{
-  save: [];
-  cancel: [];
+const props = defineProps<{
+  wrapDescriptions?: boolean;
+  showCalculatorColumn?: boolean;
 }>();
+
+const store = useTransactionStore();
 
 const allocationHeaderName = computed(() => {
   return store.selectedBankAccount?.is_sink_fund ? 'Sink Fund Allocation' : 'Allocation';
@@ -177,26 +161,12 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
     .filter((a) => a.id != null && a.name != null)
     .map((a) => ({ ...a, id: a.id!, name: a.name! })),
 );
-
-function onSave() {
-  emit('save');
-}
-
-function onCancel() {
-  emit('cancel');
-}
 </script>
 
 <style scoped>
 .transaction-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   overflow: auto;
-}
-
-.table-wrapper {
-  overflow: auto;
+  flex: 1;
 }
 
 .transactions-table {
@@ -219,17 +189,36 @@ function onCancel() {
   position: sticky;
   top: 0;
   z-index: 1;
+  border-bottom: 2px solid var(--p-surface-300);
 }
 
-.col-date { width: 12%; }
-.col-description { width: 28%; }
-.col-allocation { width: 22%; }
+.col-calculator { width: 0; min-width: 0; max-width: 0; padding: 0; overflow: hidden; }
+.col-calculator--active { width: 28px; min-width: 28px; max-width: 28px; padding: 0 4px; overflow: visible; }
+.col-date { width: 11%; }
+.col-description { width: 26%; }
+.col-allocation { width: 21%; }
 .col-money { width: 10%; }
-.col-paid { width: 7%; }
-.col-action { width: 6%; }
+.col-paid { width: 6%; }
+.col-action { width: 5%; }
+
+.col-description--truncate :deep(.text-display) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.col-description--wrap :deep(.text-display) {
+  white-space: normal;
+  word-break: break-word;
+}
 
 .right {
   text-align: right;
+}
+
+.transactions-table tbody tr:nth-child(even) {
+  background-color: var(--p-surface-50);
 }
 
 .transaction-row--deleted {
@@ -237,9 +226,17 @@ function onCancel() {
   text-decoration: line-through;
 }
 
-.list-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.paid-icon {
+  color: var(--p-green-600);
+  font-size: 0.875rem;
+}
+
+.calculator-checkbox {
+  display: block;
+}
+
+.table-footer {
+  padding: 0.5rem;
+  text-align: left;
 }
 </style>

@@ -78,6 +78,16 @@ describe('TransactionSummary', () => {
     mockSettingsStore.settings = { primary_budget_account_id: primaryAccountId };
   });
 
+  describe('layout', () => {
+    it('renders three columns in row 1', () => {
+      const wrapper = mountSummary();
+
+      expect(wrapper.find('[data-testid="last-bank-balance"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="transaction-total"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="current-bank-balance"]').exists()).toBe(true);
+    });
+  });
+
   describe('last bank balance', () => {
     it('shows the closing balance of the bank account', () => {
       const wrapper = mountSummary({ bankAccount: primaryAccount });

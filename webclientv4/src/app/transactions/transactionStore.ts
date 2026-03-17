@@ -33,7 +33,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     try {
       const [loadedBudgets, loadedAccounts] = await Promise.all([
         budgetApi.getAll(),
-        bankAccountApi.getWithBalances(),
+        bankAccountApi.getOpen(),
       ]);
       budgets.value = loadedBudgets;
       bankAccounts.value = loadedAccounts;

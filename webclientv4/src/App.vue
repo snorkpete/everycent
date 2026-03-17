@@ -9,7 +9,9 @@
       <div class="main-content">
         <AppToolbar />
 
-        <router-view />
+        <div class="page-content">
+          <router-view />
+        </div>
       </div>
     </div>
   </template>
@@ -30,12 +32,23 @@ const authStore = useAuthStore();
 <style scoped>
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main-content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.page-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 </style>

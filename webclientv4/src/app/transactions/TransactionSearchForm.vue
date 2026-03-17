@@ -1,48 +1,35 @@
 <template>
   <div class="transaction-search-form">
-    <h3 class="form-title">Select Transactions to View</h3>
-    <div class="form-fields">
-      <div class="field">
-        <label for="bank-account-select">Bank Account</label>
-        <Select
-          id="bank-account-select"
-          v-model="selectedBankAccountId"
-          :options="store.bankAccounts"
-          option-label="name"
-          option-value="id"
-          placeholder="Select Bank Account"
-          data-testid="bank-account-select"
-          @update:model-value="onBankAccountChange"
-        />
-      </div>
-      <div class="field">
-        <label for="budget-select">Budget</label>
-        <Select
-          id="budget-select"
-          v-model="selectedBudgetId"
-          :options="store.budgetsForDropdown"
-          option-label="name"
-          option-value="id"
-          placeholder="Select Budget"
-          data-testid="budget-select"
-          @update:model-value="onBudgetChange"
-        />
-      </div>
-    </div>
-    <div class="form-actions">
-      <a
-        :href="budgetLink"
-        data-testid="go-to-budget-link"
-        class="budget-link"
-      >Go to Budget</a>
-    </div>
+    <Select
+      v-model="selectedBankAccountId"
+      :options="store.bankAccounts"
+      option-label="name"
+      option-value="id"
+      placeholder="Bank Account"
+      data-testid="bank-account-select"
+      @update:model-value="onBankAccountChange"
+    />
+    <Select
+      v-model="selectedBudgetId"
+      :options="store.budgetsForDropdown"
+      option-label="name"
+      option-value="id"
+      placeholder="Budget"
+      data-testid="budget-select"
+      @update:model-value="onBudgetChange"
+    />
+    <a
+      :href="budgetLink"
+      data-testid="go-to-budget-link"
+      class="budget-link"
+    >Go to Budget</a>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import Select from 'primevue/select';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useTransactionStore } from './transactionStore';
 
 const emit = defineEmits<{
@@ -51,6 +38,7 @@ const emit = defineEmits<{
 
 const store = useTransactionStore();
 const route = useRoute();
+const router = useRouter();
 
 const selectedBankAccountId = ref<number | null>(null);
 const selectedBudgetId = ref<number | null>(null);
@@ -97,6 +85,9 @@ function onBudgetChange(id: number) {
 
 function emitFetch() {
   if (selectedBudgetId.value && selectedBankAccountId.value) {
+    router.replace({
+      query: { budget_id: selectedBudgetId.value, bank_account_id: selectedBankAccountId.value },
+    });
     emit('fetch', {
       budgetId: selectedBudgetId.value,
       bankAccountId: selectedBankAccountId.value,
@@ -107,46 +98,15 @@ function emitFetch() {
 
 <style scoped>
 .transaction-search-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 6px;
-}
-
-.form-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.field label {
-  font-size: 0.85rem;
-  color: var(--p-text-muted-color);
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
+  display: contents;
 }
 
 .budget-link {
   font-size: 0.9rem;
   color: var(--p-primary-color);
   text-decoration: none;
+  white-space: nowrap;
+  align-self: center;
 }
 
 .budget-link:hover {

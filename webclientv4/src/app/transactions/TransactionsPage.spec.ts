@@ -7,6 +7,16 @@ import TransactionsPage from './TransactionsPage.vue';
 import type { TransactionData, AllocationData, BudgetData } from './transaction.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
+// Selectors
+const EDIT_BTN = '[data-testid="edit-btn"]';
+const SAVE_BTN = '[data-testid="save-btn"]';
+const CANCEL_BTN = '[data-testid="cancel-btn"]';
+const REFRESH_BTN = '[data-testid="refresh-btn"]';
+const IMPORT_BTN = '[data-testid="import-btn"]';
+const TRANSFER_BTN = '[data-testid="transfer-btn"]';
+const WRAP_TOGGLE_BTN = '[data-testid="wrap-toggle-btn"]';
+const CALCULATOR_TOGGLE_BTN = '[data-testid="calculator-toggle-btn"]';
+
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
   useHeadingStore: () => ({ setHeading: mockSetHeading }),
@@ -69,7 +79,7 @@ const SearchFormStub = {
 const ListStub = {
   name: 'TransactionList',
   template: '<div data-testid="transaction-list" />',
-  emits: ['save', 'cancel'],
+  props: ['wrapDescriptions', 'showCalculatorColumn'],
 };
 
 const SummaryStub = {
@@ -106,6 +116,7 @@ describe('TransactionsPage', () => {
     mockStore.fetchMetadata.mockResolvedValue(undefined);
     mockStore.fetch.mockResolvedValue(undefined);
     mockStore.save.mockResolvedValue(undefined);
+    mockStore.refresh.mockResolvedValue(undefined);
   });
 
   describe('on mount', () => {
@@ -125,7 +136,7 @@ describe('TransactionsPage', () => {
   });
 
   describe('layout', () => {
-    it('renders TransactionSearchForm', () => {
+    it('renders TransactionSearchForm in toolbar', () => {
       const wrapper = mountPage();
 
       expect(wrapper.findComponent({ name: 'TransactionSearchForm' }).exists()).toBe(true);
@@ -167,33 +178,90 @@ describe('TransactionsPage', () => {
     });
   });
 
-  describe('save event from TransactionList', () => {
-    it('calls store.save with draftTransactions', async () => {
+  describe('TransactionList props', () => {
+    it('passes wrapDescriptions=false by default', () => {
       const wrapper = mountPage();
-      const draftTransactions = mockStore.draftTransactions;
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('save');
+      expect(list.props('wrapDescriptions')).toBe(false);
+    });
+
+    it('passes showCalculatorColumn=false by default', () => {
+      const wrapper = mountPage();
+
+      const list = wrapper.findComponent({ name: 'TransactionList' });
+      expect(list.props('showCalculatorColumn')).toBe(false);
+    });
+  });
+
+  describe('toolbar — edit mode buttons', () => {
+    it('shows Edit button in view mode', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
+      expect(wrapper.find(SAVE_BTN).exists()).toBe(false);
+      expect(wrapper.find(CANCEL_BTN).exists()).toBe(false);
+    });
+
+    it('shows Save and Cancel buttons in edit mode', async () => {
+      mockStore.isEditMode = true;
+      const wrapper = mountPage();
+      await nextTick();
+
+      expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
+      expect(wrapper.find(CANCEL_BTN).exists()).toBe(true);
+      expect(wrapper.find(EDIT_BTN).exists()).toBe(false);
+    });
+
+    it('calls store.enterEditMode when Edit is clicked', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(EDIT_BTN).trigger('click');
+
+      expect(mockStore.enterEditMode).toHaveBeenCalled();
+    });
+
+    it('calls store.cancelEdit when Cancel is clicked', async () => {
+      mockStore.isEditMode = true;
+      const wrapper = mountPage();
+      await nextTick();
+
+      await wrapper.find(CANCEL_BTN).trigger('click');
+
+      expect(mockStore.cancelEdit).toHaveBeenCalled();
+    });
+  });
+
+  describe('toolbar — save', () => {
+    it('calls store.save with draftTransactions when Save is clicked', async () => {
+      mockStore.isEditMode = true;
+      const wrapper = mountPage();
+      await nextTick();
+      const draftTransactions = mockStore.draftTransactions;
+
+      await wrapper.find(SAVE_BTN).trigger('click');
       await nextTick();
 
       expect(mockStore.save).toHaveBeenCalledWith(draftTransactions);
     });
 
     it('calls store.exitEditMode after saving', async () => {
+      mockStore.isEditMode = true;
       const wrapper = mountPage();
+      await nextTick();
 
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('save');
+      await wrapper.find(SAVE_BTN).trigger('click');
       await nextTick();
 
       expect(mockStore.exitEditMode).toHaveBeenCalled();
     });
 
     it('shows a success notification after saving', async () => {
+      mockStore.isEditMode = true;
       const wrapper = mountPage();
+      await nextTick();
 
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('save');
+      await wrapper.find(SAVE_BTN).trigger('click');
       await nextTick();
 
       expect(mockNotifySuccess).toHaveBeenCalledWith('Transactions saved');
@@ -205,25 +273,107 @@ describe('TransactionsPage', () => {
         mockStore.error = errorMessage;
         throw new Error('Server error');
       });
+      mockStore.isEditMode = true;
       const wrapper = mountPage();
+      await nextTick();
 
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('save');
+      await wrapper.find(SAVE_BTN).trigger('click');
       await nextTick();
 
       expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
     });
   });
 
-  describe('cancel event from TransactionList', () => {
-    it('calls store.cancelEdit on cancel', async () => {
+  describe('toolbar — refresh', () => {
+    it('shows Refresh button', () => {
       const wrapper = mountPage();
 
-      const list = wrapper.findComponent({ name: 'TransactionList' });
-      await list.vm.$emit('cancel');
+      expect(wrapper.find(REFRESH_BTN).exists()).toBe(true);
+    });
+
+    it('calls store.refresh when Refresh is clicked', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(REFRESH_BTN).trigger('click');
       await nextTick();
 
-      expect(mockStore.cancelEdit).toHaveBeenCalled();
+      expect(mockStore.refresh).toHaveBeenCalled();
+    });
+  });
+
+  describe('toolbar — Import and Transfer', () => {
+    it('shows Import button (disabled)', () => {
+      const wrapper = mountPage();
+
+      const importBtn = wrapper.find(IMPORT_BTN);
+      expect(importBtn.exists()).toBe(true);
+      expect(importBtn.attributes('disabled')).toBeDefined();
+    });
+
+    it('shows Transfer button (disabled)', () => {
+      const wrapper = mountPage();
+
+      const transferBtn = wrapper.find(TRANSFER_BTN);
+      expect(transferBtn.exists()).toBe(true);
+      expect(transferBtn.attributes('disabled')).toBeDefined();
+    });
+  });
+
+  describe('toolbar — wrap toggle', () => {
+    it('shows wrap toggle button', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find(WRAP_TOGGLE_BTN).exists()).toBe(true);
+    });
+
+    it('passes wrapDescriptions=true to TransactionList after toggle', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(WRAP_TOGGLE_BTN).trigger('click');
+      await nextTick();
+
+      const list = wrapper.findComponent({ name: 'TransactionList' });
+      expect(list.props('wrapDescriptions')).toBe(true);
+    });
+
+    it('toggles wrapDescriptions back to false on second click', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(WRAP_TOGGLE_BTN).trigger('click');
+      await wrapper.find(WRAP_TOGGLE_BTN).trigger('click');
+      await nextTick();
+
+      const list = wrapper.findComponent({ name: 'TransactionList' });
+      expect(list.props('wrapDescriptions')).toBe(false);
+    });
+  });
+
+  describe('toolbar — calculator toggle', () => {
+    it('shows calculator toggle button', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find(CALCULATOR_TOGGLE_BTN).exists()).toBe(true);
+    });
+
+    it('passes showCalculatorColumn=true to TransactionList after toggle', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+      await nextTick();
+
+      const list = wrapper.findComponent({ name: 'TransactionList' });
+      expect(list.props('showCalculatorColumn')).toBe(true);
+    });
+
+    it('toggles showCalculatorColumn back to false on second click', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+      await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+      await nextTick();
+
+      const list = wrapper.findComponent({ name: 'TransactionList' });
+      expect(list.props('showCalculatorColumn')).toBe(false);
     });
   });
 

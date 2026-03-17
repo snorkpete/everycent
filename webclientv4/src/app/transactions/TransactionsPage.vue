@@ -1,21 +1,101 @@
 <template>
   <div class="transactions-page">
-    <div class="transactions-layout">
-      <div class="search-and-summary">
+    <!-- Zone 1: Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
         <TransactionSearchForm @fetch="onFetch" />
-        <TransactionSummary
-          :transactions="store.transactions"
-          :bank-account="store.selectedBankAccount ?? undefined"
-          :allocations="store.allocations"
-        />
       </div>
-      <TransactionList @save="onSave" @cancel="onCancel" />
+      <div class="toolbar-right">
+        <Button
+          icon="pi pi-arrows-h"
+          text
+          severity="secondary"
+          size="small"
+          :class="['icon-btn', { 'icon-btn--active': wrapDescriptions }]"
+          data-testid="wrap-toggle-btn"
+          title="Toggle description wrapping — truncates long descriptions by default; wrap shows the full text"
+          @click="wrapDescriptions = !wrapDescriptions"
+        />
+        <Button
+          icon="pi pi-calculator"
+          text
+          severity="secondary"
+          size="small"
+          :class="['icon-btn', { 'icon-btn--active': showCalculatorColumn }]"
+          data-testid="calculator-toggle-btn"
+          title="Toggle calculator column — shows checkboxes to select transactions and sum their amounts"
+          @click="showCalculatorColumn = !showCalculatorColumn"
+        />
+        <Button
+          icon="pi pi-refresh"
+          text
+          severity="secondary"
+          size="small"
+          data-testid="refresh-btn"
+          title="Refresh transactions"
+          @click="onRefresh"
+        />
+        <span class="toolbar-separator" />
+        <Button
+          label="Import"
+          outlined
+          severity="secondary"
+          size="small"
+          disabled
+          data-testid="import-btn"
+        />
+        <Button
+          label="Transfer"
+          outlined
+          severity="secondary"
+          size="small"
+          disabled
+          data-testid="transfer-btn"
+        />
+        <span class="toolbar-separator" />
+        <Button
+          v-if="!store.isEditMode"
+          label="Edit"
+          data-testid="edit-btn"
+          size="small"
+          @click="store.enterEditMode()"
+        />
+        <template v-else>
+          <Button
+            label="Save"
+            data-testid="save-btn"
+            size="small"
+            @click="onSave"
+          />
+          <Button
+            label="Cancel"
+            severity="secondary"
+            data-testid="cancel-btn"
+            size="small"
+            @click="onCancel"
+          />
+        </template>
+      </div>
+    </div>
+
+    <!-- Zones 2 + 3: Summary Bar + Table (unified card) -->
+    <div class="content-card">
+      <TransactionSummary
+        :transactions="store.transactions"
+        :bank-account="store.selectedBankAccount ?? undefined"
+        :allocations="store.allocations"
+      />
+      <TransactionList
+        :wrap-descriptions="wrapDescriptions"
+        :show-calculator-column="showCalculatorColumn"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -26,6 +106,9 @@ import TransactionSummary from './TransactionSummary.vue';
 const store = useTransactionStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
+
+const wrapDescriptions = ref(false);
+const showCalculatorColumn = ref(false);
 
 onMounted(() => {
   headingStore.setHeading('Transactions');
@@ -49,36 +132,68 @@ async function onSave() {
 function onCancel() {
   store.cancelEdit();
 }
+
+async function onRefresh() {
+  await store.refresh();
+}
 </script>
 
 <style scoped>
 .transactions-page {
-  padding: 1rem 1.5rem 1.5rem;
+  padding: 0.75rem 1.5rem 0;
   height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 0;
+  overflow: hidden;
 }
 
-.transactions-layout {
-  display: grid;
-  grid-template-areas:
-    'search-summary'
-    'list';
-  grid-template-rows: auto 1fr;
-  gap: 1rem;
-  height: 100%;
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
 }
 
-.search-and-summary {
-  grid-area: search-summary;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
-@media (max-width: 600px) {
-  .search-and-summary {
-    grid-template-columns: 1fr;
-  }
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.toolbar-right :deep(.icon-btn--active.p-button) {
+  background-color: var(--p-primary-50);
+  color: var(--p-primary-color);
+}
+
+.toolbar-separator {
+  display: block;
+  width: 1px;
+  height: 1.25rem;
+  background-color: var(--p-surface-300);
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.content-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--p-surface-300);
+  border-radius: 6px;
+  background-color: var(--p-surface-0);
+  margin-bottom: 0.75rem;
 }
 </style>

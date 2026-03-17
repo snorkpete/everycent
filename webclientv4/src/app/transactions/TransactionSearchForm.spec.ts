@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { nextTick, reactive } from 'vue';
-import {mount, type VueWrapper} from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import TransactionSearchForm from './TransactionSearchForm.vue';

@@ -1,67 +1,99 @@
 <template>
   <div class="transaction-summary">
-    <div class="summary-row">
-      <span class="summary-label">Last Bank Balance</span>
-      <span class="summary-value" data-testid="last-bank-balance">{{ centsToDollars(lastBankBalance) }}</span>
-    </div>
-
-    <div class="summary-row">
-      <span class="summary-label">Transaction Total</span>
-      <span class="summary-value" data-testid="transaction-total">{{ centsToDollars(transactionTotal) }}</span>
-    </div>
-
-    <div class="summary-row summary-row--total">
-      <span class="summary-label">Current Bank Balance</span>
-      <span
-        class="summary-value"
-        data-testid="current-bank-balance"
-        :class="{ positive: currentBankBalance > 0, negative: currentBankBalance < 0 }"
-      >{{ centsToDollars(currentBankBalance) }}</span>
-    </div>
-
-    <template v-if="showBudgetBalance">
-      <div class="summary-row" data-testid="budget-balance-section">
-        <span class="summary-label">Current Budget Balance</span>
-        <span class="summary-value" data-testid="current-budget-balance">{{ centsToDollars(currentBudgetBalance) }}</span>
+    <!-- Row 1: Last Balance | Transactions | Bank Balance -->
+    <div class="summary-grid">
+      <div class="summary-cell">
+        <span class="summary-label">Last Balance</span>
+        <EcMoneyField
+          label=""
+          :edit-mode="false"
+          :model-value="lastBankBalance"
+          data-testid="last-bank-balance"
+        />
       </div>
+      <div class="summary-cell summary-cell--center">
+        <span class="summary-label">Transactions</span>
+        <EcMoneyField
+          label=""
+          :edit-mode="false"
+          :model-value="transactionTotal"
+          data-testid="transaction-total"
+        />
+      </div>
+      <div class="summary-cell summary-cell--right">
+        <span class="summary-label">Bank Balance</span>
+        <EcMoneyField
+          label=""
+          :edit-mode="false"
+          :model-value="currentBankBalance"
+          data-testid="current-bank-balance"
+        />
+      </div>
+    </div>
 
-      <div class="summary-row summary-row--total">
-        <span class="summary-label">Difference (Bank vs Budget)</span>
-        <span
-          class="summary-value"
+    <!-- Row 2 (primary account): Budget Balance | [empty] | Diff -->
+    <div
+      v-if="showBudgetBalance"
+      class="summary-grid"
+      data-testid="budget-balance-section"
+    >
+      <div class="summary-cell">
+        <span class="summary-label">Budget Balance</span>
+        <EcMoneyField
+          label=""
+          :edit-mode="false"
+          :model-value="currentBudgetBalance"
+          data-testid="current-budget-balance"
+        />
+      </div>
+      <div class="summary-cell summary-cell--center" />
+      <div class="summary-cell summary-cell--right">
+        <span class="summary-label">Diff</span>
+        <EcMoneyField
+          label=""
+          :edit-mode="false"
+          :model-value="budgetDifference"
+          highlight-mode="zero"
           data-testid="budget-difference"
-          :class="{ positive: budgetDifference > 0, negative: budgetDifference < 0 }"
-        >{{ centsToDollars(budgetDifference) }}</span>
+        />
       </div>
-    </template>
+    </div>
 
-    <template v-if="showUnpaidBalance">
-      <div class="summary-row" data-testid="unpaid-balance-section">
+    <!-- Row 2 (credit card): Unpaid Balance | [empty] | Unpaid Diff -->
+    <div
+      v-if="showUnpaidBalance"
+      class="summary-grid"
+      data-testid="unpaid-balance-section"
+    >
+      <div class="summary-cell">
         <span class="summary-label">Unpaid Balance</span>
-        <span
-          class="summary-value"
+        <EcMoneyField
+          label=""
+          :edit-mode="false"
+          :model-value="unpaidBalance"
           data-testid="unpaid-balance"
-          :class="{ positive: unpaidBalance > 0, negative: unpaidBalance < 0 }"
-        >{{ centsToDollars(unpaidBalance) }}</span>
+        />
       </div>
-
-      <div class="summary-row">
-        <span class="summary-label">Unpaid Difference</span>
-        <span
-          class="summary-value"
+      <div class="summary-cell summary-cell--center" />
+      <div class="summary-cell summary-cell--right">
+        <span class="summary-label">Unpaid Diff</span>
+        <EcMoneyField
+          label=""
+          :edit-mode="false"
+          :model-value="unpaidDifference"
+          highlight-mode="zero"
           data-testid="unpaid-difference"
-          :class="{ positive: unpaidDifference > 0, negative: unpaidDifference < 0 }"
-        >{{ centsToDollars(unpaidDifference) }}</span>
+        />
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useSettingsStore } from '../settings/settingsStore';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { total } from '../shared/util/total';
+import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import type { TransactionData, AllocationData } from './transaction.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
@@ -118,41 +150,39 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
 .transaction-summary {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 1rem;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 6px;
+  gap: 0.125rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--p-surface-50);
+  border-bottom: 1px solid var(--p-surface-200);
+  border-radius: 6px 6px 0 0;
+  flex-shrink: 0;
 }
 
-.summary-row {
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.summary-cell {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.2rem 0;
+  flex-direction: column;
+  gap: 0;
 }
 
-.summary-row--total {
-  border-top: 1px solid var(--p-surface-300);
-  margin-top: 0.25rem;
-  padding-top: 0.4rem;
-  font-size: 1rem;
+.summary-cell--center {
+  align-items: center;
+}
+
+.summary-cell--right {
+  align-items: flex-end;
 }
 
 .summary-label {
+  font-size: 0.7rem;
+  color: var(--p-text-muted-color);
   font-weight: 500;
-  flex: 2;
-}
-
-.summary-value {
-  flex: 1;
-  text-align: right;
-}
-
-.positive {
-  color: var(--p-green-600);
-}
-
-.negative {
-  color: var(--p-red-600);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
 }
 </style>

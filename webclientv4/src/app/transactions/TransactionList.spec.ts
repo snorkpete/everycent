@@ -9,14 +9,10 @@ import type { TransactionData, AllocationData, SinkFundAllocationData } from './
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
 // Selectors
-const EDIT_BTN = '[data-testid="edit-btn"]';
-const SAVE_BTN = '[data-testid="save-btn"]';
-const CANCEL_BTN = '[data-testid="cancel-btn"]';
 const ADD_BTN = '[data-testid="add-btn"]';
-const IMPORT_BTN = '[data-testid="import-btn"]';
-const TRANSFER_BTN = '[data-testid="transfer-btn"]';
 const TRANSACTION_ROW = '[data-testid="transaction-row"]';
 const ALLOCATION_HEADER = '[data-testid="allocation-header"]';
+const PAID_ICON = '[data-testid="paid-icon"]';
 
 const checkingAccount: BankAccountData = { id: 1, name: 'Checking', is_sink_fund: false, is_credit_card: false };
 const sinkFundAccount: BankAccountData = { id: 3, name: 'Sink Fund', is_sink_fund: true, is_credit_card: false };
@@ -37,8 +33,9 @@ const sampleSinkFundAllocations: SinkFundAllocationData[] = [
 let pinia: Pinia;
 let store: ReturnType<typeof useTransactionStore>;
 
-function createWrapper(): VueWrapper {
+function createWrapper(props: { wrapDescriptions?: boolean; showCalculatorColumn?: boolean } = {}): VueWrapper {
   return mount(TransactionList, {
+    props,
     global: {
       plugins: [PrimeVue, pinia],
     },
@@ -66,19 +63,6 @@ describe('TransactionList', () => {
       expect(wrapper.text()).toContain('Salary');
     });
 
-    it('shows Edit button in display mode', () => {
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
-    });
-
-    it('does not show Save or Cancel buttons in display mode', () => {
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(SAVE_BTN).exists()).toBe(false);
-      expect(wrapper.find(CANCEL_BTN).exists()).toBe(false);
-    });
-
     it('does not show Add New Transaction button in display mode', () => {
       const wrapper = createWrapper();
 
@@ -93,22 +77,18 @@ describe('TransactionList', () => {
   });
 
   describe('edit mode', () => {
-    it('shows Save, Cancel, and Add buttons when store.isEditMode is true', async () => {
+    it('shows Add button in tfoot when store.isEditMode is true', async () => {
       store.isEditMode = true;
       const wrapper = createWrapper();
       await nextTick();
 
-      expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
-      expect(wrapper.find(CANCEL_BTN).exists()).toBe(true);
       expect(wrapper.find(ADD_BTN).exists()).toBe(true);
     });
 
-    it('hides Edit button when store.isEditMode is true', async () => {
-      store.isEditMode = true;
+    it('hides Add button when store.isEditMode is false', () => {
       const wrapper = createWrapper();
-      await nextTick();
 
-      expect(wrapper.find(EDIT_BTN).exists()).toBe(false);
+      expect(wrapper.find(ADD_BTN).exists()).toBe(false);
     });
   });
 
@@ -128,38 +108,84 @@ describe('TransactionList', () => {
     });
   });
 
-  describe('Import and Transfer buttons', () => {
-    it('shows Import button in edit mode (disabled)', async () => {
-      store.isEditMode = true;
+  describe('paid column', () => {
+    it('shows checkmark icon for paid transactions in view mode', () => {
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+      ];
       const wrapper = createWrapper();
-      await nextTick();
 
-      const importBtn = wrapper.find(IMPORT_BTN);
-      expect(importBtn.exists()).toBe(true);
-      expect(importBtn.attributes('disabled')).toBeDefined();
+      expect(wrapper.find(PAID_ICON).exists()).toBe(true);
     });
 
-    it('shows Transfer button in edit mode (disabled)', async () => {
+    it('does not show checkmark icon for unpaid transactions in view mode', () => {
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'unpaid', deleted: false },
+      ];
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(PAID_ICON).exists()).toBe(false);
+    });
+
+    it('shows checkbox in edit mode instead of icon', async () => {
       store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+      ];
       const wrapper = createWrapper();
       await nextTick();
 
-      const transferBtn = wrapper.find(TRANSFER_BTN);
-      expect(transferBtn.exists()).toBe(true);
-      expect(transferBtn.attributes('disabled')).toBeDefined();
+      expect(wrapper.find(PAID_ICON).exists()).toBe(false);
+    });
+  });
+
+  describe('calculator column', () => {
+    it('does not show calculator checkboxes when showCalculatorColumn is false', () => {
+      const wrapper = createWrapper({ showCalculatorColumn: false });
+
+      expect(wrapper.find('[data-testid="calculator-checkbox-0"]').exists()).toBe(false);
+    });
+
+    it('does not show calculator checkboxes by default', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="calculator-checkbox-0"]').exists()).toBe(false);
+    });
+
+    it('shows calculator checkboxes when showCalculatorColumn is true', () => {
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+      ];
+      const wrapper = createWrapper({ showCalculatorColumn: true });
+
+      expect(wrapper.find('[data-testid="calculator-checkbox-0"]').exists()).toBe(true);
+    });
+  });
+
+  describe('description wrap/truncate toggle', () => {
+    it('applies truncate class by default', () => {
+      const wrapper = createWrapper();
+
+      const descCells = wrapper.findAll('td.col-description');
+      expect(descCells[0].classes()).toContain('col-description--truncate');
+    });
+
+    it('applies truncate class when wrapDescriptions is false', () => {
+      const wrapper = createWrapper({ wrapDescriptions: false });
+
+      const descCells = wrapper.findAll('td.col-description');
+      expect(descCells[0].classes()).toContain('col-description--truncate');
+    });
+
+    it('applies wrap class when wrapDescriptions is true', () => {
+      const wrapper = createWrapper({ wrapDescriptions: true });
+
+      const descCells = wrapper.findAll('td.col-description');
+      expect(descCells[0].classes()).toContain('col-description--wrap');
     });
   });
 
   describe('delegation to store actions', () => {
-    it('calls store.enterEditMode when Edit button is clicked', async () => {
-      const wrapper = createWrapper();
-      vi.spyOn(store, 'enterEditMode');
-
-      await wrapper.find(EDIT_BTN).trigger('click');
-
-      expect(store.enterEditMode).toHaveBeenCalled();
-    });
-
     it('calls store.addTransaction when Add New Transaction is clicked', async () => {
       store.isEditMode = true;
       const wrapper = createWrapper();
@@ -183,28 +209,6 @@ describe('TransactionList', () => {
       await wrapper.find('[data-testid="delete-btn-0"]').trigger('click');
 
       expect(store.deleteTransaction).toHaveBeenCalledWith(store.draftTransactions[0]);
-    });
-
-    it('emits save signal (no data) when Save button is clicked', async () => {
-      store.isEditMode = true;
-      const wrapper = createWrapper();
-      await nextTick();
-
-      await wrapper.find(SAVE_BTN).trigger('click');
-
-      expect(wrapper.emitted('save')).toBeTruthy();
-      expect(wrapper.emitted('save')![0]).toEqual([]);
-    });
-
-    it('emits cancel signal (no data) when Cancel button is clicked', async () => {
-      store.isEditMode = true;
-      const wrapper = createWrapper();
-      await nextTick();
-
-      await wrapper.find(CANCEL_BTN).trigger('click');
-
-      expect(wrapper.emitted('cancel')).toBeTruthy();
-      expect(wrapper.emitted('cancel')![0]).toEqual([]);
     });
   });
 
