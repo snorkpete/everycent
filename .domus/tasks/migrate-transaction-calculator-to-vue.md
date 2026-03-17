@@ -22,7 +22,7 @@ Port the floating transaction selection calculator to Vue. Shows total of checke
 
 The redesign task (`redesign-transactions-screen-ux`) reserves the column space for the calculator — this task implements the logic on top of that reserved space.
 
-- Activated by `Σ` toolbar button (toggles on/off, off by default)
+- Activated by `Σ` toolbar button (toggles on/off, off by default). The button already has `title="Toggle calculator column — shows checkboxes to select transactions and sum their amounts"` — keep this or update if the description changes, but all icon-only buttons must have a descriptive `title`.
 - When active: the reserved 32px column at the left of the table reveals checkboxes
 - Checked rows get a subtle background highlight
 - Running total of checked transactions' `net_amount` appears in the middle cell of summary bar row 2, labelled `Σ`, replacing the intentionally empty cell

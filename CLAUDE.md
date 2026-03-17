@@ -178,6 +178,10 @@ export const someApi = {
 }
 ```
 
+## Vue 3 UI Conventions (webclientv4)
+
+- **Icon-only buttons must have a `title` attribute** that explains what the button does in plain language — not just the action name, but what it achieves. Example: `title="Toggle calculator column — shows checkboxes to select transactions and sum their amounts"`. This is the discoverability mechanism for icon-only controls.
+
 ## Capturing Knowledge for Future Sessions
 
 Proactively identify information that would be lost when a session closes and
