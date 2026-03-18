@@ -64,6 +64,7 @@ const mockStore = reactive({
   addTransaction: vi.fn(),
   deleteTransaction: vi.fn(),
   onAllocationChange: vi.fn(),
+  addImportedTransactions: vi.fn(),
 });
 
 vi.mock('./transactionStore', () => ({
@@ -88,6 +89,13 @@ const SummaryStub = {
   props: ['transactions', 'bankAccount', 'allocations'],
 };
 
+const ImportDialogStub = {
+  name: 'TransactionImportDialog',
+  template: '<div data-testid="import-dialog" />',
+  props: ['visible'],
+  emits: ['update:visible', 'imported'],
+};
+
 function mountPage() {
   return mount(TransactionsPage, {
     global: {
@@ -96,6 +104,7 @@ function mountPage() {
         TransactionSearchForm: SearchFormStub,
         TransactionList: ListStub,
         TransactionSummary: SummaryStub,
+        TransactionImportDialog: ImportDialogStub,
       },
     },
   });
@@ -117,6 +126,7 @@ describe('TransactionsPage', () => {
     mockStore.fetch.mockResolvedValue(undefined);
     mockStore.save.mockResolvedValue(undefined);
     mockStore.refresh.mockResolvedValue(undefined);
+    mockStore.addImportedTransactions.mockReset();
   });
 
   describe('on mount', () => {
@@ -302,12 +312,39 @@ describe('TransactionsPage', () => {
   });
 
   describe('toolbar — Import and Transfer', () => {
-    it('shows Import button (disabled)', () => {
+    it('shows Import button', () => {
       const wrapper = mountPage();
 
       const importBtn = wrapper.find(IMPORT_BTN);
       expect(importBtn.exists()).toBe(true);
-      expect(importBtn.attributes('disabled')).toBeDefined();
+    });
+
+    it('Import button is not disabled', () => {
+      const wrapper = mountPage();
+
+      const importBtn = wrapper.find(IMPORT_BTN);
+      expect(importBtn.attributes('disabled')).toBeUndefined();
+    });
+
+    it('opens import dialog when Import button is clicked', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(IMPORT_BTN).trigger('click');
+      await nextTick();
+
+      const dialog = wrapper.findComponent({ name: 'TransactionImportDialog' });
+      expect(dialog.props('visible')).toBe(true);
+    });
+
+    it('calls store.addImportedTransactions when dialog emits "imported"', async () => {
+      const wrapper = mountPage();
+      const importedTransactions = [{ description: 'Test Import', withdrawal_amount: 100, deposit_amount: 0 }];
+
+      const dialog = wrapper.findComponent({ name: 'TransactionImportDialog' });
+      await dialog.vm.$emit('imported', importedTransactions);
+      await nextTick();
+
+      expect(mockStore.addImportedTransactions).toHaveBeenCalledWith(importedTransactions);
     });
 
     it('shows Transfer button (disabled)', () => {

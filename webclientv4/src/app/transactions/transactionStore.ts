@@ -92,7 +92,7 @@ export const useTransactionStore = defineStore('transactions', () => {
       await transactionApi.save({
         bankAccountId: selectedBankAccount.value.id!,
         budgetId: selectedBudget.value.id!,
-        transactions: transactionsToSave,
+        transactions: transactionsToSave.filter((t) => !t.deleted),
       });
       await fetch({
         budgetId: selectedBudget.value.id!,
@@ -134,6 +134,13 @@ export const useTransactionStore = defineStore('transactions', () => {
     transaction.status = allocationId > 0 ? 'paid' : 'unpaid';
   }
 
+  function addImportedTransactions(imported: TransactionData[]) {
+    if (!isEditMode.value) {
+      enterEditMode();
+    }
+    draftTransactions.value.push(...imported);
+  }
+
   async function refresh() {
     if (!selectedBankAccount.value || !selectedBudget.value) {
       return;
@@ -167,5 +174,6 @@ export const useTransactionStore = defineStore('transactions', () => {
     addTransaction,
     deleteTransaction,
     onAllocationChange,
+    addImportedTransactions,
   };
 });

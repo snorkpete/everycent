@@ -41,8 +41,8 @@
           outlined
           severity="secondary"
           size="small"
-          disabled
           data-testid="import-btn"
+          @click="showImportDialog = true"
         />
         <Button
           label="Transfer"
@@ -78,6 +78,12 @@
       </div>
     </div>
 
+    <!-- Import Dialog -->
+    <TransactionImportDialog
+      v-model:visible="showImportDialog"
+      @imported="onImport"
+    />
+
     <!-- Zones 2 + 3: Summary Bar + Table (unified card) -->
     <div class="content-card">
       <TransactionSummary
@@ -102,6 +108,8 @@ import { useNotifications } from '../notifications/useNotifications';
 import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
 import TransactionSummary from './TransactionSummary.vue';
+import TransactionImportDialog from './TransactionImportDialog.vue';
+import type { TransactionData } from './transaction.types';
 
 const store = useTransactionStore();
 const headingStore = useHeadingStore();
@@ -109,6 +117,7 @@ const notifications = useNotifications();
 
 const wrapDescriptions = ref(false);
 const showCalculatorColumn = ref(false);
+const showImportDialog = ref(false);
 
 onMounted(() => {
   headingStore.setHeading('Transactions');
@@ -135,6 +144,10 @@ function onCancel() {
 
 async function onRefresh() {
   await store.refresh();
+}
+
+function onImport(transactions: TransactionData[]) {
+  store.addImportedTransactions(transactions);
 }
 </script>
 
