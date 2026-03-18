@@ -39,7 +39,6 @@
         <Button
           label="Import"
           outlined
-          severity="secondary"
           size="small"
           data-testid="import-btn"
           @click="showImportDialog = true"
