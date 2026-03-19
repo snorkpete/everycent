@@ -92,7 +92,10 @@ export const useTransactionStore = defineStore('transactions', () => {
       await transactionApi.save({
         bankAccountId: selectedBankAccount.value.id!,
         budgetId: selectedBudget.value.id!,
-        transactions: transactionsToSave.filter((t) => !t.deleted),
+        transactions: transactionsToSave.filter((t) => !t.deleted).map((t) => {
+          const { newlyImported: _, ...rest } = t;
+          return rest;
+        }),
       });
       await fetch({
         budgetId: selectedBudget.value.id!,
@@ -138,7 +141,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     if (!isEditMode.value) {
       enterEditMode();
     }
-    draftTransactions.value.push(...imported);
+    draftTransactions.value.push(...imported.map((t) => ({ ...t, newlyImported: true })));
   }
 
   async function refresh() {

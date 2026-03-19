@@ -18,7 +18,7 @@
             v-for="(transaction, index) in store.draftTransactions"
             :key="transaction.id ?? `new-${index}`"
             data-testid="transaction-row"
-            :class="{ 'transaction-row--deleted': transaction.deleted }"
+            :class="{ 'transaction-row--deleted': transaction.deleted, 'transaction-row--newly-imported': transaction.newlyImported }"
           >
             <td :class="['col-calculator', { 'col-calculator--active': showCalculatorColumn }]">
               <Checkbox
@@ -224,6 +224,10 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 .transaction-row--deleted {
   opacity: 0.4;
   text-decoration: line-through;
+}
+
+.transaction-row--newly-imported .col-date {
+  border-left: 3px solid var(--p-blue-300);
 }
 
 .paid-icon {

@@ -365,6 +365,24 @@ describe('transactionStore', () => {
       expect(transactionApi.save).not.toHaveBeenCalled();
     });
 
+    it('strips newlyImported flag before calling transactionApi.save', async () => {
+      const importedTransaction = { description: 'Imported', withdrawal_amount: 100, deposit_amount: 0, newlyImported: true };
+      vi.mocked(transactionApi.save).mockResolvedValue([]);
+      vi.mocked(transactionApi.getAll).mockResolvedValue([]);
+      vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
+
+      const store = useTransactionStore();
+      store.selectedBankAccount = { id: 2, name: 'Checking' };
+      store.selectedBudget = { id: 3, name: 'Jan 2025' };
+      store.bankAccounts = [{ id: 2, name: 'Checking' }];
+      store.budgets = [{ id: 3, name: 'Jan 2025' }];
+
+      await store.save([importedTransaction]);
+
+      const saved = vi.mocked(transactionApi.save).mock.calls[0][0].transactions;
+      expect(saved[0]).not.toHaveProperty('newlyImported');
+    });
+
     it('filters out deleted transactions before calling transactionApi.save', async () => {
       const liveTransaction = { id: 1, description: 'Keep', withdrawal_amount: 100, deposit_amount: 0 };
       const deletedTransaction = { id: 2, description: 'Remove', withdrawal_amount: 50, deposit_amount: 0, deleted: true };
@@ -409,7 +427,28 @@ describe('transactionStore', () => {
       store.addImportedTransactions(imported);
 
       expect(store.draftTransactions).toHaveLength(2);
-      expect(store.draftTransactions[1]).toEqual(imported[0]);
+      expect(store.draftTransactions[1]).toEqual({ ...imported[0], newlyImported: true });
+    });
+
+    it('marks imported transactions with newlyImported: true', () => {
+      const store = useTransactionStore();
+      store.isEditMode = true;
+      store.draftTransactions = [];
+
+      store.addImportedTransactions([{ description: 'Imported', withdrawal_amount: 100, deposit_amount: 0 }]);
+
+      expect(store.draftTransactions[0].newlyImported).toBe(true);
+    });
+
+    it('does not mark newlyImported on pre-existing draft transactions', () => {
+      const store = useTransactionStore();
+      const existing = { id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' };
+      store.draftTransactions = [existing];
+      store.isEditMode = true;
+
+      store.addImportedTransactions([{ description: 'New', withdrawal_amount: 50, deposit_amount: 0 }]);
+
+      expect(store.draftTransactions[0].newlyImported).toBeUndefined();
     });
 
     it('preserves existing draft edits when already in edit mode', () => {
