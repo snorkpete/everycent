@@ -96,6 +96,13 @@ const ImportDialogStub = {
   emits: ['update:visible', 'imported'],
 };
 
+const TransferDialogStub = {
+  name: 'AccountTransferDialog',
+  template: '<div data-testid="transfer-dialog" />',
+  props: ['visible'],
+  emits: ['update:visible', 'transferred'],
+};
+
 function mountPage() {
   return mount(TransactionsPage, {
     global: {
@@ -105,6 +112,7 @@ function mountPage() {
         TransactionList: ListStub,
         TransactionSummary: SummaryStub,
         TransactionImportDialog: ImportDialogStub,
+        AccountTransferDialog: TransferDialogStub,
       },
     },
   });
@@ -347,12 +355,41 @@ describe('TransactionsPage', () => {
       expect(mockStore.addImportedTransactions).toHaveBeenCalledWith(importedTransactions);
     });
 
-    it('shows Transfer button (disabled)', () => {
+    it('shows Transfer button', () => {
       const wrapper = mountPage();
 
       const transferBtn = wrapper.find(TRANSFER_BTN);
       expect(transferBtn.exists()).toBe(true);
-      expect(transferBtn.attributes('disabled')).toBeDefined();
+    });
+
+    it('Transfer button is not disabled', () => {
+      const wrapper = mountPage();
+
+      const transferBtn = wrapper.find(TRANSFER_BTN);
+      expect(transferBtn.attributes('disabled')).toBeUndefined();
+    });
+
+    it('opens transfer dialog when Transfer button is clicked', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(TRANSFER_BTN).trigger('click');
+      await nextTick();
+
+      const dialog = wrapper.findComponent({ name: 'AccountTransferDialog' });
+      expect(dialog.props('visible')).toBe(true);
+    });
+
+    it('calls store.fetch when transfer dialog emits "transferred"', async () => {
+      const wrapper = mountPage();
+
+      const dialog = wrapper.findComponent({ name: 'AccountTransferDialog' });
+      await dialog.vm.$emit('transferred');
+      await nextTick();
+
+      expect(mockStore.fetch).toHaveBeenCalledWith({
+        budgetId: jan2025.id,
+        bankAccountId: checkingAccount.id,
+      });
     });
   });
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { bankAccountApi } from './bankAccountApi';
+import type { AccountTransferData } from './bankAccount.types';
 import apiGateway from '../../api/api-gateway';
 
 vi.mock('../../api/api-gateway', () => ({
@@ -114,6 +115,37 @@ describe('bankAccountApi', () => {
       const result = await bankAccountApi.getWithBalances();
 
       expect(result).toEqual(accounts);
+    });
+  });
+
+  describe('transfer', () => {
+    const fromId = 3;
+    const transferData: AccountTransferData = {
+      from: 3,
+      to: 7,
+      amount: 5000,
+      date: '2025-01-15',
+      description: 'Savings transfer',
+      budget_id: 1,
+    };
+
+    it('posts to /bank_accounts/:fromId/transfer with transfer data', async () => {
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: undefined });
+
+      await bankAccountApi.transfer(fromId, transferData);
+
+      expect(apiGateway.post).toHaveBeenCalledWith(
+        '/bank_accounts/3/transfer',
+        transferData,
+      );
+    });
+
+    it('resolves with void on success', async () => {
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: undefined });
+
+      const result = await bankAccountApi.transfer(fromId, transferData);
+
+      expect(result).toBeUndefined();
     });
   });
 });
