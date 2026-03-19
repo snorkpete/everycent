@@ -143,3 +143,6 @@ Spec covers: rendering, format pre-fill, Import button args, filtered emit, dial
 **Pre-existing test failures (unchanged):**
 - 3 in `transactionStore.spec.ts` — `fetchMetadata` tests (mock uses `getWithBalances`, store uses `getOpen`)
 - 12 in `TransactionSearchForm.spec.ts` — `useRouter` not exported from vue-router mock
+
+**Post-completion polish (2026-03-18):**
+- Import button had `severity="secondary"` which made it look visually identical to the disabled Transfer button (both gray outlined). Removed `severity="secondary"` so Import gets a purple outline — clearly actionable, distinct from the disabled state. Commit: `e02cf52d`.
