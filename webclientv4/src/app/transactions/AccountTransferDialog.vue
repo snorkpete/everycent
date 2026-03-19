@@ -19,7 +19,11 @@
           data-testid="from-account-select"
           class="w-full"
           @update:model-value="onFromAccountChange"
-        />
+        >
+          <template #option="{ option }">
+            {{ option.name }} ({{ formatBalance(option.current_balance ?? 0) }})
+          </template>
+        </Select>
         <span
           v-if="newFromBalance !== null"
           class="balance-preview"
@@ -73,7 +77,11 @@
           data-testid="to-account-select"
           class="w-full"
           @update:model-value="onToAccountChange"
-        />
+        >
+          <template #option="{ option }">
+            {{ option.name }} ({{ formatBalance(option.current_balance ?? 0) }})
+          </template>
+        </Select>
         <span
           v-if="newToBalance !== null"
           class="balance-preview"
@@ -239,7 +247,15 @@ watch(
       form.value = defaultForm();
       sinkFundAllocationsFrom.value = [];
       sinkFundAllocationsTo.value = [];
-      bankAccountsWithBalances.value = await bankAccountApi.getWithBalances();
+      const [sorted, withBalances] = await Promise.all([
+        bankAccountApi.getOpen(),
+        bankAccountApi.getWithBalances(),
+      ]);
+      const balanceMap = new Map(withBalances.map((a) => [a.id, a.current_balance]));
+      bankAccountsWithBalances.value = sorted.map((a) => ({
+        ...a,
+        current_balance: balanceMap.get(a.id) ?? 0,
+      }));
     }
   },
   { immediate: true },
