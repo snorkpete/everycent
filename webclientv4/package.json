@@ -1,0 +1,53 @@
+{
+  "name": "webclientv4",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.{ts,vue,css}\" \"*.{ts,js,json}\"",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:seed-db": "tsx cypress/scripts/seed-cypress-db.ts",
+    "cypress:seed-dev-db": "tsx cypress/scripts/seed-dev-db.ts",
+    "cypress:run:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress run",
+    "cypress:open:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress open"
+  },
+  "dependencies": {
+    "@primeuix/themes": "^2.0.3",
+    "@vueuse/core": "^14.2.1",
+    "axios": "^1.13.4",
+    "pinia": "^3.0.4",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.4",
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^24.10.1",
+    "@types/pg": "^8.11.10",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.6.0",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.8.1",
+    "bcryptjs": "^2.4.3",
+    "cypress": "^15.11.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-vue": "^10.7.0",
+    "jsdom": "^25.0.1",
+    "pg": "^8.13.3",
+    "prettier": "^3.8.1",
+    "tsx": "^4.19.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.18",
+    "vue-tsc": "^3.1.4"
+  }
+}
