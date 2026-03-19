@@ -93,6 +93,14 @@ vi.mock('./transactionStore', () => ({
   useTransactionStore: () => mockStore,
 }));
 
+// Stub PrimeVue Dialog to avoid teleport complexity in tests
+const DialogStub = {
+  name: 'Dialog',
+  template: '<div><slot /><slot name="footer" /></div>',
+  props: ['visible'],
+  emits: ['update:visible'],
+};
+
 const mockNotifyError = vi.fn();
 const mockNotifySuccess = vi.fn();
 vi.mock('../notifications/useNotifications', () => ({
@@ -111,6 +119,7 @@ function createWrapper(props: Partial<{ visible: boolean }> = {}): VueWrapper {
     },
     global: {
       plugins: [PrimeVue, createPinia()],
+      stubs: { Dialog: DialogStub },
     },
   });
 }
