@@ -34,6 +34,19 @@ export interface BankAccountData {
   institution?: InstitutionData;
 }
 
+export interface AccountTransferData {
+  from: number;
+  to: number;
+  amount: number;
+  date: string;
+  description?: string;
+  from_allocation?: number;
+  to_allocation?: number;
+  from_sink_fund_allocation?: number;
+  to_sink_fund_allocation?: number;
+  budget_id?: number;
+}
+
 /**
  * Internal form representation used by BankAccountEditDialog.
  * All fields are non-optional so form bindings are unambiguous.

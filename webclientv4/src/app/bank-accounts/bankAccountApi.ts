@@ -1,5 +1,5 @@
 import apiGateway from '../../api/api-gateway';
-import type { BankAccountData, InstitutionData } from './bankAccount.types';
+import type { BankAccountData, InstitutionData, AccountTransferData } from './bankAccount.types';
 
 export const bankAccountApi = {
   getAll: () =>
@@ -25,4 +25,7 @@ export const bankAccountApi = {
     apiGateway
       .get<BankAccountData[]>('/bank_accounts', { params: { include_current_balance: true } })
       .then((r) => r.data),
+
+  transfer: (fromId: number, data: AccountTransferData) =>
+    apiGateway.post<void>(`/bank_accounts/${fromId}/transfer`, data).then((r) => r.data),
 };

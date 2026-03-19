@@ -48,8 +48,8 @@
           outlined
           severity="secondary"
           size="small"
-          disabled
           data-testid="transfer-btn"
+          @click="showTransferDialog = true"
         />
         <span class="toolbar-separator" />
         <Button
@@ -83,6 +83,12 @@
       @imported="onImport"
     />
 
+    <!-- Transfer Dialog -->
+    <AccountTransferDialog
+      v-model:visible="showTransferDialog"
+      @transferred="onTransferred"
+    />
+
     <!-- Zones 2 + 3: Summary Bar + Table (unified card) -->
     <div class="content-card">
       <TransactionSummary
@@ -108,6 +114,7 @@ import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
 import TransactionSummary from './TransactionSummary.vue';
 import TransactionImportDialog from './TransactionImportDialog.vue';
+import AccountTransferDialog from './AccountTransferDialog.vue';
 import type { TransactionData } from './transaction.types';
 
 const store = useTransactionStore();
@@ -117,6 +124,7 @@ const notifications = useNotifications();
 const wrapDescriptions = ref(false);
 const showCalculatorColumn = ref(false);
 const showImportDialog = ref(false);
+const showTransferDialog = ref(false);
 
 onMounted(() => {
   headingStore.setHeading('Transactions');
@@ -147,6 +155,10 @@ async function onRefresh() {
 
 function onImport(transactions: TransactionData[]) {
   store.addImportedTransactions(transactions);
+}
+
+function onTransferred() {
+  store.fetch({ budgetId: store.selectedBudget!.id!, bankAccountId: store.selectedBankAccount!.id! });
 }
 </script>
 
