@@ -13,9 +13,11 @@ const jan2025: BudgetData = { id: 10, name: 'Jan 2025', status: 'open' };
 const dec2024: BudgetData = { id: 9, name: 'Dec 2024', status: 'closed' };
 
 const mockRoute = { query: {} as Record<string, string> };
+const mockRouter = { replace: vi.fn() };
 
 vi.mock('vue-router', () => ({
   useRoute: () => mockRoute,
+  useRouter: () => mockRouter,
 }));
 
 const mockStore = reactive({

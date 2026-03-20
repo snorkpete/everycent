@@ -1,69 +1,30 @@
 # Everycent - Zero Based Budget Manager
 
 ## Overview
-Personal finance app for zero-based budgeting. Rails 7.1 API backend + Angular 14 frontend (with planned Vue 3 migration).
+Personal finance app for zero-based budgeting. Rails 7.1 API backend + Angular 14 frontend, with active Vue 3 migration.
 
 ## Tech Stack
 - **Backend**: Ruby 3.2.3, Rails 7.1.3, PostgreSQL
-- **Frontend (current)**: Angular 14.3, TypeScript, Angular Material 14, RxJS
+- **Frontend (production)**: Angular 14.3, TypeScript (webclientv3)
+- **Frontend (active migration)**: Vue 3 + Vite + PrimeVue 4 + Pinia (webclientv4)
 - **Auth**: devise + devise_token_auth (token-based, stored in localStorage)
 - **Multi-tenancy**: acts_as_tenant scoped by Household
 - **Deployment**: Heroku with Puma
 
 ## Project Structure
-```
-app/                    # Rails backend (controllers, models, serializers)
-config/                 # Rails configuration (routes, database, initializers)
-db/                     # Migrations (57) and schema
-spec/                   # RSpec tests (models, controllers, factories)
-webclientv3/            # Angular 14 frontend (current)
-  src/app/              # Feature modules (budgets, transactions, bank-accounts, etc.)
-  src/api/              # ApiGateway HTTP abstraction
-webclient/              # Legacy AngularJS frontend (v1)
-public/                 # Compiled frontend assets served by Rails
-```
+Three frontend generations:
+- `webclientv3/` — Angular 14 (current production frontend)
+- `webclientv4/` — Vue 3 (active migration target)
+- `webclient/` — Legacy AngularJS (v1)
 
-## Common Commands
+Backend: `app/` (Rails controllers, models, serializers), `config/`, `db/`, `spec/`.
 
-### Backend
-```bash
-rails s                          # Start Rails server on :3000
-rspec                            # Run all backend tests
-rspec spec/models                # Run model tests only
-rspec spec/controllers           # Run controller tests only
-bundle install                   # Install Ruby dependencies
-rails db:migrate                 # Run pending migrations
-```
-
-### Frontend (Angular v3)
-```bash
-cd webclientv3
-npm start                        # Dev server on :4200 (proxies to Rails :3000)
-npm test                         # Karma + Jasmine tests
-npm run build                    # Production build to /public
-```
-
-## Key Conventions
-
-### Backend (Ruby/Rails)
+## Backend Conventions
 - RESTful JSON API with ActiveModel::Serializers for responses
 - All models use `acts_as_tenant :household` for data scoping
 - Controllers inherit from ApplicationController (includes auth + serialization)
 - Use `respond_with` for consistent API responses
 - FactoryBot for test fixtures, database cleaner for isolation
-
-### Frontend (Angular)
-- Component selector prefix: `ec-` (e.g., `ec-add-budget`)
-- Inline templates preferred for smaller components
-- ApiGateway service for all HTTP calls (returns Observables)
-- Token auth headers: access-token, client, expiry, token-type, uid
-- Feature-based module organization
-
-### Naming
-- Components: `PascalCaseComponent` / selector: `ec-kebab-case`
-- Services: `PascalCaseService`
-- Models/interfaces: `PascalCaseData`
-- Serializers: `PascalCaseSerializer`
 
 ## API Routes
 Auth mounted at `/auth` (devise_token_auth). Key resources:
@@ -92,95 +53,11 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 - Display a summary of what was changed as a result of the review feedback.
 
 ## Migration Context
-Active migration from Angular 14 to Vue 3 + Vite + PrimeVue 4 + Pinia. New frontend lives in `webclientv4/`.
+Active migration from Angular 14 to Vue 3 (webclientv4). Migration state tracked in `domus task list`.
 
-**Completed:** Auth, infrastructure (testing, loading indicator, menu, form components), setup screens (allocation-categories, institutions, settings), future budgets + mass edit dialog, bank accounts.
-
-**Remaining features** (tracked as domus tasks): transactions, current budget/budget list, sink funds, account balances, special events, reports.
-
-## Vue 3 Patterns (webclientv4)
-
-### Services → API + Store + Composable
-
-```
-Angular Service               →  Vue 3 Equivalent
-─────────────────────────────────────────────────
-HTTP calls                    →  api/someApi.ts (plain functions)
-Shared reactive state         →  Pinia store (defineStore)
-Shared logic without state    →  composable (useSomething.ts)
-```
-
-### Component Pattern
-
-```vue
-<script setup lang="ts">
-import { onMounted, computed } from 'vue'
-import { useSomeStore } from './stores/someStore'
-
-const store = useSomeStore()
-
-const props = defineProps<{ budgetId: number }>()
-const emit = defineEmits<{ saved: [id: number] }>()
-
-onMounted(() => { store.fetchData(props.budgetId) })
-
-const total = computed(() =>
-  store.items.reduce((sum, item) => sum + item.amount, 0)
-)
-</script>
-
-<template>
-  <!-- Use PrimeVue components + v-model, v-for, v-if -->
-</template>
-
-<style scoped>
-/* Component-scoped styles */
-</style>
-```
-
-### Store Pattern
-
-```typescript
-export const useSomeStore = defineStore('some', () => {
-  const items = ref<Item[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-
-  const activeItems = computed(() => items.value.filter(i => i.active))
-
-  async function fetchItems() {
-    loading.value = true
-    error.value = null
-    try {
-      items.value = await someApi.getAll()
-    } catch (e: any) {
-      error.value = e.message
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { items, loading, error, activeItems, fetchItems }
-})
-```
-
-### API Pattern
-
-```typescript
-// Plain functions, no framework dependency, easy to test
-import apiClient from '@/api/client'
-import type { Item } from '@/features/some/some.type'
-
-export const someApi = {
-  getAll: () => apiClient.get<Item[]>('/api/items').then(r => r.data),
-  getById: (id: number) => apiClient.get<Item>(`/api/items/${id}`).then(r => r.data),
-  save: (item: Item) => apiClient.put<Item>(`/api/items/${item.id}`, { item }).then(r => r.data),
-}
-```
-
-## Vue 3 UI Conventions (webclientv4)
-
-- **Icon-only buttons must have a `title` attribute** that explains what the button does in plain language — not just the action name, but what it achieves. Example: `title="Toggle calculator column — shows checkboxes to select transactions and sum their amounts"`. This is the discoverability mechanism for icon-only controls.
+See `webclientv4/CLAUDE.md` for Vue 3 setup constraints and conventions.
+Reference implementations: store → `transactionStore.ts`, API → `bankAccountApi.ts`, component → `TransactionsPage.vue`.
+For detailed coding rules, see `webclientv4/docs/vue-coding-rules.md`.
 
 ## Capturing Knowledge for Future Sessions
 

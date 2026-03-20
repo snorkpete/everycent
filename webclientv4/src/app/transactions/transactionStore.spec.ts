@@ -26,7 +26,7 @@ vi.mock('../bank-accounts/bankAccountApi', () => ({
     getInstitutions: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
-    getWithBalances: vi.fn(),
+    getOpen: vi.fn(),
   },
 }));
 
@@ -98,7 +98,7 @@ describe('transactionStore', () => {
       const budgets = [{ id: 1, name: 'Jan 2025', status: 'open' }];
       const accounts = [{ id: 2, name: 'Savings', current_balance: 50000 }];
       vi.mocked(budgetApi.getAll).mockResolvedValue(budgets);
-      vi.mocked(bankAccountApi.getWithBalances).mockResolvedValue(accounts);
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue(accounts);
 
       const store = useTransactionStore();
       await store.fetchMetadata();
@@ -113,7 +113,7 @@ describe('transactionStore', () => {
         loadingDuringCall = useTransactionStore().loading;
         return [];
       });
-      vi.mocked(bankAccountApi.getWithBalances).mockResolvedValue([]);
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
 
       const store = useTransactionStore();
       await store.fetchMetadata();
@@ -124,7 +124,7 @@ describe('transactionStore', () => {
 
     it('sets error message on failure', async () => {
       vi.mocked(budgetApi.getAll).mockRejectedValue(new Error('Network error'));
-      vi.mocked(bankAccountApi.getWithBalances).mockResolvedValue([]);
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
 
       const store = useTransactionStore();
       await store.fetchMetadata();
@@ -135,7 +135,7 @@ describe('transactionStore', () => {
 
     it('clears error on subsequent successful fetch', async () => {
       vi.mocked(budgetApi.getAll).mockRejectedValueOnce(new Error('fail'));
-      vi.mocked(bankAccountApi.getWithBalances).mockResolvedValue([]);
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
       vi.mocked(budgetApi.getAll).mockResolvedValueOnce([]);
 
       const store = useTransactionStore();
@@ -155,7 +155,7 @@ describe('transactionStore', () => {
 
       vi.mocked(transactionApi.getAll).mockResolvedValue(transactions);
       vi.mocked(budgetApi.getAllocations).mockResolvedValue(allocations);
-      vi.mocked(bankAccountApi.getWithBalances).mockResolvedValue([bankAccount]);
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([bankAccount]);
       vi.mocked(budgetApi.getAll).mockResolvedValue([budget]);
 
       const store = useTransactionStore();
