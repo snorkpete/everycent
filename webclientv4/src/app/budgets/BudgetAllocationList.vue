@@ -71,7 +71,7 @@
                     class="eye-btn"
                     title="Show transactions for this allocation"
                     data-testid="show-transactions-btn"
-                    @click="() => {}"
+                    @click="showTransactions(allocation)"
                   >
                     <i class="pi pi-eye"></i>
                   </button>
@@ -177,18 +177,35 @@
         </tfoot>
       </table>
     </div>
+    <AllocationTransactionsDialog
+      :visible="dialogVisible"
+      :allocation-id="selectedAllocationId"
+      :allocation-name="selectedAllocationName"
+      @update:visible="dialogVisible = $event"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useBudgetStore } from './budgetStore';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import AllocationTransactionsDialog from './AllocationTransactionsDialog.vue';
 import type { AllocationData } from '../transactions/transaction.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 
 const store = useBudgetStore();
+
+const dialogVisible = ref(false);
+const selectedAllocationId = ref(0);
+const selectedAllocationName = ref('');
+
+function showTransactions(allocation: AllocationData) {
+  selectedAllocationId.value = allocation.id ?? 0;
+  selectedAllocationName.value = allocation.name ?? '';
+  dialogVisible.value = true;
+}
 
 const allocationClasses = [
   { id: 'want', name: 'Want' },
