@@ -1,8 +1,8 @@
 # Task: Budget view — incomes table
 
 **ID:** budget-view-incomes-table
-**Status:** proposed
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-21
 **Parent:** migrate-budget-viewedit-screen-to-vue
@@ -66,3 +66,29 @@ Standalone `BudgetIncomeList.vue` component rendering the incomes section of the
 - `webclientv3/src/app/budgets/budget-editor/incomes/income-list-row.component.ts` — row with inline editing
 - `webclientv3/src/app/budgets/budget-editor/incomes/income-list-header.component.ts` — header
 - `webclientv3/src/app/budgets/budget-editor/incomes/income-list-footer.component.ts` — total footer
+
+---
+
+## Execution Log
+
+### 2026-03-21 — Implementation complete
+
+**Files created:**
+- `src/app/budgets/BudgetIncomeList.vue` — standalone component with view/edit modes
+- `src/app/budgets/BudgetIncomeList.spec.ts` — 33 tests, all passing
+
+**Files modified:**
+- `src/app/budgets/BudgetPage.vue` — replaced incomes placeholder with `<BudgetIncomeList />`
+
+**Implementation details:**
+- View mode: HTML table with Name, Amount, Comment columns; sticky header; footer with total (excludes deleted)
+- Edit mode: native `<input>` for name/comment (v-model direct to store), `EcMoneyField` for amount, delete button (trash/undo toggle), Add Income button
+- Delete: `income.deleted` flag toggle, `.row-deleted` class (opacity + strikethrough), excluded from total
+- Add Income: pushes `{ id: 0, name: '', amount: 0, budget_id: currentBudgetId, comment: '' }` onto `budget.incomes`
+- All icon-only buttons have `title` attributes
+- Null-safe: renders empty table when budget is null or incomes is empty
+- Styling follows FutureBudgetsPage patterns: sticky header with box-shadow, tabular-nums on amounts, row hover
+
+**Test results:** 33/33 passing. BudgetPage spec: 16/16 still passing. Pre-existing failures in ABN Amro importer and AccountTransferDialog specs are unrelated.
+
+**Note:** BudgetPage.vue was also modified by another concurrent agent (added BudgetSummary import and component). Changes are compatible.

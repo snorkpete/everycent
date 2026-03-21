@@ -1,8 +1,8 @@
 # Task: Budget view — allocations table
 
 **ID:** budget-view-allocations-table
-**Status:** proposed
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-21
 **Parent:** migrate-budget-viewedit-screen-to-vue
@@ -89,3 +89,49 @@ Total income (sum of `budget.incomes[].amount`) minus total allocations (sum of 
 - `webclientv3/src/app/budgets/budget-editor/allocations/allocation-category-row.component.ts` — category header
 - `webclientv3/src/app/budgets/budget-editor/allocations/allocation-list-header.component.ts` — table header
 - `webclientv3/src/app/budgets/budget-editor/allocations/allocation-list-footer.component.ts` — total footer
+
+---
+
+## Execution Log
+
+### 2026-03-21 — Implementation complete
+
+**Files created:**
+- `src/app/budgets/BudgetAllocationList.vue` — allocations table component
+- `src/app/budgets/BudgetAllocationList.spec.ts` — 50 tests, all passing
+
+**Files modified:**
+- `src/app/budgets/BudgetPage.vue` — replaced allocations placeholder with `<BudgetAllocationList />`, added import
+
+**What was done:**
+- View mode: table with 7 columns (Name, Amount, Spent, Remaining, Class, Fixed Amount?, Comment)
+- Rows grouped by allocation category using nested `v-for` (no dummy row injection)
+- Category sub-headers with sticky positioning (`top: var(--thead-height); z-index: 5`) and left accent bar
+- Sticky thead (`z-index: 10`) and sticky tfoot (`bottom: 0; z-index: 10`)
+- Category subtotals for Amount, Spent, Remaining (excludes deleted rows)
+- Grand total footer row with Amount, Spent, Remaining totals
+- Unallocated badge: total income - total allocations (non-deleted)
+- Remaining colour: green positive, red negative, muted zero
+- Eye icon placeholder on Spent column (no-op, `title` attribute set)
+- Edit mode: name/comment text inputs, EcMoneyField for amount, class dropdown (Want/Need/Savings), fixed amount checkbox
+- Spent and Remaining read-only in edit mode
+- Delete button toggles `allocation.deleted`; shows undo icon when deleted; deleted rows dimmed/strikethrough
+- Add allocation button per category; new allocations pushed to store with correct defaults
+- Action column (8th) only renders in edit mode
+
+**Test coverage:**
+- View mode layout (5 tests)
+- Data display (8 tests)
+- Remaining colour classes (3 tests)
+- Eye icon (2 tests)
+- Category subtotals (3 tests)
+- Grand total footer (3 tests)
+- Unallocated badge (2 tests)
+- Edit mode inputs (8 tests)
+- Edit mode delete (8 tests)
+- Edit mode add allocation (5 tests)
+- Edge cases (3 tests)
+
+**Concurrent modification note:** BudgetPage.vue was modified by another worker (BudgetIncomeList + BudgetSummary). Read fresh before editing — no conflicts.
+
+**All 272 budget test suite tests pass.** Two pre-existing failures in AccountTransferDialog.spec.ts (unrelated).
