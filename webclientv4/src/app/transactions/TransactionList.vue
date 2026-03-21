@@ -23,10 +23,11 @@
             <td :class="['col-calculator', { 'col-calculator--active': showCalculatorColumn }]">
               <Checkbox
                 v-if="showCalculatorColumn"
-                :model-value="false"
+                :model-value="transaction.selected ?? false"
                 binary
                 :data-testid="`calculator-checkbox-${index}`"
                 class="calculator-checkbox"
+                @update:model-value="transaction.selected = $event"
               />
             </td>
             <td class="col-date">
@@ -193,12 +194,12 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 }
 
 .col-calculator { width: 0; min-width: 0; max-width: 0; padding: 0; overflow: hidden; }
-.col-calculator--active { width: 28px; min-width: 28px; max-width: 28px; padding: 0 4px; overflow: visible; }
+.col-calculator--active { width: 2.5%; min-width: 0; max-width: none; padding: 0 2px; overflow: visible; }
 .col-date { width: 11%; }
-.col-description { width: 26%; }
+.col-description { width: 27%; }
 .col-allocation { width: 21%; }
 .col-money { width: 10%; }
-.col-paid { width: 6%; }
+.col-paid { width: 5.5%; }
 .col-action { width: 5%; }
 
 .col-description--truncate :deep(.text-display) {

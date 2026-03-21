@@ -93,7 +93,7 @@ export const useTransactionStore = defineStore('transactions', () => {
         bankAccountId: selectedBankAccount.value.id!,
         budgetId: selectedBudget.value.id!,
         transactions: transactionsToSave.filter((t) => !t.deleted).map((t) => {
-          const { newlyImported: _, ...rest } = t;
+          const { newlyImported: _, selected: __, ...rest } = t;
           return rest;
         }),
       });
@@ -144,6 +144,21 @@ export const useTransactionStore = defineStore('transactions', () => {
     draftTransactions.value.push(...imported.map((t) => ({ ...t, newlyImported: true })));
   }
 
+  const selectedTransactions = computed(() =>
+    draftTransactions.value.filter((t) => t.selected),
+  );
+
+  const selectedTotal = computed(() =>
+    selectedTransactions.value.reduce((sum, t) => {
+      const amount = t.net_amount ?? (t.deposit_amount ?? 0) - (t.withdrawal_amount ?? 0);
+      return sum + amount;
+    }, 0),
+  );
+
+  function clearSelections() {
+    draftTransactions.value.forEach((t) => { t.selected = false; });
+  }
+
   async function refresh() {
     if (!selectedBankAccount.value || !selectedBudget.value) {
       return;
@@ -177,6 +192,9 @@ export const useTransactionStore = defineStore('transactions', () => {
     addTransaction,
     deleteTransaction,
     onAllocationChange,
+    selectedTransactions,
+    selectedTotal,
+    clearSelections,
     addImportedTransactions,
   };
 });

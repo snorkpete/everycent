@@ -24,7 +24,7 @@
           :class="['icon-btn', { 'icon-btn--active': showCalculatorColumn }]"
           data-testid="calculator-toggle-btn"
           title="Toggle calculator column — shows checkboxes to select transactions and sum their amounts"
-          @click="showCalculatorColumn = !showCalculatorColumn"
+          @click="toggleCalculatorColumn"
         />
         <Button
           icon="pi pi-refresh"
@@ -109,6 +109,7 @@ import { onMounted, ref } from 'vue';
 import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
+import { useSettingsStore } from '../settings/settingsStore';
 import { useNotifications } from '../notifications/useNotifications';
 import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
@@ -119,6 +120,7 @@ import type { TransactionData } from './transaction.types';
 
 const store = useTransactionStore();
 const headingStore = useHeadingStore();
+const settingsStore = useSettingsStore();
 const notifications = useNotifications();
 
 const wrapDescriptions = ref(false);
@@ -129,7 +131,15 @@ const showTransferDialog = ref(false);
 onMounted(() => {
   headingStore.setHeading('Transactions');
   store.fetchMetadata();
+  settingsStore.fetchAll();
 });
+
+function toggleCalculatorColumn() {
+  showCalculatorColumn.value = !showCalculatorColumn.value;
+  if (!showCalculatorColumn.value) {
+    store.clearSelections();
+  }
+}
 
 function onFetch(params: { budgetId: number; bankAccountId: number }) {
   store.fetch(params);

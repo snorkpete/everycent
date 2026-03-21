@@ -365,6 +365,24 @@ describe('transactionStore', () => {
       expect(transactionApi.save).not.toHaveBeenCalled();
     });
 
+    it('strips selected flag before calling transactionApi.save', async () => {
+      const selectedTransaction = { description: 'Selected', withdrawal_amount: 200, deposit_amount: 0, selected: true };
+      vi.mocked(transactionApi.save).mockResolvedValue([]);
+      vi.mocked(transactionApi.getAll).mockResolvedValue([]);
+      vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
+
+      const store = useTransactionStore();
+      store.selectedBankAccount = { id: 2, name: 'Checking' };
+      store.selectedBudget = { id: 3, name: 'Jan 2025' };
+      store.bankAccounts = [{ id: 2, name: 'Checking' }];
+      store.budgets = [{ id: 3, name: 'Jan 2025' }];
+
+      await store.save([selectedTransaction]);
+
+      const saved = vi.mocked(transactionApi.save).mock.calls[0][0].transactions;
+      expect(saved[0]).not.toHaveProperty('selected');
+    });
+
     it('strips newlyImported flag before calling transactionApi.save', async () => {
       const importedTransaction = { description: 'Imported', withdrawal_amount: 100, deposit_amount: 0, newlyImported: true };
       vi.mocked(transactionApi.save).mockResolvedValue([]);
@@ -677,6 +695,88 @@ describe('transactionStore', () => {
       store.onAllocationChange(store.draftTransactions[0], 0);
 
       expect(store.draftTransactions[0].status).toBe('unpaid');
+    });
+  });
+
+  describe('selectedTransactions', () => {
+    it('returns only transactions with selected === true', () => {
+      const store = useTransactionStore();
+      store.draftTransactions = [
+        { id: 1, description: 'A', selected: true },
+        { id: 2, description: 'B', selected: false },
+        { id: 3, description: 'C', selected: true },
+        { id: 4, description: 'D' },
+      ];
+
+      expect(store.selectedTransactions).toHaveLength(2);
+      expect(store.selectedTransactions.map((t) => t.id)).toEqual([1, 3]);
+    });
+
+    it('returns empty array when no transactions are selected', () => {
+      const store = useTransactionStore();
+      store.draftTransactions = [
+        { id: 1, description: 'A' },
+        { id: 2, description: 'B', selected: false },
+      ];
+
+      expect(store.selectedTransactions).toEqual([]);
+    });
+  });
+
+  describe('selectedTotal', () => {
+    it('sums net_amount of selected transactions', () => {
+      const store = useTransactionStore();
+      store.draftTransactions = [
+        { id: 1, net_amount: 5000, selected: true },
+        { id: 2, net_amount: -2000, selected: true },
+        { id: 3, net_amount: 9999, selected: false },
+      ];
+
+      expect(store.selectedTotal).toBe(3000);
+    });
+
+    it('returns 0 when no transactions are selected', () => {
+      const store = useTransactionStore();
+      store.draftTransactions = [
+        { id: 1, net_amount: 5000 },
+      ];
+
+      expect(store.selectedTotal).toBe(0);
+    });
+
+    it('computes from withdrawal/deposit amounts when net_amount is missing', () => {
+      const store = useTransactionStore();
+      store.draftTransactions = [
+        { id: 1, withdrawal_amount: 5000, deposit_amount: 0, selected: true },
+        { id: 2, withdrawal_amount: 0, deposit_amount: 3000, selected: true },
+      ];
+
+      expect(store.selectedTotal).toBe(-2000);
+    });
+
+    it('treats fully missing amounts as 0', () => {
+      const store = useTransactionStore();
+      store.draftTransactions = [
+        { id: 1, selected: true },
+        { id: 2, net_amount: 3000, selected: true },
+      ];
+
+      expect(store.selectedTotal).toBe(3000);
+    });
+  });
+
+  describe('clearSelections', () => {
+    it('sets selected to false on all draft transactions', () => {
+      const store = useTransactionStore();
+      store.draftTransactions = [
+        { id: 1, selected: true },
+        { id: 2, selected: true },
+        { id: 3, selected: false },
+      ];
+
+      store.clearSelections();
+
+      expect(store.draftTransactions.every((t) => t.selected === false)).toBe(true);
     });
   });
 

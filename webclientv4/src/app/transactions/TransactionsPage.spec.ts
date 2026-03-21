@@ -32,6 +32,14 @@ vi.mock('../notifications/useNotifications', () => ({
   }),
 }));
 
+const mockSettingsFetchAll = vi.fn().mockResolvedValue(undefined);
+vi.mock('../settings/settingsStore', () => ({
+  useSettingsStore: () => ({
+    settings: { primary_budget_account_id: 1 },
+    fetchAll: mockSettingsFetchAll,
+  }),
+}));
+
 const checkingAccount: BankAccountData = { id: 1, name: 'Checking', is_sink_fund: false, is_credit_card: false };
 const jan2025: BudgetData = { id: 1, name: 'Jan 2025', status: 'open' };
 const sampleTransactions: TransactionData[] = [
@@ -65,6 +73,9 @@ const mockStore = reactive({
   deleteTransaction: vi.fn(),
   onAllocationChange: vi.fn(),
   addImportedTransactions: vi.fn(),
+  selectedTransactions: [] as unknown[],
+  selectedTotal: 0,
+  clearSelections: vi.fn(),
 });
 
 vi.mock('./transactionStore', () => ({
@@ -150,6 +161,13 @@ describe('TransactionsPage', () => {
       await nextTick();
 
       expect(mockStore.fetchMetadata).toHaveBeenCalled();
+    });
+
+    it('calls settingsStore.fetchAll on mount', async () => {
+      mountPage();
+      await nextTick();
+
+      expect(mockSettingsFetchAll).toHaveBeenCalled();
     });
   });
 
@@ -448,6 +466,23 @@ describe('TransactionsPage', () => {
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
       expect(list.props('showCalculatorColumn')).toBe(false);
+    });
+
+    it('calls store.clearSelections when toggling calculator column off', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+      await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+
+      expect(mockStore.clearSelections).toHaveBeenCalled();
+    });
+
+    it('does not call store.clearSelections when toggling calculator column on', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+
+      expect(mockStore.clearSelections).not.toHaveBeenCalled();
     });
   });
 
