@@ -73,6 +73,27 @@ watch(
   { immediate: true },
 );
 
+// When navigating to this page with different query params (e.g. from budget "View Transactions"),
+// the component doesn't remount — only the URL changes. Detect this and re-sync.
+watch(
+  () => route.query,
+  (query) => {
+    if (!initialised.value || store.bankAccounts.length === 0) return;
+
+    const queryBudgetId = query.budget_id ? Number(query.budget_id) : null;
+    const queryBankAccountId = query.bank_account_id ? Number(query.bank_account_id) : null;
+
+    if (queryBudgetId && queryBudgetId !== selectedBudgetId.value) {
+      selectedBudgetId.value = queryBudgetId;
+      emitFetch();
+    }
+    if (queryBankAccountId && queryBankAccountId !== selectedBankAccountId.value) {
+      selectedBankAccountId.value = queryBankAccountId;
+      emitFetch();
+    }
+  },
+);
+
 function onBankAccountChange(id: number) {
   selectedBankAccountId.value = id;
   emitFetch();

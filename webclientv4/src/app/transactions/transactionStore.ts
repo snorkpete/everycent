@@ -23,8 +23,7 @@ export const useTransactionStore = defineStore('transactions', () => {
   const budgetsForDropdown = computed(() => {
     const openBudgets = budgets.value.filter((b) => b.status === 'open');
     const closedBudgets = budgets.value.filter((b) => b.status !== 'open');
-    const lastOpen = openBudgets.length > 0 ? [openBudgets[openBudgets.length - 1]] : [];
-    return [...lastOpen, ...closedBudgets];
+    return [...openBudgets, ...closedBudgets];
   });
 
   async function fetchMetadata() {
