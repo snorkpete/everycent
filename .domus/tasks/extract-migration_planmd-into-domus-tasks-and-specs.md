@@ -3,7 +3,7 @@
 **Status:** done
 **ID:** extract-migration_planmd-into-domus-tasks-and-specs
 **Status:** done
-**Refinement:** raw
+**Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-14
 **Parent:** none

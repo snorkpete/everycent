@@ -2,7 +2,7 @@
 
 **ID:** link-transactions-to-budgets-by-foreign-key-instead-of-date-range
 **Status:** open
-**Refinement:** raw
+**Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-17
 **Parent:** none

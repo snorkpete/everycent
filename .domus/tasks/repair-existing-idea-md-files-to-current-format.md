@@ -4,7 +4,7 @@
 **Status:** done
 **ID:** repair-existing-idea-md-files-to-current-format
 **Status:** done
-**Refinement:** autonomous
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-14
 **Parent:** none

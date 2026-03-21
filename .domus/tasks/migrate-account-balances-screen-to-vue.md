@@ -2,7 +2,7 @@
 
 **ID:** migrate-account-balances-screen-to-vue
 **Status:** open
-**Refinement:** raw
+**Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-14
 **Parent:** none

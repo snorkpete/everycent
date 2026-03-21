@@ -1,8 +1,8 @@
 # Task: Migrate transaction calculator to Vue
 
 **ID:** migrate-transaction-calculator-to-vue
-**Status:** open
-**Refinement:** raw
+**Status:** done
+**Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-14
 **Parent:** none

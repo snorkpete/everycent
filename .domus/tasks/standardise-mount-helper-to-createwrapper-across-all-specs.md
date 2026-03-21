@@ -2,7 +2,7 @@
 
 **ID:** standardise-mount-helper-to-createwrapper-across-all-specs
 **Status:** open
-**Refinement:** raw
+**Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-15
 **Parent:** none

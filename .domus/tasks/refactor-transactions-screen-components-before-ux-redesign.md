@@ -2,7 +2,7 @@
 
 **ID:** refactor-transactions-screen-components-before-ux-redesign
 **Status:** done
-**Refinement:** autonomous
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-15
 **Parent:** none
