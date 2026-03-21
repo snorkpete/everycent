@@ -11,8 +11,8 @@ export interface AppMenuItem extends MenuItem {
 function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
   return [
     { label: 'Home', icon: Icon.HOME, command: () => navigate('/'), routePath: '/' },
-    { label: '* Current Budget', icon: Icon.BUDGETS_CURRENT, url: '/#/budgets/current' },
-    { label: '* Budgets', icon: Icon.BUDGETS, url: '/#/budgets' },
+    { label: 'Current Budget', icon: Icon.BUDGETS_CURRENT, command: () => navigate('/budgets/current'), routePath: '/budgets/current' },
+    { label: 'Budgets', icon: Icon.BUDGETS, command: () => navigate('/budgets'), routePath: '/budgets' },
     { label: 'Future Budgets', icon: Icon.BUDGETS_FUTURE, command: () => navigate('/budgets/future'), routePath: '/budgets/future' },
     { label: 'Transactions', icon: Icon.TRANSACTIONS, command: () => navigate('/transactions'), routePath: '/transactions' },
     { label: '* Sink Funds', icon: Icon.SINK_FUND, url: '/#/sink-funds' },

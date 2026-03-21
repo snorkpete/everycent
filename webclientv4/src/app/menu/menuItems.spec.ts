@@ -14,11 +14,26 @@ describe('menuItems', () => {
     expect(navigate).toHaveBeenCalledWith('/');
   });
 
-  it('points non-migrated routes to Angular app via url', () => {
-    const items = buildMenuItems(vi.fn(), vi.fn());
-    const budgets = items.find((item) => item.label === '* Budgets');
+  it('includes Budgets with command-based Vue navigation and routePath', () => {
+    const navigate = vi.fn();
+    const items = buildMenuItems(vi.fn(), navigate);
+    const budgets = items.find((item) => item.label === 'Budgets');
 
-    expect(budgets!.url).toBe('/#/budgets');
+    expect(budgets!.routePath).toBe('/budgets');
+    expect(budgets!.url).toBeUndefined();
+    budgets!.command!({ originalEvent: new Event('click'), item: budgets! });
+    expect(navigate).toHaveBeenCalledWith('/budgets');
+  });
+
+  it('includes Current Budget with command-based Vue navigation and routePath', () => {
+    const navigate = vi.fn();
+    const items = buildMenuItems(vi.fn(), navigate);
+    const currentBudget = items.find((item) => item.label === 'Current Budget');
+
+    expect(currentBudget!.routePath).toBe('/budgets/current');
+    expect(currentBudget!.url).toBeUndefined();
+    currentBudget!.command!({ originalEvent: new Event('click'), item: currentBudget! });
+    expect(navigate).toHaveBeenCalledWith('/budgets/current');
   });
 
   it('includes Transactions with command-based Vue navigation and routePath', () => {

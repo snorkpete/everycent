@@ -5,6 +5,8 @@ import apiGateway from '../../api/api-gateway';
 vi.mock('../../api/api-gateway', () => ({
   default: {
     get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
   },
 }));
 
@@ -50,6 +52,74 @@ describe('budgetApi', () => {
       const result = await budgetApi.getAllocations(42);
 
       expect(result).toEqual(allocations);
+    });
+  });
+
+  describe('getCurrentBudgetId', () => {
+    it('gets /budgets/current', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: { budget_id: 99 } });
+
+      await budgetApi.getCurrentBudgetId();
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/budgets/current');
+    });
+
+    it('returns the budget_id from the response', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: { budget_id: 99 } });
+
+      const result = await budgetApi.getCurrentBudgetId();
+
+      expect(result).toBe(99);
+    });
+  });
+
+  describe('create', () => {
+    it('posts to /budgets with the budget data', async () => {
+      const newBudget = { start_date: '2025-03-01' };
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: { id: 10, name: 'Mar 2025' } });
+
+      await budgetApi.create(newBudget);
+
+      expect(apiGateway.post).toHaveBeenCalledWith('/budgets', newBudget);
+    });
+
+    it('returns the response data', async () => {
+      const created = { id: 10, name: 'Mar 2025', status: 'open' };
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: created });
+
+      const result = await budgetApi.create({ start_date: '2025-03-01' });
+
+      expect(result).toEqual(created);
+    });
+  });
+
+  describe('copy', () => {
+    it('puts to /budgets/:id/copy', async () => {
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: undefined });
+
+      await budgetApi.copy(5);
+
+      expect(apiGateway.put).toHaveBeenCalledWith('/budgets/5/copy');
+    });
+  });
+
+  describe('close', () => {
+    it('puts to /budgets/:id/close', async () => {
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: undefined });
+
+      await budgetApi.close(5);
+
+      expect(apiGateway.put).toHaveBeenCalledWith('/budgets/5/close');
+    });
+  });
+
+  describe('reopenLast', () => {
+    it('posts to /budgets/reopen_last_budget', async () => {
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: undefined });
+
+      await budgetApi.reopenLast();
+
+      expect(apiGateway.post).toHaveBeenCalledWith('/budgets/reopen_last_budget');
     });
   });
 });

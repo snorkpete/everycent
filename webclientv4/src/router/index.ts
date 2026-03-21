@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import LoginPage from '../auth/LoginPage.vue';
 import { useAuthStore } from '../auth/authStore';
+import { budgetApi } from '../app/budgets/budgetApi';
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -39,6 +40,25 @@ const router = createRouter({
       path: '/budgets/future',
       name: 'future-budgets',
       component: () => import('../app/budgets/future-budgets/FutureBudgetsPage.vue'),
+    },
+    {
+      path: '/budgets',
+      name: 'budgets',
+      component: () => import('../app/budgets/BudgetsPage.vue'),
+    },
+    {
+      path: '/budgets/current',
+      name: 'current-budget',
+      component: { template: '<div />' },
+      beforeEnter: async () => {
+        const budgetId = await budgetApi.getCurrentBudgetId();
+        return { path: `/budgets/${budgetId}` };
+      },
+    },
+    {
+      path: '/budgets/:id',
+      name: 'budget-detail',
+      component: () => import('../app/budgets/BudgetDetailStub.vue'),
     },
     {
       path: '/transactions',
