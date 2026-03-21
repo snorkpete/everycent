@@ -18,6 +18,9 @@ export interface AllocationData {
   special_event_id?: number;
   budget_name?: string;
   allocation_category_name?: string;
+  allocation_class?: string;
+  is_fixed_amount?: boolean;
+  deleted?: boolean;
 }
 
 export interface SinkFundAllocationData {

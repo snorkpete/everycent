@@ -58,7 +58,7 @@ const router = createRouter({
     {
       path: '/budgets/:id',
       name: 'budget-detail',
-      component: () => import('../app/budgets/BudgetDetailStub.vue'),
+      component: () => import('../app/budgets/BudgetPage.vue'),
     },
     {
       path: '/transactions',

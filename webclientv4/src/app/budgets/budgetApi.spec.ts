@@ -122,4 +122,50 @@ describe('budgetApi', () => {
       expect(apiGateway.post).toHaveBeenCalledWith('/budgets/reopen_last_budget');
     });
   });
+
+  describe('get', () => {
+    it('gets /budgets/:id', async () => {
+      const budgetDetail = { id: 213, name: 'Mar 2026', incomes: [], allocations: [] };
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: { budget: budgetDetail } });
+
+      await budgetApi.get(213);
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/budgets/213');
+    });
+
+    it('returns the budget from the response', async () => {
+      const budgetDetail = { id: 213, name: 'Mar 2026', incomes: [], allocations: [] };
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: { budget: budgetDetail } });
+
+      const result = await budgetApi.get(213);
+
+      expect(result).toEqual(budgetDetail);
+    });
+  });
+
+  describe('save', () => {
+    it('puts to /budgets/:id with incomes and allocations as top-level params', async () => {
+      const incomes = [{ id: 1, name: 'Salary', amount: 500000, budget_id: 213 }];
+      const allocations = [{ id: 1, name: 'Groceries', amount: 100000, budget_id: 213 }];
+      const budget = { id: 213, name: 'Mar 2026', incomes, allocations };
+      const savedBudget = { ...budget };
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: { budget: savedBudget } });
+
+      await budgetApi.save(budget);
+
+      expect(apiGateway.put).toHaveBeenCalledWith('/budgets/213', {
+        incomes,
+        allocations,
+      });
+    });
+
+    it('returns the saved budget from the response', async () => {
+      const budget = { id: 213, name: 'Mar 2026', incomes: [], allocations: [] };
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: { budget } });
+
+      const result = await budgetApi.save(budget);
+
+      expect(result).toEqual(budget);
+    });
+  });
 });
