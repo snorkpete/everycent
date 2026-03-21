@@ -126,7 +126,7 @@ describe('budgetApi', () => {
   describe('get', () => {
     it('gets /budgets/:id', async () => {
       const budgetDetail = { id: 213, name: 'Mar 2026', incomes: [], allocations: [] };
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: { budget: budgetDetail } });
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: budgetDetail });
 
       await budgetApi.get(213);
 
@@ -135,7 +135,7 @@ describe('budgetApi', () => {
 
     it('returns the budget from the response', async () => {
       const budgetDetail = { id: 213, name: 'Mar 2026', incomes: [], allocations: [] };
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: { budget: budgetDetail } });
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: budgetDetail });
 
       const result = await budgetApi.get(213);
 
@@ -149,7 +149,7 @@ describe('budgetApi', () => {
       const allocations = [{ id: 1, name: 'Groceries', amount: 100000, budget_id: 213 }];
       const budget = { id: 213, name: 'Mar 2026', incomes, allocations };
       const savedBudget = { ...budget };
-      vi.mocked(apiGateway.put).mockResolvedValue({ data: { budget: savedBudget } });
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: savedBudget });
 
       await budgetApi.save(budget);
 
@@ -161,7 +161,7 @@ describe('budgetApi', () => {
 
     it('returns the saved budget from the response', async () => {
       const budget = { id: 213, name: 'Mar 2026', incomes: [], allocations: [] };
-      vi.mocked(apiGateway.put).mockResolvedValue({ data: { budget } });
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: budget });
 
       const result = await budgetApi.save(budget);
 

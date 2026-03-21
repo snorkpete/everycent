@@ -8,8 +8,8 @@ export const budgetApi = {
 
   get: (id: number) =>
     apiGateway
-      .get<{ budget: BudgetDetailData }>(`/budgets/${id}`)
-      .then((r) => r.data.budget),
+      .get<BudgetDetailData>(`/budgets/${id}`)
+      .then((r) => r.data),
 
   getAllocations: (budgetId: number) =>
     apiGateway
@@ -35,9 +35,9 @@ export const budgetApi = {
 
   save: (budget: BudgetDetailData) =>
     apiGateway
-      .put<{ budget: BudgetDetailData }>(`/budgets/${budget.id}`, {
+      .put<BudgetDetailData>(`/budgets/${budget.id}`, {
         incomes: budget.incomes as IncomeData[],
         allocations: budget.allocations as AllocationData[],
       })
-      .then((r) => r.data.budget),
+      .then((r) => r.data),
 };

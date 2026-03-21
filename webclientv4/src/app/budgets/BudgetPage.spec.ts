@@ -55,6 +55,20 @@ vi.mock('./budgetStore', () => ({
   useBudgetStore: () => mockStore,
 }));
 
+const mockSettingsStore = reactive({
+  settings: {},
+  bankAccounts: [],
+  allocationCategories: [],
+  loading: false,
+  error: null as string | null,
+  fetchAll: vi.fn().mockResolvedValue(undefined),
+  save: vi.fn(),
+});
+
+vi.mock('../settings/settingsStore', () => ({
+  useSettingsStore: () => mockSettingsStore,
+}));
+
 const mockPush = vi.fn();
 vi.mock('vue-router', () => ({
   useRoute: () => ({ params: { id: '213' } }),

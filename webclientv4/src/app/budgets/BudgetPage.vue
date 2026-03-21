@@ -11,14 +11,11 @@
           data-testid="back-btn"
           @click="router.push('/budgets')"
         />
-        <Button
-          label="View Transactions"
-          icon="pi pi-list"
-          outlined
-          size="small"
+        <a
+          :href="`#/transactions?budget_id=${route.params.id}`"
+          class="view-transactions-link"
           data-testid="view-transactions-btn"
-          @click="router.push(`/transactions?budget_id=${route.params.id}`)"
-        />
+        >View Transactions</a>
       </div>
       <div class="toolbar-right">
         <Button
@@ -48,12 +45,13 @@
 
     <!-- Content -->
     <div class="content-card">
-      <div class="placeholder-section" data-testid="incomes-section">
-        <p>Incomes section (placeholder)</p>
+      <div data-testid="incomes-section">
+        <BudgetIncomeList />
       </div>
-      <div class="placeholder-section" data-testid="allocations-section">
-        <p>Allocations section (placeholder)</p>
+      <div data-testid="allocations-section">
+        <BudgetAllocationList />
       </div>
+      <BudgetSummary />
     </div>
   </div>
 </template>
@@ -65,11 +63,16 @@ import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useBudgetStore } from './budgetStore';
 import { useNotifications } from '../notifications/useNotifications';
+import { useSettingsStore } from '../settings/settingsStore';
+import BudgetIncomeList from './BudgetIncomeList.vue';
+import BudgetAllocationList from './BudgetAllocationList.vue';
+import BudgetSummary from './BudgetSummary.vue';
 
 const route = useRoute();
 const router = useRouter();
 const store = useBudgetStore();
 const headingStore = useHeadingStore();
+const settingsStore = useSettingsStore();
 const notifications = useNotifications();
 
 function updateHeading() {
@@ -79,7 +82,7 @@ function updateHeading() {
 
 onMounted(async () => {
   const budgetId = Number(route.params.id);
-  await store.fetch(budgetId);
+  await Promise.all([store.fetch(budgetId), settingsStore.fetchAll()]);
   updateHeading();
 });
 
@@ -154,5 +157,17 @@ async function onCancel() {
 
 .placeholder-section:last-child {
   border-bottom: none;
+}
+
+.view-transactions-link {
+  font-size: 0.875rem;
+  color: var(--p-primary-color);
+  text-decoration: none;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.view-transactions-link:hover {
+  text-decoration: underline;
 }
 </style>
