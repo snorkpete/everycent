@@ -1,0 +1,1 @@
+function o(t){if(!t)return"";const[r,n,a]=t.split("-").map(Number),e=new Date(r,n-1,a);return isNaN(e.getTime())?"":e.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}export{o as f};
