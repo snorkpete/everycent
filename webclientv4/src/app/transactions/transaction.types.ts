@@ -58,5 +58,6 @@ export interface TransactionData {
   bank_account?: BankAccountData;
   deleted?: boolean;
   newlyImported?: boolean;
+  camt_imported?: boolean;
 }
 

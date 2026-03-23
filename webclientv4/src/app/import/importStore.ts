@@ -202,6 +202,7 @@ export const useImportStore = defineStore('import', () => {
               deposit_amount: t.deposit_amount ?? 0,
               bank_ref: t.bank_ref ?? '',
               status: t.status ?? 'paid',
+              camt_imported: t.camt_imported ?? true,
             })),
         })),
       };

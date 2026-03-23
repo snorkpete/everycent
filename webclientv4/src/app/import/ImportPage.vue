@@ -152,6 +152,7 @@
                 <th class="col-money right">Deposit</th>
                 <th class="col-allocation">Allocation</th>
                 <th class="col-status">Status</th>
+                <th class="col-manual">Manual</th>
                 <th class="col-action" />
               </tr>
             </thead>
@@ -185,6 +186,15 @@
                     value="New"
                     severity="success"
                     data-testid="status-new"
+                  />
+                </td>
+                <td class="col-manual center">
+                  <input
+                    type="checkbox"
+                    :checked="!transaction.camt_imported"
+                    :disabled="transaction.import_status === 'duplicate'"
+                    title="Mark as manually entered (not auto-imported)"
+                    @change="transaction.camt_imported = !($event.target as HTMLInputElement).checked"
                   />
                 </td>
                 <td class="col-action">
@@ -245,6 +255,7 @@ import Tag from 'primevue/tag';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useImportStore } from './importStore';
+import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 import type { ImportTransaction } from './import.types';
@@ -265,16 +276,22 @@ onMounted(async () => {
   store.resetPreview();
   await store.fetchMetadata();
 
-  // Inherit budget from query param or auto-select first open budget
+  // Inherit budget from query param or auto-select current budget
   const budgetIdFromQuery = Number(route.query.budget_id);
   if (budgetIdFromQuery) {
     store.selectBudget(budgetIdFromQuery);
     selectedBudgetId.value = budgetIdFromQuery;
   } else {
-    const firstOpen = store.budgets.find((b) => b.status === 'open');
-    if (firstOpen?.id) {
-      store.selectBudget(firstOpen.id);
-      selectedBudgetId.value = firstOpen.id;
+    try {
+      const currentBudgetId = await budgetApi.getCurrentBudgetId();
+      store.selectBudget(currentBudgetId);
+      selectedBudgetId.value = currentBudgetId;
+    } catch {
+      const firstOpen = store.budgets.find((b) => b.status === 'open');
+      if (firstOpen?.id) {
+        store.selectBudget(firstOpen.id);
+        selectedBudgetId.value = firstOpen.id;
+      }
     }
   }
 });
@@ -502,7 +519,10 @@ function previewRowClass(transaction: ImportTransaction) {
 .col-money { width: 11%; }
 .col-allocation { width: 18%; }
 .col-status { width: 10%; }
+.col-manual { width: 5%; text-align: center; }
 .col-action { width: 5%; }
+
+.center { text-align: center; }
 
 .preview-table tbody tr:nth-child(even) {
   background-color: var(--p-surface-50);

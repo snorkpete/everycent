@@ -132,6 +132,7 @@ export function parseCamt053Xml(
         deposit_amount: isDebit ? 0 : entry.amount,
         description: entry.description,
         status,
+        camt_imported: true,
       };
 
       if (outsidePeriod) {

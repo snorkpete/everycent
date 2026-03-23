@@ -2,7 +2,7 @@ class ImportSaveService
   class ValidationError < StandardError; end
 
   PERMITTED_FIELDS = %i[
-    transaction_date description withdrawal_amount deposit_amount bank_ref status
+    transaction_date description withdrawal_amount deposit_amount bank_ref status camt_imported
   ].freeze
 
   def initialize(budget:, bank_accounts_params:)
@@ -33,8 +33,8 @@ class ImportSaveService
 
     transactions_params.each do |txn_params|
       next if duplicate?(txn_params, existing_refs)
+      next unless in_budget_period?(txn_params)
 
-      validate_in_budget_period!(txn_params)
       create_transaction!(bank_account, txn_params)
     end
 
@@ -65,26 +65,22 @@ class ImportSaveService
     txn_params[:bank_ref].present? && existing_refs.include?(txn_params[:bank_ref])
   end
 
-  def validate_in_budget_period!(txn_params)
+  def in_budget_period?(txn_params)
     date = begin
       Date.parse(txn_params[:transaction_date].to_s)
     rescue ArgumentError, TypeError
-      raise ValidationError, "Invalid transaction_date: #{txn_params[:transaction_date]}"
+      return false
     end
 
     budget_range = @budget.start_date..@budget.end_date
-    unless budget_range.cover?(date)
-      raise ValidationError,
-            "Transaction date #{date} is outside budget period #{@budget.start_date}..#{@budget.end_date}"
-    end
+    budget_range.cover?(date)
   end
 
   def create_transaction!(bank_account, txn_params)
     permitted = txn_params.slice(*PERMITTED_FIELDS)
     Transaction.create!(
       permitted.merge(
-        bank_account_id: bank_account.id,
-        camt_imported: true
+        bank_account_id: bank_account.id
       )
     )
   end
