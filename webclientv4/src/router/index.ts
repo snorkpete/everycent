@@ -65,6 +65,11 @@ const router = createRouter({
       name: 'transactions',
       component: () => import('../app/transactions/TransactionsPage.vue'),
     },
+    {
+      path: '/import',
+      name: 'import',
+      component: () => import('../app/import/ImportPage.vue'),
+    },
   ],
 });
 
