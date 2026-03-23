@@ -142,6 +142,7 @@
             </div>
           </div>
 
+          <div class="table-scroll">
           <table class="preview-table">
             <thead>
               <tr>
@@ -201,6 +202,7 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       </template>
 
@@ -442,7 +444,6 @@ function previewRowClass(transaction: ImportTransaction) {
   border: 1px solid var(--p-surface-300);
   border-radius: 6px;
   background-color: var(--p-surface-0);
-  overflow: hidden;
 }
 
 .account-header {
@@ -467,6 +468,11 @@ function previewRowClass(transaction: ImportTransaction) {
   color: var(--p-text-muted-color);
 }
 
+.table-scroll {
+  max-height: 50vh;
+  overflow: auto;
+}
+
 .preview-table {
   width: 100%;
   border-collapse: collapse;
@@ -484,6 +490,10 @@ function previewRowClass(transaction: ImportTransaction) {
   font-weight: 600;
   text-align: left;
   background-color: var(--p-surface-50);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: 0 1px 0 var(--p-surface-300);
 }
 
 .col-date { width: 11%; }
