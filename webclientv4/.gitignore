@@ -23,6 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Vite cache
+.vite
+
+# Domus (nested copy from worktrees)
+.domus
+
 # Cypress
 cypress/videos
 cypress/screenshots
