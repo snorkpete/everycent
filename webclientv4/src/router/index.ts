@@ -70,6 +70,16 @@ const router = createRouter({
       name: 'import',
       component: () => import('../app/import/ImportPage.vue'),
     },
+    {
+      path: '/account-balances',
+      name: 'account-balances',
+      component: () => import('../app/account-balances/AccountBalancesPage.vue'),
+    },
+    {
+      path: '/sink-funds',
+      name: 'sink-funds',
+      component: () => import('../app/sink-funds/SinkFundsPage.vue'),
+    },
   ],
 });
 
