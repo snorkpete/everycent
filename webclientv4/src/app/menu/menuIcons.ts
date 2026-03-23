@@ -6,6 +6,7 @@ export const Icon = {
   BUDGETS_CURRENT: 'pi pi-star',
   BUDGETS_FUTURE: 'pi pi-chart-line',
   TRANSACTIONS: 'pi pi-credit-card',
+  IMPORT: 'pi pi-upload',
   SINK_FUND: 'pi pi-wallet',
   ACCOUNT_BALANCES: 'pi pi-building-columns',
   SPECIAL_EVENTS: 'pi pi-calendar',
