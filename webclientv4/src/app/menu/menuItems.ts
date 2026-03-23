@@ -17,7 +17,7 @@ function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
     { label: 'Transactions', icon: Icon.TRANSACTIONS, command: () => navigate('/transactions'), routePath: '/transactions' },
     { label: 'Import', icon: Icon.IMPORT, command: () => navigate('/import'), routePath: '/import' },
     { label: '* Sink Funds', icon: Icon.SINK_FUND, url: '/#/sink-funds' },
-    { label: '* Account Balances', icon: Icon.ACCOUNT_BALANCES, url: '/#/account-balances' },
+    { label: 'Account Balances', icon: Icon.ACCOUNT_BALANCES, command: () => navigate('/account-balances'), routePath: '/account-balances' },
     { label: '* Special Events', icon: Icon.SPECIAL_EVENTS, url: '/#/special-events' },
   ];
 }
