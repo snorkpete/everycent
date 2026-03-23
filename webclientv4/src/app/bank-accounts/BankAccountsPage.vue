@@ -9,6 +9,11 @@
         />
         <span>Show Closed Accounts</span>
       </label>
+
+      <div class="page-actions">
+        <Button label="Add Bank Account" data-testid="add-btn" @click="addAccount" />
+        <Button label="Refresh" severity="secondary" data-testid="refresh-btn" @click="refresh" />
+      </div>
     </div>
 
     <ul class="account-list">
@@ -36,11 +41,6 @@
         />
       </li>
     </ul>
-
-    <div class="page-actions">
-      <Button label="Add Bank Account" data-testid="add-btn" @click="addAccount" />
-      <Button label="Refresh" severity="secondary" data-testid="refresh-btn" @click="refresh" />
-    </div>
 
     <BankAccountEditDialog
       :visible="dialogVisible"
@@ -118,11 +118,14 @@ async function onSave(account: BankAccountData) {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: 100%;
+  overflow: auto;
 }
 
 .controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .toggle-label {
@@ -140,7 +143,7 @@ async function onSave(account: BankAccountData) {
   flex-direction: column;
   border: 1px solid var(--p-surface-200);
   border-radius: 6px;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .account-item {
