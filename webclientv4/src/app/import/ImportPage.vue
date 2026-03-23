@@ -42,19 +42,14 @@
     <div class="content-area">
       <!-- File Upload -->
       <div class="upload-section">
-        <input
-          ref="fileInput"
-          type="file"
+        <FileUpload
+          mode="basic"
           accept=".zip"
-          class="hidden-file-input"
-          data-testid="file-input"
-          @change="onFileChange"
-        />
-        <Button
-          icon="pi pi-plus"
-          label="Select ZIP file"
+          custom-upload
+          auto
+          choose-label="Select ZIP file"
           data-testid="file-upload"
-          @click="fileInput?.click()"
+          @select="onFileSelect"
         />
         <ProgressSpinner
           v-if="store.loading"
@@ -242,6 +237,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
+import FileUpload from 'primevue/fileupload';
 import Message from 'primevue/message';
 import Tag from 'primevue/tag';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -257,7 +253,6 @@ const notifications = useNotifications();
 const route = useRoute();
 
 const selectedBudgetId = ref<number | null>(null);
-const fileInput = ref<HTMLInputElement | null>(null);
 
 const hasMatchedAccounts = computed(() =>
   store.fileSummary.some((row) => row.matchedAccountName != null),
@@ -286,13 +281,9 @@ function onBudgetChange(budgetId: number) {
   store.resetPreview();
 }
 
-async function onFileChange(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
+async function onFileSelect(event: { files: File[] }) {
+  const file = event.files[0];
   if (!file) return;
-
-  // Reset input so re-selecting the same file triggers change
-  input.value = '';
 
   store.resetPreview();
   try {
@@ -389,10 +380,6 @@ function previewRowClass(transaction: ImportTransaction) {
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-
-.hidden-file-input {
-  display: none;
 }
 
 .loading-spinner {
