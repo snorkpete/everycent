@@ -10,6 +10,7 @@
             <th class="col-money right">Withdrawn</th>
             <th class="col-money right">Deposited</th>
             <th class="col-paid">Paid</th>
+            <th class="col-auto">Auto</th>
             <th class="col-action" />
           </tr>
         </thead>
@@ -99,6 +100,13 @@
                 />
               </template>
             </td>
+            <td class="col-auto">
+              <i
+                v-if="transaction.camt_imported"
+                class="pi pi-check paid-icon"
+                data-testid="auto-icon"
+              />
+            </td>
             <td class="col-action">
               <Button
                 v-if="store.isEditMode"
@@ -114,7 +122,7 @@
         </tbody>
         <tfoot v-if="store.isEditMode">
           <tr>
-            <td :colspan="8" class="table-footer">
+            <td :colspan="9" class="table-footer">
               <Button
                 label="Add New Transaction"
                 severity="secondary"
@@ -198,7 +206,8 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 .col-description { width: 28%; }
 .col-allocation { width: 22%; }
 .col-money { width: 10%; }
-.col-paid { width: 5.5%; }
+.col-paid { width: 4%; }
+.col-auto { width: 4%; }
 .col-action { width: 2%; }
 
 .col-description--truncate :deep(.text-display) {

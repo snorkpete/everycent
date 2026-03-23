@@ -152,7 +152,6 @@
                 <th class="col-money right">Deposit</th>
                 <th class="col-allocation">Allocation</th>
                 <th class="col-status">Status</th>
-                <th class="col-manual">Manual</th>
                 <th class="col-action" />
               </tr>
             </thead>
@@ -186,15 +185,6 @@
                     value="New"
                     severity="success"
                     data-testid="status-new"
-                  />
-                </td>
-                <td class="col-manual center">
-                  <input
-                    type="checkbox"
-                    :checked="!transaction.camt_imported"
-                    :disabled="transaction.import_status === 'duplicate'"
-                    title="Mark as manually entered (not auto-imported)"
-                    @change="transaction.camt_imported = !($event.target as HTMLInputElement).checked"
                   />
                 </td>
                 <td class="col-action">
@@ -519,10 +509,7 @@ function previewRowClass(transaction: ImportTransaction) {
 .col-money { width: 11%; }
 .col-allocation { width: 18%; }
 .col-status { width: 10%; }
-.col-manual { width: 5%; text-align: center; }
 .col-action { width: 5%; }
-
-.center { text-align: center; }
 
 .preview-table tbody tr:nth-child(even) {
   background-color: var(--p-surface-50);
