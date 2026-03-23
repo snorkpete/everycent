@@ -70,7 +70,10 @@ export function parseCamt053Xml(
       const iban = getTextContent(stmt, 'Acct>Id>IBAN') ?? '';
 
       if (!accountMap.has(iban)) {
-        const matched = bankAccounts.find((ba) => ba.accountNo === iban);
+        const normalizedIban = iban.replace(/\s/g, '');
+        const matched = bankAccounts.find(
+          (ba) => ba.accountNo.replace(/\s/g, '') === normalizedIban,
+        );
         accountMap.set(iban, {
           bankAccountId: matched?.id,
           accountType: matched?.accountType,

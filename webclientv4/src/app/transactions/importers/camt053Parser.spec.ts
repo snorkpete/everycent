@@ -207,6 +207,54 @@ describe('camt053Parser', () => {
         expect(result.accounts).toHaveLength(1);
         expect(result.accounts[0].transactions).toHaveLength(1);
       });
+
+      it('matches when accountNo has spaces but IBAN in XML does not', () => {
+        const xml = makeXml({
+          iban: 'NL62ABNA0123456789',
+          entries: beaEntry({}),
+        });
+        const spacedAccounts = [
+          { id: 1, accountNo: 'NL62 ABNA 0123 4567 89', accountType: 'checking' },
+        ];
+        const result = parseCamt053Xml(
+          [xml],
+          spacedAccounts,
+          defaultStartDate,
+          defaultEndDate,
+        );
+        expect(result.accounts[0].bankAccountId).toBe(1);
+      });
+
+      it('matches when IBAN in XML has spaces but accountNo does not', () => {
+        const xml = makeXml({
+          iban: 'NL62 ABNA 0123 4567 89',
+          entries: beaEntry({}),
+        });
+        const result = parseCamt053Xml(
+          [xml],
+          defaultBankAccounts,
+          defaultStartDate,
+          defaultEndDate,
+        );
+        expect(result.accounts[0].bankAccountId).toBe(1);
+      });
+
+      it('matches when both accountNo and IBAN have spaces', () => {
+        const xml = makeXml({
+          iban: 'NL62 ABNA 0123 4567 89',
+          entries: beaEntry({}),
+        });
+        const spacedAccounts = [
+          { id: 1, accountNo: 'NL62 ABNA 0123 4567 89', accountType: 'checking' },
+        ];
+        const result = parseCamt053Xml(
+          [xml],
+          spacedAccounts,
+          defaultStartDate,
+          defaultEndDate,
+        );
+        expect(result.accounts[0].bankAccountId).toBe(1);
+      });
     });
 
     describe('bank_ref extraction', () => {
