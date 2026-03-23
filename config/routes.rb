@@ -7,6 +7,8 @@ Rails.application.routes.draw do
       get 'by_sink_fund_allocation'
       get 'by_credit_card'
       get 'last_update'
+      post 'import_preview'
+      post 'import_save'
     end
   end
   resources :budgets, except: [:new, :edit] do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_17_121750) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_22_000000) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -206,7 +206,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_17_121750) do
     t.string "brought_forward_status"
     t.bigint "household_id"
     t.boolean "is_manual_adjustment", default: false
+    t.boolean "camt_imported", default: false
     t.index ["allocation_id"], name: "index_transactions_on_allocation_id"
+    t.index ["bank_account_id", "bank_ref"], name: "index_transactions_on_bank_account_id_and_bank_ref", unique: true
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["household_id"], name: "index_transactions_on_household_id"
     t.index ["transaction_date"], name: "index_transactions_on_transaction_date"

@@ -44,6 +44,13 @@
           @click="showImportDialog = true"
         />
         <Button
+          label="Import CAMT"
+          outlined
+          size="small"
+          data-testid="import-camt-btn"
+          @click="navigateToImport"
+        />
+        <Button
           label="Transfer"
           outlined
           severity="secondary"
@@ -106,6 +113,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
@@ -118,6 +126,7 @@ import TransactionImportDialog from './TransactionImportDialog.vue';
 import AccountTransferDialog from './AccountTransferDialog.vue';
 import type { TransactionData } from './transaction.types';
 
+const router = useRouter();
 const store = useTransactionStore();
 const headingStore = useHeadingStore();
 const settingsStore = useSettingsStore();
@@ -169,6 +178,14 @@ function onImport(transactions: TransactionData[]) {
 
 function onTransferred() {
   store.fetch({ budgetId: store.selectedBudget!.id!, bankAccountId: store.selectedBankAccount!.id! });
+}
+
+function navigateToImport() {
+  const query: Record<string, string> = {};
+  if (store.selectedBudget?.id) {
+    query.budget_id = String(store.selectedBudget.id);
+  }
+  router.push({ name: 'import', query });
 }
 </script>
 

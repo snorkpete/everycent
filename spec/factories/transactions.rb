@@ -27,7 +27,7 @@ FactoryBot.define do
     household
     bank_account
     description { "MyString" }
-    bank_ref { "MyString" }
+    bank_ref { "TEST-#{SecureRandom.hex(8)}" }
     transaction_date { "2015-01-19" }
     withdrawal_amount { 1 }
     deposit_amount { 1 }
