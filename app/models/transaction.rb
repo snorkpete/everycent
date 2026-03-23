@@ -31,6 +31,7 @@ class Transaction < ApplicationRecord
   belongs_to :sink_fund_allocation, optional: true
 
   before_save :check_status
+  before_create :assign_bank_ref
 
   def self.preloaded
     includes({ allocation: :allocation_category }, { bank_account: :institution } )
@@ -111,6 +112,12 @@ class Transaction < ApplicationRecord
     else
       self.status = 'paid'
     end
+  end
+
+  def assign_bank_ref
+    return if bank_ref.present?
+
+    self.bank_ref = "MAN-#{SecureRandom.hex(8)}"
   end
 
   def to_brought_forward_version(brought_forward_date)
