@@ -11,6 +11,10 @@
       Loading transactions...
     </div>
 
+    <div v-else-if="error" class="error-state" data-testid="error-state">
+      Failed to load transactions.
+    </div>
+
     <div v-else-if="transactions.length === 0" class="empty-state" data-testid="empty-state">
       No transactions found for this allocation.
     </div>
@@ -65,6 +69,7 @@ defineEmits<{
 
 const transactions = ref<TransactionData[]>([]);
 const loading = ref(false);
+const error = ref(false);
 
 const dialogTitle = computed(() => `Transactions for ${props.allocationName}`);
 
@@ -78,10 +83,11 @@ watch(
     if (isVisible && props.allocationId) {
       loading.value = true;
       transactions.value = [];
+      error.value = false;
       try {
         transactions.value = await budgetApi.getTransactionsForAllocation(props.allocationId);
       } catch {
-        // Silently handle fetch errors — dialog shows empty state
+        error.value = true;
       } finally {
         loading.value = false;
       }
@@ -138,9 +144,14 @@ watch(
 }
 
 .loading-state,
-.empty-state {
+.empty-state,
+.error-state {
   padding: 1.5rem;
   text-align: center;
   color: var(--p-text-muted-color);
+}
+
+.error-state {
+  color: var(--p-red-500);
 }
 </style>

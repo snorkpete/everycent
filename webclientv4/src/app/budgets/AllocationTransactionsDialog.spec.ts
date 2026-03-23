@@ -19,6 +19,7 @@ const EMPTY_STATE = '[data-testid="empty-state"]';
 const TRANSACTIONS_TABLE = '[data-testid="transactions-table"]';
 const TRANSACTION_ROW = '[data-testid="transaction-row"]';
 const TOTAL_ROW = '[data-testid="total-row"]';
+const ERROR_STATE = '[data-testid="error-state"]';
 
 // Stub PrimeVue Dialog to avoid teleport complexity in tests
 const DialogStub = {
@@ -328,7 +329,7 @@ describe('AllocationTransactionsDialog', () => {
       expect(row.text()).toContain('0.00');
     });
 
-    it('handles API error gracefully (loading stops)', async () => {
+    it('handles API error gracefully and shows error state', async () => {
       vi.mocked(budgetApi.getTransactionsForAllocation).mockRejectedValue(new Error('Network error'));
 
       const wrapper = createWrapper({ visible: false });
@@ -336,6 +337,28 @@ describe('AllocationTransactionsDialog', () => {
       await flushPromises();
 
       expect(wrapper.find(LOADING_STATE).exists()).toBe(false);
+      expect(wrapper.find(ERROR_STATE).exists()).toBe(true);
+      expect(wrapper.find(ERROR_STATE).text()).toBe('Failed to load transactions.');
+      expect(wrapper.find(EMPTY_STATE).exists()).toBe(false);
+    });
+
+    it('clears error state when dialog is reopened', async () => {
+      vi.mocked(budgetApi.getTransactionsForAllocation)
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce(sampleTransactions);
+
+      const wrapper = createWrapper({ visible: false });
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+
+      expect(wrapper.find(ERROR_STATE).exists()).toBe(true);
+
+      await wrapper.setProps({ visible: false });
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+
+      expect(wrapper.find(ERROR_STATE).exists()).toBe(false);
+      expect(wrapper.findAll(TRANSACTION_ROW)).toHaveLength(sampleTransactions.length);
     });
   });
 });
