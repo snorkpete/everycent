@@ -262,6 +262,7 @@ const hasMatchedAccounts = computed(() =>
 
 onMounted(async () => {
   headingStore.setHeading('Import Transactions');
+  store.resetPreview();
   await store.fetchMetadata();
 
   // Inherit budget from query param or auto-select first open budget
