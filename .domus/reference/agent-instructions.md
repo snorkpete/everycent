@@ -69,6 +69,26 @@ A **task** is for known implementation work. Even if details need refinement, th
 
 When in doubt: if you don't know whether something will be built, it's an idea. If you know it will, it's a task.
 
+## Dispatching a task to a Worker
+
+When the user says "dispatch", "run the worker on X", "dispatch this task", or similar:
+
+1. Run `domus dispatch <task-id>` — this transitions the task to `in-progress` and creates the execution log
+2. Launch a Worker subagent via the Agent tool with `subagent_type: "general-purpose"`, `isolation: "worktree"`, `run_in_background: true`
+3. Pass the task ID, main repo path, and instruct it to read its role file at `.domus/reference/staff/roles/worker.md`
+
+Only dispatch tasks that are `ready` status. If the task is not ready, advance it first or ask the user.
+
+## Updating the base branch config
+
+Run `domus config set-branch [<branch>]` when the user explicitly mentions the domus branch config — e.g. "set the domus branch", "update the domus branch config", "change the domus base branch". If no branch is given, the current git branch is detected automatically. Do not trigger on generic git branch mentions.
+
+## Staff — always-present roles
+
+@staff/role-activation-rules.md
+@staff/roles/butler.md
+@staff/roles/foreman.md
+
 ## Further reading (load when needed)
 
 - `docs/cli-reference.md` — read when using the domus CLI directly (command syntax, flags)

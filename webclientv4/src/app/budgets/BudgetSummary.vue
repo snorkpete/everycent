@@ -1,63 +1,46 @@
 <template>
   <div class="budget-summary" data-testid="budget-summary">
-    <!-- Discretionary Amount -->
-    <div class="summary-section" data-testid="discretionary-section">
-      <h3 class="section-title">Summary</h3>
-      <table class="summary-table">
-        <tbody>
-          <template v-if="familyType === 'single'">
-            <tr data-testid="single-person-row">
-              <td class="label-cell">{{ singlePerson }}'s Discretionary Amount</td>
-              <td class="amount-cell">{{ centsToDollars(totalDiscretionaryAmount) }}</td>
-            </tr>
-          </template>
-          <template v-else>
-            <tr data-testid="total-discretionary-row">
-              <td class="label-cell">Total Discretionary Amount</td>
-              <td class="amount-cell">{{ centsToDollars(totalDiscretionaryAmount) }}</td>
-            </tr>
-            <tr data-testid="wife-amount-row">
-              <td class="label-cell">{{ wife }}'s Amount</td>
-              <td class="amount-cell">{{ centsToDollars(Math.floor(totalDiscretionaryAmount / 2)) }}</td>
-            </tr>
-            <tr data-testid="husband-amount-row">
-              <td class="label-cell">{{ husband }}'s Amount</td>
-              <td class="amount-cell">{{ centsToDollars(Math.floor(totalDiscretionaryAmount / 2)) }}</td>
-            </tr>
-          </template>
-        </tbody>
-      </table>
+    <div class="summary-header">
+      <h3 class="section-title">Spending Breakdown</h3>
     </div>
 
-    <!-- Wants Summary -->
-    <div class="summary-section" data-testid="wants-summary-section">
-      <h3 class="section-title">Wants Summary</h3>
-      <table class="summary-table">
-        <thead>
-          <tr>
-            <th class="label-cell">Need, Want or Savings</th>
-            <th class="amount-cell">Amount</th>
-            <th class="percent-cell">Percentage</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr data-testid="needs-row">
-            <td class="label-cell">Needs</td>
-            <td class="amount-cell">{{ centsToDollars(needsAmount) }}</td>
-            <td class="percent-cell">{{ needsPercentage }}%</td>
-          </tr>
-          <tr data-testid="wants-row">
-            <td class="label-cell">Wants</td>
-            <td class="amount-cell">{{ centsToDollars(wantsAmount) }}</td>
-            <td class="percent-cell">{{ wantsPercentage }}%</td>
-          </tr>
-          <tr data-testid="savings-row">
-            <td class="label-cell">Savings</td>
-            <td class="amount-cell">{{ centsToDollars(savingsAmount) }}</td>
-            <td class="percent-cell">{{ savingsPercentage }}%</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="breakdown-bars">
+      <div class="bar-row" data-testid="needs-row">
+        <span class="bar-label">Needs</span>
+        <div class="bar-track">
+          <div class="bar-fill bar-need" :style="{ width: needsPercentage + '%' }"></div>
+        </div>
+        <span class="bar-amount">{{ centsToDollars(needsAmount) }}</span>
+        <span class="bar-percent">{{ needsPercentage }}%</span>
+      </div>
+      <div class="bar-row" data-testid="wants-row">
+        <span class="bar-label">Wants</span>
+        <div class="bar-track">
+          <div class="bar-fill bar-want" :style="{ width: wantsPercentage + '%' }"></div>
+        </div>
+        <span class="bar-amount">{{ centsToDollars(wantsAmount) }}</span>
+        <span class="bar-percent">{{ wantsPercentage }}%</span>
+      </div>
+      <div class="bar-row" data-testid="savings-row">
+        <span class="bar-label">Savings</span>
+        <div class="bar-track">
+          <div class="bar-fill bar-savings" :style="{ width: savingsPercentage + '%' }"></div>
+        </div>
+        <span class="bar-amount">{{ centsToDollars(savingsAmount) }}</span>
+        <span class="bar-percent">{{ savingsPercentage }}%</span>
+      </div>
+    </div>
+
+    <!-- Discretionary detail for couples -->
+    <div v-if="familyType !== 'single'" class="discretionary-detail" data-testid="discretionary-section">
+      <div class="detail-row" data-testid="wife-amount-row">
+        <span class="detail-label">{{ wife }}'s Discretionary</span>
+        <span class="detail-amount">{{ centsToDollars(Math.floor(totalDiscretionaryAmount / 2)) }}</span>
+      </div>
+      <div class="detail-row" data-testid="husband-amount-row">
+        <span class="detail-label">{{ husband }}'s Discretionary</span>
+        <span class="detail-amount">{{ centsToDollars(Math.floor(totalDiscretionaryAmount / 2)) }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -74,7 +57,6 @@ const settingsStore = useSettingsStore();
 const familyType = computed(() => settingsStore.settings.family_type ?? 'couple');
 const wife = computed(() => settingsStore.settings.wife ?? 'Wife');
 const husband = computed(() => settingsStore.settings.husband ?? 'Husband');
-const singlePerson = computed(() => settingsStore.settings.single_person ?? 'User');
 
 const totalIncome = computed(() => {
   const incomes = budgetStore.budget?.incomes ?? [];
@@ -122,51 +104,108 @@ const wantsPercentage = computed(() => {
 
 <style scoped>
 .budget-summary {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
 }
 
-.summary-section {
-  margin-bottom: 1.5rem;
-}
-
-.summary-section:last-child {
-  margin-bottom: 0;
+.summary-header {
+  margin-bottom: 0.5rem;
 }
 
 .section-title {
-  font-size: 1rem;
+  margin: 0;
+  font-size: 0.85rem;
   font-weight: 600;
-  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--p-text-muted-color);
 }
 
-.summary-table {
-  width: 100%;
-  border-collapse: collapse;
+/* ── Bar chart breakdown ── */
+.breakdown-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.summary-table th,
-.summary-table td {
-  padding: 0.35rem 0.5rem;
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.label-cell {
+.bar-label {
+  width: 4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   text-align: right;
-  font-weight: bold;
-  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
 }
 
-.amount-cell {
+.bar-track {
+  flex: 1;
+  height: 0.6rem;
+  background-color: var(--p-surface-200);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.bar-need {
+  background-color: #3b82f6;
+}
+
+.bar-want {
+  background-color: #f59e0b;
+}
+
+.bar-savings {
+  background-color: #22c55e;
+}
+
+.bar-amount {
+  width: 5.5rem;
   text-align: right;
-  width: 8rem;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--p-text-color);
 }
 
-.percent-cell {
+.bar-percent {
+  width: 2.5rem;
   text-align: right;
-  width: 6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--p-text-muted-color);
 }
 
-.summary-table thead th {
-  border-bottom: 1px solid var(--p-surface-300);
-  font-size: 0.875rem;
+/* ── Discretionary detail ── */
+.discretionary-detail {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--p-surface-200);
+  display: flex;
+  gap: 2rem;
+}
+
+.detail-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+}
+
+.detail-amount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 </style>

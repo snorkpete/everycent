@@ -1,6 +1,5 @@
 <template>
   <div class="allocation-list">
-    <div class="table-wrapper">
       <table class="allocations-table">
         <thead>
           <tr>
@@ -9,8 +8,7 @@
             <th class="spent-col">Spent</th>
             <th class="remaining-col">Remaining</th>
             <th class="class-col">Class</th>
-            <th class="fixed-col">Fixed Amount?</th>
-            <th class="comment-col">Comment</th>
+            <th class="fixed-col">Fixed?</th>
             <th v-if="store.isEditMode" class="action-col"></th>
           </tr>
         </thead>
@@ -28,7 +26,6 @@
               >
                 {{ centsToDollars(categoryRemaining(category)) }}
               </td>
-              <td></td>
               <td></td>
               <td></td>
               <td v-if="store.isEditMode"></td>
@@ -114,19 +111,7 @@
                   type="checkbox"
                   data-testid="allocation-fixed-checkbox"
                 />
-                <span v-else>{{ allocation.is_fixed_amount ? 'Yes' : 'No' }}</span>
-              </td>
-
-              <!-- Comment -->
-              <td>
-                <input
-                  v-if="store.isEditMode"
-                  v-model="allocation.comment"
-                  type="text"
-                  class="p-inputtext cell-input"
-                  data-testid="allocation-comment-input"
-                />
-                <span v-else>{{ allocation.comment }}</span>
+                <span v-else>{{ allocation.is_fixed_amount ? 'Yes' : '' }}</span>
               </td>
 
               <!-- Delete action -->
@@ -167,16 +152,10 @@
             </th>
             <th></th>
             <th></th>
-            <th>
-              <span class="unallocated-badge" data-testid="unallocated-badge">
-                Unallocated: {{ centsToDollars(unallocated) }}
-              </span>
-            </th>
             <th v-if="store.isEditMode"></th>
           </tr>
         </tfoot>
       </table>
-    </div>
   </div>
 </template>
 
@@ -243,6 +222,18 @@ const totalIncome = computed(() =>
 
 const unallocated = computed(() => totalIncome.value - totalAmount.value);
 
+function dominantClass(category: AllocationCategoryData): string {
+  const allocs = activeAllocationsForCategory(category);
+  if (allocs.length === 0) return '';
+  const counts: Record<string, number> = {};
+  for (const a of allocs) {
+    const cls = a.allocation_class ?? 'want';
+    counts[cls] = (counts[cls] ?? 0) + 1;
+  }
+  const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+  return titleCase(dominant);
+}
+
 function remainingClass(value: number): string {
   if (value > 0) return 'amount-positive';
   if (value < 0) return 'amount-negative';
@@ -274,13 +265,7 @@ function addAllocation(category: AllocationCategoryData) {
 
 <style scoped>
 .allocation-list {
-  display: flex;
-  flex-direction: column;
   min-height: 0;
-}
-
-.table-wrapper {
-  overflow: auto;
 }
 
 /* ── Base table ── */
@@ -316,7 +301,7 @@ function addAllocation(category: AllocationCategoryData) {
   position: sticky;
   top: var(--thead-height);
   z-index: 5;
-  background-color: var(--p-surface-50);
+  background-color: var(--p-primary-50, #f0f4ff);
   font-weight: 700;
   font-size: 0.9rem;
   padding: 0.55rem 0.75rem;
@@ -326,6 +311,15 @@ function addAllocation(category: AllocationCategoryData) {
 .allocations-table .category-header td:first-child {
   z-index: 15;
   box-shadow: inset 3px 0 0 var(--p-primary-400);
+}
+
+.category-class-badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--p-text-muted-color);
+  margin-left: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 /* ── Sticky footer ── */
@@ -365,13 +359,12 @@ function addAllocation(category: AllocationCategoryData) {
 }
 
 /* ── Column widths ── */
-.name-col { width: 22%; }
-.amount-col { width: 10%; }
-.spent-col { width: 10%; }
-.remaining-col { width: 10%; }
-.class-col { width: 8%; }
+.name-col { width: 30%; }
+.amount-col { width: 13%; }
+.spent-col { width: 13%; }
+.remaining-col { width: 13%; }
+.class-col { width: 10%; }
 .fixed-col { width: 8%; }
-.comment-col { width: 25%; }
 .action-col { width: 5%; }
 
 /* ── Spent cell with eye icon ── */
@@ -390,6 +383,12 @@ function addAllocation(category: AllocationCategoryData) {
   color: var(--p-text-muted-color);
   font-size: 0.85rem;
   line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+tr:hover .eye-btn {
+  opacity: 1;
 }
 
 .eye-btn:hover {
@@ -463,18 +462,6 @@ function addAllocation(category: AllocationCategoryData) {
 /* ── Class display ── */
 .class-display {
   font-size: 0.85rem;
-}
-
-/* ── Unallocated badge ── */
-.unallocated-badge {
-  display: inline-block;
-  border-radius: 5px;
-  border: 1px solid var(--p-surface-400);
-  background-color: var(--p-surface-300);
-  font-size: 0.8rem;
-  color: var(--p-text-color);
-  padding: 0.15rem 0.5rem;
-  font-weight: 500;
 }
 
 /* ── Row hover ── */

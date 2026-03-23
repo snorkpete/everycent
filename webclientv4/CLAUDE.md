@@ -13,6 +13,8 @@ Call `router.replace({ query: { ... } })` in `emitFetch()` when selection change
 ## Development Setup
 
 - **No proxy** — Axios hits Rails directly at `http://localhost:3000` (CORS configured). Do not add a proxy.
+- **Angular comparison** — `localhost:3000` also serves the Angular v3 app. Same credentials work. Open both side by side to verify feature parity during migration.
+- **JetBrains** — open `webclientv4/` as project root to avoid tsconfig resolution issues.
 - **matchMedia mock** — global mock in `src/test/setup.ts`, required by PrimeVue DatePicker and Select. Do not remove it.
 
 ## Coding Conventions

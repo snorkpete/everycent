@@ -781,7 +781,7 @@ describe('transactionStore', () => {
   });
 
   describe('budgetsForDropdown computed', () => {
-    it('includes all open budgets followed by all closed budgets', () => {
+    it('includes open budgets (earliest first) followed by closed budgets', () => {
       const store = useTransactionStore();
       store.budgets = [
         { id: 1, name: 'Nov 2024', status: 'closed' },
@@ -791,8 +791,8 @@ describe('transactionStore', () => {
       ];
 
       expect(store.budgetsForDropdown).toEqual([
-        { id: 3, name: 'Jan 2025', status: 'open' },
         { id: 4, name: 'Feb 2025', status: 'open' },
+        { id: 3, name: 'Jan 2025', status: 'open' },
         { id: 1, name: 'Nov 2024', status: 'closed' },
         { id: 2, name: 'Dec 2024', status: 'closed' },
       ]);

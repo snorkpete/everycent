@@ -23,7 +23,7 @@ export const useTransactionStore = defineStore('transactions', () => {
   const budgetsForDropdown = computed(() => {
     const openBudgets = budgets.value.filter((b) => b.status === 'open');
     const closedBudgets = budgets.value.filter((b) => b.status !== 'open');
-    return [...openBudgets, ...closedBudgets];
+    return [...openBudgets.slice().reverse(), ...closedBudgets];
   });
 
   async function fetchMetadata() {

@@ -19,7 +19,6 @@
         <tr>
           <th class="col-name">Name</th>
           <th class="col-amount">Amount</th>
-          <th class="col-comment">Comment</th>
           <th v-if="store.isEditMode" class="col-actions"></th>
         </tr>
       </thead>
@@ -53,20 +52,6 @@
             />
           </td>
 
-          <td class="col-comment">
-            <template v-if="store.isEditMode">
-              <input
-                v-model="income.comment"
-                type="text"
-                class="p-inputtext inline-input"
-                data-testid="income-comment-input"
-              />
-            </template>
-            <template v-else>
-              {{ income.comment }}
-            </template>
-          </td>
-
           <td v-if="store.isEditMode" class="col-actions">
             <Button
               :icon="income.deleted ? 'pi pi-undo' : 'pi pi-trash'"
@@ -85,7 +70,6 @@
         <tr data-testid="income-total-row">
           <th class="col-name">Total</th>
           <th class="col-amount amount-value">{{ centsToDollars(totalAmount) }}</th>
-          <th class="col-comment"></th>
           <th v-if="store.isEditMode" class="col-actions"></th>
         </tr>
       </tfoot>
@@ -192,10 +176,6 @@ function toggleDeleted(income: IncomeData) {
   text-align: right;
   font-variant-numeric: tabular-nums;
   min-width: 8rem;
-}
-
-.col-comment {
-  min-width: 12rem;
 }
 
 .col-actions {

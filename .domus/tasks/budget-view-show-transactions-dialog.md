@@ -1,8 +1,9 @@
 # Task: Budget view — show transactions dialog
 
 **ID:** budget-view-show-transactions-dialog
-**Status:** proposed
-**Autonomous:** false
+**Status:** done
+**Branch:** task/budget-view-show-transactions-dialog
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-21
 **Parent:** migrate-budget-viewedit-screen-to-vue
@@ -21,10 +22,10 @@ Wire up the placeholder eye icon in the allocations table to open a dialog showi
 ## Acceptance Criteria
 
 - [ ] Clicking the eye icon on the Spent column opens a PrimeVue Dialog
-- [ ] Dialog header shows the allocation name (e.g. "Groceries — Transactions")
+- [ ] Dialog header shows "Transactions for {allocation name}" (e.g. "Transactions for Groceries")
 - [ ] Dialog displays a compact transaction list: Date, Description, Amount columns
-- [ ] Transactions fetched via API: `GET /transactions?allocation_id=X`
-- [ ] Amount column shows withdrawal as negative, deposit as positive (or net amount)
+- [ ] Transactions fetched via API: `GET /transactions/by_allocation?allocation_id=X`
+- [ ] Amount column displays `net_amount` field from each transaction
 - [ ] Total row at bottom summing displayed amounts
 - [ ] Loading state while fetching
 - [ ] Empty state when no transactions exist for the allocation
@@ -45,10 +46,10 @@ Wire up the placeholder eye icon in the allocations table to open a dialog showi
 - `src/app/budgets/budgetApi.ts` — add `getTransactionsForAllocation(allocationId)` if not already available
 
 ### API
-The transactions endpoint already supports filtering by allocation. Check `GET /transactions?allocation_id=X` — the Angular version uses `SharedTransactionService.transactionsForAllocation(allocation.id)` which likely hits this endpoint.
+The Angular version uses `SharedTransactionService.transactionsForAllocation(allocation.id)` which hits `GET /transactions/by_allocation?allocation_id=X`. This is a custom route, not the standard transactions index.
 
 ### Design decisions
-- Compact table inside a Dialog — no store needed, just local state in the dialog component (fetch on open, display results)
+- Compact table inside a Dialog — local state in the dialog component (fetch on open, display results). Can access the page's budget store if needed.
 - Dialog width ~500px (matches Angular's compact transaction list dialog)
 - Reuse `TransactionData` type from `transaction.types.ts`
 - Amounts displayed with `centsToDollars`

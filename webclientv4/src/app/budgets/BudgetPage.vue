@@ -43,16 +43,19 @@
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="content-card">
-      <div data-testid="incomes-section">
+    <!-- Budget Summary Strip -->
+    <BudgetSummaryStrip />
+
+    <!-- Scrollable content area -->
+    <div class="content-area">
+      <div class="content-card" data-testid="incomes-section">
         <BudgetIncomeList />
       </div>
-      <div data-testid="allocations-section">
+      <div class="content-card" data-testid="allocations-section">
         <BudgetAllocationList />
       </div>
-      <BudgetSummary />
     </div>
+
   </div>
 </template>
 
@@ -66,7 +69,7 @@ import { useNotifications } from '../notifications/useNotifications';
 import { useSettingsStore } from '../settings/settingsStore';
 import BudgetIncomeList from './BudgetIncomeList.vue';
 import BudgetAllocationList from './BudgetAllocationList.vue';
-import BudgetSummary from './BudgetSummary.vue';
+import BudgetSummaryStrip from './BudgetSummaryStrip.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -77,7 +80,7 @@ const notifications = useNotifications();
 
 function updateHeading() {
   const budgetName = store.budget?.name ?? '';
-  headingStore.setHeading(budgetName ? `Edit Budget: ${budgetName}` : 'Budget');
+  headingStore.setHeading(budgetName ? `Budget: ${budgetName}` : 'Budget');
 }
 
 onMounted(async () => {
@@ -138,25 +141,18 @@ async function onCancel() {
   flex-shrink: 0;
 }
 
-.content-card {
+.content-area {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  min-height: 0;
   overflow: auto;
+  padding-bottom: 0.75rem;
+}
+
+.content-card {
   border: 1px solid var(--p-surface-300);
   border-radius: 6px;
   background-color: var(--p-surface-0);
-  margin-bottom: 0.75rem;
-}
-
-.placeholder-section {
-  padding: 1rem;
-  border-bottom: 1px solid var(--p-surface-200);
-  color: var(--p-text-muted-color);
-}
-
-.placeholder-section:last-child {
-  border-bottom: none;
+  margin-bottom: 0.5rem;
 }
 
 .view-transactions-link {

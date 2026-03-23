@@ -23,6 +23,7 @@ Read the task's current status and decide what to do.
 
 1. Validate the task is dispatchable: `domus dispatch <task-id>` (validates ready + autonomous, calls `domus task start`)
 2. Launch a Worker subagent with `isolation: "worktree"`, passing the task ID and the `--root` path to the main repo
+3. The first instruction in the Worker prompt must be: **read and follow `.domus/reference/staff/roles/worker.md`**. This is non-negotiable — the Worker role file contains the full execution protocol (logging, review, merge, close-out). Without it, Workers skip critical steps.
 
 The Worker reads the task file and execution log on start. If the execution log has entries, the Worker resumes from the last completed step.
 

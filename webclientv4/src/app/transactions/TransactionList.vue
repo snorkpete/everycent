@@ -3,7 +3,7 @@
     <table class="transactions-table">
         <thead>
           <tr>
-            <th :class="['col-calculator', { 'col-calculator--active': showCalculatorColumn }]" />
+            <th class="col-calculator" />
             <th class="col-date">Date</th>
             <th class="col-description">Description</th>
             <th data-testid="allocation-header" class="col-allocation">{{ allocationHeaderName }}</th>
@@ -20,7 +20,7 @@
             data-testid="transaction-row"
             :class="{ 'transaction-row--deleted': transaction.deleted, 'transaction-row--newly-imported': transaction.newlyImported }"
           >
-            <td :class="['col-calculator', { 'col-calculator--active': showCalculatorColumn }]">
+            <td class="col-calculator">
               <Checkbox
                 v-if="showCalculatorColumn"
                 :model-value="transaction.selected ?? false"
@@ -193,14 +193,13 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
   border-bottom: 2px solid var(--p-surface-300);
 }
 
-.col-calculator { width: 0; min-width: 0; max-width: 0; padding: 0; overflow: hidden; }
-.col-calculator--active { width: 2.5%; min-width: 0; max-width: none; padding: 0 2px; overflow: visible; }
-.col-date { width: 11%; }
-.col-description { width: 27%; }
-.col-allocation { width: 21%; }
+.col-calculator { width: 2.5%; padding: 0 2px; }
+.col-date { width: 10%; }
+.col-description { width: 28%; }
+.col-allocation { width: 22%; }
 .col-money { width: 10%; }
 .col-paid { width: 5.5%; }
-.col-action { width: 5%; }
+.col-action { width: 2%; }
 
 .col-description--truncate :deep(.text-display) {
   overflow: hidden;
