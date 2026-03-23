@@ -1,0 +1,1 @@
+import{_ as t,o as a,c as s,a as o}from"./index-Dmi5RT5i.js";const r={},n={class:"home"};function c(_,e){return a(),s("div",n,[...e[0]||(e[0]=[o("h1",null,"Welcome to EveryCent",-1),o("p",null,"Your zero-based budget manager.",-1)])])}const l=t(r,[["render",c],["__scopeId","data-v-0676be0e"]]);export{l as default};

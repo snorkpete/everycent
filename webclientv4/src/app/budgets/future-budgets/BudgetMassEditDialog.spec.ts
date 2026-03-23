@@ -1,0 +1,279 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { nextTick } from 'vue';
+import { mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import PrimeVue from 'primevue/config';
+import BudgetMassEditDialog from './BudgetMassEditDialog.vue';
+import type { FutureBudgetData } from './futureBudgets.types';
+import { centsToDollars } from '../../shared/util/cents-to-dollars';
+
+const makeBudget = (overrides: Partial<FutureBudgetData> = {}): FutureBudgetData => ({
+  id: 1,
+  name: 'Jan 2025',
+  start_date: '2025-01-01',
+  end_date: '2025-01-31',
+  status: 'open',
+  incomes: [],
+  allocations: [],
+  ...overrides,
+});
+
+// Stub PrimeVue Dialog to avoid teleport complexity in tests
+const DialogStub = {
+  name: 'Dialog',
+  template: '<div><slot /><slot name="footer" /></div>',
+  props: ['visible', 'header'],
+  emits: ['update:visible'],
+};
+
+function mountDialog(props: Record<string, unknown> = {}) {
+  return mount(BudgetMassEditDialog, {
+    props: {
+      visible: true,
+      type: 'income',
+      name: 'Salary',
+      budgets: [makeBudget()],
+      amountsPerBudget: {},
+      ...props,
+    },
+    global: {
+      plugins: [PrimeVue, createPinia()],
+      stubs: { Dialog: DialogStub },
+    },
+  });
+}
+
+describe('BudgetMassEditDialog', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    vi.clearAllMocks();
+  });
+
+  describe('dialog title', () => {
+    it('shows the income/allocation name as the dialog title', () => {
+      const wrapper = mountDialog({ type: 'income', name: 'Salary' });
+      const dialog = wrapper.findComponent({ name: 'Dialog' });
+      expect(dialog.props('header')).toBe('Salary');
+    });
+
+    it('shows the allocation name for allocation type', () => {
+      const wrapper = mountDialog({ type: 'allocation', name: 'Groceries' });
+      const dialog = wrapper.findComponent({ name: 'Dialog' });
+      expect(dialog.props('header')).toBe('Groceries');
+    });
+  });
+
+  describe('form initialisation', () => {
+    it('populates name input from the name prop on open', async () => {
+      const wrapper = mountDialog({ name: 'Bonus', visible: false });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const nameInput = wrapper.find('[data-testid="name-input"]');
+      expect((nameInput.element as HTMLInputElement).value).toBe('Bonus');
+    });
+
+    it('populates amount from amountsPerBudget for existing entry', async () => {
+      const budget = makeBudget({ id: 1, name: 'Jan 2025' });
+      const wrapper = mountDialog({
+        visible: false,
+        budgets: [budget],
+        amountsPerBudget: { 1: { id: 10, amount: 500000 } },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const amountInput = wrapper.find('[data-testid="amount-input-0"] input');
+      expect((amountInput.element as HTMLInputElement).value).toBe('5,000.00');
+    });
+
+    it('defaults amount to 0 for budgets not in amountsPerBudget', async () => {
+      const budget = makeBudget({ name: 'Jan 2025' });
+      const wrapper = mountDialog({
+        visible: false,
+        budgets: [budget],
+        amountsPerBudget: {},
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const amountInput = wrapper.find('[data-testid="amount-input-0"] input');
+      expect((amountInput.element as HTMLInputElement).value).toBe('0.00');
+    });
+
+    it('reinitialises the form when the dialog reopens', async () => {
+      const budget = makeBudget({ name: 'Jan 2025' });
+      const wrapper = mountDialog({
+        visible: true,
+        name: 'Old Name',
+        budgets: [budget],
+        amountsPerBudget: {},
+      });
+      await nextTick();
+
+      await wrapper.setProps({ visible: false });
+      await wrapper.setProps({ visible: true, name: 'New Name' });
+      await nextTick();
+
+      const nameInput = wrapper.find('[data-testid="name-input"]');
+      expect((nameInput.element as HTMLInputElement).value).toBe('New Name');
+    });
+  });
+
+  describe('allocation-specific rows', () => {
+    it('does not show info rows for income type', () => {
+      const wrapper = mountDialog({ type: 'income' });
+
+      expect(wrapper.text()).not.toContain('Total Income');
+      expect(wrapper.text()).not.toContain('Already Allocated');
+      expect(wrapper.text()).not.toContain('Discretionary Amount');
+    });
+
+    it('shows Total Income, Already Allocated, and Discretionary Amount for allocation type', () => {
+      const wrapper = mountDialog({ type: 'allocation' });
+
+      expect(wrapper.text()).toContain('Total Income');
+      expect(wrapper.text()).toContain('Already Allocated');
+      expect(wrapper.text()).toContain('Discretionary Amount');
+    });
+  });
+
+  describe('Save button', () => {
+    it('emits save with income payload', async () => {
+      const budget = makeBudget({ id: 5, name: 'Jan 2025' });
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'income',
+        name: 'Salary',
+        budgets: [budget],
+        amountsPerBudget: { 5: { id: 10, amount: 500000 } },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
+
+      const emitted = wrapper.emitted('save');
+      expect(emitted).toBeTruthy();
+      expect(emitted![0][0]).toEqual({
+        type: 'income',
+        name: 'Salary',
+        amounts: [{ id: 10, amount: 500000, budget_id: 5 }],
+      });
+    });
+
+    it('emits save with allocation payload including category id', async () => {
+      const budget = makeBudget({ id: 5, name: 'Jan 2025' });
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets: [budget],
+        amountsPerBudget: { 5: { id: 20, amount: 150000 } },
+        categoryId: 3,
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
+
+      const emitted = wrapper.emitted('save');
+      expect(emitted).toBeTruthy();
+      expect(emitted![0][0]).toEqual({
+        type: 'allocation',
+        name: 'Rent',
+        amounts: [{ id: 20, amount: 150000, budget_id: 5 }],
+        allocation_category_id: 3,
+      });
+    });
+
+    it('uses the edited name value in the payload', async () => {
+      const budget = makeBudget({ id: 5, name: 'Jan 2025' });
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'income',
+        name: 'Salary',
+        budgets: [budget],
+        amountsPerBudget: {},
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const nameInput = wrapper.find('[data-testid="name-input"]');
+      await nameInput.setValue('New Name');
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
+
+      const emitted = wrapper.emitted('save');
+      expect((emitted![0][0] as { name: string }).name).toBe('New Name');
+    });
+  });
+
+  describe('Cancel button', () => {
+    it('emits update:visible false', async () => {
+      const wrapper = mountDialog();
+
+      await wrapper.find('[data-testid="cancel-btn"]').trigger('click');
+
+      expect(wrapper.emitted('update:visible')).toEqual([[false]]);
+    });
+  });
+
+  describe('column headers', () => {
+    it('shows budget names as column headers', () => {
+      const budgets = [makeBudget({ name: 'Jan 2025' }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const wrapper = mountDialog({ budgets });
+
+      expect(wrapper.text()).toContain('Jan 2025');
+      expect(wrapper.text()).toContain('Feb 2025');
+    });
+  });
+
+  describe('dynamic totaling', () => {
+    it('updates Discretionary Amount live when the amount input changes', async () => {
+      const income = 200000;
+      const rentAllocation = 50000;
+      const initialFoodAllocation = 30000;
+      const updatedFoodAllocation = 40000;
+
+      const budget = makeBudget({
+        id: 1,
+        incomes: [{ id: 1, name: 'Salary', amount: income, budget_id: 1, bank_account_id: 1 }],
+        allocations: [
+          { id: 1, name: 'Rent', amount: rentAllocation, budget_id: 1, allocation_category_id: 1 },
+          {
+            id: 2,
+            name: 'Food',
+            amount: initialFoodAllocation,
+            budget_id: 1,
+            allocation_category_id: 1,
+          },
+        ],
+      });
+
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Food',
+        budgets: [budget],
+        amountsPerBudget: { 1: { id: 2, amount: initialFoodAllocation } },
+      });
+
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const discretionaryCell = wrapper.find('[data-testid="discretionary-display-0"]');
+      // Initial: income - rent - initialFood = 200000 - 50000 - 30000 = 120000 → $1,200.00
+      const initialDiscretionary = income - rentAllocation - initialFoodAllocation;
+      expect(discretionaryCell.text()).toContain(centsToDollars(initialDiscretionary));
+
+      const amountInput = wrapper.find('[data-testid="amount-input-0"] input');
+      await amountInput.setValue('400.00');
+      await amountInput.trigger('change');
+      await nextTick();
+
+      // After: income - rent - updatedFood = 200000 - 50000 - 40000 = 110000 → $1,100.00
+      const updatedDiscretionary = income - rentAllocation - updatedFoodAllocation;
+      expect(discretionaryCell.text()).toContain(centsToDollars(updatedDiscretionary));
+    });
+  });
+});

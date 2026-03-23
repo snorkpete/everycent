@@ -27,6 +27,8 @@ let Icon = {
   DELETE: "delete_forever",
   UNDO_DELETE: "refresh",
 
+  NEW_VERSION: "open_in_new",
+
   DEACTIVATE: "archive",
   ACTIVATE: "unarchive"
 };
