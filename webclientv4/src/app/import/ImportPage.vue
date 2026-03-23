@@ -42,14 +42,19 @@
     <div class="content-area">
       <!-- File Upload -->
       <div class="upload-section">
-        <FileUpload
-          mode="basic"
+        <input
+          ref="fileInput"
+          type="file"
           accept=".zip"
-          :auto="true"
-          custom-upload
-          choose-label="Select ZIP file"
+          class="hidden-file-input"
+          data-testid="file-input"
+          @change="onFileChange"
+        />
+        <Button
+          icon="pi pi-plus"
+          label="Select ZIP file"
           data-testid="file-upload"
-          @uploader="onFileSelect"
+          @click="fileInput?.click()"
         />
         <ProgressSpinner
           v-if="store.loading"
@@ -237,7 +242,6 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
-import FileUpload from 'primevue/fileupload';
 import Message from 'primevue/message';
 import Tag from 'primevue/tag';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -253,6 +257,7 @@ const notifications = useNotifications();
 const route = useRoute();
 
 const selectedBudgetId = ref<number | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 
 const hasMatchedAccounts = computed(() =>
   store.fileSummary.some((row) => row.matchedAccountName != null),
@@ -281,9 +286,13 @@ function onBudgetChange(budgetId: number) {
   store.resetPreview();
 }
 
-async function onFileSelect(event: { files: File[] }) {
-  const file = event.files[0];
+async function onFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
   if (!file) return;
+
+  // Reset input so re-selecting the same file triggers change
+  input.value = '';
 
   store.resetPreview();
   try {
@@ -380,6 +389,10 @@ function previewRowClass(transaction: ImportTransaction) {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.hidden-file-input {
+  display: none;
 }
 
 .loading-spinner {
