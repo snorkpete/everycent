@@ -1,7 +1,7 @@
 # Task: Migrate budget view/edit screen to Vue
 
 **ID:** migrate-budget-viewedit-screen-to-vue
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-21

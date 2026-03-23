@@ -1,8 +1,9 @@
 # Task: Import page UI
 
 **ID:** import-page-ui
-**Status:** raw
-**Autonomous:** false
+**Status:** done
+**Branch:** task/import-page-ui
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-22
 **Parent:** camt053-bank-statement-import
