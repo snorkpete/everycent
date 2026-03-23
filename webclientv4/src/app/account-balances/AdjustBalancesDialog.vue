@@ -11,11 +11,7 @@
         <thead>
           <tr>
             <th class="row-label-col">Bank Account</th>
-            <th
-              v-for="account in accounts"
-              :key="account.id"
-              class="account-col"
-            >
+            <th v-for="account in accounts" :key="account.id" class="account-col">
               {{ account.name }}
             </th>
           </tr>
@@ -23,11 +19,7 @@
         <tbody>
           <tr>
             <td class="row-label">Current Balance</td>
-            <td
-              v-for="(account, index) in accounts"
-              :key="account.id"
-              class="money-col"
-            >
+            <td v-for="(account, index) in accounts" :key="account.id" class="money-col">
               <EcMoneyField
                 :label="''"
                 :edit-mode="false"
@@ -37,16 +29,12 @@
           </tr>
           <tr>
             <td class="row-label">New Account Balance</td>
-            <td
-              v-for="(account, index) in accounts"
-              :key="account.id"
-              class="money-col"
-            >
+            <td v-for="(account, index) in accounts" :key="account.id" class="money-col">
               <EcMoneyField
+                v-model="adjustments[index].new_balance"
                 :label="''"
                 :edit-mode="true"
                 :data-testid="`new-balance-${account.id}`"
-                v-model="adjustments[index].new_balance"
               />
             </td>
           </tr>
@@ -56,17 +44,8 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <Button
-          label="Save"
-          data-testid="save-btn"
-          @click="onSave"
-        />
-        <Button
-          label="Cancel"
-          severity="secondary"
-          data-testid="cancel-btn"
-          @click="close"
-        />
+        <Button label="Save" data-testid="save-btn" @click="onSave" />
+        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
       </div>
     </template>
   </Dialog>
@@ -95,19 +74,24 @@ const notifications = useNotifications();
 
 const adjustments = ref<BalanceAdjustmentData[]>([]);
 
-// Reset form when dialog opens or accounts change
+function initAdjustments(accounts: AccountBalanceData[]) {
+  adjustments.value = accounts.map((a) => ({
+    bank_account_id: a.id,
+    new_balance: a.current_balance,
+    currentBalance: a.current_balance,
+  }));
+}
+
+// Always sync adjustments from accounts so the template never reads undefined indices.
+// Re-initialise whenever accounts change (new data from store) or dialog opens.
+watch(() => props.accounts, initAdjustments, { immediate: true });
 watch(
-  () => [props.visible, props.accounts] as const,
-  ([isVisible, currentAccounts]) => {
+  () => props.visible,
+  (isVisible) => {
     if (isVisible) {
-      adjustments.value = currentAccounts.map((a) => ({
-        bank_account_id: a.id,
-        new_balance: a.current_balance,
-        currentBalance: a.current_balance,
-      }));
+      initAdjustments(props.accounts);
     }
   },
-  { immediate: true },
 );
 
 async function onSave() {

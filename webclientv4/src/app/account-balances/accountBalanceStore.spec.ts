@@ -138,7 +138,10 @@ describe('accountBalanceStore', () => {
     it('sets loading to true while fetching', async () => {
       let resolve: (value: AccountBalanceData[]) => void;
       vi.mocked(accountBalanceApi.getAll).mockImplementation(
-        () => new Promise((r) => { resolve = r; }),
+        () =>
+          new Promise((r) => {
+            resolve = r;
+          }),
       );
       const store = useAccountBalanceStore();
 

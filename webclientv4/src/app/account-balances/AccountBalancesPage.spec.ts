@@ -67,7 +67,8 @@ vi.mock('./accountBalanceStore', () => ({
 
 const ToggleSwitchStub = {
   name: 'ToggleSwitch',
-  template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'update:modelValue\', !modelValue)" />',
+  template:
+    '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'update:modelValue\', !modelValue)" />',
   props: ['modelValue'],
   emits: ['update:modelValue'],
 };
@@ -186,10 +187,13 @@ describe('AccountBalancesPage', () => {
     it('passes currentAccounts to Current Accounts table', () => {
       const wrapper = createWrapper();
 
-      const table = wrapper.findComponent({ name: 'AccountCategoryTable' });
       // first table is Current Accounts
-      expect(wrapper.findAllComponents({ name: 'AccountCategoryTable' })[0].props('heading')).toBe('Current Accounts');
-      expect(wrapper.findAllComponents({ name: 'AccountCategoryTable' })[0].props('accounts')).toEqual([currentAccount]);
+      expect(wrapper.findAllComponents({ name: 'AccountCategoryTable' })[0].props('heading')).toBe(
+        'Current Accounts',
+      );
+      expect(
+        wrapper.findAllComponents({ name: 'AccountCategoryTable' })[0].props('accounts'),
+      ).toEqual([currentAccount]);
     });
 
     it('passes correct heading for each table', () => {

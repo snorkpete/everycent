@@ -77,8 +77,7 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
     accounts.value
       .filter(
         (a) =>
-          a.account_category === 'current' ||
-          (a.account_category === 'liability' && a.is_cash),
+          a.account_category === 'current' || (a.account_category === 'liability' && a.is_cash),
       )
       .reduce((sum, a) => sum + a.current_balance, 0),
   );
@@ -92,15 +91,12 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
   const netNonCashAssets = computed(() =>
     accounts.value
       .filter(
-        (a) =>
-          (a.account_category === 'asset' || a.account_category === 'liability') && !a.is_cash,
+        (a) => (a.account_category === 'asset' || a.account_category === 'liability') && !a.is_cash,
       )
       .reduce((sum, a) => sum + a.current_balance, 0),
   );
 
-  const netWorth = computed(() =>
-    accounts.value.reduce((sum, a) => sum + a.current_balance, 0),
-  );
+  const netWorth = computed(() => accounts.value.reduce((sum, a) => sum + a.current_balance, 0));
 
   return {
     accounts,
