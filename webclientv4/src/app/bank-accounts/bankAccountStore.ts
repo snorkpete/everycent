@@ -13,7 +13,9 @@ export const useBankAccountStore = defineStore('bankAccounts', () => {
     loading.value = true;
     error.value = null;
     try {
-      bankAccounts.value = await bankAccountApi.getAll();
+      const accounts = await bankAccountApi.getAll();
+      accounts.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''));
+      bankAccounts.value = accounts;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load bank accounts';
     } finally {
