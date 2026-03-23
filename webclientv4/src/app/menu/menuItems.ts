@@ -11,13 +11,48 @@ export interface AppMenuItem extends MenuItem {
 function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
   return [
     { label: 'Home', icon: Icon.HOME, command: () => navigate('/'), routePath: '/' },
-    { label: 'Current Budget', icon: Icon.BUDGETS_CURRENT, command: () => navigate('/budgets/current'), routePath: '/budgets/current' },
-    { label: 'Budgets', icon: Icon.BUDGETS, command: () => navigate('/budgets'), routePath: '/budgets' },
-    { label: 'Future Budgets', icon: Icon.BUDGETS_FUTURE, command: () => navigate('/budgets/future'), routePath: '/budgets/future' },
-    { label: 'Transactions', icon: Icon.TRANSACTIONS, command: () => navigate('/transactions'), routePath: '/transactions' },
-    { label: 'Import', icon: Icon.IMPORT, command: () => navigate('/import'), routePath: '/import' },
-    { label: '* Sink Funds', icon: Icon.SINK_FUND, url: '/#/sink-funds' },
-    { label: '* Account Balances', icon: Icon.ACCOUNT_BALANCES, url: '/#/account-balances' },
+    {
+      label: 'Current Budget',
+      icon: Icon.BUDGETS_CURRENT,
+      command: () => navigate('/budgets/current'),
+      routePath: '/budgets/current',
+    },
+    {
+      label: 'Budgets',
+      icon: Icon.BUDGETS,
+      command: () => navigate('/budgets'),
+      routePath: '/budgets',
+    },
+    {
+      label: 'Future Budgets',
+      icon: Icon.BUDGETS_FUTURE,
+      command: () => navigate('/budgets/future'),
+      routePath: '/budgets/future',
+    },
+    {
+      label: 'Transactions',
+      icon: Icon.TRANSACTIONS,
+      command: () => navigate('/transactions'),
+      routePath: '/transactions',
+    },
+    {
+      label: 'Import',
+      icon: Icon.IMPORT,
+      command: () => navigate('/import'),
+      routePath: '/import',
+    },
+    {
+      label: 'Sink Funds',
+      icon: Icon.SINK_FUND,
+      command: () => navigate('/sink-funds'),
+      routePath: '/sink-funds',
+    },
+    {
+      label: 'Account Balances',
+      icon: Icon.ACCOUNT_BALANCES,
+      command: () => navigate('/account-balances'),
+      routePath: '/account-balances',
+    },
     { label: '* Special Events', icon: Icon.SPECIAL_EVENTS, url: '/#/special-events' },
   ];
 }
@@ -29,8 +64,16 @@ function buildReportsSection(): AppMenuItem {
     icon: Icon.REPORTING,
     items: [
       { label: '* Net Worth Report', icon: Icon.NET_WORTH, url: '/#/reports/net-worth' },
-      { label: '* Category Spending Report', icon: Icon.CATEGORY_SPENDING, url: '/#/reports/category-spending' },
-      { label: '* Needs vs Wants Report', icon: Icon.NEEDS_VS_WANTS, url: '/#/reports/needs-vs-wants' },
+      {
+        label: '* Category Spending Report',
+        icon: Icon.CATEGORY_SPENDING,
+        url: '/#/reports/category-spending',
+      },
+      {
+        label: '* Needs vs Wants Report',
+        icon: Icon.NEEDS_VS_WANTS,
+        url: '/#/reports/needs-vs-wants',
+      },
     ],
   };
 }
@@ -41,15 +84,38 @@ function buildSetupSection(navigate: (path: string) => void): AppMenuItem {
     key: 'setup',
     icon: Icon.SETUP,
     items: [
-      { label: 'Allocation Categories', icon: Icon.ALLOCATION_CATEGORIES, command: () => navigate('/setup/allocation-categories'), routePath: '/setup/allocation-categories' },
-      { label: 'Financial Institutions', icon: Icon.INSTITUTIONS, command: () => navigate('/setup/institutions'), routePath: '/setup/institutions' },
-      { label: 'Bank Accounts', icon: Icon.BANK_ACCOUNTS, command: () => navigate('/setup/bank-accounts'), routePath: '/setup/bank-accounts' },
-      { label: 'Settings', icon: Icon.SETTINGS, command: () => navigate('/setup/settings'), routePath: '/setup/settings' },
+      {
+        label: 'Allocation Categories',
+        icon: Icon.ALLOCATION_CATEGORIES,
+        command: () => navigate('/setup/allocation-categories'),
+        routePath: '/setup/allocation-categories',
+      },
+      {
+        label: 'Financial Institutions',
+        icon: Icon.INSTITUTIONS,
+        command: () => navigate('/setup/institutions'),
+        routePath: '/setup/institutions',
+      },
+      {
+        label: 'Bank Accounts',
+        icon: Icon.BANK_ACCOUNTS,
+        command: () => navigate('/setup/bank-accounts'),
+        routePath: '/setup/bank-accounts',
+      },
+      {
+        label: 'Settings',
+        icon: Icon.SETTINGS,
+        command: () => navigate('/setup/settings'),
+        routePath: '/setup/settings',
+      },
     ],
   };
 }
 
-export function buildMenuItems(onLogout: () => void, navigate: (path: string) => void): AppMenuItem[] {
+export function buildMenuItems(
+  onLogout: () => void,
+  navigate: (path: string) => void,
+): AppMenuItem[] {
   return [
     ...buildMainItems(navigate),
     { separator: true },
