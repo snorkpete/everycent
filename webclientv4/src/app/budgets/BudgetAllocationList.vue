@@ -156,7 +156,6 @@
           </tr>
         </tfoot>
       </table>
-    </div>
     <AllocationTransactionsDialog
       :visible="dialogVisible"
       :allocation-id="selectedAllocationId"
