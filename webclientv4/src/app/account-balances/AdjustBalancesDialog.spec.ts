@@ -137,7 +137,13 @@ describe('AdjustBalancesDialog', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const vm = wrapper.vm as { adjustments: Array<{ bank_account_id: number; new_balance: number; currentBalance: number }> };
+      const vm = wrapper.vm as {
+        adjustments: Array<{
+          bank_account_id: number;
+          new_balance: number;
+          currentBalance: number;
+        }>;
+      };
       expect(vm.adjustments).toHaveLength(2);
       expect(vm.adjustments[0].bank_account_id).toBe(1);
       expect(vm.adjustments[0].new_balance).toBe(100000);
@@ -166,8 +172,16 @@ describe('AdjustBalancesDialog', () => {
 
       expect(mockStore.adjustBalances).toHaveBeenCalledWith(
         expect.arrayContaining([
-          expect.objectContaining({ bank_account_id: 1, new_balance: 100000, currentBalance: 100000 }),
-          expect.objectContaining({ bank_account_id: 2, new_balance: 200000, currentBalance: 200000 }),
+          expect.objectContaining({
+            bank_account_id: 1,
+            new_balance: 100000,
+            currentBalance: 100000,
+          }),
+          expect.objectContaining({
+            bank_account_id: 2,
+            new_balance: 200000,
+            currentBalance: 200000,
+          }),
         ]),
       );
     });

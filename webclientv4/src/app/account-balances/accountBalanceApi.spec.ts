@@ -76,10 +76,9 @@ describe('accountBalanceApi', () => {
 
       await accountBalanceApi.adjustBalances(adjustments);
 
-      expect(apiGateway.post).toHaveBeenCalledWith(
-        '/bank_accounts/manually_adjust_balances',
-        { adjustments },
-      );
+      expect(apiGateway.post).toHaveBeenCalledWith('/bank_accounts/manually_adjust_balances', {
+        adjustments,
+      });
     });
 
     it('returns the response data', async () => {

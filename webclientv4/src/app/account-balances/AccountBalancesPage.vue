@@ -24,10 +24,7 @@
     </div>
 
     <!-- Adjust Balances Dialog -->
-    <AdjustBalancesDialog
-      v-model:visible="showAdjustDialog"
-      :accounts="store.accounts"
-    />
+    <AdjustBalancesDialog v-model:visible="showAdjustDialog" :accounts="store.accounts" />
 
     <!-- Content -->
     <div class="content-card">
@@ -70,23 +67,33 @@
         <div class="net-worth-summary" data-testid="net-worth-summary">
           <div class="summary-line">
             <span class="summary-label">Total Liabilities</span>
-            <span class="summary-value" data-testid="total-liabilities">{{ formatMoney(store.totalLiabilities) }}</span>
+            <span class="summary-value" data-testid="total-liabilities">{{
+              formatMoney(store.totalLiabilities)
+            }}</span>
           </div>
           <div class="summary-line">
             <span class="summary-label">Net Current Cash</span>
-            <span class="summary-value" data-testid="net-current-cash">{{ formatMoney(store.netCurrentCash) }}</span>
+            <span class="summary-value" data-testid="net-current-cash">{{
+              formatMoney(store.netCurrentCash)
+            }}</span>
           </div>
           <div class="summary-line">
             <span class="summary-label">Net Cash Assets</span>
-            <span class="summary-value" data-testid="net-cash-assets">{{ formatMoney(store.netCashAssets) }}</span>
+            <span class="summary-value" data-testid="net-cash-assets">{{
+              formatMoney(store.netCashAssets)
+            }}</span>
           </div>
           <div class="summary-line">
             <span class="summary-label">Net Non Cash Assets</span>
-            <span class="summary-value" data-testid="net-non-cash-assets">{{ formatMoney(store.netNonCashAssets) }}</span>
+            <span class="summary-value" data-testid="net-non-cash-assets">{{
+              formatMoney(store.netNonCashAssets)
+            }}</span>
           </div>
           <div class="summary-line summary-line--net-worth">
             <span class="summary-label">Net Worth</span>
-            <span class="summary-value" data-testid="net-worth">{{ formatMoney(store.netWorth) }}</span>
+            <span class="summary-value" data-testid="net-worth">{{
+              formatMoney(store.netWorth)
+            }}</span>
           </div>
         </div>
       </div>
