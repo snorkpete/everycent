@@ -169,6 +169,24 @@ RSpec.describe Transaction, :type => :model do
     end
   end
 
+  describe "#assign_bank_ref" do
+    it "assigns a MAN- prefixed bank_ref when bank_ref is blank on create" do
+      transaction = create(:transaction, bank_ref: nil)
+      expect(transaction.bank_ref).to start_with("MAN-")
+      expect(transaction.bank_ref.length).to eq(20) # "MAN-" (4) + 16 hex chars
+    end
+
+    it "does not overwrite a pre-set bank_ref on create" do
+      transaction = create(:transaction, bank_ref: "CAMT-abc123")
+      expect(transaction.bank_ref).to eq("CAMT-abc123")
+    end
+
+    it "assigns a MAN- prefixed bank_ref when bank_ref is an empty string on create" do
+      transaction = create(:transaction, bank_ref: "")
+      expect(transaction.bank_ref).to start_with("MAN-")
+    end
+  end
+
   describe "#net_amount" do
     it "equal to the deposit_amount - withdrawal_amount" do
       transaction = build(:transaction, withdrawal_amount: 50_00, deposit_amount: 60_00)
