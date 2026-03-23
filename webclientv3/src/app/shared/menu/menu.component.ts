@@ -67,6 +67,21 @@ export interface MenuItemConfig {
         </ec-menu-item>
       </mat-expansion-panel>
 
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <ec-icon [icon]="Icon.NEW_VERSION"></ec-icon>
+          New Version
+        </mat-expansion-panel-header>
+        <mat-nav-list>
+          <mat-divider></mat-divider>
+          <a mat-list-item href="/v4/#/">
+            <ec-icon [icon]="Icon.HOME"></ec-icon>
+            Home
+          </a>
+          <mat-divider></mat-divider>
+        </mat-nav-list>
+      </mat-expansion-panel>
+
       <mat-divider></mat-divider>
       <mat-list-item (click)="logOut()">
         <ec-icon [icon]="Icon.LOGOUT"></ec-icon>

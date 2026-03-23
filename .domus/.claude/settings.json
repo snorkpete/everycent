@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(git -C *)",
+      "Bash(cd * && git *)",
+      "Bash(bun *)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash(/Users/kion/.bun/bin/domus:*)"
+    ]
+  },
+  "env": {
+    "PATH": "/Users/kion/.bun/bin:/Users/kion/.local/bin:/Users/kion/.rbenv/shims:/Users/kion/.nvm/versions/node/v24.13.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Postgres.app/Contents/Versions/latest/bin:/Users/kion/.cargo/bin"
+  }
+}
