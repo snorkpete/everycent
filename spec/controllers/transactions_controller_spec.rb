@@ -60,4 +60,259 @@ RSpec.describe TransactionsController, :type => :controller do
     end
 
   end
+
+  describe '#import_preview' do
+    let(:budget) { create(:budget, household: @household, start_date: Date.new(2026, 3, 1)) }
+    let(:bank_account) do
+      ba = create(:bank_account,
+        household: @household,
+        account_no: "NL00ABNA0000000001",
+        opening_balance: 50000
+      )
+      ba.update_columns(closing_balance: 50000, closing_date: Date.new(2026, 2, 28))
+      ba
+    end
+
+    before :each do
+      @user = create(:user, household: @household)
+      auth_request(@user)
+    end
+
+    it 'returns success with valid data' do
+      post :import_preview, params: {
+        budget_id: budget.id,
+        bank_accounts: [
+          {
+            bank_account_id: bank_account.id,
+            iban: "NL00ABNA0000000001",
+            transactions: [
+              {
+                transaction_date: "2026-03-15",
+                description: "Test txn",
+                withdrawal_amount: 500,
+                deposit_amount: 0,
+                bank_ref: "REF001",
+                status: "paid"
+              }
+            ]
+          }
+        ]
+      }
+
+      expect(response).to have_http_status(:success)
+      body = JSON.parse(response.body)
+      expect(body["bank_accounts"].length).to eq(1)
+      ba = body["bank_accounts"].first
+      expect(ba["bank_account_id"]).to eq(bank_account.id)
+      expect(ba["current_balance"]).to eq(50000)
+      expect(ba["net"]).to eq(-500)
+      expect(ba["projected_balance"]).to eq(49500)
+      expect(ba["transactions"].first["import_status"]).to eq("new")
+    end
+
+    it 'returns 404 for non-existent budget' do
+      post :import_preview, params: {
+        budget_id: 999999,
+        bank_accounts: []
+      }
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'returns 404 for non-existent bank account' do
+      post :import_preview, params: {
+        budget_id: budget.id,
+        bank_accounts: [
+          {
+            bank_account_id: 999999,
+            iban: "NL00ABNA0000000001",
+            transactions: []
+          }
+        ]
+      }
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'returns 422 for IBAN mismatch' do
+      post :import_preview, params: {
+        budget_id: budget.id,
+        bank_accounts: [
+          {
+            bank_account_id: bank_account.id,
+            iban: "DE89370400440532013000",
+            transactions: []
+          }
+        ]
+      }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      body = JSON.parse(response.body)
+      expect(body["error"]).to match(/IBAN mismatch/)
+    end
+
+    it 'marks duplicate transactions correctly' do
+      create(:transaction,
+        household: @household,
+        bank_account: bank_account,
+        bank_ref: "EXISTING-REF",
+        transaction_date: Date.new(2026, 3, 10),
+        withdrawal_amount: 200,
+        deposit_amount: 0
+      )
+
+      post :import_preview, params: {
+        budget_id: budget.id,
+        bank_accounts: [
+          {
+            bank_account_id: bank_account.id,
+            iban: "NL00ABNA0000000001",
+            transactions: [
+              {
+                transaction_date: "2026-03-10",
+                description: "Duplicate",
+                withdrawal_amount: 200,
+                deposit_amount: 0,
+                bank_ref: "EXISTING-REF",
+                status: "paid"
+              },
+              {
+                transaction_date: "2026-03-15",
+                description: "New one",
+                withdrawal_amount: 300,
+                deposit_amount: 0,
+                bank_ref: "BRAND-NEW",
+                status: "paid"
+              }
+            ]
+          }
+        ]
+      }
+
+      expect(response).to have_http_status(:success)
+      body = JSON.parse(response.body)
+      txns = body["bank_accounts"].first["transactions"]
+      expect(txns[0]["import_status"]).to eq("duplicate")
+      expect(txns[1]["import_status"]).to eq("new")
+    end
+
+    it 'marks out-of-period transactions correctly' do
+      post :import_preview, params: {
+        budget_id: budget.id,
+        bank_accounts: [
+          {
+            bank_account_id: bank_account.id,
+            iban: "NL00ABNA0000000001",
+            transactions: [
+              {
+                transaction_date: "2026-02-15",
+                description: "Before period",
+                withdrawal_amount: 100,
+                deposit_amount: 0,
+                bank_ref: "REF-BEFORE",
+                status: "paid"
+              },
+              {
+                transaction_date: "2026-03-15",
+                description: "In period",
+                withdrawal_amount: 100,
+                deposit_amount: 0,
+                bank_ref: "REF-IN",
+                status: "paid"
+              }
+            ]
+          }
+        ]
+      }
+
+      expect(response).to have_http_status(:success)
+      body = JSON.parse(response.body)
+      txns = body["bank_accounts"].first["transactions"]
+      expect(txns[0]["import_status"]).to eq("out_of_period")
+      expect(txns[1]["import_status"]).to eq("new")
+    end
+
+    it 'requires authentication' do
+      # Clear auth headers to simulate unauthenticated request
+      request.headers.merge!({
+        'access-token' => '',
+        'token-type' => '',
+        'client' => '',
+        'uid' => ''
+      })
+      sign_out @user
+
+      post :import_preview, params: {
+        budget_id: budget.id,
+        bank_accounts: []
+      }
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    context 'tenant scoping' do
+      it 'cannot access a budget from another household' do
+        other_household = create(:household, name: "Other Household")
+        other_budget = nil
+        ActsAsTenant.with_tenant(other_household) do
+          other_budget = create(:budget, household: other_household, start_date: Date.new(2026, 3, 1))
+        end
+
+        post :import_preview, params: {
+          budget_id: other_budget.id,
+          bank_accounts: []
+        }
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'cannot access a bank account from another household' do
+        other_household = create(:household, name: "Other Household")
+        other_bank_account = nil
+        ActsAsTenant.with_tenant(other_household) do
+          other_bank_account = create(:bank_account,
+            household: other_household,
+            account_no: "NL00ABNA0000000001"
+          )
+        end
+
+        post :import_preview, params: {
+          budget_id: budget.id,
+          bank_accounts: [
+            {
+              bank_account_id: other_bank_account.id,
+              iban: "NL00ABNA0000000001",
+              transactions: []
+            }
+          ]
+        }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    it 'does not save any transactions to the database' do
+      expect {
+        post :import_preview, params: {
+          budget_id: budget.id,
+          bank_accounts: [
+            {
+              bank_account_id: bank_account.id,
+              iban: "NL00ABNA0000000001",
+              transactions: [
+                {
+                  transaction_date: "2026-03-15",
+                  description: "Should not be saved",
+                  withdrawal_amount: 500,
+                  deposit_amount: 0,
+                  bank_ref: "NO-SAVE",
+                  status: "paid"
+                }
+              ]
+            }
+          ]
+        }
+      }.not_to change(Transaction, :count)
+    end
+  end
 end

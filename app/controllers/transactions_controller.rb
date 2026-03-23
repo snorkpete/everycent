@@ -45,6 +45,20 @@ class TransactionsController < ApplicationController
     respond_with(@transaction, TransactionSerializer)
   end
 
+  def import_preview
+    budget = Budget.find(params[:budget_id])
+    service = ImportPreviewService.new(
+      budget: budget,
+      bank_accounts_params: import_preview_params[:bank_accounts] || []
+    )
+    result = service.call
+    render json: result
+  rescue ImportPreviewService::ValidationError => e
+    render json: { error: e.message }, status: :unprocessable_entity
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { error: e.message }, status: :not_found
+  end
+
   def create
     @transactions = Transaction.update_with_params(transaction_params)
     respond_with(@transactions, TransactionSerializer)
@@ -56,10 +70,22 @@ class TransactionsController < ApplicationController
   end
 
   protected
+
   def transaction_params
     params.permit(:budget_id, :bank_account_id, :transactions => [
       :id, :description, :bank_ref, :bank_account_id, :transaction_date,
       :withdrawal_amount, :deposit_amount,
       :allocation_id, :sink_fund_allocation_id, :status, :brought_forward_status])
+  end
+
+  def import_preview_params
+    params.permit(
+      :budget_id,
+      bank_accounts: [
+        :bank_account_id,
+        :iban,
+        { transactions: [:transaction_date, :description, :withdrawal_amount, :deposit_amount, :bank_ref, :status] }
+      ]
+    )
   end
 end
