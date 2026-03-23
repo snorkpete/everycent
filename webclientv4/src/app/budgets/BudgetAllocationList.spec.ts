@@ -4,9 +4,24 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetAllocationList from './BudgetAllocationList.vue';
+import AllocationTransactionsDialog from './AllocationTransactionsDialog.vue';
 import type { BudgetDetailData } from './budget.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 import type { AllocationData } from '../transactions/transaction.types';
+
+// Stub PrimeVue Dialog to avoid teleport complexity in tests
+const DialogStub = {
+  name: 'Dialog',
+  template: '<div><slot /><slot name="footer" /></div>',
+  props: {
+    visible: { type: Boolean },
+    header: { type: String },
+    modal: { type: Boolean },
+    closable: { type: Boolean },
+    style: { type: Object },
+  },
+  emits: ['update:visible'],
+};
 
 // Selectors
 const CATEGORY_HEADER = (id: number) => `[data-testid="category-header-${id}"]`;
@@ -95,10 +110,17 @@ vi.mock('./budgetStore', () => ({
   useBudgetStore: () => mockStore,
 }));
 
+vi.mock('./budgetApi', () => ({
+  budgetApi: {
+    getTransactionsForAllocation: vi.fn().mockResolvedValue([]),
+  },
+}));
+
 function createWrapper(): VueWrapper {
   return mount(BudgetAllocationList, {
     global: {
       plugins: [PrimeVue, createPinia()],
+      stubs: { Dialog: DialogStub },
     },
   });
 }
@@ -251,6 +273,18 @@ describe('BudgetAllocationList', () => {
 
       const button = wrapper.find(SHOW_TRANSACTIONS_BTN);
       expect(button.attributes('title')).toBe('Show transactions for this allocation');
+    });
+
+    it('opens the transactions dialog when eye icon is clicked', async () => {
+      const wrapper = createWrapper();
+
+      const button = wrapper.find(SHOW_TRANSACTIONS_BTN);
+      await button.trigger('click');
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      expect(dialog.props('visible')).toBe(true);
+      expect(dialog.props('allocationId')).toBe(1);
+      expect(dialog.props('allocationName')).toBe('Groceries');
     });
   });
 

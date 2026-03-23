@@ -1,6 +1,6 @@
 import apiGateway from '../../api/api-gateway';
 import type { BudgetData, BudgetDetailData, IncomeData } from './budget.types';
-import type { AllocationData } from '../transactions/transaction.types';
+import type { AllocationData, TransactionData } from '../transactions/transaction.types';
 
 export const budgetApi = {
   getAll: () =>
@@ -38,6 +38,13 @@ export const budgetApi = {
       .put<BudgetDetailData>(`/budgets/${budget.id}`, {
         incomes: budget.incomes as IncomeData[],
         allocations: budget.allocations as AllocationData[],
+      })
+      .then((r) => r.data),
+
+  getTransactionsForAllocation: (allocationId: number) =>
+    apiGateway
+      .get<TransactionData[]>('/transactions/by_allocation', {
+        params: { allocation_id: allocationId },
       })
       .then((r) => r.data),
 };

@@ -168,4 +168,27 @@ describe('budgetApi', () => {
       expect(result).toEqual(budget);
     });
   });
+
+  describe('getTransactionsForAllocation', () => {
+    it('gets /transactions/by_allocation with allocation_id param', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
+
+      await budgetApi.getTransactionsForAllocation(42);
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/transactions/by_allocation', {
+        params: { allocation_id: 42 },
+      });
+    });
+
+    it('returns the response data', async () => {
+      const transactions = [
+        { id: 1, description: 'Supermarket', net_amount: -5000 },
+      ];
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: transactions });
+
+      const result = await budgetApi.getTransactionsForAllocation(42);
+
+      expect(result).toEqual(transactions);
+    });
+  });
 });
