@@ -13,13 +13,22 @@ import type {
   SaveResponse,
 } from './import.types';
 
-export type ImportPhase = 'idle' | 'preview' | 'saved';
+export type ImportPhase = 'idle' | 'parsed' | 'preview' | 'saved';
+
+export interface FileSummaryRow {
+  iban: string;
+  matchedAccountName: string | null;
+  totalTransactions: number;
+  inPeriodCount: number;
+  outOfPeriodCount: number;
+}
 
 export const useImportStore = defineStore('import', () => {
   const budgets = ref<BudgetData[]>([]);
   const bankAccounts = ref<BankAccountData[]>([]);
   const selectedBudget = ref<BudgetData | null>(null);
 
+  const parsedAccounts = ref<CamtAccountResult[]>([]);
   const previewAccounts = ref<PreviewBankAccount[]>([]);
   const unmatchedIbans = ref<UnmatchedIban[]>([]);
   const saveResult = ref<SaveResponse | null>(null);
@@ -36,6 +45,24 @@ export const useImportStore = defineStore('import', () => {
 
   const isBudgetCurrent = computed(() => {
     return selectedBudget.value?.status === 'open';
+  });
+
+  const fileSummary = computed<FileSummaryRow[]>(() => {
+    return parsedAccounts.value.map((account) => {
+      const inPeriod = account.transactions.filter((t) => !t.deleted).length;
+      const outOfPeriod = account.transactions.filter((t) => t.deleted).length;
+      const matchedBa = account.bankAccountId != null
+        ? bankAccounts.value.find((ba) => ba.id === account.bankAccountId)
+        : null;
+
+      return {
+        iban: account.iban,
+        matchedAccountName: matchedBa?.name ?? null,
+        totalTransactions: account.transactions.length,
+        inPeriodCount: inPeriod,
+        outOfPeriodCount: outOfPeriod,
+      };
+    });
   });
 
   const confirmableTransactions = computed(() => {
@@ -69,7 +96,7 @@ export const useImportStore = defineStore('import', () => {
     selectedBudget.value = budgets.value.find((b) => b.id === budgetId) ?? null;
   }
 
-  async function parseAndPreview(file: File) {
+  async function parseFile(file: File) {
     if (!selectedBudget.value) {
       error.value = 'No budget selected';
       throw new Error('No budget selected');
@@ -78,6 +105,7 @@ export const useImportStore = defineStore('import', () => {
     loading.value = true;
     error.value = null;
     phase.value = 'idle';
+    parsedAccounts.value = [];
     previewAccounts.value = [];
     unmatchedIbans.value = [];
     saveResult.value = null;
@@ -98,30 +126,44 @@ export const useImportStore = defineStore('import', () => {
         endDate: selectedBudget.value.end_date ?? '',
       });
 
-      // Separate matched vs unmatched accounts
-      const matched: CamtAccountResult[] = [];
-      const unmatched: UnmatchedIban[] = [];
-      for (const account of parseResult.accounts) {
-        if (account.bankAccountId != null) {
-          matched.push(account);
-        } else {
-          unmatched.push({
-            iban: account.iban,
-            transactionCount: account.transactions.length,
-          });
-        }
-      }
-      unmatchedIbans.value = unmatched;
+      parsedAccounts.value = parseResult.accounts;
+      phase.value = 'parsed';
+    } catch (e: unknown) {
+      error.value = e instanceof Error ? e.message : 'Failed to process file';
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  }
 
-      // Call preview endpoint
+  async function fetchPreview() {
+    if (!selectedBudget.value) {
+      error.value = 'No budget selected';
+      throw new Error('No budget selected');
+    }
+
+    const matched = parsedAccounts.value.filter((a) => a.bankAccountId != null);
+    const unmatched: UnmatchedIban[] = parsedAccounts.value
+      .filter((a) => a.bankAccountId == null)
+      .map((a) => ({ iban: a.iban, transactionCount: a.transactions.length }));
+
+    unmatchedIbans.value = unmatched;
+
+    if (matched.length === 0) {
+      // Nothing to preview — stay on parsed phase
+      return;
+    }
+
+    loading.value = true;
+    error.value = null;
+
+    try {
       const payload = buildPreviewPayload(selectedBudget.value.id!, matched);
       const response = await importApi.preview(payload);
-
-      // Enrich preview accounts with bank account names
       previewAccounts.value = response.bank_accounts;
       phase.value = 'preview';
     } catch (e: unknown) {
-      error.value = e instanceof Error ? e.message : 'Failed to process file';
+      error.value = e instanceof Error ? e.message : 'Failed to load preview';
       throw e;
     } finally {
       loading.value = false;
@@ -176,6 +218,7 @@ export const useImportStore = defineStore('import', () => {
   }
 
   function resetPreview() {
+    parsedAccounts.value = [];
     previewAccounts.value = [];
     unmatchedIbans.value = [];
     saveResult.value = null;
@@ -191,6 +234,7 @@ export const useImportStore = defineStore('import', () => {
     budgets,
     bankAccounts,
     selectedBudget,
+    parsedAccounts,
     previewAccounts,
     unmatchedIbans,
     saveResult,
@@ -199,10 +243,12 @@ export const useImportStore = defineStore('import', () => {
     phase,
     budgetsForDropdown,
     isBudgetCurrent,
+    fileSummary,
     confirmableTransactions,
     fetchMetadata,
     selectBudget,
-    parseAndPreview,
+    parseFile,
+    fetchPreview,
     toggleDeleteTransaction,
     saveImport,
     resetPreview,

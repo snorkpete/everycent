@@ -72,21 +72,59 @@
         {{ store.error }}
       </Message>
 
-      <!-- Preview Phase -->
-      <template v-if="store.phase === 'preview'">
-        <!-- Unmatched IBANs -->
-        <Message
-          v-for="unmatched in store.unmatchedIbans"
-          :key="unmatched.iban"
-          severity="warn"
-          :closable="false"
-          data-testid="unmatched-iban"
-          class="unmatched-iban-message"
-        >
-          IBAN {{ unmatched.iban }} — no matching account, {{ unmatched.transactionCount }} transactions skipped
-        </Message>
+      <!-- Parsed Phase: File Summary -->
+      <template v-if="store.phase !== 'idle'">
+        <table class="summary-table" data-testid="file-summary">
+          <thead>
+            <tr>
+              <th>IBAN</th>
+              <th>EveryCent Account</th>
+              <th class="right">Total</th>
+              <th class="right">To Add</th>
+              <th class="right">To Skip</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="row in store.fileSummary"
+              :key="row.iban"
+              :class="{ 'unmatched-row': !row.matchedAccountName }"
+              data-testid="summary-row"
+            >
+              <td>{{ row.iban }}</td>
+              <td>
+                <span v-if="row.matchedAccountName">{{ row.matchedAccountName }}</span>
+                <span v-else class="missing-account" data-testid="missing-account">Bank account missing</span>
+              </td>
+              <td class="right">{{ row.totalTransactions }}</td>
+              <td class="right">{{ row.inPeriodCount }}</td>
+              <td class="right">{{ row.outOfPeriodCount }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <!-- Account groups -->
+        <!-- Action buttons -->
+        <div class="action-bar">
+          <Button
+            label="Preview"
+            severity="secondary"
+            data-testid="preview-btn"
+            :disabled="!hasMatchedAccounts || store.loading"
+            title="Check for duplicate transactions on the server"
+            @click="onPreview"
+          />
+          <Button
+            label="Import and Save"
+            data-testid="save-btn"
+            :disabled="!hasMatchedAccounts || store.phase === 'parsed' || store.loading"
+            title="Save new transactions to the database"
+            @click="onSave"
+          />
+        </div>
+      </template>
+
+      <!-- Preview Phase: Detailed Transaction List -->
+      <template v-if="store.phase === 'preview'">
         <div
           v-for="(account, accountIndex) in store.previewAccounts"
           :key="account.bank_account_id"
@@ -164,15 +202,6 @@
             </tbody>
           </table>
         </div>
-
-        <!-- Import button -->
-        <div class="action-bar">
-          <Button
-            label="Import"
-            data-testid="save-btn"
-            @click="onSave"
-          />
-        </div>
       </template>
 
       <!-- Saved Phase -->
@@ -204,7 +233,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
@@ -224,6 +253,10 @@ const notifications = useNotifications();
 const route = useRoute();
 
 const selectedBudgetId = ref<number | null>(null);
+
+const hasMatchedAccounts = computed(() =>
+  store.fileSummary.some((row) => row.matchedAccountName != null),
+);
 
 onMounted(async () => {
   headingStore.setHeading('Import Transactions');
@@ -254,9 +287,17 @@ async function onFileSelect(event: { files: File[] }) {
 
   store.resetPreview();
   try {
-    await store.parseAndPreview(file);
+    await store.parseFile(file);
   } catch {
     notifications.error(store.error ?? 'Failed to process file');
+  }
+}
+
+async function onPreview() {
+  try {
+    await store.fetchPreview();
+  } catch {
+    notifications.error(store.error ?? 'Failed to load preview');
   }
 }
 
@@ -354,10 +395,49 @@ function previewRowClass(transaction: ImportTransaction) {
   margin: 0;
 }
 
-.unmatched-iban-message {
-  margin: 0;
+/* ── File summary table ── */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  border: 1px solid var(--p-surface-300);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
+.summary-table th,
+.summary-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--p-surface-200);
+  text-align: left;
+}
+
+.summary-table th {
+  font-weight: 600;
+  background-color: var(--p-surface-50);
+}
+
+.right {
+  text-align: right;
+}
+
+.unmatched-row {
+  background-color: #fef3c7;
+}
+
+.missing-account {
+  color: #b45309;
+  font-style: italic;
+}
+
+/* ── Action bar ── */
+.action-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+/* ── Account groups (preview) ── */
 .account-group {
   border: 1px solid var(--p-surface-300);
   border-radius: 6px;
@@ -413,10 +493,6 @@ function previewRowClass(transaction: ImportTransaction) {
 .col-status { width: 10%; }
 .col-action { width: 5%; }
 
-.right {
-  text-align: right;
-}
-
 .preview-table tbody tr:nth-child(even) {
   background-color: var(--p-surface-50);
 }
@@ -433,12 +509,6 @@ function previewRowClass(transaction: ImportTransaction) {
 .preview-row--out-of-period {
   opacity: 0.4;
   text-decoration: line-through;
-}
-
-.action-bar {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
 }
 
 .save-summary {

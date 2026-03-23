@@ -44,10 +44,14 @@ class ImportSaveService
   def validate_iban!(bank_account, iban)
     return if iban.blank? && bank_account.account_no.blank?
 
-    if iban != bank_account.account_no
+    if normalize_iban(iban) != normalize_iban(bank_account.account_no)
       raise ValidationError,
             "IBAN mismatch for bank account #{bank_account.id}: expected #{bank_account.account_no}, got #{iban}"
     end
+  end
+
+  def normalize_iban(value)
+    value.to_s.gsub(/\s/, '')
   end
 
   def load_existing_refs(bank_account)
