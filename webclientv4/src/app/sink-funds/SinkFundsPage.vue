@@ -24,10 +24,9 @@
         <template v-if="!store.isEditMode">
           <Button
             label="Transfer Money"
-            outlined
-            severity="secondary"
             size="small"
             data-testid="transfer-btn"
+            @click="showTransferDialog = true"
           />
           <Button label="Edit" size="small" data-testid="edit-btn" @click="store.enterEditMode()" />
         </template>
@@ -61,6 +60,10 @@
       </div>
       <SinkFundAllocationTable v-else />
     </div>
+
+    <SinkFundTransferDialog
+      v-model:visible="showTransferDialog"
+    />
   </div>
 </template>
 
@@ -74,6 +77,7 @@ import { useHeadingStore } from '../toolbar/headingStore';
 import { useSinkFundStore } from './sinkFundStore';
 import { useNotifications } from '../notifications/useNotifications';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
+import SinkFundTransferDialog from './SinkFundTransferDialog.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -82,6 +86,7 @@ const headingStore = useHeadingStore();
 const notifications = useNotifications();
 
 const selectedSinkFundId = ref<number | null>(null);
+const showTransferDialog = ref(false);
 
 onMounted(async () => {
   headingStore.setHeading('Sink Fund Obligations');

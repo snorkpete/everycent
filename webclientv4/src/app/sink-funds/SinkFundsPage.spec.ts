@@ -5,6 +5,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SinkFundsPage from './SinkFundsPage.vue';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
+import SinkFundTransferDialog from './SinkFundTransferDialog.vue';
 import type { SinkFundData } from './sinkFund.types';
 
 // Selectors
@@ -188,6 +189,17 @@ describe('SinkFundsPage', () => {
       expect(wrapper.find(ADD_OBLIGATION_BTN).exists()).toBe(true);
       expect(wrapper.find(EDIT_BTN).exists()).toBe(false);
       expect(wrapper.find(TRANSFER_BTN).exists()).toBe(false);
+    });
+
+    it('opens transfer dialog when Transfer Money is clicked', async () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.findComponent(SinkFundTransferDialog).props('visible')).toBe(false);
+
+      await wrapper.find(TRANSFER_BTN).trigger('click');
+      await nextTick();
+
+      expect(wrapper.findComponent(SinkFundTransferDialog).props('visible')).toBe(true);
     });
 
     it('calls store.enterEditMode when Edit is clicked', async () => {
