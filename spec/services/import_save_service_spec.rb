@@ -58,6 +58,30 @@ RSpec.describe ImportSaveService do
         expect(txn.camt_imported).to be true
       end
 
+      it 'defaults camt_imported to true when not provided in params' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "DEFAULT-001")]
+        }]
+
+        build_service(params).call
+        txn = Transaction.find_by(bank_ref: "DEFAULT-001")
+        expect(txn.camt_imported).to be true
+      end
+
+      it 'respects camt_imported: false when explicitly provided' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "MANUAL-001", camt_imported: false)]
+        }]
+
+        build_service(params).call
+        txn = Transaction.find_by(bank_ref: "MANUAL-001")
+        expect(txn.camt_imported).to be false
+      end
+
       it 'preserves the bank_ref from input (does not overwrite with before_create callback)' do
         ref = "ACCT-SVCR-REF-12345"
         params = [{

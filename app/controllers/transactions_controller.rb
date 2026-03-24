@@ -98,7 +98,7 @@ class TransactionsController < ApplicationController
       bank_accounts: [
         :bank_account_id,
         :iban,
-        { transactions: [:transaction_date, :description, :withdrawal_amount, :deposit_amount, :bank_ref, :status, :deleted] }
+        { transactions: [:transaction_date, :description, :withdrawal_amount, :deposit_amount, :bank_ref, :status, :deleted, :camt_imported] }
       ]
     )
   end

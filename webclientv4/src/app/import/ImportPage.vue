@@ -262,7 +262,8 @@ import { useImportStore } from './importStore';
 import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
-import type { ImportTransaction, SkippedTransaction } from './import.types';
+import { formatSkipReasons } from './formatSkipReasons';
+import type { ImportTransaction } from './import.types';
 
 const store = useImportStore();
 const headingStore = useHeadingStore();
@@ -334,22 +335,6 @@ async function onSave() {
   }
 }
 
-const SKIP_REASON_LABELS: Record<string, string> = {
-  duplicate: 'duplicate',
-  out_of_period: 'out of period',
-  invalid_date: 'invalid date',
-  user_excluded: 'manually excluded',
-};
-
-function formatSkipReasons(skipped: SkippedTransaction[]): string {
-  const counts = new Map<string, number>();
-  for (const s of skipped) {
-    counts.set(s.reason, (counts.get(s.reason) ?? 0) + 1);
-  }
-  return Array.from(counts.entries())
-    .map(([reason, count]) => `${count} ${SKIP_REASON_LABELS[reason] ?? reason}`)
-    .join(', ');
-}
 
 function previewRowClass(transaction: ImportTransaction) {
   return {

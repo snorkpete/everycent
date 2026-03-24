@@ -30,6 +30,8 @@ export interface SavePayload {
       deposit_amount: number;
       bank_ref: string;
       status: string;
+      camt_imported: boolean;
+      deleted: boolean;
     }[];
   }[];
 }

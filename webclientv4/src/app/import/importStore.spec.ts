@@ -443,8 +443,10 @@ describe('importStore', () => {
       expect(payload.bank_accounts[0].transactions).toHaveLength(2);
       expect(payload.bank_accounts[0].transactions[0].bank_ref).toBe('REF001');
       expect(payload.bank_accounts[0].transactions[0].deleted).toBe(false);
+      expect(payload.bank_accounts[0].transactions[0].camt_imported).toBe(true);
       expect(payload.bank_accounts[0].transactions[1].bank_ref).toBe('REF002');
       expect(payload.bank_accounts[0].transactions[1].deleted).toBe(false);
+      expect(payload.bank_accounts[0].transactions[1].camt_imported).toBe(true);
     });
 
     it('sets phase to saved on success', async () => {

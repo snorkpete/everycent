@@ -92,10 +92,11 @@ class ImportSaveService
 
   def create_transaction!(bank_account, txn_params)
     permitted = txn_params.slice(*PERMITTED_FIELDS)
+    camt_imported = txn_params.key?(:camt_imported) ? ActiveModel::Type::Boolean.new.cast(txn_params[:camt_imported]) : true
     Transaction.create!(
       permitted.merge(
         bank_account_id: bank_account.id,
-        camt_imported: true
+        camt_imported: camt_imported
       )
     )
   end
