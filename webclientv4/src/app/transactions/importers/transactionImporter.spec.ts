@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { transactionImporter } from './transactionImporter';
 import * as abnAmroBankImporterModule from './abnAmroBankImporter';
 import * as abnAmroCreditCardImporterModule from './abnAmroCreditCardImporter';
+import * as abnAmroCreditCard2026ImporterModule from './abnAmroCreditCard2026Importer';
 import * as scotiaImporterModule from './scotiaImporter';
 
 vi.mock('./abnAmroBankImporter', () => ({
@@ -9,6 +10,9 @@ vi.mock('./abnAmroBankImporter', () => ({
 }));
 vi.mock('./abnAmroCreditCardImporter', () => ({
   abnAmroCreditCardImporter: vi.fn().mockReturnValue([]),
+}));
+vi.mock('./abnAmroCreditCard2026Importer', () => ({
+  abnAmroCreditCard2026Importer: vi.fn().mockReturnValue([]),
 }));
 vi.mock('./scotiaImporter', () => ({
   scotiaImporter: vi.fn().mockReturnValue([]),
@@ -37,6 +41,15 @@ describe('transactionImporter', () => {
 
       expect(abnAmroCreditCardImporterModule.abnAmroCreditCardImporter).toHaveBeenCalledWith(input, startDate, endDate);
       expect(abnAmroBankImporterModule.abnAmroBankImporter).not.toHaveBeenCalled();
+      expect(scotiaImporterModule.scotiaImporter).not.toHaveBeenCalled();
+    });
+
+    it('routes "abn-amro-creditcard-2026" to abnAmroCreditCard2026Importer', () => {
+      transactionImporter(input, startDate, endDate, 'abn-amro-creditcard-2026');
+
+      expect(abnAmroCreditCard2026ImporterModule.abnAmroCreditCard2026Importer).toHaveBeenCalledWith(input, startDate, endDate);
+      expect(abnAmroBankImporterModule.abnAmroBankImporter).not.toHaveBeenCalled();
+      expect(abnAmroCreditCardImporterModule.abnAmroCreditCardImporter).not.toHaveBeenCalled();
       expect(scotiaImporterModule.scotiaImporter).not.toHaveBeenCalled();
     });
 

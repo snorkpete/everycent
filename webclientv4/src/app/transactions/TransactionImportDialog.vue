@@ -77,7 +77,8 @@ const selectedFormat = ref<string | undefined>(undefined);
 
 const importFormats = [
   { id: 'abn-amro-bank', name: 'ABN Amro Bank Account' },
-  { id: 'abn-amro-creditcard', name: 'ABN Amro Credit Card' },
+  { id: 'abn-amro-creditcard', name: 'ABN Amro Credit Card (old)' },
+  { id: 'abn-amro-creditcard-2026', name: 'ABN Amro Credit Card (2026+)' },
   { id: 'new-bank-account', name: 'Scotia Bank Account' },
 ];
 

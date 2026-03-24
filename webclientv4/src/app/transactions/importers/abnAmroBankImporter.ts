@@ -11,6 +11,13 @@ const MONTH_MAP: Record<string, number> = {
   Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
 };
 
+/** Wraps `new Date()` so tests can mock it via `dateProvider.today = ...`. */
+export const dateProvider = {
+  today(): Date {
+    return new Date();
+  },
+};
+
 function convertInputToLines(input: string | null): string[] {
   if (!input) return [];
   return input.split(/[\n]/);
@@ -26,7 +33,7 @@ function parseFormattedDate(line: string): DateParts | false {
   let match = line.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{1,2}) ([A-Za-z]{3}) /);
   if (match) {
     return {
-      year: new Date().getFullYear(),
+      year: dateProvider.today().getFullYear(),
       month: MONTH_MAP[match[3]],
       day: parseInt(match[2], 10),
     };
@@ -36,7 +43,7 @@ function parseFormattedDate(line: string): DateParts | false {
   match = line.match(/^(Mo|Tu|We|Th|Fr|Sa|Su) (\d{1,2}) ([A-Za-z]{3}) /);
   if (match) {
     return {
-      year: new Date().getFullYear(),
+      year: dateProvider.today().getFullYear(),
       month: MONTH_MAP[match[3]],
       day: parseInt(match[2], 10),
     };
@@ -64,10 +71,10 @@ function isDate(line: string): boolean {
 function extractDate(line: string): Date | undefined {
   if (!isDate(line)) return undefined;
 
-  if (line === 'today') return new Date();
+  if (line === 'today') return dateProvider.today();
 
   if (line === 'yesterday') {
-    const d = new Date();
+    const d = dateProvider.today();
     d.setDate(d.getDate() - 1);
     return d;
   }
@@ -112,13 +119,25 @@ function extractAmount(line: string): number {
   return sign === '-' ? -amount : amount;
 }
 
+function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function formatDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export function abnAmroBankImporter(
   input: string,
   startDate: string,
   endDate: string,
 ): TransactionData[] {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const start = parseLocalDate(startDate);
+  const end = parseLocalDate(endDate);
 
   const transactions: TransactionData[] = [];
   let currentDate: Date | undefined;
@@ -148,8 +167,8 @@ export function abnAmroBankImporter(
         status: 'paid',
       };
 
-      if (currentDate && currentDate.toISOString) {
-        transaction.transaction_date = currentDate.toISOString().substring(0, 10);
+      if (currentDate) {
+        transaction.transaction_date = formatDate(currentDate);
       }
 
       if (currentDate && (currentDate < start || currentDate > end)) {
