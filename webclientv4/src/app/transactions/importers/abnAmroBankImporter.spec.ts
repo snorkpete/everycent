@@ -1,9 +1,17 @@
-import { describe, it, expect } from 'vitest';
-import { abnAmroBankImporter } from './abnAmroBankImporter';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { abnAmroBankImporter, dateProvider } from './abnAmroBankImporter';
 
 describe('abnAmroBankImporter', () => {
   const startDate = '2025-04-01';
   const endDate = '2025-04-30';
+
+  const originalToday = dateProvider.today;
+  beforeEach(() => {
+    dateProvider.today = () => new Date(2025, 3, 25);
+  });
+  afterEach(() => {
+    dateProvider.today = originalToday;
+  });
 
   const sampleInput = `
 April 2025
