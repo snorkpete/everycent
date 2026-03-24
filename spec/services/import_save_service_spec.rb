@@ -112,6 +112,18 @@ RSpec.describe ImportSaveService do
         expect(ba_result[:transactions].length).to eq(2)
       end
 
+      it 'includes camt_imported in response transactions' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "CAMT-RESP-001")]
+        }]
+
+        result = build_service(params).call
+        txn = result[:bank_accounts].first[:transactions].first
+        expect(txn[:camt_imported]).to be true
+      end
+
       it 'does not include import_status on returned transactions' do
         params = [{
           bank_account_id: bank_account.id,
@@ -281,7 +293,7 @@ RSpec.describe ImportSaveService do
         }.not_to change(Transaction, :count)
       end
 
-      it 'rolls back if an out-of-period transaction is submitted' do
+      it 'silently skips out-of-period transactions without rolling back valid ones' do
         params = [
           {
             bank_account_id: bank_account.id,
@@ -296,12 +308,11 @@ RSpec.describe ImportSaveService do
         ]
 
         expect {
-          begin
-            build_service(params).call
-          rescue ImportSaveService::ValidationError
-            # expected
-          end
-        }.not_to change(Transaction, :count)
+          build_service(params).call
+        }.to change(Transaction, :count).by(1)
+
+        expect(Transaction.find_by(bank_ref: "GOOD-ONE")).to be_present
+        expect(Transaction.find_by(bank_ref: "BAD-DATE")).to be_nil
       end
     end
 
@@ -318,28 +329,28 @@ RSpec.describe ImportSaveService do
         }.to raise_error(ImportSaveService::ValidationError, /IBAN mismatch/)
       end
 
-      it 'raises ValidationError for out-of-period transaction date' do
+      it 'silently skips out-of-period transaction dates' do
         params = [{
           bank_account_id: bank_account.id,
           iban: "NL00ABNA0000000001",
-          transactions: [txn_params(transaction_date: "2026-01-15")]
+          transactions: [txn_params(bank_ref: "OOP-001", transaction_date: "2026-01-15")]
         }]
 
         expect {
           build_service(params).call
-        }.to raise_error(ImportSaveService::ValidationError, /outside budget period/)
+        }.not_to change(Transaction, :count)
       end
 
-      it 'raises ValidationError for invalid transaction date' do
+      it 'silently skips invalid transaction dates' do
         params = [{
           bank_account_id: bank_account.id,
           iban: "NL00ABNA0000000001",
-          transactions: [txn_params(transaction_date: "not-a-date")]
+          transactions: [txn_params(bank_ref: "BAD-DATE-001", transaction_date: "not-a-date")]
         }]
 
         expect {
           build_service(params).call
-        }.to raise_error(ImportSaveService::ValidationError, /Invalid transaction_date/)
+        }.not_to change(Transaction, :count)
       end
 
       it 'raises RecordNotFound for non-existent bank account' do

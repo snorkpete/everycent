@@ -22,14 +22,15 @@ function beaEntry(opts: {
   ref?: string;
   amount?: string;
   cdtDbt?: string;
-  bookingDate?: string;
+  valueDate?: string;
   addtlNtryInf?: string;
 }): string {
   return `
 <Ntry>
   <Amt Ccy="EUR">${opts.amount ?? '000000000000004.87'}</Amt>
   <CdtDbtInd>${opts.cdtDbt ?? 'DBIT'}</CdtDbtInd>
-  <BookgDt><Dt>${opts.bookingDate ?? '2026-02-23'}</Dt></BookgDt>
+  <BookgDt><Dt>2026-02-23</Dt></BookgDt>
+  <ValDt><Dt>${opts.valueDate ?? '2026-02-23'}</Dt></ValDt>
   <AcctSvcrRef>${opts.ref ?? 'REF001'}</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N426</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>${opts.addtlNtryInf ?? 'BEA, Betaalpas                  Albert Heijn 2242,PAS363        NR:BS159644, 23.02.26/12:56     ALMERE'}</AddtlNtryInf>
@@ -40,7 +41,7 @@ function sepaEntry(opts: {
   ref?: string;
   amount?: string;
   cdtDbt?: string;
-  bookingDate?: string;
+  valueDate?: string;
   addtlNtryInf?: string;
   creditorName?: string;
   debtorName?: string;
@@ -53,7 +54,8 @@ function sepaEntry(opts: {
 <Ntry>
   <Amt Ccy="EUR">${opts.amount ?? '000000000000012.50'}</Amt>
   <CdtDbtInd>${opts.cdtDbt ?? 'DBIT'}</CdtDbtInd>
-  <BookgDt><Dt>${opts.bookingDate ?? '2026-02-20'}</Dt></BookgDt>
+  <BookgDt><Dt>2026-02-20</Dt></BookgDt>
+  <ValDt><Dt>${opts.valueDate ?? '2026-02-20'}</Dt></ValDt>
   <AcctSvcrRef>${opts.ref ?? 'REF002'}</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N654</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>${opts.addtlNtryInf ?? '/TRTP/SEPA Incasso /NAME/Simpel'}</AddtlNtryInf>
@@ -69,14 +71,15 @@ function internationalEntry(opts: {
   ref?: string;
   amount?: string;
   cdtDbt?: string;
-  bookingDate?: string;
+  valueDate?: string;
   addtlNtryInf?: string;
 }): string {
   return `
 <Ntry>
   <Amt Ccy="EUR">${opts.amount ?? '000000000000050.00'}</Amt>
   <CdtDbtInd>${opts.cdtDbt ?? 'DBIT'}</CdtDbtInd>
-  <BookgDt><Dt>${opts.bookingDate ?? '2026-02-18'}</Dt></BookgDt>
+  <BookgDt><Dt>2026-02-18</Dt></BookgDt>
+  <ValDt><Dt>${opts.valueDate ?? '2026-02-18'}</Dt></ValDt>
   <AcctSvcrRef>${opts.ref ?? 'REF003'}</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N785</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>${opts.addtlNtryInf ?? '  International Wire Transfer to XYZ Corp  '}</AddtlNtryInf>
@@ -393,9 +396,9 @@ describe('camt053Parser', () => {
     });
 
     describe('transaction_date', () => {
-      it('sets transaction_date from BookgDt/Dt', () => {
+      it('sets transaction_date from ValDt/Dt', () => {
         const xml = makeXml({
-          entries: beaEntry({ bookingDate: '2026-02-15' }),
+          entries: beaEntry({ valueDate: '2026-02-15' }),
         });
         const result = parseCamt053Xml(
           [xml],
@@ -405,12 +408,29 @@ describe('camt053Parser', () => {
         );
         expect(result.accounts[0].transactions[0].transaction_date).toBe('2026-02-15');
       });
+
+      it('uses value date for weekend transactions booked on Monday', () => {
+        // 2026-02-14 = Saturday, 2026-02-16 = Monday (bank booking day)
+        const xml = makeXml({
+          entries: beaEntry({
+            valueDate: '2026-02-14',
+            ref: 'WEEKEND_SAT',
+          }),
+        });
+        const result = parseCamt053Xml(
+          [xml],
+          defaultBankAccounts,
+          defaultStartDate,
+          defaultEndDate,
+        );
+        expect(result.accounts[0].transactions[0].transaction_date).toBe('2026-02-14');
+      });
     });
 
     describe('period filtering', () => {
       it('marks transactions outside budget period as deleted: true', () => {
         const xml = makeXml({
-          entries: beaEntry({ bookingDate: '2026-01-15', ref: 'OUTSIDE' }),
+          entries: beaEntry({ valueDate: '2026-01-15', ref: 'OUTSIDE' }),
         });
         const result = parseCamt053Xml(
           [xml],
@@ -423,7 +443,7 @@ describe('camt053Parser', () => {
 
       it('does not mark transactions within budget period as deleted', () => {
         const xml = makeXml({
-          entries: beaEntry({ bookingDate: '2026-02-15', ref: 'INSIDE' }),
+          entries: beaEntry({ valueDate: '2026-02-15', ref: 'INSIDE' }),
         });
         const result = parseCamt053Xml(
           [xml],
@@ -436,7 +456,7 @@ describe('camt053Parser', () => {
 
       it('includes transactions on start date boundary', () => {
         const xml = makeXml({
-          entries: beaEntry({ bookingDate: '2026-02-01', ref: 'START' }),
+          entries: beaEntry({ valueDate: '2026-02-01', ref: 'START' }),
         });
         const result = parseCamt053Xml(
           [xml],
@@ -449,7 +469,7 @@ describe('camt053Parser', () => {
 
       it('includes transactions on end date boundary', () => {
         const xml = makeXml({
-          entries: beaEntry({ bookingDate: '2026-02-28', ref: 'END' }),
+          entries: beaEntry({ valueDate: '2026-02-28', ref: 'END' }),
         });
         const result = parseCamt053Xml(
           [xml],
@@ -462,7 +482,7 @@ describe('camt053Parser', () => {
 
       it('marks transactions after end date as deleted', () => {
         const xml = makeXml({
-          entries: beaEntry({ bookingDate: '2026-03-01', ref: 'AFTER' }),
+          entries: beaEntry({ valueDate: '2026-03-01', ref: 'AFTER' }),
         });
         const result = parseCamt053Xml(
           [xml],
@@ -610,6 +630,7 @@ describe('camt053Parser', () => {
   <Amt Ccy="EUR">000000000000015.00</Amt>
   <CdtDbtInd>DBIT</CdtDbtInd>
   <BookgDt><Dt>2026-02-20</Dt></BookgDt>
+  <ValDt><Dt>2026-02-20</Dt></ValDt>
   <AcctSvcrRef>REF_FALLBACK</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N658</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>/TRTP/SEPA Incasso /NAME/Energiedirect BV /MARF/EDB-000123 /REMI/Maandtermijn</AddtlNtryInf>
@@ -651,6 +672,7 @@ describe('camt053Parser', () => {
   <Amt Ccy="EUR">000000000000005.00</Amt>
   <CdtDbtInd>DBIT</CdtDbtInd>
   <BookgDt><Dt>2026-02-20</Dt></BookgDt>
+  <ValDt><Dt>2026-02-20</Dt></ValDt>
   <AcctSvcrRef>REF_EDGE</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N999</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>  Some unknown format  </AddtlNtryInf>
