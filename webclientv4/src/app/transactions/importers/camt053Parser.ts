@@ -26,7 +26,7 @@ interface RawEntry {
   bankRef: string;
   amount: number;
   cdtDbtInd: string;
-  bookingDate: string;
+  valueDate: string;
   description: string;
 }
 
@@ -95,7 +95,7 @@ export function parseCamt053Xml(
 
         const amountStr = getTextContent(ntry, 'Amt') ?? '0';
         const cdtDbtInd = getTextContent(ntry, 'CdtDbtInd') ?? '';
-        const bookingDate = getDirectChildTextContent(ntry, 'BookgDt', 'Dt') ?? '';
+        const valueDate = getDirectChildTextContent(ntry, 'ValDt', 'Dt') ?? '';
         const description = extractDescription(ntry);
 
         ibanEntries.set(bankRef, {
@@ -103,7 +103,7 @@ export function parseCamt053Xml(
           bankRef,
           amount: amountToCents(amountStr),
           cdtDbtInd,
-          bookingDate,
+          valueDate,
           description,
         });
       }
@@ -121,13 +121,13 @@ export function parseCamt053Xml(
     const transactions: TransactionData[] = [];
     for (const entry of entryMap.values()) {
       const isDebit = entry.cdtDbtInd === 'DBIT';
-      const txDate = new Date(entry.bookingDate + 'T12:00:00');
+      const txDate = new Date(entry.valueDate + 'T12:00:00');
       const outsidePeriod = txDate < start || txDate > end;
 
       const transaction: TransactionData = {
         bank_ref: entry.bankRef,
         bank_account_id: meta.bankAccountId,
-        transaction_date: entry.bookingDate,
+        transaction_date: entry.valueDate,
         withdrawal_amount: isDebit ? entry.amount : 0,
         deposit_amount: isDebit ? 0 : entry.amount,
         description: entry.description,
@@ -228,7 +228,7 @@ function getTextContent(parent: Element, path: string): string | undefined {
 /**
  * Gets the text content of a nested child, but only looking at direct children
  * of the parent for the first tag, then walking down.
- * Used for BookgDt>Dt to avoid grabbing ValDt>Dt instead.
+ * Used for ValDt>Dt to avoid grabbing BookgDt>Dt (or vice versa) via deep search.
  */
 function getDirectChildTextContent(
   parent: Element,
