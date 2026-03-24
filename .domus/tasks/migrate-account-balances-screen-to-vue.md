@@ -1,7 +1,7 @@
 # Task: Migrate account balances screen to Vue
 
 **ID:** migrate-account-balances-screen-to-vue
-**Status:** proposed
+**Status:** done
 **Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-14

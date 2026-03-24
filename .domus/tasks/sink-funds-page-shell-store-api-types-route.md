@@ -1,7 +1,7 @@
 # Task: Sink funds — page shell, store, API, types, route
 
 **ID:** sink-funds-page-shell-store-api-types-route
-**Status:** proposed
+**Status:** done
 **Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-03-21
