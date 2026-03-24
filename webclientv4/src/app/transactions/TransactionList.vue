@@ -203,12 +203,12 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 
 .col-calculator { width: 2.5%; padding: 0 2px; }
 .col-date { width: 10%; }
-.col-description { width: 28%; }
+.col-description { width: 26.5%; }
 .col-allocation { width: 22%; }
 .col-money { width: 10%; }
 .col-paid { width: 4%; }
 .col-auto { width: 4%; }
-.col-action { width: 2%; }
+.col-action { width: 3.5%; }
 
 .col-description--truncate :deep(.text-display) {
   overflow: hidden;

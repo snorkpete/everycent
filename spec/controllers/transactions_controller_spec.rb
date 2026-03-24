@@ -426,30 +426,32 @@ RSpec.describe TransactionsController, :type => :controller do
       expect(body["error"]).to match(/IBAN mismatch/)
     end
 
-    it 'returns 422 for out-of-period transaction date' do
-      post :import_save, params: {
-        budget_id: budget.id,
-        bank_accounts: [
-          {
-            bank_account_id: bank_account.id,
-            iban: "NL00ABNA0000000001",
-            transactions: [
-              {
-                transaction_date: "2026-01-15",
-                description: "Out of period",
-                withdrawal_amount: 100,
-                deposit_amount: 0,
-                bank_ref: "OOP-001",
-                status: "paid"
-              }
-            ]
-          }
-        ]
-      }
+    it 'silently skips out-of-period transactions' do
+      expect {
+        post :import_save, params: {
+          budget_id: budget.id,
+          bank_accounts: [
+            {
+              bank_account_id: bank_account.id,
+              iban: "NL00ABNA0000000001",
+              transactions: [
+                {
+                  transaction_date: "2026-01-15",
+                  description: "Out of period",
+                  withdrawal_amount: 100,
+                  deposit_amount: 0,
+                  bank_ref: "OOP-001",
+                  status: "paid"
+                }
+              ]
+            }
+          ]
+        }
+      }.not_to change(Transaction, :count)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:success)
       body = JSON.parse(response.body)
-      expect(body["error"]).to match(/outside budget period/)
+      expect(body["bank_accounts"].first["transactions"]).to be_empty
     end
 
     it 'returns 404 for non-existent budget' do
@@ -542,6 +544,59 @@ RSpec.describe TransactionsController, :type => :controller do
         }
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'preserves camt_imported and bank_ref on re-save' do
+      it 'retains camt_imported and bank_ref when transactions are saved via the regular endpoint' do
+        # Step 1: Import a CAMT transaction
+        post :import_save, params: {
+          budget_id: budget.id,
+          bank_accounts: [
+            {
+              bank_account_id: bank_account.id,
+              iban: "NL00ABNA0000000001",
+              transactions: [
+                {
+                  transaction_date: "2026-03-15",
+                  description: "Imported txn",
+                  withdrawal_amount: 500,
+                  deposit_amount: 0,
+                  bank_ref: "CAMT-REF-001",
+                  status: "paid",
+                  camt_imported: true
+                }
+              ]
+            }
+          ]
+        }
+
+        imported_txn = Transaction.find_by(bank_ref: "CAMT-REF-001")
+        expect(imported_txn.camt_imported).to be true
+
+        # Step 2: Re-save via the regular transactions endpoint (as the Transactions screen does)
+        post :create, params: {
+          budget_id: budget.id,
+          bank_account_id: bank_account.id,
+          transactions: [
+            {
+              description: "Imported txn",
+              bank_ref: "CAMT-REF-001",
+              bank_account_id: bank_account.id,
+              transaction_date: "2026-03-15",
+              withdrawal_amount: 500,
+              deposit_amount: 0,
+              status: "paid",
+              camt_imported: true
+            }
+          ]
+        }
+
+        # Step 3: Verify the transaction still has its camt_imported flag and bank_ref
+        resaved_txn = Transaction.find_by(bank_ref: "CAMT-REF-001")
+        expect(resaved_txn).to be_present
+        expect(resaved_txn.bank_ref).to eq("CAMT-REF-001")
+        expect(resaved_txn.camt_imported).to be true
       end
     end
 

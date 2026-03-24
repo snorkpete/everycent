@@ -123,6 +123,17 @@
         </div>
       </template>
 
+      <!-- Unmatched IBANs -->
+      <Message
+        v-for="unmatched in store.unmatchedIbans"
+        :key="unmatched.iban"
+        severity="warn"
+        :closable="false"
+        data-testid="unmatched-iban"
+      >
+        {{ unmatched.iban }}: {{ unmatched.transactionCount }} transactions skipped (no matching bank account)
+      </Message>
+
       <!-- Preview Phase: Detailed Transaction List -->
       <template v-if="store.phase === 'preview'">
         <div
@@ -219,7 +230,10 @@
           data-testid="save-summary"
         >
           <strong>{{ store.getBankAccountName(account.bank_account_id) }}</strong>:
-          {{ account.transactions.length }} transactions
+          {{ account.transactions.length }} transaction{{ account.transactions.length === 1 ? '' : 's' }} saved<template v-if="account.skipped?.length">,
+            {{ account.skipped.length }} skipped
+            ({{ formatSkipReasons(account.skipped) }})
+          </template>
         </div>
 
         <router-link :to="{ name: 'transactions' }">
@@ -248,7 +262,7 @@ import { useImportStore } from './importStore';
 import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
-import type { ImportTransaction } from './import.types';
+import type { ImportTransaction, SkippedTransaction } from './import.types';
 
 const store = useImportStore();
 const headingStore = useHeadingStore();
@@ -318,6 +332,23 @@ async function onSave() {
   } catch {
     notifications.error(store.error ?? 'Failed to save import');
   }
+}
+
+const SKIP_REASON_LABELS: Record<string, string> = {
+  duplicate: 'duplicate',
+  out_of_period: 'out of period',
+  invalid_date: 'invalid date',
+  user_excluded: 'manually excluded',
+};
+
+function formatSkipReasons(skipped: SkippedTransaction[]): string {
+  const counts = new Map<string, number>();
+  for (const s of skipped) {
+    counts.set(s.reason, (counts.get(s.reason) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .map(([reason, count]) => `${count} ${SKIP_REASON_LABELS[reason] ?? reason}`)
+    .join(', ');
 }
 
 function previewRowClass(transaction: ImportTransaction) {

@@ -65,15 +65,6 @@ export const useImportStore = defineStore('import', () => {
     });
   });
 
-  const confirmableTransactions = computed(() => {
-    return previewAccounts.value.map((account) => ({
-      ...account,
-      transactions: account.transactions.filter(
-        (t) => t.import_status !== 'duplicate' && !t.deleted,
-      ),
-    }));
-  });
-
   async function fetchMetadata() {
     loading.value = true;
     error.value = null;
@@ -193,9 +184,7 @@ export const useImportStore = defineStore('import', () => {
         bank_accounts: previewAccounts.value.map((account) => ({
           bank_account_id: account.bank_account_id,
           iban: bankAccounts.value.find((ba) => ba.id === account.bank_account_id)?.account_no ?? '',
-          transactions: account.transactions
-            .filter((t) => t.import_status !== 'duplicate' && !t.deleted)
-            .map((t) => ({
+          transactions: account.transactions.map((t) => ({
               transaction_date: t.transaction_date ?? '',
               description: t.description ?? '',
               withdrawal_amount: t.withdrawal_amount ?? 0,
@@ -203,6 +192,7 @@ export const useImportStore = defineStore('import', () => {
               bank_ref: t.bank_ref ?? '',
               status: t.status ?? 'paid',
               camt_imported: t.camt_imported ?? true,
+              deleted: t.deleted ?? false,
             })),
         })),
       };
@@ -245,7 +235,6 @@ export const useImportStore = defineStore('import', () => {
     budgetsForDropdown,
     isBudgetCurrent,
     fileSummary,
-    confirmableTransactions,
     fetchMetadata,
     selectBudget,
     parseFile,

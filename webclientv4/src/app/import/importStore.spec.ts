@@ -206,7 +206,7 @@ describe('importStore', () => {
     });
   });
 
-  describe('parseAndPreview', () => {
+  describe('parseFile', () => {
     function setupStoreForParse() {
       const store = useImportStore();
       store.selectedBudget = { id: 1, name: 'Mar 2026', status: 'open', start_date: '2026-03-01', end_date: '2026-03-31' };
@@ -216,7 +216,84 @@ describe('importStore', () => {
       return store;
     }
 
-    it('calls parser and preview endpoint, sets previewAccounts', async () => {
+    it('parses file and sets parsedAccounts and phase to parsed', async () => {
+      const store = setupStoreForParse();
+      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
+      await store.parseFile(file);
+
+      expect(store.parsedAccounts).toHaveLength(1);
+      expect(store.parsedAccounts[0].iban).toBe('NL01ABNA1234567890');
+      expect(store.phase).toBe('parsed');
+    });
+
+    it('sets loading true during parse and false after', async () => {
+      const { parseCamt053Zip } = await import('../transactions/importers/camt053Parser');
+      let loadingDuringCall = false;
+      vi.mocked(parseCamt053Zip).mockImplementationOnce(async () => {
+        loadingDuringCall = useImportStore().loading;
+        return { accounts: [] };
+      });
+
+      const store = setupStoreForParse();
+      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
+      await store.parseFile(file);
+
+      expect(loadingDuringCall).toBe(true);
+      expect(store.loading).toBe(false);
+    });
+
+    it('sets error and re-throws when no budget selected', async () => {
+      const store = useImportStore();
+      store.selectedBudget = null;
+
+      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
+      await expect(store.parseFile(file)).rejects.toThrow('No budget selected');
+
+      expect(store.error).toBe('No budget selected');
+    });
+
+    it('sets error and re-throws on parse failure', async () => {
+      const { parseCamt053Zip } = await import('../transactions/importers/camt053Parser');
+      vi.mocked(parseCamt053Zip).mockRejectedValueOnce(new Error('Invalid ZIP'));
+
+      const store = setupStoreForParse();
+      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
+      await expect(store.parseFile(file)).rejects.toThrow('Invalid ZIP');
+
+      expect(store.error).toBe('Invalid ZIP');
+      expect(store.loading).toBe(false);
+    });
+
+    it('resets state before processing', async () => {
+      const store = setupStoreForParse();
+      store.previewAccounts = [{ bank_account_id: 99, current_balance: 0, net: 0, projected_balance: 0, transactions: [] }];
+      store.unmatchedIbans = [{ iban: 'NL99', transactionCount: 1 }];
+      store.saveResult = { bank_accounts: [] };
+      store.phase = 'saved';
+
+      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
+      await store.parseFile(file);
+
+      expect(store.previewAccounts).toEqual([]);
+      expect(store.unmatchedIbans).toEqual([]);
+      expect(store.saveResult).toBeNull();
+    });
+  });
+
+  describe('fetchPreview', () => {
+    function setupStoreForPreview() {
+      const store = useImportStore();
+      store.selectedBudget = { id: 1, name: 'Mar 2026', status: 'open', start_date: '2026-03-01', end_date: '2026-03-31' };
+      store.bankAccounts = [
+        { id: 10, name: 'Checking', account_no: 'NL01ABNA1234567890', account_type: 'normal' },
+      ];
+      store.parsedAccounts = [
+        { iban: 'NL01ABNA1234567890', bankAccountId: 10, transactions: [{ description: 'Test', bank_ref: 'REF001' }] },
+      ];
+      return store;
+    }
+
+    it('calls preview endpoint and sets previewAccounts', async () => {
       const previewResponse = {
         bank_accounts: [
           {
@@ -227,7 +304,6 @@ describe('importStore', () => {
             transactions: [
               {
                 bank_ref: 'REF001',
-                bank_account_id: 10,
                 transaction_date: '2026-03-15',
                 withdrawal_amount: 5000,
                 deposit_amount: 0,
@@ -241,83 +317,47 @@ describe('importStore', () => {
       };
       vi.mocked(importApi.preview).mockResolvedValue(previewResponse);
 
-      const store = setupStoreForParse();
-      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
-      await store.parseAndPreview(file);
+      const store = setupStoreForPreview();
+      await store.fetchPreview();
 
       expect(store.previewAccounts).toEqual(previewResponse.bank_accounts);
       expect(store.phase).toBe('preview');
     });
 
-    it('sets loading true during parse and false after', async () => {
-      let loadingDuringCall = false;
-      vi.mocked(importApi.preview).mockImplementation(async () => {
-        loadingDuringCall = useImportStore().loading;
-        return { bank_accounts: [] };
-      });
-
-      const store = setupStoreForParse();
-      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
-      await store.parseAndPreview(file);
-
-      expect(loadingDuringCall).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
-    it('sets error and re-throws when no budget selected', async () => {
-      const store = useImportStore();
-      store.selectedBudget = null;
-
-      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
-      await expect(store.parseAndPreview(file)).rejects.toThrow('No budget selected');
-
-      expect(store.error).toBe('No budget selected');
-    });
-
-    it('sets error and re-throws on preview endpoint failure', async () => {
-      vi.mocked(importApi.preview).mockRejectedValue(new Error('Server error'));
-
-      const store = setupStoreForParse();
-      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
-      await expect(store.parseAndPreview(file)).rejects.toThrow('Server error');
-
-      expect(store.error).toBe('Server error');
-      expect(store.loading).toBe(false);
-    });
-
     it('separates unmatched IBANs from matched accounts', async () => {
-      const { parseCamt053Zip } = await import('../transactions/importers/camt053Parser');
-      vi.mocked(parseCamt053Zip).mockResolvedValueOnce({
-        accounts: [
-          { iban: 'NL01ABNA1234567890', bankAccountId: 10, transactions: [{ description: 'Test' }] },
-          { iban: 'NL99UNKN0000000000', bankAccountId: undefined, transactions: [{ description: 'A' }, { description: 'B' }] },
-        ],
-      });
       vi.mocked(importApi.preview).mockResolvedValue({ bank_accounts: [] });
 
-      const store = setupStoreForParse();
-      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
-      await store.parseAndPreview(file);
+      const store = setupStoreForPreview();
+      store.parsedAccounts = [
+        { iban: 'NL01ABNA1234567890', bankAccountId: 10, transactions: [{ description: 'Test' }] },
+        { iban: 'NL99UNKN0000000000', bankAccountId: undefined, transactions: [{ description: 'A' }, { description: 'B' }] },
+      ];
+      await store.fetchPreview();
 
       expect(store.unmatchedIbans).toEqual([
         { iban: 'NL99UNKN0000000000', transactionCount: 2 },
       ]);
     });
 
-    it('resets preview state before processing', async () => {
-      vi.mocked(importApi.preview).mockResolvedValue({ bank_accounts: [] });
+    it('sets error and re-throws on preview endpoint failure', async () => {
+      vi.mocked(importApi.preview).mockRejectedValue(new Error('Server error'));
 
-      const store = setupStoreForParse();
-      store.previewAccounts = [{ bank_account_id: 99, current_balance: 0, net: 0, projected_balance: 0, transactions: [] }];
-      store.unmatchedIbans = [{ iban: 'NL99', transactionCount: 1 }];
-      store.saveResult = { bank_accounts: [] };
-      store.phase = 'saved';
+      const store = setupStoreForPreview();
+      await expect(store.fetchPreview()).rejects.toThrow('Server error');
 
-      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
-      await store.parseAndPreview(file);
+      expect(store.error).toBe('Server error');
+      expect(store.loading).toBe(false);
+    });
 
-      // previewAccounts is set from the (empty) response, unmatchedIbans and saveResult reset
-      expect(store.saveResult).toBeNull();
+    it('does nothing when no matched accounts', async () => {
+      const store = setupStoreForPreview();
+      store.parsedAccounts = [
+        { iban: 'NL99UNKN0000000000', bankAccountId: undefined, transactions: [{ description: 'A' }] },
+      ];
+      await store.fetchPreview();
+
+      expect(importApi.preview).not.toHaveBeenCalled();
+      expect(store.phase).not.toBe('preview');
     });
   });
 
@@ -350,30 +390,6 @@ describe('importStore', () => {
       // Should not throw
       store.toggleDeleteTransaction(99, 0);
       store.toggleDeleteTransaction(0, 99);
-    });
-  });
-
-  describe('confirmableTransactions', () => {
-    it('filters out duplicates and deleted transactions', () => {
-      const store = useImportStore();
-      store.previewAccounts = [
-        {
-          bank_account_id: 10,
-          current_balance: 100000,
-          net: 0,
-          projected_balance: 100000,
-          transactions: [
-            { description: 'New', import_status: 'new', deleted: false },
-            { description: 'Duplicate', import_status: 'duplicate', deleted: false },
-            { description: 'Deleted', import_status: 'new', deleted: true },
-            { description: 'Out of period', import_status: 'out_of_period', deleted: false },
-          ],
-        },
-      ];
-
-      const result = store.confirmableTransactions;
-      expect(result[0].transactions).toHaveLength(2);
-      expect(result[0].transactions.map((t) => t.description)).toEqual(['New', 'Out of period']);
     });
   });
 
@@ -415,7 +431,7 @@ describe('importStore', () => {
       return store;
     }
 
-    it('calls save endpoint with non-deleted, non-duplicate transactions', async () => {
+    it('sends all transactions including duplicates and deleted with their flags', async () => {
       const saveResponse = { bank_accounts: [{ bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, transactions: [] }] };
       vi.mocked(importApi.save).mockResolvedValue(saveResponse);
 
@@ -424,8 +440,11 @@ describe('importStore', () => {
 
       expect(importApi.save).toHaveBeenCalledTimes(1);
       const payload = vi.mocked(importApi.save).mock.calls[0][0];
-      expect(payload.bank_accounts[0].transactions).toHaveLength(1);
+      expect(payload.bank_accounts[0].transactions).toHaveLength(2);
       expect(payload.bank_accounts[0].transactions[0].bank_ref).toBe('REF001');
+      expect(payload.bank_accounts[0].transactions[0].deleted).toBe(false);
+      expect(payload.bank_accounts[0].transactions[1].bank_ref).toBe('REF002');
+      expect(payload.bank_accounts[0].transactions[1].deleted).toBe(false);
     });
 
     it('sets phase to saved on success', async () => {

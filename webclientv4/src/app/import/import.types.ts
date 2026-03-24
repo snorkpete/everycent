@@ -21,12 +21,18 @@ export interface UnmatchedIban {
   transactionCount: number;
 }
 
+export interface SkippedTransaction {
+  bank_ref: string;
+  reason: 'duplicate' | 'out_of_period' | 'invalid_date' | 'user_excluded';
+}
+
 export interface SaveBankAccount {
   bank_account_id: number;
   current_balance: number;
   net: number;
   projected_balance: number;
   transactions: TransactionData[];
+  skipped: SkippedTransaction[];
 }
 
 export interface SaveResponse {

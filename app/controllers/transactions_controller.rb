@@ -89,7 +89,7 @@ class TransactionsController < ApplicationController
     params.permit(:budget_id, :bank_account_id, :transactions => [
       :id, :description, :bank_ref, :bank_account_id, :transaction_date,
       :withdrawal_amount, :deposit_amount,
-      :allocation_id, :sink_fund_allocation_id, :status, :brought_forward_status])
+      :allocation_id, :sink_fund_allocation_id, :status, :brought_forward_status, :camt_imported])
   end
 
   def import_save_params
@@ -98,7 +98,7 @@ class TransactionsController < ApplicationController
       bank_accounts: [
         :bank_account_id,
         :iban,
-        { transactions: [:transaction_date, :description, :withdrawal_amount, :deposit_amount, :bank_ref, :status] }
+        { transactions: [:transaction_date, :description, :withdrawal_amount, :deposit_amount, :bank_ref, :status, :deleted] }
       ]
     )
   end
