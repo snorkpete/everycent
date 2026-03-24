@@ -1,5 +1,6 @@
 import apiGateway from '../../api/api-gateway';
 import type { SinkFundData, SinkFundTransferData } from './sinkFund.types';
+import type { TransactionData } from '../transactions/transaction.types';
 
 export const sinkFundApi = {
   getAll: () =>
@@ -25,5 +26,12 @@ export const sinkFundApi = {
   transfer: (sinkFundId: number, transferData: SinkFundTransferData) =>
     apiGateway
       .post<SinkFundData>(`/sink_funds/${sinkFundId}/transfer_allocation`, transferData)
+      .then((r) => r.data),
+
+  getTransactionsForAllocation: (sinkFundAllocationId: number) =>
+    apiGateway
+      .get<TransactionData[]>('/transactions/by_sink_fund_allocation', {
+        params: { sink_fund_allocation_id: sinkFundAllocationId },
+      })
       .then((r) => r.data),
 };

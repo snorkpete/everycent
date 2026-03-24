@@ -157,19 +157,33 @@
         </tr>
       </tfoot>
     </table>
+    <AllocationTransactionsDialog
+      :visible="dialogVisible"
+      :allocation-id="selectedAllocationId"
+      :allocation-name="selectedAllocationName"
+      :fetch-transactions="sinkFundApi.getTransactionsForAllocation"
+      @update:visible="dialogVisible = $event"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import Tooltip from 'primevue/tooltip';
 import { useSinkFundStore } from './sinkFundStore';
+import { sinkFundApi } from './sinkFundApi';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData } from './sinkFund.types';
 
 const vTooltip = Tooltip;
 
 const store = useSinkFundStore();
+
+const dialogVisible = ref(false);
+const selectedAllocationId = ref(0);
+const selectedAllocationName = ref('');
 
 function outstanding(allocation: SinkFundAllocationData): number {
   const target = allocation.target ?? 0;
@@ -191,8 +205,10 @@ function toggleStatus(allocation: SinkFundAllocationData) {
   allocation.status = allocation.status === 'open' ? 'closed' : 'open';
 }
 
-function onShowTransactions(_allocation: SinkFundAllocationData) {
-  // Placeholder — subtask 5 wires this up
+function onShowTransactions(allocation: SinkFundAllocationData) {
+  selectedAllocationId.value = allocation.id ?? 0;
+  selectedAllocationName.value = allocation.name ?? '';
+  dialogVisible.value = true;
 }
 </script>
 
@@ -236,13 +252,13 @@ function onShowTransactions(_allocation: SinkFundAllocationData) {
 }
 
 /* ── Column widths ── */
-.name-col { width: 25%; }
-.balance-col { width: 10%; }
+.name-col { width: 20%; }
+.balance-col { width: 12%; }
 .target-col { width: 10%; }
 .outstanding-col { width: 10%; }
-.comment-col { width: 20%; }
-.status-col { width: 5%; }
-.action-col { width: 10%; }
+.comment-col { width: 16%; }
+.status-col { width: 6%; }
+.action-col { width: 6%; }
 
 /* ── Amount cells ── */
 .amount-cell {

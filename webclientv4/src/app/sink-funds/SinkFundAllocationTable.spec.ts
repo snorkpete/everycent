@@ -4,6 +4,7 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
+import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData, SinkFundData } from './sinkFund.types';
 
 // Selectors
@@ -262,6 +263,21 @@ describe('SinkFundAllocationTable', () => {
       const eyeBtn = rows[0].find(SHOW_TRANSACTIONS_BTN);
       expect(eyeBtn.exists()).toBe(true);
       expect(eyeBtn.attributes('title')).toBe('Show transactions for this allocation');
+    });
+
+    it('opens transactions dialog when eye icon is clicked', async () => {
+      const wrapper = createWrapper();
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      expect(dialog.props('visible')).toBe(false);
+
+      const rows = wrapper.findAll(ALLOCATION_ROW);
+      await rows[0].find(SHOW_TRANSACTIONS_BTN).trigger('click');
+      await nextTick();
+
+      expect(dialog.props('visible')).toBe(true);
+      expect(dialog.props('allocationId')).toBe(openAllocation.id);
+      expect(dialog.props('allocationName')).toBe(openAllocation.name);
     });
 
     it('applies closed-row styling to closed allocations', async () => {
