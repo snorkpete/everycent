@@ -1,1 +1,0 @@
-import{p as e}from"./index--CnzKBM1.js";const i={getAll:()=>e.get("/allocation_categories").then(a=>a.data),create:a=>e.post("/allocation_categories",a).then(t=>t.data),update:a=>e.put(`/allocation_categories/${a.id}`,a).then(t=>t.data)};export{i as a};
