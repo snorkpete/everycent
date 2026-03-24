@@ -13,15 +13,8 @@ const ADJUST_BALANCES_BTN = '[data-testid="adjust-balances-btn"]';
 const CURRENT_ACCOUNTS_TABLE = '[data-testid="current-accounts-table"]';
 const CASH_ASSETS_TABLE = '[data-testid="cash-assets-table"]';
 const NON_CASH_ASSETS_TABLE = '[data-testid="non-cash-assets-table"]';
-const TOTAL_ASSETS_LINE = '[data-testid="total-assets-line"]';
 const CREDIT_CARDS_TABLE = '[data-testid="credit-cards-table"]';
 const LOANS_TABLE = '[data-testid="loans-table"]';
-const NET_WORTH_SUMMARY = '[data-testid="net-worth-summary"]';
-const TOTAL_LIABILITIES = '[data-testid="total-liabilities"]';
-const NET_CURRENT_CASH = '[data-testid="net-current-cash"]';
-const NET_CASH_ASSETS = '[data-testid="net-cash-assets"]';
-const NET_NON_CASH_ASSETS = '[data-testid="net-non-cash-assets"]';
-const NET_WORTH = '[data-testid="net-worth"]';
 
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
@@ -39,6 +32,19 @@ const currentAccount: AccountBalanceData = {
   closing_balance: 100000,
   expected_closing_balance: 90000,
   current_balance: 100000,
+};
+
+const creditCardAccount: AccountBalanceData = {
+  id: 2,
+  name: 'Amro Credit Card',
+  account_type: 'credit_card',
+  account_category: 'liability',
+  is_cash: true,
+  closing_date: '2026-03-24',
+  next_closing_date: '2026-04-24',
+  closing_balance: 0,
+  expected_closing_balance: 0,
+  current_balance: 0,
 };
 
 const mockStore = reactive({
@@ -86,6 +92,11 @@ const AdjustDialogStub = {
   emits: ['update:visible'],
 };
 
+const SummaryStripStub = {
+  name: 'AccountBalanceSummaryStrip',
+  template: '<div data-testid="account-balance-summary-strip" />',
+};
+
 function createWrapper(): VueWrapper {
   return mount(AccountBalancesPage, {
     global: {
@@ -94,6 +105,7 @@ function createWrapper(): VueWrapper {
         ToggleSwitch: ToggleSwitchStub,
         AccountCategoryTable: CategoryTableStub,
         AdjustBalancesDialog: AdjustDialogStub,
+        AccountBalanceSummaryStrip: SummaryStripStub,
       },
     },
   });
@@ -150,36 +162,46 @@ describe('AccountBalancesPage', () => {
       expect(wrapper.find(ADJUST_BALANCES_BTN).exists()).toBe(true);
     });
 
-    it('renders all five category tables', () => {
+    it('renders summary strip', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="account-balance-summary-strip"]').exists()).toBe(true);
+    });
+
+    it('hides summary strip when loading', () => {
+      mockStore.loading = true;
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="account-balance-summary-strip"]').exists()).toBe(false);
+    });
+
+    it('hides summary strip when error', () => {
+      mockStore.error = 'Failed';
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="account-balance-summary-strip"]').exists()).toBe(false);
+    });
+
+    it('renders category tables that have accounts', () => {
       const wrapper = createWrapper();
 
       expect(wrapper.find(CURRENT_ACCOUNTS_TABLE).exists()).toBe(true);
-      expect(wrapper.find(CASH_ASSETS_TABLE).exists()).toBe(true);
-      expect(wrapper.find(NON_CASH_ASSETS_TABLE).exists()).toBe(true);
+    });
+
+    it('hides category tables with no accounts', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(CASH_ASSETS_TABLE).exists()).toBe(false);
+      expect(wrapper.find(NON_CASH_ASSETS_TABLE).exists()).toBe(false);
+      expect(wrapper.find(CREDIT_CARDS_TABLE).exists()).toBe(false);
+      expect(wrapper.find(LOANS_TABLE).exists()).toBe(false);
+    });
+
+    it('shows category tables when accounts are populated', () => {
+      mockStore.creditCardAccounts = [creditCardAccount];
+      const wrapper = createWrapper();
+
       expect(wrapper.find(CREDIT_CARDS_TABLE).exists()).toBe(true);
-      expect(wrapper.find(LOANS_TABLE).exists()).toBe(true);
-    });
-
-    it('renders Total Assets line', () => {
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(TOTAL_ASSETS_LINE).exists()).toBe(true);
-      expect(wrapper.find(TOTAL_ASSETS_LINE).text()).toContain('Total Assets');
-    });
-
-    it('renders net worth summary section', () => {
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(NET_WORTH_SUMMARY).exists()).toBe(true);
-    });
-
-    it('renders Total Assets line before Credit Cards section', () => {
-      const wrapper = createWrapper();
-
-      const html = wrapper.html();
-      const totalAssetsPos = html.indexOf('data-testid="total-assets-line"');
-      const creditCardsPos = html.indexOf('data-testid="credit-cards-table"');
-      expect(totalAssetsPos).toBeLessThan(creditCardsPos);
     });
   });
 
@@ -187,61 +209,9 @@ describe('AccountBalancesPage', () => {
     it('passes currentAccounts to Current Accounts table', () => {
       const wrapper = createWrapper();
 
-      // first table is Current Accounts
-      expect(wrapper.findAllComponents({ name: 'AccountCategoryTable' })[0].props('heading')).toBe(
-        'Current Accounts',
-      );
-      expect(
-        wrapper.findAllComponents({ name: 'AccountCategoryTable' })[0].props('accounts'),
-      ).toEqual([currentAccount]);
-    });
-
-    it('passes correct heading for each table', () => {
-      const wrapper = createWrapper();
-
       const tables = wrapper.findAllComponents({ name: 'AccountCategoryTable' });
       expect(tables[0].props('heading')).toBe('Current Accounts');
-      expect(tables[1].props('heading')).toBe('Cash Assets');
-      expect(tables[2].props('heading')).toBe('Non Cash Assets');
-      expect(tables[3].props('heading')).toBe('Credit Cards');
-      expect(tables[4].props('heading')).toBe('Loans');
-    });
-  });
-
-  describe('net worth summary', () => {
-    it('displays total liabilities', () => {
-      mockStore.totalLiabilities = -1030000;
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(TOTAL_LIABILITIES).text()).toBe('-10,300.00');
-    });
-
-    it('displays net current cash', () => {
-      mockStore.netCurrentCash = 70000;
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(NET_CURRENT_CASH).text()).toBe('700.00');
-    });
-
-    it('displays net cash assets', () => {
-      mockStore.netCashAssets = 200000;
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(NET_CASH_ASSETS).text()).toBe('2,000.00');
-    });
-
-    it('displays net non cash assets', () => {
-      mockStore.netNonCashAssets = -500000;
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(NET_NON_CASH_ASSETS).text()).toBe('-5,000.00');
-    });
-
-    it('displays net worth', () => {
-      mockStore.netWorth = -230000;
-      const wrapper = createWrapper();
-
-      expect(wrapper.find(NET_WORTH).text()).toBe('-2,300.00');
+      expect(tables[0].props('accounts')).toEqual([currentAccount]);
     });
   });
 
@@ -258,7 +228,7 @@ describe('AccountBalancesPage', () => {
       mockStore.loading = true;
       const wrapper = createWrapper();
 
-      expect(wrapper.find('.content-scroll').exists()).toBe(false);
+      expect(wrapper.find(CURRENT_ACCOUNTS_TABLE).exists()).toBe(false);
     });
   });
 

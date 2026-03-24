@@ -59,9 +59,15 @@ watch(model, (newVal) => {
 
 const formattedValue = computed(() => centsToDollars(model.value));
 
+// Colour highlighting for displayed amounts:
+//
+//   (no mode)    — negatives red, everything else default
+//   "positive"   — positives green, negatives red, zero default
+//                   Use for values where positive = good (balances, net worth, assets)
+//   "zero"       — zero green, non-zero red
+//                   Use for values where zero = good (diffs, remaining balances)
 const moneyDisplayClasses = computed(() => ({
   positive: props.highlightMode === 'positive' ? model.value > 0 : props.highlightMode === 'zero' ? model.value === 0 : false,
-  // default (no highlightMode): negatives are always red
   negative: props.highlightMode === 'zero' ? model.value !== 0 : model.value < 0,
 }));
 
