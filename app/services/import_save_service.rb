@@ -2,7 +2,7 @@ class ImportSaveService
   class ValidationError < StandardError; end
 
   PERMITTED_FIELDS = %i[
-    transaction_date description withdrawal_amount deposit_amount bank_ref status camt_imported
+    transaction_date description withdrawal_amount deposit_amount bank_ref status
   ].freeze
 
   def initialize(budget:, bank_accounts_params:)
@@ -80,7 +80,8 @@ class ImportSaveService
     permitted = txn_params.slice(*PERMITTED_FIELDS)
     Transaction.create!(
       permitted.merge(
-        bank_account_id: bank_account.id
+        bank_account_id: bank_account.id,
+        camt_imported: true
       )
     )
   end
@@ -116,7 +117,8 @@ class ImportSaveService
       status: txn.status,
       paid: txn.paid,
       net_amount: txn.net_amount,
-      brought_forward_status: txn.brought_forward_status
+      brought_forward_status: txn.brought_forward_status,
+      camt_imported: txn.camt_imported
     }
   end
 end
