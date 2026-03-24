@@ -59,12 +59,7 @@
       <div v-else-if="!store.sinkFund" class="empty-placeholder" data-testid="empty-placeholder">
         Select a sink fund to view obligations.
       </div>
-      <template v-else>
-        <!-- Allocations table goes here (subtask 2) -->
-        <div data-testid="allocations-placeholder" />
-        <!-- Summary rows go here (subtask 3) -->
-        <div data-testid="summary-placeholder" />
-      </template>
+      <SinkFundAllocationTable v-else />
     </div>
   </div>
 </template>
@@ -78,6 +73,7 @@ import ToggleSwitch from 'primevue/toggleswitch';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSinkFundStore } from './sinkFundStore';
 import { useNotifications } from '../notifications/useNotifications';
+import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
 
 const route = useRoute();
 const router = useRouter();
