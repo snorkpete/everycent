@@ -192,11 +192,26 @@ describe('TransactionsPage', () => {
   });
 
   describe('TransactionSummary props', () => {
-    it('passes transactions to TransactionSummary', () => {
+    it('passes committed transactions when not in edit mode', () => {
       const wrapper = mountPage();
 
       const summary = wrapper.findComponent({ name: 'TransactionSummary' });
       expect(summary.props('transactions')).toEqual(sampleTransactions);
+    });
+
+    it('passes draft transactions when in edit mode', async () => {
+      const draftTransactions: TransactionData[] = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid' },
+        { id: 2, description: 'New draft', withdrawal_amount: 1000, deposit_amount: 0, status: 'paid' },
+      ];
+      mockStore.isEditMode = true;
+      mockStore.draftTransactions = draftTransactions;
+
+      const wrapper = mountPage();
+      await nextTick();
+
+      const summary = wrapper.findComponent({ name: 'TransactionSummary' });
+      expect(summary.props('transactions')).toEqual(draftTransactions);
     });
 
     it('passes bankAccount to TransactionSummary', () => {

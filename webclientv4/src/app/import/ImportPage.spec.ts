@@ -378,6 +378,73 @@ describe('ImportPage', () => {
       expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
     });
 
+    it('shows dynamic net change from non-deleted new transactions', async () => {
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const summary = wrapper.find('[data-testid="balance-summary"]');
+      // Only REF001 is 'new' (withdrawal 5000) → net = -5000 = -$50.00
+      expect(summary.text()).toContain('Net change: -50.00');
+    });
+
+    it('shows dynamic projected balance', async () => {
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const summary = wrapper.find('[data-testid="balance-summary"]');
+      // current_balance 100000 + net -5000 = 95000 = $950.00
+      expect(summary.text()).toContain('Projected: 950.00');
+    });
+
+    it('updates net and projected when a new transaction is deleted', async () => {
+      // Deep clone so mutations don't affect other tests
+      const accounts: PreviewBankAccount[] = [
+        {
+          bank_account_id: 10,
+          current_balance: 100000,
+          net: -5000,
+          projected_balance: 95000,
+          transactions: [
+            {
+              bank_ref: 'REF001',
+              transaction_date: '2026-03-15',
+              withdrawal_amount: 5000,
+              deposit_amount: 0,
+              description: 'Test payment',
+              status: 'paid',
+              import_status: 'new',
+            },
+            {
+              bank_ref: 'REF002',
+              transaction_date: '2026-03-10',
+              withdrawal_amount: 3000,
+              deposit_amount: 0,
+              description: 'Duplicate payment',
+              status: 'paid',
+              import_status: 'duplicate',
+            },
+          ],
+        },
+      ];
+      mockStore.previewAccounts = accounts;
+      const wrapper = createWrapper();
+      await nextTick();
+
+      // Before delete: net = -5000 (-$50.00), projected = 95000 ($950.00)
+      let summary = wrapper.find('[data-testid="balance-summary"]');
+      expect(summary.text()).toContain('Net change: -50.00');
+      expect(summary.text()).toContain('Projected: 950.00');
+
+      // Mark the new transaction as deleted (mutate through the reactive proxy)
+      mockStore.previewAccounts[0].transactions[0].deleted = true;
+      await nextTick();
+
+      // After delete: net = 0 ($0.00), projected = 100000 ($1,000.00)
+      summary = wrapper.find('[data-testid="balance-summary"]');
+      expect(summary.text()).toContain('Net change: 0.00');
+      expect(summary.text()).toContain('Projected: 1,000.00');
+    });
+
     it('hides preview when phase is idle', async () => {
       mockStore.phase = 'idle';
       const wrapper = createWrapper();

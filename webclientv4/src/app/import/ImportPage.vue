@@ -148,8 +148,8 @@
             </h3>
             <div class="balance-summary" data-testid="balance-summary">
               <span>Balance: {{ centsToDollars(account.current_balance) }}</span>
-              <span>Net change: {{ centsToDollars(account.net) }}</span>
-              <span>Projected: {{ centsToDollars(account.projected_balance) }}</span>
+              <span>Net change: {{ centsToDollars(accountNet(account)) }}</span>
+              <span>Projected: {{ centsToDollars(accountProjectedBalance(account)) }}</span>
             </div>
           </div>
 
@@ -263,7 +263,7 @@ import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { formatSkipReasons } from './formatSkipReasons';
-import type { ImportTransaction } from './import.types';
+import type { ImportTransaction, PreviewBankAccount } from './import.types';
 
 const store = useImportStore();
 const headingStore = useHeadingStore();
@@ -335,6 +335,16 @@ async function onSave() {
   }
 }
 
+
+function accountNet(account: PreviewBankAccount): number {
+  return account.transactions
+    .filter((t) => t.import_status === 'new' && !t.deleted)
+    .reduce((sum, t) => sum + (t.deposit_amount ?? 0) - (t.withdrawal_amount ?? 0), 0);
+}
+
+function accountProjectedBalance(account: PreviewBankAccount): number {
+  return account.current_balance + accountNet(account);
+}
 
 function previewRowClass(transaction: ImportTransaction) {
   return {
