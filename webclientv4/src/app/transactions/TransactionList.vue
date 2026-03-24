@@ -109,13 +109,24 @@
             </td>
             <td class="col-action">
               <Button
-                v-if="store.isEditMode"
+                v-if="store.isEditMode && !transaction.deleted"
                 icon="pi pi-trash"
                 severity="danger"
                 text
                 size="small"
+                title="Delete this transaction"
                 :data-testid="`delete-btn-${index}`"
                 @click="store.deleteTransaction(transaction)"
+              />
+              <Button
+                v-if="store.isEditMode && transaction.deleted"
+                icon="pi pi-undo"
+                severity="secondary"
+                text
+                size="small"
+                title="Restore this deleted transaction"
+                :data-testid="`undo-delete-btn-${index}`"
+                @click="store.undoDeleteTransaction(transaction)"
               />
             </td>
           </tr>

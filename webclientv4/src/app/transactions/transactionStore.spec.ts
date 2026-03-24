@@ -666,6 +666,18 @@ describe('transactionStore', () => {
     });
   });
 
+  describe('undoDeleteTransaction', () => {
+    it('sets deleted to false on the transaction', () => {
+      const store = useTransactionStore();
+      const transaction = { id: 1, description: 'Groceries', withdrawal_amount: 100, deposit_amount: 0, status: 'paid', deleted: true };
+      store.draftTransactions = [transaction];
+
+      store.undoDeleteTransaction(store.draftTransactions[0]);
+
+      expect(store.draftTransactions[0].deleted).toBe(false);
+    });
+  });
+
   describe('onAllocationChange', () => {
     it('sets allocation_id on the transaction', () => {
       const store = useTransactionStore();
