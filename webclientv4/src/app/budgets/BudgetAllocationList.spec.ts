@@ -4,7 +4,7 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetAllocationList from './BudgetAllocationList.vue';
-import AllocationTransactionsDialog from './AllocationTransactionsDialog.vue';
+import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { BudgetDetailData } from './budget.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 import type { AllocationData } from '../transactions/transaction.types';

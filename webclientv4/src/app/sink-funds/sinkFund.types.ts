@@ -36,3 +36,9 @@ export interface SinkFundTransferData {
   new_allocation_id: number;
   amount: number;
 }
+
+export interface SinkFundTransferFormData {
+  existing_allocation_id: number | null;
+  new_allocation_id: number | null;
+  amount: number;
+}

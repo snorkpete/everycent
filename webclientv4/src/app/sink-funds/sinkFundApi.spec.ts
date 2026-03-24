@@ -18,16 +18,16 @@ describe('sinkFundApi', () => {
 
   describe('getAll', () => {
     it('gets /sink_funds', async () => {
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: { bank_accounts: [] } });
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
 
       await sinkFundApi.getAll();
 
       expect(apiGateway.get).toHaveBeenCalledWith('/sink_funds');
     });
 
-    it('returns the bank_accounts array from the response', async () => {
+    it('returns the array from the response', async () => {
       const sinkFunds: SinkFundData[] = [{ id: 1, name: 'Emergency Fund' }];
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: { bank_accounts: sinkFunds } });
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: sinkFunds });
 
       const result = await sinkFundApi.getAll();
 
@@ -37,16 +37,16 @@ describe('sinkFundApi', () => {
 
   describe('get', () => {
     it('gets /sink_funds/:id', async () => {
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: { bank_account: { id: 5 } } });
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: { id: 5 } });
 
       await sinkFundApi.get(5);
 
       expect(apiGateway.get).toHaveBeenCalledWith('/sink_funds/5');
     });
 
-    it('returns the bank_account from the response', async () => {
+    it('returns the sink fund from the response', async () => {
       const sinkFund: SinkFundData = { id: 5, name: 'Holiday Fund', sink_fund_allocations: [] };
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: { bank_account: sinkFund } });
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: sinkFund });
 
       const result = await sinkFundApi.get(5);
 
@@ -62,7 +62,7 @@ describe('sinkFundApi', () => {
     };
 
     it('puts to /sink_funds/:id with nested sink_fund payload', async () => {
-      vi.mocked(apiGateway.put).mockResolvedValue({ data: { bank_account: sinkFund } });
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: sinkFund });
 
       await sinkFundApi.save(sinkFund);
 
@@ -74,9 +74,9 @@ describe('sinkFundApi', () => {
       });
     });
 
-    it('returns the bank_account from the response', async () => {
+    it('returns the saved sink fund from the response', async () => {
       const saved: SinkFundData = { ...sinkFund, current_balance: 100000 };
-      vi.mocked(apiGateway.put).mockResolvedValue({ data: { bank_account: saved } });
+      vi.mocked(apiGateway.put).mockResolvedValue({ data: saved });
 
       const result = await sinkFundApi.save(sinkFund);
 
@@ -92,7 +92,7 @@ describe('sinkFundApi', () => {
     };
 
     it('posts to /sink_funds/:id/transfer_allocation with transfer data', async () => {
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: { bank_account: { id: 3 } } });
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: { id: 3 } });
 
       await sinkFundApi.transfer(3, transferData);
 
@@ -102,9 +102,9 @@ describe('sinkFundApi', () => {
       );
     });
 
-    it('returns the bank_account from the response', async () => {
+    it('returns the updated sink fund from the response', async () => {
       const updatedFund: SinkFundData = { id: 3, name: 'Rainy Day Fund' };
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: { bank_account: updatedFund } });
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: updatedFund });
 
       const result = await sinkFundApi.transfer(3, transferData);
 

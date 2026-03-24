@@ -4,6 +4,8 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SinkFundsPage from './SinkFundsPage.vue';
+import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
+import SinkFundTransferDialog from './SinkFundTransferDialog.vue';
 import type { SinkFundData } from './sinkFund.types';
 
 // Selectors
@@ -16,6 +18,7 @@ const TRANSFER_BTN = '[data-testid="transfer-btn"]';
 const SHOW_CLOSED_TOGGLE = '[data-testid="show-closed-toggle"]';
 const LOADING_PLACEHOLDER = '[data-testid="loading-placeholder"]';
 const EMPTY_PLACEHOLDER = '[data-testid="empty-placeholder"]';
+const ALLOCATIONS_TABLE = '[data-testid="allocations-table"]';
 
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
@@ -59,6 +62,11 @@ const mockStore = reactive({
   error: null as string | null,
   isEditMode: false,
   showDeactivated: false,
+  visibleAllocations: [] as SinkFundData['sink_fund_allocations'],
+  totalAssignedBalance: 0,
+  unassignedBalance: 0,
+  totalTarget: 0,
+  totalOutstanding: 0,
   fetchList: vi.fn().mockResolvedValue(undefined),
   fetchDetail: vi.fn().mockResolvedValue(undefined),
   save: vi.fn().mockResolvedValue(undefined),
@@ -89,6 +97,11 @@ describe('SinkFundsPage', () => {
     mockStore.error = null;
     mockStore.isEditMode = false;
     mockStore.showDeactivated = false;
+    mockStore.visibleAllocations = [];
+    mockStore.totalAssignedBalance = 0;
+    mockStore.unassignedBalance = 0;
+    mockStore.totalTarget = 0;
+    mockStore.totalOutstanding = 0;
     mockStore.fetchList.mockResolvedValue(undefined);
     mockStore.fetchDetail.mockResolvedValue(undefined);
     mockStore.save.mockResolvedValue(undefined);
@@ -176,6 +189,17 @@ describe('SinkFundsPage', () => {
       expect(wrapper.find(ADD_OBLIGATION_BTN).exists()).toBe(true);
       expect(wrapper.find(EDIT_BTN).exists()).toBe(false);
       expect(wrapper.find(TRANSFER_BTN).exists()).toBe(false);
+    });
+
+    it('opens transfer dialog when Transfer Money is clicked', async () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.findComponent(SinkFundTransferDialog).props('visible')).toBe(false);
+
+      await wrapper.find(TRANSFER_BTN).trigger('click');
+      await nextTick();
+
+      expect(wrapper.findComponent(SinkFundTransferDialog).props('visible')).toBe(true);
     });
 
     it('calls store.enterEditMode when Edit is clicked', async () => {
@@ -293,15 +317,23 @@ describe('SinkFundsPage', () => {
       expect(wrapper.find(LOADING_PLACEHOLDER).exists()).toBe(false);
     });
 
-    it('shows content placeholders when a sink fund is selected', async () => {
+    it('renders SinkFundAllocationTable when a sink fund is selected', async () => {
       mockStore.loading = false;
       mockStore.sinkFund = sinkFundA;
       const wrapper = mountPage();
       await nextTick();
 
-      expect(wrapper.find('[data-testid="allocations-placeholder"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="summary-placeholder"]').exists()).toBe(true);
+      expect(wrapper.findComponent(SinkFundAllocationTable).exists()).toBe(true);
+      expect(wrapper.find(ALLOCATIONS_TABLE).exists()).toBe(true);
       expect(wrapper.find(EMPTY_PLACEHOLDER).exists()).toBe(false);
+    });
+
+    it('does not render SinkFundAllocationTable when no sink fund is selected', () => {
+      mockStore.loading = false;
+      mockStore.sinkFund = null;
+      const wrapper = mountPage();
+
+      expect(wrapper.findComponent(SinkFundAllocationTable).exists()).toBe(false);
     });
   });
 });

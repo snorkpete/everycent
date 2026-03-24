@@ -4,14 +4,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import AllocationTransactionsDialog from './AllocationTransactionsDialog.vue';
-import { budgetApi } from './budgetApi';
 import type { TransactionData } from '../transactions/transaction.types';
-
-vi.mock('./budgetApi', () => ({
-  budgetApi: {
-    getTransactionsForAllocation: vi.fn(),
-  },
-}));
 
 // Selectors
 const LOADING_STATE = '[data-testid="loading-state"]';
@@ -56,16 +49,20 @@ const sampleTransactions: TransactionData[] = [
   },
 ];
 
+let mockFetchTransactions: ReturnType<typeof vi.fn>;
+
 function createWrapper(props: Partial<{
   visible: boolean;
   allocationId: number;
   allocationName: string;
-}> = {}): VueWrapper {
+  fetchTransactions: (id: number) => Promise<TransactionData[]>;
+}> = {}): VueWrapper<InstanceType<typeof AllocationTransactionsDialog>> {
   return mount(AllocationTransactionsDialog, {
     props: {
       visible: true,
       allocationId: 42,
       allocationName: 'Groceries',
+      fetchTransactions: mockFetchTransactions,
       ...props,
     },
     global: {
@@ -79,23 +76,22 @@ describe('AllocationTransactionsDialog', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
+    mockFetchTransactions = vi.fn().mockResolvedValue([]);
   });
 
   describe('dialog header', () => {
     it('passes the allocation name in the dialog header', () => {
-      const allocationName = 'Groceries';
-      const wrapper = createWrapper({ allocationName, visible: false });
+      const wrapper = createWrapper({ allocationName: 'Groceries', visible: false });
 
       const dialog = wrapper.findComponent(DialogStub);
-      expect(dialog.props('header')).toBe(`Transactions for ${allocationName}`);
+      expect(dialog.props('header')).toBe('Transactions for Groceries');
     });
 
     it('uses different allocation name in header', () => {
-      const allocationName = 'Rent';
-      const wrapper = createWrapper({ allocationName, visible: false });
+      const wrapper = createWrapper({ allocationName: 'Rent', visible: false });
 
       const dialog = wrapper.findComponent(DialogStub);
-      expect(dialog.props('header')).toBe(`Transactions for ${allocationName}`);
+      expect(dialog.props('header')).toBe('Transactions for Rent');
     });
   });
 
@@ -121,7 +117,7 @@ describe('AllocationTransactionsDialog', () => {
       const pendingPromise = new Promise<TransactionData[]>((resolve) => {
         resolvePromise = resolve;
       });
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockReturnValue(pendingPromise);
+      mockFetchTransactions.mockReturnValue(pendingPromise);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -133,7 +129,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('hides loading message after fetch completes', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -145,7 +141,7 @@ describe('AllocationTransactionsDialog', () => {
 
   describe('empty state', () => {
     it('shows empty message when no transactions exist', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue([]);
+      mockFetchTransactions.mockResolvedValue([]);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -156,7 +152,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('does not show table when empty', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue([]);
+      mockFetchTransactions.mockResolvedValue([]);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -168,7 +164,7 @@ describe('AllocationTransactionsDialog', () => {
 
   describe('transaction list', () => {
     it('renders a row for each transaction', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -179,7 +175,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('displays transaction date', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -190,7 +186,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('displays transaction description', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -201,7 +197,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('displays net_amount formatted as dollars', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -212,7 +208,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('shows three columns: Date, Description, Amount', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -228,20 +224,18 @@ describe('AllocationTransactionsDialog', () => {
 
   describe('total row', () => {
     it('shows the sum of all net_amounts', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
       await flushPromises();
 
-      // Total: -5000 + -1500 + -3000 = -9500 cents = -95.00
-      const expectedTotal = '-95.00';
       const totalRow = wrapper.find(TOTAL_ROW);
-      expect(totalRow.text()).toContain(expectedTotal);
+      expect(totalRow.text()).toContain('-95.00');
     });
 
     it('shows "Total" label', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(sampleTransactions);
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -252,7 +246,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('does not show total row when no transactions', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue([]);
+      mockFetchTransactions.mockResolvedValue([]);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -262,28 +256,23 @@ describe('AllocationTransactionsDialog', () => {
     });
   });
 
-  describe('API interaction', () => {
-    it('fetches transactions when dialog becomes visible', async () => {
-      const allocationId = 42;
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue([]);
-
-      const wrapper = createWrapper({ visible: false, allocationId });
+  describe('fetch interaction', () => {
+    it('calls fetchTransactions when dialog becomes visible', async () => {
+      const wrapper = createWrapper({ visible: false, allocationId: 42 });
       await wrapper.setProps({ visible: true });
       await flushPromises();
 
-      expect(budgetApi.getTransactionsForAllocation).toHaveBeenCalledWith(allocationId);
+      expect(mockFetchTransactions).toHaveBeenCalledWith(42);
     });
 
     it('does not fetch when dialog is hidden', () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue([]);
-
       createWrapper({ visible: false });
 
-      expect(budgetApi.getTransactionsForAllocation).not.toHaveBeenCalled();
+      expect(mockFetchTransactions).not.toHaveBeenCalled();
     });
 
     it('clears previous transactions before fetching new ones', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation)
+      mockFetchTransactions
         .mockResolvedValueOnce(sampleTransactions)
         .mockResolvedValueOnce([]);
 
@@ -303,8 +292,6 @@ describe('AllocationTransactionsDialog', () => {
 
   describe('visibility', () => {
     it('emits update:visible when dialog emits update:visible', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue([]);
-
       const wrapper = createWrapper({ visible: true });
 
       const dialog = wrapper.findComponent(DialogStub);
@@ -319,7 +306,7 @@ describe('AllocationTransactionsDialog', () => {
       const transactionsWithUndefined: TransactionData[] = [
         { id: 1, transaction_date: '2026-03-01', description: 'Test' },
       ];
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockResolvedValue(transactionsWithUndefined);
+      mockFetchTransactions.mockResolvedValue(transactionsWithUndefined);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -329,8 +316,8 @@ describe('AllocationTransactionsDialog', () => {
       expect(row.text()).toContain('0.00');
     });
 
-    it('handles API error gracefully and shows error state', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation).mockRejectedValue(new Error('Network error'));
+    it('handles fetch error gracefully and shows error state', async () => {
+      mockFetchTransactions.mockRejectedValue(new Error('Network error'));
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });
@@ -343,7 +330,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('clears error state when dialog is reopened', async () => {
-      vi.mocked(budgetApi.getTransactionsForAllocation)
+      mockFetchTransactions
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce(sampleTransactions);
 

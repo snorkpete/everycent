@@ -9,6 +9,7 @@
             <th class="remaining-col">Remaining</th>
             <th class="class-col">Class</th>
             <th class="fixed-col">Fixed?</th>
+            <th class="comment-col">Comment</th>
             <th v-if="store.isEditMode" class="action-col"></th>
           </tr>
         </thead>
@@ -26,6 +27,7 @@
               >
                 {{ centsToDollars(categoryRemaining(category)) }}
               </td>
+              <td></td>
               <td></td>
               <td></td>
               <td v-if="store.isEditMode"></td>
@@ -111,7 +113,19 @@
                   type="checkbox"
                   data-testid="allocation-fixed-checkbox"
                 />
-                <span v-else>{{ allocation.is_fixed_amount ? 'Yes' : '' }}</span>
+                <span v-else>{{ allocation.is_fixed_amount ? 'Yes' : 'No' }}</span>
+              </td>
+
+              <!-- Comment -->
+              <td>
+                <input
+                  v-if="store.isEditMode"
+                  v-model="allocation.comment"
+                  type="text"
+                  class="p-inputtext cell-input"
+                  data-testid="allocation-comment-input"
+                />
+                <span v-else>{{ allocation.comment }}</span>
               </td>
 
               <!-- Delete action -->
@@ -152,14 +166,19 @@
             </th>
             <th></th>
             <th></th>
+            <th></th>
             <th v-if="store.isEditMode"></th>
           </tr>
         </tfoot>
       </table>
+    <div class="unallocated-badge" data-testid="unallocated-badge">
+      Unallocated: {{ centsToDollars(unallocated) }}
+    </div>
     <AllocationTransactionsDialog
       :visible="dialogVisible"
       :allocation-id="selectedAllocationId"
       :allocation-name="selectedAllocationName"
+      :fetch-transactions="budgetApi.getTransactionsForAllocation"
       @update:visible="dialogVisible = $event"
     />
   </div>
@@ -170,7 +189,8 @@ import { computed, ref } from 'vue';
 import { useBudgetStore } from './budgetStore';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
-import AllocationTransactionsDialog from './AllocationTransactionsDialog.vue';
+import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
+import { budgetApi } from './budgetApi';
 import type { AllocationData } from '../transactions/transaction.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 

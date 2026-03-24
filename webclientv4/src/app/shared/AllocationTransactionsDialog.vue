@@ -53,14 +53,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
-import { budgetApi } from './budgetApi';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
+import { centsToDollars } from './util/cents-to-dollars';
 import type { TransactionData } from '../transactions/transaction.types';
 
 const props = defineProps<{
   visible: boolean;
   allocationId: number;
   allocationName: string;
+  fetchTransactions: (id: number) => Promise<TransactionData[]>;
 }>();
 
 defineEmits<{
@@ -85,7 +85,7 @@ watch(
       transactions.value = [];
       error.value = false;
       try {
-        transactions.value = await budgetApi.getTransactionsForAllocation(props.allocationId);
+        transactions.value = await props.fetchTransactions(props.allocationId);
       } catch {
         error.value = true;
       } finally {
@@ -97,8 +97,14 @@ watch(
 </script>
 
 <style scoped>
+.transactions-content {
+  max-height: 60vh;
+  overflow: auto;
+}
+
 .transactions-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.875rem;
 }
@@ -107,26 +113,38 @@ watch(
 .transactions-table td {
   padding: 0.4rem 0.75rem;
   border-bottom: 1px solid var(--p-surface-200);
+}
+
+.date-col {
+  width: 25%;
   white-space: nowrap;
+}
+
+.amount-col {
+  width: 25%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.description-col {
+  width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .transactions-table thead th {
   font-weight: 600;
   background-color: var(--p-surface-50);
   text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-.date-col {
-  width: 25%;
-}
-
-.description-col {
-  width: 50%;
-}
-
-.amount-col {
-  width: 25%;
-  text-align: right;
+.transactions-table tfoot td {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--p-surface-0);
 }
 
 .amount-cell {

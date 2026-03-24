@@ -7,7 +7,7 @@ export default defineConfig({
   base: '/v4/',
   plugins: [vue()],
   server: {
-    port: 4200,
+    port: 4201,
     host: '127.0.0.1',
   },
   build: {
