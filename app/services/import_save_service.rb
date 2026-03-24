@@ -30,15 +30,29 @@ class ImportSaveService
 
     transactions_params = (ba_params[:transactions] || []).map(&:to_h)
     existing_refs = load_existing_refs(bank_account)
+    skipped = []
 
     transactions_params.each do |txn_params|
-      next if duplicate?(txn_params, existing_refs)
-      next unless in_budget_period?(txn_params)
+      if ActiveModel::Type::Boolean.new.cast(txn_params[:deleted])
+        skipped << { bank_ref: txn_params[:bank_ref], reason: "user_excluded" }
+        next
+      end
+
+      if duplicate?(txn_params, existing_refs)
+        skipped << { bank_ref: txn_params[:bank_ref], reason: "duplicate" }
+        next
+      end
+
+      period_status = budget_period_status(txn_params)
+      unless period_status == :in_period
+        skipped << { bank_ref: txn_params[:bank_ref], reason: period_status.to_s }
+        next
+      end
 
       create_transaction!(bank_account, txn_params)
     end
 
-    build_response(bank_account)
+    build_response(bank_account).merge(skipped: skipped)
   end
 
   def validate_iban!(bank_account, iban)
@@ -65,23 +79,24 @@ class ImportSaveService
     txn_params[:bank_ref].present? && existing_refs.include?(txn_params[:bank_ref])
   end
 
-  def in_budget_period?(txn_params)
+  def budget_period_status(txn_params)
     date = begin
       Date.parse(txn_params[:transaction_date].to_s)
     rescue ArgumentError, TypeError
-      return false
+      return :invalid_date
     end
 
     budget_range = @budget.start_date..@budget.end_date
-    budget_range.cover?(date)
+    budget_range.cover?(date) ? :in_period : :out_of_period
   end
 
   def create_transaction!(bank_account, txn_params)
     permitted = txn_params.slice(*PERMITTED_FIELDS)
+    camt_imported = txn_params.key?(:camt_imported) ? ActiveModel::Type::Boolean.new.cast(txn_params[:camt_imported]) : true
     Transaction.create!(
       permitted.merge(
         bank_account_id: bank_account.id,
-        camt_imported: true
+        camt_imported: camt_imported
       )
     )
   end

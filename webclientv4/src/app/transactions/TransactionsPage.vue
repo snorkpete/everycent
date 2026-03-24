@@ -99,7 +99,7 @@
     <!-- Zones 2 + 3: Summary Bar + Table (unified card) -->
     <div class="content-card">
       <TransactionSummary
-        :transactions="store.transactions"
+        :transactions="store.isEditMode ? store.draftTransactions : store.transactions"
         :bank-account="store.selectedBankAccount ?? undefined"
         :allocations="store.allocations"
       />

@@ -46,16 +46,40 @@ RSpec.describe ImportSaveService do
         }.to change(Transaction, :count).by(2)
       end
 
-      it 'sets camt_imported to true on created transactions' do
+      it 'sets camt_imported to true when provided in params' do
         params = [{
           bank_account_id: bank_account.id,
           iban: "NL00ABNA0000000001",
-          transactions: [txn_params(bank_ref: "CAMT-001")]
+          transactions: [txn_params(bank_ref: "CAMT-001", camt_imported: true)]
         }]
 
         build_service(params).call
         txn = Transaction.find_by(bank_ref: "CAMT-001")
         expect(txn.camt_imported).to be true
+      end
+
+      it 'defaults camt_imported to true when not provided in params' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "DEFAULT-001")]
+        }]
+
+        build_service(params).call
+        txn = Transaction.find_by(bank_ref: "DEFAULT-001")
+        expect(txn.camt_imported).to be true
+      end
+
+      it 'respects camt_imported: false when explicitly provided' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "MANUAL-001", camt_imported: false)]
+        }]
+
+        build_service(params).call
+        txn = Transaction.find_by(bank_ref: "MANUAL-001")
+        expect(txn.camt_imported).to be false
       end
 
       it 'preserves the bank_ref from input (does not overwrite with before_create callback)' do
@@ -298,12 +322,10 @@ RSpec.describe ImportSaveService do
           {
             bank_account_id: bank_account.id,
             iban: "NL00ABNA0000000001",
-            transactions: [txn_params(bank_ref: "GOOD-ONE")]
-          },
-          {
-            bank_account_id: bank_account.id,
-            iban: "NL00ABNA0000000001",
-            transactions: [txn_params(bank_ref: "BAD-DATE", transaction_date: "2026-01-01")]
+            transactions: [
+              txn_params(bank_ref: "GOOD-ONE"),
+              txn_params(bank_ref: "BAD-DATE", transaction_date: "2026-01-01")
+            ]
           }
         ]
 
@@ -363,6 +385,129 @@ RSpec.describe ImportSaveService do
         expect {
           build_service(params).call
         }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context 'skip reporting' do
+      it 'reports skipped out-of-period transactions' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "OOP-001", transaction_date: "2026-01-15")]
+        }]
+
+        result = build_service(params).call
+        skipped = result[:bank_accounts].first[:skipped]
+        expect(skipped.length).to eq(1)
+        expect(skipped.first[:bank_ref]).to eq("OOP-001")
+        expect(skipped.first[:reason]).to eq("out_of_period")
+      end
+
+      it 'reports skipped duplicate transactions' do
+        create(:transaction,
+          household: household,
+          bank_account: bank_account,
+          bank_ref: "DUP-REPORT",
+          transaction_date: Date.new(2026, 3, 10),
+          withdrawal_amount: 200,
+          deposit_amount: 0
+        )
+
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "DUP-REPORT")]
+        }]
+
+        result = build_service(params).call
+        skipped = result[:bank_accounts].first[:skipped]
+        expect(skipped.length).to eq(1)
+        expect(skipped.first[:bank_ref]).to eq("DUP-REPORT")
+        expect(skipped.first[:reason]).to eq("duplicate")
+      end
+
+      it 'reports skipped transactions with invalid dates' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "BAD-DATE", transaction_date: "not-a-date")]
+        }]
+
+        result = build_service(params).call
+        skipped = result[:bank_accounts].first[:skipped]
+        expect(skipped.length).to eq(1)
+        expect(skipped.first[:bank_ref]).to eq("BAD-DATE")
+        expect(skipped.first[:reason]).to eq("invalid_date")
+      end
+
+      it 'returns empty skipped array when all transactions are saved' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "ALL-GOOD")]
+        }]
+
+        result = build_service(params).call
+        expect(result[:bank_accounts].first[:skipped]).to eq([])
+      end
+
+      it 'reports skipped user-excluded transactions' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [
+            txn_params(bank_ref: "EXCLUDED-001", deleted: true),
+            txn_params(bank_ref: "KEPT-001", deleted: false)
+          ]
+        }]
+
+        result = build_service(params).call
+        ba_result = result[:bank_accounts].first
+        expect(ba_result[:skipped]).to include(
+          hash_including(bank_ref: "EXCLUDED-001", reason: "user_excluded")
+        )
+        expect(Transaction.find_by(bank_ref: "EXCLUDED-001")).to be_nil
+        expect(Transaction.find_by(bank_ref: "KEPT-001")).to be_present
+      end
+
+      it 'does not create transactions marked as deleted' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "DEL-001", deleted: true)]
+        }]
+
+        expect {
+          build_service(params).call
+        }.not_to change(Transaction, :count)
+      end
+
+      it 'reports multiple skipped transactions with different reasons' do
+        create(:transaction,
+          household: household,
+          bank_account: bank_account,
+          bank_ref: "EXISTING-ONE",
+          transaction_date: Date.new(2026, 3, 10),
+          withdrawal_amount: 100,
+          deposit_amount: 0
+        )
+
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [
+            txn_params(bank_ref: "EXISTING-ONE"),
+            txn_params(bank_ref: "OLD-DATE", transaction_date: "2025-12-01"),
+            txn_params(bank_ref: "DELETED-ONE", deleted: true),
+            txn_params(bank_ref: "GOOD-ONE")
+          ]
+        }]
+
+        result = build_service(params).call
+        ba_result = result[:bank_accounts].first
+        expect(ba_result[:skipped].length).to eq(3)
+        expect(ba_result[:skipped].map { |s| s[:reason] }).to contain_exactly("duplicate", "out_of_period", "user_excluded")
+        expect(ba_result[:transactions].any? { |t| t[:bank_ref] == "GOOD-ONE" }).to be true
       end
     end
 

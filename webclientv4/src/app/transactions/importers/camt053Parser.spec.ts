@@ -25,12 +25,13 @@ function beaEntry(opts: {
   valueDate?: string;
   addtlNtryInf?: string;
 }): string {
+  const date = opts.bookingDate ?? '2026-02-23';
   return `
 <Ntry>
   <Amt Ccy="EUR">${opts.amount ?? '000000000000004.87'}</Amt>
   <CdtDbtInd>${opts.cdtDbt ?? 'DBIT'}</CdtDbtInd>
-  <BookgDt><Dt>2026-02-23</Dt></BookgDt>
-  <ValDt><Dt>${opts.valueDate ?? '2026-02-23'}</Dt></ValDt>
+  <BookgDt><Dt>${date}</Dt></BookgDt>
+  <ValDt><Dt>${opts.valueDate ?? date}</Dt></ValDt>
   <AcctSvcrRef>${opts.ref ?? 'REF001'}</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N426</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>${opts.addtlNtryInf ?? 'BEA, Betaalpas                  Albert Heijn 2242,PAS363        NR:BS159644, 23.02.26/12:56     ALMERE'}</AddtlNtryInf>
@@ -50,12 +51,13 @@ function sepaEntry(opts: {
     ? `<Dbtr><Nm>${opts.debtorName}</Nm></Dbtr>`
     : `<Cdtr><Nm>${opts.creditorName ?? 'Simpel'}</Nm></Cdtr>`;
 
+  const date = opts.bookingDate ?? '2026-02-20';
   return `
 <Ntry>
   <Amt Ccy="EUR">${opts.amount ?? '000000000000012.50'}</Amt>
   <CdtDbtInd>${opts.cdtDbt ?? 'DBIT'}</CdtDbtInd>
-  <BookgDt><Dt>2026-02-20</Dt></BookgDt>
-  <ValDt><Dt>${opts.valueDate ?? '2026-02-20'}</Dt></ValDt>
+  <BookgDt><Dt>${date}</Dt></BookgDt>
+  <ValDt><Dt>${opts.valueDate ?? date}</Dt></ValDt>
   <AcctSvcrRef>${opts.ref ?? 'REF002'}</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N654</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>${opts.addtlNtryInf ?? '/TRTP/SEPA Incasso /NAME/Simpel'}</AddtlNtryInf>
@@ -74,12 +76,13 @@ function internationalEntry(opts: {
   valueDate?: string;
   addtlNtryInf?: string;
 }): string {
+  const date = opts.bookingDate ?? '2026-02-18';
   return `
 <Ntry>
   <Amt Ccy="EUR">${opts.amount ?? '000000000000050.00'}</Amt>
   <CdtDbtInd>${opts.cdtDbt ?? 'DBIT'}</CdtDbtInd>
-  <BookgDt><Dt>2026-02-18</Dt></BookgDt>
-  <ValDt><Dt>${opts.valueDate ?? '2026-02-18'}</Dt></ValDt>
+  <BookgDt><Dt>${date}</Dt></BookgDt>
+  <ValDt><Dt>${opts.valueDate ?? date}</Dt></ValDt>
   <AcctSvcrRef>${opts.ref ?? 'REF003'}</AcctSvcrRef>
   <BkTxCd><Prtry><Cd>N785</Cd></Prtry></BkTxCd>
   <AddtlNtryInf>${opts.addtlNtryInf ?? '  International Wire Transfer to XYZ Corp  '}</AddtlNtryInf>

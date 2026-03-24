@@ -109,13 +109,24 @@
             </td>
             <td class="col-action">
               <Button
-                v-if="store.isEditMode"
+                v-if="store.isEditMode && !transaction.deleted"
                 icon="pi pi-trash"
                 severity="danger"
                 text
                 size="small"
+                title="Delete this transaction"
                 :data-testid="`delete-btn-${index}`"
                 @click="store.deleteTransaction(transaction)"
+              />
+              <Button
+                v-if="store.isEditMode && transaction.deleted"
+                icon="pi pi-undo"
+                severity="secondary"
+                text
+                size="small"
+                title="Restore this deleted transaction"
+                :data-testid="`undo-delete-btn-${index}`"
+                @click="store.undoDeleteTransaction(transaction)"
               />
             </td>
           </tr>
@@ -203,12 +214,12 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 
 .col-calculator { width: 2.5%; padding: 0 2px; }
 .col-date { width: 10%; }
-.col-description { width: 28%; }
+.col-description { width: 26.5%; }
 .col-allocation { width: 22%; }
 .col-money { width: 10%; }
 .col-paid { width: 4%; }
 .col-auto { width: 4%; }
-.col-action { width: 2%; }
+.col-action { width: 3.5%; }
 
 .col-description--truncate :deep(.text-display) {
   overflow: hidden;

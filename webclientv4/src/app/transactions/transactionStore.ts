@@ -131,6 +131,10 @@ export const useTransactionStore = defineStore('transactions', () => {
     transaction.deleted = true;
   }
 
+  function undoDeleteTransaction(transaction: TransactionData) {
+    transaction.deleted = false;
+  }
+
   function onAllocationChange(transaction: TransactionData, allocationId: number) {
     transaction.allocation_id = allocationId;
     transaction.status = allocationId > 0 ? 'paid' : 'unpaid';
@@ -190,6 +194,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     cancelEdit,
     addTransaction,
     deleteTransaction,
+    undoDeleteTransaction,
     onAllocationChange,
     selectedTransactions,
     selectedTotal,

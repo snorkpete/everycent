@@ -212,6 +212,44 @@ describe('TransactionList', () => {
     });
   });
 
+  describe('undo delete', () => {
+    it('hides delete button for already-deleted transactions', async () => {
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      expect(wrapper.find('[data-testid="delete-btn-0"]').exists()).toBe(false);
+    });
+
+    it('shows undo button for deleted transactions', async () => {
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      expect(wrapper.find('[data-testid="undo-delete-btn-0"]').exists()).toBe(true);
+    });
+
+    it('calls store.undoDeleteTransaction when undo button is clicked', async () => {
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+      vi.spyOn(store, 'undoDeleteTransaction');
+
+      await wrapper.find('[data-testid="undo-delete-btn-0"]').trigger('click');
+
+      expect(store.undoDeleteTransaction).toHaveBeenCalledWith(store.draftTransactions[0]);
+    });
+  });
+
   describe('deleted transaction display', () => {
     it('applies deleted class to rows where deleted is true', async () => {
       store.isEditMode = true;

@@ -39,6 +39,13 @@ vi.mock('../notifications/useNotifications', () => ({
   }),
 }));
 
+const mockGetCurrentBudgetId = vi.fn().mockResolvedValue(1);
+vi.mock('../budgets/budgetApi', () => ({
+  budgetApi: {
+    getCurrentBudgetId: () => mockGetCurrentBudgetId(),
+  },
+}));
+
 const openBudget: BudgetData = { id: 1, name: 'Mar 2026', status: 'open', start_date: '2026-03-01', end_date: '2026-03-31' };
 const closedBudget: BudgetData = { id: 2, name: 'Feb 2026', status: 'closed' };
 const checkingAccount: BankAccountData = { id: 10, name: 'Checking', account_no: 'NL01ABNA1234567890' };
@@ -93,10 +100,12 @@ const mockStore = reactive({
   phase: 'idle' as ImportPhase,
   budgetsForDropdown: [openBudget, closedBudget] as BudgetData[],
   isBudgetCurrent: true,
-  confirmableTransactions: [] as PreviewBankAccount[],
+  fileSummary: [] as { iban: string; matchedAccountName: string | null; totalTransactions: number; inPeriodCount: number; outOfPeriodCount: number }[],
   fetchMetadata: vi.fn().mockResolvedValue(undefined),
   selectBudget: vi.fn(),
   parseAndPreview: vi.fn().mockResolvedValue(undefined),
+  parseFile: vi.fn().mockResolvedValue(undefined),
+  fetchPreview: vi.fn().mockResolvedValue(undefined),
   toggleDeleteTransaction: vi.fn(),
   saveImport: vi.fn().mockResolvedValue(undefined),
   resetPreview: vi.fn(),
@@ -160,9 +169,12 @@ describe('ImportPage', () => {
     mockStore.error = null;
     mockStore.phase = 'idle';
     mockStore.isBudgetCurrent = true;
+    mockStore.fileSummary = [];
     mockStore.fetchMetadata.mockResolvedValue(undefined);
-    mockStore.parseAndPreview.mockResolvedValue(undefined);
+    mockStore.parseFile.mockResolvedValue(undefined);
+    mockStore.fetchPreview.mockResolvedValue(undefined);
     mockStore.saveImport.mockResolvedValue(undefined);
+    mockGetCurrentBudgetId.mockResolvedValue(1);
     mockRoute.query = {};
   });
 
@@ -224,15 +236,15 @@ describe('ImportPage', () => {
       expect(wrapper.find(FILE_UPLOAD).exists()).toBe(true);
     });
 
-    it('calls parseAndPreview when file is selected', async () => {
+    it('calls parseFile when file is selected', async () => {
       const wrapper = createWrapper();
       const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
 
       const fileUpload = wrapper.findComponent({ name: 'FileUpload' });
-      await fileUpload.vm.$emit('uploader', { files: [file] });
+      await fileUpload.vm.$emit('select', { files: [file] });
       await nextTick();
 
-      expect(mockStore.parseAndPreview).toHaveBeenCalledWith(file);
+      expect(mockStore.parseFile).toHaveBeenCalledWith(file);
     });
 
     it('resets preview before processing new file', async () => {
@@ -240,7 +252,7 @@ describe('ImportPage', () => {
       const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
 
       const fileUpload = wrapper.findComponent({ name: 'FileUpload' });
-      await fileUpload.vm.$emit('uploader', { files: [file] });
+      await fileUpload.vm.$emit('select', { files: [file] });
       await nextTick();
 
       expect(mockStore.resetPreview).toHaveBeenCalled();
@@ -248,7 +260,7 @@ describe('ImportPage', () => {
 
     it('shows error notification on parse failure', async () => {
       const errorMsg = 'Parse failed';
-      mockStore.parseAndPreview.mockImplementation(async () => {
+      mockStore.parseFile.mockImplementation(async () => {
         mockStore.error = errorMsg;
         throw new Error(errorMsg);
       });
@@ -257,7 +269,7 @@ describe('ImportPage', () => {
       const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
 
       const fileUpload = wrapper.findComponent({ name: 'FileUpload' });
-      await fileUpload.vm.$emit('uploader', { files: [file] });
+      await fileUpload.vm.$emit('select', { files: [file] });
       await nextTick();
 
       expect(mockNotifyError).toHaveBeenCalledWith(errorMsg);
@@ -366,6 +378,73 @@ describe('ImportPage', () => {
       expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
     });
 
+    it('shows dynamic net change from non-deleted new transactions', async () => {
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const summary = wrapper.find('[data-testid="balance-summary"]');
+      // Only REF001 is 'new' (withdrawal 5000) → net = -5000 = -$50.00
+      expect(summary.text()).toContain('Net change: -50.00');
+    });
+
+    it('shows dynamic projected balance', async () => {
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const summary = wrapper.find('[data-testid="balance-summary"]');
+      // current_balance 100000 + net -5000 = 95000 = $950.00
+      expect(summary.text()).toContain('Projected: 950.00');
+    });
+
+    it('updates net and projected when a new transaction is deleted', async () => {
+      // Deep clone so mutations don't affect other tests
+      const accounts: PreviewBankAccount[] = [
+        {
+          bank_account_id: 10,
+          current_balance: 100000,
+          net: -5000,
+          projected_balance: 95000,
+          transactions: [
+            {
+              bank_ref: 'REF001',
+              transaction_date: '2026-03-15',
+              withdrawal_amount: 5000,
+              deposit_amount: 0,
+              description: 'Test payment',
+              status: 'paid',
+              import_status: 'new',
+            },
+            {
+              bank_ref: 'REF002',
+              transaction_date: '2026-03-10',
+              withdrawal_amount: 3000,
+              deposit_amount: 0,
+              description: 'Duplicate payment',
+              status: 'paid',
+              import_status: 'duplicate',
+            },
+          ],
+        },
+      ];
+      mockStore.previewAccounts = accounts;
+      const wrapper = createWrapper();
+      await nextTick();
+
+      // Before delete: net = -5000 (-$50.00), projected = 95000 ($950.00)
+      let summary = wrapper.find('[data-testid="balance-summary"]');
+      expect(summary.text()).toContain('Net change: -50.00');
+      expect(summary.text()).toContain('Projected: 950.00');
+
+      // Mark the new transaction as deleted (mutate through the reactive proxy)
+      mockStore.previewAccounts[0].transactions[0].deleted = true;
+      await nextTick();
+
+      // After delete: net = 0 ($0.00), projected = 100000 ($1,000.00)
+      summary = wrapper.find('[data-testid="balance-summary"]');
+      expect(summary.text()).toContain('Net change: 0.00');
+      expect(summary.text()).toContain('Projected: 1,000.00');
+    });
+
     it('hides preview when phase is idle', async () => {
       mockStore.phase = 'idle';
       const wrapper = createWrapper();
@@ -393,9 +472,12 @@ describe('ImportPage', () => {
   });
 
   describe('save flow', () => {
+    const matchedFileSummary = [{ iban: 'NL01ABNA1234567890', matchedAccountName: 'Checking', totalTransactions: 3, inPeriodCount: 2, outOfPeriodCount: 1 }];
+
     it('calls saveImport when save button clicked', async () => {
       mockStore.phase = 'preview';
       mockStore.previewAccounts = samplePreviewAccounts;
+      mockStore.fileSummary = matchedFileSummary;
       const wrapper = createWrapper();
       await nextTick();
 
@@ -408,6 +490,7 @@ describe('ImportPage', () => {
     it('shows success notification on save', async () => {
       mockStore.phase = 'preview';
       mockStore.previewAccounts = samplePreviewAccounts;
+      mockStore.fileSummary = matchedFileSummary;
       const wrapper = createWrapper();
       await nextTick();
 
@@ -425,6 +508,7 @@ describe('ImportPage', () => {
       });
       mockStore.phase = 'preview';
       mockStore.previewAccounts = samplePreviewAccounts;
+      mockStore.fileSummary = matchedFileSummary;
       const wrapper = createWrapper();
       await nextTick();
 
@@ -440,7 +524,7 @@ describe('ImportPage', () => {
       mockStore.phase = 'saved';
       mockStore.saveResult = {
         bank_accounts: [
-          { bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, transactions: [{ id: 1 }, { id: 2 }] },
+          { bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, transactions: [{ id: 1 }, { id: 2 }], skipped: [] },
         ],
       };
     });
@@ -459,7 +543,7 @@ describe('ImportPage', () => {
       const summaries = wrapper.findAll(SAVE_SUMMARY);
       expect(summaries).toHaveLength(1);
       expect(summaries[0].text()).toContain('Checking');
-      expect(summaries[0].text()).toContain('2 transactions');
+      expect(summaries[0].text()).toContain('2 transactions saved');
     });
 
     it('shows link to transactions screen', async () => {
@@ -467,6 +551,65 @@ describe('ImportPage', () => {
       await nextTick();
 
       expect(wrapper.find(VIEW_TRANSACTIONS_BTN).exists()).toBe(true);
+    });
+
+    it('shows skipped transaction count when transactions were skipped', async () => {
+      mockStore.saveResult = {
+        bank_accounts: [
+          {
+            bank_account_id: 10,
+            current_balance: 95000,
+            net: 0,
+            projected_balance: 95000,
+            transactions: [{ id: 1 }],
+            skipped: [
+              { bank_ref: 'DUP-001', reason: 'duplicate' },
+              { bank_ref: 'OOP-001', reason: 'out_of_period' },
+            ],
+          },
+        ],
+      };
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const summary = wrapper.find(SAVE_SUMMARY);
+      expect(summary.text()).toContain('1 transaction saved');
+      expect(summary.text()).toContain('2 skipped');
+    });
+
+    it('does not show skipped info when nothing was skipped', async () => {
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const summary = wrapper.find(SAVE_SUMMARY);
+      expect(summary.text()).not.toContain('skipped');
+    });
+
+    it('shows breakdown of skip reasons', async () => {
+      mockStore.saveResult = {
+        bank_accounts: [
+          {
+            bank_account_id: 10,
+            current_balance: 95000,
+            net: 0,
+            projected_balance: 95000,
+            transactions: [{ id: 1 }],
+            skipped: [
+              { bank_ref: 'DUP-001', reason: 'duplicate' },
+              { bank_ref: 'DUP-002', reason: 'duplicate' },
+              { bank_ref: 'OOP-001', reason: 'out_of_period' },
+              { bank_ref: 'EXC-001', reason: 'user_excluded' },
+            ],
+          },
+        ],
+      };
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const summary = wrapper.find(SAVE_SUMMARY);
+      expect(summary.text()).toContain('2 duplicate');
+      expect(summary.text()).toContain('1 out of period');
+      expect(summary.text()).toContain('1 manually excluded');
     });
   });
 });
