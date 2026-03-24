@@ -181,7 +181,8 @@ const yesNoList: ListItem[] = [
 const importFormats: ListItem[] = [
   { id: 'abn-amro-bank', name: 'ABN Amro Bank Account' },
   { id: 'abn-amro-bank-old', name: 'ABN Amro Bank Account (old format)' },
-  { id: 'abn-amro-creditcard', name: 'ABN Amro Credit Card' },
+  { id: 'abn-amro-creditcard', name: 'ABN Amro Credit Card (old)' },
+  { id: 'abn-amro-creditcard-2026', name: 'ABN Amro Credit Card (2026+)' },
   { id: 'new-bank-account', name: 'Scotia Bank Account' },
   { id: 'fc-bank', name: 'FCB Bank Account' },
   { id: 'fc-creditcard', name: 'FCB Credit Card (not implemented)' },

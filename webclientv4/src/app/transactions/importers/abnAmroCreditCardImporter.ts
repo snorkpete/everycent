@@ -25,9 +25,17 @@ function extractDate(line: string): Date | null {
   return new Date(parseInt(year, 10), month, parseInt(day, 10));
 }
 
+function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 function formatDate(date: Date): string {
   if (!date) return '';
-  return date.toISOString().substring(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function isAmountLine(line: string): boolean {
@@ -51,8 +59,8 @@ export function abnAmroCreditCardImporter(
   startDate: string,
   endDate: string,
 ): TransactionData[] {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const start = parseLocalDate(startDate);
+  const end = parseLocalDate(endDate);
 
   const lines = convertInputToLines(input);
   const transactions: TransactionData[] = [];
