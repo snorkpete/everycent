@@ -1,13 +1,14 @@
 <template>
   <div class="account-category-table">
-    <h3 class="section-heading">{{ heading }}</h3>
+    <h3 class="section-heading">
+      <span>{{ heading }}</span>
+      <span class="heading-total">{{ centsToDollars(totalCurrentBalance) }}</span>
+    </h3>
     <table class="account-table">
       <thead>
         <tr>
           <th class="col-name">Name</th>
           <th class="col-institution">Institution</th>
-          <th class="col-type">Account Type</th>
-          <th class="col-category">Category</th>
           <th class="col-money">
             Balance At <em>{{ closingDateLabel }}</em>
           </th>
@@ -20,22 +21,45 @@
       <tbody>
         <tr v-for="account in accounts" :key="account.id">
           <td>
-            <a :href="`/#/transactions?bank_account_id=${account.id}`">{{ account.name }}</a>
+            <span class="name-cell">
+              <router-link :to="`/transactions?bank_account_id=${account.id}`">{{
+                account.name
+              }}</router-link>
+              <i
+                v-if="account.account_type === 'sink_fund'"
+                v-tooltip.top="{ value: 'Sink fund account', showDelay: 0, hideDelay: 0 }"
+                class="pi pi-wallet sink-fund-icon"
+              />
+            </span>
           </td>
           <td>{{ account.institution?.name ?? '' }}</td>
-          <td>{{ account.account_type }}</td>
-          <td>{{ account.account_category }}</td>
-          <td class="money-cell">{{ formatMoney(account.closing_balance) }}</td>
-          <td class="money-cell">{{ formatMoney(account.expected_closing_balance) }}</td>
-          <td class="money-cell">{{ formatMoney(account.current_balance) }}</td>
+          <td class="money-cell">
+            <EcMoneyField label="" :edit-mode="false" :model-value="account.closing_balance" />
+          </td>
+          <td class="money-cell">
+            <EcMoneyField
+              label=""
+              :edit-mode="false"
+              :model-value="account.expected_closing_balance"
+            />
+          </td>
+          <td class="money-cell">
+            <EcMoneyField label="" :edit-mode="false" :model-value="account.current_balance" />
+          </td>
         </tr>
       </tbody>
       <tfoot>
         <tr class="total-row">
-          <th colspan="4" class="total-label">Total</th>
-          <th class="money-cell">{{ formatMoney(totalClosingBalance) }}</th>
-          <th class="money-cell">{{ formatMoney(totalExpectedClosingBalance) }}</th>
-          <th class="money-cell">{{ formatMoney(totalCurrentBalance) }}</th>
+          <th colspan="2" class="total-label">Total</th>
+          <th class="money-cell">
+            <EcMoneyField label="" :edit-mode="false" :model-value="totalClosingBalance" />
+          </th>
+          <th class="money-cell">
+            <EcMoneyField label="" :edit-mode="false" :model-value="totalExpectedClosingBalance" />
+          </th>
+          <th class="money-cell">
+            <EcMoneyField label="" :edit-mode="false" :model-value="totalCurrentBalance" />
+          </th>
         </tr>
       </tfoot>
     </table>
@@ -46,6 +70,7 @@
 import { computed } from 'vue';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { formatDate } from '../shared/util/format-date';
+import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import type { AccountBalanceData } from './accountBalance.types';
 
 const props = defineProps<{
@@ -74,22 +99,28 @@ const totalExpectedClosingBalance = computed(() =>
 const totalCurrentBalance = computed(() =>
   props.accounts.reduce((sum, a) => sum + a.current_balance, 0),
 );
-
-function formatMoney(cents: number): string {
-  return centsToDollars(cents);
-}
 </script>
 
 <style scoped>
 .account-category-table {
-  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
 }
 
 .section-heading {
-  font-size: 0.9375rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 0.5rem;
   color: var(--p-text-color);
+}
+
+.heading-total {
+  font-variant-numeric: tabular-nums;
+  color: var(--p-text-muted-color);
+  font-weight: 500;
+  font-size: 0.875rem;
 }
 
 .account-table {
@@ -110,14 +141,20 @@ function formatMoney(cents: number): string {
   color: var(--p-text-muted-color);
   font-size: 0.8125rem;
   white-space: nowrap;
+  background-color: var(--p-surface-50);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border-bottom: none;
+  box-shadow: 0 2px 0 var(--p-surface-300);
 }
 
-.money-cell {
+.account-table .money-cell {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-.col-money {
+.account-table .col-money {
   text-align: right;
   white-space: nowrap;
 }
@@ -126,9 +163,11 @@ function formatMoney(cents: number): string {
   font-weight: 600;
   border-top: 2px solid var(--p-surface-300);
   border-bottom: none;
+  background-color: var(--p-surface-100);
+  font-size: 0.9375rem;
 }
 
-.total-label {
+.account-table .total-label {
   text-align: right;
   color: var(--p-text-muted-color);
 }
@@ -144,5 +183,33 @@ function formatMoney(cents: number): string {
 
 .account-table a:hover {
   text-decoration: underline;
+}
+
+.name-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.sink-fund-icon {
+  font-size: 0.75rem;
+  color: var(--p-text-muted-color);
+  cursor: help;
+}
+
+/* EcMoneyField inline in table cells */
+.money-cell :deep(.ec-money-field) {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+.money-cell :deep(.ec-money-field .label) {
+  display: none;
+}
+.money-cell :deep(.money-display) {
+  font-size: 0.875rem;
+}
+
+.total-row .money-cell :deep(.money-display) {
+  font-size: 0.9375rem;
 }
 </style>

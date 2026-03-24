@@ -17,7 +17,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class="current-balance-row">
             <td class="row-label">Current Balance</td>
             <td v-for="(account, index) in accounts" :key="account.id" class="money-col">
               <EcMoneyField
@@ -153,6 +153,10 @@ defineExpose({ adjustments });
 
 .money-col {
   min-width: 8rem;
+}
+
+.current-balance-row td {
+  background-color: var(--p-surface-50);
 }
 
 .dialog-footer {
