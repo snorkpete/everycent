@@ -126,6 +126,7 @@ class Transaction < ApplicationRecord
     new_transaction.transaction_date = brought_forward_date
     new_transaction.status = 'unpaid'
     new_transaction.brought_forward_status = 'added'
+    new_transaction.bank_ref = nil
     new_transaction
   end
 

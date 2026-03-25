@@ -214,8 +214,8 @@ RSpec.describe Transaction, :type => :model do
       expect(@new_transaction.bank_account_id).to eq @original_transaction.bank_account_id
     end
 
-    it "sets the bank_ref the new transaction to the same as the original transaction" do
-      expect(@new_transaction.bank_ref).to eq @original_transaction.bank_ref
+    it "clears the bank_ref so a new one is assigned on save" do
+      expect(@new_transaction.bank_ref).to be_nil
     end
 
     it "sets the withdrawal_amount of the new transaction to the same as the original transaction" do
