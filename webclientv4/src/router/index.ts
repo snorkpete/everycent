@@ -93,7 +93,7 @@ const router = createRouter({
     {
       path: '/special-events/:id/allocations',
       name: 'special-event-allocations',
-      component: { template: '<div>Special Event Allocations (coming soon)</div>' },
+      component: () => import('../app/special-events/SpecialEventAllocationsEditor.vue'),
     },
   ],
 });
