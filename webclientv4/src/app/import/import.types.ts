@@ -1,7 +1,10 @@
 import type { TransactionData } from '../transactions/transaction.types';
+import type { MatchType } from '../budgets/autoAllocate.types';
 
 export interface ImportTransaction extends TransactionData {
   import_status?: 'new' | 'duplicate' | 'out_of_period';
+  auto_match_type?: MatchType;
+  auto_allocation_name?: string;
 }
 
 export interface PreviewBankAccount {
@@ -31,7 +34,7 @@ export interface SaveBankAccount {
   current_balance: number;
   net: number;
   projected_balance: number;
-  transactions: TransactionData[];
+  saved_count: number;
   skipped: SkippedTransaction[];
 }
 

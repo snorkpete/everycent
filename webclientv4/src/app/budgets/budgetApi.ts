@@ -1,6 +1,7 @@
 import apiGateway from '../../api/api-gateway';
 import type { BudgetData, BudgetDetailData, IncomeData } from './budget.types';
 import type { AllocationData, TransactionData } from '../transactions/transaction.types';
+import type { AutoAllocateResponse } from './autoAllocate.types';
 
 export const budgetApi = {
   getAll: () =>
@@ -46,5 +47,10 @@ export const budgetApi = {
       .get<TransactionData[]>('/transactions/by_allocation', {
         params: { allocation_id: allocationId },
       })
+      .then((r) => r.data),
+
+  autoAllocate: (budgetId: number, descriptions: string[]) =>
+    apiGateway
+      .post<AutoAllocateResponse>(`/budgets/${budgetId}/auto_allocate`, { descriptions })
       .then((r) => r.data),
 };

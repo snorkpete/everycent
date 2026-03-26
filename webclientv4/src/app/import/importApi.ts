@@ -32,6 +32,7 @@ export interface SavePayload {
       status: string;
       camt_imported: boolean;
       deleted: boolean;
+      allocation_id: number | null;
     }[];
   }[];
 }

@@ -11,7 +11,18 @@
             <th class="col-money right">Deposited</th>
             <th class="col-paid">Paid</th>
             <th class="col-auto">Auto</th>
-            <th class="col-action" />
+            <th class="col-action">
+              <Button
+                v-if="store.isEditMode"
+                :icon="allDeleted ? 'pi pi-undo' : 'pi pi-trash'"
+                :severity="allDeleted ? 'secondary' : 'danger'"
+                text
+                size="small"
+                data-testid="delete-all-btn"
+                v-tooltip.top="allDeleted ? 'Restore all transactions' : 'Delete all transactions'"
+                @click="toggleDeleteAll"
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -58,14 +69,23 @@
                 />
               </template>
               <template v-else>
-                <EcListField
-                  label=""
-                  :edit-mode="store.isEditMode"
-                  :items="allocationItems"
-                  group-by="allocation_category"
-                  :model-value="transaction.allocation_id ?? null"
-                  @update:model-value="store.onAllocationChange(transaction, $event as number)"
-                />
+                <div class="allocation-cell" :class="autoAllocationClass(transaction)">
+                  <i
+                    v-if="transaction.auto_match_type"
+                    :class="transaction.auto_match_type === 'exact' ? 'pi pi-check-circle' : 'pi pi-question-circle'"
+                    class="auto-indicator"
+                    v-tooltip.top="`Auto-matched (${transaction.auto_match_type})`"
+                  />
+                  <EcListField
+                    label=""
+                    :edit-mode="store.isEditMode"
+                    :items="allocationItems"
+                    group-by="allocation_category"
+                    filterable
+                    :model-value="transaction.allocation_id ?? null"
+                    @update:model-value="store.onAllocationChange(transaction, $event as number)"
+                  />
+                </div>
               </template>
             </td>
             <td class="col-money right">
@@ -157,6 +177,7 @@ import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import EcListField from '../shared/form/list-field/EcListField.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
+import type { TransactionData } from './transaction.types';
 import { useTransactionStore } from './transactionStore';
 
 const props = defineProps<{
@@ -181,6 +202,23 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
     .filter((a) => a.id != null && a.name != null)
     .map((a) => ({ ...a, id: a.id!, name: a.name! })),
 );
+
+const allDeleted = computed(() =>
+  store.draftTransactions.length > 0 && store.draftTransactions.every((t) => t.deleted),
+);
+
+function toggleDeleteAll() {
+  const newState = !allDeleted.value;
+  store.draftTransactions.forEach((t) => { t.deleted = newState; });
+}
+
+function autoAllocationClass(transaction: TransactionData) {
+  if (!transaction.auto_match_type) return {};
+  return {
+    'allocation-cell--exact': transaction.auto_match_type === 'exact',
+    'allocation-cell--contains': transaction.auto_match_type === 'contains',
+  };
+}
 </script>
 
 <style scoped>
@@ -215,11 +253,20 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 .col-calculator { width: 2.5%; padding: 0 2px; }
 .col-date { width: 10%; }
 .col-description { width: 26.5%; }
-.col-allocation { width: 22%; }
+.col-allocation { width: 22%; overflow: hidden; }
 .col-money { width: 10%; }
-.col-paid { width: 4%; }
-.col-auto { width: 4%; }
+.col-paid { width: 4%; text-align: center; }
+.col-auto { width: 4%; text-align: center; }
 .col-action { width: 3.5%; }
+
+.col-allocation :deep(.ec-list-field) {
+  width: 100%;
+}
+
+.col-allocation :deep(.p-select) {
+  width: 100%;
+  max-width: 100%;
+}
 
 .col-description--truncate :deep(.text-display) {
   overflow: hidden;
@@ -262,5 +309,26 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 .table-footer {
   padding: 0.5rem;
   text-align: left;
+}
+
+/* ── Auto-allocation indicators ── */
+.allocation-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.auto-indicator {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.allocation-cell--exact .auto-indicator {
+  color: #15803d;
+}
+
+.allocation-cell--contains .auto-indicator {
+  color: #b45309;
 }
 </style>

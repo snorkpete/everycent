@@ -114,7 +114,7 @@
             @click="onPreview"
           />
           <Button
-            label="Import and Save"
+            label="Import"
             data-testid="save-btn"
             :disabled="!hasMatchedAccounts || store.phase === 'parsed' || store.loading"
             title="Save new transactions to the database"
@@ -177,7 +177,22 @@
                 <td class="col-description">{{ transaction.description }}</td>
                 <td class="col-money right">{{ centsToDollars(transaction.withdrawal_amount) }}</td>
                 <td class="col-money right">{{ centsToDollars(transaction.deposit_amount) }}</td>
-                <td class="col-allocation" />
+                <td class="col-allocation">
+                  <span
+                    v-if="transaction.allocation_id && transaction.auto_match_type"
+                    class="auto-allocation"
+                    :class="`auto-allocation--${transaction.auto_match_type}`"
+                    v-tooltip.top="`Auto-matched (${transaction.auto_match_type})`"
+                  >
+                    <i :class="transaction.auto_match_type === 'exact' ? 'pi pi-check-circle' : 'pi pi-question-circle'" />
+                    {{ transaction.auto_allocation_name }}
+                    <i
+                      class="pi pi-times auto-allocation-clear"
+
+                      @click="clearAutoAllocation(transaction)"
+                    />
+                  </span>
+                </td>
                 <td class="col-status">
                   <Tag
                     v-if="transaction.import_status === 'duplicate'"
@@ -230,7 +245,7 @@
           data-testid="save-summary"
         >
           <strong>{{ store.getBankAccountName(account.bank_account_id) }}</strong>:
-          {{ account.transactions.length }} transaction{{ account.transactions.length === 1 ? '' : 's' }} saved<template v-if="account.skipped?.length">,
+          {{ account.saved_count }} transaction{{ account.saved_count === 1 ? '' : 's' }} saved<template v-if="account.skipped?.length">,
             {{ account.skipped.length }} skipped
             ({{ formatSkipReasons(account.skipped) }})
           </template>
@@ -321,6 +336,7 @@ async function onFileSelect(event: { files: File[] }) {
 async function onPreview() {
   try {
     await store.fetchPreview();
+    await store.autoAllocate();
   } catch {
     notifications.error(store.error ?? 'Failed to load preview');
   }
@@ -344,6 +360,12 @@ function accountNet(account: PreviewBankAccount): number {
 
 function accountProjectedBalance(account: PreviewBankAccount): number {
   return account.current_balance + accountNet(account);
+}
+
+function clearAutoAllocation(transaction: ImportTransaction) {
+  transaction.allocation_id = undefined;
+  transaction.auto_match_type = undefined;
+  transaction.auto_allocation_name = undefined;
 }
 
 function previewRowClass(transaction: ImportTransaction) {
@@ -562,5 +584,36 @@ function previewRowClass(transaction: ImportTransaction) {
 
 .nav-link {
   text-decoration: none;
+}
+
+/* ── Auto-allocation indicators ── */
+.auto-allocation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.auto-allocation--exact {
+  color: #15803d;
+  background-color: #f0fdf4;
+}
+
+.auto-allocation--contains {
+  color: #b45309;
+  background-color: #fffbeb;
+}
+
+.auto-allocation-clear {
+  cursor: pointer;
+  font-size: 0.7rem;
+  opacity: 0.5;
+  margin-left: 0.15rem;
+}
+
+.auto-allocation-clear:hover {
+  opacity: 1;
 }
 </style>

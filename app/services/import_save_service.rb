@@ -2,7 +2,7 @@ class ImportSaveService
   class ValidationError < StandardError; end
 
   PERMITTED_FIELDS = %i[
-    transaction_date description withdrawal_amount deposit_amount bank_ref status
+    transaction_date description withdrawal_amount deposit_amount bank_ref status allocation_id
   ].freeze
 
   def initialize(budget:, bank_accounts_params:)
@@ -31,6 +31,7 @@ class ImportSaveService
     transactions_params = (ba_params[:transactions] || []).map(&:to_h)
     existing_refs = load_existing_refs(bank_account)
     skipped = []
+    saved_count = 0
 
     transactions_params.each do |txn_params|
       if ActiveModel::Type::Boolean.new.cast(txn_params[:deleted])
@@ -50,9 +51,10 @@ class ImportSaveService
       end
 
       create_transaction!(bank_account, txn_params)
+      saved_count += 1
     end
 
-    build_response(bank_account).merge(skipped: skipped)
+    build_response(bank_account, saved_count).merge(skipped: skipped)
   end
 
   def validate_iban!(bank_account, iban)
@@ -101,12 +103,7 @@ class ImportSaveService
     )
   end
 
-  def build_response(bank_account)
-    budget_range = @budget.start_date..@budget.end_date
-    all_transactions = Transaction.where(bank_account_id: bank_account.id)
-                                  .where(transaction_date: budget_range)
-                                  .order(:transaction_date)
-
+  def build_response(bank_account, saved_count)
     current_balance = bank_account.reload.current_balance
 
     {
@@ -114,26 +111,8 @@ class ImportSaveService
       current_balance: current_balance,
       net: 0,
       projected_balance: current_balance,
-      transactions: all_transactions.map { |txn| serialize_transaction(txn) }
+      saved_count: saved_count
     }
   end
 
-  def serialize_transaction(txn)
-    {
-      id: txn.id,
-      description: txn.description,
-      bank_ref: txn.bank_ref,
-      bank_account_id: txn.bank_account_id,
-      transaction_date: txn.transaction_date,
-      withdrawal_amount: txn.withdrawal_amount,
-      deposit_amount: txn.deposit_amount,
-      allocation_id: txn.allocation_id,
-      sink_fund_allocation_id: txn.sink_fund_allocation_id,
-      status: txn.status,
-      paid: txn.paid,
-      net_amount: txn.net_amount,
-      brought_forward_status: txn.brought_forward_status,
-      camt_imported: txn.camt_imported
-    }
-  end
 end
