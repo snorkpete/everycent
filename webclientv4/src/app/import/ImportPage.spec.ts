@@ -524,7 +524,7 @@ describe('ImportPage', () => {
       mockStore.phase = 'saved';
       mockStore.saveResult = {
         bank_accounts: [
-          { bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, transactions: [{ id: 1 }, { id: 2 }], skipped: [] },
+          { bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, saved_count: 2, skipped: [] },
         ],
       };
     });
@@ -561,7 +561,7 @@ describe('ImportPage', () => {
             current_balance: 95000,
             net: 0,
             projected_balance: 95000,
-            transactions: [{ id: 1 }],
+            saved_count: 1,
             skipped: [
               { bank_ref: 'DUP-001', reason: 'duplicate' },
               { bank_ref: 'OOP-001', reason: 'out_of_period' },
@@ -593,7 +593,7 @@ describe('ImportPage', () => {
             current_balance: 95000,
             net: 0,
             projected_balance: 95000,
-            transactions: [{ id: 1 }],
+            saved_count: 1,
             skipped: [
               { bank_ref: 'DUP-001', reason: 'duplicate' },
               { bank_ref: 'DUP-002', reason: 'duplicate' },

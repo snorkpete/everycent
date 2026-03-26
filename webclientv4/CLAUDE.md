@@ -16,6 +16,7 @@ Call `router.replace({ query: { ... } })` in `emitFetch()` when selection change
 - **Angular comparison** — `localhost:3000` also serves the Angular v3 app. Same credentials work. Open both side by side to verify feature parity during migration.
 - **JetBrains** — open `webclientv4/` as project root to avoid tsconfig resolution issues.
 - **matchMedia mock** — global mock in `src/test/setup.ts`, required by PrimeVue DatePicker and Select. Do not remove it.
+- **Always use npm scripts** — use `npm run dev`, `npm run build`, `npm run test`, never invoke tools directly (`npx vite`, `npx vitest`, etc.). If an npm script fails, fix the underlying problem (install deps, fix PATH) rather than bypassing the script.
 
 ## Coding Conventions
 
