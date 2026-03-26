@@ -12,6 +12,8 @@
         :option-group-children="groupBy ? 'items' : undefined"
         :filter="filterable"
         :auto-filter-focus="filterable"
+        :auto-option-focus="filterable"
+        :select-on-focus="false"
         :reset-filter-on-hide="true"
         show-clear
         fluid
