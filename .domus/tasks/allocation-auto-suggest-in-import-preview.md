@@ -3,9 +3,9 @@
 **ID:** allocation-auto-suggest-in-import-preview
 **Status:** raw
 **Autonomous:** false
-**Priority:** low
+**Priority:** high
 **Captured:** 2026-03-22
-**Parent:** camt053-bank-statement-import
+**Parent:** none
 **Depends on:** import-page-ui
 **Idea:** none
 **Spec refs:** none
