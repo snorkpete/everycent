@@ -150,7 +150,7 @@ function editEvent(event: SpecialEventData) {
 }
 
 function viewEvent(event: SpecialEventData) {
-  router.push(`/special-events/${event.id}`);
+  router.push({ name: 'special-event-detail', params: { id: event.id } });
 }
 
 function confirmDelete(event: SpecialEventData) {

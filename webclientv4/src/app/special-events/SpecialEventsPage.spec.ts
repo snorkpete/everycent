@@ -148,7 +148,7 @@ describe('SpecialEventsPage', () => {
 
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
-      expect(mockPush).toHaveBeenCalledWith('/special-events/1');
+      expect(mockPush).toHaveBeenCalledWith({ name: 'special-event-detail', params: { id: 1 } });
     });
 
     it('has a title attribute', () => {
