@@ -142,20 +142,13 @@ describe('SpecialEventsPage', () => {
     });
   });
 
-  describe('view button', () => {
-    it('navigates to the event detail page', async () => {
+  describe('event name link', () => {
+    it('navigates to the event detail page when clicked', async () => {
       const wrapper = createWrapper();
 
-      await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
+      await wrapper.find('[data-testid="event-link-1"]').trigger('click');
 
       expect(mockPush).toHaveBeenCalledWith({ name: 'special-event-detail', params: { id: 1 } });
-    });
-
-    it('has a title attribute', () => {
-      const wrapper = createWrapper();
-
-      const viewBtn = wrapper.find('[data-testid="view-btn-1"]');
-      expect(viewBtn.attributes('title')).toBeTruthy();
     });
   });
 

@@ -17,19 +17,27 @@
       />
     </div>
 
+    <div v-if="store.currentSpecialEvent" class="header-card" data-testid="event-header">
+      <h2 class="event-name">{{ store.currentSpecialEvent.name }}</h2>
+      <div class="event-summary">
+        <span>Budgeted: {{ centsToDollars(store.currentSpecialEvent.budget_amount) }}</span>
+        <span>Actual: {{ centsToDollars(totalSpent) }}</span>
+      </div>
+    </div>
+
     <div class="panels">
       <div class="panel current-allocations">
         <h3>Current Allocations</h3>
-        <DataTable :value="currentAllocations" data-testid="current-allocations-table">
+        <DataTable :value="currentAllocations" data-testid="current-allocations-table" size="small">
           <Column field="name" header="Allocation" />
           <Column field="budget_name" header="Budget" />
           <Column field="allocation_category_name" header="Category" />
-          <Column field="amount" header="Amount" style="text-align: right">
+          <Column field="amount" header="Amount" header-style="text-align: right" style="text-align: right">
             <template #body="{ data }">
               {{ centsToDollars(data.amount) }}
             </template>
           </Column>
-          <Column field="spent" header="Spent" style="text-align: right">
+          <Column field="spent" header="Spent" header-style="text-align: right" style="text-align: right">
             <template #body="{ data }">
               {{ centsToDollars(data.spent) }}
             </template>
@@ -67,7 +75,7 @@
           />
           <Select
             v-model="selectedCategoryId"
-            :options="categoryOptions"
+            :options="allocationCategories"
             option-label="name"
             option-value="id"
             placeholder="All Categories"
@@ -77,19 +85,19 @@
           />
         </div>
 
-        <DataTable :value="groupedAllocations" data-testid="available-allocations-table">
+        <DataTable :value="groupedAllocations" data-testid="available-allocations-table" size="small">
           <Column header="Name">
             <template #body="{ data: row }">
               <span v-if="row._isCategoryHeader" class="category-header">{{ row.name }}</span>
               <span v-else>{{ row.name }}</span>
             </template>
           </Column>
-          <Column header="Budgeted" style="text-align: right">
+          <Column header="Budgeted" header-style="text-align: right" style="text-align: right">
             <template #body="{ data: row }">
               <span v-if="!row._isCategoryHeader">{{ centsToDollars(row.amount) }}</span>
             </template>
           </Column>
-          <Column header="Spent" style="text-align: right">
+          <Column header="Spent" header-style="text-align: right" style="text-align: right">
             <template #body="{ data: row }">
               <span v-if="!row._isCategoryHeader">{{ centsToDollars(row.spent) }}</span>
             </template>
@@ -149,8 +157,6 @@ const selectedCategoryId = ref<number | null>(null);
 const totalSpent = computed(() =>
   currentAllocations.value.reduce((sum, a) => sum + (a.spent ?? 0), 0),
 );
-
-const categoryOptions = computed(() => allocationCategories.value);
 
 const groupedAllocations = computed(() => {
   const filtered = selectedCategoryId.value
@@ -217,13 +223,6 @@ function removeAllocation(allocation: SpecialEventAllocationData) {
   );
 }
 
-function calculateActualAmount(): number {
-  return currentAllocations.value.reduce(
-    (sum, a) => sum + (a.spent ?? 0),
-    0,
-  );
-}
-
 async function save() {
   const eventId = Number(route.params.id);
   if (!eventId) return;
@@ -235,7 +234,7 @@ async function save() {
   try {
     await store.updateAllocations(eventId, {
       allocation_ids: allocationIds,
-      actual_amount: calculateActualAmount(),
+      actual_amount: totalSpent.value,
     });
     notifications.success('Special event allocations updated');
     router.push({ name: 'special-event-detail', params: { id: eventId } });
@@ -333,6 +332,24 @@ onMounted(async () => {
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
+}
+
+.header-card {
+  border: 1px solid var(--p-surface-300);
+  border-radius: 6px;
+  background-color: var(--p-surface-0);
+  padding: 1rem;
+  flex-shrink: 0;
+}
+
+.event-name {
+  margin: 0 0 0.5rem;
+}
+
+.event-summary {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--p-text-muted-color);
 }
 
 .panels {

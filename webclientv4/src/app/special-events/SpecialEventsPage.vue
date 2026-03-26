@@ -13,7 +13,17 @@
 
     <div class="content-card">
       <DataTable :value="store.specialEvents" data-testid="events-table">
-        <Column field="name" header="Name" />
+        <Column field="name" header="Name">
+          <template #body="{ data }">
+            <a
+              class="event-link"
+              :data-testid="`event-link-${data.id}`"
+              @click="viewEvent(data)"
+            >
+              {{ data.name }}
+            </a>
+          </template>
+        </Column>
         <Column field="start_date" header="Start Date">
           <template #body="{ data }">
             {{ formatDate(data.start_date) }}
@@ -38,15 +48,6 @@
         </Column>
         <Column header="Actions" style="width: 120px; text-align: center">
           <template #body="{ data }">
-            <Button
-              icon="pi pi-eye"
-              text
-              severity="info"
-              size="small"
-              :data-testid="`view-btn-${data.id}`"
-              title="View special event details"
-              @click="viewEvent(data)"
-            />
             <Button
               icon="pi pi-pencil"
               text
@@ -224,6 +225,16 @@ function differenceClass(event: SpecialEventData): string {
   border-radius: 6px;
   background-color: var(--p-surface-0);
   margin-bottom: 0.75rem;
+}
+
+.event-link {
+  color: var(--p-primary-color);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.event-link:hover {
+  text-decoration: underline;
 }
 
 .negative {
