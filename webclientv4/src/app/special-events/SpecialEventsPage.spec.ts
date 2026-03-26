@@ -148,7 +148,7 @@ describe('SpecialEventsPage', () => {
 
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
-      expect(mockPush).toHaveBeenCalledWith('/special-events/1');
+      expect(mockPush).toHaveBeenCalledWith({ name: 'special-event-detail', params: { id: 1 } });
     });
 
     it('has a title attribute', () => {
@@ -283,7 +283,7 @@ describe('SpecialEventsPage', () => {
       await form.vm.$emit('submit', updatedData);
       await nextTick();
 
-      expect(mockStore.update).toHaveBeenCalledWith(1, updatedData);
+      expect(mockStore.update).toHaveBeenCalledWith(1, { name: 'Updated Birthday', budget_amount: 60000 });
       expect(mockNotifySuccess).toHaveBeenCalledWith('Special event updated');
       expect(form.props('visible')).toBe(false);
     });

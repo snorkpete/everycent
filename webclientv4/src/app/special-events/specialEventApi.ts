@@ -1,5 +1,5 @@
 import apiGateway from '../../api/api-gateway';
-import type { SpecialEventData } from './specialEvent.types';
+import type { SpecialEventData, UpdateAllocationsPayload } from './specialEvent.types';
 
 export const specialEventApi = {
   getAll: () =>
@@ -23,7 +23,7 @@ export const specialEventApi = {
 
   updateAllocations: (
     id: number,
-    data: { allocation_ids: number[]; actual_amount: number },
+    data: UpdateAllocationsPayload,
   ) =>
     apiGateway
       .put<SpecialEventData>(`/special_events/${id}/allocations`, {

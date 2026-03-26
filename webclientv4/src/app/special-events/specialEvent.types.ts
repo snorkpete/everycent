@@ -22,3 +22,14 @@ export interface SpecialEventData {
   start_date?: string;
   allocations?: SpecialEventAllocationData[];
 }
+
+export interface UpdateAllocationsPayload {
+  allocation_ids: number[];
+  actual_amount: number;
+}
+
+export interface SpecialEventFormData {
+  name: string;
+  budget_amount: number;
+  start_date: string;
+}

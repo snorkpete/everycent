@@ -150,7 +150,7 @@ function editEvent(event: SpecialEventData) {
 }
 
 function viewEvent(event: SpecialEventData) {
-  router.push(`/special-events/${event.id}`);
+  router.push({ name: 'special-event-detail', params: { id: event.id } });
 }
 
 function confirmDelete(event: SpecialEventData) {
@@ -173,7 +173,8 @@ async function deleteEvent() {
 async function onSubmit(data: Partial<SpecialEventData>) {
   try {
     if (data.id) {
-      await store.update(data.id, data);
+      const { id, ...payload } = data;
+      await store.update(id, payload);
       notifications.success('Special event updated');
     } else {
       await store.create(data);

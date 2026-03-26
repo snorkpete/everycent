@@ -33,13 +33,7 @@ import Button from 'primevue/button';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcDateField from '../shared/form/date-field/EcDateField.vue';
-import type { SpecialEventData } from './specialEvent.types';
-
-interface SpecialEventFormData {
-  name: string;
-  budget_amount: number;
-  start_date: string;
-}
+import type { SpecialEventData, SpecialEventFormData } from './specialEvent.types';
 
 const props = defineProps<{
   visible: boolean;

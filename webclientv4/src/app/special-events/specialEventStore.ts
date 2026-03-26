@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { specialEventApi } from './specialEventApi';
-import type { SpecialEventData } from './specialEvent.types';
+import type { SpecialEventData, UpdateAllocationsPayload } from './specialEvent.types';
 
 export const useSpecialEventStore = defineStore('specialEvents', () => {
   const specialEvents = ref<SpecialEventData[]>([]);
@@ -79,7 +79,7 @@ export const useSpecialEventStore = defineStore('specialEvents', () => {
 
   async function updateAllocations(
     id: number,
-    data: { allocation_ids: number[]; actual_amount: number },
+    data: UpdateAllocationsPayload,
   ) {
     loading.value = true;
     error.value = null;
