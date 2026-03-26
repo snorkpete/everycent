@@ -80,6 +80,21 @@ const router = createRouter({
       name: 'sink-funds',
       component: () => import('../app/sink-funds/SinkFundsPage.vue'),
     },
+    {
+      path: '/special-events',
+      name: 'special-events',
+      component: () => import('../app/special-events/SpecialEventsPage.vue'),
+    },
+    {
+      path: '/special-events/:id',
+      name: 'special-event-detail',
+      component: () => import('../app/special-events/SpecialEventDetailPage.vue'),
+    },
+    {
+      path: '/special-events/:id/allocations',
+      name: 'special-event-allocations',
+      component: () => import('../app/special-events/SpecialEventAllocationsEditor.vue'),
+    },
   ],
 });
 
