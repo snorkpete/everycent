@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     member do
       put 'copy'
       put 'close'
+      post 'auto_allocate'
     end
 
     collection do

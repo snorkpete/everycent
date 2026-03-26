@@ -4,6 +4,7 @@ import { transactionApi } from './transactionApi';
 import { budgetApi } from '../budgets/budgetApi';
 import { bankAccountApi } from '../bank-accounts/bankAccountApi';
 import type { TransactionData, AllocationData, SinkFundAllocationData } from './transaction.types';
+import type { MatchType } from '../budgets/autoAllocate.types';
 import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
@@ -140,6 +141,29 @@ export const useTransactionStore = defineStore('transactions', () => {
     transaction.status = allocationId > 0 ? 'paid' : 'unpaid';
   }
 
+  async function autoAllocate() {
+    if (!selectedBudget.value?.id) return;
+
+    // Only suggest for unallocated, non-deleted transactions
+    const candidates = draftTransactions.value
+      .map((tx, index) => ({ tx, index }))
+      .filter(({ tx }) => !tx.allocation_id && !tx.deleted && tx.description);
+
+    if (candidates.length === 0) return;
+
+    const descriptions = candidates.map(({ tx }) => tx.description!);
+    const response = await budgetApi.autoAllocate(selectedBudget.value.id, descriptions);
+
+    for (let i = 0; i < response.suggestions.length; i++) {
+      const suggestion = response.suggestions[i];
+      if (!suggestion) continue;
+
+      const tx = draftTransactions.value[candidates[i].index];
+      tx.allocation_id = suggestion.allocation_id;
+      tx.auto_match_type = suggestion.match_type as MatchType;
+    }
+  }
+
   function addImportedTransactions(imported: TransactionData[]) {
     if (!isEditMode.value) {
       enterEditMode();
@@ -200,5 +224,6 @@ export const useTransactionStore = defineStore('transactions', () => {
     selectedTotal,
     clearSelections,
     addImportedTransactions,
+    autoAllocate,
   };
 });

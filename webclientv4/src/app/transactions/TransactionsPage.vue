@@ -68,6 +68,15 @@
         />
         <template v-else>
           <Button
+            icon="pi pi-sparkles"
+            label="Auto Allocate"
+            outlined
+            size="small"
+            data-testid="auto-allocate-btn"
+            v-tooltip.top="'Suggest allocations based on previous budget\'s transactions'"
+            @click="onAutoAllocate"
+          />
+          <Button
             label="Save"
             data-testid="save-btn"
             size="small"
@@ -166,6 +175,15 @@ async function onSave() {
 
 function onCancel() {
   store.cancelEdit();
+}
+
+async function onAutoAllocate() {
+  try {
+    await store.autoAllocate();
+    notifications.info('Auto-allocation complete');
+  } catch {
+    notifications.error('Failed to auto-allocate');
+  }
 }
 
 async function onRefresh() {

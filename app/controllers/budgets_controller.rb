@@ -72,6 +72,16 @@ class BudgetsController < ApplicationController
     respond_with(@budget, BudgetSerializer)
   end
 
+  def auto_allocate
+    budget = Budget.find(params[:id])
+    descriptions = params[:descriptions] || []
+
+    suggester = AutoAllocationSuggester.new(budget: budget, descriptions: descriptions)
+    suggestions = suggester.call
+
+    render json: { suggestions: suggestions }
+  end
+
   def mass_update
     result = Budget.mass_update(params)
     if result

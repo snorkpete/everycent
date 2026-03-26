@@ -10,6 +10,15 @@
         option-value="id"
         :option-group-label="groupBy ? 'label' : undefined"
         :option-group-children="groupBy ? 'items' : undefined"
+        :filter="filterable"
+        :auto-filter-focus="filterable"
+        :auto-option-focus="filterable"
+        :select-on-focus="false"
+        :reset-filter-on-hide="true"
+        show-clear
+        fluid
+        placeholder=" "
+        :pt="selectPt"
         @update:model-value="$emit('update:modelValue', $event)"
       />
     </template>
@@ -36,6 +45,7 @@ const props = defineProps<{
    * Example: groupBy="category" requires items with `category_id` and `category.name`.
    */
   groupBy?: string;
+  filterable?: boolean;
 }>();
 
 defineEmits<{
@@ -74,6 +84,17 @@ const groups = computed((): ListGroup[] => {
 });
 
 const displayOptions = computed(() => (props.groupBy ? groups.value : props.items));
+
+const selectPt = computed(() => {
+  const pt: Record<string, any> = {
+    label: { class: 'ec-select-label' },
+  };
+  if (props.groupBy) {
+    pt.optionGroupLabel = { class: 'ec-group-label' };
+    pt.option = { class: 'ec-group-option' };
+  }
+  return pt;
+});
 </script>
 
 <style scoped>
@@ -91,5 +112,28 @@ const displayOptions = computed(() => (props.groupBy ? groups.value : props.item
 
 .value {
   font-size: 14px;
+}
+</style>
+
+<style>
+/* Unscoped so PT classes apply to the teleported overlay */
+.ec-group-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--p-primary-color);
+  padding: 0.6rem 0.75rem 0.25rem;
+}
+
+.ec-group-option {
+  padding-left: 1.5rem !important;
+  font-size: 0.8rem;
+}
+
+.p-select.p-component .ec-select-label {
+  min-height: 2.6rem;
+  display: flex;
+  align-items: center;
 }
 </style>

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { importApi, buildPreviewPayload } from './importApi';
 import { budgetApi } from '../budgets/budgetApi';
 import { bankAccountApi } from '../bank-accounts/bankAccountApi';
+import type { MatchType } from '../budgets/autoAllocate.types';
 import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 import type { CamtAccountResult } from '../transactions/importers/camt053Parser';
@@ -193,6 +194,7 @@ export const useImportStore = defineStore('import', () => {
               status: t.status ?? 'paid',
               camt_imported: t.camt_imported ?? true,
               deleted: t.deleted ?? false,
+              allocation_id: t.allocation_id ?? null,
             })),
         })),
       };
@@ -215,6 +217,39 @@ export const useImportStore = defineStore('import', () => {
     saveResult.value = null;
     error.value = null;
     phase.value = 'idle';
+  }
+
+  async function autoAllocate() {
+    if (!selectedBudget.value?.id || previewAccounts.value.length === 0) return;
+
+    // Collect descriptions from all new, non-deleted transactions across all accounts
+    const descriptionsWithPositions: { accountIndex: number; txIndex: number; description: string }[] = [];
+    for (let ai = 0; ai < previewAccounts.value.length; ai++) {
+      const account = previewAccounts.value[ai];
+      for (let ti = 0; ti < account.transactions.length; ti++) {
+        const tx = account.transactions[ti];
+        if (tx.import_status === 'new' && !tx.deleted && tx.description) {
+          descriptionsWithPositions.push({ accountIndex: ai, txIndex: ti, description: tx.description });
+        }
+      }
+    }
+
+    if (descriptionsWithPositions.length === 0) return;
+
+    const descriptions = descriptionsWithPositions.map((d) => d.description);
+    const response = await budgetApi.autoAllocate(selectedBudget.value.id, descriptions);
+
+    // Apply suggestions back to transactions by position
+    for (let i = 0; i < response.suggestions.length; i++) {
+      const suggestion = response.suggestions[i];
+      if (!suggestion) continue;
+
+      const pos = descriptionsWithPositions[i];
+      const tx = previewAccounts.value[pos.accountIndex].transactions[pos.txIndex];
+      tx.allocation_id = suggestion.allocation_id;
+      tx.auto_match_type = suggestion.match_type as MatchType;
+      tx.auto_allocation_name = suggestion.allocation_name;
+    }
   }
 
   function getBankAccountName(bankAccountId: number): string {
@@ -242,6 +277,7 @@ export const useImportStore = defineStore('import', () => {
     toggleDeleteTransaction,
     saveImport,
     resetPreview,
+    autoAllocate,
     getBankAccountName,
   };
 });

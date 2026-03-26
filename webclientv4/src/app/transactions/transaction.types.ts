@@ -1,5 +1,6 @@
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
+import type { MatchType } from '../budgets/autoAllocate.types';
 export type { BudgetData } from '../budgets/budget.types';
 
 export interface AllocationData {
@@ -59,5 +60,6 @@ export interface TransactionData {
   deleted?: boolean;
   newlyImported?: boolean;
   camt_imported?: boolean;
+  auto_match_type?: MatchType;
 }
 
