@@ -53,7 +53,12 @@ function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
       command: () => navigate('/account-balances'),
       routePath: '/account-balances',
     },
-    { label: '* Special Events', icon: Icon.SPECIAL_EVENTS, url: '/#/special-events' },
+    {
+      label: 'Special Events',
+      icon: Icon.SPECIAL_EVENTS,
+      command: () => navigate('/special-events'),
+      routePath: '/special-events',
+    },
   ];
 }
 
