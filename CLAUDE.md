@@ -19,6 +19,9 @@ Three frontend generations:
 
 Backend: `app/` (Rails controllers, models, serializers), `config/`, `db/`, `spec/`.
 
+## Confidence Signaling
+When stating facts about library behavior, API details, or code not read in this session, flag your confidence level. Use "I believe" or "I'm not certain" when working from training knowledge rather than something verified in the current session. It's fine to be wrong — just signal when you're working from memory vs. evidence so the user can decide whether to vet it.
+
 ## Backend Conventions
 - RESTful JSON API with ActiveModel::Serializers for responses
 - All models use `acts_as_tenant :household` for data scoping
@@ -41,6 +44,16 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 1. Build Angular: `cd webclientv3 && npm run build` (outputs to /public)
 2. Build v1 legacy: `cd webclient && gulp` (outputs to /public/v1)
 3. Commit: `git add . && git commit -m "build of static assets"`
+
+## Deployment
+Prerequisite: user must have run `heroku login` in their terminal session.
+
+1. Build Vue assets: `cd webclientv4 && npm run build` (outputs to /public/v4)
+2. Commit the built assets: `git add public/ && git commit -m "production build"`
+3. Push to all three remotes:
+   - `git push origin master` — GitHub (code backup)
+   - `git push heroku master` — Heroku production deploy
+   - `git push staging master:main` — Heroku staging (temporary; pushes master to staging's main branch)
 
 ## Testing (Vue App - webclientv4)
 - Use test-driven development (TDD). Write tests before implementation.
