@@ -2,6 +2,17 @@
   <aside v-if="isDesktop" class="desktop-sidebar" data-testid="desktop-sidebar">
     <div class="brand">EveryCent</div>
     <PanelMenu :model="activeMenuItems" v-model:expandedKeys="expandedKeys" />
+    <div class="color-picker">
+      <button
+        v-for="color in colorOptions"
+        :key="color.name"
+        class="color-swatch"
+        :class="{ active: activeColor === color.name }"
+        :style="{ backgroundColor: color.preview }"
+        :title="color.name"
+        @click="setColor(color.name)"
+      />
+    </div>
   </aside>
 
   <template v-else>
@@ -20,15 +31,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useBreakpoints, breakpointsPrimeFlex } from '@vueuse/core';
 import PanelMenu from 'primevue/panelmenu';
 import Button from 'primevue/button';
 import Drawer from 'primevue/drawer';
+import { updatePrimaryPalette } from '@primeuix/themes';
 import { useAuthStore } from '../../auth/authStore';
 import { useRouter, useRoute } from 'vue-router';
 import { buildMenuItems } from './menuItems';
 import type { AppMenuItem } from './menuItems';
+
+const colorOptions = [
+  { name: 'indigo', preview: '#6366f1' },
+  { name: 'blue', preview: '#3b82f6' },
+] as const;
+
+type ColorName = (typeof colorOptions)[number]['name'];
+
+const STORAGE_KEY = 'ec-primary-color';
+const activeColor = ref<ColorName>(
+  (localStorage.getItem(STORAGE_KEY) as ColorName) || 'indigo',
+);
+
+function buildPalette(name: string) {
+  const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+  return Object.fromEntries(shades.map((s) => [s, `{${name}.${s}}`]));
+}
+
+function setColor(name: ColorName) {
+  activeColor.value = name;
+  localStorage.setItem(STORAGE_KEY, name);
+  updatePrimaryPalette(buildPalette(name));
+}
+
+// Apply saved color on startup (skips default to avoid unnecessary update)
+onMounted(() => {
+  if (activeColor.value !== 'indigo') {
+    updatePrimaryPalette(buildPalette(activeColor.value));
+  }
+});
 
 const breakpoints = useBreakpoints(breakpointsPrimeFlex);
 const isDesktop = breakpoints.greaterOrEqual('lg');
@@ -166,8 +208,8 @@ watch(
 :deep(.p-panelmenu-header.ec-active .p-panelmenu-header-link),
 /* Active route — sub-items; class lands on .p-panelmenu-item (li) */
 :deep(.p-panelmenu-item.ec-active .p-panelmenu-item-link) {
-  background: rgba(20, 184, 166, 0.15);
-  color: #2dd4bf;
+  background: color-mix(in srgb, var(--p-primary-400) 20%, transparent);
+  color: var(--p-primary-300);
 }
 
 /* Expanded group header */
@@ -199,5 +241,32 @@ watch(
 /* No dividers between panels */
 :deep(.p-panelmenu-panel + .p-panelmenu-panel) {
   border-top: none;
+}
+
+.color-picker {
+  margin-top: auto;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  padding: 0;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch.active {
+  border-color: #e2e8f0;
 }
 </style>
