@@ -103,12 +103,12 @@ describe('BudgetPage', () => {
       expect(mockStore.fetch).toHaveBeenCalledWith(213);
     });
 
-    it('sets the heading to "Edit Budget: {budget name}"', async () => {
+    it('sets the heading to "Budget: {budget name}"', async () => {
       createWrapper();
       await nextTick();
       await nextTick();
 
-      expect(mockSetHeading).toHaveBeenCalledWith('Edit Budget: Mar 25 - Apr 24, 2026');
+      expect(mockSetHeading).toHaveBeenCalledWith('Budget: Mar 25 - Apr 24, 2026');
     });
 
     it('sets heading to "Budget" when budget has no name', async () => {
@@ -156,12 +156,11 @@ describe('BudgetPage', () => {
       expect(wrapper.find(VIEW_TRANSACTIONS_BTN).exists()).toBe(true);
     });
 
-    it('navigates to /transactions with budget_id when View Transactions is clicked', async () => {
+    it('links to /transactions with budget_id', () => {
       const wrapper = createWrapper();
+      const link = wrapper.find(VIEW_TRANSACTIONS_BTN);
 
-      await wrapper.find(VIEW_TRANSACTIONS_BTN).trigger('click');
-
-      expect(mockPush).toHaveBeenCalledWith('/transactions?budget_id=213');
+      expect(link.attributes('href')).toBe('#/transactions?budget_id=213');
     });
   });
 
