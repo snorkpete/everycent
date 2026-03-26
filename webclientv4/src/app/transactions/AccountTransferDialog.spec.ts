@@ -24,6 +24,7 @@ const TO_BALANCE_PREVIEW = '[data-testid="to-balance-preview"]';
 
 vi.mock('../bank-accounts/bankAccountApi', () => ({
   bankAccountApi: {
+    getOpen: vi.fn(),
     getWithBalances: vi.fn(),
     transfer: vi.fn(),
   },
@@ -153,6 +154,11 @@ describe('AccountTransferDialog', () => {
     vi.clearAllMocks();
     mockStore.allocations = sampleAllocations;
     mockStore.selectedBudget = jan2025;
+    vi.mocked(bankAccountApi.getOpen).mockResolvedValue([
+      checkingAccount,
+      savingsAccount,
+      sinkFundAccount,
+    ]);
     vi.mocked(bankAccountApi.getWithBalances).mockResolvedValue([
       checkingAccount,
       savingsAccount,

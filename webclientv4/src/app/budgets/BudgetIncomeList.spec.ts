@@ -11,7 +11,6 @@ const INCOME_ROW = '[data-testid="income-row"]';
 const TOTAL_ROW = '[data-testid="income-total-row"]';
 const ADD_INCOME_BTN = '[data-testid="add-income-btn"]';
 const NAME_INPUT = '[data-testid="income-name-input"]';
-const COMMENT_INPUT = '[data-testid="income-comment-input"]';
 
 function deleteBtn(index: number): string {
   return `[data-testid="delete-income-btn-${index}"]`;
@@ -92,15 +91,6 @@ describe('BudgetIncomeList', () => {
       expect(firstRow.text()).toContain(expectedAmount);
     });
 
-    it('displays the income comment', () => {
-      const wrapper = createWrapper();
-
-      const firstRow = wrapper.findAll(INCOME_ROW)[0];
-      const expectedComment = 'Monthly pay';
-
-      expect(firstRow.text()).toContain(expectedComment);
-    });
-
     it('shows the total amount in the footer', () => {
       const wrapper = createWrapper();
 
@@ -176,23 +166,6 @@ describe('BudgetIncomeList', () => {
       expect((input.element as HTMLInputElement).value).toBe(expectedName);
     });
 
-    it('shows comment input fields for each income', () => {
-      const wrapper = createWrapper();
-
-      const inputs = wrapper.findAll(COMMENT_INPUT);
-
-      expect(inputs).toHaveLength(2);
-    });
-
-    it('populates comment input with the income comment', () => {
-      const wrapper = createWrapper();
-
-      const input = wrapper.findAll(COMMENT_INPUT)[0];
-      const expectedComment = 'Monthly pay';
-
-      expect((input.element as HTMLInputElement).value).toBe(expectedComment);
-    });
-
     it('shows the Add Income button', () => {
       const wrapper = createWrapper();
 
@@ -226,7 +199,7 @@ describe('BudgetIncomeList', () => {
       const wrapper = createWrapper();
 
       const headerCells = wrapper.findAll('thead th');
-      const expectedColumnCount = 4;
+      const expectedColumnCount = 3;
 
       expect(headerCells).toHaveLength(expectedColumnCount);
     });
@@ -383,14 +356,5 @@ describe('BudgetIncomeList', () => {
       expect(mockStore.budget!.incomes[0].name).toBe(newName);
     });
 
-    it('updates income comment in the store when typed into', async () => {
-      const wrapper = createWrapper();
-      const newComment = 'Updated comment';
-
-      const input = wrapper.findAll(COMMENT_INPUT)[0];
-      await input.setValue(newComment);
-
-      expect(mockStore.budget!.incomes[0].comment).toBe(newComment);
-    });
   });
 });
