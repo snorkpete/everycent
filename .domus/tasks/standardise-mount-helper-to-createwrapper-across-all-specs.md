@@ -1,7 +1,7 @@
 # Task: Standardise mount helper to createWrapper across all specs
 
 **ID:** standardise-mount-helper-to-createwrapper-across-all-specs
-**Status:** open
+**Status:** raw
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-15

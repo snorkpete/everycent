@@ -537,16 +537,29 @@ RSpec.describe ImportSaveService do
     end
 
     context 'field whitelisting' do
-      it 'does not allow allocation_id to be set via import' do
+      it 'allows allocation_id to be set via import (for auto-allocate)' do
+        allocation = create(:allocation, budget: budget, household: household, bank_account: bank_account)
         params = [{
           bank_account_id: bank_account.id,
           iban: "NL00ABNA0000000001",
-          transactions: [txn_params(bank_ref: "WHITELIST-001").merge(allocation_id: 12345)]
+          transactions: [txn_params(bank_ref: "WHITELIST-001").merge(allocation_id: allocation.id)]
         }]
 
         build_service(params).call
         txn = Transaction.find_by(bank_ref: "WHITELIST-001")
-        expect(txn.allocation_id).to be_nil
+        expect(txn.allocation_id).to eq(allocation.id)
+      end
+
+      it 'does not allow sink_fund_allocation_id to be set via import' do
+        params = [{
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [txn_params(bank_ref: "WHITELIST-002").merge(sink_fund_allocation_id: 99999)]
+        }]
+
+        build_service(params).call
+        txn = Transaction.find_by(bank_ref: "WHITELIST-002")
+        expect(txn.sink_fund_allocation_id).to be_nil
       end
     end
   end
