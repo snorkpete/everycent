@@ -74,12 +74,16 @@ class Allocation < ApplicationRecord
 
     params[:amounts].each do |amount_data|
       if amount_data[:id] == 0
-        Allocation.create(
+        if amount_data[:amount] != 0
+          attrs = {
             name: params[:name],
             amount: amount_data[:amount],
             budget_id: amount_data[:budget_id],
             allocation_category_id: params[:allocation_category_id]
-        ) if amount_data[:amount] != 0
+          }
+          attrs[:is_fixed_amount] = amount_data[:is_fixed_amount] unless amount_data[:is_fixed_amount].nil?
+          Allocation.create(attrs)
+        end
         next
       end
 
@@ -89,7 +93,9 @@ class Allocation < ApplicationRecord
       if amount_data[:amount] == 0
         allocation.destroy
       else
-        allocation.update(name: params[:name], amount: amount_data[:amount])
+        attrs = { name: params[:name], amount: amount_data[:amount] }
+        attrs[:is_fixed_amount] = amount_data[:is_fixed_amount] unless amount_data[:is_fixed_amount].nil?
+        allocation.update(attrs)
       end
     end
 

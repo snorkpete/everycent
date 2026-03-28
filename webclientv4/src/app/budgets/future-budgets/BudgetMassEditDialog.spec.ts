@@ -162,7 +162,7 @@ describe('BudgetMassEditDialog', () => {
       });
     });
 
-    it('emits save with allocation payload including category id', async () => {
+    it('emits save with allocation payload including category id and is_fixed_amount', async () => {
       const budget = makeBudget({ id: 5, name: 'Jan 2025' });
       const wrapper = mountDialog({
         visible: false,
@@ -182,7 +182,7 @@ describe('BudgetMassEditDialog', () => {
       expect(emitted![0][0]).toEqual({
         type: 'allocation',
         name: 'Rent',
-        amounts: [{ id: 20, amount: 150000, budget_id: 5 }],
+        amounts: [{ id: 20, amount: 150000, budget_id: 5, is_fixed_amount: false }],
         allocation_category_id: 3,
       });
     });
@@ -225,6 +225,167 @@ describe('BudgetMassEditDialog', () => {
 
       expect(wrapper.text()).toContain('Jan 2025');
       expect(wrapper.text()).toContain('Feb 2025');
+    });
+  });
+
+  describe('is_fixed_amount — allocation type', () => {
+    it('shows a Fixed? checkbox row for allocation type', async () => {
+      const budget = makeBudget({ id: 1 });
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets: [budget],
+        amountsPerBudget: { 1: { id: 10, amount: 150000, is_fixed_amount: false } },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      expect(wrapper.find('[data-testid="fixed-row"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="fixed-checkbox-0"]').exists()).toBe(true);
+    });
+
+    it('does not show Fixed? row for income type', () => {
+      const wrapper = mountDialog({ type: 'income' });
+
+      expect(wrapper.find('[data-testid="fixed-row"]').exists()).toBe(false);
+    });
+
+    it('initialises checkbox from amountsPerBudget is_fixed_amount value', async () => {
+      const budget = makeBudget({ id: 1 });
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets: [budget],
+        amountsPerBudget: { 1: { id: 10, amount: 150000, is_fixed_amount: true } },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const checkbox = wrapper.find('[data-testid="fixed-checkbox-0"]');
+      expect((checkbox.element as HTMLInputElement).checked).toBe(true);
+    });
+
+    it('defaults checkbox to false when is_fixed_amount not provided', async () => {
+      const budget = makeBudget({ id: 1 });
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets: [budget],
+        amountsPerBudget: { 1: { id: 10, amount: 150000 } },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const checkbox = wrapper.find('[data-testid="fixed-checkbox-0"]');
+      expect((checkbox.element as HTMLInputElement).checked).toBe(false);
+    });
+
+    it('includes is_fixed_amount in save payload', async () => {
+      const budget = makeBudget({ id: 5 });
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets: [budget],
+        amountsPerBudget: { 5: { id: 20, amount: 150000, is_fixed_amount: false } },
+        categoryId: 3,
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const checkbox = wrapper.find('[data-testid="fixed-checkbox-0"]');
+      await checkbox.setValue(true);
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
+
+      const emitted = wrapper.emitted('save');
+      expect(emitted![0][0]).toEqual({
+        type: 'allocation',
+        name: 'Rent',
+        amounts: [{ id: 20, amount: 150000, budget_id: 5, is_fixed_amount: true }],
+        allocation_category_id: 3,
+      });
+    });
+
+    it('shows a Set All Fixed checkbox', async () => {
+      const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets,
+        amountsPerBudget: {
+          1: { id: 10, amount: 150000, is_fixed_amount: false },
+          2: { id: 20, amount: 150000, is_fixed_amount: false },
+        },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      expect(wrapper.find('[data-testid="set-all-fixed-row"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="set-all-fixed-checkbox"]').exists()).toBe(true);
+    });
+
+    it('set all fixed checkbox sets all per-budget checkboxes to checked', async () => {
+      const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets,
+        amountsPerBudget: {
+          1: { id: 10, amount: 150000, is_fixed_amount: false },
+          2: { id: 20, amount: 150000, is_fixed_amount: false },
+        },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      const setAllCheckbox = wrapper.find('[data-testid="set-all-fixed-checkbox"]');
+      await setAllCheckbox.setValue(true);
+      await nextTick();
+
+      const checkbox0 = wrapper.find('[data-testid="fixed-checkbox-0"]');
+      const checkbox1 = wrapper.find('[data-testid="fixed-checkbox-1"]');
+      expect((checkbox0.element as HTMLInputElement).checked).toBe(true);
+      expect((checkbox1.element as HTMLInputElement).checked).toBe(true);
+    });
+
+    it('set all fixed checkbox unchecks all per-budget checkboxes when unchecked', async () => {
+      const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const wrapper = mountDialog({
+        visible: false,
+        type: 'allocation',
+        name: 'Rent',
+        budgets,
+        amountsPerBudget: {
+          1: { id: 10, amount: 150000, is_fixed_amount: true },
+          2: { id: 20, amount: 150000, is_fixed_amount: true },
+        },
+      });
+      await wrapper.setProps({ visible: true });
+      await nextTick();
+
+      // First set all to true via the toggle, then uncheck it
+      const setAllCheckbox = wrapper.find('[data-testid="set-all-fixed-checkbox"]');
+      await setAllCheckbox.setValue(true);
+      await nextTick();
+
+      await setAllCheckbox.setValue(false);
+      await nextTick();
+
+      const checkbox0 = wrapper.find('[data-testid="fixed-checkbox-0"]');
+      const checkbox1 = wrapper.find('[data-testid="fixed-checkbox-1"]');
+      expect((checkbox0.element as HTMLInputElement).checked).toBe(false);
+      expect((checkbox1.element as HTMLInputElement).checked).toBe(false);
+    });
+
+    it('does not show set all fixed row for income type', () => {
+      const wrapper = mountDialog({ type: 'income' });
+
+      expect(wrapper.find('[data-testid="set-all-fixed-row"]').exists()).toBe(false);
     });
   });
 

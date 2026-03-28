@@ -15,6 +15,7 @@ export interface FutureAllocationData {
   allocation_category_id: number;
   allocation_type?: string;
   is_standing_order?: boolean;
+  is_fixed_amount?: boolean;
   bank_account_id?: number;
   comment?: string;
 }
@@ -35,12 +36,14 @@ export interface AmountRow {
   budget_id: number;
   budgetIncome: number;
   totalAllocationsWithoutCurrent: number;
+  is_fixed_amount?: boolean;
 }
 
 export interface MassUpdateAmountEntry {
   id: number;
   amount: number;
   budget_id: number;
+  is_fixed_amount?: boolean;
 }
 
 export interface MassUpdatePayload {

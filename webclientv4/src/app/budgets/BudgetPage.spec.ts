@@ -14,6 +14,7 @@ const SAVE_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
 const INCOMES_SECTION = '[data-testid="incomes-section"]';
 const ALLOCATIONS_SECTION = '[data-testid="allocations-section"]';
+const VARIABLE_ONLY_TOGGLE = '[data-testid="variable-only-toggle"]';
 
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
@@ -200,6 +201,37 @@ describe('BudgetPage', () => {
       await nextTick();
 
       expect(mockStore.cancelEdit).toHaveBeenCalled();
+    });
+  });
+
+  describe('toolbar — variable-only toggle', () => {
+    it('shows a variable-only toggle button', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(VARIABLE_ONLY_TOGGLE).exists()).toBe(true);
+    });
+
+    it('defaults to "All Allocations" label', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(VARIABLE_ONLY_TOGGLE).text()).toContain('All Allocations');
+    });
+
+    it('toggles label to "Variable Only" when clicked', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find(VARIABLE_ONLY_TOGGLE).trigger('click');
+
+      expect(wrapper.find(VARIABLE_ONLY_TOGGLE).text()).toContain('Variable Only');
+    });
+
+    it('passes variableOnly prop to BudgetAllocationList', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find(VARIABLE_ONLY_TOGGLE).trigger('click');
+
+      const allocationList = wrapper.findComponent({ name: 'BudgetAllocationList' });
+      expect(allocationList.props('variableOnly')).toBe(true);
     });
   });
 

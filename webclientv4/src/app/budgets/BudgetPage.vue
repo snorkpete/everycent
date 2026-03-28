@@ -16,6 +16,15 @@
           class="view-transactions-link"
           data-testid="view-transactions-btn"
         >View Transactions</a>
+        <Button
+          :label="variableOnly ? 'Variable Only' : 'All Allocations'"
+          :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
+          :outlined="!variableOnly"
+          size="small"
+          data-testid="variable-only-toggle"
+          title="Toggle between showing all allocations and variable-only mode"
+          @click="variableOnly = !variableOnly"
+        />
       </div>
       <div class="toolbar-right">
         <Button
@@ -52,7 +61,7 @@
         <BudgetIncomeList />
       </div>
       <div class="content-card" data-testid="allocations-section">
-        <BudgetAllocationList />
+        <BudgetAllocationList :variable-only="variableOnly" />
       </div>
     </div>
 
@@ -60,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
@@ -77,6 +86,7 @@ const store = useBudgetStore();
 const headingStore = useHeadingStore();
 const settingsStore = useSettingsStore();
 const notifications = useNotifications();
+const variableOnly = ref(false);
 
 function updateHeading() {
   const budgetName = store.budget?.name ?? '';

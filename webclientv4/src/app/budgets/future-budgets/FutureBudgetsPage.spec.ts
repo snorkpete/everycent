@@ -356,6 +356,28 @@ describe('FutureBudgetsPage', () => {
     });
   });
 
+  describe('variable-only toggle', () => {
+    it('shows a variable-only toggle button', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').exists()).toBe(true);
+    });
+
+    it('defaults to "All Allocations" label', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain('All Allocations');
+    });
+
+    it('toggles label to "Variable Only" when clicked', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
+
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain('Variable Only');
+    });
+  });
+
   describe('Refresh button', () => {
     it('calls fetchAll when refresh button is clicked', async () => {
       const wrapper = mountPage();

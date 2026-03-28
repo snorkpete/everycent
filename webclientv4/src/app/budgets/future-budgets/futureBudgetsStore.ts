@@ -26,9 +26,9 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
 
   const incomeNames = computed(() => Object.keys(incomeDisplayData.value));
 
-  // allocationDisplayData: { [categoryId]: { [allocationName]: { [budgetId]: { id, amount } } } }
+  // allocationDisplayData: { [categoryId]: { [allocationName]: { [budgetId]: { id, amount, is_fixed_amount } } } }
   const allocationDisplayData = computed(() => {
-    const results: Record<number, Record<string, Record<number, { id: number; amount: number }>>> =
+    const results: Record<number, Record<string, Record<number, { id: number; amount: number; is_fixed_amount: boolean }>>> =
       {};
     for (const budget of budgets.value) {
       for (const allocation of budget.allocations) {
@@ -38,6 +38,7 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
         results[catId][allocation.name][budget.id] = {
           id: allocation.id,
           amount: allocation.amount,
+          is_fixed_amount: allocation.is_fixed_amount ?? false,
         };
       }
     }

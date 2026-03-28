@@ -2,6 +2,15 @@
   <div class="future-budgets-page">
     <div class="page-header">
       <Button
+        :label="variableOnly ? 'Variable Only' : 'All Allocations'"
+        :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
+        :outlined="!variableOnly"
+        size="small"
+        data-testid="variable-only-toggle"
+        title="Toggle between showing all allocations and variable-only mode"
+        @click="variableOnly = !variableOnly"
+      />
+      <Button
         label="Refresh"
         severity="secondary"
         data-testid="refresh-btn"
@@ -186,6 +195,7 @@ const dialogType = ref<'income' | 'allocation'>('income');
 const dialogName = ref('');
 const dialogAmountsPerBudget = ref<Record<number, { id: number; amount: number }>>({});
 const dialogCategoryId = ref<number | undefined>(undefined);
+const variableOnly = ref(false);
 
 const colSpan = computed(() => store.budgets.length + 1);
 
@@ -275,6 +285,7 @@ async function onSave(payload: MassUpdatePayload) {
 .page-header {
   display: flex;
   justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 /* ── Table wrapper: the scroll container — both axes ── */
