@@ -1,7 +1,7 @@
 # Task: Fix all TypeScript strict mode errors in webclientv4
 
 **ID:** fix-all-typescript-strict-mode-errors-in-webclientv4
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-23

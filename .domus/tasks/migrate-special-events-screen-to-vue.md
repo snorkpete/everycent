@@ -1,7 +1,7 @@
 # Task: Migrate special events screen to Vue
 
 **ID:** migrate-special-events-screen-to-vue
-**Status:** open
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-14
