@@ -70,11 +70,11 @@ const mockStore = reactive({
   allocationDisplayData: {
     3: {
       Rent: {
-        1: { id: 50, amount: 150000 },
-        2: { id: 60, amount: 150000 },
+        1: { id: 50, amount: 150000, is_fixed_amount: false },
+        2: { id: 60, amount: 150000, is_fixed_amount: false },
       },
     },
-  } as Record<number, Record<string, Record<number, { id: number; amount: number }>>>,
+  } as Record<number, Record<string, Record<number, { id: number; amount: number; is_fixed_amount: boolean }>>>,
   fetchAll: vi.fn().mockResolvedValue(undefined),
   massUpdate: vi.fn().mockResolvedValue(undefined),
   totalIncomeForBudget: vi.fn((b: FutureBudgetData) => (b.id === 1 ? 500000 : 510000)),
@@ -353,6 +353,155 @@ describe('FutureBudgetsPage', () => {
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
       expect(dialog.props('name')).toBe('New Allocation');
       expect(dialog.props('categoryId')).toBe(3);
+    });
+  });
+
+  describe('variable-only toggle', () => {
+    it('shows a variable-only toggle button', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').exists()).toBe(true);
+    });
+
+    it('defaults to "All Allocations" label', () => {
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain('All Allocations');
+    });
+
+    it('toggles label to "Variable Only" when clicked', async () => {
+      const wrapper = mountPage();
+
+      await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
+
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain('Variable Only');
+    });
+  });
+
+  describe('variable-only mode filtering', () => {
+    const billsCategory: AllocationCategoryData = { id: 5, name: 'Bills' };
+
+    function setupVariableOnlyData() {
+      // Category 3 (Fixed): Rent is fixed in ALL budgets, Insurance is fixed in all budgets
+      // Category 5 (Bills): Electric is variable in all budgets, Internet is fixed in budget 1 but variable in budget 2
+      mockStore.allocationCategories = [fixedCategory, billsCategory];
+      mockStore.allocationDisplayData = {
+        3: {
+          Rent: {
+            1: { id: 50, amount: 150000, is_fixed_amount: true },
+            2: { id: 60, amount: 150000, is_fixed_amount: true },
+          },
+          Insurance: {
+            1: { id: 51, amount: 50000, is_fixed_amount: true },
+            2: { id: 61, amount: 50000, is_fixed_amount: true },
+          },
+        },
+        5: {
+          Electric: {
+            1: { id: 70, amount: 20000, is_fixed_amount: false },
+            2: { id: 80, amount: 22000, is_fixed_amount: false },
+          },
+          Internet: {
+            1: { id: 71, amount: 10000, is_fixed_amount: true },
+            2: { id: 81, amount: 10000, is_fixed_amount: false },
+          },
+        },
+      };
+    }
+
+    it('shows all allocation rows in default mode', () => {
+      setupVariableOnlyData();
+
+      const wrapper = mountPage();
+      const rows = wrapper.findAll('[data-testid="allocation-row"]');
+
+      expect(rows).toHaveLength(4);
+      expect(rows.map(r => r.text())).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('Rent'),
+          expect.stringContaining('Insurance'),
+          expect.stringContaining('Electric'),
+          expect.stringContaining('Internet'),
+        ]),
+      );
+    });
+
+    it('does not show fixed subtotal rows in default mode', () => {
+      setupVariableOnlyData();
+
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="fixed-subtotal-3"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="fixed-subtotal-5"]').exists()).toBe(false);
+    });
+
+    it('does not show fixed total row in footer in default mode', () => {
+      setupVariableOnlyData();
+
+      const wrapper = mountPage();
+
+      expect(wrapper.find('[data-testid="fixed-total-row"]').exists()).toBe(false);
+    });
+
+    it('hides allocations that are fixed in ALL budgets when variable-only is active', async () => {
+      setupVariableOnlyData();
+
+      const wrapper = mountPage();
+      await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
+
+      const rows = wrapper.findAll('[data-testid="allocation-row"]');
+      const rowTexts = rows.map(r => r.text());
+
+      // Rent and Insurance are fixed in all budgets — hidden
+      expect(rowTexts).not.toEqual(expect.arrayContaining([expect.stringContaining('Rent')]));
+      expect(rowTexts).not.toEqual(expect.arrayContaining([expect.stringContaining('Insurance')]));
+    });
+
+    it('keeps allocations that are variable in at least one budget', async () => {
+      setupVariableOnlyData();
+
+      const wrapper = mountPage();
+      await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
+
+      const rows = wrapper.findAll('[data-testid="allocation-row"]');
+      const rowTexts = rows.map(r => r.text());
+
+      // Electric is variable in all budgets — visible
+      expect(rowTexts).toEqual(expect.arrayContaining([expect.stringContaining('Electric')]));
+      // Internet is fixed in budget 1 but variable in budget 2 — visible
+      expect(rowTexts).toEqual(expect.arrayContaining([expect.stringContaining('Internet')]));
+    });
+
+    it('shows per-category fixed subtotal row with correct amounts per budget', async () => {
+      setupVariableOnlyData();
+
+      const wrapper = mountPage();
+      await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
+
+      // Category 3 has Rent (150000) + Insurance (50000) = 200000 fixed in both budgets
+      const fixedSubtotal3 = wrapper.find('[data-testid="fixed-subtotal-3"]');
+      expect(fixedSubtotal3.exists()).toBe(true);
+      expect(fixedSubtotal3.text()).toContain('2,000.00'); // 200000 cents = 2000.00
+
+      // Category 5 has Internet fixed in budget 1 only (10000)
+      const fixedSubtotal5 = wrapper.find('[data-testid="fixed-subtotal-5"]');
+      expect(fixedSubtotal5.exists()).toBe(true);
+      expect(fixedSubtotal5.text()).toContain('100.00'); // 10000 cents = 100.00 (budget 1)
+    });
+
+    it('shows overall fixed total row in footer with correct amounts per budget', async () => {
+      setupVariableOnlyData();
+
+      const wrapper = mountPage();
+      await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
+
+      const fixedTotalRow = wrapper.find('[data-testid="fixed-total-row"]');
+      expect(fixedTotalRow.exists()).toBe(true);
+      // Budget 1: Rent 150000 + Insurance 50000 + Internet 10000 = 210000 = 2,100.00
+      // Budget 2: Rent 150000 + Insurance 50000 = 200000 = 2,000.00
+      expect(fixedTotalRow.text()).toContain('Fixed Total');
+      expect(fixedTotalRow.text()).toContain('2,100.00');
+      expect(fixedTotalRow.text()).toContain('2,000.00');
     });
   });
 

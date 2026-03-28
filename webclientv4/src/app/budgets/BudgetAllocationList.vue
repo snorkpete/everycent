@@ -33,6 +33,27 @@
               <td v-if="store.isEditMode"></td>
             </tr>
 
+            <!-- Fixed subtotal row (variable-only mode) — below category header -->
+            <tr
+              v-if="variableOnly && fixedAllocationsForCategory(category).length > 0"
+              class="fixed-subtotal-row"
+              :data-testid="`fixed-subtotal-${category.id}`"
+            >
+              <td>Fixed</td>
+              <td class="amount-cell">{{ centsToDollars(fixedCategoryAmount(category)) }}</td>
+              <td class="amount-cell">{{ centsToDollars(fixedCategorySpent(category)) }}</td>
+              <td
+                class="amount-cell"
+                :class="remainingClass(fixedCategoryRemaining(category))"
+              >
+                {{ centsToDollars(fixedCategoryRemaining(category)) }}
+              </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td v-if="store.isEditMode"></td>
+            </tr>
+
             <!-- Allocation rows -->
             <tr
               v-for="(allocation, index) in allocationsForCategory(category)"
@@ -49,7 +70,14 @@
                   class="p-inputtext cell-input"
                   data-testid="allocation-name-input"
                 />
-                <span v-else>{{ allocation.name }}</span>
+                <span v-else>
+                  {{ allocation.name }}
+                  <i
+                    v-if="!variableOnly && allocation.is_fixed_amount"
+                    class="pi pi-lock fixed-icon"
+                    v-tooltip="'Fixed allocation'"
+                  ></i>
+                </span>
               </td>
 
               <!-- Amount -->
@@ -157,6 +185,18 @@
         </tbody>
 
         <tfoot>
+          <tr v-if="variableOnly" class="fixed-total-row" data-testid="fixed-total-row">
+            <th>Fixed Total</th>
+            <th class="amount-cell">{{ centsToDollars(totalFixedAmount) }}</th>
+            <th class="amount-cell">{{ centsToDollars(totalFixedSpent) }}</th>
+            <th class="amount-cell" :class="remainingClass(totalFixedRemaining)">
+              {{ centsToDollars(totalFixedRemaining) }}
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th v-if="store.isEditMode"></th>
+          </tr>
           <tr class="total-row" data-testid="total-row">
             <th>Total</th>
             <th class="amount-cell">{{ centsToDollars(totalAmount) }}</th>
@@ -194,6 +234,12 @@ import { budgetApi } from './budgetApi';
 import type { AllocationData } from '../transactions/transaction.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 
+const props = withDefaults(defineProps<{
+  variableOnly?: boolean;
+}>(), {
+  variableOnly: false,
+});
+
 const store = useBudgetStore();
 
 const dialogVisible = ref(false);
@@ -212,16 +258,48 @@ const allocationClasses = [
   { id: 'savings', name: 'Savings' },
 ];
 
-function allocationsForCategory(category: AllocationCategoryData): AllocationData[] {
+function allAllocationsForCategory(category: AllocationCategoryData): AllocationData[] {
   if (!store.budget?.allocations) return [];
   return store.budget.allocations.filter(
     (a) => a.allocation_category_id === category.id,
   );
 }
 
-function activeAllocationsForCategory(category: AllocationCategoryData): AllocationData[] {
-  return allocationsForCategory(category).filter((a) => !a.deleted);
+function allocationsForCategory(category: AllocationCategoryData): AllocationData[] {
+  const all = allAllocationsForCategory(category);
+  if (!props.variableOnly) return all;
+  return all.filter((a) => !a.is_fixed_amount);
 }
+
+function activeAllocationsForCategory(category: AllocationCategoryData): AllocationData[] {
+  return allAllocationsForCategory(category).filter((a) => !a.deleted);
+}
+
+function fixedAllocationsForCategory(category: AllocationCategoryData): AllocationData[] {
+  return allAllocationsForCategory(category).filter((a) => !a.deleted && a.is_fixed_amount);
+}
+
+function fixedCategoryAmount(category: AllocationCategoryData): number {
+  return fixedAllocationsForCategory(category).reduce((sum, a) => sum + (a.amount ?? 0), 0);
+}
+
+function fixedCategorySpent(category: AllocationCategoryData): number {
+  return fixedAllocationsForCategory(category).reduce((sum, a) => sum + (a.spent ?? 0), 0);
+}
+
+function fixedCategoryRemaining(category: AllocationCategoryData): number {
+  return fixedCategoryAmount(category) - fixedCategorySpent(category);
+}
+
+const totalFixedAmount = computed(() =>
+  activeAllocations.value.filter((a) => a.is_fixed_amount).reduce((sum, a) => sum + (a.amount ?? 0), 0),
+);
+
+const totalFixedSpent = computed(() =>
+  activeAllocations.value.filter((a) => a.is_fixed_amount).reduce((sum, a) => sum + (a.spent ?? 0), 0),
+);
+
+const totalFixedRemaining = computed(() => totalFixedAmount.value - totalFixedSpent.value);
 
 function categoryAmount(category: AllocationCategoryData): number {
   return activeAllocationsForCategory(category).reduce((sum, a) => sum + (a.amount ?? 0), 0);
@@ -499,6 +577,30 @@ tr:hover .eye-btn {
 /* ── Class display ── */
 .class-display {
   font-size: 0.85rem;
+}
+
+/* ── Fixed indicator icon ── */
+.fixed-icon {
+  font-size: 0.75rem;
+  margin-left: 0.35rem;
+  color: var(--p-text-muted-color);
+}
+
+/* ── Fixed subtotal row ── */
+.fixed-subtotal-row td {
+  background-color: var(--p-surface-100);
+  font-weight: 600;
+  color: var(--p-text-color);
+  font-size: 0.95rem;
+  border-bottom: 2px solid var(--p-surface-200);
+}
+
+/* ── Fixed total row (footer) ── */
+.fixed-total-row th {
+  background-color: var(--p-surface-50);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--p-text-muted-color);
 }
 
 /* ── Row hover ── */

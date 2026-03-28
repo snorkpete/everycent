@@ -588,6 +588,138 @@ describe('BudgetAllocationList', () => {
     });
   });
 
+  describe('variable-only mode', () => {
+    function createVariableWrapper(): VueWrapper {
+      return mount(BudgetAllocationList, {
+        props: { variableOnly: true },
+        global: {
+          plugins: [PrimeVue, createPinia()],
+          stubs: { Dialog: DialogStub },
+        },
+      });
+    }
+
+    it('hides individual fixed allocations when variableOnly is true', () => {
+      const wrapper = createVariableWrapper();
+
+      const rows = wrapper.findAll(ALLOCATION_ROW);
+      // Rent (is_fixed_amount=true) should be hidden; Groceries + Entertainment remain
+      expect(rows).toHaveLength(2);
+      expect(rows.map((r) => r.text()).join()).not.toContain('Rent');
+    });
+
+    it('shows a per-category "Fixed" subtotal row', () => {
+      const wrapper = createVariableWrapper();
+
+      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
+      expect(fixedRow.exists()).toBe(true);
+      // Rent is 1000.00
+      expect(fixedRow.text()).toContain('1,000.00');
+    });
+
+    it('does not show per-category fixed subtotal row when no fixed allocations in that category', () => {
+      const wrapper = createVariableWrapper();
+
+      // Lifestyle (cat 20) has no fixed allocations
+      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-20"]');
+      expect(fixedRow.exists()).toBe(false);
+    });
+
+    it('category totals still sum all allocations (fixed + variable)', () => {
+      const wrapper = createVariableWrapper();
+
+      // Essentials: Groceries 500 + Rent 1000 = 1500.00
+      const header = wrapper.find(CATEGORY_HEADER(10));
+      const amountCell = header.findAll('td')[1];
+      expect(amountCell.text()).toBe('1,500.00');
+    });
+
+    it('footer totals still reflect full budget', () => {
+      const wrapper = createVariableWrapper();
+
+      // All: 500 + 1000 + 200 = 1700.00
+      const footer = wrapper.find(TOTAL_ROW);
+      const amountCell = footer.findAll('th')[1];
+      expect(amountCell.text()).toBe('1,700.00');
+    });
+
+    it('shows overall fixed total row in footer', () => {
+      const wrapper = createVariableWrapper();
+
+      const fixedTotalRow = wrapper.find('[data-testid="fixed-total-row"]');
+      expect(fixedTotalRow.exists()).toBe(true);
+      // Only Rent is fixed: 1000.00
+      expect(fixedTotalRow.text()).toContain('1,000.00');
+    });
+
+    it('spent column is visible in variable-only mode', () => {
+      const wrapper = createVariableWrapper();
+
+      const headerCells = wrapper.findAll('thead th');
+      const headerTexts = headerCells.map((h) => h.text());
+      expect(headerTexts).toContain('Spent');
+    });
+
+    it('new allocations can be added in variable-only mode in edit mode', async () => {
+      mockStore.isEditMode = true;
+      const wrapper = createVariableWrapper();
+      await nextTick();
+      const initialCount = mockStore.budget!.allocations.length;
+
+      await wrapper.find(ADD_ALLOCATION_BTN(10)).trigger('click');
+
+      expect(mockStore.budget!.allocations).toHaveLength(initialCount + 1);
+    });
+
+    it('shows all allocations when variableOnly is false (default)', () => {
+      const wrapper = createWrapper();
+
+      const rows = wrapper.findAll(ALLOCATION_ROW);
+      expect(rows).toHaveLength(3);
+    });
+
+    it('does not show fixed subtotal rows when variableOnly is false', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="fixed-subtotal-10"]').exists()).toBe(false);
+    });
+
+    it('does not show overall fixed total row when variableOnly is false', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="fixed-total-row"]').exists()).toBe(false);
+    });
+
+    it('shows category header + fixed subtotal only when all allocations in category are fixed', () => {
+      // Make all allocations in Essentials fixed
+      mockStore.budget!.allocations[0].is_fixed_amount = true; // Groceries
+      mockStore.budget!.allocations[1].is_fixed_amount = true; // Rent (already true)
+      const wrapper = createVariableWrapper();
+
+      // No variable allocation rows for Essentials
+      const rows = wrapper.findAll(ALLOCATION_ROW);
+      // Only Entertainment (category 20) remains
+      expect(rows).toHaveLength(1);
+      expect(rows[0].text()).toContain('Entertainment');
+
+      // But Essentials category header still exists
+      expect(wrapper.find(CATEGORY_HEADER(10)).exists()).toBe(true);
+      // Fixed subtotal shows
+      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
+      expect(fixedRow.exists()).toBe(true);
+      // 500 + 1000 = 1500.00
+      expect(fixedRow.text()).toContain('1,500.00');
+    });
+
+    it('fixed subtotal row shows spent for fixed allocations', () => {
+      const wrapper = createVariableWrapper();
+
+      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
+      // Rent spent: 1000.00
+      expect(fixedRow.text()).toContain('1,000.00');
+    });
+  });
+
   describe('edge cases', () => {
     it('renders nothing when budget is null', () => {
       mockStore.budget = null;

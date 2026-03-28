@@ -2,6 +2,15 @@
   <div class="future-budgets-page">
     <div class="page-header">
       <Button
+        :label="variableOnly ? 'Variable Only' : 'All Allocations'"
+        :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
+        :outlined="!variableOnly"
+        size="small"
+        data-testid="variable-only-toggle"
+        title="Toggle between showing all allocations and variable-only mode"
+        @click="variableOnly = !variableOnly"
+      />
+      <Button
         label="Refresh"
         severity="secondary"
         data-testid="refresh-btn"
@@ -70,6 +79,18 @@
               </td>
             </tr>
 
+            <!-- Fixed subtotal row (variable-only mode) — below category header -->
+            <tr
+              v-if="variableOnly && hasFixedAllocationsInCategory(category)"
+              class="fixed-subtotal-row"
+              :data-testid="`fixed-subtotal-${category.id}`"
+            >
+              <td>Fixed</td>
+              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
+                {{ displayAmount(fixedTotalForCategory(category, budget)) }}
+              </td>
+            </tr>
+
             <tr
               v-for="allocName in allocationNamesFor(category)"
               :key="allocName"
@@ -82,6 +103,16 @@
                   @click="openAllocationDialog(category, allocName)"
                 >
                   {{ allocName }}
+                  <i
+                    v-if="category.id != null && isFixedInAllBudgets(category.id, allocName)"
+                    class="pi pi-lock fixed-icon fixed-icon--all"
+                    v-tooltip="'Fixed in all budgets'"
+                  ></i>
+                  <i
+                    v-else-if="category.id != null && isFixedInSomeBudgets(category.id, allocName)"
+                    class="pi pi-lock-open fixed-icon fixed-icon--some"
+                    v-tooltip="'Fixed in some budgets'"
+                  ></i>
                 </button>
               </td>
               <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
@@ -137,6 +168,12 @@
 
         <!-- Single-row tfoot enables position: sticky; bottom: 0 -->
         <tfoot>
+          <tr v-if="variableOnly" class="fixed-total-row" data-testid="fixed-total-row">
+            <th>Fixed Total</th>
+            <th v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
+              {{ displayAmount(totalFixedForBudget(budget)) }}
+            </th>
+          </tr>
           <tr class="total-row total-row--prominent" data-testid="total-discretionary-row">
             <th>Total Discretionary Money</th>
             <th
@@ -186,6 +223,7 @@ const dialogType = ref<'income' | 'allocation'>('income');
 const dialogName = ref('');
 const dialogAmountsPerBudget = ref<Record<number, { id: number; amount: number }>>({});
 const dialogCategoryId = ref<number | undefined>(undefined);
+const variableOnly = ref(false);
 
 const colSpan = computed(() => store.budgets.length + 1);
 
@@ -220,7 +258,49 @@ function categoryTotalFor(category: AllocationCategoryData, budget: FutureBudget
 
 function allocationNamesFor(category: AllocationCategoryData): string[] {
   if (category.id == null) return [];
-  return Object.keys(store.allocationDisplayData[category.id] ?? {});
+  const allNames = Object.keys(store.allocationDisplayData[category.id] ?? {});
+  if (!variableOnly.value) return allNames;
+  return allNames.filter((name) => !isFixedInAllBudgets(category.id!, name));
+}
+
+function isFixedInAllBudgets(categoryId: number, allocName: string): boolean {
+  const byBudget = store.allocationDisplayData[categoryId]?.[allocName];
+  if (!byBudget) return false;
+  return Object.values(byBudget).every((entry) => entry.is_fixed_amount);
+}
+
+function isFixedInSomeBudgets(categoryId: number, allocName: string): boolean {
+  const byBudget = store.allocationDisplayData[categoryId]?.[allocName];
+  if (!byBudget) return false;
+  const values = Object.values(byBudget);
+  return values.some((entry) => entry.is_fixed_amount) && !values.every((entry) => entry.is_fixed_amount);
+}
+
+function fixedTotalForCategory(category: AllocationCategoryData, budget: FutureBudgetData): number {
+  if (category.id == null) return 0;
+  const categoryData = store.allocationDisplayData[category.id];
+  if (!categoryData) return 0;
+  return Object.entries(categoryData).reduce((sum, [, byBudget]) => {
+    const entry = byBudget[budget.id];
+    if (entry?.is_fixed_amount) return sum + entry.amount;
+    return sum;
+  }, 0);
+}
+
+function hasFixedAllocationsInCategory(category: AllocationCategoryData): boolean {
+  if (category.id == null) return false;
+  const categoryData = store.allocationDisplayData[category.id];
+  if (!categoryData) return false;
+  return Object.values(categoryData).some((byBudget) =>
+    Object.values(byBudget).some((entry) => entry.is_fixed_amount),
+  );
+}
+
+function totalFixedForBudget(budget: FutureBudgetData): number {
+  return store.allocationCategories.reduce(
+    (sum, category) => sum + fixedTotalForCategory(category, budget),
+    0,
+  );
 }
 
 function allocationAmountFor(
@@ -275,6 +355,7 @@ async function onSave(payload: MassUpdatePayload) {
 .page-header {
   display: flex;
   justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 /* ── Table wrapper: the scroll container — both axes ── */
@@ -488,6 +569,23 @@ async function onSave(payload: MassUpdatePayload) {
   font-weight: 600;
 }
 
+/* ── Fixed subtotal row ── */
+.fixed-subtotal-row td {
+  background-color: var(--p-surface-100);
+  font-weight: 600;
+  color: var(--p-text-color);
+  font-size: 0.95rem;
+  border-bottom: 2px solid var(--p-surface-200);
+}
+
+/* ── Fixed total row (footer) ── */
+.fixed-total-row th {
+  background-color: var(--p-surface-50);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--p-text-muted-color);
+}
+
 /* ── Row hover ── */
 .budgets-table tbody tr:hover td,
 .budgets-table tbody tr:hover th {
@@ -515,6 +613,17 @@ async function onSave(payload: MassUpdatePayload) {
 
 .row-link:hover {
   text-decoration-color: currentColor;
+}
+
+/* ── Fixed indicator icon ── */
+.fixed-icon {
+  font-size: 0.75rem;
+  margin-left: 0.35rem;
+}
+
+.fixed-icon--all,
+.fixed-icon--some {
+  color: var(--p-text-muted-color);
 }
 
 /* ── Add link ── */

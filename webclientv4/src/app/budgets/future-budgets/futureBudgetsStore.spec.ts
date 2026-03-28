@@ -175,7 +175,7 @@ describe('futureBudgetsStore', () => {
       expect(store.allocationDisplayData).toEqual({
         3: {
           Rent: {
-            1: { id: 50, amount: 150000 },
+            1: { id: 50, amount: 150000, is_fixed_amount: false },
           },
         },
       });

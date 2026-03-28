@@ -219,6 +219,45 @@ RSpec.describe Allocation, :type => :model do
     end
 
 
+    it "updates is_fixed_amount when provided in amount_data" do
+      @params = { type: 'allocation', name: 'Food', amounts:[
+          { id: @may_allocation.id, amount: 600, is_fixed_amount: true },
+          { id: @june_allocation.id, amount: 800, is_fixed_amount: false },
+      ]}
+      Allocation.mass_update(@params)
+
+      may = Allocation.find(@may_allocation.id)
+      june = Allocation.find(@june_allocation.id)
+
+      expect(may.is_fixed_amount).to be true
+      expect(june.is_fixed_amount).to be false
+    end
+
+    it "does not change is_fixed_amount when not provided in amount_data" do
+      @may_allocation.update(is_fixed_amount: true)
+      @params = { type: 'allocation', name: 'Groceries', amounts:[
+          { id: @may_allocation.id, amount: 600 },
+      ]}
+      Allocation.mass_update(@params)
+
+      may = Allocation.find(@may_allocation.id)
+      expect(may.is_fixed_amount).to be true
+    end
+
+    it "sets is_fixed_amount on newly created allocations" do
+      @new_budget = create(:budget)
+      valid_category = AllocationCategory.first
+      @params = { type: 'allocation', name: 'Groceries',
+                  allocation_category_id: valid_category.id,
+                  amounts:[
+                    { id: 0, amount: 600, budget_id: @new_budget.id, is_fixed_amount: true },
+      ]}
+      Allocation.mass_update(@params)
+
+      new_allocation = Allocation.find_by_budget_id @new_budget.id
+      expect(new_allocation.is_fixed_amount).to be true
+    end
+
     it "deletes an allocation if the id exists and amount is 0" do
       @params = { type: 'allocation', name: 'Groceries', amounts:[
           {id: @may_allocation.id, amount: 0, budget_id: 10 },
