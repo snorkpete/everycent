@@ -176,6 +176,7 @@ watch(
     if (isVisible) {
       formName.value = props.name;
       amounts.value = buildAmounts();
+      setAllFixed.value = amounts.value.length > 0 && amounts.value.every((a) => a.is_fixed_amount);
     }
   },
 );

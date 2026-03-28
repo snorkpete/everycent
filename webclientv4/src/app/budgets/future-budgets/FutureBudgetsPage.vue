@@ -79,6 +79,18 @@
               </td>
             </tr>
 
+            <!-- Fixed subtotal row (variable-only mode) — below category header -->
+            <tr
+              v-if="variableOnly && hasFixedAllocationsInCategory(category)"
+              class="fixed-subtotal-row"
+              :data-testid="`fixed-subtotal-${category.id}`"
+            >
+              <td>Fixed</td>
+              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
+                {{ displayAmount(fixedTotalForCategory(category, budget)) }}
+              </td>
+            </tr>
+
             <tr
               v-for="allocName in allocationNamesFor(category)"
               :key="allocName"
@@ -91,22 +103,20 @@
                   @click="openAllocationDialog(category, allocName)"
                 >
                   {{ allocName }}
+                  <i
+                    v-if="category.id != null && isFixedInAllBudgets(category.id, allocName)"
+                    class="pi pi-lock fixed-icon fixed-icon--all"
+                    v-tooltip="'Fixed in all budgets'"
+                  ></i>
+                  <i
+                    v-else-if="category.id != null && isFixedInSomeBudgets(category.id, allocName)"
+                    class="pi pi-lock-open fixed-icon fixed-icon--some"
+                    v-tooltip="'Fixed in some budgets'"
+                  ></i>
                 </button>
               </td>
               <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
                 {{ displayAmount(allocationAmountFor(category, allocName, budget)) }}
-              </td>
-            </tr>
-
-            <!-- Fixed subtotal row (variable-only mode) -->
-            <tr
-              v-if="variableOnly && hasFixedAllocationsInCategory(category)"
-              class="fixed-subtotal-row"
-              :data-testid="`fixed-subtotal-${category.id}`"
-            >
-              <td>Fixed</td>
-              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-                {{ displayAmount(fixedTotalForCategory(category, budget)) }}
               </td>
             </tr>
 
@@ -257,6 +267,13 @@ function isFixedInAllBudgets(categoryId: number, allocName: string): boolean {
   const byBudget = store.allocationDisplayData[categoryId]?.[allocName];
   if (!byBudget) return false;
   return Object.values(byBudget).every((entry) => entry.is_fixed_amount);
+}
+
+function isFixedInSomeBudgets(categoryId: number, allocName: string): boolean {
+  const byBudget = store.allocationDisplayData[categoryId]?.[allocName];
+  if (!byBudget) return false;
+  const values = Object.values(byBudget);
+  return values.some((entry) => entry.is_fixed_amount) && !values.every((entry) => entry.is_fixed_amount);
 }
 
 function fixedTotalForCategory(category: AllocationCategoryData, budget: FutureBudgetData): number {
@@ -554,10 +571,11 @@ async function onSave(payload: MassUpdatePayload) {
 
 /* ── Fixed subtotal row ── */
 .fixed-subtotal-row td {
-  background-color: var(--p-surface-50);
-  font-style: italic;
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
+  background-color: var(--p-surface-100);
+  font-weight: 600;
+  color: var(--p-text-color);
+  font-size: 0.95rem;
+  border-bottom: 2px solid var(--p-surface-200);
 }
 
 /* ── Fixed total row (footer) ── */
@@ -595,6 +613,17 @@ async function onSave(payload: MassUpdatePayload) {
 
 .row-link:hover {
   text-decoration-color: currentColor;
+}
+
+/* ── Fixed indicator icon ── */
+.fixed-icon {
+  font-size: 0.75rem;
+  margin-left: 0.35rem;
+}
+
+.fixed-icon--all,
+.fixed-icon--some {
+  color: var(--p-text-muted-color);
 }
 
 /* ── Add link ── */
