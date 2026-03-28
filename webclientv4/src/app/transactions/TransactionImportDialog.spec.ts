@@ -132,10 +132,10 @@ describe('TransactionImportDialog', () => {
       );
     });
 
-    it('emits "imported" with filtered (non-deleted) transactions', async () => {
+    it('emits "imported" with all transactions including out-of-range ones marked deleted', async () => {
       const fakeResult = [
-        { description: 'Keep', withdrawal_amount: 100, deposit_amount: 0 },
-        { description: 'Remove', withdrawal_amount: 0, deposit_amount: 0, deleted: true },
+        { description: 'In range', withdrawal_amount: 100, deposit_amount: 0 },
+        { description: 'Out of range', withdrawal_amount: 0, deposit_amount: 0, deleted: true },
       ];
       vi.mocked(transactionImporter).mockReturnValue(fakeResult);
 
@@ -146,7 +146,7 @@ describe('TransactionImportDialog', () => {
 
       const emitted = wrapper.emitted('imported');
       expect(emitted).toBeDefined();
-      expect(emitted![0][0]).toEqual([fakeResult[0]]);
+      expect(emitted![0][0]).toEqual(fakeResult);
     });
 
     it('emits "update:visible" with false after import', async () => {

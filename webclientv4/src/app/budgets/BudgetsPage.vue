@@ -46,7 +46,13 @@
             :key="budget.id"
             data-testid="budget-row"
           >
-            <td class="name-cell">{{ budget.name }}</td>
+            <td class="name-cell">
+              <a
+                class="budget-name-link"
+                :data-testid="`budget-name-link-${budget.id}`"
+                @click.prevent="goToBudget(budget)"
+              >{{ budget.name }}</a>
+            </td>
             <td class="status-cell">
               <span
                 class="status-badge"
@@ -272,6 +278,15 @@ async function onAddBudget(startDate: string) {
 
 .name-cell {
   font-weight: 500;
+}
+
+.budget-name-link {
+  color: var(--p-primary-color);
+  text-decoration: none;
+}
+
+.budget-name-link:hover {
+  text-decoration: underline;
 }
 
 .status-col {

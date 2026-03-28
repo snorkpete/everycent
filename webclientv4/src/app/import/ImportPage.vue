@@ -173,7 +173,7 @@
                 data-testid="preview-row"
                 :class="previewRowClass(transaction)"
               >
-                <td class="col-date">{{ transaction.transaction_date }}</td>
+                <td class="col-date">{{ formatDate(transaction.transaction_date ?? '') }}</td>
                 <td class="col-description">{{ transaction.description }}</td>
                 <td class="col-money right">{{ centsToDollars(transaction.withdrawal_amount) }}</td>
                 <td class="col-money right">{{ centsToDollars(transaction.deposit_amount) }}</td>
@@ -277,6 +277,7 @@ import { useImportStore } from './importStore';
 import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
+import { formatDate } from '../shared/util/format-date';
 import { formatSkipReasons } from './formatSkipReasons';
 import type { ImportTransaction, PreviewBankAccount } from './import.types';
 

@@ -111,15 +111,15 @@ describe('AccountCategoryTable', () => {
       const wrapper = createWrapper('Current Accounts', [savingsAccount]);
 
       expect(wrapper.find('thead').text()).toContain('Balance At');
-      // closing_date is 2026-03-24 → "Mar 24, 2026"
-      expect(wrapper.find('thead').text()).toContain('Mar 24, 2026');
+      // closing_date is 2026-03-24 → "24-03-2026"
+      expect(wrapper.find('thead').text()).toContain('24-03-2026');
     });
 
     it('renders Balance At next_closing_date header from first account', () => {
       const wrapper = createWrapper('Current Accounts', [savingsAccount]);
 
-      // next_closing_date is 2026-04-24 → "Apr 24, 2026"
-      expect(wrapper.find('thead').text()).toContain('Apr 24, 2026');
+      // next_closing_date is 2026-04-24 → "24-04-2026"
+      expect(wrapper.find('thead').text()).toContain('24-04-2026');
     });
 
     it('renders Current Balance column header', () => {

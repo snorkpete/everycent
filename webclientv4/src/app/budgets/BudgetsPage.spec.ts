@@ -142,6 +142,17 @@ describe('BudgetsPage', () => {
       expect(rows[2].text()).toContain('Jan 2025');
     });
 
+    it('links each budget name to the budget detail page', async () => {
+      const wrapper = createWrapper();
+
+      const link = wrapper.find(`[data-testid="budget-name-link-${budget1.id}"]`);
+      expect(link.exists()).toBe(true);
+      expect(link.text()).toBe('Mar 2025');
+
+      await link.trigger('click');
+      expect(mockPush).toHaveBeenCalledWith(`/budgets/${budget1.id}`);
+    });
+
     it('shows a status badge for each budget', () => {
       const wrapper = createWrapper();
 

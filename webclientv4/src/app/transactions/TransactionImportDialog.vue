@@ -99,9 +99,8 @@ function runImport() {
   const endDate = store.selectedBudget?.end_date ?? '';
 
   const all = transactionImporter(rawInput.value, startDate, endDate, selectedFormat.value);
-  const filtered = all.filter((t) => !t.deleted);
 
-  emit('imported', filtered);
+  emit('imported', all);
   emit('update:visible', false);
 }
 

@@ -17,7 +17,13 @@ vi.mock('../budgets/budgetApi', () => ({
   budgetApi: {
     getAll: vi.fn(),
     getAllocations: vi.fn(),
+    autoAllocate: vi.fn(),
   },
+}));
+
+const mockSettings = { primary_budget_account_id: 1 };
+vi.mock('../settings/settingsStore', () => ({
+  useSettingsStore: () => ({ settings: mockSettings }),
 }));
 
 vi.mock('../bank-accounts/bankAccountApi', () => ({
@@ -792,21 +798,85 @@ describe('transactionStore', () => {
     });
   });
 
-  describe('budgetsForDropdown computed', () => {
-    it('includes open budgets (earliest first) followed by closed budgets', () => {
+  describe('autoAllocate', () => {
+    it('calls the API when account is the primary budget account', async () => {
       const store = useTransactionStore();
+      mockSettings.primary_budget_account_id = 1;
+      store.selectedBankAccount = { id: 1, name: 'Checking', is_credit_card: false };
+      store.selectedBudget = { id: 10, name: 'Jan 2025' };
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 0, description: 'Groceries', bank_account_id: 1, withdrawal_amount: 5000, deposit_amount: 0 },
+      ];
+
+      vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
+      await store.autoAllocate();
+
+      expect(budgetApi.autoAllocate).toHaveBeenCalled();
+    });
+
+    it('calls the API when account is a credit card', async () => {
+      const store = useTransactionStore();
+      mockSettings.primary_budget_account_id = 1;
+      store.selectedBankAccount = { id: 5, name: 'Credit Card', is_credit_card: true };
+      store.selectedBudget = { id: 10, name: 'Jan 2025' };
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 0, description: 'Coffee', bank_account_id: 5, withdrawal_amount: 500, deposit_amount: 0 },
+      ];
+
+      vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
+      await store.autoAllocate();
+
+      expect(budgetApi.autoAllocate).toHaveBeenCalled();
+    });
+
+    it('does not call the API when account is not primary or credit card', async () => {
+      const store = useTransactionStore();
+      mockSettings.primary_budget_account_id = 1;
+      store.selectedBankAccount = { id: 99, name: 'Savings', is_credit_card: false };
+      store.selectedBudget = { id: 10, name: 'Jan 2025' };
+      store.isEditMode = true;
+      store.draftTransactions = [
+        { id: 0, description: 'Transfer', bank_account_id: 99, withdrawal_amount: 10000, deposit_amount: 0 },
+      ];
+
+      await store.autoAllocate();
+
+      expect(budgetApi.autoAllocate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('budgetsForDropdown computed', () => {
+    it('includes only the current budget (earliest open) followed by closed budgets', () => {
+      const store = useTransactionStore();
+      // API returns budgets sorted by start_date desc
       store.budgets = [
-        { id: 1, name: 'Nov 2024', status: 'closed' },
-        { id: 2, name: 'Dec 2024', status: 'closed' },
-        { id: 3, name: 'Jan 2025', status: 'open' },
         { id: 4, name: 'Feb 2025', status: 'open' },
+        { id: 3, name: 'Jan 2025', status: 'open' },
+        { id: 2, name: 'Dec 2024', status: 'closed' },
+        { id: 1, name: 'Nov 2024', status: 'closed' },
+      ];
+
+      expect(store.budgetsForDropdown).toEqual([
+        { id: 3, name: 'Jan 2025', status: 'open' },
+        { id: 2, name: 'Dec 2024', status: 'closed' },
+        { id: 1, name: 'Nov 2024', status: 'closed' },
+      ]);
+    });
+
+    it('excludes future open budgets (current = earliest open by start_date)', () => {
+      const store = useTransactionStore();
+      // API returns budgets sorted by start_date desc
+      store.budgets = [
+        { id: 5, name: 'Mar 2025', status: 'open' },
+        { id: 4, name: 'Feb 2025', status: 'open' },
+        { id: 3, name: 'Jan 2025', status: 'closed' },
       ];
 
       expect(store.budgetsForDropdown).toEqual([
         { id: 4, name: 'Feb 2025', status: 'open' },
-        { id: 3, name: 'Jan 2025', status: 'open' },
-        { id: 1, name: 'Nov 2024', status: 'closed' },
-        { id: 2, name: 'Dec 2024', status: 'closed' },
+        { id: 3, name: 'Jan 2025', status: 'closed' },
       ]);
     });
 

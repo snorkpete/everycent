@@ -31,7 +31,7 @@ describe('EcDateField', () => {
     });
 
     it('displays the formatted date', () => {
-      const expectedDisplay = 'Dec 25, 2024';
+      const expectedDisplay = '25-12-2024';
       const wrapper = mountComponent();
 
       expect(wrapper.text()).toContain(expectedDisplay);
