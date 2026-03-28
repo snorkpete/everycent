@@ -1,7 +1,7 @@
 # Task: Fix allocation_id test-code mismatch in import save service
 
 **ID:** fix-allocation_id-test-code-mismatch-in-import-save-service
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
