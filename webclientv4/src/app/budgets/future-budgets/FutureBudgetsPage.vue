@@ -98,6 +98,18 @@
               </td>
             </tr>
 
+            <!-- Fixed subtotal row (variable-only mode) -->
+            <tr
+              v-if="variableOnly && hasFixedAllocationsInCategory(category)"
+              class="fixed-subtotal-row"
+              :data-testid="`fixed-subtotal-${category.id}`"
+            >
+              <td>Fixed</td>
+              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
+                {{ displayAmount(fixedTotalForCategory(category, budget)) }}
+              </td>
+            </tr>
+
             <tr class="add-row" :data-testid="`add-allocation-row-${category.id}`">
               <td :colspan="colSpan">
                 <button
@@ -146,6 +158,12 @@
 
         <!-- Single-row tfoot enables position: sticky; bottom: 0 -->
         <tfoot>
+          <tr v-if="variableOnly" class="fixed-total-row" data-testid="fixed-total-row">
+            <th>Fixed Total</th>
+            <th v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
+              {{ displayAmount(totalFixedForBudget(budget)) }}
+            </th>
+          </tr>
           <tr class="total-row total-row--prominent" data-testid="total-discretionary-row">
             <th>Total Discretionary Money</th>
             <th
@@ -230,7 +248,42 @@ function categoryTotalFor(category: AllocationCategoryData, budget: FutureBudget
 
 function allocationNamesFor(category: AllocationCategoryData): string[] {
   if (category.id == null) return [];
-  return Object.keys(store.allocationDisplayData[category.id] ?? {});
+  const allNames = Object.keys(store.allocationDisplayData[category.id] ?? {});
+  if (!variableOnly.value) return allNames;
+  return allNames.filter((name) => !isFixedInAllBudgets(category.id!, name));
+}
+
+function isFixedInAllBudgets(categoryId: number, allocName: string): boolean {
+  const byBudget = store.allocationDisplayData[categoryId]?.[allocName];
+  if (!byBudget) return false;
+  return Object.values(byBudget).every((entry) => entry.is_fixed_amount);
+}
+
+function fixedTotalForCategory(category: AllocationCategoryData, budget: FutureBudgetData): number {
+  if (category.id == null) return 0;
+  const categoryData = store.allocationDisplayData[category.id];
+  if (!categoryData) return 0;
+  return Object.entries(categoryData).reduce((sum, [, byBudget]) => {
+    const entry = byBudget[budget.id];
+    if (entry?.is_fixed_amount) return sum + entry.amount;
+    return sum;
+  }, 0);
+}
+
+function hasFixedAllocationsInCategory(category: AllocationCategoryData): boolean {
+  if (category.id == null) return false;
+  const categoryData = store.allocationDisplayData[category.id];
+  if (!categoryData) return false;
+  return Object.values(categoryData).some((byBudget) =>
+    Object.values(byBudget).some((entry) => entry.is_fixed_amount),
+  );
+}
+
+function totalFixedForBudget(budget: FutureBudgetData): number {
+  return store.allocationCategories.reduce(
+    (sum, category) => sum + fixedTotalForCategory(category, budget),
+    0,
+  );
 }
 
 function allocationAmountFor(
@@ -497,6 +550,22 @@ async function onSave(payload: MassUpdatePayload) {
 .amount-income {
   color: var(--p-primary-600);
   font-weight: 600;
+}
+
+/* ── Fixed subtotal row ── */
+.fixed-subtotal-row td {
+  background-color: var(--p-surface-50);
+  font-style: italic;
+  color: var(--p-text-muted-color);
+  font-size: 0.85rem;
+}
+
+/* ── Fixed total row (footer) ── */
+.fixed-total-row th {
+  background-color: var(--p-surface-50);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--p-text-muted-color);
 }
 
 /* ── Row hover ── */
