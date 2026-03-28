@@ -1,1 +1,0 @@
-import{b6 as r}from"./index-_xb82NJT.js";function t(){const s=r();return{success(e){s.add({severity:"success",summary:"Success",detail:e,life:3e3})},error(e){s.add({severity:"error",summary:"Error",detail:e,life:5e3})},info(e){s.add({severity:"info",summary:"Info",detail:e,life:3e3})}}}export{t as u};
