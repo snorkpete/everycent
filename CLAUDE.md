@@ -61,6 +61,11 @@ Prerequisite: user must have run `heroku login` in their terminal session.
 - If 100% coverage is not feasible for a specific piece of code, do not silently skip it — confirm with the user first and document the reason.
 - Run tests after every change to ensure nothing is broken.
 
+## Pre-Commit Checks
+- Before committing, run `npm run type-check` (in webclientv4/) and verify there are no TypeScript errors. Do not commit with type errors.
+- Before committing, run `npm run test` (in webclientv4/) and verify all tests pass. Do not commit with failing tests.
+- Before committing, run `bundle exec rspec` and verify all backend tests pass. Do not commit with failing tests.
+
 ## Code Review (Vue App - webclientv4)
 - Before committing any changes, run the `senior-code-reviewer` agent over all modified files.
 - Before acting on any review feedback, run `domus task list` and check whether the feedback point is already captured as an open task. If it is, note it as already tracked and do not act on it now.

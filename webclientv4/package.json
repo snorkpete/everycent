@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "type-check": "vue-tsc -b --noEmit",
     "lint": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{ts,vue,css}\" \"*.{ts,js,json}\"",
     "cypress:open": "cypress open",

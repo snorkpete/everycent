@@ -182,7 +182,7 @@ describe('AllocationTransactionsDialog', () => {
       await flushPromises();
 
       const firstRow = wrapper.findAll(TRANSACTION_ROW)[0];
-      expect(firstRow.text()).toContain('2026-03-01');
+      expect(firstRow.text()).toContain('01-03-2026');
     });
 
     it('displays transaction description', async () => {

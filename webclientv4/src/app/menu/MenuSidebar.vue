@@ -1,6 +1,9 @@
 <template>
   <aside v-if="isDesktop" class="desktop-sidebar" data-testid="desktop-sidebar">
-    <div class="brand">EveryCent</div>
+    <div class="brand">
+      <img src="/everycent-icon.jpeg" alt="EveryCent" class="brand-logo" />
+      <span>EveryCent</span>
+    </div>
     <PanelMenu :model="activeMenuItems" v-model:expandedKeys="expandedKeys" />
     <div class="color-picker">
       <button
@@ -9,7 +12,7 @@
         class="color-swatch"
         :class="{ active: activeColor === color.name }"
         :style="{ backgroundColor: color.preview }"
-        :title="color.name"
+        :title="`Switch to ${color.name} theme`"
         @click="setColor(color.name)"
       />
     </div>
@@ -45,6 +48,8 @@ import type { AppMenuItem } from './menuItems';
 const colorOptions = [
   { name: 'indigo', preview: '#6366f1' },
   { name: 'blue', preview: '#3b82f6' },
+  { name: 'teal', preview: '#14b8a6' },
+  { name: 'amber', preview: '#f59e0b' },
 ] as const;
 
 type ColorName = (typeof colorOptions)[number]['name'];
@@ -152,13 +157,22 @@ watch(
 }
 
 .brand {
-  padding: 1.25rem 1rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
   font-size: 1.05rem;
   font-weight: 700;
   color: #e2e8f0;
   letter-spacing: 0.04em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
 }
 
 .mobile-menu-toggle {

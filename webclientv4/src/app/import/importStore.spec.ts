@@ -16,7 +16,13 @@ vi.mock('./importApi', () => ({
 vi.mock('../budgets/budgetApi', () => ({
   budgetApi: {
     getAll: vi.fn(),
+    autoAllocate: vi.fn(),
   },
+}));
+
+const mockSettings = { primary_budget_account_id: 10 };
+vi.mock('../settings/settingsStore', () => ({
+  useSettingsStore: () => ({ settings: mockSettings }),
 }));
 
 vi.mock('../bank-accounts/bankAccountApi', () => ({
@@ -517,6 +523,64 @@ describe('importStore', () => {
       expect(store.saveResult).toBeNull();
       expect(store.error).toBeNull();
       expect(store.phase).toBe('idle');
+    });
+  });
+
+  describe('autoAllocate', () => {
+    it('calls the API for the primary budget account', async () => {
+      const store = useImportStore();
+      mockSettings.primary_budget_account_id = 10;
+      store.selectedBudget = { id: 1, name: 'Jan 2025', status: 'open' };
+      store.bankAccounts = [{ id: 10, name: 'Checking', is_credit_card: false }];
+      store.previewAccounts = [{
+        bank_account_id: 10,
+        current_balance: 0,
+        net: 0,
+        projected_balance: 0,
+        transactions: [{ description: 'Groceries', import_status: 'new', bank_ref: 'R1', withdrawal_amount: 5000, deposit_amount: 0 }],
+      }];
+
+      vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
+      await store.autoAllocate();
+
+      expect(budgetApi.autoAllocate).toHaveBeenCalled();
+    });
+
+    it('calls the API for credit card accounts', async () => {
+      const store = useImportStore();
+      mockSettings.primary_budget_account_id = 10;
+      store.selectedBudget = { id: 1, name: 'Jan 2025', status: 'open' };
+      store.bankAccounts = [{ id: 20, name: 'Credit Card', is_credit_card: true }];
+      store.previewAccounts = [{
+        bank_account_id: 20,
+        current_balance: 0,
+        net: 0,
+        projected_balance: 0,
+        transactions: [{ description: 'Coffee', import_status: 'new', bank_ref: 'R2', withdrawal_amount: 500, deposit_amount: 0 }],
+      }];
+
+      vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
+      await store.autoAllocate();
+
+      expect(budgetApi.autoAllocate).toHaveBeenCalled();
+    });
+
+    it('skips accounts that are not primary or credit card', async () => {
+      const store = useImportStore();
+      mockSettings.primary_budget_account_id = 10;
+      store.selectedBudget = { id: 1, name: 'Jan 2025', status: 'open' };
+      store.bankAccounts = [{ id: 99, name: 'Savings', is_credit_card: false }];
+      store.previewAccounts = [{
+        bank_account_id: 99,
+        current_balance: 0,
+        net: 0,
+        projected_balance: 0,
+        transactions: [{ description: 'Transfer', import_status: 'new', bank_ref: 'R3', withdrawal_amount: 10000, deposit_amount: 0 }],
+      }];
+
+      await store.autoAllocate();
+
+      expect(budgetApi.autoAllocate).not.toHaveBeenCalled();
     });
   });
 

@@ -139,7 +139,7 @@ describe('SpecialEventDetailPage', () => {
       const wrapper = createWrapper();
 
       const header = wrapper.find('[data-testid="event-header"]');
-      expect(header.text()).toContain('Jun 15, 2026');
+      expect(header.text()).toContain('15-06-2026');
     });
 
     it('hides start date when not set', async () => {

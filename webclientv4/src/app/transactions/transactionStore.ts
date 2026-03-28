@@ -7,6 +7,7 @@ import type { TransactionData, AllocationData, SinkFundAllocationData } from './
 import type { MatchType } from '../budgets/autoAllocate.types';
 import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
+import { useSettingsStore } from '../settings/settingsStore';
 
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref<TransactionData[]>([]);
@@ -22,9 +23,12 @@ export const useTransactionStore = defineStore('transactions', () => {
   const error = ref<string | null>(null);
 
   const budgetsForDropdown = computed(() => {
+    // Current budget = earliest open budget by start_date.
+    // API returns budgets sorted by start_date desc, so the current budget is the last open one.
     const openBudgets = budgets.value.filter((b) => b.status === 'open');
-    const closedBudgets = budgets.value.filter((b) => b.status !== 'open');
-    return [...openBudgets.slice().reverse(), ...closedBudgets];
+    const currentBudget = openBudgets.length > 0 ? openBudgets[openBudgets.length - 1] : null;
+    const closedBudgets = budgets.value.filter((b) => b.status === 'closed');
+    return currentBudget ? [currentBudget, ...closedBudgets] : closedBudgets;
   });
 
   async function fetchMetadata() {
@@ -141,8 +145,17 @@ export const useTransactionStore = defineStore('transactions', () => {
     transaction.status = allocationId > 0 ? 'paid' : 'unpaid';
   }
 
+  function isAutoAllocateEligible(): boolean {
+    const account = selectedBankAccount.value;
+    if (!account) return false;
+    if (account.is_credit_card) return true;
+    const settingsStore = useSettingsStore();
+    return account.id === settingsStore.settings.primary_budget_account_id;
+  }
+
   async function autoAllocate() {
     if (!selectedBudget.value?.id) return;
+    if (!isAutoAllocateEligible()) return;
 
     // Only suggest for unallocated, non-deleted transactions
     const candidates = draftTransactions.value

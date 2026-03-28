@@ -11,6 +11,17 @@
     </div>
     <div class="strip-divider"></div>
     <div class="strip-item">
+      <span class="strip-label">Unallocated</span>
+      <span
+        class="strip-value"
+        :class="discretionaryClass"
+        data-testid="unallocated-amount"
+      >
+        {{ centsToDollars(discretionaryTotal) }}
+      </span>
+    </div>
+    <div class="strip-divider"></div>
+    <div class="strip-item">
       <span class="strip-label">{{ discretionaryLabel }}</span>
       <span
         class="strip-value discretionary-value"

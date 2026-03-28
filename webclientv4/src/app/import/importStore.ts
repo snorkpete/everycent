@@ -6,10 +6,10 @@ import { bankAccountApi } from '../bank-accounts/bankAccountApi';
 import type { MatchType } from '../budgets/autoAllocate.types';
 import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
+import { useSettingsStore } from '../settings/settingsStore';
 import type { CamtAccountResult } from '../transactions/importers/camt053Parser';
 import type {
   PreviewBankAccount,
-  ImportTransaction,
   UnmatchedIban,
   SaveResponse,
 } from './import.types';
@@ -39,9 +39,12 @@ export const useImportStore = defineStore('import', () => {
   const phase = ref<ImportPhase>('idle');
 
   const budgetsForDropdown = computed(() => {
-    const open = budgets.value.filter((b) => b.status === 'open');
-    const closed = budgets.value.filter((b) => b.status !== 'open');
-    return [...open, ...closed];
+    // Current budget = earliest open budget by start_date.
+    // API returns budgets sorted by start_date desc, so the current budget is the last open one.
+    const openBudgets = budgets.value.filter((b) => b.status === 'open');
+    const currentBudget = openBudgets.length > 0 ? openBudgets[openBudgets.length - 1] : null;
+    const closedBudgets = budgets.value.filter((b) => b.status === 'closed');
+    return currentBudget ? [currentBudget, ...closedBudgets] : closedBudgets;
   });
 
   const isBudgetCurrent = computed(() => {
@@ -219,13 +222,22 @@ export const useImportStore = defineStore('import', () => {
     phase.value = 'idle';
   }
 
+  function isAccountAutoAllocateEligible(bankAccountId: number): boolean {
+    const ba = bankAccounts.value.find((a) => a.id === bankAccountId);
+    if (!ba) return false;
+    if (ba.is_credit_card) return true;
+    const settingsStore = useSettingsStore();
+    return ba.id === settingsStore.settings.primary_budget_account_id;
+  }
+
   async function autoAllocate() {
     if (!selectedBudget.value?.id || previewAccounts.value.length === 0) return;
 
-    // Collect descriptions from all new, non-deleted transactions across all accounts
+    // Collect descriptions from all new, non-deleted transactions across eligible accounts
     const descriptionsWithPositions: { accountIndex: number; txIndex: number; description: string }[] = [];
     for (let ai = 0; ai < previewAccounts.value.length; ai++) {
       const account = previewAccounts.value[ai];
+      if (!isAccountAutoAllocateEligible(account.bank_account_id)) continue;
       for (let ti = 0; ti < account.transactions.length; ti++) {
         const tx = account.transactions[ti];
         if (tx.import_status === 'new' && !tx.deleted && tx.description) {

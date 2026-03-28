@@ -34,7 +34,7 @@
             :key="transaction.id"
             data-testid="transaction-row"
           >
-            <td>{{ transaction.transaction_date }}</td>
+            <td>{{ formatDate(transaction.transaction_date ?? '') }}</td>
             <td>{{ transaction.description }}</td>
             <td class="amount-cell">{{ centsToDollars(transaction.net_amount ?? 0) }}</td>
           </tr>
@@ -54,6 +54,7 @@
 import { ref, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
 import { centsToDollars } from './util/cents-to-dollars';
+import { formatDate } from './util/format-date';
 import type { TransactionData } from '../transactions/transaction.types';
 
 const props = defineProps<{
