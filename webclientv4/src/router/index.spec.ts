@@ -33,6 +33,13 @@ vi.mock('../app/allocation-categories/allocationCategoryApi', () => ({
   },
 }));
 
+function authenticateUser() {
+  localStorage.setItem('access-token', 'valid-token');
+  vi.mocked(authApi.validateToken).mockResolvedValue({
+    data: { success: true },
+  } as unknown);
+}
+
 describe('router', () => {
   beforeEach(async () => {
     setActivePinia(createPinia());
@@ -59,10 +66,7 @@ describe('router', () => {
   });
 
   it('allows access to protected routes when authenticated', async () => {
-    localStorage.setItem('access-token', 'valid-token');
-    vi.mocked(authApi.validateToken).mockResolvedValue({
-      data: { success: true },
-    } as unknown);
+    authenticateUser();
 
     await router.push('/');
 
@@ -70,10 +74,7 @@ describe('router', () => {
   });
 
   it('routes /setup/bank-accounts to setup-bank-accounts when authenticated', async () => {
-    localStorage.setItem('access-token', 'valid-token');
-    vi.mocked(authApi.validateToken).mockResolvedValue({
-      data: { success: true },
-    } as unknown);
+    authenticateUser();
 
     await router.push('/setup/bank-accounts');
 
@@ -81,10 +82,7 @@ describe('router', () => {
   });
 
   it('routes /setup/allocation-categories to setup-allocation-categories when authenticated', async () => {
-    localStorage.setItem('access-token', 'valid-token');
-    vi.mocked(authApi.validateToken).mockResolvedValue({
-      data: { success: true },
-    } as unknown);
+    authenticateUser();
 
     await router.push('/setup/allocation-categories');
 
@@ -92,10 +90,7 @@ describe('router', () => {
   });
 
   it('routes /setup/institutions to setup-institutions when authenticated', async () => {
-    localStorage.setItem('access-token', 'valid-token');
-    vi.mocked(authApi.validateToken).mockResolvedValue({
-      data: { success: true },
-    } as unknown);
+    authenticateUser();
 
     await router.push('/setup/institutions');
 
@@ -103,10 +98,7 @@ describe('router', () => {
   });
 
   it('routes /setup/settings to setup-settings when authenticated', async () => {
-    localStorage.setItem('access-token', 'valid-token');
-    vi.mocked(authApi.validateToken).mockResolvedValue({
-      data: { success: true },
-    } as unknown);
+    authenticateUser();
 
     await router.push('/setup/settings');
 
@@ -114,10 +106,7 @@ describe('router', () => {
   });
 
   it('fetches settings on every authenticated navigation', async () => {
-    localStorage.setItem('access-token', 'valid-token');
-    vi.mocked(authApi.validateToken).mockResolvedValue({
-      data: { success: true },
-    } as unknown);
+    authenticateUser();
 
     await router.push('/');
     vi.mocked(settingsApi.get).mockClear();
@@ -133,5 +122,39 @@ describe('router', () => {
     await router.push('/login');
 
     expect(settingsApi.get).not.toHaveBeenCalled();
+  });
+
+  describe('page titles', () => {
+    it('sets document title to "EveryCent" for home route', async () => {
+      authenticateUser();
+
+      await router.push('/');
+
+      expect(document.title).toBe('EveryCent');
+    });
+
+    it.each([
+      ['/login', 'Login - EveryCent'],
+      ['/setup/bank-accounts', 'Bank Accounts - EveryCent'],
+      ['/setup/allocation-categories', 'Allocation Categories - EveryCent'],
+      ['/setup/institutions', 'Institutions - EveryCent'],
+      ['/setup/settings', 'Settings - EveryCent'],
+      ['/budgets/future', 'Future Budgets - EveryCent'],
+      ['/budgets', 'Budgets - EveryCent'],
+      ['/budgets/123', 'Budget - EveryCent'],
+      ['/transactions', 'Transactions - EveryCent'],
+      ['/import', 'Transaction Import - EveryCent'],
+      ['/account-balances', 'Account Balances - EveryCent'],
+      ['/sink-funds', 'Sink Funds - EveryCent'],
+      ['/special-events', 'Special Events - EveryCent'],
+      ['/special-events/1', 'Special Event - EveryCent'],
+      ['/special-events/1/allocations', 'Special Event Allocations - EveryCent'],
+    ])('route %s sets title to "%s"', async (path, expectedTitle) => {
+      authenticateUser();
+
+      await router.push(path);
+
+      expect(document.title).toBe(expectedTitle);
+    });
   });
 });
