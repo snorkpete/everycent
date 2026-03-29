@@ -1,7 +1,7 @@
 # Task: Centralize auth token management
 
 **ID:** centralize-auth-token-management
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
