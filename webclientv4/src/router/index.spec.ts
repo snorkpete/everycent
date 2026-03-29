@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import router from './index';
 import { authApi } from '../auth/authApi';
+import { settingsApi } from '../app/settings/settingsApi';
+import { bankAccountApi } from '../app/bank-accounts/bankAccountApi';
+import { allocationCategoryApi } from '../app/allocation-categories/allocationCategoryApi';
 
 vi.mock('../auth/authApi', () => ({
   authApi: {
@@ -11,11 +14,34 @@ vi.mock('../auth/authApi', () => ({
   },
 }));
 
+vi.mock('../app/settings/settingsApi', () => ({
+  settingsApi: {
+    get: vi.fn(),
+    save: vi.fn(),
+  },
+}));
+
+vi.mock('../app/bank-accounts/bankAccountApi', () => ({
+  bankAccountApi: {
+    getOpen: vi.fn(),
+  },
+}));
+
+vi.mock('../app/allocation-categories/allocationCategoryApi', () => ({
+  allocationCategoryApi: {
+    getAll: vi.fn(),
+  },
+}));
+
 describe('router', () => {
   beforeEach(async () => {
     setActivePinia(createPinia());
     localStorage.clear();
     vi.restoreAllMocks();
+    // Mock settings APIs so the router guard doesn't fail on authenticated routes
+    vi.mocked(settingsApi.get).mockResolvedValue({});
+    vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
+    vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
     // Start at a known location
     await router.push('/login');
   });
@@ -36,7 +62,7 @@ describe('router', () => {
     localStorage.setItem('access-token', 'valid-token');
     vi.mocked(authApi.validateToken).mockResolvedValue({
       data: { success: true },
-    } as any);
+    } as unknown);
 
     await router.push('/');
 
@@ -47,7 +73,7 @@ describe('router', () => {
     localStorage.setItem('access-token', 'valid-token');
     vi.mocked(authApi.validateToken).mockResolvedValue({
       data: { success: true },
-    } as any);
+    } as unknown);
 
     await router.push('/setup/bank-accounts');
 
@@ -58,7 +84,7 @@ describe('router', () => {
     localStorage.setItem('access-token', 'valid-token');
     vi.mocked(authApi.validateToken).mockResolvedValue({
       data: { success: true },
-    } as any);
+    } as unknown);
 
     await router.push('/setup/allocation-categories');
 
@@ -69,7 +95,7 @@ describe('router', () => {
     localStorage.setItem('access-token', 'valid-token');
     vi.mocked(authApi.validateToken).mockResolvedValue({
       data: { success: true },
-    } as any);
+    } as unknown);
 
     await router.push('/setup/institutions');
 
@@ -80,10 +106,32 @@ describe('router', () => {
     localStorage.setItem('access-token', 'valid-token');
     vi.mocked(authApi.validateToken).mockResolvedValue({
       data: { success: true },
-    } as any);
+    } as unknown);
 
     await router.push('/setup/settings');
 
     expect(router.currentRoute.value.name).toBe('setup-settings');
+  });
+
+  it('fetches settings on every authenticated navigation', async () => {
+    localStorage.setItem('access-token', 'valid-token');
+    vi.mocked(authApi.validateToken).mockResolvedValue({
+      data: { success: true },
+    } as unknown);
+
+    await router.push('/');
+    vi.mocked(settingsApi.get).mockClear();
+
+    await router.push('/budgets');
+
+    expect(settingsApi.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fetch settings when navigating to login', async () => {
+    vi.mocked(settingsApi.get).mockClear();
+
+    await router.push('/login');
+
+    expect(settingsApi.get).not.toHaveBeenCalled();
   });
 });

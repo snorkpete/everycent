@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import LoginPage from '../auth/LoginPage.vue';
 import { useAuthStore } from '../auth/authStore';
+import { useSettingsStore } from '../app/settings/settingsStore';
 import { budgetApi } from '../app/budgets/budgetApi';
 
 const router = createRouter({
@@ -107,6 +108,9 @@ router.beforeEach(async (to) => {
   if (!isLoggedIn) {
     return { name: 'login' };
   }
+
+  const settingsStore = useSettingsStore();
+  await settingsStore.fetchAll();
 });
 
 export default router;
