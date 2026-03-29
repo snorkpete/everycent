@@ -1,7 +1,7 @@
 # Task: Fix budgetListStore missing finally blocks
 
 **ID:** fix-budgetliststore-missing-finally-blocks
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
