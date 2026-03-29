@@ -79,6 +79,11 @@ See `webclientv4/CLAUDE.md` for Vue 3 setup constraints and conventions.
 Reference implementations: store → `transactionStore.ts`, API → `bankAccountApi.ts`, component → `TransactionsPage.vue`.
 For detailed coding rules, see `webclientv4/docs/vue-coding-rules.md`.
 
+## Merge Strategy
+- **Single-commit feature branch → ready-for-prod**: fast-forward (default `git merge`)
+- **Multi-commit feature branch → ready-for-prod**: `--no-ff` (keeps commits grouped in history)
+- **ready-for-prod → master**: `--ff-only` (ready-for-prod is just a staging technicality, no merge commits needed)
+
 ## Domus Workflow
 See `.domus/reference/agent-instructions.md` for domus workflow rules (task lifecycle, dispatch, CLI commands, staff roles).
 

@@ -1,7 +1,7 @@
 # Task: Add importApi tests
 
 **ID:** add-importapi-tests
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-03-28
