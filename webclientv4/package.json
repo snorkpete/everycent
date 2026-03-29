@@ -18,7 +18,17 @@
     "cypress:seed-db": "tsx cypress/scripts/seed-cypress-db.ts",
     "cypress:seed-dev-db": "tsx cypress/scripts/seed-dev-db.ts",
     "cypress:run:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress run",
-    "cypress:open:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress open"
+    "cypress:open:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress open",
+    "prepare": "cd .. && husky webclientv4/.husky"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.css": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
@@ -44,7 +54,9 @@
     "cypress": "^15.11.0",
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^10.7.0",
+    "husky": "^9.1.7",
     "jsdom": "^25.0.1",
+    "lint-staged": "^16.4.0",
     "pg": "^8.13.3",
     "prettier": "^3.8.1",
     "tsx": "^4.19.3",
