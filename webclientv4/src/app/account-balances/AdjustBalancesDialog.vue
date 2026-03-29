@@ -19,22 +19,18 @@
         <tbody>
           <tr class="current-balance-row">
             <td class="row-label">Current Balance</td>
-            <td v-for="(account, index) in accounts" :key="account.id" class="money-col">
-              <EcMoneyField
-                :label="''"
-                :edit-mode="false"
-                :model-value="adjustments[index]?.currentBalance ?? 0"
-              />
+            <td v-for="adj in adjustments" :key="adj.bank_account_id" class="money-col">
+              <EcMoneyField :label="''" :edit-mode="false" :model-value="adj.currentBalance" />
             </td>
           </tr>
           <tr>
             <td class="row-label">New Account Balance</td>
-            <td v-for="(account, index) in accounts" :key="account.id" class="money-col">
+            <td v-for="adj in adjustments" :key="adj.bank_account_id" class="money-col">
               <EcMoneyField
-                v-model="adjustments[index].new_balance"
+                v-model="adj.new_balance"
                 :label="''"
                 :edit-mode="true"
-                :data-testid="`new-balance-${account.id}`"
+                :data-testid="`new-balance-${adj.bank_account_id}`"
               />
             </td>
           </tr>

@@ -22,9 +22,9 @@
             <td class="sticky-col">
               <InputText v-model="formName" class="name-input" data-testid="name-input" />
             </td>
-            <td v-for="(_, i) in amounts" :key="amounts[i].budget_id">
+            <td v-for="(row, i) in amounts" :key="row.budget_id">
               <EcMoneyField
-                v-model="amounts[i].amount"
+                v-model="row.amount"
                 label=""
                 :edit-mode="true"
                 :data-testid="`amount-input-${i}`"
@@ -35,9 +35,9 @@
           <template v-if="type === 'allocation'">
             <tr data-testid="fixed-row">
               <td class="info-label sticky-col">Fixed?</td>
-              <td v-for="(_, i) in amounts" :key="amounts[i].budget_id" class="center-cell">
+              <td v-for="(row, i) in amounts" :key="row.budget_id" class="center-cell">
                 <input
-                  v-model="amounts[i].is_fixed_amount"
+                  v-model="row.is_fixed_amount"
                   type="checkbox"
                   :data-testid="`fixed-checkbox-${i}`"
                 />

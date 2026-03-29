@@ -1,11 +1,7 @@
-export interface SummableItem {
-  deleted?: boolean;
-  deposit_amount?: number;
-  withdrawal_amount?: number;
-  [key: string]: unknown;
-}
-
-const total = (items: SummableItem[] = [], fieldToSum: string): number => {
+const total = (
+  items: { deleted?: boolean; deposit_amount?: number; withdrawal_amount?: number }[] = [],
+  fieldToSum: string,
+): number => {
   return items.reduce((sum, item) => {
     if (item.deleted) {
       return sum;
@@ -15,7 +11,7 @@ const total = (items: SummableItem[] = [], fieldToSum: string): number => {
       return sum + ((item.deposit_amount ?? 0) - (item.withdrawal_amount ?? 0));
     }
 
-    const value = item[fieldToSum];
+    const value = (item as Record<string, unknown>)[fieldToSum];
     if (!value || typeof value !== 'number') {
       return sum;
     }

@@ -81,7 +81,9 @@ const notifications = useNotifications();
 
 const editMode = ref(false);
 
-function toFormData(s: SettingsData): SettingsData {
+type SettingsFormData = SettingsData & Required<Pick<SettingsData, 'husband' | 'wife' | 'single_person'>>;
+
+function toFormData(s: SettingsData): SettingsFormData {
   return {
     // Explicitly carry bank_charges_allocation_name so it survives a save round-trip
     // even though it is not currently rendered as an editable field.
@@ -97,7 +99,7 @@ function toFormData(s: SettingsData): SettingsData {
   };
 }
 
-const formData = reactive<SettingsData>(toFormData({}));
+const formData = reactive<SettingsFormData>(toFormData({}));
 
 const bankAccountItems = computed<ListItem[]>(() =>
   store.bankAccounts

@@ -17,8 +17,8 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
     const results: Record<string, Record<number, { id: number; amount: number }>> = {};
     for (const budget of budgets.value) {
       for (const income of budget.incomes) {
-        results[income.name] ??= {};
-        results[income.name][budget.id] = { id: income.id, amount: income.amount };
+        const row = (results[income.name] ??= {});
+        row[budget.id] = { id: income.id, amount: income.amount };
       }
     }
     return results;
@@ -35,9 +35,9 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
     for (const budget of budgets.value) {
       for (const allocation of budget.allocations) {
         const catId = allocation.allocation_category_id;
-        results[catId] ??= {};
-        results[catId][allocation.name] ??= {};
-        results[catId][allocation.name][budget.id] = {
+        const cat = (results[catId] ??= {});
+        const row = (cat[allocation.name] ??= {});
+        row[budget.id] = {
           id: allocation.id,
           amount: allocation.amount,
           is_fixed_amount: allocation.is_fixed_amount ?? false,
