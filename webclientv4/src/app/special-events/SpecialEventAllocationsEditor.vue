@@ -32,12 +32,22 @@
           <Column field="name" header="Allocation" />
           <Column field="budget_name" header="Budget" />
           <Column field="allocation_category_name" header="Category" />
-          <Column field="amount" header="Amount" header-style="text-align: right" style="text-align: right">
+          <Column
+            field="amount"
+            header="Amount"
+            header-style="text-align: right"
+            style="text-align: right"
+          >
             <template #body="{ data }">
               {{ centsToDollars(data.amount) }}
             </template>
           </Column>
-          <Column field="spent" header="Spent" header-style="text-align: right" style="text-align: right">
+          <Column
+            field="spent"
+            header="Spent"
+            header-style="text-align: right"
+            style="text-align: right"
+          >
             <template #body="{ data }">
               {{ centsToDollars(data.spent) }}
             </template>
@@ -85,7 +95,11 @@
           />
         </div>
 
-        <DataTable :value="groupedAllocations" data-testid="available-allocations-table" size="small">
+        <DataTable
+          :value="groupedAllocations"
+          data-testid="available-allocations-table"
+          size="small"
+        >
           <Column header="Name">
             <template #body="{ data: row }">
               <span v-if="row._isCategoryHeader" class="category-header">{{ row.name }}</span>
@@ -175,9 +189,7 @@ const groupedAllocations = computed(() => {
 
   // Then each category with allocations
   allocationCategories.value.forEach((cat) => {
-    const allocations = filtered.filter(
-      (a) => a.allocation_category_id === cat.id,
-    );
+    const allocations = filtered.filter((a) => a.allocation_category_id === cat.id);
     if (allocations.length > 0) {
       categories.set(cat.name ?? 'Unknown', allocations);
     }
@@ -218,9 +230,7 @@ function addAllocation(allocation: AllocationData) {
 }
 
 function removeAllocation(allocation: SpecialEventAllocationData) {
-  currentAllocations.value = currentAllocations.value.filter(
-    (a) => a.id !== allocation.id,
-  );
+  currentAllocations.value = currentAllocations.value.filter((a) => a.id !== allocation.id);
 }
 
 async function save() {
@@ -239,9 +249,7 @@ async function save() {
     notifications.success('Special event allocations updated');
     router.push({ name: 'special-event-detail', params: { id: eventId } });
   } catch {
-    notifications.error(
-      store.error ?? 'Failed to update special event allocations',
-    );
+    notifications.error(store.error ?? 'Failed to update special event allocations');
   }
 }
 

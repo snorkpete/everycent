@@ -41,17 +41,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="budget in store.budgets"
-            :key="budget.id"
-            data-testid="budget-row"
-          >
+          <tr v-for="budget in store.budgets" :key="budget.id" data-testid="budget-row">
             <td class="name-cell">
               <a
                 class="budget-name-link"
                 :data-testid="`budget-name-link-${budget.id}`"
                 @click.prevent="goToBudget(budget)"
-              >{{ budget.name }}</a>
+                >{{ budget.name }}</a
+              >
             </td>
             <td class="status-cell">
               <span

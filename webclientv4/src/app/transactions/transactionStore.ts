@@ -96,10 +96,12 @@ export const useTransactionStore = defineStore('transactions', () => {
       await transactionApi.save({
         bankAccountId: selectedBankAccount.value.id!,
         budgetId: selectedBudget.value.id!,
-        transactions: transactionsToSave.filter((t) => !t.deleted).map((t) => {
-          const { newlyImported: _, selected: __, ...rest } = t;
-          return rest;
-        }),
+        transactions: transactionsToSave
+          .filter((t) => !t.deleted)
+          .map((t) => {
+            const { newlyImported, selected, ...rest } = t;
+            return rest;
+          }),
       });
       await fetch({
         budgetId: selectedBudget.value.id!,
@@ -184,9 +186,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     draftTransactions.value.push(...imported.map((t) => ({ ...t, newlyImported: true })));
   }
 
-  const selectedTransactions = computed(() =>
-    draftTransactions.value.filter((t) => t.selected),
-  );
+  const selectedTransactions = computed(() => draftTransactions.value.filter((t) => t.selected));
 
   const selectedTotal = computed(() =>
     selectedTransactions.value.reduce((sum, t) => {
@@ -196,7 +196,9 @@ export const useTransactionStore = defineStore('transactions', () => {
   );
 
   function clearSelections() {
-    draftTransactions.value.forEach((t) => { t.selected = false; });
+    draftTransactions.value.forEach((t) => {
+      t.selected = false;
+    });
   }
 
   async function refresh() {

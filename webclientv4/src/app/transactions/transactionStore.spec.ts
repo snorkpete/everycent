@@ -289,7 +289,9 @@ describe('transactionStore', () => {
 
   describe('save', () => {
     it('calls transactionApi.save with bank account and budget from selected state', async () => {
-      const transactions = [{ id: 1, description: 'Test', withdrawal_amount: 100, deposit_amount: 0 }];
+      const transactions = [
+        { id: 1, description: 'Test', withdrawal_amount: 100, deposit_amount: 0 },
+      ];
       vi.mocked(transactionApi.save).mockResolvedValue(transactions);
       vi.mocked(transactionApi.getAll).mockResolvedValue(transactions);
       vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
@@ -372,7 +374,12 @@ describe('transactionStore', () => {
     });
 
     it('strips selected flag before calling transactionApi.save', async () => {
-      const selectedTransaction = { description: 'Selected', withdrawal_amount: 200, deposit_amount: 0, selected: true };
+      const selectedTransaction = {
+        description: 'Selected',
+        withdrawal_amount: 200,
+        deposit_amount: 0,
+        selected: true,
+      };
       vi.mocked(transactionApi.save).mockResolvedValue([]);
       vi.mocked(transactionApi.getAll).mockResolvedValue([]);
       vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
@@ -390,7 +397,12 @@ describe('transactionStore', () => {
     });
 
     it('strips newlyImported flag before calling transactionApi.save', async () => {
-      const importedTransaction = { description: 'Imported', withdrawal_amount: 100, deposit_amount: 0, newlyImported: true };
+      const importedTransaction = {
+        description: 'Imported',
+        withdrawal_amount: 100,
+        deposit_amount: 0,
+        newlyImported: true,
+      };
       vi.mocked(transactionApi.save).mockResolvedValue([]);
       vi.mocked(transactionApi.getAll).mockResolvedValue([]);
       vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
@@ -408,8 +420,19 @@ describe('transactionStore', () => {
     });
 
     it('filters out deleted transactions before calling transactionApi.save', async () => {
-      const liveTransaction = { id: 1, description: 'Keep', withdrawal_amount: 100, deposit_amount: 0 };
-      const deletedTransaction = { id: 2, description: 'Remove', withdrawal_amount: 50, deposit_amount: 0, deleted: true };
+      const liveTransaction = {
+        id: 1,
+        description: 'Keep',
+        withdrawal_amount: 100,
+        deposit_amount: 0,
+      };
+      const deletedTransaction = {
+        id: 2,
+        description: 'Remove',
+        withdrawal_amount: 50,
+        deposit_amount: 0,
+        deleted: true,
+      };
       vi.mocked(transactionApi.save).mockResolvedValue([liveTransaction]);
       vi.mocked(transactionApi.getAll).mockResolvedValue([liveTransaction]);
       vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
@@ -434,17 +457,25 @@ describe('transactionStore', () => {
     it('enters edit mode if not already in edit mode', () => {
       const store = useTransactionStore();
       store.isEditMode = false;
-      store.transactions = [{ id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      store.transactions = [
+        { id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' },
+      ];
 
-      store.addImportedTransactions([{ description: 'Imported', withdrawal_amount: 500, deposit_amount: 0 }]);
+      store.addImportedTransactions([
+        { description: 'Imported', withdrawal_amount: 500, deposit_amount: 0 },
+      ]);
 
       expect(store.isEditMode).toBe(true);
     });
 
     it('appends imported transactions to draftTransactions', () => {
       const store = useTransactionStore();
-      store.transactions = [{ id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
-      store.draftTransactions = [{ id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      store.transactions = [
+        { id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' },
+      ];
+      store.draftTransactions = [
+        { id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' },
+      ];
       store.isEditMode = true;
 
       const imported = [{ description: 'Imported', withdrawal_amount: 500, deposit_amount: 0 }];
@@ -459,41 +490,69 @@ describe('transactionStore', () => {
       store.isEditMode = true;
       store.draftTransactions = [];
 
-      store.addImportedTransactions([{ description: 'Imported', withdrawal_amount: 100, deposit_amount: 0 }]);
+      store.addImportedTransactions([
+        { description: 'Imported', withdrawal_amount: 100, deposit_amount: 0 },
+      ]);
 
       expect(store.draftTransactions[0].newlyImported).toBe(true);
     });
 
     it('does not mark newlyImported on pre-existing draft transactions', () => {
       const store = useTransactionStore();
-      const existing = { id: 1, description: 'Existing', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' };
+      const existing = {
+        id: 1,
+        description: 'Existing',
+        withdrawal_amount: 0,
+        deposit_amount: 0,
+        status: 'paid',
+      };
       store.draftTransactions = [existing];
       store.isEditMode = true;
 
-      store.addImportedTransactions([{ description: 'New', withdrawal_amount: 50, deposit_amount: 0 }]);
+      store.addImportedTransactions([
+        { description: 'New', withdrawal_amount: 50, deposit_amount: 0 },
+      ]);
 
       expect(store.draftTransactions[0].newlyImported).toBeUndefined();
     });
 
     it('preserves existing draft edits when already in edit mode', () => {
       const store = useTransactionStore();
-      const existingDraft = { id: 1, description: 'Edited locally', withdrawal_amount: 999, deposit_amount: 0, status: 'paid' };
-      store.transactions = [{ id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      const existingDraft = {
+        id: 1,
+        description: 'Edited locally',
+        withdrawal_amount: 999,
+        deposit_amount: 0,
+        status: 'paid',
+      };
+      store.transactions = [
+        { id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' },
+      ];
       store.draftTransactions = [existingDraft];
       store.isEditMode = true;
 
-      store.addImportedTransactions([{ description: 'New Import', withdrawal_amount: 100, deposit_amount: 0 }]);
+      store.addImportedTransactions([
+        { description: 'New Import', withdrawal_amount: 100, deposit_amount: 0 },
+      ]);
 
       expect(store.draftTransactions[0]).toEqual(existingDraft);
     });
 
     it('clones transactions into draft when entering edit mode on import', () => {
-      const original = { id: 1, description: 'Original', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' };
+      const original = {
+        id: 1,
+        description: 'Original',
+        withdrawal_amount: 0,
+        deposit_amount: 0,
+        status: 'paid',
+      };
       const store = useTransactionStore();
       store.transactions = [original];
       store.isEditMode = false;
 
-      store.addImportedTransactions([{ description: 'Imported', withdrawal_amount: 200, deposit_amount: 0 }]);
+      store.addImportedTransactions([
+        { description: 'Imported', withdrawal_amount: 200, deposit_amount: 0 },
+      ]);
 
       // draftTransactions has both the clone and the imported row
       expect(store.draftTransactions).toHaveLength(2);
@@ -554,7 +613,9 @@ describe('transactionStore', () => {
     });
 
     it('does not reset draftTransactions', () => {
-      const draft = [{ id: 1, description: 'Draft', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      const draft = [
+        { id: 1, description: 'Draft', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' },
+      ];
       const store = useTransactionStore();
       store.isEditMode = true;
       store.draftTransactions = draft;
@@ -568,7 +629,9 @@ describe('transactionStore', () => {
   describe('enterEditMode', () => {
     it('sets isEditMode to true', () => {
       const store = useTransactionStore();
-      store.transactions = [{ id: 1, description: 'Test', withdrawal_amount: 100, deposit_amount: 0, status: 'paid' }];
+      store.transactions = [
+        { id: 1, description: 'Test', withdrawal_amount: 100, deposit_amount: 0, status: 'paid' },
+      ];
 
       store.enterEditMode();
 
@@ -576,7 +639,13 @@ describe('transactionStore', () => {
     });
 
     it('creates a deep copy of transactions into draftTransactions', () => {
-      const transaction = { id: 1, description: 'Original', withdrawal_amount: 100, deposit_amount: 0, status: 'paid' };
+      const transaction = {
+        id: 1,
+        description: 'Original',
+        withdrawal_amount: 100,
+        deposit_amount: 0,
+        status: 'paid',
+      };
       const store = useTransactionStore();
       store.transactions = [transaction];
 
@@ -600,8 +669,18 @@ describe('transactionStore', () => {
 
     it('resets draftTransactions from transactions', () => {
       const store = useTransactionStore();
-      store.transactions = [{ id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
-      store.draftTransactions = [{ id: 1, description: 'Draft edit', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      store.transactions = [
+        { id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' },
+      ];
+      store.draftTransactions = [
+        {
+          id: 1,
+          description: 'Draft edit',
+          withdrawal_amount: 0,
+          deposit_amount: 0,
+          status: 'paid',
+        },
+      ];
       store.isEditMode = true;
 
       store.cancelEdit();
@@ -611,7 +690,9 @@ describe('transactionStore', () => {
 
     it('creates a deep copy so draft is independent of transactions', () => {
       const store = useTransactionStore();
-      store.transactions = [{ id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' }];
+      store.transactions = [
+        { id: 1, description: 'Server', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' },
+      ];
 
       store.cancelEdit();
       store.draftTransactions[0].description = 'Mutated';
@@ -663,7 +744,14 @@ describe('transactionStore', () => {
   describe('deleteTransaction', () => {
     it('sets deleted to true on the transaction', () => {
       const store = useTransactionStore();
-      const transaction = { id: 1, description: 'Groceries', withdrawal_amount: 100, deposit_amount: 0, status: 'paid', deleted: false };
+      const transaction = {
+        id: 1,
+        description: 'Groceries',
+        withdrawal_amount: 100,
+        deposit_amount: 0,
+        status: 'paid',
+        deleted: false,
+      };
       store.draftTransactions = [transaction];
 
       store.deleteTransaction(store.draftTransactions[0]);
@@ -675,7 +763,14 @@ describe('transactionStore', () => {
   describe('undoDeleteTransaction', () => {
     it('sets deleted to false on the transaction', () => {
       const store = useTransactionStore();
-      const transaction = { id: 1, description: 'Groceries', withdrawal_amount: 100, deposit_amount: 0, status: 'paid', deleted: true };
+      const transaction = {
+        id: 1,
+        description: 'Groceries',
+        withdrawal_amount: 100,
+        deposit_amount: 0,
+        status: 'paid',
+        deleted: true,
+      };
       store.draftTransactions = [transaction];
 
       store.undoDeleteTransaction(store.draftTransactions[0]);
@@ -687,7 +782,13 @@ describe('transactionStore', () => {
   describe('onAllocationChange', () => {
     it('sets allocation_id on the transaction', () => {
       const store = useTransactionStore();
-      const transaction = { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'unpaid' };
+      const transaction = {
+        id: 1,
+        description: 'Test',
+        withdrawal_amount: 0,
+        deposit_amount: 0,
+        status: 'unpaid',
+      };
       store.draftTransactions = [transaction];
 
       store.onAllocationChange(store.draftTransactions[0], 5);
@@ -697,7 +798,13 @@ describe('transactionStore', () => {
 
     it('sets status to "paid" when allocationId is greater than 0', () => {
       const store = useTransactionStore();
-      const transaction = { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'unpaid' };
+      const transaction = {
+        id: 1,
+        description: 'Test',
+        withdrawal_amount: 0,
+        deposit_amount: 0,
+        status: 'unpaid',
+      };
       store.draftTransactions = [transaction];
 
       store.onAllocationChange(store.draftTransactions[0], 3);
@@ -707,7 +814,13 @@ describe('transactionStore', () => {
 
     it('sets status to "unpaid" when allocationId is 0', () => {
       const store = useTransactionStore();
-      const transaction = { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'paid' };
+      const transaction = {
+        id: 1,
+        description: 'Test',
+        withdrawal_amount: 0,
+        deposit_amount: 0,
+        status: 'paid',
+      };
       store.draftTransactions = [transaction];
 
       store.onAllocationChange(store.draftTransactions[0], 0);
@@ -755,9 +868,7 @@ describe('transactionStore', () => {
 
     it('returns 0 when no transactions are selected', () => {
       const store = useTransactionStore();
-      store.draftTransactions = [
-        { id: 1, net_amount: 5000 },
-      ];
+      store.draftTransactions = [{ id: 1, net_amount: 5000 }];
 
       expect(store.selectedTotal).toBe(0);
     });
@@ -806,7 +917,13 @@ describe('transactionStore', () => {
       store.selectedBudget = { id: 10, name: 'Jan 2025' };
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 0, description: 'Groceries', bank_account_id: 1, withdrawal_amount: 5000, deposit_amount: 0 },
+        {
+          id: 0,
+          description: 'Groceries',
+          bank_account_id: 1,
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+        },
       ];
 
       vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
@@ -822,7 +939,13 @@ describe('transactionStore', () => {
       store.selectedBudget = { id: 10, name: 'Jan 2025' };
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 0, description: 'Coffee', bank_account_id: 5, withdrawal_amount: 500, deposit_amount: 0 },
+        {
+          id: 0,
+          description: 'Coffee',
+          bank_account_id: 5,
+          withdrawal_amount: 500,
+          deposit_amount: 0,
+        },
       ];
 
       vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
@@ -838,7 +961,13 @@ describe('transactionStore', () => {
       store.selectedBudget = { id: 10, name: 'Jan 2025' };
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 0, description: 'Transfer', bank_account_id: 99, withdrawal_amount: 10000, deposit_amount: 0 },
+        {
+          id: 0,
+          description: 'Transfer',
+          bank_account_id: 99,
+          withdrawal_amount: 10000,
+          deposit_amount: 0,
+        },
       ];
 
       await store.autoAllocate();

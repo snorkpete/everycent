@@ -77,17 +77,13 @@ export const useSpecialEventStore = defineStore('specialEvents', () => {
     }
   }
 
-  async function updateAllocations(
-    id: number,
-    data: UpdateAllocationsPayload,
-  ) {
+  async function updateAllocations(id: number, data: UpdateAllocationsPayload) {
     loading.value = true;
     error.value = null;
     try {
       currentSpecialEvent.value = await specialEventApi.updateAllocations(id, data);
     } catch (e: unknown) {
-      error.value =
-        e instanceof Error ? e.message : 'Failed to update special event allocations';
+      error.value = e instanceof Error ? e.message : 'Failed to update special event allocations';
       throw e;
     } finally {
       loading.value = false;

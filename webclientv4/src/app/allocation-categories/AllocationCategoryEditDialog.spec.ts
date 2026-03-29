@@ -100,7 +100,9 @@ describe('AllocationCategoryEditDialog', () => {
       const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
       await saveBtn.trigger('click');
 
-      expect(wrapper.emitted('save')?.[0]).toEqual([{ id: existingCategory.id, name: existingCategory.name }]);
+      expect(wrapper.emitted('save')?.[0]).toEqual([
+        { id: existingCategory.id, name: existingCategory.name },
+      ]);
     });
 
     it('returns to view mode when "Cancel" is clicked on an existing category', async () => {

@@ -219,9 +219,7 @@ describe('SinkFundAllocationTable', () => {
     });
 
     it('applies amount-positive class when outstanding is positive', async () => {
-      mockStore.visibleAllocations = [
-        { ...openAllocation, current_balance: 60000, target: 50000 },
-      ];
+      mockStore.visibleAllocations = [{ ...openAllocation, current_balance: 60000, target: 50000 }];
       const wrapper = createWrapper();
       await nextTick();
 
@@ -231,9 +229,7 @@ describe('SinkFundAllocationTable', () => {
     });
 
     it('applies amount-muted class when outstanding is zero', async () => {
-      mockStore.visibleAllocations = [
-        { ...openAllocation, current_balance: 50000, target: 50000 },
-      ];
+      mockStore.visibleAllocations = [{ ...openAllocation, current_balance: 50000, target: 50000 }];
       const wrapper = createWrapper();
       await nextTick();
 
@@ -300,10 +296,7 @@ describe('SinkFundAllocationTable', () => {
   describe('allocation rows — edit mode', () => {
     beforeEach(() => {
       mockStore.isEditMode = true;
-      mockStore.visibleAllocations = [
-        { ...openAllocation },
-        { ...zeroTargetAllocation },
-      ];
+      mockStore.visibleAllocations = [{ ...openAllocation }, { ...zeroTargetAllocation }];
     });
 
     it('renders name as text input', async () => {

@@ -64,11 +64,7 @@
             data-testid="calculator-total"
           >
             <span class="summary-label">Selected Total</span>
-            <EcMoneyField
-              label=""
-              :edit-mode="false"
-              :model-value="store.selectedTotal"
-            />
+            <EcMoneyField label="" :edit-mode="false" :model-value="store.selectedTotal" />
             <Button
               icon="pi pi-times"
               text
@@ -159,7 +155,9 @@ const budgetDifference = computed(() => currentBankBalance.value - currentBudget
 
 const showUnpaidBalance = computed(() => {
   if (!props.bankAccount) return false;
-  return props.bankAccount.account_type === 'credit_card' || props.bankAccount.is_credit_card === true;
+  return (
+    props.bankAccount.account_type === 'credit_card' || props.bankAccount.is_credit_card === true
+  );
 });
 
 const unpaidBalance = computed(() => {
@@ -256,10 +254,14 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
 
 /* Fade transition for calculator total */
 .calc-fade-enter-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 .calc-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 .calc-fade-enter-from {
   opacity: 0;

@@ -62,12 +62,8 @@ export function buildPreviewPayload(
 
 export const importApi = {
   preview: (payload: PreviewPayload) =>
-    apiGateway
-      .post<PreviewResponse>('/transactions/import_preview', payload)
-      .then((r) => r.data),
+    apiGateway.post<PreviewResponse>('/transactions/import_preview', payload).then((r) => r.data),
 
   save: (payload: SavePayload) =>
-    apiGateway
-      .post<SaveResponse>('/transactions/import_save', payload)
-      .then((r) => r.data),
+    apiGateway.post<SaveResponse>('/transactions/import_save', payload).then((r) => r.data),
 };

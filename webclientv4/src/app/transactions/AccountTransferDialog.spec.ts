@@ -478,9 +478,7 @@ describe('AccountTransferDialog', () => {
       await wrapper.find(TRANSFER_BTN).trigger('click');
       await flushPromises();
 
-      expect(mockNotifyError).toHaveBeenCalledWith(
-        expect.stringContaining('Transfer failed'),
-      );
+      expect(mockNotifyError).toHaveBeenCalledWith(expect.stringContaining('Transfer failed'));
     });
 
     it('does not close the dialog on failure', async () => {

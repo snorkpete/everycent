@@ -8,11 +8,7 @@ import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 import { useSettingsStore } from '../settings/settingsStore';
 import type { CamtAccountResult } from '../transactions/importers/camt053Parser';
-import type {
-  PreviewBankAccount,
-  UnmatchedIban,
-  SaveResponse,
-} from './import.types';
+import type { PreviewBankAccount, UnmatchedIban, SaveResponse } from './import.types';
 
 export type ImportPhase = 'idle' | 'parsed' | 'preview' | 'saved';
 
@@ -55,9 +51,10 @@ export const useImportStore = defineStore('import', () => {
     return parsedAccounts.value.map((account) => {
       const inPeriod = account.transactions.filter((t) => !t.deleted).length;
       const outOfPeriod = account.transactions.filter((t) => t.deleted).length;
-      const matchedBa = account.bankAccountId != null
-        ? bankAccounts.value.find((ba) => ba.id === account.bankAccountId)
-        : null;
+      const matchedBa =
+        account.bankAccountId != null
+          ? bankAccounts.value.find((ba) => ba.id === account.bankAccountId)
+          : null;
 
       return {
         iban: account.iban,
@@ -187,18 +184,19 @@ export const useImportStore = defineStore('import', () => {
         budget_id: selectedBudget.value.id!,
         bank_accounts: previewAccounts.value.map((account) => ({
           bank_account_id: account.bank_account_id,
-          iban: bankAccounts.value.find((ba) => ba.id === account.bank_account_id)?.account_no ?? '',
+          iban:
+            bankAccounts.value.find((ba) => ba.id === account.bank_account_id)?.account_no ?? '',
           transactions: account.transactions.map((t) => ({
-              transaction_date: t.transaction_date ?? '',
-              description: t.description ?? '',
-              withdrawal_amount: t.withdrawal_amount ?? 0,
-              deposit_amount: t.deposit_amount ?? 0,
-              bank_ref: t.bank_ref ?? '',
-              status: t.status ?? 'paid',
-              camt_imported: t.camt_imported ?? true,
-              deleted: t.deleted ?? false,
-              allocation_id: t.allocation_id ?? null,
-            })),
+            transaction_date: t.transaction_date ?? '',
+            description: t.description ?? '',
+            withdrawal_amount: t.withdrawal_amount ?? 0,
+            deposit_amount: t.deposit_amount ?? 0,
+            bank_ref: t.bank_ref ?? '',
+            status: t.status ?? 'paid',
+            camt_imported: t.camt_imported ?? true,
+            deleted: t.deleted ?? false,
+            allocation_id: t.allocation_id ?? null,
+          })),
         })),
       };
 
@@ -234,14 +232,22 @@ export const useImportStore = defineStore('import', () => {
     if (!selectedBudget.value?.id || previewAccounts.value.length === 0) return;
 
     // Collect descriptions from all new, non-deleted transactions across eligible accounts
-    const descriptionsWithPositions: { accountIndex: number; txIndex: number; description: string }[] = [];
+    const descriptionsWithPositions: {
+      accountIndex: number;
+      txIndex: number;
+      description: string;
+    }[] = [];
     for (let ai = 0; ai < previewAccounts.value.length; ai++) {
       const account = previewAccounts.value[ai];
       if (!isAccountAutoAllocateEligible(account.bank_account_id)) continue;
       for (let ti = 0; ti < account.transactions.length; ti++) {
         const tx = account.transactions[ti];
         if (tx.import_status === 'new' && !tx.deleted && tx.description) {
-          descriptionsWithPositions.push({ accountIndex: ai, txIndex: ti, description: tx.description });
+          descriptionsWithPositions.push({
+            accountIndex: ai,
+            txIndex: ti,
+            description: tx.description,
+          });
         }
       }
     }

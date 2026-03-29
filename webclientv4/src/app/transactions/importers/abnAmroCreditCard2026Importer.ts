@@ -1,20 +1,33 @@
 import type { TransactionData } from '../transaction.types';
 
 const MONTH_MAP: Record<string, number> = {
-  jan: 0, feb: 1, mar: 2, mrt: 2, apr: 3, may: 4, mei: 4, jun: 5,
-  jul: 6, aug: 7, sep: 8, okt: 9, oct: 9, nov: 10, dec: 11,
+  jan: 0,
+  feb: 1,
+  mar: 2,
+  mrt: 2,
+  apr: 3,
+  may: 4,
+  mei: 4,
+  jun: 5,
+  jul: 6,
+  aug: 7,
+  sep: 8,
+  okt: 9,
+  oct: 9,
+  nov: 10,
+  dec: 11,
 };
 
 const DATE_PATTERN = /^(\d{1,2})\s+([a-z]{3})\.?\s+(\d{4})$/i;
 const DESCRIPTION_LABEL = /^Transaction description:/i;
-const CARDHOLDER_LABEL = /^Cardholder:/i;
 const AMOUNT_LABEL = /^Transaction amount:/i;
 const NOISE_PATTERNS = [
+  /^Cardholder:/i,
   /^RECURRING$/i,
   /^RESERVED$/i,
   /^Current Period$/i,
-  /^\d{4}$/,                    // standalone year like "2026"
-  /^\d+\s+\w+\s+to\s+\d+/i,   // date range like "28 februari to 27 maart 2026"
+  /^\d{4}$/, // standalone year like "2026"
+  /^\d+\s+\w+\s+to\s+\d+/i, // date range like "28 februari to 27 maart 2026"
 ];
 
 function isNoise(line: string): boolean {

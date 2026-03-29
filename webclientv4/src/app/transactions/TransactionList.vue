@@ -1,169 +1,181 @@
 <template>
   <div class="transaction-list">
     <table class="transactions-table">
-        <thead>
-          <tr>
-            <th class="col-calculator" />
-            <th class="col-date">Date</th>
-            <th class="col-description">Description</th>
-            <th data-testid="allocation-header" class="col-allocation">{{ allocationHeaderName }}</th>
-            <th class="col-money right">Withdrawn</th>
-            <th class="col-money right">Deposited</th>
-            <th class="col-paid">Paid</th>
-            <th class="col-auto">Auto</th>
-            <th class="col-action">
-              <Button
-                v-if="store.isEditMode"
-                :icon="allDeleted ? 'pi pi-undo' : 'pi pi-trash'"
-                :severity="allDeleted ? 'secondary' : 'danger'"
-                text
-                size="small"
-                data-testid="delete-all-btn"
-                v-tooltip.top="allDeleted ? 'Restore all transactions' : 'Delete all transactions'"
-                @click="toggleDeleteAll"
-              />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(transaction, index) in store.draftTransactions"
-            :key="transaction.id ?? `new-${index}`"
-            data-testid="transaction-row"
-            :class="{ 'transaction-row--deleted': transaction.deleted, 'transaction-row--newly-imported': transaction.newlyImported }"
+      <thead>
+        <tr>
+          <th class="col-calculator" />
+          <th class="col-date">Date</th>
+          <th class="col-description">Description</th>
+          <th data-testid="allocation-header" class="col-allocation">{{ allocationHeaderName }}</th>
+          <th class="col-money right">Withdrawn</th>
+          <th class="col-money right">Deposited</th>
+          <th class="col-paid">Paid</th>
+          <th class="col-auto">Auto</th>
+          <th class="col-action">
+            <Button
+              v-if="store.isEditMode"
+              v-tooltip.top="allDeleted ? 'Restore all transactions' : 'Delete all transactions'"
+              :icon="allDeleted ? 'pi pi-undo' : 'pi pi-trash'"
+              :severity="allDeleted ? 'secondary' : 'danger'"
+              text
+              size="small"
+              data-testid="delete-all-btn"
+              @click="toggleDeleteAll"
+            />
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(transaction, index) in store.draftTransactions"
+          :key="transaction.id ?? `new-${index}`"
+          data-testid="transaction-row"
+          :class="{
+            'transaction-row--deleted': transaction.deleted,
+            'transaction-row--newly-imported': transaction.newlyImported,
+          }"
+        >
+          <td class="col-calculator">
+            <Checkbox
+              v-if="showCalculatorColumn"
+              :model-value="transaction.selected ?? false"
+              binary
+              :data-testid="`calculator-checkbox-${index}`"
+              class="calculator-checkbox"
+              @update:model-value="transaction.selected = $event"
+            />
+          </td>
+          <td class="col-date">
+            <EcDateField
+              label=""
+              :edit-mode="store.isEditMode"
+              :model-value="transaction.transaction_date ?? ''"
+              @update:model-value="transaction.transaction_date = $event"
+            />
+          </td>
+          <td
+            :class="[
+              'col-description',
+              wrapDescriptions ? 'col-description--wrap' : 'col-description--truncate',
+            ]"
           >
-            <td class="col-calculator">
-              <Checkbox
-                v-if="showCalculatorColumn"
-                :model-value="transaction.selected ?? false"
-                binary
-                :data-testid="`calculator-checkbox-${index}`"
-                class="calculator-checkbox"
-                @update:model-value="transaction.selected = $event"
-              />
-            </td>
-            <td class="col-date">
-              <EcDateField
+            <EcTextField
+              label=""
+              :edit-mode="store.isEditMode"
+              :model-value="transaction.description ?? ''"
+              @update:model-value="transaction.description = $event"
+            />
+          </td>
+          <td class="col-allocation">
+            <template v-if="store.selectedBankAccount?.is_sink_fund">
+              <EcListField
                 label=""
                 :edit-mode="store.isEditMode"
-                :model-value="transaction.transaction_date ?? ''"
-                @update:model-value="transaction.transaction_date = $event"
+                :items="sinkFundAllocationItems"
+                :model-value="transaction.sink_fund_allocation_id ?? null"
+                @update:model-value="transaction.sink_fund_allocation_id = $event as number"
               />
-            </td>
-            <td :class="['col-description', wrapDescriptions ? 'col-description--wrap' : 'col-description--truncate']">
-              <EcTextField
-                label=""
-                :edit-mode="store.isEditMode"
-                :model-value="transaction.description ?? ''"
-                @update:model-value="transaction.description = $event"
-              />
-            </td>
-            <td class="col-allocation">
-              <template v-if="store.selectedBankAccount?.is_sink_fund">
+            </template>
+            <template v-else>
+              <div class="allocation-cell" :class="autoAllocationClass(transaction)">
+                <i
+                  v-if="transaction.auto_match_type"
+                  v-tooltip.top="`Auto-matched (${transaction.auto_match_type})`"
+                  :class="
+                    transaction.auto_match_type === 'exact'
+                      ? 'pi pi-check-circle'
+                      : 'pi pi-question-circle'
+                  "
+                  class="auto-indicator"
+                />
                 <EcListField
                   label=""
                   :edit-mode="store.isEditMode"
-                  :items="sinkFundAllocationItems"
-                  :model-value="transaction.sink_fund_allocation_id ?? null"
-                  @update:model-value="transaction.sink_fund_allocation_id = $event as number"
+                  :items="allocationItems"
+                  group-by="allocation_category"
+                  filterable
+                  :model-value="transaction.allocation_id ?? null"
+                  @update:model-value="store.onAllocationChange(transaction, $event as number)"
                 />
-              </template>
-              <template v-else>
-                <div class="allocation-cell" :class="autoAllocationClass(transaction)">
-                  <i
-                    v-if="transaction.auto_match_type"
-                    :class="transaction.auto_match_type === 'exact' ? 'pi pi-check-circle' : 'pi pi-question-circle'"
-                    class="auto-indicator"
-                    v-tooltip.top="`Auto-matched (${transaction.auto_match_type})`"
-                  />
-                  <EcListField
-                    label=""
-                    :edit-mode="store.isEditMode"
-                    :items="allocationItems"
-                    group-by="allocation_category"
-                    filterable
-                    :model-value="transaction.allocation_id ?? null"
-                    @update:model-value="store.onAllocationChange(transaction, $event as number)"
-                  />
-                </div>
-              </template>
-            </td>
-            <td class="col-money right">
-              <EcMoneyField
-                label=""
-                :edit-mode="store.isEditMode"
-                :model-value="transaction.withdrawal_amount ?? 0"
-                @update:model-value="transaction.withdrawal_amount = $event"
+              </div>
+            </template>
+          </td>
+          <td class="col-money right">
+            <EcMoneyField
+              label=""
+              :edit-mode="store.isEditMode"
+              :model-value="transaction.withdrawal_amount ?? 0"
+              @update:model-value="transaction.withdrawal_amount = $event"
+            />
+          </td>
+          <td class="col-money right">
+            <EcMoneyField
+              label=""
+              :edit-mode="store.isEditMode"
+              :model-value="transaction.deposit_amount ?? 0"
+              @update:model-value="transaction.deposit_amount = $event"
+            />
+          </td>
+          <td class="col-paid">
+            <template v-if="store.isEditMode">
+              <Checkbox
+                :model-value="transaction.status === 'paid'"
+                binary
+                @update:model-value="transaction.status = $event ? 'paid' : 'unpaid'"
               />
-            </td>
-            <td class="col-money right">
-              <EcMoneyField
-                label=""
-                :edit-mode="store.isEditMode"
-                :model-value="transaction.deposit_amount ?? 0"
-                @update:model-value="transaction.deposit_amount = $event"
-              />
-            </td>
-            <td class="col-paid">
-              <template v-if="store.isEditMode">
-                <Checkbox
-                  :model-value="transaction.status === 'paid'"
-                  binary
-                  @update:model-value="transaction.status = $event ? 'paid' : 'unpaid'"
-                />
-              </template>
-              <template v-else>
-                <i
-                  v-if="transaction.status === 'paid'"
-                  class="pi pi-check paid-icon"
-                  data-testid="paid-icon"
-                />
-              </template>
-            </td>
-            <td class="col-auto">
+            </template>
+            <template v-else>
               <i
-                v-if="transaction.camt_imported"
+                v-if="transaction.status === 'paid'"
                 class="pi pi-check paid-icon"
-                data-testid="auto-icon"
+                data-testid="paid-icon"
               />
-            </td>
-            <td class="col-action">
-              <Button
-                v-if="store.isEditMode && !transaction.deleted"
-                icon="pi pi-trash"
-                severity="danger"
-                text
-                size="small"
-                title="Delete this transaction"
-                :data-testid="`delete-btn-${index}`"
-                @click="store.deleteTransaction(transaction)"
-              />
-              <Button
-                v-if="store.isEditMode && transaction.deleted"
-                icon="pi pi-undo"
-                severity="secondary"
-                text
-                size="small"
-                title="Restore this deleted transaction"
-                :data-testid="`undo-delete-btn-${index}`"
-                @click="store.undoDeleteTransaction(transaction)"
-              />
-            </td>
-          </tr>
-        </tbody>
-        <tfoot v-if="store.isEditMode">
-          <tr>
-            <td :colspan="9" class="table-footer">
-              <Button
-                label="Add New Transaction"
-                severity="secondary"
-                size="small"
-                data-testid="add-btn"
-                @click="store.addTransaction()"
-              />
-            </td>
-          </tr>
-        </tfoot>
+            </template>
+          </td>
+          <td class="col-auto">
+            <i
+              v-if="transaction.camt_imported"
+              class="pi pi-check paid-icon"
+              data-testid="auto-icon"
+            />
+          </td>
+          <td class="col-action">
+            <Button
+              v-if="store.isEditMode && !transaction.deleted"
+              icon="pi pi-trash"
+              severity="danger"
+              text
+              size="small"
+              title="Delete this transaction"
+              :data-testid="`delete-btn-${index}`"
+              @click="store.deleteTransaction(transaction)"
+            />
+            <Button
+              v-if="store.isEditMode && transaction.deleted"
+              icon="pi pi-undo"
+              severity="secondary"
+              text
+              size="small"
+              title="Restore this deleted transaction"
+              :data-testid="`undo-delete-btn-${index}`"
+              @click="store.undoDeleteTransaction(transaction)"
+            />
+          </td>
+        </tr>
+      </tbody>
+      <tfoot v-if="store.isEditMode">
+        <tr>
+          <td :colspan="9" class="table-footer">
+            <Button
+              label="Add New Transaction"
+              severity="secondary"
+              size="small"
+              data-testid="add-btn"
+              @click="store.addTransaction()"
+            />
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </template>
@@ -180,7 +192,7 @@ import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
 import type { TransactionData } from './transaction.types';
 import { useTransactionStore } from './transactionStore';
 
-const props = defineProps<{
+defineProps<{
   wrapDescriptions?: boolean;
   showCalculatorColumn?: boolean;
 }>();
@@ -203,13 +215,15 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
     .map((a) => ({ ...a, id: a.id!, name: a.name! })),
 );
 
-const allDeleted = computed(() =>
-  store.draftTransactions.length > 0 && store.draftTransactions.every((t) => t.deleted),
+const allDeleted = computed(
+  () => store.draftTransactions.length > 0 && store.draftTransactions.every((t) => t.deleted),
 );
 
 function toggleDeleteAll() {
   const newState = !allDeleted.value;
-  store.draftTransactions.forEach((t) => { t.deleted = newState; });
+  store.draftTransactions.forEach((t) => {
+    t.deleted = newState;
+  });
 }
 
 function autoAllocationClass(transaction: TransactionData) {
@@ -250,14 +264,34 @@ function autoAllocationClass(transaction: TransactionData) {
   border-bottom: 2px solid var(--p-surface-300);
 }
 
-.col-calculator { width: 2.5%; padding: 0 2px; }
-.col-date { width: 10%; }
-.col-description { width: 26.5%; }
-.col-allocation { width: 22%; overflow: hidden; }
-.col-money { width: 10%; }
-.col-paid { width: 4%; text-align: center; }
-.col-auto { width: 4%; text-align: center; }
-.col-action { width: 3.5%; }
+.col-calculator {
+  width: 2.5%;
+  padding: 0 2px;
+}
+.col-date {
+  width: 10%;
+}
+.col-description {
+  width: 26.5%;
+}
+.col-allocation {
+  width: 22%;
+  overflow: hidden;
+}
+.col-money {
+  width: 10%;
+}
+.col-paid {
+  width: 4%;
+  text-align: center;
+}
+.col-auto {
+  width: 4%;
+  text-align: center;
+}
+.col-action {
+  width: 3.5%;
+}
 
 .col-allocation :deep(.ec-list-field) {
   width: 100%;

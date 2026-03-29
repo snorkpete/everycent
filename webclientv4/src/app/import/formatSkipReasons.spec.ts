@@ -8,9 +8,7 @@ describe('formatSkipReasons', () => {
   });
 
   it('formats a single reason', () => {
-    const skipped: SkippedTransaction[] = [
-      { bank_ref: 'REF1', reason: 'duplicate' },
-    ];
+    const skipped: SkippedTransaction[] = [{ bank_ref: 'REF1', reason: 'duplicate' }];
     expect(formatSkipReasons(skipped)).toBe('1 duplicate');
   });
 
@@ -44,16 +42,12 @@ describe('formatSkipReasons', () => {
   });
 
   it('falls back to raw reason key for unknown reasons', () => {
-    const skipped = [
-      { bank_ref: 'REF1', reason: 'some_new_reason' },
-    ] as SkippedTransaction[];
+    const skipped = [{ bank_ref: 'REF1', reason: 'some_new_reason' }] as SkippedTransaction[];
     expect(formatSkipReasons(skipped)).toBe('1 some_new_reason');
   });
 
   it('uses label for invalid_date reason', () => {
-    const skipped: SkippedTransaction[] = [
-      { bank_ref: 'REF1', reason: 'invalid_date' },
-    ];
+    const skipped: SkippedTransaction[] = [{ bank_ref: 'REF1', reason: 'invalid_date' }];
     expect(formatSkipReasons(skipped)).toBe('1 invalid date');
   });
 });

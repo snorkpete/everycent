@@ -134,10 +134,7 @@ describe('bankAccountApi', () => {
 
       await bankAccountApi.transfer(fromId, transferData);
 
-      expect(apiGateway.post).toHaveBeenCalledWith(
-        '/bank_accounts/3/transfer',
-        transferData,
-      );
+      expect(apiGateway.post).toHaveBeenCalledWith('/bank_accounts/3/transfer', transferData);
     });
 
     it('resolves with void on success', async () => {

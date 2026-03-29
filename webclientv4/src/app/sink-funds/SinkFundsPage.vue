@@ -61,9 +61,7 @@
       <SinkFundAllocationTable v-else />
     </div>
 
-    <SinkFundTransferDialog
-      v-model:visible="showTransferDialog"
-    />
+    <SinkFundTransferDialog v-model:visible="showTransferDialog" />
   </div>
 </template>
 

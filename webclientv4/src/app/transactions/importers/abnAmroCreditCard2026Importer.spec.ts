@@ -385,7 +385,9 @@ Transaction amount:
     });
 
     it('returns empty array for null input', () => {
-      expect(abnAmroCreditCard2026Importer(null as unknown as string, startDate, endDate)).toEqual([]);
+      expect(abnAmroCreditCard2026Importer(null as unknown as string, startDate, endDate)).toEqual(
+        [],
+      );
     });
 
     it('returns empty array for header-only input', () => {

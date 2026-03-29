@@ -4,7 +4,7 @@
       <img src="/everycent-icon.jpeg" alt="EveryCent" class="brand-logo" />
       <span>EveryCent</span>
     </div>
-    <PanelMenu :model="activeMenuItems" v-model:expandedKeys="expandedKeys" />
+    <PanelMenu v-model:expanded-keys="expandedKeys" :model="activeMenuItems" />
     <div class="color-picker">
       <button
         v-for="color in colorOptions"
@@ -28,7 +28,7 @@
       @click="drawerVisible = true"
     />
     <Drawer v-model:visible="drawerVisible" data-testid="mobile-drawer">
-      <PanelMenu :model="activeMenuItems" v-model:expandedKeys="expandedKeys" />
+      <PanelMenu v-model:expanded-keys="expandedKeys" :model="activeMenuItems" />
     </Drawer>
   </template>
 </template>
@@ -55,9 +55,7 @@ const colorOptions = [
 type ColorName = (typeof colorOptions)[number]['name'];
 
 const STORAGE_KEY = 'ec-primary-color';
-const activeColor = ref<ColorName>(
-  (localStorage.getItem(STORAGE_KEY) as ColorName) || 'indigo',
-);
+const activeColor = ref<ColorName>((localStorage.getItem(STORAGE_KEY) as ColorName) || 'indigo');
 
 function buildPalette(name: string) {
   const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
@@ -272,7 +270,9 @@ watch(
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.15s;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
   padding: 0;
 }
 

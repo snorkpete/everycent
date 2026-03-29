@@ -355,6 +355,5 @@ describe('BudgetIncomeList', () => {
 
       expect(mockStore.budget!.incomes[0].name).toBe(newName);
     });
-
   });
 });

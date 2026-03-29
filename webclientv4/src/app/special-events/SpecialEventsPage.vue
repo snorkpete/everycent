@@ -15,11 +15,7 @@
       <DataTable :value="store.specialEvents" data-testid="events-table">
         <Column field="name" header="Name">
           <template #body="{ data }">
-            <a
-              class="event-link"
-              :data-testid="`event-link-${data.id}`"
-              @click="viewEvent(data)"
-            >
+            <a class="event-link" :data-testid="`event-link-${data.id}`" @click="viewEvent(data)">
               {{ data.name }}
             </a>
           </template>

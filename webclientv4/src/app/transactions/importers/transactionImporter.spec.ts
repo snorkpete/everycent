@@ -31,7 +31,11 @@ describe('transactionImporter', () => {
     it('routes "abn-amro-bank" to abnAmroBankImporter', () => {
       transactionImporter(input, startDate, endDate, 'abn-amro-bank');
 
-      expect(abnAmroBankImporterModule.abnAmroBankImporter).toHaveBeenCalledWith(input, startDate, endDate);
+      expect(abnAmroBankImporterModule.abnAmroBankImporter).toHaveBeenCalledWith(
+        input,
+        startDate,
+        endDate,
+      );
       expect(abnAmroCreditCardImporterModule.abnAmroCreditCardImporter).not.toHaveBeenCalled();
       expect(scotiaImporterModule.scotiaImporter).not.toHaveBeenCalled();
     });
@@ -39,7 +43,11 @@ describe('transactionImporter', () => {
     it('routes "abn-amro-creditcard" to abnAmroCreditCardImporter', () => {
       transactionImporter(input, startDate, endDate, 'abn-amro-creditcard');
 
-      expect(abnAmroCreditCardImporterModule.abnAmroCreditCardImporter).toHaveBeenCalledWith(input, startDate, endDate);
+      expect(abnAmroCreditCardImporterModule.abnAmroCreditCardImporter).toHaveBeenCalledWith(
+        input,
+        startDate,
+        endDate,
+      );
       expect(abnAmroBankImporterModule.abnAmroBankImporter).not.toHaveBeenCalled();
       expect(scotiaImporterModule.scotiaImporter).not.toHaveBeenCalled();
     });
@@ -47,7 +55,9 @@ describe('transactionImporter', () => {
     it('routes "abn-amro-creditcard-2026" to abnAmroCreditCard2026Importer', () => {
       transactionImporter(input, startDate, endDate, 'abn-amro-creditcard-2026');
 
-      expect(abnAmroCreditCard2026ImporterModule.abnAmroCreditCard2026Importer).toHaveBeenCalledWith(input, startDate, endDate);
+      expect(
+        abnAmroCreditCard2026ImporterModule.abnAmroCreditCard2026Importer,
+      ).toHaveBeenCalledWith(input, startDate, endDate);
       expect(abnAmroBankImporterModule.abnAmroBankImporter).not.toHaveBeenCalled();
       expect(abnAmroCreditCardImporterModule.abnAmroCreditCardImporter).not.toHaveBeenCalled();
       expect(scotiaImporterModule.scotiaImporter).not.toHaveBeenCalled();

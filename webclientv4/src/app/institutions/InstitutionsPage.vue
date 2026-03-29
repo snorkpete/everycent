@@ -1,11 +1,7 @@
 <template>
   <div class="institutions-page">
     <ul class="institution-list">
-      <li
-        v-for="institution in store.institutions"
-        :key="institution.id"
-        class="institution-item"
-      >
+      <li v-for="institution in store.institutions" :key="institution.id" class="institution-item">
         <span class="institution-name">{{ institution.name }}</span>
         <Button
           label="Edit"
@@ -19,7 +15,13 @@
 
     <div class="page-actions">
       <Button label="Add Institution" data-testid="add-btn" @click="addInstitution" />
-      <Button label="Refresh" severity="secondary" data-testid="refresh-btn" :loading="store.loading" @click="refresh" />
+      <Button
+        label="Refresh"
+        severity="secondary"
+        data-testid="refresh-btn"
+        :loading="store.loading"
+        @click="refresh"
+      />
     </div>
 
     <InstitutionEditDialog

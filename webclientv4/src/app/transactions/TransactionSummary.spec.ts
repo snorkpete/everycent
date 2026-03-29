@@ -66,9 +66,30 @@ vi.mock('./transactionStore', () => ({
 }));
 
 const transactions: TransactionData[] = [
-  { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
-  { id: 2, description: 'Salary', withdrawal_amount: 0, deposit_amount: 300000, status: 'paid', deleted: false },
-  { id: 3, description: 'Deleted', withdrawal_amount: 1000, deposit_amount: 0, status: 'paid', deleted: true },
+  {
+    id: 1,
+    description: 'Groceries',
+    withdrawal_amount: 5000,
+    deposit_amount: 0,
+    status: 'paid',
+    deleted: false,
+  },
+  {
+    id: 2,
+    description: 'Salary',
+    withdrawal_amount: 0,
+    deposit_amount: 300000,
+    status: 'paid',
+    deleted: false,
+  },
+  {
+    id: 3,
+    description: 'Deleted',
+    withdrawal_amount: 1000,
+    deposit_amount: 0,
+    status: 'paid',
+    deleted: true,
+  },
 ];
 
 const allocations: AllocationData[] = [
@@ -76,11 +97,13 @@ const allocations: AllocationData[] = [
   { id: 2, name: 'Rent', amount: 100000, spent: 100000 },
 ];
 
-function createWrapper(props: {
-  bankAccount?: BankAccountData;
-  transactions?: TransactionData[];
-  allocations?: AllocationData[];
-} = {}): VueWrapper {
+function createWrapper(
+  props: {
+    bankAccount?: BankAccountData;
+    transactions?: TransactionData[];
+    allocations?: AllocationData[];
+  } = {},
+): VueWrapper {
   return mount(TransactionSummary, {
     props: {
       bankAccount: 'bankAccount' in props ? props.bankAccount : primaryAccount,
@@ -199,10 +222,27 @@ describe('TransactionSummary', () => {
 
     it('shows unpaid balance (net amount of unpaid transactions)', () => {
       const creditTransactions: TransactionData[] = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'unpaid', deleted: false },
-        { id: 2, description: 'Paid item', withdrawal_amount: 2000, deposit_amount: 0, status: 'paid', deleted: false },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'unpaid',
+          deleted: false,
+        },
+        {
+          id: 2,
+          description: 'Paid item',
+          withdrawal_amount: 2000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+        },
       ];
-      const wrapper = createWrapper({ bankAccount: creditCardAccount, transactions: creditTransactions });
+      const wrapper = createWrapper({
+        bankAccount: creditCardAccount,
+        transactions: creditTransactions,
+      });
 
       const unpaidEl = wrapper.find(UNPAID_BALANCE);
       expect(unpaidEl.exists()).toBe(true);

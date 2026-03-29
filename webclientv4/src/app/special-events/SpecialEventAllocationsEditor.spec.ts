@@ -404,9 +404,7 @@ describe('SpecialEventAllocationsEditor', () => {
       await vm.onBudgetChange();
       await flushPromises();
 
-      const headers = vm.groupedAllocations
-        .filter((a) => a._isCategoryHeader)
-        .map((a) => a.name);
+      const headers = vm.groupedAllocations.filter((a) => a._isCategoryHeader).map((a) => a.name);
 
       // Transport has no allocations, shouldn't appear
       expect(headers).not.toContain('Transport');
@@ -551,9 +549,7 @@ describe('SpecialEventAllocationsEditor', () => {
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
       await flushPromises();
 
-      expect(mockNotifySuccess).toHaveBeenCalledWith(
-        'Special event allocations updated',
-      );
+      expect(mockNotifySuccess).toHaveBeenCalledWith('Special event allocations updated');
     });
 
     it('navigates to detail page after successful save', async () => {

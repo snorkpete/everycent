@@ -3,15 +3,9 @@ import type { SinkFundData, SinkFundTransferData } from './sinkFund.types';
 import type { TransactionData } from '../transactions/transaction.types';
 
 export const sinkFundApi = {
-  getAll: () =>
-    apiGateway
-      .get<SinkFundData[]>('/sink_funds')
-      .then((r) => r.data),
+  getAll: () => apiGateway.get<SinkFundData[]>('/sink_funds').then((r) => r.data),
 
-  get: (id: number) =>
-    apiGateway
-      .get<SinkFundData>(`/sink_funds/${id}`)
-      .then((r) => r.data),
+  get: (id: number) => apiGateway.get<SinkFundData>(`/sink_funds/${id}`).then((r) => r.data),
 
   save: (sinkFund: SinkFundData) =>
     apiGateway

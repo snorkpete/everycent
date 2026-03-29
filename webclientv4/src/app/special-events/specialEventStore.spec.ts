@@ -321,9 +321,7 @@ describe('specialEventStore', () => {
     });
 
     it('sets error message on failure and re-throws', async () => {
-      vi.mocked(specialEventApi.updateAllocations).mockRejectedValue(
-        new Error('Allocation error'),
-      );
+      vi.mocked(specialEventApi.updateAllocations).mockRejectedValue(new Error('Allocation error'));
 
       const store = useSpecialEventStore();
       await expect(

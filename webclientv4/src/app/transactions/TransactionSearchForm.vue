@@ -18,11 +18,7 @@
       data-testid="budget-select"
       @update:model-value="onBudgetChange"
     />
-    <a
-      :href="budgetLink"
-      data-testid="go-to-budget-link"
-      class="budget-link"
-    >Go to Budget</a>
+    <a :href="budgetLink" data-testid="go-to-budget-link" class="budget-link">Go to Budget</a>
   </div>
 </template>
 
@@ -59,7 +55,9 @@ watch(
     if (initialised.value || accounts.length === 0) return;
 
     const queryBudgetId = route.query.budget_id ? Number(route.query.budget_id) : null;
-    const queryBankAccountId = route.query.bank_account_id ? Number(route.query.bank_account_id) : null;
+    const queryBankAccountId = route.query.bank_account_id
+      ? Number(route.query.bank_account_id)
+      : null;
 
     const firstAccount = accounts[0];
     const firstBudget = store.budgetsForDropdown[0];

@@ -62,4 +62,3 @@ export interface TransactionData {
   camt_imported?: boolean;
   auto_match_type?: MatchType;
 }
-

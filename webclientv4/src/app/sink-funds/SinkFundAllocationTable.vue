@@ -47,7 +47,10 @@
         <tr
           v-for="(allocation, index) in store.visibleAllocations"
           :key="allocation.id || `new-${index}`"
-          :class="{ 'deleted-row': allocation.deleted, 'closed-row': allocation.status === 'closed' }"
+          :class="{
+            'deleted-row': allocation.deleted,
+            'closed-row': allocation.status === 'closed',
+          }"
           data-testid="allocation-row"
         >
           <!-- Name -->
@@ -89,10 +92,7 @@
           </td>
 
           <!-- Outstanding -->
-          <td
-            class="amount-cell"
-            :class="outstandingClass(outstanding(allocation))"
-          >
+          <td class="amount-cell" :class="outstandingClass(outstanding(allocation))">
             {{ centsToDollars(outstanding(allocation)) }}
           </td>
 
@@ -252,13 +252,27 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
 }
 
 /* ── Column widths ── */
-.name-col { width: 20%; }
-.balance-col { width: 12%; }
-.target-col { width: 10%; }
-.outstanding-col { width: 10%; }
-.comment-col { width: 16%; }
-.status-col { width: 6%; }
-.action-col { width: 6%; }
+.name-col {
+  width: 20%;
+}
+.balance-col {
+  width: 12%;
+}
+.target-col {
+  width: 10%;
+}
+.outstanding-col {
+  width: 10%;
+}
+.comment-col {
+  width: 16%;
+}
+.status-col {
+  width: 6%;
+}
+.action-col {
+  width: 6%;
+}
 
 /* ── Amount cells ── */
 .amount-cell {

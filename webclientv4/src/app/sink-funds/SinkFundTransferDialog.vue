@@ -37,28 +37,14 @@
 
       <!-- Amount -->
       <div class="field">
-        <EcMoneyField
-          v-model="form.amount"
-          label="Amount"
-          :edit-mode="true"
-        />
+        <EcMoneyField v-model="form.amount" label="Amount" :edit-mode="true" />
       </div>
     </div>
 
     <template #footer>
       <div class="dialog-footer">
-        <Button
-          label="Save"
-          data-testid="save-btn"
-          :disabled="!canSave"
-          @click="onSave"
-        />
-        <Button
-          label="Cancel"
-          severity="secondary"
-          data-testid="cancel-btn"
-          @click="close"
-        />
+        <Button label="Save" data-testid="save-btn" :disabled="!canSave" @click="onSave" />
+        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
       </div>
     </template>
   </Dialog>
@@ -113,7 +99,10 @@ const UNASSIGNED_VALUE = 0;
 
 const transferOptions = computed(() => {
   const options: { label: string; value: number }[] = [
-    { label: `Unassigned Money - ${centsToDollars(store.unassignedBalance)}`, value: UNASSIGNED_VALUE },
+    {
+      label: `Unassigned Money - ${centsToDollars(store.unassignedBalance)}`,
+      value: UNASSIGNED_VALUE,
+    },
   ];
 
   for (const allocation of store.sinkFund?.sink_fund_allocations ?? []) {
