@@ -3,7 +3,7 @@
 **ID:** add-inline-prop-to-ecmoneyfield-for-table-usage
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-03-28
 **Parent:** none
 **Depends on:** none

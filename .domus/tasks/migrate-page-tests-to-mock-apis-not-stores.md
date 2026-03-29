@@ -3,7 +3,7 @@
 **ID:** migrate-page-tests-to-mock-apis-not-stores
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-03-28
 **Parent:** none
 **Depends on:** create-shared-test-data-factories, extract-shared-test-stubs-dialogstub-etc

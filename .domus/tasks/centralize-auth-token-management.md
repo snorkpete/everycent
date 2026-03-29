@@ -3,7 +3,7 @@
 **ID:** centralize-auth-token-management
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-03-28
 **Parent:** none
 **Depends on:** extract-modular-api-gateway-interceptors

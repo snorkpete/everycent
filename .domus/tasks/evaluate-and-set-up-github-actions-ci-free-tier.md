@@ -1,7 +1,7 @@
 # Task: Evaluate and set up GitHub Actions CI (free tier)
 
 **ID:** evaluate-and-set-up-github-actions-ci-free-tier
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-03-28

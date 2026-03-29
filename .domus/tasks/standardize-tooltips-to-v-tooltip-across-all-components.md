@@ -3,7 +3,7 @@
 **ID:** standardize-tooltips-to-v-tooltip-across-all-components
 **Status:** raw
 **Autonomous:** false
-**Priority:** low
+**Priority:** high
 **Captured:** 2026-03-28
 **Parent:** none
 **Depends on:** none

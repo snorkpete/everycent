@@ -1,7 +1,7 @@
 # Task: Make build:safe the default build command
 
 **ID:** make-buildsafe-the-default-build-command
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-28

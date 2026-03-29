@@ -1,7 +1,7 @@
 # Task: Set up pre-commit hooks with husky and lint-staged
 
 **ID:** set-up-pre-commit-hooks-with-husky-and-lint-staged
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
