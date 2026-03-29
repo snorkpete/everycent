@@ -62,7 +62,7 @@ RSpec.describe ImportPreviewService do
 
       service = ImportPreviewService.new(budget: budget, bank_accounts_params: params)
       expect { service.call }.to raise_error(
-        ImportPreviewService::ValidationError,
+        ImportValidation::ValidationError,
         /IBAN mismatch/
       )
     end
@@ -96,7 +96,7 @@ RSpec.describe ImportPreviewService do
   end
 
   describe ".validate_transactions!" do
-    it "raises ValidationError for invalid dates" do
+    it "classifies transactions with invalid dates as invalid_date (does not raise)" do
       params = [
         ActionController::Parameters.new(
           bank_account_id: bank_account.id,
@@ -115,13 +115,11 @@ RSpec.describe ImportPreviewService do
       ]
 
       service = ImportPreviewService.new(budget: budget, bank_accounts_params: params)
-      expect { service.call }.to raise_error(
-        ImportPreviewService::ValidationError,
-        /Invalid transaction_date/
-      )
+      result = service.call
+      expect(result[:bank_accounts].first[:transactions].first[:import_status]).to eq("invalid_date")
     end
 
-    it "raises ValidationError for negative withdrawal_amount" do
+    it "classifies negative withdrawal_amount as invalid_amounts" do
       params = [
         ActionController::Parameters.new(
           bank_account_id: bank_account.id,
@@ -140,13 +138,11 @@ RSpec.describe ImportPreviewService do
       ]
 
       service = ImportPreviewService.new(budget: budget, bank_accounts_params: params)
-      expect { service.call }.to raise_error(
-        ImportPreviewService::ValidationError,
-        /withdrawal_amount must be non-negative/
-      )
+      result = service.call
+      expect(result[:bank_accounts].first[:transactions].first[:import_status]).to eq("invalid_amounts")
     end
 
-    it "raises ValidationError for negative deposit_amount" do
+    it "classifies negative deposit_amount as invalid_amounts" do
       params = [
         ActionController::Parameters.new(
           bank_account_id: bank_account.id,
@@ -165,10 +161,54 @@ RSpec.describe ImportPreviewService do
       ]
 
       service = ImportPreviewService.new(budget: budget, bank_accounts_params: params)
-      expect { service.call }.to raise_error(
-        ImportPreviewService::ValidationError,
-        /deposit_amount must be non-negative/
-      )
+      result = service.call
+      expect(result[:bank_accounts].first[:transactions].first[:import_status]).to eq("invalid_amounts")
+    end
+
+    it "classifies both withdrawal and deposit non-zero as invalid_amounts" do
+      params = [
+        ActionController::Parameters.new(
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [
+            ActionController::Parameters.new(
+              transaction_date: "2026-03-15",
+              description: "Test",
+              withdrawal_amount: 100,
+              deposit_amount: 50,
+              bank_ref: "REF001",
+              status: "paid"
+            )
+          ]
+        )
+      ]
+
+      service = ImportPreviewService.new(budget: budget, bank_accounts_params: params)
+      result = service.call
+      expect(result[:bank_accounts].first[:transactions].first[:import_status]).to eq("invalid_amounts")
+    end
+
+    it "allows both withdrawal and deposit to be zero" do
+      params = [
+        ActionController::Parameters.new(
+          bank_account_id: bank_account.id,
+          iban: "NL00ABNA0000000001",
+          transactions: [
+            ActionController::Parameters.new(
+              transaction_date: "2026-03-15",
+              description: "Zero txn",
+              withdrawal_amount: 0,
+              deposit_amount: 0,
+              bank_ref: "REF-ZERO",
+              status: "paid"
+            )
+          ]
+        )
+      ]
+
+      service = ImportPreviewService.new(budget: budget, bank_accounts_params: params)
+      result = service.call
+      expect(result[:bank_accounts].first[:transactions].first[:import_status]).to eq("new")
     end
   end
 

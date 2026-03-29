@@ -311,7 +311,7 @@ RSpec.describe ImportSaveService do
         expect {
           begin
             build_service(params).call
-          rescue ImportSaveService::ValidationError
+          rescue ImportValidation::ValidationError
             # expected
           end
         }.not_to change(Transaction, :count)
@@ -348,7 +348,7 @@ RSpec.describe ImportSaveService do
 
         expect {
           build_service(params).call
-        }.to raise_error(ImportSaveService::ValidationError, /IBAN mismatch/)
+        }.to raise_error(ImportValidation::ValidationError, /IBAN mismatch/)
       end
 
       it 'silently skips out-of-period transaction dates' do

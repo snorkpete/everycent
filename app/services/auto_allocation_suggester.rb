@@ -38,18 +38,17 @@ class AutoAllocationSuggester
   end
 
   def load_previous_transactions(previous_budget)
-    sink_fund_account_ids = BankAccount.sink_funds.pluck(:id)
-
-    Transaction.where(bank_account_id: BankAccount.where.not(id: sink_fund_account_ids).select(:id))
+    Transaction.joins(:bank_account)
+               .where.not(bank_accounts: { account_type: 'sink_fund' })
                .where(transaction_date: previous_budget.start_date..previous_budget.end_date)
                .where.not(allocation_id: nil)
                .includes(:allocation)
   end
 
   def load_current_allocations
-    @budget.allocations.includes(:bank_account).reject do |a|
-      a.bank_account&.account_type == "sink_fund"
-    end
+    @budget.allocations
+           .left_joins(:bank_account)
+           .where("bank_accounts.account_type IS NULL OR bank_accounts.account_type != ?", "sink_fund")
   end
 
   def match_pass(unmatched_indices, prev_transactions, current_allocations, suggestions, match_type: "exact")

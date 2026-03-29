@@ -53,7 +53,7 @@ class TransactionsController < ApplicationController
     )
     result = service.call
     render json: result
-  rescue ImportPreviewService::ValidationError => e
+  rescue ImportValidation::ValidationError => e
     render json: { error: e.message }, status: :unprocessable_entity
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: e.message }, status: :not_found
@@ -67,7 +67,7 @@ class TransactionsController < ApplicationController
     )
     result = service.call
     render json: result
-  rescue ImportSaveService::ValidationError => e
+  rescue ImportValidation::ValidationError => e
     render json: { error: e.message }, status: :unprocessable_entity
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: e.message }, status: :not_found
@@ -92,6 +92,11 @@ class TransactionsController < ApplicationController
       :allocation_id, :sink_fund_allocation_id, :status, :brought_forward_status, :camt_imported])
   end
 
+  # HTTP security boundary: what Rails strong params accepts from the request.
+  # The persistence boundary (what actually gets written to the DB) is defined separately
+  # in ImportValidation::PERMITTED_FIELDS. These overlap but serve different purposes —
+  # fields like :deleted and :camt_imported are accepted here but handled specially by
+  # the service, not passed through to the DB via slice.
   def import_save_params
     params.permit(
       :budget_id,
