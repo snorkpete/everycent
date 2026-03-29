@@ -20,17 +20,25 @@ export const useBudgetListStore = defineStore('budgetList', () => {
       const openBudgets = budgets.value.filter((b) => b.status === 'open');
       if (openBudgets.length === 0) return false;
       const lastOpen = openBudgets[openBudgets.length - 1];
-      return lastOpen.id === budget.id;
+      return lastOpen != null && lastOpen.id === budget.id;
     };
   });
+
+  function errorMessage(e: unknown, fallback: string): string {
+    return e instanceof Error ? e.message : fallback;
+  }
+
+  async function loadBudgets() {
+    budgets.value = await budgetApi.getAll();
+  }
 
   async function fetchAll() {
     loading.value = true;
     error.value = null;
     try {
-      budgets.value = await budgetApi.getAll();
-    } catch (e) {
-      error.value = 'Failed to load budgets';
+      await loadBudgets();
+    } catch (e: unknown) {
+      error.value = errorMessage(e, 'Failed to load budgets');
       throw e;
     } finally {
       loading.value = false;
@@ -38,46 +46,58 @@ export const useBudgetListStore = defineStore('budgetList', () => {
   }
 
   async function copyBudget(budgetId: number) {
+    loading.value = true;
     error.value = null;
     try {
       await budgetApi.copy(budgetId);
-      await fetchAll();
-    } catch (e) {
-      error.value = 'Failed to copy budget';
+      await loadBudgets();
+    } catch (e: unknown) {
+      error.value = errorMessage(e, 'Failed to copy budget');
       throw e;
+    } finally {
+      loading.value = false;
     }
   }
 
   async function closeBudget(budgetId: number) {
+    loading.value = true;
     error.value = null;
     try {
       await budgetApi.close(budgetId);
-      await fetchAll();
-    } catch (e) {
-      error.value = 'Failed to close budget';
+      await loadBudgets();
+    } catch (e: unknown) {
+      error.value = errorMessage(e, 'Failed to close budget');
       throw e;
+    } finally {
+      loading.value = false;
     }
   }
 
   async function reopenLastBudget() {
+    loading.value = true;
     error.value = null;
     try {
       await budgetApi.reopenLast();
-      await fetchAll();
-    } catch (e) {
-      error.value = 'Failed to reopen budget';
+      await loadBudgets();
+    } catch (e: unknown) {
+      error.value = errorMessage(e, 'Failed to reopen budget');
       throw e;
+    } finally {
+      loading.value = false;
     }
   }
 
   async function addBudget(startDate: string) {
+    loading.value = true;
     error.value = null;
     try {
       await budgetApi.create({ start_date: startDate });
-      await fetchAll();
-    } catch (e) {
-      error.value = 'Failed to create budget';
+      await loadBudgets();
+    } catch (e: unknown) {
+      error.value = errorMessage(e, 'Failed to create budget');
       throw e;
+    } finally {
+      loading.value = false;
     }
   }
 
