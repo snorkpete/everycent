@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useSettingsStore } from './settingsStore';
 import { settingsApi } from './settingsApi';
+import { bankAccountApi } from '../bank-accounts/bankAccountApi';
 import { allocationCategoryApi } from '../allocation-categories/allocationCategoryApi';
-import apiGateway from '../../api/api-gateway';
 
 vi.mock('./settingsApi', () => ({
   settingsApi: {
@@ -12,15 +12,15 @@ vi.mock('./settingsApi', () => ({
   },
 }));
 
-vi.mock('../allocation-categories/allocationCategoryApi', () => ({
-  allocationCategoryApi: {
-    getAll: vi.fn(),
+vi.mock('../bank-accounts/bankAccountApi', () => ({
+  bankAccountApi: {
+    getOpen: vi.fn(),
   },
 }));
 
-vi.mock('../../api/api-gateway', () => ({
-  default: {
-    get: vi.fn(),
+vi.mock('../allocation-categories/allocationCategoryApi', () => ({
+  allocationCategoryApi: {
+    getAll: vi.fn(),
   },
 }));
 
@@ -37,7 +37,7 @@ describe('settingsStore', () => {
       const loadedCategories = [{ id: 2, name: 'Groceries' }];
 
       vi.mocked(settingsApi.get).mockResolvedValue(loadedSettings);
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: loadedAccounts });
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue(loadedAccounts);
       vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(loadedCategories);
 
       const store = useSettingsStore();
@@ -48,24 +48,13 @@ describe('settingsStore', () => {
       expect(store.allocationCategories).toEqual(loadedCategories);
     });
 
-    it('requests bank accounts from /bank_accounts', async () => {
-      vi.mocked(settingsApi.get).mockResolvedValue({});
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
-      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
-
-      const store = useSettingsStore();
-      await store.fetchAll();
-
-      expect(apiGateway.get).toHaveBeenCalledWith('/bank_accounts');
-    });
-
     it('sets loading to true during fetch and false after', async () => {
       let loadingDuringCall = false;
       vi.mocked(settingsApi.get).mockImplementation(async () => {
         loadingDuringCall = useSettingsStore().loading;
         return {};
       });
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
       vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
 
       const store = useSettingsStore();
@@ -77,7 +66,7 @@ describe('settingsStore', () => {
 
     it('sets error message on failure', async () => {
       vi.mocked(settingsApi.get).mockRejectedValue(new Error('Network error'));
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
       vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
 
       const store = useSettingsStore();
@@ -89,7 +78,7 @@ describe('settingsStore', () => {
 
     it('sets a fallback error message when the rejection is not an Error instance', async () => {
       vi.mocked(settingsApi.get).mockRejectedValue('unexpected');
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
       vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
 
       const store = useSettingsStore();
@@ -101,7 +90,7 @@ describe('settingsStore', () => {
     it('clears error on subsequent successful fetch', async () => {
       vi.mocked(settingsApi.get).mockRejectedValueOnce(new Error('fail'));
       vi.mocked(settingsApi.get).mockResolvedValueOnce({});
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
+      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
       vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
 
       const store = useSettingsStore();

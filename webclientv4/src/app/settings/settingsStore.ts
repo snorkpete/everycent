@@ -1,8 +1,8 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { settingsApi } from './settingsApi';
+import { bankAccountApi } from '../bank-accounts/bankAccountApi';
 import { allocationCategoryApi } from '../allocation-categories/allocationCategoryApi';
-import apiGateway from '../../api/api-gateway';
 import type { SettingsData } from './settings.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
@@ -20,8 +20,7 @@ export const useSettingsStore = defineStore('settings', () => {
     try {
       const [loadedSettings, loadedAccounts, loadedCategories] = await Promise.all([
         settingsApi.get(),
-        // Fetch directly to avoid coupling with bankAccountStore's loading state
-        apiGateway.get<BankAccountData[]>('/bank_accounts').then((r) => r.data),
+        bankAccountApi.getOpen(),
         allocationCategoryApi.getAll(),
       ]);
       settings.value = loadedSettings;
