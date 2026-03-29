@@ -87,7 +87,8 @@ function toFormData(s: SettingsData): SettingsData {
     // even though it is not currently rendered as an editable field.
     bank_charges_allocation_name: s.bank_charges_allocation_name,
     primary_budget_account_id: s.primary_budget_account_id,
-    default_allocation_category_id_for_special_events: s.default_allocation_category_id_for_special_events,
+    default_allocation_category_id_for_special_events:
+      s.default_allocation_category_id_for_special_events,
     // Default to 'couple' only before the real data loads; overwritten in onMounted .then()
     family_type: s.family_type ?? 'couple',
     husband: s.husband ?? '',

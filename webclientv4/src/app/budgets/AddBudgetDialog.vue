@@ -18,18 +18,8 @@
     </div>
 
     <template #footer>
-      <Button
-        label="Cancel"
-        severity="secondary"
-        data-testid="cancel-btn"
-        @click="close"
-      />
-      <Button
-        label="Save"
-        data-testid="save-btn"
-        :disabled="!startDate"
-        @click="save"
-      />
+      <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
+      <Button label="Save" data-testid="save-btn" :disabled="!startDate" @click="save" />
     </template>
   </Dialog>
 </template>

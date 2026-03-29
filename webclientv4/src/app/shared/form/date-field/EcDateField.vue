@@ -2,11 +2,7 @@
   <div class="ec-date-field">
     <template v-if="editMode">
       <label :for="inputId">{{ label }}</label>
-      <DatePicker
-        :id="inputId"
-        :model-value="dateValue"
-        @update:model-value="onDateChange"
-      />
+      <DatePicker :id="inputId" :model-value="dateValue" @update:model-value="onDateChange" />
     </template>
     <template v-else>
       <span class="label">{{ label }}</span>

@@ -48,7 +48,14 @@ const AddBudgetDialogStub = {
 };
 
 function makeBudget(overrides: Partial<BudgetData> = {}): BudgetData {
-  return { id: 1, name: 'Jan 2025', start_date: '2025-01-01', end_date: '2025-01-31', status: 'open', ...overrides };
+  return {
+    id: 1,
+    name: 'Jan 2025',
+    start_date: '2025-01-01',
+    end_date: '2025-01-31',
+    status: 'open',
+    ...overrides,
+  };
 }
 
 const budget1 = makeBudget({ id: 1, name: 'Mar 2025', status: 'open' });

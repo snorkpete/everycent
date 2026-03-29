@@ -51,12 +51,14 @@ const sampleTransactions: TransactionData[] = [
 
 let mockFetchTransactions: ReturnType<typeof vi.fn>;
 
-function createWrapper(props: Partial<{
-  visible: boolean;
-  allocationId: number;
-  allocationName: string;
-  fetchTransactions: (id: number) => Promise<TransactionData[]>;
-}> = {}): VueWrapper<InstanceType<typeof AllocationTransactionsDialog>> {
+function createWrapper(
+  props: Partial<{
+    visible: boolean;
+    allocationId: number;
+    allocationName: string;
+    fetchTransactions: (id: number) => Promise<TransactionData[]>;
+  }> = {},
+): VueWrapper<InstanceType<typeof AllocationTransactionsDialog>> {
   return mount(AllocationTransactionsDialog, {
     props: {
       visible: true,
@@ -272,9 +274,7 @@ describe('AllocationTransactionsDialog', () => {
     });
 
     it('clears previous transactions before fetching new ones', async () => {
-      mockFetchTransactions
-        .mockResolvedValueOnce(sampleTransactions)
-        .mockResolvedValueOnce([]);
+      mockFetchTransactions.mockResolvedValueOnce(sampleTransactions).mockResolvedValueOnce([]);
 
       const wrapper = createWrapper({ visible: false });
       await wrapper.setProps({ visible: true });

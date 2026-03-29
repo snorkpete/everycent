@@ -28,8 +28,10 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
 
   // allocationDisplayData: { [categoryId]: { [allocationName]: { [budgetId]: { id, amount, is_fixed_amount } } } }
   const allocationDisplayData = computed(() => {
-    const results: Record<number, Record<string, Record<number, { id: number; amount: number; is_fixed_amount: boolean }>>> =
-      {};
+    const results: Record<
+      number,
+      Record<string, Record<number, { id: number; amount: number; is_fixed_amount: boolean }>>
+    > = {};
     for (const budget of budgets.value) {
       for (const allocation of budget.allocations) {
         const catId = allocation.allocation_category_id;

@@ -116,7 +116,9 @@ describe('TransactionImportDialog', () => {
 
   describe('Import button', () => {
     it('calls transactionImporter with the raw input, date range, and selected format', async () => {
-      const fakeResult = [{ description: 'Test Import', withdrawal_amount: 100, deposit_amount: 0 }];
+      const fakeResult = [
+        { description: 'Test Import', withdrawal_amount: 100, deposit_amount: 0 },
+      ];
       vi.mocked(transactionImporter).mockReturnValue(fakeResult);
 
       const wrapper = createWrapper();

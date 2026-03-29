@@ -68,20 +68,15 @@
         />
         <template v-else>
           <Button
+            v-tooltip.top="'Suggest allocations based on previous budget\'s transactions'"
             icon="pi pi-sparkles"
             label="Auto Allocate"
             outlined
             size="small"
             data-testid="auto-allocate-btn"
-            v-tooltip.top="'Suggest allocations based on previous budget\'s transactions'"
             @click="onAutoAllocate"
           />
-          <Button
-            label="Save"
-            data-testid="save-btn"
-            size="small"
-            @click="onSave"
-          />
+          <Button label="Save" data-testid="save-btn" size="small" @click="onSave" />
           <Button
             label="Cancel"
             severity="secondary"
@@ -94,16 +89,10 @@
     </div>
 
     <!-- Import Dialog -->
-    <TransactionImportDialog
-      v-model:visible="showImportDialog"
-      @imported="onImport"
-    />
+    <TransactionImportDialog v-model:visible="showImportDialog" @imported="onImport" />
 
     <!-- Transfer Dialog -->
-    <AccountTransferDialog
-      v-model:visible="showTransferDialog"
-      @transferred="onTransferred"
-    />
+    <AccountTransferDialog v-model:visible="showTransferDialog" @transferred="onTransferred" />
 
     <!-- Zones 2 + 3: Summary Bar + Table (unified card) -->
     <div class="content-card">
@@ -195,7 +184,10 @@ function onImport(transactions: TransactionData[]) {
 }
 
 function onTransferred() {
-  store.fetch({ budgetId: store.selectedBudget!.id!, bankAccountId: store.selectedBankAccount!.id! });
+  store.fetch({
+    budgetId: store.selectedBudget!.id!,
+    bankAccountId: store.selectedBankAccount!.id!,
+  });
 }
 
 function navigateToImport() {

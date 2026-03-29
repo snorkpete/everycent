@@ -82,11 +82,7 @@
             {{ option.name }} ({{ formatBalance(option.current_balance ?? 0) }})
           </template>
         </Select>
-        <span
-          v-if="newToBalance !== null"
-          class="balance-preview"
-          data-testid="to-balance-preview"
-        >
+        <span v-if="newToBalance !== null" class="balance-preview" data-testid="to-balance-preview">
           New balance: {{ formatBalance(newToBalance) }}
         </span>
       </div>
@@ -125,11 +121,7 @@
 
       <!-- Date -->
       <div class="field">
-        <EcDateField
-          v-model="form.date"
-          label="Date"
-          :edit-mode="true"
-        />
+        <EcDateField v-model="form.date" label="Date" :edit-mode="true" />
       </div>
 
       <!-- Description -->
@@ -145,11 +137,7 @@
 
       <!-- Amount -->
       <div class="field">
-        <EcMoneyField
-          v-model="form.amount"
-          label="Amount"
-          :edit-mode="true"
-        />
+        <EcMoneyField v-model="form.amount" label="Amount" :edit-mode="true" />
       </div>
     </div>
 
@@ -161,12 +149,7 @@
           :disabled="!canTransfer"
           @click="runTransfer"
         />
-        <Button
-          label="Cancel"
-          severity="secondary"
-          data-testid="cancel-btn"
-          @click="close"
-        />
+        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
       </div>
     </template>
   </Dialog>
@@ -321,9 +304,7 @@ async function onToAccountChange() {
   sinkFundAllocationsTo.value = [];
 
   if (toAccount.value?.is_sink_fund) {
-    sinkFundAllocationsTo.value = await transactionApi.getSinkFundAllocations(
-      toAccount.value.id!,
-    );
+    sinkFundAllocationsTo.value = await transactionApi.getSinkFundAllocations(toAccount.value.id!);
   }
 }
 
@@ -338,15 +319,13 @@ async function runTransfer() {
   };
 
   if (fromAccount.value?.is_sink_fund) {
-    payload.from_sink_fund_allocation =
-      form.value.from_sink_fund_allocation_id ?? undefined;
+    payload.from_sink_fund_allocation = form.value.from_sink_fund_allocation_id ?? undefined;
   } else {
     payload.from_allocation = form.value.from_allocation_id ?? undefined;
   }
 
   if (toAccount.value?.is_sink_fund) {
-    payload.to_sink_fund_allocation =
-      form.value.to_sink_fund_allocation_id ?? undefined;
+    payload.to_sink_fund_allocation = form.value.to_sink_fund_allocation_id ?? undefined;
   } else {
     payload.to_allocation = form.value.to_allocation_id ?? undefined;
   }

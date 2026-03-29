@@ -222,12 +222,7 @@ describe('camt053Parser', () => {
         const spacedAccounts = [
           { id: 1, accountNo: 'NL62 ABNA 0123 4567 89', accountType: 'checking' },
         ];
-        const result = parseCamt053Xml(
-          [xml],
-          spacedAccounts,
-          defaultStartDate,
-          defaultEndDate,
-        );
+        const result = parseCamt053Xml([xml], spacedAccounts, defaultStartDate, defaultEndDate);
         expect(result.accounts[0].bankAccountId).toBe(1);
       });
 
@@ -253,12 +248,7 @@ describe('camt053Parser', () => {
         const spacedAccounts = [
           { id: 1, accountNo: 'NL62 ABNA 0123 4567 89', accountType: 'checking' },
         ];
-        const result = parseCamt053Xml(
-          [xml],
-          spacedAccounts,
-          defaultStartDate,
-          defaultEndDate,
-        );
+        const result = parseCamt053Xml([xml], spacedAccounts, defaultStartDate, defaultEndDate);
         expect(result.accounts[0].bankAccountId).toBe(1);
       });
     });

@@ -45,11 +45,7 @@
           </td>
 
           <td class="col-amount">
-            <EcMoneyField
-              v-model="income.amount"
-              label=""
-              :edit-mode="store.isEditMode"
-            />
+            <EcMoneyField v-model="income.amount" label="" :edit-mode="store.isEditMode" />
           </td>
 
           <td v-if="store.isEditMode" class="col-actions">
@@ -90,9 +86,7 @@ const store = useBudgetStore();
 const incomes = computed(() => store.budget?.incomes ?? []);
 
 const totalAmount = computed(() =>
-  incomes.value
-    .filter((i) => !i.deleted)
-    .reduce((sum, i) => sum + (i.amount ?? 0), 0),
+  incomes.value.filter((i) => !i.deleted).reduce((sum, i) => sum + (i.amount ?? 0), 0),
 );
 
 function addIncome() {

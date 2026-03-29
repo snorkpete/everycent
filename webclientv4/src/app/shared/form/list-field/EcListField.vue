@@ -54,11 +54,10 @@ defineEmits<{
 
 const inputId = useId();
 
-const selectedItemName = computed(
-  () =>
-    props.modelValue != null
-      ? (props.items.find((item) => item.id === props.modelValue)?.name ?? '')
-      : '',
+const selectedItemName = computed(() =>
+  props.modelValue != null
+    ? (props.items.find((item) => item.id === props.modelValue)?.name ?? '')
+    : '',
 );
 
 const groups = computed((): ListGroup[] => {
@@ -86,7 +85,7 @@ const groups = computed((): ListGroup[] => {
 const displayOptions = computed(() => (props.groupBy ? groups.value : props.items));
 
 const selectPt = computed(() => {
-  const pt: Record<string, any> = {
+  const pt: Record<string, Record<string, string>> = {
     label: { class: 'ec-select-label' },
   };
   if (props.groupBy) {

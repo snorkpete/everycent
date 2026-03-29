@@ -36,7 +36,14 @@ const sampleBudget: BudgetDetailData = {
     { id: 1, name: 'Salary', amount: 500000, budget_id: 213, bank_account_id: 10, comment: '' },
   ],
   allocations: [
-    { id: 1, name: 'Groceries', amount: 100000, budget_id: 213, allocation_category_id: 5, is_fixed_amount: true },
+    {
+      id: 1,
+      name: 'Groceries',
+      amount: 100000,
+      budget_id: 213,
+      allocation_category_id: 5,
+      is_fixed_amount: true,
+    },
   ],
 };
 
@@ -112,7 +119,12 @@ describe('budgetStore', () => {
 
     it('sets loading to true while fetching', async () => {
       let resolveGet: (value: BudgetDetailData) => void;
-      vi.mocked(budgetApi.get).mockImplementation(() => new Promise((r) => { resolveGet = r; }));
+      vi.mocked(budgetApi.get).mockImplementation(
+        () =>
+          new Promise((r) => {
+            resolveGet = r;
+          }),
+      );
       vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(sampleCategories);
       const store = useBudgetStore();
 
@@ -211,7 +223,12 @@ describe('budgetStore', () => {
       let resolveSave: (value: BudgetDetailData) => void;
       vi.mocked(budgetApi.get).mockResolvedValue(sampleBudget);
       vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(sampleCategories);
-      vi.mocked(budgetApi.save).mockImplementation(() => new Promise((r) => { resolveSave = r; }));
+      vi.mocked(budgetApi.save).mockImplementation(
+        () =>
+          new Promise((r) => {
+            resolveSave = r;
+          }),
+      );
       const store = useBudgetStore();
       await store.fetch(213);
 

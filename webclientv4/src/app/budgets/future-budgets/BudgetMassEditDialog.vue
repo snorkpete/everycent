@@ -20,11 +20,7 @@
         <tbody>
           <tr>
             <td class="sticky-col">
-              <InputText
-                v-model="formName"
-                class="name-input"
-                data-testid="name-input"
-              />
+              <InputText v-model="formName" class="name-input" data-testid="name-input" />
             </td>
             <td v-for="(_, i) in amounts" :key="amounts[i].budget_id">
               <EcMoneyField
@@ -82,9 +78,7 @@
                 :data-testid="`discretionary-display-${i}`"
               >
                 <EcMoneyField
-                  :model-value="
-                    row.budgetIncome - row.totalAllocationsWithoutCurrent - row.amount
-                  "
+                  :model-value="row.budgetIncome - row.totalAllocationsWithoutCurrent - row.amount"
                   label=""
                   :edit-mode="false"
                   :highlight-positive="true"
@@ -150,9 +144,7 @@ function buildAmounts(): AmountRow[] {
     const originalAmount = existing.amount;
 
     const budgetIncome =
-      props.type === 'allocation'
-        ? budget.incomes.reduce((sum, i) => sum + i.amount, 0)
-        : 0;
+      props.type === 'allocation' ? budget.incomes.reduce((sum, i) => sum + i.amount, 0) : 0;
 
     const totalAllocationsWithoutCurrent =
       props.type === 'allocation'
@@ -165,7 +157,7 @@ function buildAmounts(): AmountRow[] {
       budget_id: budget.id,
       budgetIncome,
       totalAllocationsWithoutCurrent,
-      is_fixed_amount: ('is_fixed_amount' in existing) ? existing.is_fixed_amount : false,
+      is_fixed_amount: 'is_fixed_amount' in existing ? existing.is_fixed_amount : false,
     };
   });
 }

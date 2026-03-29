@@ -40,14 +40,17 @@ vi.mock('../settings/settingsStore', () => ({
   }),
 }));
 
-const checkingAccount: BankAccountData = { id: 1, name: 'Checking', is_sink_fund: false, is_credit_card: false };
+const checkingAccount: BankAccountData = {
+  id: 1,
+  name: 'Checking',
+  is_sink_fund: false,
+  is_credit_card: false,
+};
 const jan2025: BudgetData = { id: 1, name: 'Jan 2025', status: 'open' };
 const sampleTransactions: TransactionData[] = [
   { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid' },
 ];
-const sampleAllocations: AllocationData[] = [
-  { id: 1, name: 'Food', amount: 20000 },
-];
+const sampleAllocations: AllocationData[] = [{ id: 1, name: 'Food', amount: 20000 }];
 
 const mockStore = reactive({
   transactions: sampleTransactions as TransactionData[],
@@ -201,8 +204,20 @@ describe('TransactionsPage', () => {
 
     it('passes draft transactions when in edit mode', async () => {
       const draftTransactions: TransactionData[] = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid' },
-        { id: 2, description: 'New draft', withdrawal_amount: 1000, deposit_amount: 0, status: 'paid' },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+        },
+        {
+          id: 2,
+          description: 'New draft',
+          withdrawal_amount: 1000,
+          deposit_amount: 0,
+          status: 'paid',
+        },
       ];
       mockStore.isEditMode = true;
       mockStore.draftTransactions = draftTransactions;
@@ -379,7 +394,9 @@ describe('TransactionsPage', () => {
 
     it('calls store.addImportedTransactions when dialog emits "imported"', async () => {
       const wrapper = mountPage();
-      const importedTransactions = [{ description: 'Test Import', withdrawal_amount: 100, deposit_amount: 0 }];
+      const importedTransactions = [
+        { description: 'Test Import', withdrawal_amount: 100, deposit_amount: 0 },
+      ];
 
       const dialog = wrapper.findComponent({ name: 'TransactionImportDialog' });
       await dialog.vm.$emit('imported', importedTransactions);

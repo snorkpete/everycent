@@ -40,12 +40,7 @@
           :disabled="!selectedFormat || !store.selectedBudget"
           @click="runImport"
         />
-        <Button
-          label="Cancel"
-          severity="secondary"
-          data-testid="cancel-btn"
-          @click="close"
-        />
+        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
       </div>
     </template>
   </Dialog>

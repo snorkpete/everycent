@@ -10,7 +10,6 @@ import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
 // Selectors
-const BUDGET_SELECT = '[data-testid="budget-select"]';
 const BUDGET_WARNING = '[data-testid="budget-warning"]';
 const FILE_UPLOAD = '[data-testid="file-upload"]';
 const LOADING_SPINNER = '[data-testid="loading-spinner"]';
@@ -46,9 +45,19 @@ vi.mock('../budgets/budgetApi', () => ({
   },
 }));
 
-const openBudget: BudgetData = { id: 1, name: 'Mar 2026', status: 'open', start_date: '2026-03-01', end_date: '2026-03-31' };
+const openBudget: BudgetData = {
+  id: 1,
+  name: 'Mar 2026',
+  status: 'open',
+  start_date: '2026-03-01',
+  end_date: '2026-03-31',
+};
 const closedBudget: BudgetData = { id: 2, name: 'Feb 2026', status: 'closed' };
-const checkingAccount: BankAccountData = { id: 10, name: 'Checking', account_no: 'NL01ABNA1234567890' };
+const checkingAccount: BankAccountData = {
+  id: 10,
+  name: 'Checking',
+  account_no: 'NL01ABNA1234567890',
+};
 
 const samplePreviewAccounts: PreviewBankAccount[] = [
   {
@@ -94,13 +103,21 @@ const mockStore = reactive({
   selectedBudget: openBudget as BudgetData | null,
   previewAccounts: [] as PreviewBankAccount[],
   unmatchedIbans: [] as UnmatchedIban[],
-  saveResult: null as { bank_accounts: { bank_account_id: number; transactions: unknown[] }[] } | null,
+  saveResult: null as {
+    bank_accounts: { bank_account_id: number; transactions: unknown[] }[];
+  } | null,
   loading: false,
   error: null as string | null,
   phase: 'idle' as ImportPhase,
   budgetsForDropdown: [openBudget, closedBudget] as BudgetData[],
   isBudgetCurrent: true,
-  fileSummary: [] as { iban: string; matchedAccountName: string | null; totalTransactions: number; inPeriodCount: number; outOfPeriodCount: number }[],
+  fileSummary: [] as {
+    iban: string;
+    matchedAccountName: string | null;
+    totalTransactions: number;
+    inPeriodCount: number;
+    outOfPeriodCount: number;
+  }[],
   fetchMetadata: vi.fn().mockResolvedValue(undefined),
   selectBudget: vi.fn(),
   parseAndPreview: vi.fn().mockResolvedValue(undefined),
@@ -458,9 +475,7 @@ describe('ImportPage', () => {
   describe('unmatched IBANs', () => {
     it('shows unmatched IBAN messages', async () => {
       mockStore.phase = 'preview';
-      mockStore.unmatchedIbans = [
-        { iban: 'NL99UNKN0000000000', transactionCount: 5 },
-      ];
+      mockStore.unmatchedIbans = [{ iban: 'NL99UNKN0000000000', transactionCount: 5 }];
       const wrapper = createWrapper();
       await nextTick();
 
@@ -472,7 +487,15 @@ describe('ImportPage', () => {
   });
 
   describe('save flow', () => {
-    const matchedFileSummary = [{ iban: 'NL01ABNA1234567890', matchedAccountName: 'Checking', totalTransactions: 3, inPeriodCount: 2, outOfPeriodCount: 1 }];
+    const matchedFileSummary = [
+      {
+        iban: 'NL01ABNA1234567890',
+        matchedAccountName: 'Checking',
+        totalTransactions: 3,
+        inPeriodCount: 2,
+        outOfPeriodCount: 1,
+      },
+    ];
 
     it('calls saveImport when save button clicked', async () => {
       mockStore.phase = 'preview';
@@ -524,7 +547,14 @@ describe('ImportPage', () => {
       mockStore.phase = 'saved';
       mockStore.saveResult = {
         bank_accounts: [
-          { bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, saved_count: 2, skipped: [] },
+          {
+            bank_account_id: 10,
+            current_balance: 95000,
+            net: 0,
+            projected_balance: 95000,
+            saved_count: 2,
+            skipped: [],
+          },
         ],
       };
     });

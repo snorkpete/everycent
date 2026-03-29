@@ -1,216 +1,207 @@
 <template>
   <div class="allocation-list">
-      <table class="allocations-table">
-        <thead>
-          <tr>
-            <th class="name-col">Name</th>
-            <th class="amount-col">Amount</th>
-            <th class="spent-col">Spent</th>
-            <th class="remaining-col">Remaining</th>
-            <th class="class-col">Class</th>
-            <th class="fixed-col">Fixed?</th>
-            <th class="comment-col">Comment</th>
-            <th v-if="store.isEditMode" class="action-col"></th>
+    <table class="allocations-table">
+      <thead>
+        <tr>
+          <th class="name-col">Name</th>
+          <th class="amount-col">Amount</th>
+          <th class="spent-col">Spent</th>
+          <th class="remaining-col">Remaining</th>
+          <th class="class-col">Class</th>
+          <th class="fixed-col">Fixed?</th>
+          <th class="comment-col">Comment</th>
+          <th v-if="store.isEditMode" class="action-col"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <template v-for="category in store.allocationCategories" :key="category.id">
+          <!-- Category sub-header -->
+          <tr class="category-header" :data-testid="`category-header-${category.id}`">
+            <td>{{ category.name }}</td>
+            <td class="amount-cell">{{ centsToDollars(categoryAmount(category)) }}</td>
+            <td class="amount-cell">{{ centsToDollars(categorySpent(category)) }}</td>
+            <td class="amount-cell" :class="remainingClass(categoryRemaining(category))">
+              {{ centsToDollars(categoryRemaining(category)) }}
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td v-if="store.isEditMode"></td>
           </tr>
-        </thead>
 
-        <tbody>
-          <template v-for="category in store.allocationCategories" :key="category.id">
-            <!-- Category sub-header -->
-            <tr class="category-header" :data-testid="`category-header-${category.id}`">
-              <td>{{ category.name }}</td>
-              <td class="amount-cell">{{ centsToDollars(categoryAmount(category)) }}</td>
-              <td class="amount-cell">{{ centsToDollars(categorySpent(category)) }}</td>
-              <td
-                class="amount-cell"
-                :class="remainingClass(categoryRemaining(category))"
-              >
-                {{ centsToDollars(categoryRemaining(category)) }}
-              </td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td v-if="store.isEditMode"></td>
-            </tr>
+          <!-- Fixed subtotal row (variable-only mode) — below category header -->
+          <tr
+            v-if="variableOnly && fixedAllocationsForCategory(category).length > 0"
+            class="fixed-subtotal-row"
+            :data-testid="`fixed-subtotal-${category.id}`"
+          >
+            <td>Fixed</td>
+            <td class="amount-cell">{{ centsToDollars(fixedCategoryAmount(category)) }}</td>
+            <td class="amount-cell">{{ centsToDollars(fixedCategorySpent(category)) }}</td>
+            <td class="amount-cell" :class="remainingClass(fixedCategoryRemaining(category))">
+              {{ centsToDollars(fixedCategoryRemaining(category)) }}
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td v-if="store.isEditMode"></td>
+          </tr>
 
-            <!-- Fixed subtotal row (variable-only mode) — below category header -->
-            <tr
-              v-if="variableOnly && fixedAllocationsForCategory(category).length > 0"
-              class="fixed-subtotal-row"
-              :data-testid="`fixed-subtotal-${category.id}`"
-            >
-              <td>Fixed</td>
-              <td class="amount-cell">{{ centsToDollars(fixedCategoryAmount(category)) }}</td>
-              <td class="amount-cell">{{ centsToDollars(fixedCategorySpent(category)) }}</td>
-              <td
-                class="amount-cell"
-                :class="remainingClass(fixedCategoryRemaining(category))"
-              >
-                {{ centsToDollars(fixedCategoryRemaining(category)) }}
-              </td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td v-if="store.isEditMode"></td>
-            </tr>
+          <!-- Allocation rows -->
+          <tr
+            v-for="(allocation, index) in allocationsForCategory(category)"
+            :key="allocation.id || `${category.id}-${index}`"
+            :class="{ 'deleted-row': allocation.deleted }"
+            data-testid="allocation-row"
+          >
+            <!-- Name -->
+            <td>
+              <input
+                v-if="store.isEditMode"
+                v-model="allocation.name"
+                type="text"
+                class="p-inputtext cell-input"
+                data-testid="allocation-name-input"
+              />
+              <span v-else>
+                {{ allocation.name }}
+                <i
+                  v-if="!variableOnly && allocation.is_fixed_amount"
+                  v-tooltip="'Fixed allocation'"
+                  class="pi pi-lock fixed-icon"
+                ></i>
+              </span>
+            </td>
 
-            <!-- Allocation rows -->
-            <tr
-              v-for="(allocation, index) in allocationsForCategory(category)"
-              :key="allocation.id || `${category.id}-${index}`"
-              :class="{ 'deleted-row': allocation.deleted }"
-              data-testid="allocation-row"
-            >
-              <!-- Name -->
-              <td>
-                <input
-                  v-if="store.isEditMode"
-                  v-model="allocation.name"
-                  type="text"
-                  class="p-inputtext cell-input"
-                  data-testid="allocation-name-input"
-                />
-                <span v-else>
-                  {{ allocation.name }}
-                  <i
-                    v-if="!variableOnly && allocation.is_fixed_amount"
-                    class="pi pi-lock fixed-icon"
-                    v-tooltip="'Fixed allocation'"
-                  ></i>
-                </span>
-              </td>
+            <!-- Amount -->
+            <td class="amount-cell">
+              <EcMoneyField
+                v-if="store.isEditMode"
+                v-model="allocation.amount"
+                label=""
+                :edit-mode="true"
+              />
+              <span v-else>{{ centsToDollars(allocation.amount ?? 0) }}</span>
+            </td>
 
-              <!-- Amount -->
-              <td class="amount-cell">
-                <EcMoneyField
-                  v-if="store.isEditMode"
-                  v-model="allocation.amount"
-                  label=""
-                  :edit-mode="true"
-                />
-                <span v-else>{{ centsToDollars(allocation.amount ?? 0) }}</span>
-              </td>
-
-              <!-- Spent -->
-              <td class="amount-cell">
-                <span class="spent-cell">
-                  <button
-                    class="eye-btn"
-                    title="Show transactions for this allocation"
-                    data-testid="show-transactions-btn"
-                    @click="showTransactions(allocation)"
-                  >
-                    <i class="pi pi-eye"></i>
-                  </button>
-                  <span>{{ centsToDollars(allocation.spent ?? 0) }}</span>
-                </span>
-              </td>
-
-              <!-- Remaining -->
-              <td
-                class="amount-cell"
-                :class="remainingClass(remaining(allocation))"
-              >
-                {{ centsToDollars(remaining(allocation)) }}
-              </td>
-
-              <!-- Class -->
-              <td>
-                <select
-                  v-if="store.isEditMode"
-                  v-model="allocation.allocation_class"
-                  class="cell-select"
-                  data-testid="allocation-class-select"
-                >
-                  <option
-                    v-for="cls in allocationClasses"
-                    :key="cls.id"
-                    :value="cls.id"
-                  >
-                    {{ cls.name }}
-                  </option>
-                </select>
-                <span v-else class="class-display">{{ titleCase(allocation.allocation_class) }}</span>
-              </td>
-
-              <!-- Fixed Amount? -->
-              <td class="center-cell">
-                <input
-                  v-if="store.isEditMode"
-                  v-model="allocation.is_fixed_amount"
-                  type="checkbox"
-                  data-testid="allocation-fixed-checkbox"
-                />
-                <span v-else>{{ allocation.is_fixed_amount ? 'Yes' : 'No' }}</span>
-              </td>
-
-              <!-- Comment -->
-              <td>
-                <input
-                  v-if="store.isEditMode"
-                  v-model="allocation.comment"
-                  type="text"
-                  class="p-inputtext cell-input"
-                  data-testid="allocation-comment-input"
-                />
-                <span v-else>{{ allocation.comment }}</span>
-              </td>
-
-              <!-- Delete action -->
-              <td v-if="store.isEditMode" class="center-cell">
+            <!-- Spent -->
+            <td class="amount-cell">
+              <span class="spent-cell">
                 <button
-                  class="delete-btn"
-                  :title="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
-                  :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
-                  @click="toggleDeleted(allocation)"
+                  class="eye-btn"
+                  title="Show transactions for this allocation"
+                  data-testid="show-transactions-btn"
+                  @click="showTransactions(allocation)"
                 >
-                  <i :class="allocation.deleted ? 'pi pi-undo' : 'pi pi-trash'"></i>
+                  <i class="pi pi-eye"></i>
                 </button>
-              </td>
-            </tr>
+                <span>{{ centsToDollars(allocation.spent ?? 0) }}</span>
+              </span>
+            </td>
 
-            <!-- Add allocation button -->
-            <tr v-if="store.isEditMode" class="add-row" :data-testid="`add-allocation-row-${category.id}`">
-              <td :colspan="8">
-                <button
-                  class="add-link"
-                  :data-testid="`add-allocation-btn-${category.id}`"
-                  @click="addAllocation(category)"
-                >
-                  + Add {{ category.name }} Allocation
-                </button>
-              </td>
-            </tr>
-          </template>
-        </tbody>
+            <!-- Remaining -->
+            <td class="amount-cell" :class="remainingClass(remaining(allocation))">
+              {{ centsToDollars(remaining(allocation)) }}
+            </td>
 
-        <tfoot>
-          <tr v-if="variableOnly" class="fixed-total-row" data-testid="fixed-total-row">
-            <th>Fixed Total</th>
-            <th class="amount-cell">{{ centsToDollars(totalFixedAmount) }}</th>
-            <th class="amount-cell">{{ centsToDollars(totalFixedSpent) }}</th>
-            <th class="amount-cell" :class="remainingClass(totalFixedRemaining)">
-              {{ centsToDollars(totalFixedRemaining) }}
-            </th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th v-if="store.isEditMode"></th>
+            <!-- Class -->
+            <td>
+              <select
+                v-if="store.isEditMode"
+                v-model="allocation.allocation_class"
+                class="cell-select"
+                data-testid="allocation-class-select"
+              >
+                <option v-for="cls in allocationClasses" :key="cls.id" :value="cls.id">
+                  {{ cls.name }}
+                </option>
+              </select>
+              <span v-else class="class-display">{{ titleCase(allocation.allocation_class) }}</span>
+            </td>
+
+            <!-- Fixed Amount? -->
+            <td class="center-cell">
+              <input
+                v-if="store.isEditMode"
+                v-model="allocation.is_fixed_amount"
+                type="checkbox"
+                data-testid="allocation-fixed-checkbox"
+              />
+              <span v-else>{{ allocation.is_fixed_amount ? 'Yes' : 'No' }}</span>
+            </td>
+
+            <!-- Comment -->
+            <td>
+              <input
+                v-if="store.isEditMode"
+                v-model="allocation.comment"
+                type="text"
+                class="p-inputtext cell-input"
+                data-testid="allocation-comment-input"
+              />
+              <span v-else>{{ allocation.comment }}</span>
+            </td>
+
+            <!-- Delete action -->
+            <td v-if="store.isEditMode" class="center-cell">
+              <button
+                class="delete-btn"
+                :title="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
+                :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
+                @click="toggleDeleted(allocation)"
+              >
+                <i :class="allocation.deleted ? 'pi pi-undo' : 'pi pi-trash'"></i>
+              </button>
+            </td>
           </tr>
-          <tr class="total-row" data-testid="total-row">
-            <th>Total</th>
-            <th class="amount-cell">{{ centsToDollars(totalAmount) }}</th>
-            <th class="amount-cell">{{ centsToDollars(totalSpent) }}</th>
-            <th class="amount-cell" :class="remainingClass(totalRemaining)">
-              {{ centsToDollars(totalRemaining) }}
-            </th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th v-if="store.isEditMode"></th>
+
+          <!-- Add allocation button -->
+          <tr
+            v-if="store.isEditMode"
+            class="add-row"
+            :data-testid="`add-allocation-row-${category.id}`"
+          >
+            <td :colspan="8">
+              <button
+                class="add-link"
+                :data-testid="`add-allocation-btn-${category.id}`"
+                @click="addAllocation(category)"
+              >
+                + Add {{ category.name }} Allocation
+              </button>
+            </td>
           </tr>
-        </tfoot>
-      </table>
+        </template>
+      </tbody>
+
+      <tfoot>
+        <tr v-if="variableOnly" class="fixed-total-row" data-testid="fixed-total-row">
+          <th>Fixed Total</th>
+          <th class="amount-cell">{{ centsToDollars(totalFixedAmount) }}</th>
+          <th class="amount-cell">{{ centsToDollars(totalFixedSpent) }}</th>
+          <th class="amount-cell" :class="remainingClass(totalFixedRemaining)">
+            {{ centsToDollars(totalFixedRemaining) }}
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th v-if="store.isEditMode"></th>
+        </tr>
+        <tr class="total-row" data-testid="total-row">
+          <th>Total</th>
+          <th class="amount-cell">{{ centsToDollars(totalAmount) }}</th>
+          <th class="amount-cell">{{ centsToDollars(totalSpent) }}</th>
+          <th class="amount-cell" :class="remainingClass(totalRemaining)">
+            {{ centsToDollars(totalRemaining) }}
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th v-if="store.isEditMode"></th>
+        </tr>
+      </tfoot>
+    </table>
     <div class="unallocated-badge" data-testid="unallocated-badge">
       Unallocated: {{ centsToDollars(unallocated) }}
     </div>
@@ -234,11 +225,14 @@ import { budgetApi } from './budgetApi';
 import type { AllocationData } from '../transactions/transaction.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 
-const props = withDefaults(defineProps<{
-  variableOnly?: boolean;
-}>(), {
-  variableOnly: false,
-});
+const props = withDefaults(
+  defineProps<{
+    variableOnly?: boolean;
+  }>(),
+  {
+    variableOnly: false,
+  },
+);
 
 const store = useBudgetStore();
 
@@ -260,9 +254,7 @@ const allocationClasses = [
 
 function allAllocationsForCategory(category: AllocationCategoryData): AllocationData[] {
   if (!store.budget?.allocations) return [];
-  return store.budget.allocations.filter(
-    (a) => a.allocation_category_id === category.id,
-  );
+  return store.budget.allocations.filter((a) => a.allocation_category_id === category.id);
 }
 
 function allocationsForCategory(category: AllocationCategoryData): AllocationData[] {
@@ -292,11 +284,15 @@ function fixedCategoryRemaining(category: AllocationCategoryData): number {
 }
 
 const totalFixedAmount = computed(() =>
-  activeAllocations.value.filter((a) => a.is_fixed_amount).reduce((sum, a) => sum + (a.amount ?? 0), 0),
+  activeAllocations.value
+    .filter((a) => a.is_fixed_amount)
+    .reduce((sum, a) => sum + (a.amount ?? 0), 0),
 );
 
 const totalFixedSpent = computed(() =>
-  activeAllocations.value.filter((a) => a.is_fixed_amount).reduce((sum, a) => sum + (a.spent ?? 0), 0),
+  activeAllocations.value
+    .filter((a) => a.is_fixed_amount)
+    .reduce((sum, a) => sum + (a.spent ?? 0), 0),
 );
 
 const totalFixedRemaining = computed(() => totalFixedAmount.value - totalFixedSpent.value);
@@ -317,8 +313,8 @@ function remaining(allocation: AllocationData): number {
   return (allocation.amount ?? 0) - (allocation.spent ?? 0);
 }
 
-const activeAllocations = computed(() =>
-  store.budget?.allocations?.filter((a) => !a.deleted) ?? [],
+const activeAllocations = computed(
+  () => store.budget?.allocations?.filter((a) => !a.deleted) ?? [],
 );
 
 const totalAmount = computed(() =>
@@ -331,23 +327,11 @@ const totalSpent = computed(() =>
 
 const totalRemaining = computed(() => totalAmount.value - totalSpent.value);
 
-const totalIncome = computed(() =>
-  store.budget?.incomes?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0,
+const totalIncome = computed(
+  () => store.budget?.incomes?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0,
 );
 
 const unallocated = computed(() => totalIncome.value - totalAmount.value);
-
-function dominantClass(category: AllocationCategoryData): string {
-  const allocs = activeAllocationsForCategory(category);
-  if (allocs.length === 0) return '';
-  const counts: Record<string, number> = {};
-  for (const a of allocs) {
-    const cls = a.allocation_class ?? 'want';
-    counts[cls] = (counts[cls] ?? 0) + 1;
-  }
-  const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
-  return titleCase(dominant);
-}
 
 function remainingClass(value: number): string {
   if (value > 0) return 'amount-positive';
@@ -474,13 +458,27 @@ function addAllocation(category: AllocationCategoryData) {
 }
 
 /* ── Column widths ── */
-.name-col { width: 30%; }
-.amount-col { width: 13%; }
-.spent-col { width: 13%; }
-.remaining-col { width: 13%; }
-.class-col { width: 10%; }
-.fixed-col { width: 8%; }
-.action-col { width: 5%; }
+.name-col {
+  width: 30%;
+}
+.amount-col {
+  width: 13%;
+}
+.spent-col {
+  width: 13%;
+}
+.remaining-col {
+  width: 13%;
+}
+.class-col {
+  width: 10%;
+}
+.fixed-col {
+  width: 8%;
+}
+.action-col {
+  width: 5%;
+}
 
 /* ── Spent cell with eye icon ── */
 .spent-cell {

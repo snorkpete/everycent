@@ -91,7 +91,9 @@ describe('InstitutionEditDialog', () => {
 
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
-      expect(wrapper.emitted('save')?.[0]).toEqual([{ id: existingInstitution.id, name: existingInstitution.name }]);
+      expect(wrapper.emitted('save')?.[0]).toEqual([
+        { id: existingInstitution.id, name: existingInstitution.name },
+      ]);
     });
 
     it('returns to view mode when "Cancel" is clicked on an existing institution', async () => {

@@ -14,16 +14,48 @@ const TRANSACTION_ROW = '[data-testid="transaction-row"]';
 const ALLOCATION_HEADER = '[data-testid="allocation-header"]';
 const PAID_ICON = '[data-testid="paid-icon"]';
 
-const checkingAccount: BankAccountData = { id: 1, name: 'Checking', is_sink_fund: false, is_credit_card: false };
-const sinkFundAccount: BankAccountData = { id: 3, name: 'Sink Fund', is_sink_fund: true, is_credit_card: false };
+const checkingAccount: BankAccountData = {
+  id: 1,
+  name: 'Checking',
+  is_sink_fund: false,
+  is_credit_card: false,
+};
+const sinkFundAccount: BankAccountData = {
+  id: 3,
+  name: 'Sink Fund',
+  is_sink_fund: true,
+  is_credit_card: false,
+};
 
 const sampleTransactions: TransactionData[] = [
-  { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', transaction_date: '2025-01-05', deleted: false },
-  { id: 2, description: 'Salary', withdrawal_amount: 0, deposit_amount: 300000, status: 'paid', transaction_date: '2025-01-01', deleted: false },
+  {
+    id: 1,
+    description: 'Groceries',
+    withdrawal_amount: 5000,
+    deposit_amount: 0,
+    status: 'paid',
+    transaction_date: '2025-01-05',
+    deleted: false,
+  },
+  {
+    id: 2,
+    description: 'Salary',
+    withdrawal_amount: 0,
+    deposit_amount: 300000,
+    status: 'paid',
+    transaction_date: '2025-01-01',
+    deleted: false,
+  },
 ];
 
 const sampleAllocations: AllocationData[] = [
-  { id: 1, name: 'Food', amount: 20000, allocation_category_id: 1, allocation_category: { id: 1, name: 'Living' } },
+  {
+    id: 1,
+    name: 'Food',
+    amount: 20000,
+    allocation_category_id: 1,
+    allocation_category: { id: 1, name: 'Living' },
+  },
 ];
 
 const sampleSinkFundAllocations: SinkFundAllocationData[] = [
@@ -33,7 +65,9 @@ const sampleSinkFundAllocations: SinkFundAllocationData[] = [
 let pinia: Pinia;
 let store: ReturnType<typeof useTransactionStore>;
 
-function createWrapper(props: { wrapDescriptions?: boolean; showCalculatorColumn?: boolean } = {}): VueWrapper {
+function createWrapper(
+  props: { wrapDescriptions?: boolean; showCalculatorColumn?: boolean } = {},
+): VueWrapper {
   return mount(TransactionList, {
     props,
     global: {
@@ -111,7 +145,14 @@ describe('TransactionList', () => {
   describe('paid column', () => {
     it('shows checkmark icon for paid transactions in view mode', () => {
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+        },
       ];
       const wrapper = createWrapper();
 
@@ -120,7 +161,14 @@ describe('TransactionList', () => {
 
     it('does not show checkmark icon for unpaid transactions in view mode', () => {
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'unpaid', deleted: false },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'unpaid',
+          deleted: false,
+        },
       ];
       const wrapper = createWrapper();
 
@@ -130,7 +178,14 @@ describe('TransactionList', () => {
     it('shows checkbox in edit mode instead of icon', async () => {
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+        },
       ];
       const wrapper = createWrapper();
       await nextTick();
@@ -154,7 +209,14 @@ describe('TransactionList', () => {
 
     it('shows calculator checkboxes when showCalculatorColumn is true', () => {
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+        },
       ];
       const wrapper = createWrapper({ showCalculatorColumn: true });
 
@@ -200,7 +262,14 @@ describe('TransactionList', () => {
     it('calls store.deleteTransaction with the transaction when delete button is clicked', async () => {
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: false },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+        },
       ];
       const wrapper = createWrapper();
       await nextTick();
@@ -216,7 +285,14 @@ describe('TransactionList', () => {
     it('hides delete button for already-deleted transactions', async () => {
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: true,
+        },
       ];
       const wrapper = createWrapper();
       await nextTick();
@@ -227,7 +303,14 @@ describe('TransactionList', () => {
     it('shows undo button for deleted transactions', async () => {
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: true,
+        },
       ];
       const wrapper = createWrapper();
       await nextTick();
@@ -238,7 +321,14 @@ describe('TransactionList', () => {
     it('calls store.undoDeleteTransaction when undo button is clicked', async () => {
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: true,
+        },
       ];
       const wrapper = createWrapper();
       await nextTick();
@@ -254,7 +344,14 @@ describe('TransactionList', () => {
     it('applies deleted class to rows where deleted is true', async () => {
       store.isEditMode = true;
       store.draftTransactions = [
-        { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid', deleted: true },
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: true,
+        },
       ];
       const wrapper = createWrapper();
       await nextTick();

@@ -15,7 +15,8 @@
           :href="`#/transactions?budget_id=${route.params.id}`"
           class="view-transactions-link"
           data-testid="view-transactions-btn"
-        >View Transactions</a>
+          >View Transactions</a
+        >
         <Button
           :label="variableOnly ? 'Variable Only' : 'All Allocations'"
           :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
@@ -35,12 +36,7 @@
           @click="store.enterEditMode()"
         />
         <template v-else>
-          <Button
-            label="Save"
-            data-testid="save-btn"
-            size="small"
-            @click="onSave"
-          />
+          <Button label="Save" data-testid="save-btn" size="small" @click="onSave" />
           <Button
             label="Cancel"
             severity="secondary"
@@ -64,7 +60,6 @@
         <BudgetAllocationList :variable-only="variableOnly" />
       </div>
     </div>
-
   </div>
 </template>
 
@@ -99,9 +94,12 @@ onMounted(async () => {
   updateHeading();
 });
 
-watch(() => store.budget?.name, () => {
-  updateHeading();
-});
+watch(
+  () => store.budget?.name,
+  () => {
+    updateHeading();
+  },
+);
 
 async function onSave() {
   try {

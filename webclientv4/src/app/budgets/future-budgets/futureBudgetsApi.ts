@@ -4,8 +4,7 @@ import type { SettingsData } from '../../settings/settings.types';
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 
 export const futureBudgetsApi = {
-  getFutureBudgets: () =>
-    apiGateway.get<FutureBudgetData[]>('/budgets/future').then((r) => r.data),
+  getFutureBudgets: () => apiGateway.get<FutureBudgetData[]>('/budgets/future').then((r) => r.data),
 
   getAllocationCategories: () =>
     apiGateway.get<AllocationCategoryData[]>('/allocation_categories').then((r) => r.data),

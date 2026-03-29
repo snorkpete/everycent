@@ -215,7 +215,13 @@ describe('importStore', () => {
   describe('parseFile', () => {
     function setupStoreForParse() {
       const store = useImportStore();
-      store.selectedBudget = { id: 1, name: 'Mar 2026', status: 'open', start_date: '2026-03-01', end_date: '2026-03-31' };
+      store.selectedBudget = {
+        id: 1,
+        name: 'Mar 2026',
+        status: 'open',
+        start_date: '2026-03-01',
+        end_date: '2026-03-31',
+      };
       store.bankAccounts = [
         { id: 10, name: 'Checking', account_no: 'NL01ABNA1234567890', account_type: 'normal' },
       ];
@@ -272,7 +278,9 @@ describe('importStore', () => {
 
     it('resets state before processing', async () => {
       const store = setupStoreForParse();
-      store.previewAccounts = [{ bank_account_id: 99, current_balance: 0, net: 0, projected_balance: 0, transactions: [] }];
+      store.previewAccounts = [
+        { bank_account_id: 99, current_balance: 0, net: 0, projected_balance: 0, transactions: [] },
+      ];
       store.unmatchedIbans = [{ iban: 'NL99', transactionCount: 1 }];
       store.saveResult = { bank_accounts: [] };
       store.phase = 'saved';
@@ -289,12 +297,22 @@ describe('importStore', () => {
   describe('fetchPreview', () => {
     function setupStoreForPreview() {
       const store = useImportStore();
-      store.selectedBudget = { id: 1, name: 'Mar 2026', status: 'open', start_date: '2026-03-01', end_date: '2026-03-31' };
+      store.selectedBudget = {
+        id: 1,
+        name: 'Mar 2026',
+        status: 'open',
+        start_date: '2026-03-01',
+        end_date: '2026-03-31',
+      };
       store.bankAccounts = [
         { id: 10, name: 'Checking', account_no: 'NL01ABNA1234567890', account_type: 'normal' },
       ];
       store.parsedAccounts = [
-        { iban: 'NL01ABNA1234567890', bankAccountId: 10, transactions: [{ description: 'Test', bank_ref: 'REF001' }] },
+        {
+          iban: 'NL01ABNA1234567890',
+          bankAccountId: 10,
+          transactions: [{ description: 'Test', bank_ref: 'REF001' }],
+        },
       ];
       return store;
     }
@@ -336,13 +354,15 @@ describe('importStore', () => {
       const store = setupStoreForPreview();
       store.parsedAccounts = [
         { iban: 'NL01ABNA1234567890', bankAccountId: 10, transactions: [{ description: 'Test' }] },
-        { iban: 'NL99UNKN0000000000', bankAccountId: undefined, transactions: [{ description: 'A' }, { description: 'B' }] },
+        {
+          iban: 'NL99UNKN0000000000',
+          bankAccountId: undefined,
+          transactions: [{ description: 'A' }, { description: 'B' }],
+        },
       ];
       await store.fetchPreview();
 
-      expect(store.unmatchedIbans).toEqual([
-        { iban: 'NL99UNKN0000000000', transactionCount: 2 },
-      ]);
+      expect(store.unmatchedIbans).toEqual([{ iban: 'NL99UNKN0000000000', transactionCount: 2 }]);
     });
 
     it('sets error and re-throws on preview endpoint failure', async () => {
@@ -358,7 +378,11 @@ describe('importStore', () => {
     it('does nothing when no matched accounts', async () => {
       const store = setupStoreForPreview();
       store.parsedAccounts = [
-        { iban: 'NL99UNKN0000000000', bankAccountId: undefined, transactions: [{ description: 'A' }] },
+        {
+          iban: 'NL99UNKN0000000000',
+          bankAccountId: undefined,
+          transactions: [{ description: 'A' }],
+        },
       ];
       await store.fetchPreview();
 
@@ -376,9 +400,7 @@ describe('importStore', () => {
           current_balance: 100000,
           net: 0,
           projected_balance: 100000,
-          transactions: [
-            { description: 'Test', import_status: 'new', deleted: false },
-          ],
+          transactions: [{ description: 'Test', import_status: 'new', deleted: false }],
         },
       ];
 
@@ -403,9 +425,7 @@ describe('importStore', () => {
     function setupStoreForSave() {
       const store = useImportStore();
       store.selectedBudget = { id: 1, name: 'Mar 2026', status: 'open' };
-      store.bankAccounts = [
-        { id: 10, name: 'Checking', account_no: 'NL01ABNA1234567890' },
-      ];
+      store.bankAccounts = [{ id: 10, name: 'Checking', account_no: 'NL01ABNA1234567890' }];
       store.previewAccounts = [
         {
           bank_account_id: 10,
@@ -438,7 +458,17 @@ describe('importStore', () => {
     }
 
     it('sends all transactions including duplicates and deleted with their flags', async () => {
-      const saveResponse = { bank_accounts: [{ bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, transactions: [] }] };
+      const saveResponse = {
+        bank_accounts: [
+          {
+            bank_account_id: 10,
+            current_balance: 95000,
+            net: 0,
+            projected_balance: 95000,
+            transactions: [],
+          },
+        ],
+      };
       vi.mocked(importApi.save).mockResolvedValue(saveResponse);
 
       const store = setupStoreForSave();
@@ -465,7 +495,17 @@ describe('importStore', () => {
     });
 
     it('stores save result', async () => {
-      const saveResponse = { bank_accounts: [{ bank_account_id: 10, current_balance: 95000, net: 0, projected_balance: 95000, transactions: [] }] };
+      const saveResponse = {
+        bank_accounts: [
+          {
+            bank_account_id: 10,
+            current_balance: 95000,
+            net: 0,
+            projected_balance: 95000,
+            transactions: [],
+          },
+        ],
+      };
       vi.mocked(importApi.save).mockResolvedValue(saveResponse);
 
       const store = setupStoreForSave();
@@ -510,7 +550,9 @@ describe('importStore', () => {
   describe('resetPreview', () => {
     it('clears preview state and returns to idle', () => {
       const store = useImportStore();
-      store.previewAccounts = [{ bank_account_id: 10, current_balance: 0, net: 0, projected_balance: 0, transactions: [] }];
+      store.previewAccounts = [
+        { bank_account_id: 10, current_balance: 0, net: 0, projected_balance: 0, transactions: [] },
+      ];
       store.unmatchedIbans = [{ iban: 'NL01', transactionCount: 1 }];
       store.saveResult = { bank_accounts: [] };
       store.error = 'some error';
@@ -532,13 +574,23 @@ describe('importStore', () => {
       mockSettings.primary_budget_account_id = 10;
       store.selectedBudget = { id: 1, name: 'Jan 2025', status: 'open' };
       store.bankAccounts = [{ id: 10, name: 'Checking', is_credit_card: false }];
-      store.previewAccounts = [{
-        bank_account_id: 10,
-        current_balance: 0,
-        net: 0,
-        projected_balance: 0,
-        transactions: [{ description: 'Groceries', import_status: 'new', bank_ref: 'R1', withdrawal_amount: 5000, deposit_amount: 0 }],
-      }];
+      store.previewAccounts = [
+        {
+          bank_account_id: 10,
+          current_balance: 0,
+          net: 0,
+          projected_balance: 0,
+          transactions: [
+            {
+              description: 'Groceries',
+              import_status: 'new',
+              bank_ref: 'R1',
+              withdrawal_amount: 5000,
+              deposit_amount: 0,
+            },
+          ],
+        },
+      ];
 
       vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
       await store.autoAllocate();
@@ -551,13 +603,23 @@ describe('importStore', () => {
       mockSettings.primary_budget_account_id = 10;
       store.selectedBudget = { id: 1, name: 'Jan 2025', status: 'open' };
       store.bankAccounts = [{ id: 20, name: 'Credit Card', is_credit_card: true }];
-      store.previewAccounts = [{
-        bank_account_id: 20,
-        current_balance: 0,
-        net: 0,
-        projected_balance: 0,
-        transactions: [{ description: 'Coffee', import_status: 'new', bank_ref: 'R2', withdrawal_amount: 500, deposit_amount: 0 }],
-      }];
+      store.previewAccounts = [
+        {
+          bank_account_id: 20,
+          current_balance: 0,
+          net: 0,
+          projected_balance: 0,
+          transactions: [
+            {
+              description: 'Coffee',
+              import_status: 'new',
+              bank_ref: 'R2',
+              withdrawal_amount: 500,
+              deposit_amount: 0,
+            },
+          ],
+        },
+      ];
 
       vi.mocked(budgetApi.autoAllocate).mockResolvedValue({ suggestions: [] });
       await store.autoAllocate();
@@ -570,13 +632,23 @@ describe('importStore', () => {
       mockSettings.primary_budget_account_id = 10;
       store.selectedBudget = { id: 1, name: 'Jan 2025', status: 'open' };
       store.bankAccounts = [{ id: 99, name: 'Savings', is_credit_card: false }];
-      store.previewAccounts = [{
-        bank_account_id: 99,
-        current_balance: 0,
-        net: 0,
-        projected_balance: 0,
-        transactions: [{ description: 'Transfer', import_status: 'new', bank_ref: 'R3', withdrawal_amount: 10000, deposit_amount: 0 }],
-      }];
+      store.previewAccounts = [
+        {
+          bank_account_id: 99,
+          current_balance: 0,
+          net: 0,
+          projected_balance: 0,
+          transactions: [
+            {
+              description: 'Transfer',
+              import_status: 'new',
+              bank_ref: 'R3',
+              withdrawal_amount: 10000,
+              deposit_amount: 0,
+            },
+          ],
+        },
+      ];
 
       await store.autoAllocate();
 

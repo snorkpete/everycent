@@ -1,8 +1,18 @@
 import type { TransactionData } from '../transaction.types';
 
 const MONTH_MAP: Record<string, number> = {
-  jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
-  jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+  jan: 0,
+  feb: 1,
+  mar: 2,
+  apr: 3,
+  may: 4,
+  jun: 5,
+  jul: 6,
+  aug: 7,
+  sep: 8,
+  oct: 9,
+  nov: 10,
+  dec: 11,
 };
 
 function convertInputToLines(input: string | null): string[] {
@@ -39,15 +49,11 @@ function formatDate(date: Date): string {
 }
 
 function isAmountLine(line: string): boolean {
-  return !!line
-    .replaceAll('.', '')
-    .match(/^([+-]\s*)?€\s*(\d+),(\d+)$/);
+  return !!line.replaceAll('.', '').match(/^([+-]\s*)?€\s*(\d+),(\d+)$/);
 }
 
 function extractAmount(line: string): number {
-  const match = line
-    .replaceAll('.', '')
-    .match(/^([+-]\s*)?€\s*(\d+),(\d+)$/);
+  const match = line.replaceAll('.', '').match(/^([+-]\s*)?€\s*(\d+),(\d+)$/);
   if (!match) return 0;
   const [, sign, whole, decimal] = match;
   const amount = parseInt(whole, 10) * 100 + parseInt(decimal, 10);

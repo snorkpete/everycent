@@ -181,9 +181,7 @@ describe('budgetApi', () => {
     });
 
     it('returns the response data', async () => {
-      const transactions = [
-        { id: 1, description: 'Supermarket', net_amount: -5000 },
-      ];
+      const transactions = [{ id: 1, description: 'Supermarket', net_amount: -5000 }];
       vi.mocked(apiGateway.get).mockResolvedValue({ data: transactions });
 
       const result = await budgetApi.getTransactionsForAllocation(42);

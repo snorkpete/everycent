@@ -12,9 +12,7 @@ describe('api-gateway', () => {
   });
 
   it('sets Content-Type to application/json', () => {
-    expect(apiGateway.defaults.headers['Content-Type']).toBe(
-      'application/json',
-    );
+    expect(apiGateway.defaults.headers['Content-Type']).toBe('application/json');
   });
 
   describe('request interceptor', () => {
@@ -188,5 +186,4 @@ describe('api-gateway', () => {
       expect(result).toBe(response);
     });
   });
-
 });

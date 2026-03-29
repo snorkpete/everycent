@@ -94,9 +94,7 @@ const formVisible = ref(false);
 
 const event = computed(() => store.currentSpecialEvent);
 const allocations = computed(() => event.value?.allocations ?? []);
-const totalSpent = computed(() =>
-  allocations.value.reduce((sum, a) => sum + (a.spent ?? 0), 0),
-);
+const totalSpent = computed(() => allocations.value.reduce((sum, a) => sum + (a.spent ?? 0), 0));
 
 onMounted(() => {
   headingStore.setHeading('Special Event');
