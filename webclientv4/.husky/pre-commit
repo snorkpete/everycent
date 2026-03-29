@@ -1,0 +1,36 @@
+#!/bin/sh
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+# --- Vue: lint-staged (ESLint + Prettier on staged .ts/.vue files) ---
+cd "$repo_root/webclientv4" || { echo "pre-commit: can't cd to webclientv4"; exit 1; }
+npx lint-staged
+
+# --- Rails: run rspec for changed Ruby files ---
+cd "$repo_root"
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+staged_ruby_files=$(echo "$staged_files" | grep '^app/.*\.rb$' || true)
+staged_spec_files=$(echo "$staged_files" | grep '^spec/.*_spec\.rb$' || true)
+
+# Map app/ files to their corresponding spec files
+mapped_specs=""
+for file in $staged_ruby_files; do
+  # app/models/foo.rb -> spec/models/foo_spec.rb
+  # app/controllers/foo_controller.rb -> spec/controllers/foo_controller_spec.rb
+  # app/services/foo.rb -> spec/services/foo_spec.rb
+  spec_file=$(echo "$file" | sed 's|^app/|spec/|' | sed 's|\.rb$|_spec.rb|')
+  if [ -f "$spec_file" ]; then
+    mapped_specs="$mapped_specs $spec_file"
+  fi
+done
+
+# Combine and deduplicate
+all_specs=$(printf '%s\n' "$staged_spec_files" "$mapped_specs" | grep -v '^$' | sort -u || true)
+
+if [ -n "$all_specs" ]; then
+  echo "Running rspec for changed files..."
+  echo "$all_specs"
+  # shellcheck disable=SC2086 -- intentional word splitting: each line becomes a separate arg
+  bundle exec rspec --fail-fast $all_specs
+fi
