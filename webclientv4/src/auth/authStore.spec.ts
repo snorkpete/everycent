@@ -31,7 +31,7 @@ describe('authStore', () => {
       expect(authApi.signIn).toHaveBeenCalledWith('user@test.com', 'password');
     });
 
-    it('sets error and clears credentials on failed login', async () => {
+    it('sets error on failed login', async () => {
       const axiosError = {
         isAxiosError: true,
         response: { data: { errors: ['Invalid credentials'] } },

@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { authApi } from './authApi';
-import { AUTH_HEADER_KEYS } from './auth.types';
+import { clearTokens, hasToken } from './authTokens';
 
 export const useAuthStore = defineStore('auth', () => {
   const loggedIn = ref(false);
@@ -14,7 +14,6 @@ export const useAuthStore = defineStore('auth', () => {
       await authApi.signIn(email, password);
       loggedIn.value = true;
     } catch (e: unknown) {
-      clearCredentials();
       loggedIn.value = false;
       if (axios.isAxiosError(e)) {
         error.value = e.response?.data?.errors?.[0] ?? 'Login failed';
@@ -26,15 +25,14 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function logOut() {
-    clearCredentials();
+    clearTokens();
     loggedIn.value = false;
   }
 
   async function checkSession(): Promise<boolean> {
     if (loggedIn.value) return true;
 
-    const token = localStorage.getItem('access-token');
-    if (!token) {
+    if (!hasToken()) {
       loggedIn.value = false;
       return false;
     }
@@ -46,12 +44,6 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       loggedIn.value = false;
       return false;
-    }
-  }
-
-  function clearCredentials() {
-    for (const key of AUTH_HEADER_KEYS) {
-      localStorage.removeItem(key);
     }
   }
 

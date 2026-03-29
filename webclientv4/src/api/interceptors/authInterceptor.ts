@@ -1,22 +1,15 @@
 import type { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { AUTH_HEADER_KEYS } from '../../auth/auth.types';
+import { getTokens, saveTokens } from '../../auth/authTokens';
 
 export function attachAuthHeaders(config: InternalAxiosRequestConfig) {
-  for (const key of AUTH_HEADER_KEYS) {
-    const value = localStorage.getItem(key);
-    if (value) {
-      config.headers[key] = value;
-    }
+  const tokens = getTokens();
+  for (const [key, value] of Object.entries(tokens)) {
+    config.headers[key] = value;
   }
   return config;
 }
 
 export function saveAuthHeaders(response: AxiosResponse) {
-  for (const key of AUTH_HEADER_KEYS) {
-    const value = response.headers[key];
-    if (value) {
-      localStorage.setItem(key, value);
-    }
-  }
+  saveTokens(response.headers as Record<string, string | undefined>);
   return response;
 }
