@@ -217,7 +217,7 @@ function getTextContent(parent: Element, path: string): string | undefined {
 
   for (const tag of parts) {
     if (!current) return undefined;
-    const children = current.getElementsByTagName(tag);
+    const children: HTMLCollectionOf<Element> = current.getElementsByTagName(tag);
     if (children.length === 0) return undefined;
     current = children[0];
   }
@@ -247,7 +247,7 @@ function getDirectChildTextContent(
 
   for (const tag of rest) {
     if (!target) return undefined;
-    const children = target.getElementsByTagName(tag);
+    const children: HTMLCollectionOf<Element> = target.getElementsByTagName(tag);
     if (children.length === 0) return undefined;
     target = children[0];
   }
