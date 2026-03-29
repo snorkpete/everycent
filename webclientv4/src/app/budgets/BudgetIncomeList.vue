@@ -98,7 +98,7 @@ function addIncome() {
     budget_id: store.budget.id,
     comment: '',
   };
-  store.budget.incomes.push(newIncome);
+  store.addIncome(newIncome);
 }
 
 function toggleDeleted(income: IncomeData) {

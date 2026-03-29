@@ -262,6 +262,61 @@ describe('budgetStore', () => {
     });
   });
 
+  describe('addIncome', () => {
+    const newIncome = { id: 0, name: 'Bonus', amount: 100000, budget_id: 213, comment: '' };
+
+    it('pushes the income into budget.incomes', async () => {
+      vi.mocked(budgetApi.get).mockResolvedValue(sampleBudget);
+      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(sampleCategories);
+      const store = useBudgetStore();
+      await store.fetch(213);
+
+      store.addIncome(newIncome);
+
+      expect(store.budget!.incomes).toHaveLength(2);
+      expect(store.budget!.incomes[1]).toEqual(newIncome);
+    });
+
+    it('does nothing if budget is null', () => {
+      const store = useBudgetStore();
+
+      store.addIncome(newIncome);
+
+      expect(store.budget).toBeNull();
+    });
+  });
+
+  describe('addAllocation', () => {
+    const newAllocation = {
+      id: 0,
+      name: 'Bus Pass',
+      amount: 5000,
+      spent: 0,
+      budget_id: 213,
+      allocation_category_id: 6,
+    };
+
+    it('pushes the allocation into budget.allocations', async () => {
+      vi.mocked(budgetApi.get).mockResolvedValue(sampleBudget);
+      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(sampleCategories);
+      const store = useBudgetStore();
+      await store.fetch(213);
+
+      store.addAllocation(newAllocation);
+
+      expect(store.budget!.allocations).toHaveLength(2);
+      expect(store.budget!.allocations[1]).toEqual(newAllocation);
+    });
+
+    it('does nothing if budget is null', () => {
+      const store = useBudgetStore();
+
+      store.addAllocation(newAllocation);
+
+      expect(store.budget).toBeNull();
+    });
+  });
+
   describe('cancelEdit', () => {
     it('exits edit mode', async () => {
       vi.mocked(budgetApi.get).mockResolvedValue(sampleBudget);

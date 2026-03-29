@@ -2,7 +2,8 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { budgetApi } from './budgetApi';
 import { allocationCategoryApi } from '../allocation-categories/allocationCategoryApi';
-import type { BudgetDetailData } from './budget.types';
+import type { BudgetDetailData, IncomeData } from './budget.types';
+import type { AllocationData } from '../transactions/transaction.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 
 export const useBudgetStore = defineStore('budget', () => {
@@ -55,6 +56,16 @@ export const useBudgetStore = defineStore('budget', () => {
     isEditMode.value = false;
   }
 
+  function addIncome(income: IncomeData) {
+    if (!budget.value) return;
+    budget.value.incomes.push(income);
+  }
+
+  function addAllocation(allocation: AllocationData) {
+    if (!budget.value) return;
+    budget.value.allocations.push(allocation);
+  }
+
   async function cancelEdit() {
     if (!budget.value?.id) return;
     isEditMode.value = false;
@@ -71,6 +82,8 @@ export const useBudgetStore = defineStore('budget', () => {
     save,
     enterEditMode,
     exitEditMode,
+    addIncome,
+    addAllocation,
     cancelEdit,
   };
 });

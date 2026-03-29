@@ -358,7 +358,7 @@ function addAllocation(category: AllocationCategoryData) {
     budget_id: store.budget.id,
     allocation_category_id: category.id,
   };
-  store.budget.allocations.push(newAllocation);
+  store.addAllocation(newAllocation);
 }
 </script>
 

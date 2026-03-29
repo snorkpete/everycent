@@ -92,6 +92,10 @@ const mockStore = reactive({
   enterEditMode: vi.fn(),
   exitEditMode: vi.fn(),
   cancelEdit: vi.fn(),
+  addAllocation(allocation: AllocationData) {
+    if (!this.budget) return;
+    this.budget.allocations.push(allocation);
+  },
 });
 
 vi.mock('./budgetStore', () => ({
