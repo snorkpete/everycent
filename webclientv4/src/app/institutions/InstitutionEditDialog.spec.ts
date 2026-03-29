@@ -5,14 +5,7 @@ import PrimeVue from 'primevue/config';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import InstitutionEditDialog from './InstitutionEditDialog.vue';
 import type { InstitutionData } from './institution.types';
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible'],
-  emits: ['update:visible'],
-};
+import { DialogStub } from '../../test/stubs';
 
 const existingInstitution: InstitutionData = { id: 1, name: 'First Bank' };
 const newInstitution: InstitutionData = {};

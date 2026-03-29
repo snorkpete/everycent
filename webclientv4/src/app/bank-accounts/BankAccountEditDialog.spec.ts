@@ -6,14 +6,7 @@ import EcListField from '../shared/form/list-field/EcListField.vue';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import BankAccountEditDialog from './BankAccountEditDialog.vue';
 import type { BankAccountData, InstitutionData } from './bankAccount.types';
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible'],
-  emits: ['update:visible'],
-};
+import { DialogStub } from '../../test/stubs';
 
 const institutions: InstitutionData[] = [
   { id: 1, name: 'First Bank' },
