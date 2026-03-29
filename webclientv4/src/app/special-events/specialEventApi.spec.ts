@@ -125,10 +125,9 @@ describe('specialEventApi', () => {
 
       await specialEventApi.updateAllocations(2, data);
 
-      expect(apiGateway.put).toHaveBeenCalledWith(
-        '/special_events/2/allocations',
-        { special_event: data },
-      );
+      expect(apiGateway.put).toHaveBeenCalledWith('/special_events/2/allocations', {
+        special_event: data,
+      });
     });
 
     it('returns the response data', async () => {

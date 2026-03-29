@@ -6,7 +6,11 @@ import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import SinkFundTransferDialog from './SinkFundTransferDialog.vue';
 import { sinkFundApi } from './sinkFundApi';
-import type { SinkFundAllocationData, SinkFundData, SinkFundTransferFormData } from './sinkFund.types';
+import type {
+  SinkFundAllocationData,
+  SinkFundData,
+  SinkFundTransferFormData,
+} from './sinkFund.types';
 
 // Selectors
 const SAVE_BTN = '[data-testid="save-btn"]';
@@ -61,7 +65,9 @@ const DialogStub = {
   emits: ['update:visible'],
 };
 
-function createWrapper(props: Partial<{ visible: boolean }> = {}): VueWrapper<InstanceType<typeof SinkFundTransferDialog>> {
+function createWrapper(
+  props: Partial<{ visible: boolean }> = {},
+): VueWrapper<InstanceType<typeof SinkFundTransferDialog>> {
   return mount(SinkFundTransferDialog, {
     props: {
       visible: true,

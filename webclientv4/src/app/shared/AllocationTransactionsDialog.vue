@@ -74,9 +74,7 @@ const error = ref(false);
 
 const dialogTitle = computed(() => `Transactions for ${props.allocationName}`);
 
-const total = computed(() =>
-  transactions.value.reduce((sum, t) => sum + (t.net_amount ?? 0), 0),
-);
+const total = computed(() => transactions.value.reduce((sum, t) => sum + (t.net_amount ?? 0), 0));
 
 watch(
   () => props.visible,

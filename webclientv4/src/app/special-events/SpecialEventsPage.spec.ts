@@ -276,7 +276,10 @@ describe('SpecialEventsPage', () => {
       await form.vm.$emit('submit', updatedData);
       await nextTick();
 
-      expect(mockStore.update).toHaveBeenCalledWith(1, { name: 'Updated Birthday', budget_amount: 60000 });
+      expect(mockStore.update).toHaveBeenCalledWith(1, {
+        name: 'Updated Birthday',
+        budget_amount: 60000,
+      });
       expect(mockNotifySuccess).toHaveBeenCalledWith('Special event updated');
       expect(form.props('visible')).toBe(false);
     });

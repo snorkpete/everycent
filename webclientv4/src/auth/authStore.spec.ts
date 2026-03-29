@@ -40,9 +40,7 @@ describe('authStore', () => {
 
       const store = useAuthStore();
 
-      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(
-        axiosError,
-      );
+      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(axiosError);
 
       expect(store.loggedIn).toBe(false);
       expect(store.error).toBe('Invalid credentials');
@@ -57,9 +55,7 @@ describe('authStore', () => {
 
       const store = useAuthStore();
 
-      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(
-        axiosError,
-      );
+      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(axiosError);
 
       expect(store.error).toBe('Login failed');
     });
@@ -69,9 +65,7 @@ describe('authStore', () => {
 
       const store = useAuthStore();
 
-      await expect(store.logIn('user@test.com', 'pass')).rejects.toThrow(
-        'Network error',
-      );
+      await expect(store.logIn('user@test.com', 'pass')).rejects.toThrow('Network error');
 
       expect(store.loggedIn).toBe(false);
       expect(store.error).toBe('Login failed');
@@ -149,9 +143,7 @@ describe('authStore', () => {
 
     it('returns false when token validation fails', async () => {
       localStorage.setItem('access-token', 'expired-token');
-      vi.mocked(authApi.validateToken).mockRejectedValue(
-        new Error('Unauthorized'),
-      );
+      vi.mocked(authApi.validateToken).mockRejectedValue(new Error('Unauthorized'));
 
       const store = useAuthStore();
       const result = await store.checkSession();

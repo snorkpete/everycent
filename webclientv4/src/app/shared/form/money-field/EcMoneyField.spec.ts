@@ -149,9 +149,7 @@ describe('EcMoneyField', () => {
 
       await wrapper.find('input').setValue(dollarInput);
 
-      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
-        expectedCents,
-      ]);
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expectedCents]);
     });
 
     it('handles input with commas by stripping them before converting', async () => {
@@ -161,9 +159,7 @@ describe('EcMoneyField', () => {
 
       await wrapper.find('input').setValue(dollarInput);
 
-      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
-        expectedCents,
-      ]);
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expectedCents]);
     });
 
     it('emits 0 for non-numeric input', async () => {

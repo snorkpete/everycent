@@ -255,7 +255,9 @@ describe('futureBudgetsStore', () => {
 
     it('updates store.budgets with refreshed data after mass update', async () => {
       const updatedBudget = makeBudget({
-        incomes: [{ id: 1, name: 'Updated Salary', amount: 600000, budget_id: 1, bank_account_id: 1 }],
+        incomes: [
+          { id: 1, name: 'Updated Salary', amount: 600000, budget_id: 1, bank_account_id: 1 },
+        ],
       });
       vi.mocked(futureBudgetsApi.massUpdate).mockResolvedValue({ success: true });
       vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([updatedBudget]);

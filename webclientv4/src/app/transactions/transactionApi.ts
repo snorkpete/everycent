@@ -9,11 +9,7 @@ export const transactionApi = {
       })
       .then((r) => r.data),
 
-  save: (payload: {
-    bankAccountId: number;
-    budgetId: number;
-    transactions: TransactionData[];
-  }) =>
+  save: (payload: { bankAccountId: number; budgetId: number; transactions: TransactionData[] }) =>
     apiGateway
       .post<TransactionData[]>('/transactions', {
         bank_account_id: payload.bankAccountId,

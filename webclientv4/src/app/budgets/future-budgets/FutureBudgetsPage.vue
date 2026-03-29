@@ -53,7 +53,11 @@
 
           <tr class="add-row" data-testid="add-income-row">
             <td :colspan="colSpan">
-              <button class="add-link" data-testid="add-income-btn" @click="openIncomeDialog('New Income')">
+              <button
+                class="add-link"
+                data-testid="add-income-btn"
+                @click="openIncomeDialog('New Income')"
+              >
                 + Add New Income
               </button>
             </td>
@@ -105,13 +109,13 @@
                   {{ allocName }}
                   <i
                     v-if="category.id != null && isFixedInAllBudgets(category.id, allocName)"
-                    class="pi pi-lock fixed-icon fixed-icon--all"
                     v-tooltip="'Fixed in all budgets'"
+                    class="pi pi-lock fixed-icon fixed-icon--all"
                   ></i>
                   <i
                     v-else-if="category.id != null && isFixedInSomeBudgets(category.id, allocName)"
-                    class="pi pi-lock-open fixed-icon fixed-icon--some"
                     v-tooltip="'Fixed in some budgets'"
+                    class="pi pi-lock-open fixed-icon fixed-icon--some"
                   ></i>
                 </button>
               </td>
@@ -273,7 +277,9 @@ function isFixedInSomeBudgets(categoryId: number, allocName: string): boolean {
   const byBudget = store.allocationDisplayData[categoryId]?.[allocName];
   if (!byBudget) return false;
   const values = Object.values(byBudget);
-  return values.some((entry) => entry.is_fixed_amount) && !values.every((entry) => entry.is_fixed_amount);
+  return (
+    values.some((entry) => entry.is_fixed_amount) && !values.every((entry) => entry.is_fixed_amount)
+  );
 }
 
 function fixedTotalForCategory(category: AllocationCategoryData, budget: FutureBudgetData): number {
@@ -324,9 +330,7 @@ function openAllocationDialog(category: AllocationCategoryData, allocName: strin
   dialogType.value = 'allocation';
   dialogName.value = allocName;
   dialogAmountsPerBudget.value =
-    category.id != null
-      ? (store.allocationDisplayData[category.id]?.[allocName] ?? {})
-      : {};
+    category.id != null ? (store.allocationDisplayData[category.id]?.[allocName] ?? {}) : {};
   dialogCategoryId.value = category.id;
   dialogVisible.value = true;
 }

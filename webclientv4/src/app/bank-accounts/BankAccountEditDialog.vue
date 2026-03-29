@@ -49,7 +49,11 @@
 
       <EcTextField v-model="formData.account_no" label="Official Account #" :edit-mode="editMode" />
 
-      <EcMoneyField v-model="formData.opening_balance" label="Opening Balance" :edit-mode="editMode" />
+      <EcMoneyField
+        v-model="formData.opening_balance"
+        label="Opening Balance"
+        :edit-mode="editMode"
+      />
 
       <EcListField
         :model-value="formData.import_format"

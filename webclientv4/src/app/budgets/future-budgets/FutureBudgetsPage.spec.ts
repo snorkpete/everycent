@@ -30,9 +30,7 @@ const jan2025: FutureBudgetData = {
   end_date: '2025-01-31',
   status: 'open',
   incomes: [{ id: 10, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 }],
-  allocations: [
-    { id: 50, name: 'Rent', amount: 150000, budget_id: 1, allocation_category_id: 3 },
-  ],
+  allocations: [{ id: 50, name: 'Rent', amount: 150000, budget_id: 1, allocation_category_id: 3 }],
 };
 
 const feb2025: FutureBudgetData = {
@@ -42,9 +40,7 @@ const feb2025: FutureBudgetData = {
   end_date: '2025-02-28',
   status: 'open',
   incomes: [{ id: 20, name: 'Salary', amount: 510000, budget_id: 2, bank_account_id: 1 }],
-  allocations: [
-    { id: 60, name: 'Rent', amount: 150000, budget_id: 2, allocation_category_id: 3 },
-  ],
+  allocations: [{ id: 60, name: 'Rent', amount: 150000, budget_id: 2, allocation_category_id: 3 }],
 };
 
 const fixedCategory: AllocationCategoryData = { id: 3, name: 'Fixed' };
@@ -74,11 +70,14 @@ const mockStore = reactive({
         2: { id: 60, amount: 150000, is_fixed_amount: false },
       },
     },
-  } as Record<number, Record<string, Record<number, { id: number; amount: number; is_fixed_amount: boolean }>>>,
+  } as Record<
+    number,
+    Record<string, Record<number, { id: number; amount: number; is_fixed_amount: boolean }>>
+  >,
   fetchAll: vi.fn().mockResolvedValue(undefined),
   massUpdate: vi.fn().mockResolvedValue(undefined),
   totalIncomeForBudget: vi.fn((b: FutureBudgetData) => (b.id === 1 ? 500000 : 510000)),
-  totalAllocationsForBudget: vi.fn((_b: FutureBudgetData) => 150000),
+  totalAllocationsForBudget: vi.fn(() => 150000),
   discretionaryForBudget: vi.fn((b: FutureBudgetData) => (b.id === 1 ? 350000 : 360000)),
 });
 
@@ -340,9 +339,7 @@ describe('FutureBudgetsPage', () => {
       await wrapper.find('[data-testid="edit-allocation-Rent"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
-      expect(dialog.props('amountsPerBudget')).toEqual(
-        mockStore.allocationDisplayData[3]['Rent'],
-      );
+      expect(dialog.props('amountsPerBudget')).toEqual(mockStore.allocationDisplayData[3]['Rent']);
     });
 
     it('opens the dialog for a new allocation when add button is clicked', async () => {
@@ -366,7 +363,9 @@ describe('FutureBudgetsPage', () => {
     it('defaults to "All Allocations" label', () => {
       const wrapper = mountPage();
 
-      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain('All Allocations');
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain(
+        'All Allocations',
+      );
     });
 
     it('toggles label to "Variable Only" when clicked', async () => {
@@ -374,7 +373,9 @@ describe('FutureBudgetsPage', () => {
 
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
-      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain('Variable Only');
+      expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain(
+        'Variable Only',
+      );
     });
   });
 
@@ -416,7 +417,7 @@ describe('FutureBudgetsPage', () => {
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
 
       expect(rows).toHaveLength(4);
-      expect(rows.map(r => r.text())).toEqual(
+      expect(rows.map((r) => r.text())).toEqual(
         expect.arrayContaining([
           expect.stringContaining('Rent'),
           expect.stringContaining('Insurance'),
@@ -450,7 +451,7 @@ describe('FutureBudgetsPage', () => {
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
-      const rowTexts = rows.map(r => r.text());
+      const rowTexts = rows.map((r) => r.text());
 
       // Rent and Insurance are fixed in all budgets — hidden
       expect(rowTexts).not.toEqual(expect.arrayContaining([expect.stringContaining('Rent')]));
@@ -464,7 +465,7 @@ describe('FutureBudgetsPage', () => {
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
-      const rowTexts = rows.map(r => r.text());
+      const rowTexts = rows.map((r) => r.text());
 
       // Electric is variable in all budgets — visible
       expect(rowTexts).toEqual(expect.arrayContaining([expect.stringContaining('Electric')]));

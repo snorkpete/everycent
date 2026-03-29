@@ -24,9 +24,7 @@ describe('HomePage', () => {
   it('renders welcome message', () => {
     const wrapper = mountComponent();
 
-    expect(wrapper.find('[data-testid="welcome-heading"]').text()).toBe(
-      'Welcome to EveryCent',
-    );
+    expect(wrapper.find('[data-testid="welcome-heading"]').text()).toBe('Welcome to EveryCent');
     expect(wrapper.find('[data-testid="welcome-message"]').text()).toBe(
       'Your zero-based budget manager.',
     );

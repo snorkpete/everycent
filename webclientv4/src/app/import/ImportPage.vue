@@ -58,7 +58,9 @@
           stroke-width="4"
           style="width: 2rem; height: 2rem"
         />
-        <span v-if="store.loading" class="loading-text" data-testid="loading-text">Processing...</span>
+        <span v-if="store.loading" class="loading-text" data-testid="loading-text"
+          >Processing...</span
+        >
       </div>
 
       <!-- Error display -->
@@ -94,7 +96,9 @@
               <td>{{ row.iban }}</td>
               <td>
                 <span v-if="row.matchedAccountName">{{ row.matchedAccountName }}</span>
-                <span v-else class="missing-account" data-testid="missing-account">Bank account missing</span>
+                <span v-else class="missing-account" data-testid="missing-account"
+                  >Bank account missing</span
+                >
               </td>
               <td class="right">{{ row.totalTransactions }}</td>
               <td class="right">{{ row.inPeriodCount }}</td>
@@ -131,7 +135,8 @@
         :closable="false"
         data-testid="unmatched-iban"
       >
-        {{ unmatched.iban }}: {{ unmatched.transactionCount }} transactions skipped (no matching bank account)
+        {{ unmatched.iban }}: {{ unmatched.transactionCount }} transactions skipped (no matching
+        bank account)
       </Message>
 
       <!-- Preview Phase: Detailed Transaction List -->
@@ -154,80 +159,91 @@
           </div>
 
           <div class="table-scroll">
-          <table class="preview-table">
-            <thead>
-              <tr>
-                <th class="col-date">Date</th>
-                <th class="col-description">Description</th>
-                <th class="col-money right">Withdrawal</th>
-                <th class="col-money right">Deposit</th>
-                <th class="col-allocation">Allocation</th>
-                <th class="col-status">Status</th>
-                <th class="col-action" />
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(transaction, txIndex) in account.transactions"
-                :key="transaction.bank_ref ?? txIndex"
-                data-testid="preview-row"
-                :class="previewRowClass(transaction)"
-              >
-                <td class="col-date">{{ formatDate(transaction.transaction_date ?? '') }}</td>
-                <td class="col-description">{{ transaction.description }}</td>
-                <td class="col-money right">{{ centsToDollars(transaction.withdrawal_amount) }}</td>
-                <td class="col-money right">{{ centsToDollars(transaction.deposit_amount) }}</td>
-                <td class="col-allocation">
-                  <span
-                    v-if="transaction.allocation_id && transaction.auto_match_type"
-                    class="auto-allocation"
-                    :class="`auto-allocation--${transaction.auto_match_type}`"
-                    v-tooltip.top="`Auto-matched (${transaction.auto_match_type})`"
-                  >
-                    <i :class="transaction.auto_match_type === 'exact' ? 'pi pi-check-circle' : 'pi pi-question-circle'" />
-                    {{ transaction.auto_allocation_name }}
-                    <i
-                      class="pi pi-times auto-allocation-clear"
-
-                      @click="clearAutoAllocation(transaction)"
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th class="col-date">Date</th>
+                  <th class="col-description">Description</th>
+                  <th class="col-money right">Withdrawal</th>
+                  <th class="col-money right">Deposit</th>
+                  <th class="col-allocation">Allocation</th>
+                  <th class="col-status">Status</th>
+                  <th class="col-action" />
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(transaction, txIndex) in account.transactions"
+                  :key="transaction.bank_ref ?? txIndex"
+                  data-testid="preview-row"
+                  :class="previewRowClass(transaction)"
+                >
+                  <td class="col-date">{{ formatDate(transaction.transaction_date ?? '') }}</td>
+                  <td class="col-description">{{ transaction.description }}</td>
+                  <td class="col-money right">
+                    {{ centsToDollars(transaction.withdrawal_amount) }}
+                  </td>
+                  <td class="col-money right">{{ centsToDollars(transaction.deposit_amount) }}</td>
+                  <td class="col-allocation">
+                    <span
+                      v-if="transaction.allocation_id && transaction.auto_match_type"
+                      v-tooltip.top="`Auto-matched (${transaction.auto_match_type})`"
+                      class="auto-allocation"
+                      :class="`auto-allocation--${transaction.auto_match_type}`"
+                    >
+                      <i
+                        :class="
+                          transaction.auto_match_type === 'exact'
+                            ? 'pi pi-check-circle'
+                            : 'pi pi-question-circle'
+                        "
+                      />
+                      {{ transaction.auto_allocation_name }}
+                      <i
+                        class="pi pi-times auto-allocation-clear"
+                        @click="clearAutoAllocation(transaction)"
+                      />
+                    </span>
+                  </td>
+                  <td class="col-status">
+                    <Tag
+                      v-if="transaction.import_status === 'duplicate'"
+                      value="Duplicate"
+                      severity="secondary"
+                      data-testid="status-duplicate"
                     />
-                  </span>
-                </td>
-                <td class="col-status">
-                  <Tag
-                    v-if="transaction.import_status === 'duplicate'"
-                    value="Duplicate"
-                    severity="secondary"
-                    data-testid="status-duplicate"
-                  />
-                  <Tag
-                    v-else-if="transaction.import_status === 'out_of_period'"
-                    value="Out of period"
-                    severity="warn"
-                    data-testid="status-out-of-period"
-                  />
-                  <Tag
-                    v-else-if="transaction.import_status === 'new'"
-                    value="New"
-                    severity="success"
-                    data-testid="status-new"
-                  />
-                </td>
-                <td class="col-action">
-                  <Button
-                    v-if="transaction.import_status !== 'duplicate'"
-                    :icon="transaction.deleted ? 'pi pi-undo' : 'pi pi-trash'"
-                    :severity="transaction.deleted ? 'secondary' : 'danger'"
-                    text
-                    size="small"
-                    :data-testid="`delete-toggle-${accountIndex}-${txIndex}`"
-                    :title="transaction.deleted ? 'Restore this transaction' : 'Exclude this transaction from import'"
-                    @click="store.toggleDeleteTransaction(accountIndex, txIndex)"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    <Tag
+                      v-else-if="transaction.import_status === 'out_of_period'"
+                      value="Out of period"
+                      severity="warn"
+                      data-testid="status-out-of-period"
+                    />
+                    <Tag
+                      v-else-if="transaction.import_status === 'new'"
+                      value="New"
+                      severity="success"
+                      data-testid="status-new"
+                    />
+                  </td>
+                  <td class="col-action">
+                    <Button
+                      v-if="transaction.import_status !== 'duplicate'"
+                      :icon="transaction.deleted ? 'pi pi-undo' : 'pi pi-trash'"
+                      :severity="transaction.deleted ? 'secondary' : 'danger'"
+                      text
+                      size="small"
+                      :data-testid="`delete-toggle-${accountIndex}-${txIndex}`"
+                      :title="
+                        transaction.deleted
+                          ? 'Restore this transaction'
+                          : 'Exclude this transaction from import'
+                      "
+                      @click="store.toggleDeleteTransaction(accountIndex, txIndex)"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </template>
@@ -244,19 +260,17 @@
           class="save-summary"
           data-testid="save-summary"
         >
-          <strong>{{ store.getBankAccountName(account.bank_account_id) }}</strong>:
-          {{ account.saved_count }} transaction{{ account.saved_count === 1 ? '' : 's' }} saved<template v-if="account.skipped?.length">,
-            {{ account.skipped.length }} skipped
-            ({{ formatSkipReasons(account.skipped) }})
+          <strong>{{ store.getBankAccountName(account.bank_account_id) }}</strong
+          >: {{ account.saved_count }} transaction{{
+            account.saved_count === 1 ? '' : 's'
+          }}
+          saved<template v-if="account.skipped?.length"
+            >, {{ account.skipped.length }} skipped ({{ formatSkipReasons(account.skipped) }})
           </template>
         </div>
 
         <router-link :to="{ name: 'transactions' }">
-          <Button
-            label="View Transactions"
-            outlined
-            data-testid="view-transactions-btn"
-          />
+          <Button label="View Transactions" outlined data-testid="view-transactions-btn" />
         </router-link>
       </template>
     </div>
@@ -352,7 +366,6 @@ async function onSave() {
   }
 }
 
-
 function accountNet(account: PreviewBankAccount): number {
   return account.transactions
     .filter((t) => t.import_status === 'new' && !t.deleted)
@@ -373,7 +386,8 @@ function previewRowClass(transaction: ImportTransaction) {
   return {
     'preview-row--duplicate': transaction.import_status === 'duplicate',
     'preview-row--deleted': transaction.deleted && transaction.import_status !== 'duplicate',
-    'preview-row--out-of-period': transaction.import_status === 'out_of_period' && !transaction.deleted,
+    'preview-row--out-of-period':
+      transaction.import_status === 'out_of_period' && !transaction.deleted,
   };
 }
 </script>
@@ -553,12 +567,24 @@ function previewRowClass(transaction: ImportTransaction) {
   box-shadow: 0 1px 0 var(--p-surface-300);
 }
 
-.col-date { width: 11%; }
-.col-description { width: 30%; }
-.col-money { width: 11%; }
-.col-allocation { width: 18%; }
-.col-status { width: 10%; }
-.col-action { width: 5%; }
+.col-date {
+  width: 11%;
+}
+.col-description {
+  width: 30%;
+}
+.col-money {
+  width: 11%;
+}
+.col-allocation {
+  width: 18%;
+}
+.col-status {
+  width: 10%;
+}
+.col-action {
+  width: 5%;
+}
 
 .preview-table tbody tr:nth-child(even) {
   background-color: var(--p-surface-50);

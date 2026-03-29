@@ -12,11 +12,7 @@
     <div class="strip-divider"></div>
     <div class="strip-item">
       <span class="strip-label">Unallocated</span>
-      <span
-        class="strip-value"
-        :class="discretionaryClass"
-        data-testid="unallocated-amount"
-      >
+      <span class="strip-value" :class="discretionaryClass" data-testid="unallocated-amount">
         {{ centsToDollars(discretionaryTotal) }}
       </span>
     </div>
@@ -84,8 +80,8 @@ const discretionaryClass = computed(() => {
 });
 
 // Needs/Wants/Savings percentages
-const activeAllocations = computed(() =>
-  budgetStore.budget?.allocations?.filter((a) => !a.deleted) ?? [],
+const activeAllocations = computed(
+  () => budgetStore.budget?.allocations?.filter((a) => !a.deleted) ?? [],
 );
 
 const needsAmount = computed(() =>

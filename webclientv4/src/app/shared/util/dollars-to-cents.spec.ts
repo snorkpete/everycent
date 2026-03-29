@@ -2,9 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { dollarsToCents } from './dollars-to-cents';
 
 describe('#dollarsToCents', () => {
-
   it('converts a number dollar value to cents', () => {
-    expect(dollarsToCents(450.40)).toEqual(45040);
+    expect(dollarsToCents(450.4)).toEqual(45040);
   });
 
   it('converts a string dollar value to cents', () => {

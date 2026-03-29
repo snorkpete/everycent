@@ -132,7 +132,11 @@ describe('EcListField', () => {
 
     it('passes a string modelValue to the Select in edit mode', () => {
       const selectedId = 'credit_card';
-      const wrapper = mountComponent({ editMode: true, items: stringItems, modelValue: selectedId });
+      const wrapper = mountComponent({
+        editMode: true,
+        items: stringItems,
+        modelValue: selectedId,
+      });
 
       expect(wrapper.findComponent(Select).props('modelValue')).toBe(selectedId);
     });
@@ -178,7 +182,10 @@ describe('EcListField', () => {
         items: groupedItems,
         groupBy: 'category',
       });
-      const options = wrapper.findComponent(Select).props('options') as { label: string; items: ListItem[] }[];
+      const options = wrapper.findComponent(Select).props('options') as {
+        label: string;
+        items: ListItem[];
+      }[];
 
       expect(options).toHaveLength(2);
     });
@@ -189,7 +196,10 @@ describe('EcListField', () => {
         items: groupedItems,
         groupBy: 'category',
       });
-      const options = wrapper.findComponent(Select).props('options') as { label: string; items: ListItem[] }[];
+      const options = wrapper.findComponent(Select).props('options') as {
+        label: string;
+        items: ListItem[];
+      }[];
 
       expect(options[0].label).toBe('Food');
       expect(options[1].label).toBe('Transport');
@@ -201,7 +211,10 @@ describe('EcListField', () => {
         items: groupedItems,
         groupBy: 'category',
       });
-      const options = wrapper.findComponent(Select).props('options') as { label: string; items: ListItem[] }[];
+      const options = wrapper.findComponent(Select).props('options') as {
+        label: string;
+        items: ListItem[];
+      }[];
       const foodGroup = options.find((g) => g.label === 'Food')!;
       const transportGroup = options.find((g) => g.label === 'Transport')!;
 

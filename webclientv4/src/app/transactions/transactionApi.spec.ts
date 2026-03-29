@@ -37,7 +37,9 @@ describe('transactionApi', () => {
 
   describe('save', () => {
     it('posts to /transactions with bank_account_id, budget_id, and transactions', async () => {
-      const transactions = [{ id: 1, description: 'Test', withdrawal_amount: 100, deposit_amount: 0 }];
+      const transactions = [
+        { id: 1, description: 'Test', withdrawal_amount: 100, deposit_amount: 0 },
+      ];
       vi.mocked(apiGateway.post).mockResolvedValue({ data: transactions });
 
       await transactionApi.save({

@@ -1,11 +1,7 @@
 <template>
   <div class="allocation-categories-page">
     <ul class="category-list">
-      <li
-        v-for="category in store.allocationCategories"
-        :key="category.id"
-        class="category-item"
-      >
+      <li v-for="category in store.allocationCategories" :key="category.id" class="category-item">
         <span class="category-name">{{ category.name }}</span>
         <Button
           label="Edit"

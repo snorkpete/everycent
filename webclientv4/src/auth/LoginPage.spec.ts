@@ -58,9 +58,7 @@ describe('LoginPage', () => {
   it('renders the login form', () => {
     const wrapper = mountLoginPage();
 
-    expect(wrapper.find('[data-testid="login-heading"]').text()).toBe(
-      'EveryCent - Log In',
-    );
+    expect(wrapper.find('[data-testid="login-heading"]').text()).toBe('EveryCent - Log In');
     expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="email-input"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="password-input"]').exists()).toBe(true);
@@ -86,7 +84,7 @@ describe('LoginPage', () => {
 
   it('calls authStore.logIn and navigates to / on success', async () => {
     const { authApi } = await import('./authApi');
-    vi.mocked(authApi.signIn).mockResolvedValue({} as any);
+    vi.mocked(authApi.signIn).mockResolvedValue({} as Awaited<ReturnType<typeof authApi.signIn>>);
 
     const email = 'user@test.com';
     const password = 'password123';
@@ -120,8 +118,8 @@ describe('LoginPage', () => {
   });
 
   it('shows loading state during login and clears it after', async () => {
-    let resolveSignIn!: (value: any) => void;
     const { authApi } = await import('./authApi');
+    let resolveSignIn!: (value: Awaited<ReturnType<typeof authApi.signIn>>) => void;
     vi.mocked(authApi.signIn).mockImplementation(
       () => new Promise((resolve) => (resolveSignIn = resolve)),
     );
@@ -130,16 +128,12 @@ describe('LoginPage', () => {
     await wrapper.find('[data-testid="login-form"]').trigger('submit');
     await flushPromises();
 
-    expect(
-      wrapper.find('[data-testid="login-button"]').attributes('data-loading'),
-    ).toBe('true');
+    expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('true');
 
     resolveSignIn({});
     await flushPromises();
 
-    expect(
-      wrapper.find('[data-testid="login-button"]').attributes('data-loading'),
-    ).toBe('false');
+    expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
   });
 
   it('clears loading state on failed login', async () => {
@@ -150,8 +144,6 @@ describe('LoginPage', () => {
     await wrapper.find('[data-testid="login-form"]').trigger('submit');
     await flushPromises();
 
-    expect(
-      wrapper.find('[data-testid="login-button"]').attributes('data-loading'),
-    ).toBe('false');
+    expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
   });
 });

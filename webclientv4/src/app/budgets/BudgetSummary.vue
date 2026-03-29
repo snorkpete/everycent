@@ -32,14 +32,22 @@
     </div>
 
     <!-- Discretionary detail for couples -->
-    <div v-if="familyType !== 'single'" class="discretionary-detail" data-testid="discretionary-section">
+    <div
+      v-if="familyType !== 'single'"
+      class="discretionary-detail"
+      data-testid="discretionary-section"
+    >
       <div class="detail-row" data-testid="wife-amount-row">
         <span class="detail-label">{{ wife }}'s Discretionary</span>
-        <span class="detail-amount">{{ centsToDollars(Math.floor(totalDiscretionaryAmount / 2)) }}</span>
+        <span class="detail-amount">{{
+          centsToDollars(Math.floor(totalDiscretionaryAmount / 2))
+        }}</span>
       </div>
       <div class="detail-row" data-testid="husband-amount-row">
         <span class="detail-label">{{ husband }}'s Discretionary</span>
-        <span class="detail-amount">{{ centsToDollars(Math.floor(totalDiscretionaryAmount / 2)) }}</span>
+        <span class="detail-amount">{{
+          centsToDollars(Math.floor(totalDiscretionaryAmount / 2))
+        }}</span>
       </div>
     </div>
   </div>

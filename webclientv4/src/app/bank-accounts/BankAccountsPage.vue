@@ -74,9 +74,7 @@ const selectedAccount = ref<BankAccountData>({});
 const dialogEditMode = ref(false);
 
 const visibleAccounts = computed(() =>
-  showClosed.value
-    ? store.bankAccounts
-    : store.bankAccounts.filter((a) => a.status !== 'closed'),
+  showClosed.value ? store.bankAccounts : store.bankAccounts.filter((a) => a.status !== 'closed'),
 );
 
 onMounted(() => {

@@ -67,7 +67,12 @@ const formattedValue = computed(() => centsToDollars(model.value));
 //   "zero"       — zero green, non-zero red
 //                   Use for values where zero = good (diffs, remaining balances)
 const moneyDisplayClasses = computed(() => ({
-  positive: props.highlightMode === 'positive' ? model.value > 0 : props.highlightMode === 'zero' ? model.value === 0 : false,
+  positive:
+    props.highlightMode === 'positive'
+      ? model.value > 0
+      : props.highlightMode === 'zero'
+        ? model.value === 0
+        : false,
   negative: props.highlightMode === 'zero' ? model.value !== 0 : model.value < 0,
 }));
 
