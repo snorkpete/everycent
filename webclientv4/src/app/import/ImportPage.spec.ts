@@ -5,7 +5,8 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import ImportPage from './ImportPage.vue';
-import type { PreviewBankAccount, UnmatchedIban, ImportPhase } from './import.types';
+import type { PreviewBankAccount, UnmatchedIban, SaveResponse } from './import.types';
+import type { ImportPhase } from './importStore';
 import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
@@ -103,9 +104,7 @@ const mockStore = reactive({
   selectedBudget: openBudget as BudgetData | null,
   previewAccounts: [] as PreviewBankAccount[],
   unmatchedIbans: [] as UnmatchedIban[],
-  saveResult: null as {
-    bank_accounts: { bank_account_id: number; transactions: unknown[] }[];
-  } | null,
+  saveResult: null as SaveResponse | null,
   loading: false,
   error: null as string | null,
   phase: 'idle' as ImportPhase,

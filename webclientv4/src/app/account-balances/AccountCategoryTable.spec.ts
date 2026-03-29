@@ -118,7 +118,7 @@ describe('AccountCategoryTable', () => {
     it('renders Balance At next_closing_date header from first account', () => {
       const wrapper = createWrapper('Current Accounts', [savingsAccount]);
 
-      // next_closing_date is 2026-04-24 → "24-04-2026"
+      // the next_closing_date is 2026-04-24 → "24-04-2026"
       expect(wrapper.find('thead').text()).toContain('24-04-2026');
     });
 
