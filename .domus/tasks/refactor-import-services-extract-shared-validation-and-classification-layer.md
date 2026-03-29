@@ -1,7 +1,7 @@
 # Task: Refactor import services: extract shared validation and classification layer
 
 **ID:** refactor-import-services-extract-shared-validation-and-classification-layer
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-28

@@ -42,17 +42,51 @@ Always log when you advance. The log is the record of why the transition happene
 
 ### Merge and Close
 
-Merge the task's branch and mark the task done.
+Merge the task's worktree branch into the base branch (usually master).
 
-1. Review the task's branch name (recorded in the task file frontmatter or execution log)
-2. Merge the branch into the base branch
-3. Advance the task to done:
+**Pre-merge check:** Verify the task's acceptance criteria are met before merging. If they are not, route back to the Worker instead.
+
+**Safe merge protocol:**
+
+1. Find the task's branch name (recorded in the task file frontmatter or execution log) and the worktree path.
+
+2. Check which branch is checked out in the main worktree:
    ```
-   domus task advance <task-id>
-   domus task log <task-id> "Merged and closed"
+   git -C <main-repo-path> branch --show-current
    ```
 
-Check that the task's acceptance criteria are met before merging. If they are not, route back to the Worker instead.
+3. **If the main worktree is NOT on the base branch** (e.g. it's on a feature branch):
+   - Switch the worktree to the base branch and merge there:
+     ```
+     cd <worktree-path>
+     git checkout <base-branch>
+     git merge <task-branch> --no-ff
+     ```
+   - Clean up:
+     ```
+     git -C <main-repo-path> worktree remove <worktree-path>
+     git -C <main-repo-path> branch -d <task-branch>
+     ```
+   - Advance the task:
+     ```
+     domus task advance <task-id>
+     domus task log <task-id> "Merged and closed"
+     ```
+
+4. **If the main worktree IS on the base branch:**
+   - Do NOT stash, switch, or touch the main worktree in any way.
+   - Log the situation:
+     ```
+     domus task log <task-id> "Ready to merge but main worktree is on <base-branch>. Branch <task-branch> left for manual merge."
+     ```
+   - Report to the user: "Branch `<task-branch>` is ready to merge but the main worktree is on `<base-branch>`. Merge manually when the main worktree is free."
+   - Leave the worktree and branch intact.
+
+**Critical rules:**
+- NEVER run `git stash` in the main worktree
+- NEVER switch branches in the main worktree
+- NEVER force-delete a branch that hasn't been merged
+- If in doubt, leave the branch for the human. Lost branches are recoverable; lost uncommitted work is not.
 
 ## What is deferred to v0.1
 

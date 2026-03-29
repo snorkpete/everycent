@@ -1,7 +1,7 @@
 # Task: Audit foreign key constraints feasibility
 
 **ID:** audit-foreign-key-constraints-feasibility
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-03-28

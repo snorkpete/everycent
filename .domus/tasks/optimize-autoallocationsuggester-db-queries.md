@@ -1,7 +1,7 @@
 # Task: Optimize AutoAllocationSuggester DB queries
 
 **ID:** optimize-autoallocationsuggester-db-queries
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-03-28
