@@ -130,7 +130,7 @@ describe('LoginPage', () => {
 
     expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('true');
 
-    resolveSignIn({});
+    resolveSignIn({} as Awaited<ReturnType<typeof authApi.signIn>>);
     await flushPromises();
 
     expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');

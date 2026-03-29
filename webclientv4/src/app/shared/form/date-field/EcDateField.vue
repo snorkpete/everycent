@@ -2,7 +2,11 @@
   <div class="ec-date-field">
     <template v-if="editMode">
       <label :for="inputId">{{ label }}</label>
-      <DatePicker :id="inputId" :model-value="dateValue" @update:model-value="onDateChange" />
+      <DatePicker
+        :id="inputId"
+        :model-value="dateValue"
+        @update:model-value="onDateChange($event as Date | null)"
+      />
     </template>
     <template v-else>
       <span class="label">{{ label }}</span>
@@ -30,7 +34,7 @@ const inputId = useId();
 
 const dateValue = computed(() => {
   if (!props.modelValue) return null;
-  const [year, month, day] = props.modelValue.split('-').map(Number);
+  const [year = 0, month = 1, day = 1] = props.modelValue.split('-').map(Number);
   return new Date(year, month - 1, day);
 });
 

@@ -37,7 +37,7 @@ function authenticateUser() {
   localStorage.setItem('access-token', 'valid-token');
   vi.mocked(authApi.validateToken).mockResolvedValue({
     data: { success: true },
-  } as unknown);
+  } as Awaited<ReturnType<typeof authApi.validateToken>>);
 }
 
 describe('router', () => {

@@ -173,7 +173,10 @@ export const useTransactionStore = defineStore('transactions', () => {
       const suggestion = response.suggestions[i];
       if (!suggestion) continue;
 
-      const tx = draftTransactions.value[candidates[i].index];
+      const candidate = candidates[i];
+      if (!candidate) continue;
+      const tx = draftTransactions.value[candidate.index];
+      if (!tx) continue;
       tx.allocation_id = suggestion.allocation_id;
       tx.auto_match_type = suggestion.match_type as MatchType;
     }

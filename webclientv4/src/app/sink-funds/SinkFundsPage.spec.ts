@@ -151,15 +151,15 @@ describe('SinkFundsPage', () => {
     it('passes sinkFunds as options to the dropdown', () => {
       const wrapper = mountPage();
 
-      const select = wrapper.findComponent(SINK_FUND_SELECT);
-      expect(select.props('options')).toEqual([sinkFundA, sinkFundB]);
+      const select = wrapper.findComponent(SINK_FUND_SELECT) as unknown as VueWrapper;
+      expect(select.props()).toHaveProperty('options', [sinkFundA, sinkFundB]);
     });
 
     it('calls fetchDetail and updates router when a sink fund is selected', async () => {
       const wrapper = mountPage();
       await nextTick();
 
-      const select = wrapper.findComponent(SINK_FUND_SELECT);
+      const select = wrapper.findComponent(SINK_FUND_SELECT) as unknown as VueWrapper;
       await select.vm.$emit('update:modelValue', 1);
       await nextTick();
 

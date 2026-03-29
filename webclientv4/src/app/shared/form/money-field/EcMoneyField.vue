@@ -38,8 +38,8 @@ import { ref, computed, watch, useId } from 'vue';
 import { dollarsToCents } from '../../util/dollars-to-cents';
 import { centsToDollars } from '../../util/cents-to-dollars';
 
-const props = defineProps<{
-  label: string;
+const { label = '', editMode, highlightMode } = defineProps<{
+  label?: string;
   editMode: boolean;
   highlightMode?: 'positive' | 'zero';
 }>();
@@ -68,12 +68,12 @@ const formattedValue = computed(() => centsToDollars(model.value));
 //                   Use for values where zero = good (diffs, remaining balances)
 const moneyDisplayClasses = computed(() => ({
   positive:
-    props.highlightMode === 'positive'
+    highlightMode === 'positive'
       ? model.value > 0
-      : props.highlightMode === 'zero'
+      : highlightMode === 'zero'
         ? model.value === 0
         : false,
-  negative: props.highlightMode === 'zero' ? model.value !== 0 : model.value < 0,
+  negative: highlightMode === 'zero' ? model.value !== 0 : model.value < 0,
 }));
 
 const inputId = useId();

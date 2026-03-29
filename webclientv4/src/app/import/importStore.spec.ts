@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useImportStore } from './importStore';
 import { importApi } from './importApi';
+import type { PreviewResponse, SaveResponse } from './import.types';
 import { budgetApi } from '../budgets/budgetApi';
 import { bankAccountApi } from '../bank-accounts/bankAccountApi';
 
@@ -339,7 +340,7 @@ describe('importStore', () => {
           },
         ],
       };
-      vi.mocked(importApi.preview).mockResolvedValue(previewResponse);
+      vi.mocked(importApi.preview).mockResolvedValue(previewResponse as PreviewResponse);
 
       const store = setupStoreForPreview();
       await store.fetchPreview();
@@ -469,7 +470,7 @@ describe('importStore', () => {
           },
         ],
       };
-      vi.mocked(importApi.save).mockResolvedValue(saveResponse);
+      vi.mocked(importApi.save).mockResolvedValue(saveResponse as unknown as SaveResponse);
 
       const store = setupStoreForSave();
       await store.saveImport();
@@ -506,7 +507,7 @@ describe('importStore', () => {
           },
         ],
       };
-      vi.mocked(importApi.save).mockResolvedValue(saveResponse);
+      vi.mocked(importApi.save).mockResolvedValue(saveResponse as unknown as SaveResponse);
 
       const store = setupStoreForSave();
       await store.saveImport();

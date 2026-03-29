@@ -22,6 +22,7 @@ function beaEntry(opts: {
   ref?: string;
   amount?: string;
   cdtDbt?: string;
+  bookingDate?: string;
   valueDate?: string;
   addtlNtryInf?: string;
 }): string {
@@ -42,6 +43,7 @@ function sepaEntry(opts: {
   ref?: string;
   amount?: string;
   cdtDbt?: string;
+  bookingDate?: string;
   valueDate?: string;
   addtlNtryInf?: string;
   creditorName?: string;
@@ -73,6 +75,7 @@ function internationalEntry(opts: {
   ref?: string;
   amount?: string;
   cdtDbt?: string;
+  bookingDate?: string;
   valueDate?: string;
   addtlNtryInf?: string;
 }): string {

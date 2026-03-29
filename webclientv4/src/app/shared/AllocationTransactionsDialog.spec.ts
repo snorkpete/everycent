@@ -49,7 +49,7 @@ const sampleTransactions: TransactionData[] = [
   },
 ];
 
-let mockFetchTransactions: ReturnType<typeof vi.fn>;
+let mockFetchTransactions: ReturnType<typeof vi.fn<(id: number) => Promise<TransactionData[]>>>;
 
 function createWrapper(
   props: Partial<{

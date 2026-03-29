@@ -42,7 +42,9 @@ describe('formatSkipReasons', () => {
   });
 
   it('falls back to raw reason key for unknown reasons', () => {
-    const skipped = [{ bank_ref: 'REF1', reason: 'some_new_reason' }] as SkippedTransaction[];
+    const skipped = [
+      { bank_ref: 'REF1', reason: 'some_new_reason' },
+    ] as unknown as SkippedTransaction[];
     expect(formatSkipReasons(skipped)).toBe('1 some_new_reason');
   });
 

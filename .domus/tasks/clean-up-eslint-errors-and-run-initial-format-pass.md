@@ -1,7 +1,7 @@
 # Task: Clean up ESLint errors and run initial format pass
 
 **ID:** clean-up-eslint-errors-and-run-initial-format-pass
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28

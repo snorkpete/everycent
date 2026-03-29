@@ -54,15 +54,22 @@ describe('TransactionSearchForm', () => {
     it('renders bank account options from store', () => {
       const wrapper = createWrapper();
 
-      const bankAccountSelect = wrapper.findComponent('[data-testid="bank-account-select"]');
-      expect(bankAccountSelect.props('options')).toEqual([checkingAccount, savingsAccount]);
+      const bankAccountSelect = wrapper.findComponent(
+        '[data-testid="bank-account-select"]',
+      ) as unknown as VueWrapper;
+      expect(bankAccountSelect.props()).toHaveProperty('options', [
+        checkingAccount,
+        savingsAccount,
+      ]);
     });
 
     it('renders budget options from store', () => {
       const wrapper = createWrapper();
 
-      const budgetSelect = wrapper.findComponent('[data-testid="budget-select"]');
-      expect(budgetSelect.props('options')).toEqual([jan2025, dec2024]);
+      const budgetSelect = wrapper.findComponent(
+        '[data-testid="budget-select"]',
+      ) as unknown as VueWrapper;
+      expect(budgetSelect.props()).toHaveProperty('options', [jan2025, dec2024]);
     });
 
     it('shows a "Go to Budget" link', () => {
@@ -147,7 +154,9 @@ describe('TransactionSearchForm', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const bankAccountSelect = wrapper.findComponent('[data-testid="bank-account-select"]');
+      const bankAccountSelect = wrapper.findComponent(
+        '[data-testid="bank-account-select"]',
+      ) as unknown as VueWrapper;
       await bankAccountSelect.vm.$emit('update:modelValue', savingsAccount.id);
       await nextTick();
 
@@ -161,7 +170,9 @@ describe('TransactionSearchForm', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const budgetSelect = wrapper.findComponent('[data-testid="budget-select"]');
+      const budgetSelect = wrapper.findComponent(
+        '[data-testid="budget-select"]',
+      ) as unknown as VueWrapper;
       await budgetSelect.vm.$emit('update:modelValue', dec2024.id);
       await nextTick();
 

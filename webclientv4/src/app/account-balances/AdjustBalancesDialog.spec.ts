@@ -137,7 +137,7 @@ describe('AdjustBalancesDialog', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const vm = wrapper.vm as {
+      const vm = wrapper.vm as unknown as {
         adjustments: Array<{
           bank_account_id: number;
           new_balance: number;
@@ -157,7 +157,7 @@ describe('AdjustBalancesDialog', () => {
       await wrapper.setProps({ visible: true });
       await nextTick();
 
-      const vm = wrapper.vm as { adjustments: Array<{ new_balance: number }> };
+      const vm = wrapper.vm as unknown as { adjustments: Array<{ new_balance: number }> };
       expect(vm.adjustments[0].new_balance).toBe(100000);
     });
   });

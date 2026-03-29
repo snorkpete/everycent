@@ -1,7 +1,7 @@
 # Task: Ratchet down test file TypeScript errors incrementally
 
 **ID:** ratchet-down-test-file-typescript-errors-incrementally
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-28
