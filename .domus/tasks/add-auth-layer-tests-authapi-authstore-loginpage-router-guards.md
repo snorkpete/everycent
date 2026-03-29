@@ -1,7 +1,7 @@
 # Task: Add auth layer tests (authApi, authStore, LoginPage, router guards)
 
 **ID:** add-auth-layer-tests-authapi-authstore-loginpage-router-guards
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-03-28
