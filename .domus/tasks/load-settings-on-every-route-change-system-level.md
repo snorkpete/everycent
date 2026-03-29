@@ -1,7 +1,7 @@
 # Task: Load settings on every route change (system-level)
 
 **ID:** load-settings-on-every-route-change-system-level
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-28

@@ -1,7 +1,7 @@
 # Task: Fix settingsStore API layer bypass
 
 **ID:** fix-settingsstore-api-layer-bypass
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-28
