@@ -11,6 +11,7 @@ import type {
   SinkFundData,
   SinkFundTransferFormData,
 } from './sinkFund.types';
+import { DialogStub } from '../../test/stubs';
 
 // Selectors
 const SAVE_BTN = '[data-testid="save-btn"]';
@@ -56,14 +57,6 @@ vi.mock('../notifications/useNotifications', () => ({
     info: vi.fn(),
   }),
 }));
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible'],
-  emits: ['update:visible'],
-};
 
 function createWrapper(
   props: Partial<{ visible: boolean }> = {},

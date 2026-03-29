@@ -8,6 +8,7 @@ import TransactionImportDialog from './TransactionImportDialog.vue';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 import type { BudgetData } from '../budgets/budget.types';
 import { transactionImporter } from './importers/transactionImporter';
+import { DialogStub } from '../../test/stubs';
 
 // Selectors
 const IMPORT_BTN = '[data-testid="import-btn"]';
@@ -18,14 +19,6 @@ const FORMAT_SELECT = '[data-testid="import-format-select"]';
 vi.mock('./importers/transactionImporter', () => ({
   transactionImporter: vi.fn().mockReturnValue([]),
 }));
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible'],
-  emits: ['update:visible'],
-};
 
 const checkingAccount: BankAccountData = {
   id: 1,

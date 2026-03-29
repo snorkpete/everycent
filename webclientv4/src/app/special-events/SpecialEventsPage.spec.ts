@@ -5,6 +5,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SpecialEventsPage from './SpecialEventsPage.vue';
 import type { SpecialEventData } from './specialEvent.types';
+import { DialogStub } from '../../test/stubs';
 
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
@@ -62,13 +63,6 @@ const FormStub = {
   template: '<div data-testid="event-form" />',
   props: ['visible', 'specialEvent'],
   emits: ['update:visible', 'submit'],
-};
-
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div data-testid="delete-dialog"><slot /><slot name="footer" /></div>',
-  props: ['visible', 'header', 'modal', 'style'],
-  emits: ['update:visible'],
 };
 
 function createWrapper(): VueWrapper {

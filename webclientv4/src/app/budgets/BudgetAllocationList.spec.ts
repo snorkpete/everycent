@@ -9,19 +9,7 @@ import type { BudgetDetailData } from './budget.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 import type { AllocationData } from '../transactions/transaction.types';
 
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: {
-    visible: { type: Boolean },
-    header: { type: String },
-    modal: { type: Boolean },
-    closable: { type: Boolean },
-    style: { type: Object },
-  },
-  emits: ['update:visible'],
-};
+import { DialogStub } from '../../test/stubs';
 
 // Selectors
 const CATEGORY_HEADER = (id: number) => `[data-testid="category-header-${id}"]`;

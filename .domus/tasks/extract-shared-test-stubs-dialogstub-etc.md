@@ -1,7 +1,7 @@
 # Task: Extract shared test stubs (DialogStub etc)
 
 **ID:** extract-shared-test-stubs-dialogstub-etc
-**Status:** raw
+**Status:** in-progress
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28

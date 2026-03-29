@@ -5,19 +5,12 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import AddBudgetDialog from './AddBudgetDialog.vue';
+import { DialogStub } from '../../test/stubs';
 
 // Selectors
 const SAVE_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
 const DATE_PICKER = '[data-testid="start-date-picker"]';
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible'],
-  emits: ['update:visible'],
-};
 
 function createWrapper(props: Partial<{ visible: boolean }> = {}): VueWrapper {
   return mount(AddBudgetDialog, {

@@ -6,6 +6,7 @@ import PrimeVue from 'primevue/config';
 import BudgetMassEditDialog from './BudgetMassEditDialog.vue';
 import type { FutureBudgetData } from './futureBudgets.types';
 import { centsToDollars } from '../../shared/util/cents-to-dollars';
+import { DialogStub } from '../../../test/stubs';
 
 const makeBudget = (overrides: Partial<FutureBudgetData> = {}): FutureBudgetData => ({
   id: 1,
@@ -17,14 +18,6 @@ const makeBudget = (overrides: Partial<FutureBudgetData> = {}): FutureBudgetData
   allocations: [],
   ...overrides,
 });
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible', 'header'],
-  emits: ['update:visible'],
-};
 
 function mountDialog(props: Record<string, unknown> = {}) {
   return mount(BudgetMassEditDialog, {

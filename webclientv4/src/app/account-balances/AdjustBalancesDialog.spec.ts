@@ -6,18 +6,11 @@ import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import AdjustBalancesDialog from './AdjustBalancesDialog.vue';
 import type { AccountBalanceData } from './accountBalance.types';
+import { DialogStub } from '../../test/stubs';
 
 // Selectors
 const SAVE_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible', 'header', 'modal'],
-  emits: ['update:visible'],
-};
 
 // Stub EcMoneyField to simplify testing
 const EcMoneyFieldStub = {

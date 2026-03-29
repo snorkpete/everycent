@@ -6,12 +6,7 @@ import PrimeVue from 'primevue/config';
 import SpecialEventForm from './SpecialEventForm.vue';
 import type { SpecialEventData } from './specialEvent.types';
 
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div data-testid="form-dialog"><slot /><slot name="footer" /></div>',
-  props: ['visible', 'header', 'modal', 'style'],
-  emits: ['update:visible'],
-};
+import { DialogStub } from '../../test/stubs';
 
 function createWrapper(
   overrides: {

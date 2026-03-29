@@ -9,6 +9,7 @@ import { bankAccountApi } from '../bank-accounts/bankAccountApi';
 import { transactionApi } from './transactionApi';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 import type { AllocationData, BudgetData, SinkFundAllocationData } from './transaction.types';
+import { DialogStub } from '../../test/stubs';
 
 // Selectors
 const TRANSFER_BTN = '[data-testid="transfer-btn"]';
@@ -93,14 +94,6 @@ const mockStore = reactive({
 vi.mock('./transactionStore', () => ({
   useTransactionStore: () => mockStore,
 }));
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: ['visible'],
-  emits: ['update:visible'],
-};
 
 const mockNotifyError = vi.fn();
 const mockNotifySuccess = vi.fn();

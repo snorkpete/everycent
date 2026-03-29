@@ -5,6 +5,7 @@ import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import AllocationTransactionsDialog from './AllocationTransactionsDialog.vue';
 import type { TransactionData } from '../transactions/transaction.types';
+import { DialogStub } from '../../test/stubs';
 
 // Selectors
 const LOADING_STATE = '[data-testid="loading-state"]';
@@ -13,20 +14,6 @@ const TRANSACTIONS_TABLE = '[data-testid="transactions-table"]';
 const TRANSACTION_ROW = '[data-testid="transaction-row"]';
 const TOTAL_ROW = '[data-testid="total-row"]';
 const ERROR_STATE = '[data-testid="error-state"]';
-
-// Stub PrimeVue Dialog to avoid teleport complexity in tests
-const DialogStub = {
-  name: 'Dialog',
-  template: '<div><slot /><slot name="footer" /></div>',
-  props: {
-    visible: { type: Boolean },
-    header: { type: String },
-    modal: { type: Boolean },
-    closable: { type: Boolean },
-    style: { type: Object },
-  },
-  emits: ['update:visible'],
-};
 
 const sampleTransactions: TransactionData[] = [
   {
