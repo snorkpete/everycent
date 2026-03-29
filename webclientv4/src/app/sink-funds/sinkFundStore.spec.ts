@@ -37,7 +37,7 @@ describe('sinkFundStore', () => {
     vi.clearAllMocks();
   });
 
-  describe('fetchList', () => {
+  describe('fetchAll', () => {
     it('fetches and stores all sink funds', async () => {
       const funds = [
         { id: 1, name: 'Fund A' },
@@ -46,7 +46,7 @@ describe('sinkFundStore', () => {
       vi.mocked(sinkFundApi.getAll).mockResolvedValue(funds);
 
       const store = useSinkFundStore();
-      await store.fetchList();
+      await store.fetchAll();
 
       expect(store.sinkFunds).toEqual(funds);
     });
@@ -59,7 +59,7 @@ describe('sinkFundStore', () => {
       });
 
       const store = useSinkFundStore();
-      await store.fetchList();
+      await store.fetchAll();
 
       expect(loadingDuringCall).toBe(true);
       expect(store.loading).toBe(false);
@@ -69,7 +69,7 @@ describe('sinkFundStore', () => {
       vi.mocked(sinkFundApi.getAll).mockRejectedValue(new Error('Network error'));
 
       const store = useSinkFundStore();
-      await expect(store.fetchList()).rejects.toThrow('Network error');
+      await expect(store.fetchAll()).rejects.toThrow('Network error');
 
       expect(store.error).toBe('Network error');
       expect(store.loading).toBe(false);
@@ -80,8 +80,8 @@ describe('sinkFundStore', () => {
       vi.mocked(sinkFundApi.getAll).mockResolvedValueOnce([]);
 
       const store = useSinkFundStore();
-      await store.fetchList().catch(() => {});
-      await store.fetchList();
+      await store.fetchAll().catch(() => {});
+      await store.fetchAll();
 
       expect(store.error).toBeNull();
     });

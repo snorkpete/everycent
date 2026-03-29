@@ -40,7 +40,7 @@ export const useSinkFundStore = defineStore('sinkFund', () => {
       .reduce((sum, a) => sum + ((a.current_balance ?? 0) - (a.target ?? 0)), 0),
   );
 
-  async function fetchList() {
+  async function fetchAll() {
     loading.value = true;
     error.value = null;
     try {
@@ -109,7 +109,7 @@ export const useSinkFundStore = defineStore('sinkFund', () => {
     unassignedBalance,
     totalTarget,
     totalOutstanding,
-    fetchList,
+    fetchAll,
     fetchDetail,
     save,
     enterEditMode,

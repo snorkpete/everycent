@@ -67,7 +67,7 @@ const mockStore = reactive({
   unassignedBalance: 0,
   totalTarget: 0,
   totalOutstanding: 0,
-  fetchList: vi.fn().mockResolvedValue(undefined),
+  fetchAll: vi.fn().mockResolvedValue(undefined),
   fetchDetail: vi.fn().mockResolvedValue(undefined),
   save: vi.fn().mockResolvedValue(undefined),
   enterEditMode: vi.fn(),
@@ -102,7 +102,7 @@ describe('SinkFundsPage', () => {
     mockStore.unassignedBalance = 0;
     mockStore.totalTarget = 0;
     mockStore.totalOutstanding = 0;
-    mockStore.fetchList.mockResolvedValue(undefined);
+    mockStore.fetchAll.mockResolvedValue(undefined);
     mockStore.fetchDetail.mockResolvedValue(undefined);
     mockStore.save.mockResolvedValue(undefined);
     mockStore.cancelEdit.mockResolvedValue(undefined);
@@ -117,11 +117,11 @@ describe('SinkFundsPage', () => {
       expect(mockSetHeading).toHaveBeenCalledWith('Sink Fund Obligations');
     });
 
-    it('calls fetchList on mount', async () => {
+    it('calls fetchAll on mount', async () => {
       mountPage();
       await nextTick();
 
-      expect(mockStore.fetchList).toHaveBeenCalled();
+      expect(mockStore.fetchAll).toHaveBeenCalled();
     });
 
     it('does not call fetchDetail if no sink_fund_id query param', async () => {
