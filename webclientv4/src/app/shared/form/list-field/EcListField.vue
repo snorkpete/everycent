@@ -34,22 +34,19 @@ import { computed, useId } from 'vue';
 import Select from 'primevue/select';
 import type { ListItem, ListGroup } from './ec-list-field.types';
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: number | string | boolean | null | undefined;
-    label?: string;
-    editMode: boolean;
-    items: ListItem[];
-    /**
-     * When set, groups items by this field name. Expects each item to have a
-     * `{groupBy}_id` property and a nested `{groupBy}.name` string.
-     * Example: groupBy="category" requires items with `category_id` and `category.name`.
-     */
-    groupBy?: string;
-    filterable?: boolean;
-  }>(),
-  { label: '' },
-);
+const { modelValue, label = '', editMode, items, groupBy, filterable } = defineProps<{
+  modelValue: number | string | boolean | null | undefined;
+  label?: string;
+  editMode: boolean;
+  items: ListItem[];
+  /**
+   * When set, groups items by this field name. Expects each item to have a
+   * `{groupBy}_id` property and a nested `{groupBy}.name` string.
+   * Example: groupBy="category" requires items with `category_id` and `category.name`.
+   */
+  groupBy?: string;
+  filterable?: boolean;
+}>();
 
 defineEmits<{
   'update:modelValue': [value: number | string | boolean | null];
@@ -58,19 +55,17 @@ defineEmits<{
 const inputId = useId();
 
 const selectedItemName = computed(() =>
-  props.modelValue != null
-    ? (props.items.find((item) => item.id === props.modelValue)?.name ?? '')
-    : '',
+  modelValue != null ? (items.find((item) => item.id === modelValue)?.name ?? '') : '',
 );
 
 const groups = computed((): ListGroup[] => {
-  if (!props.groupBy || !props.items.length) return [];
+  if (!groupBy || !items.length) return [];
 
-  const groupByIdField = `${props.groupBy}_id`;
-  const groupByField = props.groupBy;
+  const groupByIdField = `${groupBy}_id`;
+  const groupByField = groupBy;
 
   const grouped: Record<string, ListGroup> = {};
-  for (const item of props.items) {
+  for (const item of items) {
     const groupId = String(item[groupByIdField]);
     if (!grouped[groupId]) {
       const groupObj = item[groupByField] as { name: string } | undefined;
@@ -85,13 +80,13 @@ const groups = computed((): ListGroup[] => {
   return Object.values(grouped).sort((a, b) => a.label.localeCompare(b.label));
 });
 
-const displayOptions = computed(() => (props.groupBy ? groups.value : props.items));
+const displayOptions = computed(() => (groupBy ? groups.value : items));
 
 const selectPt = computed(() => {
   const pt: Record<string, Record<string, string>> = {
     label: { class: 'ec-select-label' },
   };
-  if (props.groupBy) {
+  if (groupBy) {
     pt.optionGroupLabel = { class: 'ec-group-label' };
     pt.option = { class: 'ec-group-option' };
   }

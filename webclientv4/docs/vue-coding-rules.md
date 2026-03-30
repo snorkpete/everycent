@@ -22,10 +22,10 @@ import { useSomeStore } from './stores/someStore'
 
 const store = useSomeStore()
 
-const props = defineProps<{ budgetId: number }>()
+const { budgetId } = defineProps<{ budgetId: number }>()
 const emit = defineEmits<{ saved: [id: number] }>()
 
-onMounted(() => { store.fetchData(props.budgetId) })
+onMounted(() => { store.fetchData(budgetId) })
 
 const total = computed(() =>
   store.items.reduce((sum, item) => sum + item.amount, 0)
@@ -40,6 +40,24 @@ const total = computed(() =>
 /* Component-scoped styles */
 </style>
 ```
+
+## Props: Destructure, Don't Use `withDefaults`
+
+Use Vue 3.5+ reactive destructuring with defaults instead of `withDefaults`:
+
+```typescript
+// ✅ Correct — destructured with defaults
+const { label = '', editMode, inline = false } = defineProps<{
+  label?: string;
+  editMode: boolean;
+  inline?: boolean;
+}>();
+
+// ❌ Avoid — withDefaults macro
+const props = withDefaults(defineProps<{ ... }>(), { label: '' });
+```
+
+Destructured props are reactive in Vue 3.5+. Access them directly by name, not via `props.x`. Migrate existing `withDefaults` usages as you touch the file.
 
 ## Store Pattern
 
