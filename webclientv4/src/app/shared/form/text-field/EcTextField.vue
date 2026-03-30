@@ -49,7 +49,7 @@ const inputId = useId();
   font-size: 12px;
   font-weight: 400;
   line-height: 1.125;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--p-text-muted-color);
 }
 
 .value {

@@ -400,7 +400,7 @@ function addAllocation(category: AllocationCategoryData) {
   position: sticky;
   top: var(--thead-height);
   z-index: 5;
-  background-color: var(--p-primary-50, #f0f4ff);
+  background-color: var(--p-primary-50);
   font-weight: 700;
   font-size: 0.9rem;
   padding: 0.55rem 0.75rem;
@@ -446,11 +446,11 @@ function addAllocation(category: AllocationCategoryData) {
 
 /* ── Remaining colour classes ── */
 .amount-positive {
-  color: #16a34a;
+  color: var(--p-green-600);
 }
 
 .amount-negative {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 .amount-muted {
@@ -539,7 +539,7 @@ tr:hover .eye-btn {
 }
 
 .delete-btn:hover {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 /* ── Deleted row ── */

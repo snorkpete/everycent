@@ -555,12 +555,12 @@ async function onSave(payload: MassUpdatePayload) {
 
 /* ── Amount colour classes ── */
 .amount-positive {
-  color: #16a34a;
+  color: var(--p-green-600);
   font-weight: 700;
 }
 
 .amount-negative {
-  color: #dc2626;
+  color: var(--p-red-600);
   font-weight: 700;
 }
 

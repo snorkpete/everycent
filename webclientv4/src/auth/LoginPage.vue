@@ -78,9 +78,9 @@ async function login() {
 .login-card {
   width: 320px;
   padding: 2rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--p-surface-300);
   border-radius: 8px;
-  box-shadow: 4px 4px 10px #888;
+  box-shadow: 4px 4px 10px var(--p-surface-500);
 }
 
 .field {

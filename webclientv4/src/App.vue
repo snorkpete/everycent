@@ -40,7 +40,7 @@ const authStore = useAuthStore();
   flex: 1;
   min-width: 0;
   min-height: 0;
-  background-color: #f8fafc;
+  background-color: var(--p-surface-50);
   display: flex;
   flex-direction: column;
   overflow: hidden;

@@ -495,11 +495,11 @@ function previewRowClass(transaction: ImportTransaction) {
 }
 
 .unmatched-row {
-  background-color: #fef3c7;
+  background-color: var(--p-amber-100);
 }
 
 .missing-account {
-  color: #b45309;
+  color: var(--p-amber-700);
   font-style: italic;
 }
 
@@ -624,13 +624,13 @@ function previewRowClass(transaction: ImportTransaction) {
 }
 
 .auto-allocation--exact {
-  color: #15803d;
-  background-color: #f0fdf4;
+  color: var(--p-green-700);
+  background-color: var(--p-green-50);
 }
 
 .auto-allocation--contains {
-  color: #b45309;
-  background-color: #fffbeb;
+  color: var(--p-amber-700);
+  background-color: var(--p-amber-50);
 }
 
 .auto-allocation-clear {

@@ -319,8 +319,8 @@ async function onAddBudget(startDate: string) {
 }
 
 .status-open {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: var(--p-green-100);
+  color: var(--p-green-800);
 }
 
 .status-closed {

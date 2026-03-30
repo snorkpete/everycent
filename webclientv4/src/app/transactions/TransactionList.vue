@@ -359,10 +359,10 @@ function autoAllocationClass(transaction: TransactionData) {
 }
 
 .allocation-cell--exact .auto-indicator {
-  color: #15803d;
+  color: var(--p-green-700);
 }
 
 .allocation-cell--contains .auto-indicator {
-  color: #b45309;
+  color: var(--p-amber-700);
 }
 </style>

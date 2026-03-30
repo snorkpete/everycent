@@ -288,11 +288,11 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
 
 /* ── Outstanding colour classes ── */
 .amount-positive {
-  color: #16a34a;
+  color: var(--p-green-600);
 }
 
 .amount-negative {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 .amount-muted {
@@ -372,15 +372,15 @@ tr:hover .eye-btn {
 }
 
 .delete-btn:hover {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 .deactivate-btn:hover {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 .reactivate-btn:hover {
-  color: #16a34a;
+  color: var(--p-green-600);
 }
 
 /* ── Deleted row ── */

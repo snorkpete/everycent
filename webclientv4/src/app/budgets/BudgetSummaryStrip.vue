@@ -158,11 +158,11 @@ const wantsPercentage = computed(() => {
 }
 
 .amount-positive {
-  color: #16a34a;
+  color: var(--p-green-600);
 }
 
 .amount-negative {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 .amount-zero {
@@ -184,17 +184,17 @@ const wantsPercentage = computed(() => {
 }
 
 .nws-need {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: var(--p-blue-100);
+  color: var(--p-blue-800);
 }
 
 .nws-want {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: var(--p-amber-100);
+  color: var(--p-amber-800);
 }
 
 .nws-savings {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: var(--p-green-100);
+  color: var(--p-green-800);
 }
 </style>

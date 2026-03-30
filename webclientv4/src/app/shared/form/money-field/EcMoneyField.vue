@@ -38,7 +38,11 @@ import { ref, computed, watch, useId } from 'vue';
 import { dollarsToCents } from '../../util/dollars-to-cents';
 import { centsToDollars } from '../../util/cents-to-dollars';
 
-const { label = '', editMode, highlightMode } = defineProps<{
+const {
+  label = '',
+  editMode,
+  highlightMode,
+} = defineProps<{
   label?: string;
   editMode: boolean;
   highlightMode?: 'positive' | 'zero';
@@ -109,7 +113,7 @@ function onBlur() {
   font-size: 12px;
   font-weight: 400;
   line-height: 1.125;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--p-text-muted-color);
 }
 
 .money-display {
