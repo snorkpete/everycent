@@ -1,7 +1,7 @@
 # Task: Move array mutations into store actions
 
 **ID:** move-array-mutations-into-store-actions
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
