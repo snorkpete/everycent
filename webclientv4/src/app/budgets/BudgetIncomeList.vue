@@ -45,7 +45,7 @@
           </td>
 
           <td class="col-amount">
-            <EcMoneyField v-model="income.amount" label="" :edit-mode="store.isEditMode" />
+            <EcMoneyField v-model="income.amount" inline :edit-mode="store.isEditMode" />
           </td>
 
           <td v-if="store.isEditMode" class="col-actions">
@@ -201,9 +201,4 @@ function toggleDeleted(income: IncomeData) {
   background-color: var(--p-surface-100);
 }
 
-/* ── EcMoneyField inline in table ── */
-.col-amount :deep(.ec-money-field) {
-  flex-direction: row;
-  justify-content: flex-end;
-}
 </style>

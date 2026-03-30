@@ -34,19 +34,22 @@ import { computed, useId } from 'vue';
 import Select from 'primevue/select';
 import type { ListItem, ListGroup } from './ec-list-field.types';
 
-const props = defineProps<{
-  modelValue: number | string | boolean | null | undefined;
-  label: string;
-  editMode: boolean;
-  items: ListItem[];
-  /**
-   * When set, groups items by this field name. Expects each item to have a
-   * `{groupBy}_id` property and a nested `{groupBy}.name` string.
-   * Example: groupBy="category" requires items with `category_id` and `category.name`.
-   */
-  groupBy?: string;
-  filterable?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: number | string | boolean | null | undefined;
+    label?: string;
+    editMode: boolean;
+    items: ListItem[];
+    /**
+     * When set, groups items by this field name. Expects each item to have a
+     * `{groupBy}_id` property and a nested `{groupBy}.name` string.
+     * Example: groupBy="category" requires items with `category_id` and `category.name`.
+     */
+    groupBy?: string;
+    filterable?: boolean;
+  }>(),
+  { label: '' },
+);
 
 defineEmits<{
   'update:modelValue': [value: number | string | boolean | null];
@@ -100,6 +103,7 @@ const selectPt = computed(() => {
 .ec-list-field {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .label {

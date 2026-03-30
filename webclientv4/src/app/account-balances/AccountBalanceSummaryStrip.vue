@@ -5,8 +5,8 @@
       <div class="strip-item">
         <span class="strip-label">Total Assets</span>
         <EcMoneyField
-          label=""
           :edit-mode="false"
+          inline
           :model-value="store.totalAssets"
           highlight-mode="positive"
         />
@@ -14,13 +14,13 @@
       <div class="strip-divider"></div>
       <div class="strip-item">
         <span class="strip-label">Total Liabilities</span>
-        <EcMoneyField label="" :edit-mode="false" :model-value="store.totalLiabilities" />
+        <EcMoneyField :edit-mode="false" inline :model-value="store.totalLiabilities" />
       </div>
       <div class="strip-item strip-item--net-worth">
         <span class="strip-label">Net Worth</span>
         <EcMoneyField
-          label=""
           :edit-mode="false"
+          inline
           :model-value="store.netWorth"
           highlight-mode="positive"
         />
@@ -32,8 +32,8 @@
       <div class="strip-item strip-item--small">
         <span class="strip-label-small">Current Cash</span>
         <EcMoneyField
-          label=""
           :edit-mode="false"
+          inline
           :model-value="store.netCurrentCash"
           highlight-mode="positive"
         />
@@ -41,15 +41,15 @@
       <div class="strip-item strip-item--small">
         <span class="strip-label-small">Cash Assets</span>
         <EcMoneyField
-          label=""
           :edit-mode="false"
+          inline
           :model-value="store.netCashAssets"
           highlight-mode="positive"
         />
       </div>
       <div class="strip-item strip-item--small">
         <span class="strip-label-small">Non Cash Assets</span>
-        <EcMoneyField label="" :edit-mode="false" :model-value="store.netNonCashAssets" />
+        <EcMoneyField :edit-mode="false" inline :model-value="store.netNonCashAssets" />
       </div>
     </div>
   </div>
@@ -132,18 +132,10 @@ const store = useAccountBalanceStore();
   background-color: var(--p-surface-300);
 }
 
-/* ── EcMoneyField inline overrides ── */
-.strip-item :deep(.ec-money-field) {
-  display: inline;
-  text-align: right;
-}
-.strip-item :deep(.ec-money-field .label) {
-  display: none;
-}
+/* ── EcMoneyField size overrides per context ── */
 .strip-item :deep(.money-display) {
   font-size: 0.95rem;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 
 .strip-item--net-worth :deep(.money-display) {
