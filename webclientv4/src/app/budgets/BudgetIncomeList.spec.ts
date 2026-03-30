@@ -34,6 +34,10 @@ const mockStore = reactive({
   isEditMode: false,
   loading: false,
   error: null as string | null,
+  addIncome(income: IncomeData) {
+    if (!this.budget) return;
+    this.budget.incomes.push(income);
+  },
 });
 
 vi.mock('./budgetStore', () => ({
