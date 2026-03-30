@@ -10,7 +10,7 @@ import { DialogStub } from '../../test/stubs';
 const existingCategory: AllocationCategoryData = { id: 1, name: 'Groceries' };
 const newCategory: AllocationCategoryData = {};
 
-function mountDialog(props: Record<string, unknown> = {}) {
+function createWrapper(props: Record<string, unknown> = {}) {
   return mount(AllocationCategoryEditDialog, {
     props: {
       visible: true,
@@ -28,13 +28,13 @@ function mountDialog(props: Record<string, unknown> = {}) {
 describe('AllocationCategoryEditDialog', () => {
   describe('view mode (existing category)', () => {
     it('shows the category name', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(existingCategory.name);
     });
 
     it('shows "Make Changes" and "Close" buttons', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
       const labels = wrapper.findAll('button').map((b) => b.text());
 
       expect(labels).toContain('Make Changes');
@@ -42,7 +42,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('does not show "Save" or "Cancel" buttons', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
       const labels = wrapper.findAll('button').map((b) => b.text());
 
       expect(labels).not.toContain('Save');
@@ -50,7 +50,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('switches to edit mode when "Make Changes" is clicked', async () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       const makeChangesBtn = wrapper.findAll('button').find((b) => b.text() === 'Make Changes')!;
       await makeChangesBtn.trigger('click');
@@ -61,7 +61,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('emits update:visible false when "Close" is clicked', async () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       const closeBtn = wrapper.findAll('button').find((b) => b.text() === 'Close')!;
       await closeBtn.trigger('click');
@@ -72,7 +72,7 @@ describe('AllocationCategoryEditDialog', () => {
 
   describe('edit mode (existing category)', () => {
     it('shows "Save" and "Cancel" buttons', () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
       const labels = wrapper.findAll('button').map((b) => b.text());
 
       expect(labels).toContain('Save');
@@ -80,7 +80,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('does not show "Make Changes" or "Close" buttons', () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
       const labels = wrapper.findAll('button').map((b) => b.text());
 
       expect(labels).not.toContain('Make Changes');
@@ -88,7 +88,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('emits save with the form data when "Save" is clicked', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
       await saveBtn.trigger('click');
@@ -99,7 +99,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('returns to view mode when "Cancel" is clicked on an existing category', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const cancelBtn = wrapper.findAll('button').find((b) => b.text() === 'Cancel')!;
       await cancelBtn.trigger('click');
@@ -109,7 +109,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('resets form data when "Cancel" is clicked on an existing category', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const nameField = wrapper.findComponent(EcTextField);
       await nameField.vm.$emit('update:modelValue', 'Modified Name');
@@ -124,7 +124,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('does not emit update:visible when "Cancel" is clicked on an existing category', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const cancelBtn = wrapper.findAll('button').find((b) => b.text() === 'Cancel')!;
       await cancelBtn.trigger('click');
@@ -135,7 +135,7 @@ describe('AllocationCategoryEditDialog', () => {
 
   describe('edit mode (new category)', () => {
     it('emits update:visible false when "Cancel" is clicked on a new category', async () => {
-      const wrapper = mountDialog({ allocationCategory: newCategory, initialEditMode: true });
+      const wrapper = createWrapper({ allocationCategory: newCategory, initialEditMode: true });
 
       const cancelBtn = wrapper.findAll('button').find((b) => b.text() === 'Cancel')!;
       await cancelBtn.trigger('click');
@@ -146,7 +146,7 @@ describe('AllocationCategoryEditDialog', () => {
 
   describe('form reset on re-open', () => {
     it('resets form data when dialog becomes visible again', async () => {
-      const wrapper = mountDialog({ initialEditMode: false });
+      const wrapper = createWrapper({ initialEditMode: false });
 
       await wrapper.setProps({ visible: false });
       await wrapper.setProps({ visible: true, allocationCategory: { id: 2, name: 'Utilities' } });
@@ -155,7 +155,7 @@ describe('AllocationCategoryEditDialog', () => {
     });
 
     it('resets editMode to initialEditMode when dialog becomes visible again', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       await wrapper.setProps({ visible: false });
       await wrapper.setProps({ visible: true, initialEditMode: false });

@@ -89,8 +89,8 @@
             <td class="amount-cell">
               <span class="spent-cell">
                 <button
+                  v-tooltip="'Show transactions for this allocation'"
                   class="eye-btn"
-                  title="Show transactions for this allocation"
                   data-testid="show-transactions-btn"
                   @click="showTransactions(allocation)"
                 >
@@ -146,8 +146,8 @@
             <!-- Delete action -->
             <td v-if="store.isEditMode" class="center-cell">
               <button
+                v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
                 class="delete-btn"
-                :title="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
                 :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
                 @click="toggleDeleted(allocation)"
               >
@@ -400,7 +400,7 @@ function addAllocation(category: AllocationCategoryData) {
   position: sticky;
   top: var(--thead-height);
   z-index: 5;
-  background-color: var(--p-primary-50, #f0f4ff);
+  background-color: var(--p-primary-50);
   font-weight: 700;
   font-size: 0.9rem;
   padding: 0.55rem 0.75rem;
@@ -446,11 +446,11 @@ function addAllocation(category: AllocationCategoryData) {
 
 /* ── Remaining colour classes ── */
 .amount-positive {
-  color: #16a34a;
+  color: var(--p-green-600);
 }
 
 .amount-negative {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 .amount-muted {
@@ -539,7 +539,7 @@ tr:hover .eye-btn {
 }
 
 .delete-btn:hover {
-  color: #dc2626;
+  color: var(--p-red-600);
 }
 
 /* ── Deleted row ── */

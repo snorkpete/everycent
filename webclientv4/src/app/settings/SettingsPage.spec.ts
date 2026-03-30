@@ -60,7 +60,7 @@ vi.mock('./settingsStore', () => ({
   useSettingsStore: () => mockStore,
 }));
 
-function mountPage() {
+function createWrapper() {
   return mount(SettingsPage, {
     global: {
       plugins: [PrimeVue, createPinia()],
@@ -82,21 +82,21 @@ describe('SettingsPage', () => {
 
   describe('on mount', () => {
     it('sets the page heading to "General Settings"', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockSetHeading).toHaveBeenCalledWith('General Settings');
     });
 
     it('calls fetchAll on mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchAll).toHaveBeenCalled();
     });
 
     it('does not show an error toast when fetchAll succeeds', async () => {
-      mountPage();
+      createWrapper();
       // Two ticks needed: first for onMounted to fire, second for the fetchAll .then() to resolve
       await nextTick();
       await nextTick();
@@ -110,7 +110,7 @@ describe('SettingsPage', () => {
         mockStore.error = errorMessage;
         throw new Error('Network error');
       });
-      mountPage();
+      createWrapper();
       await nextTick();
       await nextTick();
 
@@ -120,20 +120,20 @@ describe('SettingsPage', () => {
 
   describe('view mode (default)', () => {
     it('shows the "Make Changes" button', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="edit-btn"]').exists()).toBe(true);
     });
 
     it('does not show "Save" or "Cancel" buttons', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="save-btn"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="cancel-btn"]').exists()).toBe(false);
     });
 
     it('switches to edit mode when "Make Changes" is clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
@@ -143,7 +143,7 @@ describe('SettingsPage', () => {
 
   describe('edit mode', () => {
     it('shows "Save" and "Cancel" buttons', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
@@ -152,7 +152,7 @@ describe('SettingsPage', () => {
     });
 
     it('does not show "Make Changes" button', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
@@ -163,7 +163,7 @@ describe('SettingsPage', () => {
   describe('family type conditional fields', () => {
     it('shows husband and wife fields for a couple household after load', async () => {
       mockStore.fetchAll.mockResolvedValue(undefined);
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       // Two ticks needed: first for onMounted, second for fetchAll .then() to update formData
       await nextTick();
       await nextTick();
@@ -178,7 +178,7 @@ describe('SettingsPage', () => {
       mockStore.fetchAll.mockImplementation(async () => {
         mockStore.settings = { ...singleSettings };
       });
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       // Two ticks needed: first for onMounted, second for fetchAll .then() to update formData
       await nextTick();
       await nextTick();
@@ -191,7 +191,7 @@ describe('SettingsPage', () => {
 
   describe('on save', () => {
     it('calls store.save with the current form data', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       // Two ticks to let fetchAll resolve and populate formData from store.settings
       await nextTick();
       await nextTick();
@@ -210,7 +210,7 @@ describe('SettingsPage', () => {
     });
 
     it('returns to view mode and shows a success toast after a successful save', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
@@ -226,7 +226,7 @@ describe('SettingsPage', () => {
         mockStore.error = errorMessage;
         throw new Error('Server error');
       });
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
@@ -239,7 +239,7 @@ describe('SettingsPage', () => {
 
   describe('cancel', () => {
     it('returns to view mode', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
       await wrapper.find('[data-testid="cancel-btn"]').trigger('click');

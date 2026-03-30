@@ -2,17 +2,17 @@
   <div class="allocations-editor">
     <div class="toolbar">
       <Button
+        v-tooltip="'Save allocation changes for this special event'"
         label="Save"
         data-testid="save-btn"
-        title="Save allocation changes for this special event"
         :loading="store.loading"
         @click="save"
       />
       <Button
+        v-tooltip="'Discard changes and return to event details'"
         label="Cancel"
         severity="secondary"
         data-testid="cancel-btn"
-        title="Discard changes and return to event details"
         @click="cancel"
       />
     </div>
@@ -58,12 +58,12 @@
           <Column header="" style="width: 3rem; text-align: center">
             <template #body="{ data }">
               <Button
+                v-tooltip="'Remove this allocation from the special event'"
                 icon="pi pi-times"
                 severity="danger"
                 text
                 rounded
                 :data-testid="`remove-btn-${data.id}`"
-                title="Remove this allocation from the special event"
                 @click="removeAllocation(data)"
               />
             </template>
@@ -120,11 +120,11 @@
             <template #body="{ data: row }">
               <Button
                 v-if="!row._isCategoryHeader"
+                v-tooltip="'Add this allocation to the special event'"
                 icon="pi pi-plus"
                 text
                 rounded
                 :data-testid="`add-btn-${row.id}`"
-                title="Add this allocation to the special event"
                 :disabled="isAllocationAssigned(row)"
                 @click="addAllocation(row)"
               />

@@ -7,32 +7,36 @@
       </div>
       <div class="toolbar-right">
         <Button
+          v-tooltip="
+            'Toggle description wrapping — truncates long descriptions by default; wrap shows the full text'
+          "
           icon="pi pi-arrows-h"
           text
           severity="secondary"
           size="small"
           :class="['icon-btn', { 'icon-btn--active': wrapDescriptions }]"
           data-testid="wrap-toggle-btn"
-          title="Toggle description wrapping — truncates long descriptions by default; wrap shows the full text"
           @click="wrapDescriptions = !wrapDescriptions"
         />
         <Button
+          v-tooltip="
+            'Toggle calculator column — shows checkboxes to select transactions and sum their amounts'
+          "
           icon="pi pi-calculator"
           text
           severity="secondary"
           size="small"
           :class="['icon-btn', { 'icon-btn--active': showCalculatorColumn }]"
           data-testid="calculator-toggle-btn"
-          title="Toggle calculator column — shows checkboxes to select transactions and sum their amounts"
           @click="toggleCalculatorColumn"
         />
         <Button
+          v-tooltip="'Refresh transactions'"
           icon="pi pi-refresh"
           text
           severity="secondary"
           size="small"
           data-testid="refresh-btn"
-          title="Refresh transactions"
           @click="onRefresh"
         />
         <span class="toolbar-separator" />

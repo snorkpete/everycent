@@ -45,21 +45,21 @@
         <Column header="Actions" style="width: 120px; text-align: center">
           <template #body="{ data }">
             <Button
+              v-tooltip="'Edit special event'"
               icon="pi pi-pencil"
               text
               severity="secondary"
               size="small"
               :data-testid="`edit-btn-${data.id}`"
-              title="Edit special event"
               @click="editEvent(data)"
             />
             <Button
+              v-tooltip="'Delete special event'"
               icon="pi pi-trash"
               text
               severity="danger"
               size="small"
               :data-testid="`delete-btn-${data.id}`"
-              title="Delete special event"
               @click="confirmDelete(data)"
             />
           </template>

@@ -2,12 +2,12 @@
   <div class="future-budgets-page">
     <div class="page-header">
       <Button
+        v-tooltip="'Toggle between showing all allocations and variable-only mode'"
         :label="variableOnly ? 'Variable Only' : 'All Allocations'"
         :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
         :outlined="!variableOnly"
         size="small"
         data-testid="variable-only-toggle"
-        title="Toggle between showing all allocations and variable-only mode"
         @click="variableOnly = !variableOnly"
       />
       <Button
@@ -555,12 +555,12 @@ async function onSave(payload: MassUpdatePayload) {
 
 /* ── Amount colour classes ── */
 .amount-positive {
-  color: #16a34a;
+  color: var(--p-green-600);
   font-weight: 700;
 }
 
 .amount-negative {
-  color: #dc2626;
+  color: var(--p-red-600);
   font-weight: 700;
 }
 

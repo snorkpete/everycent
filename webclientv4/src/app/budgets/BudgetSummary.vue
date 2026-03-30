@@ -164,15 +164,15 @@ const wantsPercentage = computed(() => {
 }
 
 .bar-need {
-  background-color: #3b82f6;
+  background-color: var(--p-blue-500);
 }
 
 .bar-want {
-  background-color: #f59e0b;
+  background-color: var(--p-amber-500);
 }
 
 .bar-savings {
-  background-color: #22c55e;
+  background-color: var(--p-green-500);
 }
 
 .bar-amount {

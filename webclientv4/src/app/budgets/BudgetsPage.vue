@@ -19,12 +19,12 @@
       </div>
       <div class="toolbar-right">
         <Button
+          v-tooltip="'Refresh budget list'"
           icon="pi pi-refresh"
           text
           severity="secondary"
           size="small"
           data-testid="refresh-btn"
-          title="Refresh budget list"
           @click="store.fetchAll()"
         />
       </div>
@@ -319,8 +319,8 @@ async function onAddBudget(startDate: string) {
 }
 
 .status-open {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: var(--p-green-100);
+  color: var(--p-green-800);
 }
 
 .status-closed {

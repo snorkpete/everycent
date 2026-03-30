@@ -47,7 +47,7 @@ describe('MenuSidebar', () => {
     document.body.innerHTML = '';
   });
 
-  function mountComponent() {
+  function createWrapper() {
     wrapper = mount(MenuSidebar, {
       attachTo: document.body,
       global: {
@@ -64,26 +64,26 @@ describe('MenuSidebar', () => {
     });
 
     it('renders a static sidebar', () => {
-      mountComponent();
+      createWrapper();
 
       expect(wrapper.find('[data-testid="desktop-sidebar"]').exists()).toBe(true);
     });
 
     it('does not render the mobile drawer or toggle', () => {
-      mountComponent();
+      createWrapper();
 
       expect(wrapper.find('[data-testid="menu-toggle"]').exists()).toBe(false);
       expect(document.querySelector('[data-testid="mobile-drawer"]')).toBeNull();
     });
 
     it('renders the EveryCent brand header', () => {
-      mountComponent();
+      createWrapper();
 
       expect(wrapper.find('[data-testid="desktop-sidebar"]').text()).toContain('EveryCent');
     });
 
     it('renders menu items', () => {
-      mountComponent();
+      createWrapper();
 
       expect(wrapper.text()).toContain('Home');
       expect(wrapper.text()).toContain('Reports');
@@ -95,7 +95,7 @@ describe('MenuSidebar', () => {
       const authStore = useAuthStore();
       const logOutSpy = vi.spyOn(authStore, 'logOut');
 
-      mountComponent();
+      createWrapper();
 
       const links = wrapper.findAll('.p-panelmenu-header-link');
       const logoutLink = links.find((link) => link.text().includes('Log Out'));
@@ -119,14 +119,14 @@ describe('MenuSidebar', () => {
 
     it('auto-expands the Setup section when mounted on a setup route', () => {
       mockRoute.path = '/setup/institutions';
-      mountComponent();
+      createWrapper();
 
       expect(setupHeader()!.attributes('aria-expanded')).toBe('true');
     });
 
     it('does not auto-expand Setup when mounted on a non-setup route', () => {
       mockRoute.path = '/';
-      mountComponent();
+      createWrapper();
 
       // PrimeVue omits aria-expanded entirely when the panel is collapsed (undefined = not expanded)
       expect(setupHeader()!.attributes('aria-expanded')).toBeUndefined();
@@ -134,7 +134,7 @@ describe('MenuSidebar', () => {
 
     it('expands the Setup section when navigating to a setup route', async () => {
       mockRoute.path = '/';
-      mountComponent();
+      createWrapper();
       expect(setupHeader()!.attributes('aria-expanded')).toBeUndefined(); // collapsed = attribute absent
 
       mockRoute.path = '/setup/bank-accounts';
@@ -150,19 +150,19 @@ describe('MenuSidebar', () => {
     });
 
     it('does not render the static sidebar', () => {
-      mountComponent();
+      createWrapper();
 
       expect(wrapper.find('[data-testid="desktop-sidebar"]').exists()).toBe(false);
     });
 
     it('renders the hamburger toggle', () => {
-      mountComponent();
+      createWrapper();
 
       expect(wrapper.find('[data-testid="menu-toggle"]').exists()).toBe(true);
     });
 
     it('opens the drawer when hamburger is clicked', async () => {
-      mountComponent();
+      createWrapper();
 
       await wrapper.find('[data-testid="menu-toggle"]').trigger('click');
       await nextTick();

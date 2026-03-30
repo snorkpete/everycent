@@ -19,7 +19,7 @@ const makeBudget = (overrides: Partial<FutureBudgetData> = {}): FutureBudgetData
   ...overrides,
 });
 
-function mountDialog(props: Record<string, unknown> = {}) {
+function createWrapper(props: Record<string, unknown> = {}) {
   return mount(BudgetMassEditDialog, {
     props: {
       visible: true,
@@ -44,13 +44,13 @@ describe('BudgetMassEditDialog', () => {
 
   describe('dialog title', () => {
     it('shows the income/allocation name as the dialog title', () => {
-      const wrapper = mountDialog({ type: 'income', name: 'Salary' });
+      const wrapper = createWrapper({ type: 'income', name: 'Salary' });
       const dialog = wrapper.findComponent({ name: 'Dialog' });
       expect(dialog.props('header')).toBe('Salary');
     });
 
     it('shows the allocation name for allocation type', () => {
-      const wrapper = mountDialog({ type: 'allocation', name: 'Groceries' });
+      const wrapper = createWrapper({ type: 'allocation', name: 'Groceries' });
       const dialog = wrapper.findComponent({ name: 'Dialog' });
       expect(dialog.props('header')).toBe('Groceries');
     });
@@ -58,7 +58,7 @@ describe('BudgetMassEditDialog', () => {
 
   describe('form initialisation', () => {
     it('populates name input from the name prop on open', async () => {
-      const wrapper = mountDialog({ name: 'Bonus', visible: false });
+      const wrapper = createWrapper({ name: 'Bonus', visible: false });
       await wrapper.setProps({ visible: true });
       await nextTick();
 
@@ -68,7 +68,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('populates amount from amountsPerBudget for existing entry', async () => {
       const budget = makeBudget({ id: 1, name: 'Jan 2025' });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         budgets: [budget],
         amountsPerBudget: { 1: { id: 10, amount: 500000 } },
@@ -82,7 +82,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('defaults amount to 0 for budgets not in amountsPerBudget', async () => {
       const budget = makeBudget({ name: 'Jan 2025' });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         budgets: [budget],
         amountsPerBudget: {},
@@ -96,7 +96,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('reinitialises the form when the dialog reopens', async () => {
       const budget = makeBudget({ name: 'Jan 2025' });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: true,
         name: 'Old Name',
         budgets: [budget],
@@ -115,7 +115,7 @@ describe('BudgetMassEditDialog', () => {
 
   describe('allocation-specific rows', () => {
     it('does not show info rows for income type', () => {
-      const wrapper = mountDialog({ type: 'income' });
+      const wrapper = createWrapper({ type: 'income' });
 
       expect(wrapper.text()).not.toContain('Total Income');
       expect(wrapper.text()).not.toContain('Already Allocated');
@@ -123,7 +123,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('shows Total Income, Already Allocated, and Discretionary Amount for allocation type', () => {
-      const wrapper = mountDialog({ type: 'allocation' });
+      const wrapper = createWrapper({ type: 'allocation' });
 
       expect(wrapper.text()).toContain('Total Income');
       expect(wrapper.text()).toContain('Already Allocated');
@@ -134,7 +134,7 @@ describe('BudgetMassEditDialog', () => {
   describe('Save button', () => {
     it('emits save with income payload', async () => {
       const budget = makeBudget({ id: 5, name: 'Jan 2025' });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'income',
         name: 'Salary',
@@ -157,7 +157,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('emits save with allocation payload including category id and is_fixed_amount', async () => {
       const budget = makeBudget({ id: 5, name: 'Jan 2025' });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -182,7 +182,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('uses the edited name value in the payload', async () => {
       const budget = makeBudget({ id: 5, name: 'Jan 2025' });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'income',
         name: 'Salary',
@@ -203,7 +203,7 @@ describe('BudgetMassEditDialog', () => {
 
   describe('Cancel button', () => {
     it('emits update:visible false', async () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="cancel-btn"]').trigger('click');
 
@@ -214,7 +214,7 @@ describe('BudgetMassEditDialog', () => {
   describe('column headers', () => {
     it('shows budget names as column headers', () => {
       const budgets = [makeBudget({ name: 'Jan 2025' }), makeBudget({ id: 2, name: 'Feb 2025' })];
-      const wrapper = mountDialog({ budgets });
+      const wrapper = createWrapper({ budgets });
 
       expect(wrapper.text()).toContain('Jan 2025');
       expect(wrapper.text()).toContain('Feb 2025');
@@ -224,7 +224,7 @@ describe('BudgetMassEditDialog', () => {
   describe('is_fixed_amount — allocation type', () => {
     it('shows a Fixed? checkbox row for allocation type', async () => {
       const budget = makeBudget({ id: 1 });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -239,14 +239,14 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('does not show Fixed? row for income type', () => {
-      const wrapper = mountDialog({ type: 'income' });
+      const wrapper = createWrapper({ type: 'income' });
 
       expect(wrapper.find('[data-testid="fixed-row"]').exists()).toBe(false);
     });
 
     it('initialises checkbox from amountsPerBudget is_fixed_amount value', async () => {
       const budget = makeBudget({ id: 1 });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -262,7 +262,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('defaults checkbox to false when is_fixed_amount not provided', async () => {
       const budget = makeBudget({ id: 1 });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -278,7 +278,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('includes is_fixed_amount in save payload', async () => {
       const budget = makeBudget({ id: 5 });
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -304,7 +304,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('shows a Set All Fixed checkbox', async () => {
       const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -323,7 +323,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('set all fixed checkbox sets all per-budget checkboxes to checked', async () => {
       const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -348,7 +348,7 @@ describe('BudgetMassEditDialog', () => {
 
     it('set all fixed checkbox unchecks all per-budget checkboxes when unchecked', async () => {
       const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Rent',
@@ -376,7 +376,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('does not show set all fixed row for income type', () => {
-      const wrapper = mountDialog({ type: 'income' });
+      const wrapper = createWrapper({ type: 'income' });
 
       expect(wrapper.find('[data-testid="set-all-fixed-row"]').exists()).toBe(false);
     });
@@ -404,7 +404,7 @@ describe('BudgetMassEditDialog', () => {
         ],
       });
 
-      const wrapper = mountDialog({
+      const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
         name: 'Food',

@@ -45,7 +45,7 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function mountPage() {
+function createWrapper() {
   return mount(BankAccountsPage, {
     global: {
       plugins: [PrimeVue, createPinia()],
@@ -68,21 +68,21 @@ describe('BankAccountsPage', () => {
 
   describe('on mount', () => {
     it('sets the page heading to "Setup Bank Accounts"', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Setup Bank Accounts');
     });
 
     it('calls fetchAll on mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchAll).toHaveBeenCalled();
     });
 
     it('calls fetchInstitutions on mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchInstitutions).toHaveBeenCalled();
@@ -91,19 +91,19 @@ describe('BankAccountsPage', () => {
 
   describe('account list', () => {
     it('renders open account names', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(openAccount.name);
     });
 
     it('hides closed accounts by default', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).not.toContain(closedAccount.name);
     });
 
     it('shows closed accounts when the toggle is on', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const toggleInput = wrapper.find('[data-testid="show-closed-toggle"] input');
       await toggleInput.setValue(true);
@@ -114,7 +114,7 @@ describe('BankAccountsPage', () => {
 
   describe('closed account display', () => {
     it('applies the closed class to closed account rows', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
 
       const items = wrapper.findAll('.account-item');
@@ -124,7 +124,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('does not apply the closed class to open account rows', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const items = wrapper.findAll('.account-item');
       const openItem = items.find((item) => item.text().includes(openAccount.name!));
@@ -133,7 +133,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('shows a Closed tag for closed accounts', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
 
       const items = wrapper.findAll('.account-item');
@@ -146,7 +146,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('does not show a Closed tag for open accounts', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const items = wrapper.findAll('.account-item');
       const openItem = items.find((item) => item.text().includes(openAccount.name!));
@@ -157,7 +157,7 @@ describe('BankAccountsPage', () => {
 
   describe('View button', () => {
     it('opens the dialog with the selected account', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const viewBtn = wrapper.find('[data-testid="view-btn-1"]');
       await viewBtn.trigger('click');
@@ -168,7 +168,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('opens the dialog in view mode', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const viewBtn = wrapper.find('[data-testid="view-btn-1"]');
       await viewBtn.trigger('click');
@@ -180,7 +180,7 @@ describe('BankAccountsPage', () => {
 
   describe('Add Bank Account button', () => {
     it('opens the dialog with an empty account', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -190,7 +190,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('opens the dialog in edit mode', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -201,7 +201,7 @@ describe('BankAccountsPage', () => {
 
   describe('Refresh button', () => {
     it('calls fetchAll and fetchInstitutions', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
 
@@ -212,7 +212,7 @@ describe('BankAccountsPage', () => {
 
   describe('on save', () => {
     it('calls store.save with the account data', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BankAccountEditDialog' });
@@ -223,7 +223,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('closes the dialog and shows a success toast after a successful save', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BankAccountEditDialog' });
@@ -240,7 +240,7 @@ describe('BankAccountsPage', () => {
         mockStore.error = errorMessage;
         throw new Error('Server error');
       });
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BankAccountEditDialog' });
@@ -252,7 +252,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('does not show an error toast on a clean mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockNotifyError).not.toHaveBeenCalled();

@@ -79,7 +79,7 @@ vi.mock('./sinkFundStore', () => ({
   useSinkFundStore: () => mockStore,
 }));
 
-function mountPage(): VueWrapper {
+function createWrapper(): VueWrapper {
   return mount(SinkFundsPage, {
     global: {
       plugins: [PrimeVue, createPinia()],
@@ -111,21 +111,21 @@ describe('SinkFundsPage', () => {
 
   describe('on mount', () => {
     it('sets the page heading to "Sink Fund Obligations"', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Sink Fund Obligations');
     });
 
     it('calls fetchAll on mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchAll).toHaveBeenCalled();
     });
 
     it('does not call fetchDetail if no sink_fund_id query param', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchDetail).not.toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe('SinkFundsPage', () => {
     it('calls fetchDetail with id from query param on mount', async () => {
       mockRoute.query = { sink_fund_id: '2' };
 
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchDetail).toHaveBeenCalledWith(2);
@@ -143,20 +143,20 @@ describe('SinkFundsPage', () => {
 
   describe('sink fund selector', () => {
     it('renders the sink fund select dropdown', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.findComponent(SINK_FUND_SELECT).exists()).toBe(true);
     });
 
     it('passes sinkFunds as options to the dropdown', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const select = wrapper.findComponent(SINK_FUND_SELECT) as unknown as VueWrapper;
       expect(select.props()).toHaveProperty('options', [sinkFundA, sinkFundB]);
     });
 
     it('calls fetchDetail and updates router when a sink fund is selected', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       const select = wrapper.findComponent(SINK_FUND_SELECT) as unknown as VueWrapper;
@@ -170,7 +170,7 @@ describe('SinkFundsPage', () => {
 
   describe('toolbar — edit mode buttons', () => {
     it('shows Edit and Transfer Money buttons when not in edit mode', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
       expect(wrapper.find(TRANSFER_BTN).exists()).toBe(true);
@@ -181,7 +181,7 @@ describe('SinkFundsPage', () => {
 
     it('shows Save, Cancel, and Add Obligation buttons when in edit mode', async () => {
       mockStore.isEditMode = true;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
@@ -192,7 +192,7 @@ describe('SinkFundsPage', () => {
     });
 
     it('opens transfer dialog when Transfer Money is clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.findComponent(SinkFundTransferDialog).props('visible')).toBe(false);
 
@@ -203,7 +203,7 @@ describe('SinkFundsPage', () => {
     });
 
     it('calls store.enterEditMode when Edit is clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find(EDIT_BTN).trigger('click');
 
@@ -212,7 +212,7 @@ describe('SinkFundsPage', () => {
 
     it('calls store.cancelEdit when Cancel is clicked', async () => {
       mockStore.isEditMode = true;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       await wrapper.find(CANCEL_BTN).trigger('click');
@@ -225,7 +225,7 @@ describe('SinkFundsPage', () => {
   describe('toolbar — save', () => {
     it('calls store.save when Save is clicked', async () => {
       mockStore.isEditMode = true;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       await wrapper.find(SAVE_BTN).trigger('click');
@@ -236,7 +236,7 @@ describe('SinkFundsPage', () => {
 
     it('shows a success notification after saving', async () => {
       mockStore.isEditMode = true;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       await wrapper.find(SAVE_BTN).trigger('click');
@@ -252,7 +252,7 @@ describe('SinkFundsPage', () => {
         throw new Error('Server error');
       });
       mockStore.isEditMode = true;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       await wrapper.find(SAVE_BTN).trigger('click');
@@ -266,7 +266,7 @@ describe('SinkFundsPage', () => {
     it('adds a new empty allocation to sinkFund when Add Obligation is clicked', async () => {
       mockStore.isEditMode = true;
       mockStore.sinkFund = { ...sinkFundA, sink_fund_allocations: [] };
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       await wrapper.find(ADD_OBLIGATION_BTN).trigger('click');
@@ -283,7 +283,7 @@ describe('SinkFundsPage', () => {
     it('does nothing when Add Obligation is clicked and sinkFund is null', async () => {
       mockStore.isEditMode = true;
       mockStore.sinkFund = null;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       // Should not throw
@@ -293,7 +293,7 @@ describe('SinkFundsPage', () => {
 
   describe('show closed toggle', () => {
     it('renders the show closed toggle', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find(SHOW_CLOSED_TOGGLE).exists()).toBe(true);
     });
@@ -302,7 +302,7 @@ describe('SinkFundsPage', () => {
   describe('content area', () => {
     it('shows loading placeholder when loading is true', () => {
       mockStore.loading = true;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find(LOADING_PLACEHOLDER).exists()).toBe(true);
       expect(wrapper.find(EMPTY_PLACEHOLDER).exists()).toBe(false);
@@ -311,7 +311,7 @@ describe('SinkFundsPage', () => {
     it('shows empty placeholder when not loading and no sink fund selected', () => {
       mockStore.loading = false;
       mockStore.sinkFund = null;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find(EMPTY_PLACEHOLDER).exists()).toBe(true);
       expect(wrapper.find(LOADING_PLACEHOLDER).exists()).toBe(false);
@@ -320,7 +320,7 @@ describe('SinkFundsPage', () => {
     it('renders SinkFundAllocationTable when a sink fund is selected', async () => {
       mockStore.loading = false;
       mockStore.sinkFund = sinkFundA;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.findComponent(SinkFundAllocationTable).exists()).toBe(true);
@@ -331,7 +331,7 @@ describe('SinkFundsPage', () => {
     it('does not render SinkFundAllocationTable when no sink fund is selected', () => {
       mockStore.loading = false;
       mockStore.sinkFund = null;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.findComponent(SinkFundAllocationTable).exists()).toBe(false);
     });

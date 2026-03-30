@@ -2,31 +2,31 @@
   <div class="special-event-detail-page">
     <div class="toolbar">
       <Button
+        v-tooltip="'Return to special events list'"
         icon="pi pi-arrow-left"
         label="Back"
         severity="secondary"
         data-testid="back-btn"
-        title="Return to special events list"
         @click="goBack"
       />
       <Button
+        v-tooltip="'Edit this special event\'s name, budget, and date'"
         label="Edit Details"
         data-testid="edit-btn"
-        title="Edit this special event's name, budget, and date"
         @click="editEvent"
       />
       <Button
+        v-tooltip="'Add or remove allocations for this special event'"
         label="Adjust Allocations"
         data-testid="adjust-allocations-btn"
-        title="Add or remove allocations for this special event"
         @click="adjustAllocations"
       />
       <Button
+        v-tooltip="'Reload this special event\'s data'"
         label="Refresh"
         severity="secondary"
         data-testid="refresh-btn"
         :loading="store.loading"
-        title="Reload this special event's data"
         @click="refresh"
       />
     </div>

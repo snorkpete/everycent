@@ -6,6 +6,7 @@ import PrimeVue from 'primevue/config';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData, SinkFundData } from './sinkFund.types';
+import { getTooltipValue } from '../../test/tooltip-helper';
 
 // Selectors
 const ALLOCATIONS_TABLE = '[data-testid="allocations-table"]';
@@ -258,7 +259,7 @@ describe('SinkFundAllocationTable', () => {
       const rows = wrapper.findAll(ALLOCATION_ROW);
       const eyeBtn = rows[0].find(SHOW_TRANSACTIONS_BTN);
       expect(eyeBtn.exists()).toBe(true);
-      expect(eyeBtn.attributes('title')).toBe('Show transactions for this allocation');
+      expect(getTooltipValue(eyeBtn)).toBe('Show transactions for this allocation');
     });
 
     it('opens transactions dialog when eye icon is clicked', async () => {
@@ -363,7 +364,7 @@ describe('SinkFundAllocationTable', () => {
       const rows = wrapper.findAll(ALLOCATION_ROW);
       const deleteBtn = rows[0].find(DELETE_BTN);
       expect(deleteBtn.exists()).toBe(true);
-      expect(deleteBtn.attributes('title')).toBe('Delete this obligation');
+      expect(getTooltipValue(deleteBtn)).toBe('Delete this obligation');
     });
 
     it('toggles allocation.deleted when delete button is clicked', async () => {
@@ -385,7 +386,7 @@ describe('SinkFundAllocationTable', () => {
       const rows = wrapper.findAll(ALLOCATION_ROW);
       const undoBtn = rows[0].find(UNDO_DELETE_BTN);
       expect(undoBtn.exists()).toBe(true);
-      expect(undoBtn.attributes('title')).toBe('Undo delete');
+      expect(getTooltipValue(undoBtn)).toBe('Undo delete');
     });
 
     it('applies deleted-row styling when allocation is deleted', async () => {
@@ -404,7 +405,7 @@ describe('SinkFundAllocationTable', () => {
       const rows = wrapper.findAll(ALLOCATION_ROW);
       const deactivateBtn = rows[0].find(DEACTIVATE_BTN);
       expect(deactivateBtn.exists()).toBe(true);
-      expect(deactivateBtn.attributes('title')).toBe('Close this obligation');
+      expect(getTooltipValue(deactivateBtn)).toBe('Close this obligation');
     });
 
     it('toggles status to closed when deactivate button is clicked', async () => {
@@ -426,7 +427,7 @@ describe('SinkFundAllocationTable', () => {
       const rows = wrapper.findAll(ALLOCATION_ROW);
       const reactivateBtn = rows[0].find(REACTIVATE_BTN);
       expect(reactivateBtn.exists()).toBe(true);
-      expect(reactivateBtn.attributes('title')).toBe('Reopen this obligation');
+      expect(getTooltipValue(reactivateBtn)).toBe('Reopen this obligation');
     });
 
     it('toggles status to open when reactivate button is clicked', async () => {

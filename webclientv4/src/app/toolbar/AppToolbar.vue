@@ -22,7 +22,7 @@ const headingStore = useHeadingStore();
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--p-surface-800);
   line-height: 1.3;
 }
 </style>

@@ -4,8 +4,8 @@
       <h3 class="section-title">Incomes</h3>
       <Button
         v-if="store.isEditMode"
+        v-tooltip="'Add a new income row'"
         icon="pi pi-plus"
-        title="Add a new income row"
         severity="secondary"
         size="small"
         outlined
@@ -50,8 +50,8 @@
 
           <td v-if="store.isEditMode" class="col-actions">
             <Button
+              v-tooltip="income.deleted ? 'Undo delete' : 'Delete this income'"
               :icon="income.deleted ? 'pi pi-undo' : 'pi pi-trash'"
-              :title="income.deleted ? 'Undo delete' : 'Delete this income'"
               severity="danger"
               text
               size="small"

@@ -7,7 +7,7 @@ describe('EcTextField', () => {
   const label = 'First Name';
   const value = 'John';
 
-  function mountComponent(props: Record<string, unknown> = {}) {
+  function createWrapper(props: Record<string, unknown> = {}) {
     return mount(EcTextField, {
       props: {
         modelValue: value,
@@ -23,19 +23,19 @@ describe('EcTextField', () => {
 
   describe('read-only mode', () => {
     it('displays the label', () => {
-      const wrapper = mountComponent();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(label);
     });
 
     it('displays the value as plain text', () => {
-      const wrapper = mountComponent();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(value);
     });
 
     it('does not display an input field', () => {
-      const wrapper = mountComponent();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('input').exists()).toBe(false);
     });
@@ -43,7 +43,7 @@ describe('EcTextField', () => {
 
   describe('edit mode', () => {
     it('displays an input field with the value', () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
       const input = wrapper.find('input');
 
       expect(input.exists()).toBe(true);
@@ -51,14 +51,14 @@ describe('EcTextField', () => {
     });
 
     it('displays the label', () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
 
       expect(wrapper.text()).toContain(label);
     });
 
     it('emits update:modelValue when the input changes', async () => {
       const newValue = 'Jane';
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
 
       await wrapper.find('input').setValue(newValue);
 
@@ -67,13 +67,13 @@ describe('EcTextField', () => {
 
     it('uses the specified input type', () => {
       const type = 'email';
-      const wrapper = mountComponent({ editMode: true, type });
+      const wrapper = createWrapper({ editMode: true, type });
 
       expect(wrapper.find('input').attributes('type')).toBe(type);
     });
 
     it('defaults to text type', () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
 
       expect(wrapper.find('input').attributes('type')).toBe('text');
     });

@@ -43,7 +43,7 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function mountPage() {
+function createWrapper() {
   return mount(InstitutionsPage, {
     global: {
       plugins: [PrimeVue, createPinia()],
@@ -65,14 +65,14 @@ describe('InstitutionsPage', () => {
 
   describe('on mount', () => {
     it('sets the page heading to "Financial Institutions"', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Financial Institutions');
     });
 
     it('calls fetchAll on mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchAll).toHaveBeenCalled();
@@ -81,14 +81,14 @@ describe('InstitutionsPage', () => {
 
   describe('institution list', () => {
     it('renders all institution names', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(institution1.name);
       expect(wrapper.text()).toContain(institution2.name);
     });
 
     it('renders an Edit button for each institution', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).exists()).toBe(true);
       expect(wrapper.find(`[data-testid="edit-btn-${institution2.id}"]`).exists()).toBe(true);
@@ -97,7 +97,7 @@ describe('InstitutionsPage', () => {
 
   describe('Edit button', () => {
     it('opens the dialog with the selected institution', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
@@ -107,7 +107,7 @@ describe('InstitutionsPage', () => {
     });
 
     it('opens the dialog in view mode', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
@@ -118,7 +118,7 @@ describe('InstitutionsPage', () => {
 
   describe('Add Institution button', () => {
     it('opens the dialog with an empty institution', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -128,7 +128,7 @@ describe('InstitutionsPage', () => {
     });
 
     it('opens the dialog in edit mode', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -139,7 +139,7 @@ describe('InstitutionsPage', () => {
 
   describe('Refresh button', () => {
     it('calls fetchAll', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
 
@@ -148,7 +148,7 @@ describe('InstitutionsPage', () => {
 
     it('is disabled while the store is loading', () => {
       mockStore.loading = true;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const refreshBtn = wrapper.find('[data-testid="refresh-btn"]');
       expect(refreshBtn.attributes('disabled')).toBeDefined();
@@ -156,7 +156,7 @@ describe('InstitutionsPage', () => {
 
     it('is enabled when the store is not loading', () => {
       mockStore.loading = false;
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const refreshBtn = wrapper.find('[data-testid="refresh-btn"]');
       expect(refreshBtn.attributes('disabled')).toBeUndefined();
@@ -165,7 +165,7 @@ describe('InstitutionsPage', () => {
 
   describe('on save', () => {
     it('calls store.save with the institution data', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
@@ -176,7 +176,7 @@ describe('InstitutionsPage', () => {
     });
 
     it('closes the dialog and shows a success toast after a successful save', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
@@ -193,7 +193,7 @@ describe('InstitutionsPage', () => {
         mockStore.error = errorMessage;
         throw new Error('Server error');
       });
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
@@ -205,7 +205,7 @@ describe('InstitutionsPage', () => {
     });
 
     it('does not show an error toast on a clean mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockNotifyError).not.toHaveBeenCalled();

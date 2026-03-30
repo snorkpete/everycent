@@ -18,12 +18,12 @@
           >View Transactions</a
         >
         <Button
+          v-tooltip="'Toggle between showing all allocations and variable-only mode'"
           :label="variableOnly ? 'Variable Only' : 'All Allocations'"
           :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
           :outlined="!variableOnly"
           size="small"
           data-testid="variable-only-toggle"
-          title="Toggle between showing all allocations and variable-only mode"
           @click="variableOnly = !variableOnly"
         />
       </div>
