@@ -1,7 +1,7 @@
 # Task: Add inline prop to EcMoneyField for table usage
 
 **ID:** add-inline-prop-to-ecmoneyfield-for-table-usage
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
