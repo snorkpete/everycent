@@ -1,7 +1,7 @@
 # Task: Rename sinkFundStore.fetchList to fetchAll
 
 **ID:** rename-sinkfundstorefetchlist-to-fetchall
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
