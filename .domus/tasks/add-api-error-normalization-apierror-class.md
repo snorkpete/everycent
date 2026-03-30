@@ -1,7 +1,7 @@
 # Task: Add API error normalization (ApiError class)
 
 **ID:** add-api-error-normalization-apierror-class
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-28
