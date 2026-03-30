@@ -37,7 +37,7 @@ const creditCardAccount: BankAccountData = {
   payment_due_day: 28,
 };
 
-function mountDialog(props: Record<string, unknown> = {}) {
+function createWrapper(props: Record<string, unknown> = {}) {
   return mount(BankAccountEditDialog, {
     props: {
       visible: true,
@@ -56,13 +56,13 @@ function mountDialog(props: Record<string, unknown> = {}) {
 describe('BankAccountEditDialog', () => {
   describe('view mode (initialEditMode = false)', () => {
     it('displays the account name', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(existingAccount.name);
     });
 
     it('shows Make Changes and Close buttons', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
       const buttons = wrapper.findAll('button');
       const labels = buttons.map((b) => b.text());
 
@@ -71,7 +71,7 @@ describe('BankAccountEditDialog', () => {
     });
 
     it('does not show Save or Cancel buttons', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
       const buttons = wrapper.findAll('button');
       const labels = buttons.map((b) => b.text());
 
@@ -82,7 +82,7 @@ describe('BankAccountEditDialog', () => {
 
   describe('edit mode (initialEditMode = true)', () => {
     it('shows Save and Cancel buttons', () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
       const buttons = wrapper.findAll('button');
       const labels = buttons.map((b) => b.text());
 
@@ -91,7 +91,7 @@ describe('BankAccountEditDialog', () => {
     });
 
     it('does not show Make Changes or Close buttons', () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
       const buttons = wrapper.findAll('button');
       const labels = buttons.map((b) => b.text());
 
@@ -102,7 +102,7 @@ describe('BankAccountEditDialog', () => {
 
   describe('Make Changes button', () => {
     it('switches to edit mode', async () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       const makeChangesBtn = wrapper.findAll('button').find((b) => b.text() === 'Make Changes')!;
       await makeChangesBtn.trigger('click');
@@ -115,7 +115,7 @@ describe('BankAccountEditDialog', () => {
 
   describe('Cancel button', () => {
     it('reverts to view mode for an existing account', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const cancelBtn = wrapper.findAll('button').find((b) => b.text() === 'Cancel')!;
       await cancelBtn.trigger('click');
@@ -125,7 +125,7 @@ describe('BankAccountEditDialog', () => {
     });
 
     it('resets form data to original values for an existing account', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const nameField = wrapper.findAllComponents(EcTextField)[0];
       await nameField.vm.$emit('update:modelValue', 'Modified Name');
@@ -141,7 +141,7 @@ describe('BankAccountEditDialog', () => {
     });
 
     it('closes the dialog for a new account (no id)', async () => {
-      const wrapper = mountDialog({ bankAccount: { name: '' }, initialEditMode: true });
+      const wrapper = createWrapper({ bankAccount: { name: '' }, initialEditMode: true });
 
       const cancelBtn = wrapper.findAll('button').find((b) => b.text() === 'Cancel')!;
       await cancelBtn.trigger('click');
@@ -152,7 +152,7 @@ describe('BankAccountEditDialog', () => {
 
   describe('Close button', () => {
     it('emits update:visible false', async () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       const closeBtn = wrapper.findAll('button').find((b) => b.text() === 'Close')!;
       await closeBtn.trigger('click');
@@ -163,7 +163,7 @@ describe('BankAccountEditDialog', () => {
 
   describe('Save button', () => {
     it('emits save with the current form data', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
       await saveBtn.trigger('click');
@@ -174,7 +174,7 @@ describe('BankAccountEditDialog', () => {
     });
 
     it('converts statement_day and payment_due_day from strings to numbers for a credit card account', async () => {
-      const wrapper = mountDialog({ bankAccount: creditCardAccount, initialEditMode: true });
+      const wrapper = createWrapper({ bankAccount: creditCardAccount, initialEditMode: true });
 
       const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
       await saveBtn.trigger('click');
@@ -190,7 +190,7 @@ describe('BankAccountEditDialog', () => {
   describe('form reset on re-open', () => {
     it('resets form data when dialog becomes visible again', async () => {
       // Use view mode so the name renders as visible text (not inside an input)
-      const wrapper = mountDialog({ initialEditMode: false });
+      const wrapper = createWrapper({ initialEditMode: false });
 
       await wrapper.setProps({ visible: false });
       await wrapper.setProps({
@@ -204,19 +204,19 @@ describe('BankAccountEditDialog', () => {
 
   describe('credit card section', () => {
     it('does not show credit card fields for a normal account', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="credit-card-section"]').exists()).toBe(false);
     });
 
     it('shows credit card fields when account_type is credit_card', () => {
-      const wrapper = mountDialog({ bankAccount: creditCardAccount });
+      const wrapper = createWrapper({ bankAccount: creditCardAccount });
 
       expect(wrapper.find('[data-testid="credit-card-section"]').exists()).toBe(true);
     });
 
     it('shows credit card fields after switching account_type to credit_card', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
       expect(wrapper.find('[data-testid="credit-card-section"]').exists()).toBe(false);
 
       // The first EcListField is the "Account Features" (account_type) field

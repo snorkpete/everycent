@@ -13,7 +13,7 @@ describe('HomePage', () => {
     setActivePinia(pinia);
   });
 
-  function mountComponent() {
+  function createWrapper() {
     return mount(HomePage, {
       global: {
         plugins: [pinia],
@@ -22,7 +22,7 @@ describe('HomePage', () => {
   }
 
   it('renders welcome message', () => {
-    const wrapper = mountComponent();
+    const wrapper = createWrapper();
 
     expect(wrapper.find('[data-testid="welcome-heading"]').text()).toBe('Welcome to EveryCent');
     expect(wrapper.find('[data-testid="welcome-message"]').text()).toBe(
@@ -33,7 +33,7 @@ describe('HomePage', () => {
   it('sets the heading to Home on mount', () => {
     const headingStore = useHeadingStore();
 
-    mountComponent();
+    createWrapper();
 
     expect(headingStore.heading).toBe('Home');
   });

@@ -92,7 +92,7 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function mountPage() {
+function createWrapper() {
   return mount(FutureBudgetsPage, {
     global: {
       plugins: [PrimeVue, createPinia()],
@@ -113,14 +113,14 @@ describe('FutureBudgetsPage', () => {
 
   describe('on mount', () => {
     it('sets the page heading to "Future Budgets"', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Future Budgets');
     });
 
     it('calls fetchAll on mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchAll).toHaveBeenCalled();
@@ -129,7 +129,7 @@ describe('FutureBudgetsPage', () => {
 
   describe('table headers', () => {
     it('shows budget names as column headers', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain('Jan 2025');
       expect(wrapper.text()).toContain('Feb 2025');
@@ -138,14 +138,14 @@ describe('FutureBudgetsPage', () => {
 
   describe('income section', () => {
     it('renders the incomes section header', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="incomes-section-header"]').exists()).toBe(true);
       expect(wrapper.find('[data-testid="incomes-section-header"]').text()).toBe('Incomes');
     });
 
     it('renders a row for each income name', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const rows = wrapper.findAll('[data-testid="income-row"]');
       expect(rows).toHaveLength(1);
@@ -153,7 +153,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('shows amounts for each budget column', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const row = wrapper.find('[data-testid="income-row"]');
       expect(row.text()).toContain('5,000.00');
@@ -161,13 +161,13 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('shows an Add New Income button', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="add-income-btn"]').exists()).toBe(true);
     });
 
     it('shows total income row', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const totalRow = wrapper.find('[data-testid="total-income-row"]');
       expect(totalRow.exists()).toBe(true);
@@ -177,13 +177,13 @@ describe('FutureBudgetsPage', () => {
 
   describe('allocation section', () => {
     it('renders the allocations section header', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="allocations-section-header"]').exists()).toBe(true);
     });
 
     it('renders a category header row for each allocation category', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const header = wrapper.find('[data-testid="category-header-3"]');
       expect(header.exists()).toBe(true);
@@ -191,7 +191,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('renders allocation rows within each category', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
       expect(rows).toHaveLength(1);
@@ -199,20 +199,20 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('shows allocation amounts for each budget column', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const row = wrapper.findAll('[data-testid="allocation-row"]')[0];
       expect(row.text()).toContain('1,500.00');
     });
 
     it('shows an add-allocation button per category', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="add-allocation-btn-3"]').exists()).toBe(true);
     });
 
     it('shows total allocations row', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       const totalRow = wrapper.find('[data-testid="total-allocations-row"]');
       expect(totalRow.exists()).toBe(true);
@@ -222,21 +222,21 @@ describe('FutureBudgetsPage', () => {
 
   describe('summary footer', () => {
     it('shows total discretionary row', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="total-discretionary-row"]').exists()).toBe(true);
     });
 
     describe('when family_type is couple', () => {
       it('shows husband and wife rows', () => {
-        const wrapper = mountPage();
+        const wrapper = createWrapper();
 
         expect(wrapper.find('[data-testid="husband-row"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="wife-row"]').exists()).toBe(true);
       });
 
       it('uses names from settings', () => {
-        const wrapper = mountPage();
+        const wrapper = createWrapper();
 
         expect(wrapper.find('[data-testid="husband-row"]').text()).toContain("Alice's Amount");
         expect(wrapper.find('[data-testid="wife-row"]').text()).toContain("Bob's Amount");
@@ -249,7 +249,7 @@ describe('FutureBudgetsPage', () => {
       });
 
       it('shows a single person row', () => {
-        const wrapper = mountPage();
+        const wrapper = createWrapper();
 
         expect(wrapper.find('[data-testid="single-person-row"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="single-person-row"]').text()).toContain(
@@ -258,7 +258,7 @@ describe('FutureBudgetsPage', () => {
       });
 
       it('does not show husband or wife rows', () => {
-        const wrapper = mountPage();
+        const wrapper = createWrapper();
 
         expect(wrapper.find('[data-testid="husband-row"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="wife-row"]').exists()).toBe(false);
@@ -271,7 +271,7 @@ describe('FutureBudgetsPage', () => {
       });
 
       it('shows no per-person rows', () => {
-        const wrapper = mountPage();
+        const wrapper = createWrapper();
 
         expect(wrapper.find('[data-testid="husband-row"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="wife-row"]').exists()).toBe(false);
@@ -282,7 +282,7 @@ describe('FutureBudgetsPage', () => {
 
   describe('opening income dialog', () => {
     it('opens the dialog with income type when an income name is clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
@@ -293,7 +293,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('passes the correct amountsPerBudget for the income', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
@@ -302,7 +302,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('opens the dialog with empty amounts for new income', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-income-btn"]').trigger('click');
 
@@ -314,7 +314,7 @@ describe('FutureBudgetsPage', () => {
 
   describe('opening allocation dialog', () => {
     it('opens the dialog with allocation type when an allocation name is clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-allocation-Rent"]').trigger('click');
 
@@ -325,7 +325,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('passes the category id to the dialog', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-allocation-Rent"]').trigger('click');
 
@@ -334,7 +334,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('passes the correct amountsPerBudget for the allocation', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-allocation-Rent"]').trigger('click');
 
@@ -343,7 +343,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('opens the dialog for a new allocation when add button is clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-allocation-btn-3"]').trigger('click');
 
@@ -355,13 +355,13 @@ describe('FutureBudgetsPage', () => {
 
   describe('variable-only toggle', () => {
     it('shows a variable-only toggle button', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="variable-only-toggle"]').exists()).toBe(true);
     });
 
     it('defaults to "All Allocations" label', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain(
         'All Allocations',
@@ -369,7 +369,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('toggles label to "Variable Only" when clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
@@ -413,7 +413,7 @@ describe('FutureBudgetsPage', () => {
     it('shows all allocation rows in default mode', () => {
       setupVariableOnlyData();
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
 
       expect(rows).toHaveLength(4);
@@ -430,7 +430,7 @@ describe('FutureBudgetsPage', () => {
     it('does not show fixed subtotal rows in default mode', () => {
       setupVariableOnlyData();
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="fixed-subtotal-3"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="fixed-subtotal-5"]').exists()).toBe(false);
@@ -439,7 +439,7 @@ describe('FutureBudgetsPage', () => {
     it('does not show fixed total row in footer in default mode', () => {
       setupVariableOnlyData();
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="fixed-total-row"]').exists()).toBe(false);
     });
@@ -447,7 +447,7 @@ describe('FutureBudgetsPage', () => {
     it('hides allocations that are fixed in ALL budgets when variable-only is active', async () => {
       setupVariableOnlyData();
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
@@ -461,7 +461,7 @@ describe('FutureBudgetsPage', () => {
     it('keeps allocations that are variable in at least one budget', async () => {
       setupVariableOnlyData();
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
@@ -476,7 +476,7 @@ describe('FutureBudgetsPage', () => {
     it('shows per-category fixed subtotal row with correct amounts per budget', async () => {
       setupVariableOnlyData();
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       // Category 3 has Rent (150000) + Insurance (50000) = 200000 fixed in both budgets
@@ -493,7 +493,7 @@ describe('FutureBudgetsPage', () => {
     it('shows overall fixed total row in footer with correct amounts per budget', async () => {
       setupVariableOnlyData();
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const fixedTotalRow = wrapper.find('[data-testid="fixed-total-row"]');
@@ -508,7 +508,7 @@ describe('FutureBudgetsPage', () => {
 
   describe('Refresh button', () => {
     it('calls fetchAll when refresh button is clicked', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
 
@@ -524,7 +524,7 @@ describe('FutureBudgetsPage', () => {
     };
 
     it('calls store.massUpdate with the payload', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
@@ -535,7 +535,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('closes the dialog and shows success toast after successful save', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
@@ -553,7 +553,7 @@ describe('FutureBudgetsPage', () => {
         throw new Error('Server error');
       });
 
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });

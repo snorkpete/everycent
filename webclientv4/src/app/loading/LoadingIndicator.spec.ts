@@ -13,7 +13,7 @@ describe('LoadingIndicator', () => {
     setActivePinia(pinia);
   });
 
-  function mountComponent() {
+  function createWrapper() {
     return mount(LoadingIndicator, {
       global: {
         plugins: [pinia],
@@ -25,20 +25,20 @@ describe('LoadingIndicator', () => {
     const store = useLoadingIndicatorStore();
     store.startRequest();
 
-    const wrapper = mountComponent();
+    const wrapper = createWrapper();
 
     expect(wrapper.find('[data-testid="progress-bar"]').exists()).toBe(true);
   });
 
   it('hides the progress bar when not loading', () => {
-    const wrapper = mountComponent();
+    const wrapper = createWrapper();
 
     expect(wrapper.find('[data-testid="progress-bar"]').exists()).toBe(false);
   });
 
   it('reacts to loading state changes', async () => {
     const store = useLoadingIndicatorStore();
-    const wrapper = mountComponent();
+    const wrapper = createWrapper();
 
     expect(wrapper.find('[data-testid="progress-bar"]').exists()).toBe(false);
 

@@ -14,7 +14,7 @@ describe('EcListField', () => {
     { id: 3, name: 'Entertainment' },
   ];
 
-  function mountComponent(props: Record<string, unknown> = {}) {
+  function createWrapper(props: Record<string, unknown> = {}) {
     return mount(EcListField, {
       props: {
         modelValue: 1,
@@ -31,38 +31,38 @@ describe('EcListField', () => {
 
   describe('read-only mode', () => {
     it('displays the label', () => {
-      const wrapper = mountComponent();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(label);
     });
 
     it('displays the selected item name', () => {
       const selectedItem = items[1];
-      const wrapper = mountComponent({ modelValue: selectedItem.id });
+      const wrapper = createWrapper({ modelValue: selectedItem.id });
 
       expect(wrapper.text()).toContain(selectedItem.name);
     });
 
     it('displays an empty string when no item matches the value', () => {
-      const wrapper = mountComponent({ modelValue: 0 });
+      const wrapper = createWrapper({ modelValue: 0 });
 
       expect(wrapper.find('.value').text()).toBe('');
     });
 
     it('displays an empty string when modelValue is null', () => {
-      const wrapper = mountComponent({ modelValue: null });
+      const wrapper = createWrapper({ modelValue: null });
 
       expect(wrapper.find('.value').text()).toBe('');
     });
 
     it('displays an empty string when modelValue is undefined', () => {
-      const wrapper = mountComponent({ modelValue: undefined });
+      const wrapper = createWrapper({ modelValue: undefined });
 
       expect(wrapper.find('.value').text()).toBe('');
     });
 
     it('does not display a Select component', () => {
-      const wrapper = mountComponent();
+      const wrapper = createWrapper();
 
       expect(wrapper.findComponent(Select).exists()).toBe(false);
     });
@@ -70,32 +70,32 @@ describe('EcListField', () => {
 
   describe('edit mode', () => {
     it('displays a Select component', () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
 
       expect(wrapper.findComponent(Select).exists()).toBe(true);
     });
 
     it('displays the label', () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
 
       expect(wrapper.text()).toContain(label);
     });
 
     it('passes the items as options to the Select', () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
 
       expect(wrapper.findComponent(Select).props('options')).toEqual(items);
     });
 
     it('passes the current value to the Select', () => {
       const selectedId = 2;
-      const wrapper = mountComponent({ editMode: true, modelValue: selectedId });
+      const wrapper = createWrapper({ editMode: true, modelValue: selectedId });
 
       expect(wrapper.findComponent(Select).props('modelValue')).toBe(selectedId);
     });
 
     it('emits the selected id when the selection changes', async () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
       const newId = 3;
 
       wrapper.findComponent(Select).vm.$emit('update:modelValue', newId);
@@ -118,21 +118,21 @@ describe('EcListField', () => {
 
     it('displays selected item name for a string id in read-only mode', () => {
       const selectedItem = stringItems[0];
-      const wrapper = mountComponent({ items: stringItems, modelValue: selectedItem.id });
+      const wrapper = createWrapper({ items: stringItems, modelValue: selectedItem.id });
 
       expect(wrapper.find('.value').text()).toBe(selectedItem.name);
     });
 
     it('displays selected item name for a boolean id in read-only mode', () => {
       const selectedItem = boolItems[1]; // false / No
-      const wrapper = mountComponent({ items: boolItems, modelValue: selectedItem.id });
+      const wrapper = createWrapper({ items: boolItems, modelValue: selectedItem.id });
 
       expect(wrapper.find('.value').text()).toBe(selectedItem.name);
     });
 
     it('passes a string modelValue to the Select in edit mode', () => {
       const selectedId = 'credit_card';
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         editMode: true,
         items: stringItems,
         modelValue: selectedId,
@@ -142,13 +142,13 @@ describe('EcListField', () => {
     });
 
     it('passes a boolean modelValue to the Select in edit mode', () => {
-      const wrapper = mountComponent({ editMode: true, items: boolItems, modelValue: false });
+      const wrapper = createWrapper({ editMode: true, items: boolItems, modelValue: false });
 
       expect(wrapper.findComponent(Select).props('modelValue')).toBe(false);
     });
 
     it('emits a string value when selection changes', async () => {
-      const wrapper = mountComponent({ editMode: true, items: stringItems, modelValue: null });
+      const wrapper = createWrapper({ editMode: true, items: stringItems, modelValue: null });
 
       wrapper.findComponent(Select).vm.$emit('update:modelValue', 'normal');
       await nextTick();
@@ -157,7 +157,7 @@ describe('EcListField', () => {
     });
 
     it('emits a boolean value when selection changes', async () => {
-      const wrapper = mountComponent({ editMode: true, items: boolItems, modelValue: null });
+      const wrapper = createWrapper({ editMode: true, items: boolItems, modelValue: null });
 
       wrapper.findComponent(Select).vm.$emit('update:modelValue', true);
       await nextTick();
@@ -177,7 +177,7 @@ describe('EcListField', () => {
     ];
 
     it('passes grouped options to the Select when groupBy is set', () => {
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         editMode: true,
         items: groupedItems,
         groupBy: 'category',
@@ -191,7 +191,7 @@ describe('EcListField', () => {
     });
 
     it('groups items under the correct group labels', () => {
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         editMode: true,
         items: groupedItems,
         groupBy: 'category',
@@ -206,7 +206,7 @@ describe('EcListField', () => {
     });
 
     it('places items in the correct groups', () => {
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         editMode: true,
         items: groupedItems,
         groupBy: 'category',
@@ -227,7 +227,7 @@ describe('EcListField', () => {
         { id: 3, name: 'Bus', category_id: transportCategoryId, category: { name: 'Transport' } },
         { id: 1, name: 'Groceries', category_id: foodCategoryId, category: { name: 'Food' } },
       ];
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         editMode: true,
         items: reversedItems,
         groupBy: 'category',
@@ -239,7 +239,7 @@ describe('EcListField', () => {
     });
 
     it('passes flat options when groupBy is not set', () => {
-      const wrapper = mountComponent({ editMode: true });
+      const wrapper = createWrapper({ editMode: true });
       const options = wrapper.findComponent(Select).props('options');
 
       expect(options).toEqual(items);
@@ -247,7 +247,7 @@ describe('EcListField', () => {
 
     it('displays the selected item name in read-only mode with grouped items', () => {
       const selectedItem = groupedItems[1]; // Restaurant
-      const wrapper = mountComponent({
+      const wrapper = createWrapper({
         items: groupedItems,
         groupBy: 'category',
         modelValue: selectedItem.id,

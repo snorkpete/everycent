@@ -40,7 +40,7 @@ Key rules:
 
 ## Testing
 
-- `createWrapper()` helper must have explicit `: VueWrapper` return type annotation
+- **Mount helper must be named `createWrapper()`** — not `mountPage`, `mountDialog`, `mountComponent`, etc. Must have explicit `: VueWrapper` return type annotation.
 - **PrimeVue Dialog teleports to `document.body`** — always stub in tests (`stubs: { Dialog: DialogStub }`). See `docs/testing-patterns.md` for the stub template.
 - **Wallaby for interactive sessions; `npx vitest run <spec> --reporter=verbose` for worktree agents** — Wallaby cannot see worktree files
 - Interceptors live in `src/api/interceptors/` — each has its own spec with full coverage

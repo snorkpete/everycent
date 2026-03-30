@@ -10,7 +10,7 @@ import { DialogStub } from '../../test/stubs';
 const existingInstitution: InstitutionData = { id: 1, name: 'First Bank' };
 const newInstitution: InstitutionData = {};
 
-function mountDialog(props: Record<string, unknown> = {}) {
+function createWrapper(props: Record<string, unknown> = {}) {
   return mount(InstitutionEditDialog, {
     props: {
       visible: true,
@@ -28,27 +28,27 @@ function mountDialog(props: Record<string, unknown> = {}) {
 describe('InstitutionEditDialog', () => {
   describe('view mode (existing institution)', () => {
     it('shows the institution name', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(existingInstitution.name);
     });
 
     it('shows "Make Changes" and "Close" buttons', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="edit-btn"]').exists()).toBe(true);
       expect(wrapper.find('[data-testid="close-btn"]').exists()).toBe(true);
     });
 
     it('does not show "Save" or "Cancel" buttons', () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="save-btn"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="cancel-btn"]').exists()).toBe(false);
     });
 
     it('switches to edit mode when "Make Changes" is clicked', async () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
@@ -56,7 +56,7 @@ describe('InstitutionEditDialog', () => {
     });
 
     it('emits update:visible false when "Close" is clicked', async () => {
-      const wrapper = mountDialog();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="close-btn"]').trigger('click');
 
@@ -66,21 +66,21 @@ describe('InstitutionEditDialog', () => {
 
   describe('edit mode (existing institution)', () => {
     it('shows "Save" and "Cancel" buttons', () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       expect(wrapper.find('[data-testid="save-btn"]').exists()).toBe(true);
       expect(wrapper.find('[data-testid="cancel-btn"]').exists()).toBe(true);
     });
 
     it('does not show "Make Changes" or "Close" buttons', () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       expect(wrapper.find('[data-testid="edit-btn"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="close-btn"]').exists()).toBe(false);
     });
 
     it('emits save with the form data when "Save" is clicked', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
@@ -90,7 +90,7 @@ describe('InstitutionEditDialog', () => {
     });
 
     it('returns to view mode when "Cancel" is clicked on an existing institution', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       await wrapper.find('[data-testid="cancel-btn"]').trigger('click');
 
@@ -98,7 +98,7 @@ describe('InstitutionEditDialog', () => {
     });
 
     it('resets form data when "Cancel" is clicked on an existing institution', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       const nameField = wrapper.findComponent(EcTextField);
       await nameField.vm.$emit('update:modelValue', 'Modified Name');
@@ -112,7 +112,7 @@ describe('InstitutionEditDialog', () => {
     });
 
     it('does not emit update:visible when "Cancel" is clicked on an existing institution', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       await wrapper.find('[data-testid="cancel-btn"]').trigger('click');
 
@@ -122,7 +122,7 @@ describe('InstitutionEditDialog', () => {
 
   describe('edit mode (new institution)', () => {
     it('emits update:visible false when "Cancel" is clicked on a new institution', async () => {
-      const wrapper = mountDialog({ institution: newInstitution, initialEditMode: true });
+      const wrapper = createWrapper({ institution: newInstitution, initialEditMode: true });
 
       await wrapper.find('[data-testid="cancel-btn"]').trigger('click');
 
@@ -132,7 +132,7 @@ describe('InstitutionEditDialog', () => {
 
   describe('form reset on re-open', () => {
     it('resets form data when dialog becomes visible again', async () => {
-      const wrapper = mountDialog({ initialEditMode: false });
+      const wrapper = createWrapper({ initialEditMode: false });
 
       await wrapper.setProps({ visible: false });
       await wrapper.setProps({ visible: true, institution: { id: 2, name: 'Second Bank' } });
@@ -141,7 +141,7 @@ describe('InstitutionEditDialog', () => {
     });
 
     it('resets editMode to initialEditMode when dialog becomes visible again', async () => {
-      const wrapper = mountDialog({ initialEditMode: true });
+      const wrapper = createWrapper({ initialEditMode: true });
 
       await wrapper.setProps({ visible: false });
       await wrapper.setProps({ visible: true, initialEditMode: false });

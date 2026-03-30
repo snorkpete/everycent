@@ -43,7 +43,7 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function mountPage() {
+function createWrapper() {
   return mount(AllocationCategoriesPage, {
     global: {
       plugins: [PrimeVue, createPinia()],
@@ -64,14 +64,14 @@ describe('AllocationCategoriesPage', () => {
 
   describe('on mount', () => {
     it('sets the page heading to "Allocation Categories"', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Allocation Categories');
     });
 
     it('calls fetchAll on mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockStore.fetchAll).toHaveBeenCalled();
@@ -80,14 +80,14 @@ describe('AllocationCategoriesPage', () => {
 
   describe('category list', () => {
     it('renders all category names', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.text()).toContain(category1.name);
       expect(wrapper.text()).toContain(category2.name);
     });
 
     it('renders an Edit button for each category', () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       expect(wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).exists()).toBe(true);
       expect(wrapper.find(`[data-testid="edit-btn-${category2.id}"]`).exists()).toBe(true);
@@ -96,7 +96,7 @@ describe('AllocationCategoriesPage', () => {
 
   describe('Edit button', () => {
     it('opens the dialog with the selected category', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
@@ -106,7 +106,7 @@ describe('AllocationCategoriesPage', () => {
     });
 
     it('opens the dialog in view mode', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
@@ -117,7 +117,7 @@ describe('AllocationCategoriesPage', () => {
 
   describe('Add Allocation Category button', () => {
     it('opens the dialog with an empty category', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -127,7 +127,7 @@ describe('AllocationCategoriesPage', () => {
     });
 
     it('opens the dialog in edit mode', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -138,7 +138,7 @@ describe('AllocationCategoriesPage', () => {
 
   describe('Refresh button', () => {
     it('calls fetchAll', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
 
@@ -148,7 +148,7 @@ describe('AllocationCategoriesPage', () => {
 
   describe('on save', () => {
     it('calls store.save with the category data', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
@@ -159,7 +159,7 @@ describe('AllocationCategoriesPage', () => {
     });
 
     it('closes the dialog and shows a success toast after a successful save', async () => {
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
@@ -176,7 +176,7 @@ describe('AllocationCategoriesPage', () => {
         mockStore.error = errorMessage;
         throw new Error('Server error');
       });
-      const wrapper = mountPage();
+      const wrapper = createWrapper();
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
@@ -188,7 +188,7 @@ describe('AllocationCategoriesPage', () => {
     });
 
     it('does not show an error toast on a clean mount', async () => {
-      mountPage();
+      createWrapper();
       await nextTick();
 
       expect(mockNotifyError).not.toHaveBeenCalled();
