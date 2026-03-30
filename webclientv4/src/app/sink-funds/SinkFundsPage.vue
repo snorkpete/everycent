@@ -88,7 +88,7 @@ const showTransferDialog = ref(false);
 
 onMounted(async () => {
   headingStore.setHeading('Sink Fund Obligations');
-  await store.fetchList();
+  await store.fetchAll();
 
   const queryId = route.query.sink_fund_id ? Number(route.query.sink_fund_id) : null;
   if (queryId) {
