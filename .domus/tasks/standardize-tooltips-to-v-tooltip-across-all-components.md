@@ -1,7 +1,7 @@
 # Task: Standardize tooltips to v-tooltip across all components
 
 **ID:** standardize-tooltips-to-v-tooltip-across-all-components
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28

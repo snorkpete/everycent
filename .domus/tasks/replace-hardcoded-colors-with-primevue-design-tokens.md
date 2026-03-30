@@ -1,7 +1,7 @@
 # Task: Replace hardcoded colors with PrimeVue design tokens
 
 **ID:** replace-hardcoded-colors-with-primevue-design-tokens
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
