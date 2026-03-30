@@ -57,6 +57,7 @@
 import { computed } from 'vue';
 import { useBudgetStore } from './budgetStore';
 import { useSettingsStore } from '../settings/settingsStore';
+import { useWantsNeedsBudgetBreakdown } from './useWantsNeedsBudgetBreakdown';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 
 const budgetStore = useBudgetStore();
@@ -66,48 +67,28 @@ const familyType = computed(() => settingsStore.settings.family_type ?? 'couple'
 const wife = computed(() => settingsStore.settings.wife ?? 'Wife');
 const husband = computed(() => settingsStore.settings.husband ?? 'Husband');
 
+// Includes all allocations (even deleted) — BudgetSummary shows the full budget picture
+const allocations = computed(() => budgetStore.budget?.allocations ?? []);
+
 const totalIncome = computed(() => {
   const incomes = budgetStore.budget?.incomes ?? [];
   return incomes.reduce((sum, i) => sum + (i.amount ?? 0), 0);
 });
 
-const totalAllocations = computed(() => {
-  const allocations = budgetStore.budget?.allocations ?? [];
-  return allocations.reduce((sum, a) => sum + (a.amount ?? 0), 0);
-});
+const totalAllocations = computed(() =>
+  allocations.value.reduce((sum, a) => sum + (a.amount ?? 0), 0),
+);
 
 const totalDiscretionaryAmount = computed(() => totalIncome.value - totalAllocations.value);
 
-const needsAmount = computed(() => {
-  const allocations = budgetStore.budget?.allocations ?? [];
-  return allocations
-    .filter((a) => a.allocation_class === 'need')
-    .reduce((sum, a) => sum + (a.amount ?? 0), 0);
-});
-
-const savingsAmount = computed(() => {
-  const allocations = budgetStore.budget?.allocations ?? [];
-  return allocations
-    .filter((a) => a.allocation_class === 'savings')
-    .reduce((sum, a) => sum + (a.amount ?? 0), 0);
-});
-
-const wantsAmount = computed(() => totalIncome.value - needsAmount.value - savingsAmount.value);
-
-const needsPercentage = computed(() => {
-  if (totalIncome.value === 0) return 0;
-  return Math.round((needsAmount.value / totalIncome.value) * 100);
-});
-
-const savingsPercentage = computed(() => {
-  if (totalIncome.value === 0) return 0;
-  return Math.round((savingsAmount.value / totalIncome.value) * 100);
-});
-
-const wantsPercentage = computed(() => {
-  if (totalIncome.value === 0) return 0;
-  return 100 - needsPercentage.value - savingsPercentage.value;
-});
+const {
+  needsAmount,
+  savingsAmount,
+  wantsAmount,
+  needsPercentage,
+  savingsPercentage,
+  wantsPercentage,
+} = useWantsNeedsBudgetBreakdown(allocations, totalIncome);
 </script>
 
 <style scoped>

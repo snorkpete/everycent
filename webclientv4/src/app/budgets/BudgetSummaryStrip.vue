@@ -39,6 +39,7 @@
 import { computed } from 'vue';
 import { useBudgetStore } from './budgetStore';
 import { useSettingsStore } from '../settings/settingsStore';
+import { useWantsNeedsBudgetBreakdown } from './useWantsNeedsBudgetBreakdown';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
 
 const budgetStore = useBudgetStore();
@@ -49,15 +50,18 @@ const wife = computed(() => settingsStore.settings.wife ?? 'Wife');
 const husband = computed(() => settingsStore.settings.husband ?? 'Husband');
 const singlePerson = computed(() => settingsStore.settings.single_person ?? 'User');
 
+const activeAllocations = computed(
+  () => budgetStore.budget?.allocations?.filter((a) => !a.deleted) ?? [],
+);
+
 const totalIncome = computed(() => {
   const incomes = budgetStore.budget?.incomes ?? [];
   return incomes.filter((i) => !i.deleted).reduce((sum, i) => sum + (i.amount ?? 0), 0);
 });
 
-const totalAllocations = computed(() => {
-  const allocations = budgetStore.budget?.allocations ?? [];
-  return allocations.filter((a) => !a.deleted).reduce((sum, a) => sum + (a.amount ?? 0), 0);
-});
+const totalAllocations = computed(() =>
+  activeAllocations.value.reduce((sum, a) => sum + (a.amount ?? 0), 0),
+);
 
 const discretionaryTotal = computed(() => totalIncome.value - totalAllocations.value);
 
@@ -79,37 +83,10 @@ const discretionaryClass = computed(() => {
   return 'amount-positive';
 });
 
-// Needs/Wants/Savings percentages
-const activeAllocations = computed(
-  () => budgetStore.budget?.allocations?.filter((a) => !a.deleted) ?? [],
+const { needsPercentage, savingsPercentage, wantsPercentage } = useWantsNeedsBudgetBreakdown(
+  activeAllocations,
+  totalIncome,
 );
-
-const needsAmount = computed(() =>
-  activeAllocations.value
-    .filter((a) => a.allocation_class === 'need')
-    .reduce((sum, a) => sum + (a.amount ?? 0), 0),
-);
-
-const savingsAmount = computed(() =>
-  activeAllocations.value
-    .filter((a) => a.allocation_class === 'savings')
-    .reduce((sum, a) => sum + (a.amount ?? 0), 0),
-);
-
-const needsPercentage = computed(() => {
-  if (totalIncome.value === 0) return 0;
-  return Math.round((needsAmount.value / totalIncome.value) * 100);
-});
-
-const savingsPercentage = computed(() => {
-  if (totalIncome.value === 0) return 0;
-  return Math.round((savingsAmount.value / totalIncome.value) * 100);
-});
-
-const wantsPercentage = computed(() => {
-  if (totalIncome.value === 0) return 0;
-  return 100 - needsPercentage.value - savingsPercentage.value;
-});
 </script>
 
 <style scoped>
