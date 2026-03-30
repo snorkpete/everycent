@@ -5,8 +5,8 @@
       <div class="summary-cell">
         <span class="summary-label">Last Balance</span>
         <EcMoneyField
-          label=""
           :edit-mode="false"
+          inline
           :model-value="lastBankBalance"
           data-testid="last-bank-balance"
         />
@@ -14,8 +14,8 @@
       <div class="summary-cell summary-cell--center">
         <span class="summary-label">Transactions</span>
         <EcMoneyField
-          label=""
           :edit-mode="false"
+          inline
           :model-value="transactionTotal"
           data-testid="transaction-total"
         />
@@ -23,8 +23,8 @@
       <div class="summary-cell summary-cell--right">
         <span class="summary-label">Bank Balance</span>
         <EcMoneyField
-          label=""
           :edit-mode="false"
+          inline
           :model-value="currentBankBalance"
           data-testid="current-bank-balance"
         />
@@ -38,8 +38,8 @@
         <template v-if="showBudgetBalance">
           <span class="summary-label">Budget Balance</span>
           <EcMoneyField
-            label=""
             :edit-mode="false"
+            inline
             :model-value="currentBudgetBalance"
             data-testid="current-budget-balance"
           />
@@ -47,8 +47,8 @@
         <template v-else-if="showUnpaidBalance">
           <span class="summary-label">Unpaid Balance</span>
           <EcMoneyField
-            label=""
             :edit-mode="false"
+            inline
             :model-value="unpaidBalance"
             data-testid="unpaid-balance"
           />
@@ -64,7 +64,7 @@
             data-testid="calculator-total"
           >
             <span class="summary-label">Selected Total</span>
-            <EcMoneyField label="" :edit-mode="false" :model-value="store.selectedTotal" />
+            <EcMoneyField :edit-mode="false" inline :model-value="store.selectedTotal" />
             <Button
               v-tooltip="'Clear all selected transactions'"
               icon="pi pi-times"
@@ -84,8 +84,8 @@
         <template v-if="showBudgetBalance">
           <span class="summary-label">Diff</span>
           <EcMoneyField
-            label=""
             :edit-mode="false"
+            inline
             :model-value="budgetDifference"
             highlight-mode="zero"
             data-testid="budget-difference"
@@ -94,8 +94,8 @@
         <template v-else-if="showUnpaidBalance">
           <span class="summary-label">Unpaid Diff</span>
           <EcMoneyField
-            label=""
             :edit-mode="false"
+            inline
             :model-value="unpaidDifference"
             highlight-mode="zero"
             data-testid="unpaid-difference"
@@ -208,10 +208,6 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
   justify-content: flex-end;
 }
 
-.summary-cell--right :deep(.ec-money-field) {
-  margin-left: 0;
-}
-
 .summary-label {
   font-size: 0.7rem;
   color: var(--p-text-muted-color);
@@ -221,15 +217,7 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
   white-space: nowrap;
 }
 
-/* Make EcMoneyField sit inline within summary cells */
-.summary-cell :deep(.ec-money-field) {
-  display: inline;
-  margin-left: auto;
-  text-align: right;
-}
-.summary-cell :deep(.ec-money-field .label) {
-  display: none;
-}
+/* EcMoneyField size overrides */
 .summary-cell :deep(.money-display) {
   font-size: 0.875rem;
   font-weight: 600;

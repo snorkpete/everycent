@@ -1,7 +1,7 @@
 <template>
-  <div class="ec-money-field">
+  <div :class="['ec-money-field', { 'ec-money-field--inline': inline }]">
     <template v-if="editMode">
-      <label :for="inputId">{{ label }}</label>
+      <label v-if="!inline" :for="inputId">{{ label }}</label>
       <!--
         Native <input> is used instead of PrimeVue's InputText component intentionally.
         We rely on native @focus (select-all), @input (live model update), and @blur
@@ -27,7 +27,7 @@
       />
     </template>
     <template v-else>
-      <span class="label">{{ label }}</span>
+      <span v-if="!inline" class="label">{{ label }}</span>
       <span :class="['money-display', moneyDisplayClasses]">{{ formattedValue }}</span>
     </template>
   </div>
@@ -38,14 +38,11 @@ import { ref, computed, watch, useId } from 'vue';
 import { dollarsToCents } from '../../util/dollars-to-cents';
 import { centsToDollars } from '../../util/cents-to-dollars';
 
-const {
-  label = '',
-  editMode,
-  highlightMode,
-} = defineProps<{
+const { label = '', editMode, highlightMode, inline } = defineProps<{
   label?: string;
   editMode: boolean;
   highlightMode?: 'positive' | 'zero';
+  inline?: boolean;
 }>();
 
 const model = defineModel<number>({ default: 0 });
@@ -103,6 +100,15 @@ function onBlur() {
 .ec-money-field {
   display: flex;
   flex-direction: column;
+}
+
+.ec-money-field--inline {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.ec-money-field--inline .money-display {
+  font-variant-numeric: tabular-nums;
 }
 
 .money-input {

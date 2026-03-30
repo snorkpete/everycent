@@ -34,9 +34,9 @@ import { computed, useId } from 'vue';
 import Select from 'primevue/select';
 import type { ListItem, ListGroup } from './ec-list-field.types';
 
-const props = defineProps<{
+const { modelValue, label = '', editMode, items, groupBy, filterable } = defineProps<{
   modelValue: number | string | boolean | null | undefined;
-  label: string;
+  label?: string;
   editMode: boolean;
   items: ListItem[];
   /**
@@ -55,19 +55,17 @@ defineEmits<{
 const inputId = useId();
 
 const selectedItemName = computed(() =>
-  props.modelValue != null
-    ? (props.items.find((item) => item.id === props.modelValue)?.name ?? '')
-    : '',
+  modelValue != null ? (items.find((item) => item.id === modelValue)?.name ?? '') : '',
 );
 
 const groups = computed((): ListGroup[] => {
-  if (!props.groupBy || !props.items.length) return [];
+  if (!groupBy || !items.length) return [];
 
-  const groupByIdField = `${props.groupBy}_id`;
-  const groupByField = props.groupBy;
+  const groupByIdField = `${groupBy}_id`;
+  const groupByField = groupBy;
 
   const grouped: Record<string, ListGroup> = {};
-  for (const item of props.items) {
+  for (const item of items) {
     const groupId = String(item[groupByIdField]);
     if (!grouped[groupId]) {
       const groupObj = item[groupByField] as { name: string } | undefined;
@@ -82,13 +80,13 @@ const groups = computed((): ListGroup[] => {
   return Object.values(grouped).sort((a, b) => a.label.localeCompare(b.label));
 });
 
-const displayOptions = computed(() => (props.groupBy ? groups.value : props.items));
+const displayOptions = computed(() => (groupBy ? groups.value : items));
 
 const selectPt = computed(() => {
   const pt: Record<string, Record<string, string>> = {
     label: { class: 'ec-select-label' },
   };
-  if (props.groupBy) {
+  if (groupBy) {
     pt.optionGroupLabel = { class: 'ec-group-label' };
     pt.option = { class: 'ec-group-option' };
   }
@@ -100,6 +98,7 @@ const selectPt = computed(() => {
 .ec-list-field {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .label {

@@ -34,17 +34,17 @@
           </td>
           <td>{{ account.institution?.name ?? '' }}</td>
           <td class="money-cell">
-            <EcMoneyField label="" :edit-mode="false" :model-value="account.closing_balance" />
+            <EcMoneyField :edit-mode="false" inline :model-value="account.closing_balance" />
           </td>
           <td class="money-cell">
             <EcMoneyField
-              label=""
               :edit-mode="false"
+              inline
               :model-value="account.expected_closing_balance"
             />
           </td>
           <td class="money-cell">
-            <EcMoneyField label="" :edit-mode="false" :model-value="account.current_balance" />
+            <EcMoneyField :edit-mode="false" inline :model-value="account.current_balance" />
           </td>
         </tr>
       </tbody>
@@ -52,13 +52,13 @@
         <tr class="total-row">
           <th colspan="2" class="total-label">Total</th>
           <th class="money-cell">
-            <EcMoneyField label="" :edit-mode="false" :model-value="totalClosingBalance" />
+            <EcMoneyField :edit-mode="false" inline :model-value="totalClosingBalance" />
           </th>
           <th class="money-cell">
-            <EcMoneyField label="" :edit-mode="false" :model-value="totalExpectedClosingBalance" />
+            <EcMoneyField :edit-mode="false" inline :model-value="totalExpectedClosingBalance" />
           </th>
           <th class="money-cell">
-            <EcMoneyField label="" :edit-mode="false" :model-value="totalCurrentBalance" />
+            <EcMoneyField :edit-mode="false" inline :model-value="totalCurrentBalance" />
           </th>
         </tr>
       </tfoot>
@@ -197,18 +197,7 @@ const totalCurrentBalance = computed(() =>
   cursor: help;
 }
 
-/* EcMoneyField inline in table cells */
-.money-cell :deep(.ec-money-field) {
-  flex-direction: row;
-  justify-content: flex-end;
-}
-.money-cell :deep(.ec-money-field .label) {
-  display: none;
-}
-.money-cell :deep(.money-display) {
-  font-size: 0.875rem;
-}
-
+/* EcMoneyField size overrides per context */
 .total-row .money-cell :deep(.money-display) {
   font-size: 0.9375rem;
 }

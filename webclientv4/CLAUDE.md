@@ -30,7 +30,7 @@ For detailed rules and pattern explanations (e.g. during a code review), see `do
 Key rules:
 - Feature code under `src/app/<feature>/`; shared form components under `src/app/shared/form/`
 - Use a separate `FormData` type when form shape differs from the API type (number fields bound to `EcTextField` must be strings)
-- **`EcMoneyField`** — native `<input>`, not PrimeVue. Emits on `input`, reformats on `blur`. Has `highlightMode?: 'positive' | 'zero'` prop.
+- **`EcMoneyField`** — native `<input>`, not PrimeVue. Emits on `input`, reformats on `blur`. Props: `highlightMode?: 'positive' | 'zero'`, `inline?: boolean` (hides label, row layout for tables/strips). `label` is optional (defaults to `''`).
 - Store actions that fail must re-throw after setting `error.value`
 - `useNotifications()` at `src/app/notifications/` — `.success()` / `.error()`
 - Deep-clone reactive Vue props with `structuredClone(toRaw(props.x))` — `structuredClone` alone throws on Proxy objects

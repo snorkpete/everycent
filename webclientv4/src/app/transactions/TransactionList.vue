@@ -293,15 +293,6 @@ function autoAllocationClass(transaction: TransactionData) {
   width: 3.5%;
 }
 
-.col-allocation :deep(.ec-list-field) {
-  width: 100%;
-}
-
-.col-allocation :deep(.p-select) {
-  width: 100%;
-  max-width: 100%;
-}
-
 .col-description--truncate :deep(.text-display) {
   overflow: hidden;
   text-overflow: ellipsis;
