@@ -89,8 +89,8 @@
             <td class="amount-cell">
               <span class="spent-cell">
                 <button
+                  v-tooltip="'Show transactions for this allocation'"
                   class="eye-btn"
-                  title="Show transactions for this allocation"
                   data-testid="show-transactions-btn"
                   @click="showTransactions(allocation)"
                 >
@@ -146,8 +146,8 @@
             <!-- Delete action -->
             <td v-if="store.isEditMode" class="center-cell">
               <button
+                v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
                 class="delete-btn"
-                :title="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
                 :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
                 @click="toggleDeleted(allocation)"
               >

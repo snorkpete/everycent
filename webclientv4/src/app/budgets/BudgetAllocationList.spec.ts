@@ -8,6 +8,7 @@ import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog
 import type { BudgetDetailData } from './budget.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 import type { AllocationData } from '../transactions/transaction.types';
+import { getTooltipValue } from '../../test/tooltip-helper';
 
 import { DialogStub } from '../../test/stubs';
 
@@ -264,7 +265,7 @@ describe('BudgetAllocationList', () => {
       const wrapper = createWrapper();
 
       const button = wrapper.find(SHOW_TRANSACTIONS_BTN);
-      expect(button.attributes('title')).toBe('Show transactions for this allocation');
+      expect(getTooltipValue(button)).toBe('Show transactions for this allocation');
     });
 
     it('opens the transactions dialog when eye icon is clicked', async () => {
@@ -458,7 +459,7 @@ describe('BudgetAllocationList', () => {
       await nextTick();
 
       const button = wrapper.find(DELETE_BTN);
-      expect(button.attributes('title')).toBe('Delete allocation');
+      expect(getTooltipValue(button)).toBe('Delete allocation');
     });
 
     it('toggles deleted flag when delete button is clicked', async () => {
@@ -478,7 +479,7 @@ describe('BudgetAllocationList', () => {
 
       const undoBtn = wrapper.find(UNDO_DELETE_BTN);
       expect(undoBtn.exists()).toBe(true);
-      expect(undoBtn.attributes('title')).toBe('Undo delete');
+      expect(getTooltipValue(undoBtn)).toBe('Undo delete');
     });
 
     it('applies deleted-row class to deleted allocations', async () => {

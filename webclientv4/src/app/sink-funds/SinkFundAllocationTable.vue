@@ -69,8 +69,8 @@
           <td class="amount-cell">
             <span class="balance-cell">
               <button
+                v-tooltip="'Show transactions for this allocation'"
                 class="eye-btn"
-                title="Show transactions for this allocation"
                 data-testid="show-transactions-btn"
                 @click="onShowTransactions(allocation)"
               >
@@ -114,8 +114,8 @@
           <!-- Actions (edit mode only) -->
           <td v-if="store.isEditMode" class="center-cell action-buttons">
             <button
+              v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete this obligation'"
               :class="allocation.deleted ? '' : 'delete-btn'"
-              :title="allocation.deleted ? 'Undo delete' : 'Delete this obligation'"
               :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
               @click="toggleDeleted(allocation)"
             >
@@ -123,8 +123,8 @@
             </button>
             <button
               v-if="allocation.status === 'open'"
+              v-tooltip="'Close this obligation'"
               class="deactivate-btn"
-              title="Close this obligation"
               data-testid="deactivate-btn"
               @click="toggleStatus(allocation)"
             >
@@ -132,8 +132,8 @@
             </button>
             <button
               v-else
+              v-tooltip="'Reopen this obligation'"
               class="reactivate-btn"
-              title="Reopen this obligation"
               data-testid="reactivate-btn"
               @click="toggleStatus(allocation)"
             >

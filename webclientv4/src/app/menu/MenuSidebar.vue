@@ -9,10 +9,10 @@
       <button
         v-for="color in colorOptions"
         :key="color.name"
+        v-tooltip="`Switch to ${color.name} theme`"
         class="color-swatch"
         :class="{ active: activeColor === color.name }"
         :style="{ backgroundColor: color.preview }"
-        :title="`Switch to ${color.name} theme`"
         @click="setColor(color.name)"
       />
     </div>

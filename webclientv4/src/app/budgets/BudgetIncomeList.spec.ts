@@ -5,6 +5,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetIncomeList from './BudgetIncomeList.vue';
 import type { BudgetDetailData, IncomeData } from './budget.types';
+import { getTooltipValue } from '../../test/tooltip-helper';
 
 // Selectors
 const INCOME_ROW = '[data-testid="income-row"]';
@@ -181,7 +182,7 @@ describe('BudgetIncomeList', () => {
 
       const btn = wrapper.find(ADD_INCOME_BTN);
 
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
 
     it('shows delete buttons for each row', () => {
@@ -196,7 +197,7 @@ describe('BudgetIncomeList', () => {
 
       const btn = wrapper.find(deleteBtn(0));
 
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
 
     it('shows an actions column header in edit mode', () => {
@@ -341,7 +342,7 @@ describe('BudgetIncomeList', () => {
 
       const btn = wrapper.find(deleteBtn(0));
 
-      expect(btn.attributes('title')).toContain('Undo');
+      expect(getTooltipValue(btn)).toContain('Undo');
     });
   });
 

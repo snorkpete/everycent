@@ -110,18 +110,18 @@
         <!-- Action buttons -->
         <div class="action-bar">
           <Button
+            v-tooltip="'Check for duplicate transactions on the server'"
             label="Preview"
             severity="secondary"
             data-testid="preview-btn"
             :disabled="!hasMatchedAccounts || store.loading"
-            title="Check for duplicate transactions on the server"
             @click="onPreview"
           />
           <Button
+            v-tooltip="'Save new transactions to the database'"
             label="Import"
             data-testid="save-btn"
             :disabled="!hasMatchedAccounts || store.phase === 'parsed' || store.loading"
-            title="Save new transactions to the database"
             @click="onSave"
           />
         </div>
@@ -228,16 +228,16 @@
                   <td class="col-action">
                     <Button
                       v-if="transaction.import_status !== 'duplicate'"
+                      v-tooltip="
+                        transaction.deleted
+                          ? 'Restore this transaction'
+                          : 'Exclude this transaction from import'
+                      "
                       :icon="transaction.deleted ? 'pi pi-undo' : 'pi pi-trash'"
                       :severity="transaction.deleted ? 'secondary' : 'danger'"
                       text
                       size="small"
                       :data-testid="`delete-toggle-${accountIndex}-${txIndex}`"
-                      :title="
-                        transaction.deleted
-                          ? 'Restore this transaction'
-                          : 'Exclude this transaction from import'
-                      "
                       @click="store.toggleDeleteTransaction(accountIndex, txIndex)"
                     />
                   </td>

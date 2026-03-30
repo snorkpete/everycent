@@ -66,13 +66,13 @@
             <span class="summary-label">Selected Total</span>
             <EcMoneyField label="" :edit-mode="false" :model-value="store.selectedTotal" />
             <Button
+              v-tooltip="'Clear all selected transactions'"
               icon="pi pi-times"
               text
               severity="secondary"
               size="small"
               class="calculator-clear-btn"
               data-testid="calculator-clear-btn"
-              title="Clear all selected transactions"
               @click="store.clearSelections()"
             />
           </div>

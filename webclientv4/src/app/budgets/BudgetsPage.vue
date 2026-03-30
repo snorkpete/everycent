@@ -19,12 +19,12 @@
       </div>
       <div class="toolbar-right">
         <Button
+          v-tooltip="'Refresh budget list'"
           icon="pi pi-refresh"
           text
           severity="secondary"
           size="small"
           data-testid="refresh-btn"
-          title="Refresh budget list"
           @click="store.fetchAll()"
         />
       </div>

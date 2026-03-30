@@ -223,7 +223,7 @@ describe('SpecialEventDetailPage', () => {
       const wrapper = createWrapper();
 
       const btn = wrapper.find('[data-testid="back-btn"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
@@ -242,7 +242,7 @@ describe('SpecialEventDetailPage', () => {
       const wrapper = createWrapper();
 
       const btn = wrapper.find('[data-testid="edit-btn"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
@@ -262,7 +262,7 @@ describe('SpecialEventDetailPage', () => {
       const wrapper = createWrapper();
 
       const btn = wrapper.find('[data-testid="adjust-allocations-btn"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
@@ -288,7 +288,7 @@ describe('SpecialEventDetailPage', () => {
       const wrapper = createWrapper();
 
       const btn = wrapper.find('[data-testid="refresh-btn"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 

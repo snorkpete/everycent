@@ -28,9 +28,9 @@
       </span>
     </div>
     <div class="strip-item needs-wants-savings">
-      <span class="nws-pill nws-need" title="Needs">N {{ needsPercentage }}%</span>
-      <span class="nws-pill nws-want" title="Wants">W {{ wantsPercentage }}%</span>
-      <span class="nws-pill nws-savings" title="Savings">S {{ savingsPercentage }}%</span>
+      <span v-tooltip="'Needs'" class="nws-pill nws-need">N {{ needsPercentage }}%</span>
+      <span v-tooltip="'Wants'" class="nws-pill nws-want">W {{ wantsPercentage }}%</span>
+      <span v-tooltip="'Savings'" class="nws-pill nws-savings">S {{ savingsPercentage }}%</span>
     </div>
   </div>
 </template>

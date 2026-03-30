@@ -161,7 +161,7 @@ describe('SpecialEventsPage', () => {
       const wrapper = createWrapper();
 
       const editBtn = wrapper.find('[data-testid="edit-btn-1"]');
-      expect(editBtn.attributes('title')).toBeTruthy();
+      expect(editBtn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
@@ -194,7 +194,7 @@ describe('SpecialEventsPage', () => {
       const wrapper = createWrapper();
 
       const deleteBtn = wrapper.find('[data-testid="delete-btn-1"]');
-      expect(deleteBtn.attributes('title')).toBeTruthy();
+      expect(deleteBtn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 

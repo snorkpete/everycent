@@ -34,7 +34,8 @@ Key rules:
 - Store actions that fail must re-throw after setting `error.value`
 - `useNotifications()` at `src/app/notifications/` — `.success()` / `.error()`
 - Deep-clone reactive Vue props with `structuredClone(toRaw(props.x))` — `structuredClone` alone throws on Proxy objects
-- **Icon-only buttons must have a `title` attribute** explaining what the button does in plain language (not just the action — what it achieves)
+- **Icon-only buttons must have a `v-tooltip`** explaining what the button does in plain language (not just the action — what it achieves). Never use the native HTML `title` attribute — always use PrimeVue's `v-tooltip` directive.
+- **Use PrimeVue design tokens for colors** — never hardcode hex colors or rgba values in CSS. Use `var(--p-green-600)`, `var(--p-red-600)`, `var(--p-surface-*)`, `var(--p-text-muted-color)`, etc. Exception: MenuSidebar theme preview swatches.
 - Use `bankAccountApi.getOpen()` for dropdowns/selection UI — returns open accounts sorted by category
 
 ## Testing

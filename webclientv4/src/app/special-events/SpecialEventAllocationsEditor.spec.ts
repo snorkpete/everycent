@@ -282,7 +282,7 @@ describe('SpecialEventAllocationsEditor', () => {
       await flushPromises();
 
       const btn = wrapper.find('[data-testid="remove-btn-10"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
@@ -524,7 +524,7 @@ describe('SpecialEventAllocationsEditor', () => {
       await nextTick();
 
       const btn = wrapper.find('[data-testid="add-btn-12"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
@@ -633,7 +633,7 @@ describe('SpecialEventAllocationsEditor', () => {
       await flushPromises();
 
       const btn = wrapper.find('[data-testid="save-btn"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
@@ -655,7 +655,7 @@ describe('SpecialEventAllocationsEditor', () => {
       await flushPromises();
 
       const btn = wrapper.find('[data-testid="cancel-btn"]');
-      expect(btn.attributes('title')).toBeTruthy();
+      expect(btn.attributes('data-pd-tooltip')).toBeTruthy();
     });
   });
 
