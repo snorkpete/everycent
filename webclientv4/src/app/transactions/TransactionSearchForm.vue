@@ -11,7 +11,7 @@
     />
     <Select
       v-model="selectedBudgetId"
-      :options="store.budgetsForDropdown"
+      :options="store.currentAndPastBudgets"
       option-label="name"
       option-value="id"
       placeholder="Budget"
@@ -62,7 +62,7 @@ watch(
     const queryBankAccountId = route.query.bank_account_id ? Number(route.query.bank_account_id) : null;
 
     const firstAccount = accounts[0];
-    const firstBudget = store.budgetsForDropdown[0];
+    const firstBudget = store.currentAndPastBudgets[0];
 
     selectedBankAccountId.value = queryBankAccountId ?? firstAccount?.id ?? null;
     selectedBudgetId.value = queryBudgetId ?? firstBudget?.id ?? null;

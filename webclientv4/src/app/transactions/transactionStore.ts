@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { transactionApi } from './transactionApi';
 import { budgetApi } from '../budgets/budgetApi';
 import { bankAccountApi } from '../bank-accounts/bankAccountApi';
+import { useCurrentAndPastBudgets } from '../budgets/useCurrentAndPastBudgets';
 import type { TransactionData, AllocationData, SinkFundAllocationData } from './transaction.types';
 import type { MatchType } from '../budgets/autoAllocate.types';
 import type { BudgetData } from '../budgets/budget.types';
@@ -15,31 +16,21 @@ export const useTransactionStore = defineStore('transactions', () => {
   const isEditMode = ref(false);
   const allocations = ref<AllocationData[]>([]);
   const sinkFundAllocations = ref<SinkFundAllocationData[]>([]);
-  const budgets = ref<BudgetData[]>([]);
+  const { budgets, currentAndPastBudgets, fetchBudgets } = useCurrentAndPastBudgets();
   const bankAccounts = ref<BankAccountData[]>([]);
   const selectedBankAccount = ref<BankAccountData | null>(null);
   const selectedBudget = ref<BudgetData | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const budgetsForDropdown = computed(() => {
-    // Current budget = earliest open budget by start_date.
-    // API returns budgets sorted by start_date desc, so the current budget is the last open one.
-    const openBudgets = budgets.value.filter((b) => b.status === 'open');
-    const currentBudget = openBudgets.length > 0 ? openBudgets[openBudgets.length - 1] : null;
-    const closedBudgets = budgets.value.filter((b) => b.status === 'closed');
-    return currentBudget ? [currentBudget, ...closedBudgets] : closedBudgets;
-  });
-
   async function fetchMetadata() {
     loading.value = true;
     error.value = null;
     try {
-      const [loadedBudgets, loadedAccounts] = await Promise.all([
-        budgetApi.getAll(),
+      const [, loadedAccounts] = await Promise.all([
+        fetchBudgets(),
         bankAccountApi.getOpen(),
       ]);
-      budgets.value = loadedBudgets;
       bankAccounts.value = loadedAccounts;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load metadata';
@@ -221,7 +212,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     selectedBudget,
     loading,
     error,
-    budgetsForDropdown,
+    currentAndPastBudgets,
     fetchMetadata,
     fetch,
     save,

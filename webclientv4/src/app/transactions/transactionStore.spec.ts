@@ -847,57 +847,18 @@ describe('transactionStore', () => {
     });
   });
 
-  describe('budgetsForDropdown computed', () => {
-    it('includes only the current budget (earliest open) followed by closed budgets', () => {
-      const store = useTransactionStore();
-      // API returns budgets sorted by start_date desc
-      store.budgets = [
-        { id: 4, name: 'Feb 2025', status: 'open' },
-        { id: 3, name: 'Jan 2025', status: 'open' },
-        { id: 2, name: 'Dec 2024', status: 'closed' },
-        { id: 1, name: 'Nov 2024', status: 'closed' },
-      ];
-
-      expect(store.budgetsForDropdown).toEqual([
-        { id: 3, name: 'Jan 2025', status: 'open' },
-        { id: 2, name: 'Dec 2024', status: 'closed' },
-        { id: 1, name: 'Nov 2024', status: 'closed' },
-      ]);
-    });
-
-    it('excludes future open budgets (current = earliest open by start_date)', () => {
-      const store = useTransactionStore();
-      // API returns budgets sorted by start_date desc
-      store.budgets = [
-        { id: 5, name: 'Mar 2025', status: 'open' },
-        { id: 4, name: 'Feb 2025', status: 'open' },
-        { id: 3, name: 'Jan 2025', status: 'closed' },
-      ];
-
-      expect(store.budgetsForDropdown).toEqual([
-        { id: 4, name: 'Feb 2025', status: 'open' },
-        { id: 3, name: 'Jan 2025', status: 'closed' },
-      ]);
-    });
-
-    it('includes only closed budgets when there are no open budgets', () => {
+  describe('currentAndPastBudgets computed', () => {
+    it('is wired to useCurrentAndPastBudgets composable and reflects budgets', () => {
       const store = useTransactionStore();
       store.budgets = [
-        { id: 1, name: 'Nov 2024', status: 'closed' },
+        { id: 1, name: 'Jan 2025', status: 'open' },
         { id: 2, name: 'Dec 2024', status: 'closed' },
       ];
 
-      expect(store.budgetsForDropdown).toEqual([
-        { id: 1, name: 'Nov 2024', status: 'closed' },
+      expect(store.currentAndPastBudgets).toEqual([
+        { id: 1, name: 'Jan 2025', status: 'open' },
         { id: 2, name: 'Dec 2024', status: 'closed' },
       ]);
-    });
-
-    it('returns empty array when budgets is empty', () => {
-      const store = useTransactionStore();
-      store.budgets = [];
-
-      expect(store.budgetsForDropdown).toEqual([]);
     });
   });
 });
