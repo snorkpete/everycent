@@ -22,7 +22,7 @@ vi.mock('vue-router', () => ({
 
 const mockStore = reactive({
   bankAccounts: [checkingAccount, savingsAccount] as BankAccountData[],
-  budgetsForDropdown: [jan2025, dec2024] as BudgetData[],
+  currentAndPastBudgets: [jan2025, dec2024] as BudgetData[],
   selectedBankAccount: checkingAccount as BankAccountData | null,
   selectedBudget: jan2025 as BudgetData | null,
 });
@@ -44,7 +44,7 @@ describe('TransactionSearchForm', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     mockStore.bankAccounts = [checkingAccount, savingsAccount];
-    mockStore.budgetsForDropdown = [jan2025, dec2024];
+    mockStore.currentAndPastBudgets = [jan2025, dec2024];
     mockStore.selectedBankAccount = checkingAccount;
     mockStore.selectedBudget = jan2025;
     mockRoute.query = {};
@@ -83,7 +83,7 @@ describe('TransactionSearchForm', () => {
   describe('Go to Budget link', () => {
     it('links to /budgets when no bank account/budget are selected yet', async () => {
       mockStore.bankAccounts = [];
-      mockStore.budgetsForDropdown = [];
+      mockStore.currentAndPastBudgets = [];
       const wrapper = createWrapper();
       await nextTick();
 

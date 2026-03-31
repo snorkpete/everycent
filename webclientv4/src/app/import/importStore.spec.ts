@@ -136,12 +136,12 @@ describe('importStore', () => {
       expect(store.loading).toBe(false);
     });
 
-    it('sets error and re-throws on failure', async () => {
+    it('sets error on failure without re-throwing', async () => {
       vi.mocked(budgetApi.getAll).mockRejectedValue(new Error('Network error'));
       vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
 
       const store = useImportStore();
-      await expect(store.fetchMetadata()).rejects.toThrow('Network error');
+      await store.fetchMetadata();
 
       expect(store.error).toBe('Network error');
       expect(store.loading).toBe(false);
@@ -171,22 +171,15 @@ describe('importStore', () => {
     });
   });
 
-  describe('budgetsForDropdown', () => {
-    it('puts open budgets before closed budgets', () => {
+  describe('currentAndPastBudgets computed', () => {
+    it('is wired to useCurrentAndPastBudgets composable and reflects budgets', () => {
       const store = useImportStore();
       store.budgets = [
         { id: 1, name: 'Nov 2025', status: 'closed' },
         { id: 2, name: 'Jan 2026', status: 'open' },
       ];
 
-      expect(store.budgetsForDropdown.map((b) => b.id)).toEqual([2, 1]);
-    });
-
-    it('returns empty array when budgets is empty', () => {
-      const store = useImportStore();
-      store.budgets = [];
-
-      expect(store.budgetsForDropdown).toEqual([]);
+      expect(store.currentAndPastBudgets.map((b) => b.id)).toEqual([2, 1]);
     });
   });
 

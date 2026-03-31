@@ -6,7 +6,7 @@
         <label class="budget-label">Budget:</label>
         <Select
           v-model="selectedBudgetId"
-          :options="store.budgetsForDropdown"
+          :options="store.currentAndPastBudgets"
           option-label="name"
           option-value="id"
           placeholder="Select budget"
