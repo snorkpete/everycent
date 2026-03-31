@@ -26,6 +26,7 @@ const NAME_INPUT = '[data-testid="allocation-name-input"]';
 const CLASS_SELECT = '[data-testid="allocation-class-select"]';
 const FIXED_CHECKBOX = '[data-testid="allocation-fixed-checkbox"]';
 const COMMENT_INPUT = '[data-testid="allocation-comment-input"]';
+const VARIABLE_ONLY_TOGGLE = '[data-testid="variable-only-toggle"]';
 
 const categories: AllocationCategoryData[] = [
   { id: 10, name: 'Essentials' },
@@ -116,6 +117,13 @@ function createWrapper(): VueWrapper {
       stubs: { Dialog: DialogStub },
     },
   });
+}
+
+async function createVariableOnlyWrapper(): Promise<VueWrapper> {
+  const wrapper = createWrapper();
+  await wrapper.find(VARIABLE_ONLY_TOGGLE).trigger('click');
+  await nextTick();
+  return wrapper;
 }
 
 describe('BudgetAllocationList', () => {
@@ -582,18 +590,29 @@ describe('BudgetAllocationList', () => {
   });
 
   describe('variable-only mode', () => {
-    function createVariableWrapper(): VueWrapper {
-      return mount(BudgetAllocationList, {
-        props: { variableOnly: true },
-        global: {
-          plugins: [PrimeVue, createPinia()],
-          stubs: { Dialog: DialogStub },
-        },
-      });
-    }
+    it('shows a variable-only toggle button', () => {
+      const wrapper = createWrapper();
 
-    it('hides individual fixed allocations when variableOnly is true', () => {
-      const wrapper = createVariableWrapper();
+      expect(wrapper.find(VARIABLE_ONLY_TOGGLE).exists()).toBe(true);
+    });
+
+    it('defaults to "All Allocations" label', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(VARIABLE_ONLY_TOGGLE).text()).toContain('All Allocations');
+    });
+
+    it('toggles label to "Variable Only" when clicked', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find(VARIABLE_ONLY_TOGGLE).trigger('click');
+      await nextTick();
+
+      expect(wrapper.find(VARIABLE_ONLY_TOGGLE).text()).toContain('Variable Only');
+    });
+
+    it('hides individual fixed allocations when toggle is active', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
       // Rent (is_fixed_amount=true) should be hidden; Groceries + Entertainment remain
@@ -601,8 +620,8 @@ describe('BudgetAllocationList', () => {
       expect(rows.map((r) => r.text()).join()).not.toContain('Rent');
     });
 
-    it('shows a per-category "Fixed" subtotal row', () => {
-      const wrapper = createVariableWrapper();
+    it('shows a per-category "Fixed" subtotal row', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
       expect(fixedRow.exists()).toBe(true);
@@ -610,16 +629,16 @@ describe('BudgetAllocationList', () => {
       expect(fixedRow.text()).toContain('1,000.00');
     });
 
-    it('does not show per-category fixed subtotal row when no fixed allocations in that category', () => {
-      const wrapper = createVariableWrapper();
+    it('does not show per-category fixed subtotal row when no fixed allocations in that category', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       // Lifestyle (cat 20) has no fixed allocations
       const fixedRow = wrapper.find('[data-testid="fixed-subtotal-20"]');
       expect(fixedRow.exists()).toBe(false);
     });
 
-    it('category totals still sum all allocations (fixed + variable)', () => {
-      const wrapper = createVariableWrapper();
+    it('category totals still sum all allocations (fixed + variable)', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       // Essentials: Groceries 500 + Rent 1000 = 1500.00
       const header = wrapper.find(CATEGORY_HEADER(10));
@@ -627,8 +646,8 @@ describe('BudgetAllocationList', () => {
       expect(amountCell.text()).toBe('1,500.00');
     });
 
-    it('footer totals still reflect full budget', () => {
-      const wrapper = createVariableWrapper();
+    it('footer totals still reflect full budget', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       // All: 500 + 1000 + 200 = 1700.00
       const footer = wrapper.find(TOTAL_ROW);
@@ -636,8 +655,8 @@ describe('BudgetAllocationList', () => {
       expect(amountCell.text()).toBe('1,700.00');
     });
 
-    it('shows overall fixed total row in footer', () => {
-      const wrapper = createVariableWrapper();
+    it('shows overall fixed total row in footer', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       const fixedTotalRow = wrapper.find('[data-testid="fixed-total-row"]');
       expect(fixedTotalRow.exists()).toBe(true);
@@ -645,8 +664,8 @@ describe('BudgetAllocationList', () => {
       expect(fixedTotalRow.text()).toContain('1,000.00');
     });
 
-    it('spent column is visible in variable-only mode', () => {
-      const wrapper = createVariableWrapper();
+    it('spent column is visible in variable-only mode', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       const headerCells = wrapper.findAll('thead th');
       const headerTexts = headerCells.map((h) => h.text());
@@ -655,8 +674,7 @@ describe('BudgetAllocationList', () => {
 
     it('new allocations can be added in variable-only mode in edit mode', async () => {
       mockStore.isEditMode = true;
-      const wrapper = createVariableWrapper();
-      await nextTick();
+      const wrapper = await createVariableOnlyWrapper();
       const initialCount = mockStore.budget!.allocations.length;
 
       await wrapper.find(ADD_ALLOCATION_BTN(10)).trigger('click');
@@ -664,30 +682,30 @@ describe('BudgetAllocationList', () => {
       expect(mockStore.budget!.allocations).toHaveLength(initialCount + 1);
     });
 
-    it('shows all allocations when variableOnly is false (default)', () => {
+    it('shows all allocations when toggle is not active (default)', () => {
       const wrapper = createWrapper();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
       expect(rows).toHaveLength(3);
     });
 
-    it('does not show fixed subtotal rows when variableOnly is false', () => {
+    it('does not show fixed subtotal rows when toggle is not active', () => {
       const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="fixed-subtotal-10"]').exists()).toBe(false);
     });
 
-    it('does not show overall fixed total row when variableOnly is false', () => {
+    it('does not show overall fixed total row when toggle is not active', () => {
       const wrapper = createWrapper();
 
       expect(wrapper.find('[data-testid="fixed-total-row"]').exists()).toBe(false);
     });
 
-    it('shows category header + fixed subtotal only when all allocations in category are fixed', () => {
+    it('shows category header + fixed subtotal only when all allocations in category are fixed', async () => {
       // Make all allocations in Essentials fixed
       mockStore.budget!.allocations[0].is_fixed_amount = true; // Groceries
       mockStore.budget!.allocations[1].is_fixed_amount = true; // Rent (already true)
-      const wrapper = createVariableWrapper();
+      const wrapper = await createVariableOnlyWrapper();
 
       // No variable allocation rows for Essentials
       const rows = wrapper.findAll(ALLOCATION_ROW);
@@ -704,8 +722,8 @@ describe('BudgetAllocationList', () => {
       expect(fixedRow.text()).toContain('1,500.00');
     });
 
-    it('fixed subtotal row shows spent for fixed allocations', () => {
-      const wrapper = createVariableWrapper();
+    it('fixed subtotal row shows spent for fixed allocations', async () => {
+      const wrapper = await createVariableOnlyWrapper();
 
       const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
       // Rent spent: 1000.00
