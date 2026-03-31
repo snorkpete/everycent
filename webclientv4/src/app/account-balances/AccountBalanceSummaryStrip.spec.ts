@@ -87,10 +87,10 @@ describe('AccountBalanceSummaryStrip', () => {
     expect(wrapper.text()).toContain('-1,000.00');
   });
 
-  it('uses EcMoneyField for values', () => {
+  it('uses EcMoneyDisplay for values', () => {
     const wrapper = createWrapper();
 
-    const moneyFields = wrapper.findAllComponents({ name: 'EcMoneyField' });
-    expect(moneyFields.length).toBe(6);
+    const moneyDisplays = wrapper.findAllComponents({ name: 'EcMoneyDisplay' });
+    expect(moneyDisplays.length).toBe(6);
   });
 });

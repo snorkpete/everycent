@@ -65,59 +65,33 @@ describe('EcMoneyField', () => {
       expect(wrapper.find('input').exists()).toBe(false);
     });
 
-    it('applies negative styling for negative values', () => {
-      const cents = -500;
-      const wrapper = createWrapper({ modelValue: cents });
-      const valueEl = wrapper.find('.money-display');
-
-      expect(valueEl.classes()).toContain('negative');
-    });
-
-    it('does not apply negative styling for positive values', () => {
-      const cents = 500;
-      const wrapper = createWrapper({ modelValue: cents });
+    it('does not apply any styling by default (no highlight mode)', () => {
+      const wrapper = createWrapper({ modelValue: -500 });
       const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).not.toContain('negative');
-    });
-
-    it('does not apply negative styling for zero value', () => {
-      const cents = 0;
-      const wrapper = createWrapper({ modelValue: cents });
-      const valueEl = wrapper.find('.money-display');
-
-      expect(valueEl.classes()).not.toContain('negative');
-    });
-
-    it('does not apply positive styling by default', () => {
-      const cents = 500;
-      const wrapper = createWrapper({ modelValue: cents });
-      const valueEl = wrapper.find('.money-display');
-
       expect(valueEl.classes()).not.toContain('positive');
+      expect(valueEl.classes()).not.toContain('muted');
     });
 
-    it('applies positive styling when highlightMode is positive', () => {
-      const cents = 500;
+    it('applies balance highlight mode styling when specified', () => {
       const wrapper = createWrapper({
-        modelValue: cents,
-        highlightMode: 'positive',
+        modelValue: 500,
+        highlightMode: 'balance',
       });
       const valueEl = wrapper.find('.money-display');
 
       expect(valueEl.classes()).toContain('positive');
     });
 
-    it('does not apply positive styling for negative values even when highlightMode is positive', () => {
-      const cents = -500;
+    it('applies muted styling for zero in balance mode', () => {
       const wrapper = createWrapper({
-        modelValue: cents,
-        highlightMode: 'positive',
+        modelValue: 0,
+        highlightMode: 'balance',
       });
       const valueEl = wrapper.find('.money-display');
 
-      expect(valueEl.classes()).not.toContain('positive');
-      expect(valueEl.classes()).toContain('negative');
+      expect(valueEl.classes()).toContain('muted');
     });
   });
 
@@ -149,7 +123,9 @@ describe('EcMoneyField', () => {
 
       await wrapper.find('input').setValue(dollarInput);
 
-      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expectedCents]);
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+        expectedCents,
+      ]);
     });
 
     it('handles input with commas by stripping them before converting', async () => {
@@ -159,7 +135,9 @@ describe('EcMoneyField', () => {
 
       await wrapper.find('input').setValue(dollarInput);
 
-      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expectedCents]);
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
+        expectedCents,
+      ]);
     });
 
     it('emits 0 for non-numeric input', async () => {
@@ -244,27 +222,27 @@ describe('EcMoneyField', () => {
       expect(input.element.value).toBe('15.50');
     });
 
-    it('does not apply negative styling for zero value', () => {
-      const cents = 0;
-      const wrapper = createWrapper({ editMode: true, modelValue: cents });
+    it('does not apply any styling to input by default', () => {
+      const wrapper = createWrapper({ editMode: true, modelValue: -500 });
       const input = wrapper.find('.money-input');
 
       expect(input.classes()).not.toContain('negative');
+      expect(input.classes()).not.toContain('positive');
+      expect(input.classes()).not.toContain('muted');
     });
 
-    it('applies negative styling to input for negative values', () => {
-      const cents = -500;
-      const wrapper = createWrapper({ editMode: true, modelValue: cents });
+    it('applies negative styling to input in balance mode', () => {
+      const wrapper = createWrapper({ editMode: true, modelValue: -500, highlightMode: 'balance' });
       const input = wrapper.find('.money-input');
 
       expect(input.classes()).toContain('negative');
     });
   });
 
-  describe('highlightMode: zero', () => {
+  describe('highlightMode: difference', () => {
     describe('read-only mode', () => {
       it('applies positive styling when value is zero', () => {
-        const wrapper = createWrapper({ modelValue: 0, highlightMode: 'zero' });
+        const wrapper = createWrapper({ modelValue: 0, highlightMode: 'difference' });
         const valueEl = wrapper.find('.money-display');
 
         expect(valueEl.classes()).toContain('positive');
@@ -272,7 +250,7 @@ describe('EcMoneyField', () => {
       });
 
       it('applies negative styling when value is positive', () => {
-        const wrapper = createWrapper({ modelValue: 500, highlightMode: 'zero' });
+        const wrapper = createWrapper({ modelValue: 500, highlightMode: 'difference' });
         const valueEl = wrapper.find('.money-display');
 
         expect(valueEl.classes()).toContain('negative');
@@ -280,25 +258,17 @@ describe('EcMoneyField', () => {
       });
 
       it('applies negative styling when value is negative', () => {
-        const wrapper = createWrapper({ modelValue: -500, highlightMode: 'zero' });
+        const wrapper = createWrapper({ modelValue: -500, highlightMode: 'difference' });
         const valueEl = wrapper.find('.money-display');
 
         expect(valueEl.classes()).toContain('negative');
         expect(valueEl.classes()).not.toContain('positive');
       });
-
-      it('does not affect default behaviour when absent', () => {
-        const wrapper = createWrapper({ modelValue: 0 });
-        const valueEl = wrapper.find('.money-display');
-
-        expect(valueEl.classes()).not.toContain('positive');
-        expect(valueEl.classes()).not.toContain('negative');
-      });
     });
 
     describe('edit mode', () => {
       it('applies positive styling to input when value is zero', () => {
-        const wrapper = createWrapper({ editMode: true, modelValue: 0, highlightMode: 'zero' });
+        const wrapper = createWrapper({ editMode: true, modelValue: 0, highlightMode: 'difference' });
         const input = wrapper.find('.money-input');
 
         expect(input.classes()).toContain('positive');
@@ -306,7 +276,7 @@ describe('EcMoneyField', () => {
       });
 
       it('applies negative styling to input when value is positive', () => {
-        const wrapper = createWrapper({ editMode: true, modelValue: 500, highlightMode: 'zero' });
+        const wrapper = createWrapper({ editMode: true, modelValue: 500, highlightMode: 'difference' });
         const input = wrapper.find('.money-input');
 
         expect(input.classes()).toContain('negative');
@@ -314,19 +284,11 @@ describe('EcMoneyField', () => {
       });
 
       it('applies negative styling to input when value is negative', () => {
-        const wrapper = createWrapper({ editMode: true, modelValue: -500, highlightMode: 'zero' });
+        const wrapper = createWrapper({ editMode: true, modelValue: -500, highlightMode: 'difference' });
         const input = wrapper.find('.money-input');
 
         expect(input.classes()).toContain('negative');
         expect(input.classes()).not.toContain('positive');
-      });
-
-      it('does not affect default behaviour when absent', () => {
-        const wrapper = createWrapper({ editMode: true, modelValue: 0 });
-        const input = wrapper.find('.money-input');
-
-        expect(input.classes()).not.toContain('positive');
-        expect(input.classes()).not.toContain('negative');
       });
     });
   });

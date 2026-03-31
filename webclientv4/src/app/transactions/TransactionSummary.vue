@@ -4,30 +4,15 @@
     <div class="summary-grid">
       <div class="summary-cell">
         <span class="summary-label">Last Balance</span>
-        <EcMoneyField
-          :edit-mode="false"
-          inline
-          :model-value="lastBankBalance"
-          data-testid="last-bank-balance"
-        />
+        <EcMoneyDisplay :model-value="lastBankBalance" emphasis="subtotal" data-testid="last-bank-balance" />
       </div>
       <div class="summary-cell summary-cell--center">
         <span class="summary-label">Transactions</span>
-        <EcMoneyField
-          :edit-mode="false"
-          inline
-          :model-value="transactionTotal"
-          data-testid="transaction-total"
-        />
+        <EcMoneyDisplay :model-value="transactionTotal" emphasis="subtotal" data-testid="transaction-total" />
       </div>
       <div class="summary-cell summary-cell--right">
         <span class="summary-label">Bank Balance</span>
-        <EcMoneyField
-          :edit-mode="false"
-          inline
-          :model-value="currentBankBalance"
-          data-testid="current-bank-balance"
-        />
+        <EcMoneyDisplay :model-value="currentBankBalance" emphasis="subtotal" data-testid="current-bank-balance" />
       </div>
     </div>
 
@@ -37,21 +22,11 @@
       <div class="summary-cell">
         <template v-if="showBudgetBalance">
           <span class="summary-label">Budget Balance</span>
-          <EcMoneyField
-            :edit-mode="false"
-            inline
-            :model-value="currentBudgetBalance"
-            data-testid="current-budget-balance"
-          />
+          <EcMoneyDisplay :model-value="currentBudgetBalance" emphasis="subtotal" data-testid="current-budget-balance" />
         </template>
         <template v-else-if="showUnpaidBalance">
           <span class="summary-label">Unpaid Balance</span>
-          <EcMoneyField
-            :edit-mode="false"
-            inline
-            :model-value="unpaidBalance"
-            data-testid="unpaid-balance"
-          />
+          <EcMoneyDisplay :model-value="unpaidBalance" emphasis="subtotal" data-testid="unpaid-balance" />
         </template>
       </div>
 
@@ -64,7 +39,7 @@
             data-testid="calculator-total"
           >
             <span class="summary-label">Selected Total</span>
-            <EcMoneyField :edit-mode="false" inline :model-value="store.selectedTotal" />
+            <EcMoneyDisplay :model-value="store.selectedTotal" emphasis="subtotal" />
             <Button
               v-tooltip="'Clear all selected transactions'"
               icon="pi pi-times"
@@ -83,21 +58,19 @@
       <div class="summary-cell summary-cell--right">
         <template v-if="showBudgetBalance">
           <span class="summary-label">Diff</span>
-          <EcMoneyField
-            :edit-mode="false"
-            inline
+          <EcMoneyDisplay
             :model-value="budgetDifference"
-            highlight-mode="zero"
+            highlight-mode="difference"
+            emphasis="subtotal"
             data-testid="budget-difference"
           />
         </template>
         <template v-else-if="showUnpaidBalance">
           <span class="summary-label">Unpaid Diff</span>
-          <EcMoneyField
-            :edit-mode="false"
-            inline
+          <EcMoneyDisplay
             :model-value="unpaidDifference"
-            highlight-mode="zero"
+            highlight-mode="difference"
+            emphasis="subtotal"
             data-testid="unpaid-difference"
           />
         </template>
@@ -112,11 +85,11 @@ import Button from 'primevue/button';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useTransactionStore } from './transactionStore';
 import { total } from '../shared/util/total';
-import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import type { TransactionData, AllocationData } from './transaction.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 
-const props = defineProps<{
+const { bankAccount, transactions, allocations } = defineProps<{
   bankAccount?: BankAccountData;
   transactions: TransactionData[];
   allocations: AllocationData[];
@@ -125,13 +98,13 @@ const props = defineProps<{
 const settingsStore = useSettingsStore();
 const store = useTransactionStore();
 
-const lastBankBalance = computed(() => props.bankAccount?.closing_balance ?? 0);
+const lastBankBalance = computed(() => bankAccount?.closing_balance ?? 0);
 
 const transactionTotal = computed(() => {
-  if (!props.transactions.length) return 0;
+  if (!transactions.length) return 0;
   let totalWithdrawals = 0;
   let totalDeposits = 0;
-  for (const t of props.transactions) {
+  for (const t of transactions) {
     if (!t.deleted) {
       totalWithdrawals += t.withdrawal_amount ?? 0;
       totalDeposits += t.deposit_amount ?? 0;
@@ -143,25 +116,23 @@ const transactionTotal = computed(() => {
 const currentBankBalance = computed(() => lastBankBalance.value + transactionTotal.value);
 
 const showBudgetBalance = computed(() => {
-  if (!props.bankAccount) return false;
-  return props.bankAccount.id === settingsStore.settings.primary_budget_account_id;
+  if (!bankAccount) return false;
+  return bankAccount.id === settingsStore.settings.primary_budget_account_id;
 });
 
 const currentBudgetBalance = computed(() => {
-  return total(props.allocations, 'amount') - total(props.allocations, 'spent');
+  return total(allocations, 'amount') - total(allocations, 'spent');
 });
 
 const budgetDifference = computed(() => currentBankBalance.value - currentBudgetBalance.value);
 
 const showUnpaidBalance = computed(() => {
-  if (!props.bankAccount) return false;
-  return (
-    props.bankAccount.account_type === 'credit_card' || props.bankAccount.is_credit_card === true
-  );
+  if (!bankAccount) return false;
+  return bankAccount.account_type === 'credit_card' || bankAccount.is_credit_card === true;
 });
 
 const unpaidBalance = computed(() => {
-  const unpaid = props.transactions.filter((t) => t.status !== 'paid' && !t.deleted);
+  const unpaid = transactions.filter((t) => t.status !== 'paid' && !t.deleted);
   return total(unpaid, 'net_amount');
 });
 
@@ -217,10 +188,9 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
   white-space: nowrap;
 }
 
-/* EcMoneyField size overrides */
+/* EcMoneyDisplay alignment within summary cells */
 .summary-cell :deep(.money-display) {
-  font-size: 0.875rem;
-  font-weight: 600;
+  margin-left: auto;
 }
 
 /* Calculator pill — subtle highlight with animation */
@@ -242,14 +212,10 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
 
 /* Fade transition for calculator total */
 .calc-fade-enter-active {
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 .calc-fade-leave-active {
-  transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 .calc-fade-enter-from {
   opacity: 0;

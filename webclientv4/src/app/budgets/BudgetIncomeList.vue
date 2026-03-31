@@ -65,7 +65,7 @@
       <tfoot>
         <tr data-testid="income-total-row">
           <th class="col-name">Total</th>
-          <th class="col-amount amount-value">{{ centsToDollars(totalAmount) }}</th>
+          <th class="col-amount"><EcMoneyDisplay :model-value="totalAmount" emphasis="total" highlight-mode="none" /></th>
           <th v-if="store.isEditMode" class="col-actions"></th>
         </tr>
       </tfoot>
@@ -77,8 +77,8 @@
 import { computed } from 'vue';
 import Button from 'primevue/button';
 import { useBudgetStore } from './budgetStore';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import type { IncomeData } from './budget.types';
 
 const store = useBudgetStore();
@@ -175,12 +175,6 @@ function toggleDeleted(income: IncomeData) {
 .col-actions {
   width: 3rem;
   text-align: center;
-}
-
-/* ── Amount value in footer ── */
-.amount-value {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 /* ── Inline inputs ── */

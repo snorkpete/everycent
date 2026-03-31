@@ -28,7 +28,7 @@
     </template>
     <template v-else>
       <span v-if="!inline" class="label">{{ label }}</span>
-      <span :class="['money-display', moneyDisplayClasses]">{{ formattedValue }}</span>
+      <EcMoneyDisplay :model-value="model" :highlight-mode="highlightMode ?? HighlightMode.None" />
     </template>
   </div>
 </template>
@@ -37,11 +37,14 @@
 import { ref, computed, watch, useId } from 'vue';
 import { dollarsToCents } from '../../util/dollars-to-cents';
 import { centsToDollars } from '../../util/cents-to-dollars';
+import EcMoneyDisplay from './EcMoneyDisplay.vue';
+import { HighlightMode } from '../../constants/highlightMode';
+import type { HighlightMode as HighlightModeType } from '../../constants/highlightMode';
 
 const { label = '', editMode, highlightMode, inline } = defineProps<{
   label?: string;
   editMode: boolean;
-  highlightMode?: 'positive' | 'zero';
+  highlightMode?: HighlightModeType;
   inline?: boolean;
 }>();
 
@@ -58,24 +61,23 @@ watch(model, (newVal) => {
   }
 });
 
-const formattedValue = computed(() => centsToDollars(model.value));
+const moneyDisplayClasses = computed(() => {
+  if (!highlightMode || highlightMode === HighlightMode.None) return {};
 
-// Colour highlighting for displayed amounts:
-//
-//   (no mode)    — negatives red, everything else default
-//   "positive"   — positives green, negatives red, zero default
-//                   Use for values where positive = good (balances, net worth, assets)
-//   "zero"       — zero green, non-zero red
-//                   Use for values where zero = good (diffs, remaining balances)
-const moneyDisplayClasses = computed(() => ({
-  positive:
-    highlightMode === 'positive'
-      ? model.value > 0
-      : highlightMode === 'zero'
-        ? model.value === 0
-        : false,
-  negative: highlightMode === 'zero' ? model.value !== 0 : model.value < 0,
-}));
+  if (highlightMode === HighlightMode.Balance) {
+    return {
+      positive: model.value > 0,
+      negative: model.value < 0,
+      muted: model.value === 0,
+    };
+  }
+
+  // Difference: zero is good, nonzero is bad
+  return {
+    positive: model.value === 0,
+    negative: model.value !== 0,
+  };
+});
 
 const inputId = useId();
 
@@ -122,16 +124,15 @@ function onBlur() {
   color: var(--p-text-muted-color);
 }
 
-.money-display {
-  font-size: 14px;
-  text-align: right;
-}
-
 .negative {
   color: var(--p-red-600);
 }
 
 .positive {
   color: var(--p-green-600);
+}
+
+.muted {
+  color: var(--p-text-muted-color);
 }
 </style>
