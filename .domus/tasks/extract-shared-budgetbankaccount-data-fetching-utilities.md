@@ -1,7 +1,7 @@
 # Task: Extract shared budget/bankAccount data-fetching utilities
 
 **ID:** extract-shared-budgetbankaccount-data-fetching-utilities
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
