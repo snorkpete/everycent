@@ -156,26 +156,34 @@ describe('useAllocationGrouping', () => {
     });
   });
 
-  describe('fixedCategoryTotals', () => {
-    it('returns totals scoped to fixed allocations only', () => {
-      const { fixedCategoryTotals } = setup();
+  describe('fixedAllocations — collapsed mode', () => {
+    it('returns a single synthetic row when fixed detail is hidden', () => {
+      const { fixedAllocations, hideFixedDetail } = setup();
+      hideFixedDetail();
 
-      const totals = fixedCategoryTotals(essentials);
+      const result = fixedAllocations(essentials);
 
-      // Only Rent
-      expect(totals.amount).toBe(100000);
-      expect(totals.spent).toBe(100000);
-      expect(totals.remaining).toBe(0);
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('Fixed');
+      expect(result[0].amount).toBe(100000); // Rent amount
+      expect(result[0].spent).toBe(100000);  // Rent spent
     });
 
-    it('returns zeros when no fixed allocations in category', () => {
-      const { fixedCategoryTotals } = setup();
+    it('returns empty array when no fixed allocations even when collapsed', () => {
+      const { fixedAllocations, hideFixedDetail } = setup();
+      hideFixedDetail();
 
-      const totals = fixedCategoryTotals(lifestyle);
+      expect(fixedAllocations(lifestyle)).toHaveLength(0);
+    });
 
-      expect(totals.amount).toBe(0);
-      expect(totals.spent).toBe(0);
-      expect(totals.remaining).toBe(0);
+    it('returns individual rows when fixed detail is visible', () => {
+      const { fixedAllocations } = setup();
+
+      const result = fixedAllocations(essentials);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('Rent');
+      expect(result[0].id).toBe(2);
     });
   });
 

@@ -5,6 +5,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetAllocationList from './BudgetAllocationList.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import type { BudgetDetailData } from './budget.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 import type { AllocationData } from '../transactions/transaction.types';
@@ -27,6 +28,7 @@ const CLASS_SELECT = '[data-testid="allocation-class-select"]';
 const FIXED_CHECKBOX = '[data-testid="allocation-fixed-checkbox"]';
 const COMMENT_INPUT = '[data-testid="allocation-comment-input"]';
 const VARIABLE_ONLY_TOGGLE = '[data-testid="variable-only-toggle"]';
+const FIXED_SUBTOTAL = (id: number) => `[data-testid="fixed-subtotal-${id}"]`;
 
 const categories: AllocationCategoryData[] = [
   { id: 10, name: 'Essentials' },
@@ -119,11 +121,24 @@ function createWrapper(): VueWrapper {
   });
 }
 
-async function createVariableOnlyWrapper(): Promise<VueWrapper> {
-  const wrapper = createWrapper();
-  await wrapper.find(VARIABLE_ONLY_TOGGLE).trigger('click');
+async function createWrapperWithFixedCollapsed(): Promise<VueWrapper> {
+  const fixedCollapsedWrapper = createWrapper();
+  await fixedCollapsedWrapper.find(VARIABLE_ONLY_TOGGLE).trigger('click');
   await nextTick();
-  return wrapper;
+  return fixedCollapsedWrapper;
+}
+
+// In default mode (all allocations visible), fixed rows come first per category,
+// then adjustable. So for Essentials: Rent (fixed), then Groceries (adjustable).
+// Row order: [0] Rent, [1] Groceries, [2] Entertainment
+function findRowByName(wrapper: VueWrapper, name: string) {
+  return wrapper.findAll(ALLOCATION_ROW).find((r) => {
+    // Check text content (view mode) and input values (edit mode)
+    if (r.text().includes(name)) return true;
+    const nameInput = r.find(NAME_INPUT);
+    if (nameInput.exists() && (nameInput.element as HTMLInputElement).value === name) return true;
+    return false;
+  });
 }
 
 describe('BudgetAllocationList', () => {
@@ -176,88 +191,86 @@ describe('BudgetAllocationList', () => {
     it('shows allocation name', () => {
       const wrapper = createWrapper();
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      expect(firstRow.text()).toContain('Groceries');
+      const groceriesRow = findRowByName(wrapper, 'Groceries');
+      expect(groceriesRow).toBeDefined();
     });
 
     it('shows allocation amount in dollars', () => {
       const wrapper = createWrapper();
-      const expectedAmount = '500.00';
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      expect(firstRow.text()).toContain(expectedAmount);
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      expect(groceriesRow.text()).toContain('500.00');
     });
 
     it('shows allocation spent in dollars', () => {
       const wrapper = createWrapper();
-      const expectedSpent = '300.00';
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      expect(firstRow.text()).toContain(expectedSpent);
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      expect(groceriesRow.text()).toContain('300.00');
     });
 
     it('shows allocation remaining (amount - spent)', () => {
       const wrapper = createWrapper();
-      const expectedRemaining = '200.00';
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      expect(firstRow.text()).toContain(expectedRemaining);
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      expect(groceriesRow.text()).toContain('200.00');
     });
 
     it('shows allocation class title-cased', () => {
       const wrapper = createWrapper();
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      expect(firstRow.text()).toContain('Need');
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      expect(groceriesRow.text()).toContain('Need');
     });
 
     it('shows "Yes" for fixed amount allocations', () => {
       const wrapper = createWrapper();
 
-      const rentRow = wrapper.findAll(ALLOCATION_ROW)[1];
+      const rentRow = findRowByName(wrapper, 'Rent')!;
       expect(rentRow.text()).toContain('Yes');
     });
 
     it('shows "No" for non-fixed amount allocations', () => {
       const wrapper = createWrapper();
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      expect(firstRow.text()).toContain('No');
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      expect(groceriesRow.text()).toContain('No');
     });
 
     it('shows allocation comment', () => {
       const wrapper = createWrapper();
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      expect(firstRow.text()).toContain('Weekly shop');
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      expect(groceriesRow.text()).toContain('Weekly shop');
     });
   });
 
-  describe('view mode — remaining colour', () => {
-    it('applies amount-positive class for positive remaining', () => {
+  describe('view mode — remaining uses EcMoneyDisplay with balance highlight', () => {
+    it('passes remaining value to EcMoneyDisplay', () => {
       const wrapper = createWrapper();
 
-      const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
-      const remainingCell = firstRow.findAll('td')[3];
-      expect(remainingCell.classes()).toContain('amount-positive');
+      // Groceries: amount 500, spent 300 → remaining 200 (20000 cents)
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      const remainingDisplay = groceriesRow.findAll('td')[3].findComponent(EcMoneyDisplay);
+      expect(remainingDisplay.props('modelValue')).toBe(20000);
     });
 
-    it('applies amount-negative class for negative remaining', () => {
+    it('uses balance highlight mode for remaining', () => {
       const wrapper = createWrapper();
 
-      // Entertainment: amount 200, spent 250 → remaining -50
-      const entertainmentRow = wrapper.findAll(ALLOCATION_ROW)[2];
-      const remainingCell = entertainmentRow.findAll('td')[3];
-      expect(remainingCell.classes()).toContain('amount-negative');
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      const remainingDisplay = groceriesRow.findAll('td')[3].findComponent(EcMoneyDisplay);
+      expect(remainingDisplay.props('highlightMode')).toBe('balance');
     });
 
-    it('applies amount-muted class for zero remaining', () => {
+    it('uses none highlight mode for amount and spent columns', () => {
       const wrapper = createWrapper();
 
-      // Rent: amount 1000, spent 1000 → remaining 0
-      const rentRow = wrapper.findAll(ALLOCATION_ROW)[1];
-      const remainingCell = rentRow.findAll('td')[3];
-      expect(remainingCell.classes()).toContain('amount-muted');
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      const amountDisplay = groceriesRow.findAll('td')[1].findComponent(EcMoneyDisplay);
+      const spentDisplay = groceriesRow.findAll('td')[2].findComponent(EcMoneyDisplay);
+      expect(amountDisplay.props('highlightMode')).toBe('none');
+      expect(spentDisplay.props('highlightMode')).toBe('none');
     });
   });
 
@@ -279,13 +292,14 @@ describe('BudgetAllocationList', () => {
     it('opens the transactions dialog when eye icon is clicked', async () => {
       const wrapper = createWrapper();
 
-      const button = wrapper.find(SHOW_TRANSACTIONS_BTN);
-      await button.trigger('click');
+      // First eye button is on Rent (fixed, rendered first)
+      const buttons = wrapper.findAll(SHOW_TRANSACTIONS_BTN);
+      await buttons[0].trigger('click');
 
       const dialog = wrapper.findComponent(AllocationTransactionsDialog);
       expect(dialog.props('visible')).toBe(true);
-      expect(dialog.props('allocationId')).toBe(1);
-      expect(dialog.props('allocationName')).toBe('Groceries');
+      expect(dialog.props('allocationId')).toBe(2);
+      expect(dialog.props('allocationName')).toBe('Rent');
     });
   });
 
@@ -384,11 +398,12 @@ describe('BudgetAllocationList', () => {
       expect(headerCells).toHaveLength(8);
     });
 
-    it('shows name as text input', async () => {
+    it('shows name as text input for adjustable allocations', async () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const input = wrapper.find(NAME_INPUT);
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      const input = groceriesRow.find(NAME_INPUT);
       expect(input.exists()).toBe(true);
       expect((input.element as HTMLInputElement).value).toBe('Groceries');
     });
@@ -431,9 +446,8 @@ describe('BudgetAllocationList', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const rows = wrapper.findAll(ALLOCATION_ROW);
-      const spentCell = rows[0].findAll('td')[2];
-      // Spent cell should not contain an input
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      const spentCell = groceriesRow.findAll('td')[2];
       expect(spentCell.find('input').exists()).toBe(false);
       expect(spentCell.text()).toContain('300.00');
     });
@@ -442,8 +456,8 @@ describe('BudgetAllocationList', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const rows = wrapper.findAll(ALLOCATION_ROW);
-      const remainingCell = rows[0].findAll('td')[3];
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      const remainingCell = groceriesRow.findAll('td')[3];
       expect(remainingCell.find('input').exists()).toBe(false);
       expect(remainingCell.text()).toContain('200.00');
     });
@@ -474,7 +488,9 @@ describe('BudgetAllocationList', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const deleteBtn = wrapper.find(DELETE_BTN);
+      // Find the delete button in Groceries row specifically
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      const deleteBtn = groceriesRow.find(DELETE_BTN);
       await deleteBtn.trigger('click');
 
       expect(mockStore.budget!.allocations[0].deleted).toBe(true);
@@ -495,8 +511,9 @@ describe('BudgetAllocationList', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const rows = wrapper.findAll(ALLOCATION_ROW);
-      expect(rows[0].classes()).toContain('deleted-row');
+      // Groceries is adjustable, so it's in the adjustable rows section
+      const groceriesRow = findRowByName(wrapper, 'Groceries')!;
+      expect(groceriesRow.classes()).toContain('deleted-row');
     });
 
     it('excludes deleted allocations from category subtotals', async () => {
@@ -612,72 +629,72 @@ describe('BudgetAllocationList', () => {
     });
 
     it('hides individual fixed allocations when toggle is active', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
-      const rows = wrapper.findAll(ALLOCATION_ROW);
+      const rows = fixedCollapsedWrapper.findAll(ALLOCATION_ROW);
       // Rent (is_fixed_amount=true) should be hidden; Groceries + Entertainment remain
       expect(rows).toHaveLength(2);
       expect(rows.map((r) => r.text()).join()).not.toContain('Rent');
     });
 
     it('shows a per-category "Fixed" subtotal row', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
-      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
+      const fixedRow = fixedCollapsedWrapper.find(FIXED_SUBTOTAL(10));
       expect(fixedRow.exists()).toBe(true);
       // Rent is 1000.00
       expect(fixedRow.text()).toContain('1,000.00');
     });
 
     it('does not show per-category fixed subtotal row when no fixed allocations in that category', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
       // Lifestyle (cat 20) has no fixed allocations
-      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-20"]');
+      const fixedRow = fixedCollapsedWrapper.find(FIXED_SUBTOTAL(20));
       expect(fixedRow.exists()).toBe(false);
     });
 
     it('category totals still sum all allocations (fixed + variable)', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
       // Essentials: Groceries 500 + Rent 1000 = 1500.00
-      const header = wrapper.find(CATEGORY_HEADER(10));
+      const header = fixedCollapsedWrapper.find(CATEGORY_HEADER(10));
       const amountCell = header.findAll('td')[1];
       expect(amountCell.text()).toBe('1,500.00');
     });
 
     it('footer totals still reflect full budget', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
       // All: 500 + 1000 + 200 = 1700.00
-      const footer = wrapper.find(TOTAL_ROW);
+      const footer = fixedCollapsedWrapper.find(TOTAL_ROW);
       const amountCell = footer.findAll('th')[1];
       expect(amountCell.text()).toBe('1,700.00');
     });
 
     it('shows overall fixed total row in footer', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
-      const fixedTotalRow = wrapper.find('[data-testid="fixed-total-row"]');
+      const fixedTotalRow = fixedCollapsedWrapper.find('[data-testid="fixed-total-row"]');
       expect(fixedTotalRow.exists()).toBe(true);
       // Only Rent is fixed: 1000.00
       expect(fixedTotalRow.text()).toContain('1,000.00');
     });
 
     it('spent column is visible in variable-only mode', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
-      const headerCells = wrapper.findAll('thead th');
+      const headerCells = fixedCollapsedWrapper.findAll('thead th');
       const headerTexts = headerCells.map((h) => h.text());
       expect(headerTexts).toContain('Spent');
     });
 
     it('new allocations can be added in variable-only mode in edit mode', async () => {
       mockStore.isEditMode = true;
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
       const initialCount = mockStore.budget!.allocations.length;
 
-      await wrapper.find(ADD_ALLOCATION_BTN(10)).trigger('click');
+      await fixedCollapsedWrapper.find(ADD_ALLOCATION_BTN(10)).trigger('click');
 
       expect(mockStore.budget!.allocations).toHaveLength(initialCount + 1);
     });
@@ -692,7 +709,7 @@ describe('BudgetAllocationList', () => {
     it('does not show fixed subtotal rows when toggle is not active', () => {
       const wrapper = createWrapper();
 
-      expect(wrapper.find('[data-testid="fixed-subtotal-10"]').exists()).toBe(false);
+      expect(wrapper.find(FIXED_SUBTOTAL(10)).exists()).toBe(false);
     });
 
     it('does not show overall fixed total row when toggle is not active', () => {
@@ -705,27 +722,27 @@ describe('BudgetAllocationList', () => {
       // Make all allocations in Essentials fixed
       mockStore.budget!.allocations[0].is_fixed_amount = true; // Groceries
       mockStore.budget!.allocations[1].is_fixed_amount = true; // Rent (already true)
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
       // No variable allocation rows for Essentials
-      const rows = wrapper.findAll(ALLOCATION_ROW);
+      const rows = fixedCollapsedWrapper.findAll(ALLOCATION_ROW);
       // Only Entertainment (category 20) remains
       expect(rows).toHaveLength(1);
       expect(rows[0].text()).toContain('Entertainment');
 
       // But Essentials category header still exists
-      expect(wrapper.find(CATEGORY_HEADER(10)).exists()).toBe(true);
+      expect(fixedCollapsedWrapper.find(CATEGORY_HEADER(10)).exists()).toBe(true);
       // Fixed subtotal shows
-      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
+      const fixedRow = fixedCollapsedWrapper.find(FIXED_SUBTOTAL(10));
       expect(fixedRow.exists()).toBe(true);
       // 500 + 1000 = 1500.00
       expect(fixedRow.text()).toContain('1,500.00');
     });
 
     it('fixed subtotal row shows spent for fixed allocations', async () => {
-      const wrapper = await createVariableOnlyWrapper();
+      const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
-      const fixedRow = wrapper.find('[data-testid="fixed-subtotal-10"]');
+      const fixedRow = fixedCollapsedWrapper.find(FIXED_SUBTOTAL(10));
       // Rent spent: 1000.00
       expect(fixedRow.text()).toContain('1,000.00');
     });

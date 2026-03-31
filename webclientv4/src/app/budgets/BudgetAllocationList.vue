@@ -2,12 +2,12 @@
   <div class="allocation-list">
       <div class="allocation-toolbar">
         <Button
-          :label="grouping.isFixedDetailVisible.value ? 'All Allocations' : 'Variable Only'"
-          :icon="grouping.isFixedDetailVisible.value ? 'pi pi-filter' : 'pi pi-filter-fill'"
-          :outlined="grouping.isFixedDetailVisible.value"
+          :label="isFixedDetailVisible ? 'All Allocations' : 'Variable Only'"
+          :icon="isFixedDetailVisible ? 'pi pi-filter' : 'pi pi-filter-fill'"
+          :outlined="isFixedDetailVisible"
           size="small"
           data-testid="variable-only-toggle"
-          title="Toggle between showing all allocations and variable-only mode"
+          v-tooltip="'Toggle between showing all allocations and variable-only mode'"
           @click="toggleFixedDetail"
         />
       </div>
@@ -30,52 +30,25 @@
             <!-- Category sub-header -->
             <tr class="category-header" :data-testid="`category-header-${category.id}`">
               <td>{{ category.name }}</td>
-              <td class="amount-cell">{{ centsToDollars(grouping.categoryTotals(category).amount) }}</td>
-              <td class="amount-cell">{{ centsToDollars(grouping.categoryTotals(category).spent) }}</td>
-              <td
-                class="amount-cell"
-                :class="remainingClass(grouping.categoryTotals(category).remaining)"
-              >
-                {{ centsToDollars(grouping.categoryTotals(category).remaining) }}
-              </td>
+              <td class="amount-cell"><EcMoneyDisplay :model-value="categoryTotals(category).amount" emphasis="subtotal" highlight-mode="none" /></td>
+              <td class="amount-cell"><EcMoneyDisplay :model-value="categoryTotals(category).spent" emphasis="subtotal" highlight-mode="none" /></td>
+              <td class="amount-cell"><EcMoneyDisplay :model-value="categoryTotals(category).remaining" emphasis="subtotal" /></td>
               <td></td>
               <td></td>
               <td></td>
               <td v-if="store.isEditMode"></td>
             </tr>
 
-            <!-- Fixed subtotal row (variable-only mode) — below category header -->
+            <!-- Allocation rows (fixed first, then adjustable) -->
             <tr
-              v-if="!grouping.isFixedDetailVisible.value && grouping.fixedAllocations(category).length > 0"
-              class="fixed-subtotal-row"
-              :data-testid="`fixed-subtotal-${category.id}`"
-            >
-              <td>Fixed</td>
-              <td class="amount-cell">{{ centsToDollars(grouping.fixedCategoryTotals(category).amount) }}</td>
-              <td class="amount-cell">{{ centsToDollars(grouping.fixedCategoryTotals(category).spent) }}</td>
-              <td
-                class="amount-cell"
-                :class="remainingClass(grouping.fixedCategoryTotals(category).remaining)"
-              >
-                {{ centsToDollars(grouping.fixedCategoryTotals(category).remaining) }}
-              </td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td v-if="store.isEditMode"></td>
-            </tr>
-
-            <!-- Allocation rows -->
-            <tr
-              v-for="(allocation, index) in allocationsForCategory(category)"
+              v-for="(allocation, index) in [...fixedAllocations(category), ...adjustableAllocations(category)]"
               :key="allocation.id || `${category.id}-${index}`"
-              :class="{ 'deleted-row': allocation.deleted }"
-              data-testid="allocation-row"
+              :class="{ 'fixed-subtotal-row': isSummaryRow(allocation), 'deleted-row': allocation.deleted }"
+              :data-testid="isSummaryRow(allocation) ? `fixed-subtotal-${category.id}` : 'allocation-row'"
             >
-              <!-- Name -->
               <td>
                 <input
-                  v-if="store.isEditMode"
+                  v-if="isEditable(allocation)"
                   v-model="allocation.name"
                   type="text"
                   class="p-inputtext cell-input"
@@ -84,94 +57,85 @@
                 <span v-else>
                   {{ allocation.name }}
                   <i
-                    v-if="grouping.isFixedDetailVisible.value && allocation.is_fixed_amount"
+                    v-if="allocation.is_fixed_amount && !isSummaryRow(allocation)"
                     class="pi pi-lock fixed-icon"
                     v-tooltip="'Fixed allocation'"
                   ></i>
                 </span>
               </td>
-
-              <!-- Amount -->
               <td class="amount-cell">
                 <EcMoneyField
-                  v-if="store.isEditMode"
+                  v-if="isEditable(allocation)"
                   v-model="allocation.amount"
                   label=""
                   :edit-mode="true"
                 />
-                <span v-else>{{ centsToDollars(allocation.amount ?? 0) }}</span>
+                <EcMoneyDisplay
+                  v-else
+                  :model-value="allocation.amount ?? 0"
+                  :emphasis="emphasisFor(allocation)"
+                  highlight-mode="none"
+                />
               </td>
-
-              <!-- Spent -->
               <td class="amount-cell">
                 <span class="spent-cell">
                   <button
+                    v-if="!isSummaryRow(allocation)"
                     class="eye-btn"
-                    title="Show transactions for this allocation"
+                    v-tooltip="'Show transactions for this allocation'"
                     data-testid="show-transactions-btn"
                     @click="showTransactions(allocation)"
                   >
                     <i class="pi pi-eye"></i>
                   </button>
-                  <span>{{ centsToDollars(allocation.spent ?? 0) }}</span>
+                  <EcMoneyDisplay
+                    :model-value="allocation.spent ?? 0"
+                    :emphasis="emphasisFor(allocation)"
+                    highlight-mode="none"
+                  />
                 </span>
               </td>
-
-              <!-- Remaining -->
-              <td
-                class="amount-cell"
-                :class="remainingClass(remaining(allocation))"
-              >
-                {{ centsToDollars(remaining(allocation)) }}
+              <td class="amount-cell">
+                <EcMoneyDisplay
+                  :model-value="remaining(allocation)"
+                  :emphasis="emphasisFor(allocation)"
+                />
               </td>
-
-              <!-- Class -->
               <td>
                 <select
-                  v-if="store.isEditMode"
+                  v-if="isEditable(allocation)"
                   v-model="allocation.allocation_class"
                   class="cell-select"
                   data-testid="allocation-class-select"
                 >
-                  <option
-                    v-for="cls in allocationClasses"
-                    :key="cls.id"
-                    :value="cls.id"
-                  >
-                    {{ cls.name }}
-                  </option>
+                  <option v-for="cls in allocationClasses" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
                 </select>
-                <span v-else class="class-display">{{ titleCase(allocation.allocation_class) }}</span>
+                <span v-else-if="!isSummaryRow(allocation)" class="class-display">{{ titleCase(allocation.allocation_class) }}</span>
               </td>
-
-              <!-- Fixed Amount? -->
               <td class="center-cell">
                 <input
-                  v-if="store.isEditMode"
+                  v-if="isEditable(allocation)"
                   v-model="allocation.is_fixed_amount"
                   type="checkbox"
                   data-testid="allocation-fixed-checkbox"
                 />
-                <span v-else>{{ allocation.is_fixed_amount ? 'Yes' : 'No' }}</span>
+                <span v-else-if="!isSummaryRow(allocation)">{{ allocation.is_fixed_amount ? 'Yes' : 'No' }}</span>
               </td>
-
-              <!-- Comment -->
               <td>
                 <input
-                  v-if="store.isEditMode"
+                  v-if="isEditable(allocation)"
                   v-model="allocation.comment"
                   type="text"
                   class="p-inputtext cell-input"
                   data-testid="allocation-comment-input"
                 />
-                <span v-else>{{ allocation.comment }}</span>
+                <span v-else-if="!isSummaryRow(allocation)">{{ allocation.comment }}</span>
               </td>
-
-              <!-- Delete action -->
               <td v-if="store.isEditMode" class="center-cell">
                 <button
+                  v-if="isEditable(allocation)"
                   class="delete-btn"
-                  :title="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
+                  v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
                   :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
                   @click="toggleDeleted(allocation)"
                 >
@@ -196,13 +160,11 @@
         </tbody>
 
         <tfoot>
-          <tr v-if="!grouping.isFixedDetailVisible.value" class="fixed-total-row" data-testid="fixed-total-row">
+          <tr v-if="!isFixedDetailVisible" class="fixed-total-row" data-testid="fixed-total-row">
             <th>Fixed Total</th>
-            <th class="amount-cell">{{ centsToDollars(grouping.fixedTotals.value.amount) }}</th>
-            <th class="amount-cell">{{ centsToDollars(grouping.fixedTotals.value.spent) }}</th>
-            <th class="amount-cell" :class="remainingClass(grouping.fixedTotals.value.remaining)">
-              {{ centsToDollars(grouping.fixedTotals.value.remaining) }}
-            </th>
+            <th class="amount-cell"><EcMoneyDisplay :model-value="fixedTotals.amount" emphasis="total" highlight-mode="none" /></th>
+            <th class="amount-cell"><EcMoneyDisplay :model-value="fixedTotals.spent" emphasis="total" highlight-mode="none" /></th>
+            <th class="amount-cell"><EcMoneyDisplay :model-value="fixedTotals.remaining" emphasis="total" /></th>
             <th></th>
             <th></th>
             <th></th>
@@ -210,11 +172,9 @@
           </tr>
           <tr class="total-row" data-testid="total-row">
             <th>Total</th>
-            <th class="amount-cell">{{ centsToDollars(grouping.grandTotals.value.amount) }}</th>
-            <th class="amount-cell">{{ centsToDollars(grouping.grandTotals.value.spent) }}</th>
-            <th class="amount-cell" :class="remainingClass(grouping.grandTotals.value.remaining)">
-              {{ centsToDollars(grouping.grandTotals.value.remaining) }}
-            </th>
+            <th class="amount-cell"><EcMoneyDisplay :model-value="grandTotals.amount" emphasis="total" highlight-mode="none" /></th>
+            <th class="amount-cell"><EcMoneyDisplay :model-value="grandTotals.spent" emphasis="total" highlight-mode="none" /></th>
+            <th class="amount-cell"><EcMoneyDisplay :model-value="grandTotals.remaining" emphasis="total" /></th>
             <th></th>
             <th></th>
             <th></th>
@@ -223,7 +183,7 @@
         </tfoot>
       </table>
     <div class="unallocated-badge" data-testid="unallocated-badge">
-      Unallocated: {{ centsToDollars(grouping.unallocated.value) }}
+      Unallocated: <EcMoneyDisplay :model-value="unallocated" />
     </div>
     <AllocationTransactionsDialog
       :visible="dialogVisible"
@@ -240,15 +200,16 @@ import { computed, ref } from 'vue';
 import Button from 'primevue/button';
 import { useBudgetStore } from './budgetStore';
 import { useAllocationGrouping } from './useAllocationGrouping';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
-import { remainingClass } from '../shared/util/remaining-class';
 import { titleCase } from '../shared/util/title-case';
 import { allocationClasses } from '../shared/constants/allocationClasses';
+import { Emphasis } from '../shared/constants/emphasis';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { budgetApi } from './budgetApi';
 import type { AllocationData } from '../transactions/transaction.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
+import type { Emphasis as EmphasisType } from '../shared/constants/emphasis';
 
 const store = useBudgetStore();
 
@@ -258,9 +219,36 @@ const totalIncome = computed(() =>
   store.budget?.incomes?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0,
 );
 
-const grouping = useAllocationGrouping(allocations, categories, totalIncome, {
+const {
+  fixedAllocations,
+  adjustableAllocations,
+  categoryTotals,
+  grandTotals,
+  fixedTotals,
+  unallocated,
+  isFixedDetailVisible,
+  showFixedDetail,
+  hideFixedDetail,
+} = useAllocationGrouping(allocations, categories, totalIncome, {
   displayDeletedAllocations: computed(() => store.isEditMode),
 });
+
+// Row helpers — drive all template conditionals
+function isSummaryRow(allocation: AllocationData): boolean {
+  return allocation.is_fixed_amount === true && !isFixedDetailVisible.value;
+}
+
+function isEditable(allocation: AllocationData): boolean {
+  return store.isEditMode && !isSummaryRow(allocation);
+}
+
+function emphasisFor(allocation: AllocationData): EmphasisType {
+  return isSummaryRow(allocation) ? Emphasis.Subtotal : Emphasis.Item;
+}
+
+function remaining(allocation: AllocationData): number {
+  return (allocation.amount ?? 0) - (allocation.spent ?? 0);
+}
 
 const dialogVisible = ref(false);
 const selectedAllocationId = ref(0);
@@ -272,28 +260,11 @@ function showTransactions(allocation: AllocationData) {
   dialogVisible.value = true;
 }
 
-function allocationsForCategory(category: AllocationCategoryData): AllocationData[] {
-  if (grouping.isFixedDetailVisible.value) {
-    // Show all allocations in original order, respecting deleted visibility
-    return allocations.value.filter((a) => {
-      if (a.allocation_category_id !== category.id) return false;
-      if (!store.isEditMode && a.deleted) return false;
-      return true;
-    });
-  }
-  // Variable-only mode: show only adjustable
-  return grouping.adjustableAllocations(category);
-}
-
-function remaining(allocation: AllocationData): number {
-  return (allocation.amount ?? 0) - (allocation.spent ?? 0);
-}
-
 function toggleFixedDetail() {
-  if (grouping.isFixedDetailVisible.value) {
-    grouping.hideFixedDetail();
+  if (isFixedDetailVisible.value) {
+    hideFixedDetail();
   } else {
-    grouping.showFixedDetail();
+    showFixedDetail();
   }
 }
 
@@ -373,15 +344,6 @@ function addAllocation(category: AllocationCategoryData) {
   box-shadow: inset 3px 0 0 var(--p-primary-400);
 }
 
-.category-class-badge {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--p-text-muted-color);
-  margin-left: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
 /* ── Sticky footer ── */
 .allocations-table tfoot th {
   position: sticky;
@@ -403,19 +365,6 @@ function addAllocation(category: AllocationCategoryData) {
 .allocations-table thead th.spent-col,
 .allocations-table thead th.remaining-col {
   text-align: right;
-}
-
-/* ── Remaining colour classes ── */
-.amount-positive {
-  color: #16a34a;
-}
-
-.amount-negative {
-  color: #dc2626;
-}
-
-.amount-muted {
-  color: var(--p-text-muted-color);
 }
 
 /* ── Column widths ── */
@@ -536,7 +485,6 @@ tr:hover .eye-btn {
   background-color: var(--p-surface-100);
   font-weight: 600;
   color: var(--p-text-color);
-  font-size: 0.95rem;
   border-bottom: 2px solid var(--p-surface-200);
 }
 
