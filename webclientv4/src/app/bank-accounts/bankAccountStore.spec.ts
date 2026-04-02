@@ -76,6 +76,27 @@ describe('bankAccountStore', () => {
       expect(store.institutions).toEqual(institutions);
     });
 
+    it('manages loading state', async () => {
+      vi.mocked(bankAccountApi.getInstitutions).mockResolvedValue([]);
+
+      const store = useBankAccountStore();
+      const promise = store.fetchInstitutions();
+      expect(store.loading).toBe(true);
+
+      await promise;
+      expect(store.loading).toBe(false);
+    });
+
+    it('resets loading on failure', async () => {
+      vi.mocked(bankAccountApi.getInstitutions).mockRejectedValue(new Error('Timeout'));
+
+      const store = useBankAccountStore();
+      await store.fetchInstitutions();
+
+      expect(store.loading).toBe(false);
+      expect(store.error).toBe('Timeout');
+    });
+
     it('sets error message on failure', async () => {
       vi.mocked(bankAccountApi.getInstitutions).mockRejectedValue(new Error('Timeout'));
 
