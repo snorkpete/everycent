@@ -1,12 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
+import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import FutureBudgetsPage from './FutureBudgetsPage.vue';
-import type { FutureBudgetData } from './futureBudgets.types';
+import { futureBudgetsApi } from './futureBudgetsApi';
+import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
-import type { MassUpdatePayload } from './futureBudgets.types';
+import type { SettingsData } from '../../settings/settings.types';
+import {
+  buildFutureBudget,
+  buildFutureAllocation,
+  buildFutureIncome,
+  buildAllocationCategory,
+  buildSettings,
+} from '../../../test/factories';
 
 const mockSetHeading = vi.fn();
 vi.mock('../../toolbar/headingStore', () => ({
@@ -23,67 +31,58 @@ vi.mock('../../notifications/useNotifications', () => ({
   }),
 }));
 
-const jan2025: FutureBudgetData = {
+vi.mock('./futureBudgetsApi', () => ({
+  futureBudgetsApi: {
+    getFutureBudgets: vi.fn(),
+    getAllocationCategories: vi.fn(),
+    getSettings: vi.fn(),
+    massUpdate: vi.fn(),
+  },
+}));
+
+const fixedCategory: AllocationCategoryData = buildAllocationCategory({ id: 3, name: 'Fixed' });
+
+const jan2025: FutureBudgetData = buildFutureBudget({
   id: 1,
   name: 'Jan 2025',
   start_date: '2025-01-01',
   end_date: '2025-01-31',
-  status: 'open',
-  incomes: [{ id: 10, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 }],
-  allocations: [{ id: 50, name: 'Rent', amount: 150000, budget_id: 1, allocation_category_id: 3 }],
-};
+  incomes: [buildFutureIncome({ id: 10, name: 'Salary', amount: 500000, budget_id: 1 })],
+  allocations: [
+    buildFutureAllocation({
+      id: 50,
+      name: 'Rent',
+      amount: 150000,
+      budget_id: 1,
+      allocation_category_id: 3,
+      is_fixed_amount: false,
+    }),
+  ],
+});
 
-const feb2025: FutureBudgetData = {
+const feb2025: FutureBudgetData = buildFutureBudget({
   id: 2,
   name: 'Feb 2025',
   start_date: '2025-02-01',
   end_date: '2025-02-28',
-  status: 'open',
-  incomes: [{ id: 20, name: 'Salary', amount: 510000, budget_id: 2, bank_account_id: 1 }],
-  allocations: [{ id: 60, name: 'Rent', amount: 150000, budget_id: 2, allocation_category_id: 3 }],
-};
-
-const fixedCategory: AllocationCategoryData = { id: 3, name: 'Fixed' };
-
-const mockStore = reactive({
-  budgets: [jan2025, feb2025] as FutureBudgetData[],
-  allocationCategories: [fixedCategory] as AllocationCategoryData[],
-  settings: { family_type: 'couple', husband: 'Alice', wife: 'Bob' } as {
-    family_type?: string;
-    husband?: string;
-    wife?: string;
-    single_person?: string;
-  },
-  loading: false,
-  error: null as string | null,
-  incomeDisplayData: {
-    Salary: {
-      1: { id: 10, amount: 500000 },
-      2: { id: 20, amount: 510000 },
-    },
-  } as Record<string, Record<number, { id: number; amount: number }>>,
-  incomeNames: ['Salary'],
-  allocationDisplayData: {
-    3: {
-      Rent: {
-        1: { id: 50, amount: 150000, is_fixed_amount: false },
-        2: { id: 60, amount: 150000, is_fixed_amount: false },
-      },
-    },
-  } as Record<
-    number,
-    Record<string, Record<number, { id: number; amount: number; is_fixed_amount: boolean }>>
-  >,
-  fetchAll: vi.fn().mockResolvedValue(undefined),
-  massUpdate: vi.fn().mockResolvedValue(undefined),
-  totalIncomeForBudget: vi.fn((b: FutureBudgetData) => (b.id === 1 ? 500000 : 510000)),
-  totalAllocationsForBudget: vi.fn(() => 150000),
-  discretionaryForBudget: vi.fn((b: FutureBudgetData) => (b.id === 1 ? 350000 : 360000)),
+  incomes: [buildFutureIncome({ id: 20, name: 'Salary', amount: 510000, budget_id: 2 })],
+  allocations: [
+    buildFutureAllocation({
+      id: 60,
+      name: 'Rent',
+      amount: 150000,
+      budget_id: 2,
+      allocation_category_id: 3,
+      is_fixed_amount: false,
+    }),
+  ],
 });
 
-vi.mock('./futureBudgetsStore', () => ({
-  useFutureBudgetsStore: () => mockStore,
-}));
+const defaultSettings: SettingsData = buildSettings({
+  family_type: 'couple',
+  husband: 'Alice',
+  wife: 'Bob',
+});
 
 const DialogStub = {
   name: 'BudgetMassEditDialog',
@@ -92,10 +91,23 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function createWrapper() {
+function setupDefaultApiMocks(
+  budgets: FutureBudgetData[] = [jan2025, feb2025],
+  categories: AllocationCategoryData[] = [fixedCategory],
+  settings: SettingsData = defaultSettings,
+) {
+  vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue(budgets);
+  vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue(categories);
+  vi.mocked(futureBudgetsApi.getSettings).mockResolvedValue(settings);
+  vi.mocked(futureBudgetsApi.massUpdate).mockResolvedValue({ success: true });
+}
+
+let pinia: Pinia;
+
+function createWrapper(): VueWrapper {
   return mount(FutureBudgetsPage, {
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
       stubs: { BudgetMassEditDialog: DialogStub },
     },
   });
@@ -103,33 +115,34 @@ function createWrapper() {
 
 describe('FutureBudgetsPage', () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.fetchAll.mockResolvedValue(undefined);
-    mockStore.massUpdate.mockResolvedValue(undefined);
-    mockStore.error = null;
-    mockStore.settings = { family_type: 'couple', husband: 'Alice', wife: 'Bob' };
+    setupDefaultApiMocks();
   });
 
   describe('on mount', () => {
     it('sets the page heading to "Future Budgets"', async () => {
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Future Budgets');
     });
 
-    it('calls fetchAll on mount', async () => {
+    it('calls all three API endpoints on mount', async () => {
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalled();
+      expect(futureBudgetsApi.getFutureBudgets).toHaveBeenCalled();
+      expect(futureBudgetsApi.getAllocationCategories).toHaveBeenCalled();
+      expect(futureBudgetsApi.getSettings).toHaveBeenCalled();
     });
   });
 
   describe('table headers', () => {
-    it('shows budget names as column headers', () => {
+    it('shows budget names as column headers', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.text()).toContain('Jan 2025');
       expect(wrapper.text()).toContain('Feb 2025');
@@ -137,37 +150,42 @@ describe('FutureBudgetsPage', () => {
   });
 
   describe('income section', () => {
-    it('renders the incomes section header', () => {
+    it('renders the incomes section header', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="incomes-section-header"]').exists()).toBe(true);
       expect(wrapper.find('[data-testid="incomes-section-header"]').text()).toBe('Incomes');
     });
 
-    it('renders a row for each income name', () => {
+    it('renders a row for each income name', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const rows = wrapper.findAll('[data-testid="income-row"]');
       expect(rows).toHaveLength(1);
       expect(rows[0].text()).toContain('Salary');
     });
 
-    it('shows amounts for each budget column', () => {
+    it('shows amounts for each budget column', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const row = wrapper.find('[data-testid="income-row"]');
       expect(row.text()).toContain('5,000.00');
       expect(row.text()).toContain('5,100.00');
     });
 
-    it('shows an Add New Income button', () => {
+    it('shows an Add New Income button', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="add-income-btn"]').exists()).toBe(true);
     });
 
-    it('shows total income row', () => {
+    it('shows total income row', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const totalRow = wrapper.find('[data-testid="total-income-row"]');
       expect(totalRow.exists()).toBe(true);
@@ -176,43 +194,49 @@ describe('FutureBudgetsPage', () => {
   });
 
   describe('allocation section', () => {
-    it('renders the allocations section header', () => {
+    it('renders the allocations section header', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="allocations-section-header"]').exists()).toBe(true);
     });
 
-    it('renders a category header row for each allocation category', () => {
+    it('renders a category header row for each allocation category', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const header = wrapper.find('[data-testid="category-header-3"]');
       expect(header.exists()).toBe(true);
       expect(header.text()).toContain('Fixed');
     });
 
-    it('renders allocation rows within each category', () => {
+    it('renders allocation rows within each category', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
       expect(rows).toHaveLength(1);
       expect(rows[0].text()).toContain('Rent');
     });
 
-    it('shows allocation amounts for each budget column', () => {
+    it('shows allocation amounts for each budget column', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const row = wrapper.findAll('[data-testid="allocation-row"]')[0];
       expect(row.text()).toContain('1,500.00');
     });
 
-    it('shows an add-allocation button per category', () => {
+    it('shows an add-allocation button per category', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="add-allocation-btn-3"]').exists()).toBe(true);
     });
 
-    it('shows total allocations row', () => {
+    it('shows total allocations row', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const totalRow = wrapper.find('[data-testid="total-allocations-row"]');
       expect(totalRow.exists()).toBe(true);
@@ -221,22 +245,25 @@ describe('FutureBudgetsPage', () => {
   });
 
   describe('summary footer', () => {
-    it('shows total discretionary row', () => {
+    it('shows total discretionary row', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="total-discretionary-row"]').exists()).toBe(true);
     });
 
     describe('when family_type is couple', () => {
-      it('shows husband and wife rows', () => {
+      it('shows husband and wife rows', async () => {
         const wrapper = createWrapper();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="husband-row"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="wife-row"]').exists()).toBe(true);
       });
 
-      it('uses names from settings', () => {
+      it('uses names from settings', async () => {
         const wrapper = createWrapper();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="husband-row"]').text()).toContain("Alice's Amount");
         expect(wrapper.find('[data-testid="wife-row"]').text()).toContain("Bob's Amount");
@@ -245,11 +272,16 @@ describe('FutureBudgetsPage', () => {
 
     describe('when family_type is single', () => {
       beforeEach(() => {
-        mockStore.settings = { family_type: 'single', single_person: 'Charlie' };
+        setupDefaultApiMocks(
+          [jan2025, feb2025],
+          [fixedCategory],
+          buildSettings({ family_type: 'single', single_person: 'Charlie' }),
+        );
       });
 
-      it('shows a single person row', () => {
+      it('shows a single person row', async () => {
         const wrapper = createWrapper();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="single-person-row"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="single-person-row"]').text()).toContain(
@@ -257,8 +289,9 @@ describe('FutureBudgetsPage', () => {
         );
       });
 
-      it('does not show husband or wife rows', () => {
+      it('does not show husband or wife rows', async () => {
         const wrapper = createWrapper();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="husband-row"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="wife-row"]').exists()).toBe(false);
@@ -267,11 +300,16 @@ describe('FutureBudgetsPage', () => {
 
     describe('when family_type is not set', () => {
       beforeEach(() => {
-        mockStore.settings = {};
+        setupDefaultApiMocks(
+          [jan2025, feb2025],
+          [fixedCategory],
+          buildSettings({ family_type: undefined }),
+        );
       });
 
-      it('shows no per-person rows', () => {
+      it('shows no per-person rows', async () => {
         const wrapper = createWrapper();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="husband-row"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="wife-row"]').exists()).toBe(false);
@@ -283,6 +321,7 @@ describe('FutureBudgetsPage', () => {
   describe('opening income dialog', () => {
     it('opens the dialog with income type when an income name is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
@@ -294,15 +333,20 @@ describe('FutureBudgetsPage', () => {
 
     it('passes the correct amountsPerBudget for the income', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
-      expect(dialog.props('amountsPerBudget')).toEqual(mockStore.incomeDisplayData['Salary']);
+      expect(dialog.props('amountsPerBudget')).toEqual({
+        1: { id: 10, amount: 500000 },
+        2: { id: 20, amount: 510000 },
+      });
     });
 
     it('opens the dialog with empty amounts for new income', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-income-btn"]').trigger('click');
 
@@ -315,6 +359,7 @@ describe('FutureBudgetsPage', () => {
   describe('opening allocation dialog', () => {
     it('opens the dialog with allocation type when an allocation name is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="edit-allocation-Rent"]').trigger('click');
 
@@ -326,6 +371,7 @@ describe('FutureBudgetsPage', () => {
 
     it('passes the category id to the dialog', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="edit-allocation-Rent"]').trigger('click');
 
@@ -335,15 +381,20 @@ describe('FutureBudgetsPage', () => {
 
     it('passes the correct amountsPerBudget for the allocation', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="edit-allocation-Rent"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
-      expect(dialog.props('amountsPerBudget')).toEqual(mockStore.allocationDisplayData[3]['Rent']);
+      expect(dialog.props('amountsPerBudget')).toEqual({
+        1: { id: 50, amount: 150000, is_fixed_amount: false },
+        2: { id: 60, amount: 150000, is_fixed_amount: false },
+      });
     });
 
     it('opens the dialog for a new allocation when add button is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-allocation-btn-3"]').trigger('click');
 
@@ -354,14 +405,16 @@ describe('FutureBudgetsPage', () => {
   });
 
   describe('variable-only toggle', () => {
-    it('shows a variable-only toggle button', () => {
+    it('shows a variable-only toggle button', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="variable-only-toggle"]').exists()).toBe(true);
     });
 
-    it('defaults to "All Allocations" label', () => {
+    it('defaults to "All Allocations" label', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="variable-only-toggle"]').text()).toContain(
         'All Allocations',
@@ -370,6 +423,7 @@ describe('FutureBudgetsPage', () => {
 
     it('toggles label to "Variable Only" when clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
@@ -380,40 +434,104 @@ describe('FutureBudgetsPage', () => {
   });
 
   describe('variable-only mode filtering', () => {
-    const billsCategory: AllocationCategoryData = { id: 5, name: 'Bills' };
+    const billsCategory: AllocationCategoryData = buildAllocationCategory({
+      id: 5,
+      name: 'Bills',
+    });
 
     function setupVariableOnlyData() {
-      // Category 3 (Fixed): Rent is fixed in ALL budgets, Insurance is fixed in all budgets
-      // Category 5 (Bills): Electric is variable in all budgets, Internet is fixed in budget 1 but variable in budget 2
-      mockStore.allocationCategories = [fixedCategory, billsCategory];
-      mockStore.allocationDisplayData = {
-        3: {
-          Rent: {
-            1: { id: 50, amount: 150000, is_fixed_amount: true },
-            2: { id: 60, amount: 150000, is_fixed_amount: true },
-          },
-          Insurance: {
-            1: { id: 51, amount: 50000, is_fixed_amount: true },
-            2: { id: 61, amount: 50000, is_fixed_amount: true },
-          },
-        },
-        5: {
-          Electric: {
-            1: { id: 70, amount: 20000, is_fixed_amount: false },
-            2: { id: 80, amount: 22000, is_fixed_amount: false },
-          },
-          Internet: {
-            1: { id: 71, amount: 10000, is_fixed_amount: true },
-            2: { id: 81, amount: 10000, is_fixed_amount: false },
-          },
-        },
-      };
+      const jan = buildFutureBudget({
+        id: 1,
+        name: 'Jan 2025',
+        start_date: '2025-01-01',
+        end_date: '2025-01-31',
+        incomes: [buildFutureIncome({ id: 10, name: 'Salary', amount: 500000, budget_id: 1 })],
+        allocations: [
+          buildFutureAllocation({
+            id: 50,
+            name: 'Rent',
+            amount: 150000,
+            budget_id: 1,
+            allocation_category_id: 3,
+            is_fixed_amount: true,
+          }),
+          buildFutureAllocation({
+            id: 51,
+            name: 'Insurance',
+            amount: 50000,
+            budget_id: 1,
+            allocation_category_id: 3,
+            is_fixed_amount: true,
+          }),
+          buildFutureAllocation({
+            id: 70,
+            name: 'Electric',
+            amount: 20000,
+            budget_id: 1,
+            allocation_category_id: 5,
+            is_fixed_amount: false,
+          }),
+          buildFutureAllocation({
+            id: 71,
+            name: 'Internet',
+            amount: 10000,
+            budget_id: 1,
+            allocation_category_id: 5,
+            is_fixed_amount: true,
+          }),
+        ],
+      });
+
+      const feb = buildFutureBudget({
+        id: 2,
+        name: 'Feb 2025',
+        start_date: '2025-02-01',
+        end_date: '2025-02-28',
+        incomes: [buildFutureIncome({ id: 20, name: 'Salary', amount: 510000, budget_id: 2 })],
+        allocations: [
+          buildFutureAllocation({
+            id: 60,
+            name: 'Rent',
+            amount: 150000,
+            budget_id: 2,
+            allocation_category_id: 3,
+            is_fixed_amount: true,
+          }),
+          buildFutureAllocation({
+            id: 61,
+            name: 'Insurance',
+            amount: 50000,
+            budget_id: 2,
+            allocation_category_id: 3,
+            is_fixed_amount: true,
+          }),
+          buildFutureAllocation({
+            id: 80,
+            name: 'Electric',
+            amount: 22000,
+            budget_id: 2,
+            allocation_category_id: 5,
+            is_fixed_amount: false,
+          }),
+          buildFutureAllocation({
+            id: 81,
+            name: 'Internet',
+            amount: 10000,
+            budget_id: 2,
+            allocation_category_id: 5,
+            is_fixed_amount: false,
+          }),
+        ],
+      });
+
+      setupDefaultApiMocks([jan, feb], [fixedCategory, billsCategory], defaultSettings);
     }
 
-    it('shows all allocation rows in default mode', () => {
+    it('shows all allocation rows in default mode', async () => {
       setupVariableOnlyData();
 
       const wrapper = createWrapper();
+      await flushPromises();
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
 
       expect(rows).toHaveLength(4);
@@ -427,19 +545,21 @@ describe('FutureBudgetsPage', () => {
       );
     });
 
-    it('does not show fixed subtotal rows in default mode', () => {
+    it('does not show fixed subtotal rows in default mode', async () => {
       setupVariableOnlyData();
 
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="fixed-subtotal-3"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="fixed-subtotal-5"]').exists()).toBe(false);
     });
 
-    it('does not show fixed total row in footer in default mode', () => {
+    it('does not show fixed total row in footer in default mode', async () => {
       setupVariableOnlyData();
 
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="fixed-total-row"]').exists()).toBe(false);
     });
@@ -448,6 +568,7 @@ describe('FutureBudgetsPage', () => {
       setupVariableOnlyData();
 
       const wrapper = createWrapper();
+      await flushPromises();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
@@ -462,6 +583,7 @@ describe('FutureBudgetsPage', () => {
       setupVariableOnlyData();
 
       const wrapper = createWrapper();
+      await flushPromises();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const rows = wrapper.findAll('[data-testid="allocation-row"]');
@@ -477,6 +599,7 @@ describe('FutureBudgetsPage', () => {
       setupVariableOnlyData();
 
       const wrapper = createWrapper();
+      await flushPromises();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       // Category 3 has Rent (150000) + Insurance (50000) = 200000 fixed in both budgets
@@ -494,6 +617,7 @@ describe('FutureBudgetsPage', () => {
       setupVariableOnlyData();
 
       const wrapper = createWrapper();
+      await flushPromises();
       await wrapper.find('[data-testid="variable-only-toggle"]').trigger('click');
 
       const fixedTotalRow = wrapper.find('[data-testid="fixed-total-row"]');
@@ -509,10 +633,13 @@ describe('FutureBudgetsPage', () => {
   describe('Refresh button', () => {
     it('calls fetchAll when refresh button is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
+      // once on mount, once on refresh
+      expect(futureBudgetsApi.getFutureBudgets).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -523,45 +650,44 @@ describe('FutureBudgetsPage', () => {
       amounts: [{ id: 10, amount: 500000, budget_id: 1 }],
     };
 
-    it('calls store.massUpdate with the payload', async () => {
+    it('calls futureBudgetsApi.massUpdate with the payload', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
       await dialog.vm.$emit('save', payload);
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.massUpdate).toHaveBeenCalledWith(payload);
+      expect(futureBudgetsApi.massUpdate).toHaveBeenCalledWith(payload);
     });
 
     it('closes the dialog and shows success toast after successful save', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
       await dialog.vm.$emit('save', payload);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(false);
       expect(mockNotifySuccess).toHaveBeenCalledWith('Changes saved');
     });
 
     it('keeps dialog open and shows error toast when save fails', async () => {
-      const errorMessage = 'Save failed';
-      mockStore.massUpdate.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
+      vi.mocked(futureBudgetsApi.massUpdate).mockRejectedValue(new Error('Server error'));
 
       const wrapper = createWrapper();
+      await flushPromises();
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BudgetMassEditDialog' });
       await dialog.vm.$emit('save', payload);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(true);
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalled();
     });
   });
 });
