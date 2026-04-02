@@ -113,30 +113,30 @@ describe('BankAccountsPage', () => {
   });
 
   describe('closed account display', () => {
-    it('applies the closed class to closed account rows', async () => {
+    it('applies the closed class to closed account names', async () => {
       const wrapper = createWrapper();
       await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
 
-      const items = wrapper.findAll('.account-item');
-      const closedItem = items.find((item) => item.text().includes(closedAccount.name!));
+      const names = wrapper.findAll('.account-name');
+      const closedName = names.find((el) => el.text().includes(closedAccount.name!));
 
-      expect(closedItem!.classes()).toContain('account-item--closed');
+      expect(closedName!.classes()).toContain('account-name--closed');
     });
 
-    it('does not apply the closed class to open account rows', () => {
+    it('does not apply the closed class to open account names', () => {
       const wrapper = createWrapper();
 
-      const items = wrapper.findAll('.account-item');
-      const openItem = items.find((item) => item.text().includes(openAccount.name!));
+      const names = wrapper.findAll('.account-name');
+      const openName = names.find((el) => el.text().includes(openAccount.name!));
 
-      expect(openItem!.classes()).not.toContain('account-item--closed');
+      expect(openName!.classes()).not.toContain('account-name--closed');
     });
 
     it('shows a Closed tag for closed accounts', async () => {
       const wrapper = createWrapper();
       await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
 
-      const items = wrapper.findAll('.account-item');
+      const items = wrapper.findAll('.ec-item-list__item');
       const closedItem = items.find((item) => item.text().includes(closedAccount.name!));
       const tag = closedItem!.findComponent({ name: 'Tag' });
 
@@ -148,7 +148,7 @@ describe('BankAccountsPage', () => {
     it('does not show a Closed tag for open accounts', () => {
       const wrapper = createWrapper();
 
-      const items = wrapper.findAll('.account-item');
+      const items = wrapper.findAll('.ec-item-list__item');
       const openItem = items.find((item) => item.text().includes(openAccount.name!));
 
       expect(openItem!.find('[data-testid="closed-tag"]').exists()).toBe(false);

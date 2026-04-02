@@ -1,17 +1,16 @@
 <template>
   <EcPageLayout page-name="allocation-categories">
-    <ul class="category-list">
-      <li v-for="category in store.allocationCategories" :key="category.id" class="category-item">
+    <EcItemList :items="store.allocationCategories" key-field="id">
+      <template #item="{ item: category }">
         <span class="category-name">{{ category.name }}</span>
         <Button
           label="Edit"
           size="small"
-          class="edit-btn"
           :data-testid="`edit-btn-${category.id}`"
           @click="editCategory(category)"
         />
-      </li>
-    </ul>
+      </template>
+    </EcItemList>
 
     <div class="page-actions">
       <Button label="Add Allocation Category" data-testid="add-btn" @click="addCategory" />
@@ -32,6 +31,7 @@
 import { ref, onMounted } from 'vue';
 import Button from 'primevue/button';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
+import EcItemList from '../shared/layout/EcItemList.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useAllocationCategoryStore } from './allocationCategoryStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -79,35 +79,8 @@ async function onSave(category: AllocationCategoryData) {
 </script>
 
 <style scoped>
-.category-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.category-item {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
-  gap: 0.5rem;
-}
-
-.category-item:last-child {
-  border-bottom: none;
-}
-
 .category-name {
   font-size: 0.9rem;
-}
-
-.edit-btn {
-  margin-left: auto;
 }
 
 .page-actions {

@@ -1,17 +1,16 @@
 <template>
   <EcPageLayout page-name="institutions">
-    <ul class="institution-list">
-      <li v-for="institution in store.institutions" :key="institution.id" class="institution-item">
+    <EcItemList :items="store.institutions" key-field="id">
+      <template #item="{ item: institution }">
         <span class="institution-name">{{ institution.name }}</span>
         <Button
           label="Edit"
           size="small"
-          class="edit-btn"
           :data-testid="`edit-btn-${institution.id}`"
           @click="editInstitution(institution)"
         />
-      </li>
-    </ul>
+      </template>
+    </EcItemList>
 
     <div class="page-actions">
       <Button label="Add Institution" data-testid="add-btn" @click="addInstitution" />
@@ -38,6 +37,7 @@
 import { ref, onMounted } from 'vue';
 import Button from 'primevue/button';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
+import EcItemList from '../shared/layout/EcItemList.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useInstitutionStore } from './institutionStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -85,35 +85,8 @@ async function onSave(institution: InstitutionData) {
 </script>
 
 <style scoped>
-.institution-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.institution-item {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
-  gap: 0.5rem;
-}
-
-.institution-item:last-child {
-  border-bottom: none;
-}
-
 .institution-name {
   font-size: 0.9rem;
-}
-
-.edit-btn {
-  margin-left: auto;
 }
 
 .page-actions {
