@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
+import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import BudgetsPage from './BudgetsPage.vue';
+import { buildBudget } from '../../test/factories';
 import type { BudgetData } from './budget.types';
 import { buildBudget } from '../../test/factories';
 
@@ -34,6 +35,16 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
+vi.mock('./budgetApi', () => ({
+  budgetApi: {
+    getAll: vi.fn(),
+    copy: vi.fn(),
+    close: vi.fn(),
+    reopenLast: vi.fn(),
+    create: vi.fn(),
+  },
+}));
+
 // Stub ConfirmDialog to avoid teleport complexity
 const ConfirmDialogStub = {
   name: 'ConfirmDialog',
@@ -48,11 +59,7 @@ const AddBudgetDialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-const budget1 = buildBudget({ id: 1, name: 'Mar 2025', status: 'open' });
-const budget2 = buildBudget({ id: 2, name: 'Feb 2025', status: 'open' });
-const budget3 = buildBudget({ id: 3, name: 'Jan 2025', status: 'closed' });
-
-// Mock useConfirm — capture the last require call so tests can invoke accept
+// Stub useConfirm — capture the last require call so tests can invoke accept
 let lastConfirmCall: { accept?: () => void } = {};
 vi.mock('primevue/useconfirm', () => ({
   useConfirm: () => ({
@@ -62,76 +69,71 @@ vi.mock('primevue/useconfirm', () => ({
   }),
 }));
 
-const mockStore = reactive({
-  budgets: [budget1, budget2, budget3] as BudgetData[],
-  loading: false,
-  error: null as string | null,
-  canCopy: (b: BudgetData) => b.id === budget1.id,
-  canClose: (b: BudgetData) => b.id === budget2.id,
-  fetchAll: vi.fn().mockResolvedValue(undefined),
-  copyBudget: vi.fn().mockResolvedValue(undefined),
-  closeBudget: vi.fn().mockResolvedValue(undefined),
-  reopenLastBudget: vi.fn().mockResolvedValue(undefined),
-  addBudget: vi.fn().mockResolvedValue(undefined),
-});
-
-vi.mock('./budgetListStore', () => ({
-  useBudgetListStore: () => mockStore,
-}));
-
-function createWrapper(): VueWrapper {
-  return mount(BudgetsPage, {
-    global: {
-      plugins: [PrimeVue, createPinia()],
-      stubs: {
-        ConfirmDialog: ConfirmDialogStub,
-        AddBudgetDialog: AddBudgetDialogStub,
-      },
-    },
-  });
-}
+const budget1 = buildBudget({ id: 1, name: 'Mar 2025', status: 'open' });
+const budget2 = buildBudget({ id: 2, name: 'Feb 2025', status: 'open' });
+const budget3 = buildBudget({ id: 3, name: 'Jan 2025', status: 'closed' });
+const allBudgets: BudgetData[] = [budget1, budget2, budget3];
 
 describe('BudgetsPage', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
+  let pinia: Pinia;
+  let budgetApi: (typeof import('./budgetApi'))['budgetApi'];
+
+  beforeEach(async () => {
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
     lastConfirmCall = {};
-    mockStore.budgets = [budget1, budget2, budget3];
-    mockStore.error = null;
-    mockStore.loading = false;
-    mockStore.fetchAll.mockResolvedValue(undefined);
-    mockStore.copyBudget.mockResolvedValue(undefined);
-    mockStore.closeBudget.mockResolvedValue(undefined);
-    mockStore.reopenLastBudget.mockResolvedValue(undefined);
-    mockStore.addBudget.mockResolvedValue(undefined);
+
+    const mod = await import('./budgetApi');
+    budgetApi = mod.budgetApi;
+
+    vi.mocked(budgetApi.getAll).mockResolvedValue(allBudgets);
+    vi.mocked(budgetApi.copy).mockResolvedValue(undefined as never);
+    vi.mocked(budgetApi.close).mockResolvedValue(undefined as never);
+    vi.mocked(budgetApi.reopenLast).mockResolvedValue(undefined as never);
+    vi.mocked(budgetApi.create).mockResolvedValue(undefined as never);
   });
+
+  function createWrapper(): VueWrapper {
+    return mount(BudgetsPage, {
+      global: {
+        plugins: [PrimeVue, pinia],
+        stubs: {
+          ConfirmDialog: ConfirmDialogStub,
+          AddBudgetDialog: AddBudgetDialogStub,
+        },
+      },
+    });
+  }
 
   describe('on mount', () => {
     it('sets the page heading to "Budgets"', async () => {
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Budgets');
     });
 
-    it('calls fetchAll on mount', async () => {
+    it('calls budgetApi.getAll on mount', async () => {
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalled();
+      expect(budgetApi.getAll).toHaveBeenCalled();
     });
   });
 
   describe('budget table', () => {
-    it('renders a row for each budget', () => {
+    it('renders a row for each budget', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const rows = wrapper.findAll(BUDGET_ROW);
       expect(rows).toHaveLength(3);
     });
 
-    it('shows the budget name in each row', () => {
+    it('shows the budget name in each row', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const rows = wrapper.findAll(BUDGET_ROW);
       expect(rows[0].text()).toContain('Mar 2025');
@@ -141,6 +143,7 @@ describe('BudgetsPage', () => {
 
     it('links each budget name to the budget detail page', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const link = wrapper.find(`[data-testid="budget-name-link-${budget1.id}"]`);
       expect(link.exists()).toBe(true);
@@ -150,8 +153,9 @@ describe('BudgetsPage', () => {
       expect(mockPush).toHaveBeenCalledWith(`/budgets/${budget1.id}`);
     });
 
-    it('shows a status badge for each budget', () => {
+    it('shows a status badge for each budget', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const openBadge = wrapper.find(`[data-testid="status-${budget1.id}"]`);
       expect(openBadge.text()).toBe('open');
@@ -163,17 +167,18 @@ describe('BudgetsPage', () => {
     });
 
     it('shows empty state when there are no budgets', async () => {
-      mockStore.budgets = [];
+      vi.mocked(budgetApi.getAll).mockResolvedValue([]);
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
 
       expect(wrapper.text()).toContain('No budgets found.');
     });
   });
 
   describe('View button', () => {
-    it('shows a View button for every budget', () => {
+    it('shows a View button for every budget', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(`[data-testid="view-btn-${budget1.id}"]`).exists()).toBe(true);
       expect(wrapper.find(`[data-testid="view-btn-${budget2.id}"]`).exists()).toBe(true);
@@ -182,6 +187,7 @@ describe('BudgetsPage', () => {
 
     it('navigates to /budgets/:id when View is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(`[data-testid="view-btn-${budget1.id}"]`).trigger('click');
 
@@ -190,8 +196,9 @@ describe('BudgetsPage', () => {
   });
 
   describe('Copy button', () => {
-    it('shows Copy button only for the first budget', () => {
+    it('shows Copy button only for the first budget', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(`[data-testid="copy-btn-${budget1.id}"]`).exists()).toBe(true);
       expect(wrapper.find(`[data-testid="copy-btn-${budget2.id}"]`).exists()).toBe(false);
@@ -200,43 +207,43 @@ describe('BudgetsPage', () => {
 
     it('shows confirmation dialog when Copy is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(`[data-testid="copy-btn-${budget1.id}"]`).trigger('click');
 
       expect(lastConfirmCall.accept).toBeDefined();
     });
 
-    it('calls store.copyBudget and shows success notification when confirmed', async () => {
+    it('calls budgetApi.copy and shows success notification when confirmed', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(`[data-testid="copy-btn-${budget1.id}"]`).trigger('click');
       await lastConfirmCall.accept!();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.copyBudget).toHaveBeenCalledWith(budget1.id);
+      expect(budgetApi.copy).toHaveBeenCalledWith(budget1.id);
       expect(mockNotifySuccess).toHaveBeenCalledWith('Budget copied');
     });
 
     it('shows error notification when copy fails', async () => {
-      const errorMessage = 'Failed to copy budget';
-      mockStore.copyBudget.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
+      vi.mocked(budgetApi.copy).mockRejectedValue(new Error('Server error'));
 
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(`[data-testid="copy-btn-${budget1.id}"]`).trigger('click');
       await lastConfirmCall.accept!();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
   });
 
   describe('Close button', () => {
-    it('shows Close button only for the last open budget', () => {
+    it('shows Close button only for the last open budget', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(`[data-testid="close-btn-${budget1.id}"]`).exists()).toBe(false);
       expect(wrapper.find(`[data-testid="close-btn-${budget2.id}"]`).exists()).toBe(true);
@@ -245,140 +252,143 @@ describe('BudgetsPage', () => {
 
     it('shows confirmation dialog when Close is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(`[data-testid="close-btn-${budget2.id}"]`).trigger('click');
 
       expect(lastConfirmCall.accept).toBeDefined();
     });
 
-    it('calls store.closeBudget and shows success notification when confirmed', async () => {
+    it('calls budgetApi.close and shows success notification when confirmed', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(`[data-testid="close-btn-${budget2.id}"]`).trigger('click');
       await lastConfirmCall.accept!();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.closeBudget).toHaveBeenCalledWith(budget2.id);
+      expect(budgetApi.close).toHaveBeenCalledWith(budget2.id);
       expect(mockNotifySuccess).toHaveBeenCalledWith('Budget closed');
     });
 
     it('shows error notification when close fails', async () => {
-      const errorMessage = 'Failed to close budget';
-      mockStore.closeBudget.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
+      vi.mocked(budgetApi.close).mockRejectedValue(new Error('Server error'));
 
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(`[data-testid="close-btn-${budget2.id}"]`).trigger('click');
       await lastConfirmCall.accept!();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
   });
 
   describe('Reopen Last Budget button', () => {
-    it('renders the Reopen Last Budget button', () => {
+    it('renders the Reopen Last Budget button', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
+
       expect(wrapper.find(REOPEN_BTN).exists()).toBe(true);
     });
 
     it('shows confirmation dialog when clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(REOPEN_BTN).trigger('click');
 
       expect(lastConfirmCall.accept).toBeDefined();
     });
 
-    it('calls store.reopenLastBudget and shows success notification when confirmed', async () => {
+    it('calls budgetApi.reopenLast and shows success notification when confirmed', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(REOPEN_BTN).trigger('click');
       await lastConfirmCall.accept!();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.reopenLastBudget).toHaveBeenCalled();
+      expect(budgetApi.reopenLast).toHaveBeenCalled();
       expect(mockNotifySuccess).toHaveBeenCalledWith('Last budget re-opened');
     });
 
     it('shows error notification when reopen fails', async () => {
-      const errorMessage = 'Failed to reopen budget';
-      mockStore.reopenLastBudget.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
+      vi.mocked(budgetApi.reopenLast).mockRejectedValue(new Error('Server error'));
 
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(REOPEN_BTN).trigger('click');
       await lastConfirmCall.accept!();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
   });
 
   describe('Add New Budget button', () => {
-    it('renders the Add New Budget button', () => {
+    it('renders the Add New Budget button', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
+
       expect(wrapper.find(ADD_BTN).exists()).toBe(true);
     });
 
     it('opens the AddBudgetDialog when clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(ADD_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'AddBudgetDialog' });
       expect(dialog.props('visible')).toBe(true);
     });
 
-    it('calls store.addBudget and shows success notification on save', async () => {
+    it('calls budgetApi.create and shows success notification on save', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(ADD_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'AddBudgetDialog' });
       await dialog.vm.$emit('save', '2025-04-01');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.addBudget).toHaveBeenCalledWith('2025-04-01');
+      expect(budgetApi.create).toHaveBeenCalledWith({ start_date: '2025-04-01' });
       expect(mockNotifySuccess).toHaveBeenCalledWith('Budget created');
     });
 
     it('shows error notification when add fails', async () => {
-      const errorMessage = 'Failed to create budget';
-      mockStore.addBudget.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
+      vi.mocked(budgetApi.create).mockRejectedValue(new Error('Server error'));
 
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(ADD_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'AddBudgetDialog' });
       await dialog.vm.$emit('save', '2025-04-01');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
   });
 
   describe('Refresh button', () => {
-    it('calls fetchAll when refresh button is clicked', async () => {
+    it('calls budgetApi.getAll when refresh button is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(REFRESH_BTN).trigger('click');
+      await flushPromises();
 
       // Called once on mount and once on click
-      expect(mockStore.fetchAll).toHaveBeenCalledTimes(2);
+      expect(budgetApi.getAll).toHaveBeenCalledTimes(2);
     });
   });
 });
