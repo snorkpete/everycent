@@ -16,14 +16,13 @@
       </div>
     </div>
 
-    <ul class="account-list">
-      <li
-        v-for="account in visibleAccounts"
-        :key="account.id"
-        class="account-item"
-        :class="{ 'account-item--closed': account.status === 'closed' }"
-      >
-        <span class="account-name">{{ account.name }}</span>
+    <EcItemList :items="visibleAccounts" key-field="id">
+      <template #item="{ item: account }">
+        <span
+          class="account-name"
+          :class="{ 'account-name--closed': account.status === 'closed' }"
+          >{{ account.name }}</span
+        >
         <Tag
           v-if="account.status === 'closed'"
           value="Closed"
@@ -35,12 +34,11 @@
         <Button
           label="View"
           size="small"
-          class="view-btn"
           :data-testid="`view-btn-${account.id}`"
           @click="viewAccount(account)"
         />
-      </li>
-    </ul>
+      </template>
+    </EcItemList>
 
     <BankAccountEditDialog
       :visible="dialogVisible"
@@ -61,6 +59,7 @@ import ToggleSwitch from 'primevue/toggleswitch';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useBankAccountStore } from './bankAccountStore';
 import { useNotifications } from '../notifications/useNotifications';
+import EcItemList from '../shared/layout/EcItemList.vue';
 import BankAccountEditDialog from './BankAccountEditDialog.vue';
 import type { BankAccountData } from './bankAccount.types';
 
@@ -133,47 +132,16 @@ async function onSave(account: BankAccountData) {
   cursor: pointer;
 }
 
-.account-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-.account-item {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
-  gap: 0.5rem;
-}
-
-.account-item:last-child {
-  border-bottom: none;
-}
-
-.account-item--closed {
-  background-color: var(--p-surface-50);
-}
-
-.account-item--closed .account-name {
-  color: var(--p-text-muted-color);
-}
-
 .account-name {
   font-size: 0.9rem;
 }
 
-.status-tag {
-  font-size: 0.75rem;
+.account-name--closed {
+  color: var(--p-text-muted-color);
 }
 
-.view-btn {
-  margin-left: auto;
+.status-tag {
+  font-size: 0.75rem;
 }
 
 .page-actions {
