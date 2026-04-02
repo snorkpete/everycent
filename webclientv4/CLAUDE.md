@@ -32,6 +32,7 @@ Key rules:
 - Use a separate `FormData` type when form shape differs from the API type (number fields bound to `EcTextField` must be strings)
 - **`EcMoneyField`** — native `<input>`, not PrimeVue. Emits on `input`, reformats on `blur`. Props: `highlightMode?: 'positive' | 'zero'`, `inline?: boolean` (hides label, row layout for tables/strips). `label` is optional (defaults to `''`).
 - Store actions that fail must re-throw after setting `error.value`
+- **`EcMoneyDisplay`** — read-only money display at `src/app/shared/form/money-field/EcMoneyDisplay.vue`. Props: `modelValue` (cents), `highlightMode?: HighlightMode` (`None`, `Balance`, `Difference`), `emphasis?: Emphasis` (`Item`, `Subtotal`, `Total`, `Headline`). Uses const object + type pattern for domain enums.
 - `useNotifications()` at `src/app/notifications/` — `.success()` / `.error()`
 - Deep-clone reactive Vue props with `structuredClone(toRaw(props.x))` — `structuredClone` alone throws on Proxy objects
 - **Icon-only buttons must have a `v-tooltip`** explaining what the button does in plain language (not just the action — what it achieves). Never use the native HTML `title` attribute — always use PrimeVue's `v-tooltip` directive.

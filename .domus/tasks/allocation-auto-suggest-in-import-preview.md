@@ -1,7 +1,7 @@
 # Task: Allocation auto-suggest in import preview
 
 **ID:** allocation-auto-suggest-in-import-preview
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-22
