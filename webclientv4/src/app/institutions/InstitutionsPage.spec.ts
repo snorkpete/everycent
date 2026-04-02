@@ -1,14 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { nextTick } from 'vue';
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
+import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import InstitutionsPage from './InstitutionsPage.vue';
-import type { InstitutionData } from './institution.types';
+import { useInstitutionStore } from './institutionStore';
+import { useHeadingStore } from '../toolbar/headingStore';
+import { institutionApi } from './institutionApi';
+import { buildInstitution } from '../../test/factories';
 
-const mockSetHeading = vi.fn();
-vi.mock('../toolbar/headingStore', () => ({
-  useHeadingStore: () => ({ setHeading: mockSetHeading }),
+vi.mock('./institutionApi', () => ({
+  institutionApi: {
+    getAll: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+  },
 }));
 
 const mockNotifyError = vi.fn();
@@ -21,20 +27,8 @@ vi.mock('../notifications/useNotifications', () => ({
   }),
 }));
 
-const institution1: InstitutionData = { id: 1, name: 'First Bank' };
-const institution2: InstitutionData = { id: 2, name: 'Second Bank' };
-
-const mockStore = reactive({
-  institutions: [institution1, institution2] as InstitutionData[],
-  loading: false,
-  error: null as string | null,
-  fetchAll: vi.fn().mockResolvedValue(undefined),
-  save: vi.fn().mockResolvedValue(undefined),
-});
-
-vi.mock('./institutionStore', () => ({
-  useInstitutionStore: () => mockStore,
-}));
+const institution1 = buildInstitution({ id: 1, name: 'First Bank' });
+const institution2 = buildInstitution({ id: 2, name: 'Second Bank' });
 
 const DialogStub = {
   name: 'InstitutionEditDialog',
@@ -43,52 +37,56 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function createWrapper() {
+function createWrapper(pinia: Pinia): VueWrapper {
   return mount(InstitutionsPage, {
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
       stubs: { InstitutionEditDialog: DialogStub },
     },
   });
 }
 
 describe('InstitutionsPage', () => {
+  let pinia: Pinia;
+
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.institutions = [institution1, institution2];
-    mockStore.loading = false;
-    mockStore.error = null;
-    mockStore.fetchAll.mockResolvedValue(undefined);
-    mockStore.save.mockResolvedValue(undefined);
+    vi.mocked(institutionApi.getAll).mockResolvedValue([institution1, institution2]);
+    vi.mocked(institutionApi.create).mockResolvedValue(institution1);
+    vi.mocked(institutionApi.update).mockResolvedValue(institution1);
   });
 
   describe('on mount', () => {
     it('sets the page heading to "Financial Institutions"', async () => {
-      createWrapper();
-      await nextTick();
+      createWrapper(pinia);
+      await flushPromises();
 
-      expect(mockSetHeading).toHaveBeenCalledWith('Financial Institutions');
+      const headingStore = useHeadingStore();
+      expect(headingStore.heading).toBe('Financial Institutions');
     });
 
-    it('calls fetchAll on mount', async () => {
-      createWrapper();
-      await nextTick();
+    it('calls the API to fetch all institutions on mount', async () => {
+      createWrapper(pinia);
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalled();
+      expect(institutionApi.getAll).toHaveBeenCalled();
     });
   });
 
   describe('institution list', () => {
-    it('renders all institution names', () => {
-      const wrapper = createWrapper();
+    it('renders all institution names', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       expect(wrapper.text()).toContain(institution1.name);
       expect(wrapper.text()).toContain(institution2.name);
     });
 
-    it('renders an Edit button for each institution', () => {
-      const wrapper = createWrapper();
+    it('renders an Edit button for each institution', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       expect(wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).exists()).toBe(true);
       expect(wrapper.find(`[data-testid="edit-btn-${institution2.id}"]`).exists()).toBe(true);
@@ -97,7 +95,8 @@ describe('InstitutionsPage', () => {
 
   describe('Edit button', () => {
     it('opens the dialog with the selected institution', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
@@ -107,7 +106,8 @@ describe('InstitutionsPage', () => {
     });
 
     it('opens the dialog in view mode', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
@@ -118,7 +118,8 @@ describe('InstitutionsPage', () => {
 
   describe('Add Institution button', () => {
     it('opens the dialog with an empty institution', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -128,7 +129,8 @@ describe('InstitutionsPage', () => {
     });
 
     it('opens the dialog in edit mode', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -138,75 +140,86 @@ describe('InstitutionsPage', () => {
   });
 
   describe('Refresh button', () => {
-    it('calls fetchAll', async () => {
-      const wrapper = createWrapper();
+    it('calls the API to fetch all institutions again', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
+      expect(institutionApi.getAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
     });
 
-    it('is disabled while the store is loading', () => {
-      mockStore.loading = true;
-      const wrapper = createWrapper();
+    it('passes loading=true to the Refresh button while the store is loading', async () => {
+      // Make getAll hang to keep loading=true
+      vi.mocked(institutionApi.getAll).mockImplementation(() => new Promise(() => {}));
+      const wrapper = createWrapper(pinia);
+      await nextTick();
 
-      const refreshBtn = wrapper.find('[data-testid="refresh-btn"]');
-      expect(refreshBtn.attributes('disabled')).toBeDefined();
+      const store = useInstitutionStore();
+      expect(store.loading).toBe(true);
+
+      const allButtons = wrapper.findAllComponents({ name: 'Button' });
+      const refreshBtn = allButtons.find((b) => b.attributes('data-testid') === 'refresh-btn')!;
+      expect(refreshBtn.props('loading')).toBe(true);
     });
 
-    it('is enabled when the store is not loading', () => {
-      mockStore.loading = false;
-      const wrapper = createWrapper();
+    it('passes loading=false to the Refresh button when the store is not loading', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
-      const refreshBtn = wrapper.find('[data-testid="refresh-btn"]');
-      expect(refreshBtn.attributes('disabled')).toBeUndefined();
+      const store = useInstitutionStore();
+      expect(store.loading).toBe(false);
+
+      const allButtons = wrapper.findAllComponents({ name: 'Button' });
+      const refreshBtn = allButtons.find((b) => b.attributes('data-testid') === 'refresh-btn')!;
+      expect(refreshBtn.props('loading')).toBe(false);
     });
   });
 
   describe('on save', () => {
-    it('calls store.save with the institution data', async () => {
-      const wrapper = createWrapper();
+    it('calls the API to update the institution when it has an id', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       await dialog.vm.$emit('save', institution1);
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.save).toHaveBeenCalledWith(institution1);
+      expect(institutionApi.update).toHaveBeenCalledWith(institution1);
     });
 
     it('closes the dialog and shows a success toast after a successful save', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       await dialog.vm.$emit('save', institution1);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(false);
       expect(mockNotifySuccess).toHaveBeenCalledWith('Institution saved');
     });
 
     it('keeps the dialog open and shows an error toast when save fails', async () => {
-      const errorMessage = 'Save failed';
-      mockStore.save.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
-      const wrapper = createWrapper();
+      vi.mocked(institutionApi.update).mockRejectedValue(new Error('Server error'));
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       await dialog.vm.$emit('save', institution1);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(true);
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
 
     it('does not show an error toast on a clean mount', async () => {
-      createWrapper();
-      await nextTick();
+      createWrapper(pinia);
+      await flushPromises();
 
       expect(mockNotifyError).not.toHaveBeenCalled();
     });
