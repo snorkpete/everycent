@@ -1,7 +1,8 @@
 # Task: Create EcItemList component
 
 **ID:** create-ecitemlist-component
-**Status:** ready
+**Status:** done
+**Branch:** task/create-ecitemlist-component
 **Autonomous:** true
 **Priority:** high
 **Captured:** 2026-04-02
@@ -22,16 +23,16 @@ Current consumers: BankAccountsPage, AllocationCategoriesPage, InstitutionsPage 
 
 ## Acceptance Criteria
 
-- [ ] `EcItemList.vue` exists at `src/app/shared/layout/EcItemList.vue`
-- [ ] Props: `items` (array, required), `keyField` (string, default `'id'`), `actionsRight` (boolean, default `true`)
-- [ ] Slots: `item` (scoped `{ item }`)
-- [ ] Renders a `<ul>` with bordered/rounded container styling
-- [ ] Iterates items, renders each in a `<li>` with consistent row styling (flex row, padding, gap, border-bottom between items)
-- [ ] When `actionsRight` is true, last child of each row gets `margin-left: auto`
-- [ ] Full test coverage on EcItemList
-- [ ] 3 consumers migrated: BankAccountsPage, AllocationCategoriesPage, InstitutionsPage
-- [ ] List container and item CSS removed from migrated consumers
-- [ ] All existing consumer tests pass after migration
+- [x] `EcItemList.vue` exists at `src/app/shared/layout/EcItemList.vue`
+- [x] Props: `items` (array, required), `keyField` (string, default `'id'`), `actionsRight` (boolean, default `true`)
+- [x] Slots: `item` (scoped `{ item }`)
+- [x] Renders a `<ul>` with bordered/rounded container styling
+- [x] Iterates items, renders each in a `<li>` with consistent row styling (flex row, padding, gap, border-bottom between items)
+- [x] When `actionsRight` is true, last child of each row gets `margin-left: auto`
+- [x] Full test coverage on EcItemList
+- [x] 3 consumers migrated: BankAccountsPage, AllocationCategoriesPage, InstitutionsPage
+- [x] List container and item CSS removed from migrated consumers
+- [x] All existing consumer tests pass after migration
 
 ---
 
