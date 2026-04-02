@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
+import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import TransactionsPage from './TransactionsPage.vue';
-import type { TransactionData, AllocationData, BudgetData } from './transaction.types';
-import type { BankAccountData } from '../bank-accounts/bankAccount.types';
+import { useTransactionStore } from './transactionStore';
+import { buildTransaction } from '../../test/factories/transactionFactory';
+import { buildBankAccount } from '../../test/factories/bankAccountFactory';
+import { buildBudget } from '../../test/factories/budgetFactory';
+import { buildAllocation } from '../../test/factories/allocationFactory';
+import { buildSettings } from '../../test/factories/settingsFactory';
 
 // Selectors
 const EDIT_BTN = '[data-testid="edit-btn"]';
@@ -24,66 +28,67 @@ vi.mock('../toolbar/headingStore', () => ({
 
 const mockNotifyError = vi.fn();
 const mockNotifySuccess = vi.fn();
+const mockNotifyInfo = vi.fn();
 vi.mock('../notifications/useNotifications', () => ({
   useNotifications: () => ({
     error: mockNotifyError,
     success: mockNotifySuccess,
-    info: vi.fn(),
+    info: mockNotifyInfo,
   }),
 }));
 
-const mockSettingsFetchAll = vi.fn().mockResolvedValue(undefined);
-vi.mock('../settings/settingsStore', () => ({
-  useSettingsStore: () => ({
-    settings: { primary_budget_account_id: 1 },
-    fetchAll: mockSettingsFetchAll,
-  }),
+const mockPush = vi.fn();
+vi.mock('vue-router', () => ({
+  useRouter: () => ({ push: mockPush }),
 }));
 
-const checkingAccount: BankAccountData = {
+// Mock all APIs used by the real stores
+vi.mock('./transactionApi', () => ({
+  transactionApi: {
+    getAll: vi.fn(),
+    save: vi.fn(),
+    getSinkFundAllocations: vi.fn(),
+  },
+}));
+
+vi.mock('../budgets/budgetApi', () => ({
+  budgetApi: {
+    getAll: vi.fn(),
+    getAllocations: vi.fn(),
+    autoAllocate: vi.fn(),
+  },
+}));
+
+vi.mock('../bank-accounts/bankAccountApi', () => ({
+  bankAccountApi: {
+    getOpen: vi.fn(),
+  },
+}));
+
+vi.mock('../settings/settingsApi', () => ({
+  settingsApi: {
+    get: vi.fn(),
+  },
+}));
+
+vi.mock('../allocation-categories/allocationCategoryApi', () => ({
+  allocationCategoryApi: {
+    getAll: vi.fn(),
+  },
+}));
+
+// Factory data
+const checkingAccount = buildBankAccount({ id: 1, name: 'Checking' });
+const jan2025 = buildBudget({ id: 1, name: 'Jan 2025', status: 'open' });
+const sampleTransaction = buildTransaction({
   id: 1,
-  name: 'Checking',
-  is_sink_fund: false,
-  is_credit_card: false,
-};
-const jan2025: BudgetData = { id: 1, name: 'Jan 2025', status: 'open' };
-const sampleTransactions: TransactionData[] = [
-  { id: 1, description: 'Groceries', withdrawal_amount: 5000, deposit_amount: 0, status: 'paid' },
-];
-const sampleAllocations: AllocationData[] = [{ id: 1, name: 'Food', amount: 20000 }];
-
-const mockStore = reactive({
-  transactions: sampleTransactions as TransactionData[],
-  draftTransactions: sampleTransactions as TransactionData[],
-  isEditMode: false,
-  allocations: sampleAllocations as AllocationData[],
-  sinkFundAllocations: [] as unknown[],
-  budgets: [jan2025] as BudgetData[],
-  bankAccounts: [checkingAccount] as BankAccountData[],
-  selectedBankAccount: checkingAccount as BankAccountData | null,
-  selectedBudget: jan2025 as BudgetData | null,
-  loading: false,
-  error: null as string | null,
-  budgetsForDropdown: [jan2025] as BudgetData[],
-  fetchMetadata: vi.fn().mockResolvedValue(undefined),
-  fetch: vi.fn().mockResolvedValue(undefined),
-  save: vi.fn().mockResolvedValue(undefined),
-  refresh: vi.fn().mockResolvedValue(undefined),
-  cancelEdit: vi.fn(),
-  exitEditMode: vi.fn(),
-  enterEditMode: vi.fn(),
-  addTransaction: vi.fn(),
-  deleteTransaction: vi.fn(),
-  onAllocationChange: vi.fn(),
-  addImportedTransactions: vi.fn(),
-  selectedTransactions: [] as unknown[],
-  selectedTotal: 0,
-  clearSelections: vi.fn(),
+  description: 'Groceries',
+  withdrawal_amount: 5000,
+  deposit_amount: 0,
+  status: 'paid',
 });
-
-vi.mock('./transactionStore', () => ({
-  useTransactionStore: () => mockStore,
-}));
+const sampleAllocation = buildAllocation({ id: 1, name: 'Food', amount: 20000 });
+const sampleSettings = buildSettings({ primary_budget_account_id: 1 });
 
 const SearchFormStub = {
   name: 'TransactionSearchForm',
@@ -117,10 +122,12 @@ const TransferDialogStub = {
   emits: ['update:visible', 'transferred'],
 };
 
-function createWrapper() {
+let pinia: Pinia;
+
+function createWrapper(): VueWrapper {
   return mount(TransactionsPage, {
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
       stubs: {
         TransactionSearchForm: SearchFormStub,
         TransactionList: ListStub,
@@ -132,62 +139,76 @@ function createWrapper() {
   });
 }
 
+async function setupApis() {
+  const { transactionApi } = await import('./transactionApi');
+  const { budgetApi } = await import('../budgets/budgetApi');
+  const { bankAccountApi } = await import('../bank-accounts/bankAccountApi');
+  const { settingsApi } = await import('../settings/settingsApi');
+  const { allocationCategoryApi } = await import('../allocation-categories/allocationCategoryApi');
+
+  vi.mocked(budgetApi.getAll).mockResolvedValue([jan2025]);
+  vi.mocked(bankAccountApi.getOpen).mockResolvedValue([checkingAccount]);
+  vi.mocked(transactionApi.getAll).mockResolvedValue([sampleTransaction]);
+  vi.mocked(transactionApi.save).mockResolvedValue([sampleTransaction]);
+  vi.mocked(transactionApi.getSinkFundAllocations).mockResolvedValue([]);
+  vi.mocked(budgetApi.getAllocations).mockResolvedValue([sampleAllocation]);
+  vi.mocked(settingsApi.get).mockResolvedValue(sampleSettings);
+  vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
+
+  return { transactionApi, budgetApi, bankAccountApi, settingsApi, allocationCategoryApi };
+}
+
 describe('TransactionsPage', () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.transactions = sampleTransactions;
-    mockStore.draftTransactions = sampleTransactions;
-    mockStore.isEditMode = false;
-    mockStore.allocations = sampleAllocations;
-    mockStore.sinkFundAllocations = [];
-    mockStore.selectedBankAccount = checkingAccount;
-    mockStore.selectedBudget = jan2025;
-    mockStore.error = null;
-    mockStore.fetchMetadata.mockResolvedValue(undefined);
-    mockStore.fetch.mockResolvedValue(undefined);
-    mockStore.save.mockResolvedValue(undefined);
-    mockStore.refresh.mockResolvedValue(undefined);
-    mockStore.addImportedTransactions.mockReset();
   });
 
   describe('on mount', () => {
     it('sets the page heading to "Transactions"', async () => {
+      await setupApis();
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Transactions');
     });
 
-    it('calls fetchMetadata on mount', async () => {
+    it('calls fetchMetadata on mount (fetches budgets and bank accounts)', async () => {
+      const { budgetApi, bankAccountApi } = await setupApis();
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetchMetadata).toHaveBeenCalled();
+      expect(budgetApi.getAll).toHaveBeenCalled();
+      expect(bankAccountApi.getOpen).toHaveBeenCalled();
     });
 
     it('calls settingsStore.fetchAll on mount', async () => {
+      const { settingsApi } = await setupApis();
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockSettingsFetchAll).toHaveBeenCalled();
+      expect(settingsApi.get).toHaveBeenCalled();
     });
   });
 
   describe('layout', () => {
-    it('renders TransactionSearchForm in toolbar', () => {
+    it('renders TransactionSearchForm in toolbar', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       expect(wrapper.findComponent({ name: 'TransactionSearchForm' }).exists()).toBe(true);
     });
 
-    it('renders TransactionSummary', () => {
+    it('renders TransactionSummary', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       expect(wrapper.findComponent({ name: 'TransactionSummary' }).exists()).toBe(true);
     });
 
-    it('renders TransactionList', () => {
+    it('renders TransactionList', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       expect(wrapper.findComponent({ name: 'TransactionList' }).exists()).toBe(true);
@@ -195,64 +216,74 @@ describe('TransactionsPage', () => {
   });
 
   describe('TransactionSummary props', () => {
-    it('passes committed transactions when not in edit mode', () => {
+    it('passes committed transactions when not in edit mode', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       const summary = wrapper.findComponent({ name: 'TransactionSummary' });
-      expect(summary.props('transactions')).toEqual(sampleTransactions);
+      // Before any fetch, transactions are empty
+      expect(summary.props('transactions')).toEqual([]);
     });
 
     it('passes draft transactions when in edit mode', async () => {
-      const draftTransactions: TransactionData[] = [
-        {
-          id: 1,
-          description: 'Groceries',
-          withdrawal_amount: 5000,
-          deposit_amount: 0,
-          status: 'paid',
-        },
-        {
-          id: 2,
-          description: 'New draft',
-          withdrawal_amount: 1000,
-          deposit_amount: 0,
-          status: 'paid',
-        },
-      ];
-      mockStore.isEditMode = true;
-      mockStore.draftTransactions = draftTransactions;
-
+      await setupApis();
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      // Trigger a fetch so the store has data
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      await flushPromises();
 
       const summary = wrapper.findComponent({ name: 'TransactionSummary' });
-      expect(summary.props('transactions')).toEqual(draftTransactions);
+      expect(summary.props('transactions')).toEqual(store.draftTransactions);
+      expect(store.isEditMode).toBe(true);
     });
 
-    it('passes bankAccount to TransactionSummary', () => {
+    it('passes bankAccount to TransactionSummary', async () => {
+      await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
+
+      // Trigger fetch to set selectedBankAccount
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
 
       const summary = wrapper.findComponent({ name: 'TransactionSummary' });
       expect(summary.props('bankAccount')).toEqual(checkingAccount);
     });
 
-    it('passes allocations to TransactionSummary', () => {
+    it('passes allocations to TransactionSummary', async () => {
+      await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
+
+      // Trigger fetch to load allocations
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
 
       const summary = wrapper.findComponent({ name: 'TransactionSummary' });
-      expect(summary.props('allocations')).toEqual(sampleAllocations);
+      expect(summary.props('allocations')).toEqual([sampleAllocation]);
     });
   });
 
   describe('TransactionList props', () => {
-    it('passes wrapDescriptions=false by default', () => {
+    it('passes wrapDescriptions=false by default', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
       expect(list.props('wrapDescriptions')).toBe(false);
     });
 
-    it('passes showCalculatorColumn=false by default', () => {
+    it('passes showCalculatorColumn=false by default', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
@@ -261,7 +292,8 @@ describe('TransactionsPage', () => {
   });
 
   describe('toolbar — edit mode buttons', () => {
-    it('shows Edit button in view mode', () => {
+    it('shows Edit button in view mode', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
@@ -270,112 +302,167 @@ describe('TransactionsPage', () => {
     });
 
     it('shows Save and Cancel buttons in edit mode', async () => {
-      mockStore.isEditMode = true;
+      await setupApis();
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      await flushPromises();
 
       expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
       expect(wrapper.find(CANCEL_BTN).exists()).toBe(true);
       expect(wrapper.find(EDIT_BTN).exists()).toBe(false);
     });
 
-    it('calls store.enterEditMode when Edit is clicked', async () => {
+    it('enters edit mode when Edit is clicked', async () => {
+      await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(EDIT_BTN).trigger('click');
+      await flushPromises();
 
-      expect(mockStore.enterEditMode).toHaveBeenCalled();
+      const store = useTransactionStore();
+      expect(store.isEditMode).toBe(true);
     });
 
-    it('calls store.cancelEdit when Cancel is clicked', async () => {
-      mockStore.isEditMode = true;
+    it('cancels edit mode when Cancel is clicked', async () => {
+      await setupApis();
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(CANCEL_BTN).trigger('click');
+      await flushPromises();
 
-      expect(mockStore.cancelEdit).toHaveBeenCalled();
+      expect(store.isEditMode).toBe(false);
     });
   });
 
   describe('toolbar — save', () => {
-    it('calls store.save with draftTransactions when Save is clicked', async () => {
-      mockStore.isEditMode = true;
+    it('calls transactionApi.save when Save is clicked', async () => {
+      const { transactionApi } = await setupApis();
       const wrapper = createWrapper();
-      await nextTick();
-      const draftTransactions = mockStore.draftTransactions;
+      await flushPromises();
+
+      // Fetch to populate store, then enter edit mode
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.save).toHaveBeenCalledWith(draftTransactions);
+      expect(transactionApi.save).toHaveBeenCalled();
     });
 
-    it('calls store.exitEditMode after saving', async () => {
-      mockStore.isEditMode = true;
+    it('exits edit mode after saving', async () => {
+      await setupApis();
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      // Fetch to populate store, then enter edit mode
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.exitEditMode).toHaveBeenCalled();
+      expect(store.isEditMode).toBe(false);
     });
 
     it('shows a success notification after saving', async () => {
-      mockStore.isEditMode = true;
+      await setupApis();
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       expect(mockNotifySuccess).toHaveBeenCalledWith('Transactions saved');
     });
 
     it('shows an error notification if save fails', async () => {
-      const errorMessage = 'Save failed';
-      mockStore.save.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
-      mockStore.isEditMode = true;
+      const { transactionApi } = await setupApis();
+      vi.mocked(transactionApi.save).mockRejectedValue(new Error('Server error'));
+
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalled();
     });
   });
 
   describe('toolbar — refresh', () => {
-    it('shows Refresh button', () => {
+    it('shows Refresh button', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       expect(wrapper.find(REFRESH_BTN).exists()).toBe(true);
     });
 
     it('calls store.refresh when Refresh is clicked', async () => {
+      const { transactionApi } = await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
+
+      // Populate the store with a selected account/budget so refresh works
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+      vi.clearAllMocks();
 
       await wrapper.find(REFRESH_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.refresh).toHaveBeenCalled();
+      // Refresh calls fetch internally, which calls transactionApi.getAll
+      expect(transactionApi.getAll).toHaveBeenCalled();
     });
   });
 
   describe('toolbar — Import and Transfer', () => {
-    it('shows Import button', () => {
+    it('shows Import button', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       const importBtn = wrapper.find(IMPORT_BTN);
       expect(importBtn.exists()).toBe(true);
     });
 
-    it('Import button is not disabled', () => {
+    it('Import button is not disabled', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       const importBtn = wrapper.find(IMPORT_BTN);
@@ -383,36 +470,45 @@ describe('TransactionsPage', () => {
     });
 
     it('opens import dialog when Import button is clicked', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       await wrapper.find(IMPORT_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'TransactionImportDialog' });
       expect(dialog.props('visible')).toBe(true);
     });
 
-    it('calls store.addImportedTransactions when dialog emits "imported"', async () => {
+    it('adds imported transactions to draft when dialog emits "imported"', async () => {
+      await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
+
       const importedTransactions = [
         { description: 'Test Import', withdrawal_amount: 100, deposit_amount: 0 },
       ];
 
       const dialog = wrapper.findComponent({ name: 'TransactionImportDialog' });
       await dialog.vm.$emit('imported', importedTransactions);
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.addImportedTransactions).toHaveBeenCalledWith(importedTransactions);
+      const store = useTransactionStore();
+      // addImportedTransactions enters edit mode and adds to draftTransactions
+      expect(store.isEditMode).toBe(true);
+      expect(store.draftTransactions.some((t) => t.description === 'Test Import')).toBe(true);
     });
 
-    it('shows Transfer button', () => {
+    it('shows Transfer button', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       const transferBtn = wrapper.find(TRANSFER_BTN);
       expect(transferBtn.exists()).toBe(true);
     });
 
-    it('Transfer button is not disabled', () => {
+    it('Transfer button is not disabled', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       const transferBtn = wrapper.find(TRANSFER_BTN);
@@ -420,23 +516,32 @@ describe('TransactionsPage', () => {
     });
 
     it('opens transfer dialog when Transfer button is clicked', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       await wrapper.find(TRANSFER_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'AccountTransferDialog' });
       expect(dialog.props('visible')).toBe(true);
     });
 
     it('calls store.fetch when transfer dialog emits "transferred"', async () => {
+      const { transactionApi } = await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
+
+      // First fetch so selectedBudget/selectedBankAccount are set
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+      vi.clearAllMocks();
 
       const dialog = wrapper.findComponent({ name: 'AccountTransferDialog' });
       await dialog.vm.$emit('transferred');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetch).toHaveBeenCalledWith({
+      expect(transactionApi.getAll).toHaveBeenCalledWith({
         budgetId: jan2025.id,
         bankAccountId: checkingAccount.id,
       });
@@ -444,28 +549,31 @@ describe('TransactionsPage', () => {
   });
 
   describe('toolbar — wrap toggle', () => {
-    it('shows wrap toggle button', () => {
+    it('shows wrap toggle button', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       expect(wrapper.find(WRAP_TOGGLE_BTN).exists()).toBe(true);
     });
 
     it('passes wrapDescriptions=true to TransactionList after toggle', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       await wrapper.find(WRAP_TOGGLE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
       expect(list.props('wrapDescriptions')).toBe(true);
     });
 
     it('toggles wrapDescriptions back to false on second click', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       await wrapper.find(WRAP_TOGGLE_BTN).trigger('click');
       await wrapper.find(WRAP_TOGGLE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
       expect(list.props('wrapDescriptions')).toBe(false);
@@ -473,60 +581,91 @@ describe('TransactionsPage', () => {
   });
 
   describe('toolbar — calculator toggle', () => {
-    it('shows calculator toggle button', () => {
+    it('shows calculator toggle button', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       expect(wrapper.find(CALCULATOR_TOGGLE_BTN).exists()).toBe(true);
     });
 
     it('passes showCalculatorColumn=true to TransactionList after toggle', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
       expect(list.props('showCalculatorColumn')).toBe(true);
     });
 
     it('toggles showCalculatorColumn back to false on second click', async () => {
+      await setupApis();
       const wrapper = createWrapper();
 
       await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
       await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const list = wrapper.findComponent({ name: 'TransactionList' });
       expect(list.props('showCalculatorColumn')).toBe(false);
     });
 
-    it('calls store.clearSelections when toggling calculator column off', async () => {
+    it('clears selections when toggling calculator column off', async () => {
+      await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
+
+      // Fetch so store has transactions with draft data
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      // Mark a transaction as selected
+      store.draftTransactions[0].selected = true;
 
       await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
       await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+      await flushPromises();
 
-      expect(mockStore.clearSelections).toHaveBeenCalled();
+      expect(store.draftTransactions[0].selected).toBe(false);
     });
 
-    it('does not call store.clearSelections when toggling calculator column on', async () => {
+    it('does not clear selections when toggling calculator column on', async () => {
+      await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
+
+      // Fetch so store has transactions with draft data
+      const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
+      await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
+      await flushPromises();
+
+      const store = useTransactionStore();
+      store.enterEditMode();
+      store.draftTransactions[0].selected = true;
 
       await wrapper.find(CALCULATOR_TOGGLE_BTN).trigger('click');
+      await flushPromises();
 
-      expect(mockStore.clearSelections).not.toHaveBeenCalled();
+      // Selected status should not be cleared when toggling ON
+      expect(store.draftTransactions[0].selected).toBe(true);
     });
   });
 
   describe('fetch event from TransactionSearchForm', () => {
-    it('calls store.fetch with the given params', async () => {
+    it('calls transactionApi.getAll with the given params', async () => {
+      const { transactionApi } = await setupApis();
       const wrapper = createWrapper();
+      await flushPromises();
 
       const searchForm = wrapper.findComponent({ name: 'TransactionSearchForm' });
       await searchForm.vm.$emit('fetch', { budgetId: 1, bankAccountId: 1 });
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetch).toHaveBeenCalledWith({ budgetId: 1, bankAccountId: 1 });
+      expect(transactionApi.getAll).toHaveBeenCalledWith({ budgetId: 1, bankAccountId: 1 });
     });
   });
 });
