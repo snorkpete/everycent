@@ -65,6 +65,10 @@ Prerequisite: user must have run `heroku login` in their terminal session.
 - Before committing, run `npm run type-check` (in webclientv4/) and verify there are no TypeScript errors. Do not commit with type errors.
 - Before committing, run `npm run test` (in webclientv4/) and verify all tests pass. Do not commit with failing tests.
 - Before committing, run `bundle exec rspec` and verify all backend tests pass. Do not commit with failing tests.
+- Before staging, restore `package-lock.json` if it was modified incidentally (`git checkout -- webclientv4/package-lock.json`). Only commit lockfile changes when the task specifically involves adding, removing, or updating dependencies.
+- **Never use `--no-verify`** to bypass pre-commit hooks. If hooks fail, fix the underlying issue. Using `--no-verify` requires explicit permission from the user.
+- **Never add `eslint-disable` comments** to suppress lint errors without explicit permission from the user. Fix the code instead. This includes pre-existing violations in files you touch — if you modify a file and encounter existing lint errors, fix them.
+- **Never bypass TypeScript errors** with `@ts-ignore`, `@ts-expect-error`, or bang assertions (`!`). Fix with proper type guards. Suppression requires explicit permission. This includes pre-existing type errors in files you touch — if you modify a file and it has existing type errors, fix them.
 
 ## Code Review (Vue App - webclientv4)
 - Before committing any changes, run the `senior-code-reviewer` agent over all modified files.

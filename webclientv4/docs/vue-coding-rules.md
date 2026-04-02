@@ -90,6 +90,8 @@ Rules:
 - Always include `loading` and `error` refs
 - Actions that fail must re-throw after setting `error.value` so callers can react
 - Use `computed` for derived state
+- **Never mutate store arrays from components** — always use store actions (e.g. `store.addAllocation()`, not `store.budget.allocations.push()`). The store owns its data; components request changes through actions.
+- **All settings access goes through `useSettingsStore()`** — never fetch settings independently via an API call. The router guard loads settings on every route change, so `settingsStore` is guaranteed to be populated when any page renders.
 
 ## API Pattern
 
@@ -122,6 +124,14 @@ Uses native `<input>` instead of PrimeVue InputText/InputNumber — the cents-co
 - Reformats display on `blur`
 - `highlightMode?: 'positive' | 'zero'` — controls which sign gets colour treatment (default: negatives red)
 
+## Naming
+
+Use explicit variable names. Avoid abbreviations — `bankAccount` not `ba`, `allocation` not `alloc`, `transaction` not `tx`. The only acceptable short names are universally understood loop variables like `i`, `e` (in catch blocks), or single-letter callbacks in `.map(x => ...)` where the context is immediately obvious.
+
+## Formatting
+
+Don't collapse multi-element expressions onto one line. Array literals, `Promise.all` argument lists, object literals with multiple keys, and similar constructs should have one element per line for readability.
+
 ## Cloning Reactive Props
 
 ```typescript
@@ -131,3 +141,58 @@ const draft = structuredClone(toRaw(props.item))
 // Wrong — structuredClone throws on Proxy objects
 const draft = structuredClone(props.item)
 ```
+
+## Testing: Single Pinia Instance
+
+Tests that use real Pinia stores must share one Pinia instance between `setActivePinia` and the component mount. Never call `createPinia()` twice.
+
+```typescript
+// ✅ Correct — one instance shared everywhere
+let pinia: Pinia;
+
+beforeEach(() => {
+  pinia = createPinia();
+  setActivePinia(pinia);
+});
+
+function createWrapper(): VueWrapper {
+  return mount(MyPage, {
+    global: { plugins: [pinia, PrimeVue] },
+  });
+}
+
+// ❌ Wrong — two instances, stores don't share state
+beforeEach(() => {
+  setActivePinia(createPinia());      // instance A
+});
+function createWrapper(): VueWrapper {
+  return mount(MyPage, {
+    global: { plugins: [createPinia()] }, // instance B!
+  });
+}
+```
+
+## Testing: Mock at the API Boundary
+
+Page specs should mock API modules, not stores. Use real Pinia stores so store logic is exercised.
+
+```typescript
+// ✅ Correct — mock the API, use real store
+vi.mock('./someApi', () => ({
+  someApi: { getAll: vi.fn(), save: vi.fn() },
+}));
+
+// In tests:
+vi.mocked(someApi.getAll).mockResolvedValue([buildItem()]);
+
+// ❌ Avoid — mocking the entire store
+vi.mock('./someStore', () => ({
+  useSomeStore: () => mockStore,
+}));
+```
+
+**Exception:** Composables that bridge external services (e.g. `useNotifications` wraps PrimeVue toast) still need mocking because they depend on providers not available in unit tests.
+
+## Testing: Assert on Rendered Output
+
+Prefer asserting on what the user sees (rendered text, element presence) over internal state. Use input params to drive assertions when rendered output isn't practical (should be rare).
