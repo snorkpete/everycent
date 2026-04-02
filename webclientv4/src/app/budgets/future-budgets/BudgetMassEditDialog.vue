@@ -20,11 +20,15 @@
         <tbody>
           <tr>
             <td class="sticky-col">
-              <InputText v-model="formName" class="name-input" data-testid="name-input" />
+              <InputText
+                v-model="formName"
+                class="name-input"
+                data-testid="name-input"
+              />
             </td>
-            <td v-for="(row, i) in amounts" :key="row.budget_id">
+            <td v-for="(_, i) in amounts" :key="amounts[i].budget_id">
               <EcMoneyField
-                v-model="row.amount"
+                v-model="amounts[i].amount"
                 label=""
                 :edit-mode="true"
                 :data-testid="`amount-input-${i}`"
@@ -35,9 +39,9 @@
           <template v-if="type === 'allocation'">
             <tr data-testid="fixed-row">
               <td class="info-label sticky-col">Fixed?</td>
-              <td v-for="(row, i) in amounts" :key="row.budget_id" class="center-cell">
+              <td v-for="(_, i) in amounts" :key="amounts[i].budget_id" class="center-cell">
                 <input
-                  v-model="row.is_fixed_amount"
+                  v-model="amounts[i].is_fixed_amount"
                   type="checkbox"
                   :data-testid="`fixed-checkbox-${i}`"
                 />
@@ -57,17 +61,13 @@
             <tr class="info-row info-row--first">
               <td class="info-label sticky-col">Total Income</td>
               <td v-for="row in amounts" :key="row.budget_id">
-                <EcMoneyField :model-value="row.budgetIncome" label="" :edit-mode="false" />
+                <EcMoneyDisplay :model-value="row.budgetIncome" highlight-mode="none" />
               </td>
             </tr>
             <tr class="info-row">
               <td class="info-label sticky-col">Already Allocated</td>
               <td v-for="row in amounts" :key="row.budget_id">
-                <EcMoneyField
-                  :model-value="row.totalAllocationsWithoutCurrent"
-                  label=""
-                  :edit-mode="false"
-                />
+                <EcMoneyDisplay :model-value="row.totalAllocationsWithoutCurrent" highlight-mode="none" />
               </td>
             </tr>
             <tr class="info-row">
@@ -77,11 +77,8 @@
                 :key="row.budget_id"
                 :data-testid="`discretionary-display-${i}`"
               >
-                <EcMoneyField
+                <EcMoneyDisplay
                   :model-value="row.budgetIncome - row.totalAllocationsWithoutCurrent - row.amount"
-                  label=""
-                  :edit-mode="false"
-                  :highlight-positive="true"
                 />
               </td>
             </tr>
@@ -110,6 +107,7 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import EcMoneyField from '../../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../../shared/form/money-field/EcMoneyDisplay.vue';
 import { budgetHeaderLines } from './budgetHeaderLines';
 import type { AmountRow, FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 
@@ -144,7 +142,9 @@ function buildAmounts(): AmountRow[] {
     const originalAmount = existing.amount;
 
     const budgetIncome =
-      props.type === 'allocation' ? budget.incomes.reduce((sum, i) => sum + i.amount, 0) : 0;
+      props.type === 'allocation'
+        ? budget.incomes.reduce((sum, i) => sum + i.amount, 0)
+        : 0;
 
     const totalAllocationsWithoutCurrent =
       props.type === 'allocation'
@@ -157,7 +157,7 @@ function buildAmounts(): AmountRow[] {
       budget_id: budget.id,
       budgetIncome,
       totalAllocationsWithoutCurrent,
-      is_fixed_amount: 'is_fixed_amount' in existing ? existing.is_fixed_amount : false,
+      is_fixed_amount: ('is_fixed_amount' in existing) ? existing.is_fixed_amount : false,
     };
   });
 }

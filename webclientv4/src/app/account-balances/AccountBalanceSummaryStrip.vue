@@ -4,26 +4,16 @@
     <div class="strip-row strip-row--primary">
       <div class="strip-item">
         <span class="strip-label">Total Assets</span>
-        <EcMoneyField
-          :edit-mode="false"
-          inline
-          :model-value="store.totalAssets"
-          highlight-mode="positive"
-        />
+        <EcMoneyDisplay :model-value="store.totalAssets" emphasis="subtotal" />
       </div>
       <div class="strip-divider"></div>
       <div class="strip-item">
         <span class="strip-label">Total Liabilities</span>
-        <EcMoneyField :edit-mode="false" inline :model-value="store.totalLiabilities" />
+        <EcMoneyDisplay :model-value="store.totalLiabilities" emphasis="subtotal" />
       </div>
       <div class="strip-item strip-item--net-worth">
         <span class="strip-label">Net Worth</span>
-        <EcMoneyField
-          :edit-mode="false"
-          inline
-          :model-value="store.netWorth"
-          highlight-mode="positive"
-        />
+        <EcMoneyDisplay :model-value="store.netWorth" emphasis="headline" />
       </div>
     </div>
 
@@ -31,25 +21,15 @@
     <div class="strip-row strip-row--secondary">
       <div class="strip-item strip-item--small">
         <span class="strip-label-small">Current Cash</span>
-        <EcMoneyField
-          :edit-mode="false"
-          inline
-          :model-value="store.netCurrentCash"
-          highlight-mode="positive"
-        />
+        <EcMoneyDisplay :model-value="store.netCurrentCash" />
       </div>
       <div class="strip-item strip-item--small">
         <span class="strip-label-small">Cash Assets</span>
-        <EcMoneyField
-          :edit-mode="false"
-          inline
-          :model-value="store.netCashAssets"
-          highlight-mode="positive"
-        />
+        <EcMoneyDisplay :model-value="store.netCashAssets" />
       </div>
       <div class="strip-item strip-item--small">
         <span class="strip-label-small">Non Cash Assets</span>
-        <EcMoneyField :edit-mode="false" inline :model-value="store.netNonCashAssets" />
+        <EcMoneyDisplay :model-value="store.netNonCashAssets" />
       </div>
     </div>
   </div>
@@ -57,7 +37,7 @@
 
 <script setup lang="ts">
 import { useAccountBalanceStore } from './accountBalanceStore';
-import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 
 const store = useAccountBalanceStore();
 </script>
@@ -132,19 +112,4 @@ const store = useAccountBalanceStore();
   background-color: var(--p-surface-300);
 }
 
-/* ── EcMoneyField size overrides per context ── */
-.strip-item :deep(.money-display) {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.strip-item--net-worth :deep(.money-display) {
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.strip-item--small :deep(.money-display) {
-  font-size: 0.8rem;
-  font-weight: 500;
-}
 </style>

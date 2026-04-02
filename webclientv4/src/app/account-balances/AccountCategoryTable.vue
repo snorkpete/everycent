@@ -2,7 +2,7 @@
   <div class="account-category-table">
     <h3 class="section-heading">
       <span>{{ heading }}</span>
-      <span class="heading-total">{{ centsToDollars(totalCurrentBalance) }}</span>
+      <span class="heading-total"><EcMoneyDisplay :model-value="totalCurrentBalance" emphasis="subtotal" /></span>
     </h3>
     <table class="account-table">
       <thead>
@@ -34,17 +34,13 @@
           </td>
           <td>{{ account.institution?.name ?? '' }}</td>
           <td class="money-cell">
-            <EcMoneyField :edit-mode="false" inline :model-value="account.closing_balance" />
+            <EcMoneyDisplay :model-value="account.closing_balance" highlight-mode="none" />
           </td>
           <td class="money-cell">
-            <EcMoneyField
-              :edit-mode="false"
-              inline
-              :model-value="account.expected_closing_balance"
-            />
+            <EcMoneyDisplay :model-value="account.expected_closing_balance" highlight-mode="none" />
           </td>
           <td class="money-cell">
-            <EcMoneyField :edit-mode="false" inline :model-value="account.current_balance" />
+            <EcMoneyDisplay :model-value="account.current_balance" highlight-mode="none" />
           </td>
         </tr>
       </tbody>
@@ -52,13 +48,13 @@
         <tr class="total-row">
           <th colspan="2" class="total-label">Total</th>
           <th class="money-cell">
-            <EcMoneyField :edit-mode="false" inline :model-value="totalClosingBalance" />
+            <EcMoneyDisplay :model-value="totalClosingBalance" emphasis="total" />
           </th>
           <th class="money-cell">
-            <EcMoneyField :edit-mode="false" inline :model-value="totalExpectedClosingBalance" />
+            <EcMoneyDisplay :model-value="totalExpectedClosingBalance" emphasis="total" />
           </th>
           <th class="money-cell">
-            <EcMoneyField :edit-mode="false" inline :model-value="totalCurrentBalance" />
+            <EcMoneyDisplay :model-value="totalCurrentBalance" emphasis="total" />
           </th>
         </tr>
       </tfoot>
@@ -68,9 +64,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { formatDate } from '../shared/util/format-date';
-import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import type { AccountBalanceData } from './accountBalance.types';
 
 const props = defineProps<{
@@ -197,8 +192,4 @@ const totalCurrentBalance = computed(() =>
   cursor: help;
 }
 
-/* EcMoneyField size overrides per context */
-.total-row .money-cell :deep(.money-display) {
-  font-size: 0.9375rem;
-}
 </style>
