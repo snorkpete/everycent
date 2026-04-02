@@ -1,14 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
+import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import AllocationCategoriesPage from './AllocationCategoriesPage.vue';
-import type { AllocationCategoryData } from './allocationCategory.types';
+import { useHeadingStore } from '../toolbar/headingStore';
+import { allocationCategoryApi } from './allocationCategoryApi';
+import { buildAllocationCategory } from '../../test/factories';
 
-const mockSetHeading = vi.fn();
-vi.mock('../toolbar/headingStore', () => ({
-  useHeadingStore: () => ({ setHeading: mockSetHeading }),
+vi.mock('./allocationCategoryApi', () => ({
+  allocationCategoryApi: {
+    getAll: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+  },
 }));
 
 const mockNotifyError = vi.fn();
@@ -21,20 +25,8 @@ vi.mock('../notifications/useNotifications', () => ({
   }),
 }));
 
-const category1: AllocationCategoryData = { id: 1, name: 'Groceries' };
-const category2: AllocationCategoryData = { id: 2, name: 'Utilities' };
-
-const mockStore = reactive({
-  allocationCategories: [category1, category2] as AllocationCategoryData[],
-  loading: false,
-  error: null as string | null,
-  fetchAll: vi.fn().mockResolvedValue(undefined),
-  save: vi.fn().mockResolvedValue(undefined),
-});
-
-vi.mock('./allocationCategoryStore', () => ({
-  useAllocationCategoryStore: () => mockStore,
-}));
+const category1 = buildAllocationCategory({ id: 1, name: 'Groceries' });
+const category2 = buildAllocationCategory({ id: 2, name: 'Utilities' });
 
 const DialogStub = {
   name: 'AllocationCategoryEditDialog',
@@ -43,51 +35,56 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function createWrapper() {
+function createWrapper(pinia: Pinia): VueWrapper {
   return mount(AllocationCategoriesPage, {
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
       stubs: { AllocationCategoryEditDialog: DialogStub },
     },
   });
 }
 
 describe('AllocationCategoriesPage', () => {
+  let pinia: Pinia;
+
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.allocationCategories = [category1, category2];
-    mockStore.error = null;
-    mockStore.fetchAll.mockResolvedValue(undefined);
-    mockStore.save.mockResolvedValue(undefined);
+    vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([category1, category2]);
+    vi.mocked(allocationCategoryApi.create).mockResolvedValue(category1);
+    vi.mocked(allocationCategoryApi.update).mockResolvedValue(category1);
   });
 
   describe('on mount', () => {
     it('sets the page heading to "Allocation Categories"', async () => {
-      createWrapper();
-      await nextTick();
+      createWrapper(pinia);
+      await flushPromises();
 
-      expect(mockSetHeading).toHaveBeenCalledWith('Allocation Categories');
+      const headingStore = useHeadingStore();
+      expect(headingStore.heading).toBe('Allocation Categories');
     });
 
-    it('calls fetchAll on mount', async () => {
-      createWrapper();
-      await nextTick();
+    it('calls the API to fetch all categories on mount', async () => {
+      createWrapper(pinia);
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalled();
+      expect(allocationCategoryApi.getAll).toHaveBeenCalled();
     });
   });
 
   describe('category list', () => {
-    it('renders all category names', () => {
-      const wrapper = createWrapper();
+    it('renders all category names', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       expect(wrapper.text()).toContain(category1.name);
       expect(wrapper.text()).toContain(category2.name);
     });
 
-    it('renders an Edit button for each category', () => {
-      const wrapper = createWrapper();
+    it('renders an Edit button for each category', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       expect(wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).exists()).toBe(true);
       expect(wrapper.find(`[data-testid="edit-btn-${category2.id}"]`).exists()).toBe(true);
@@ -96,7 +93,8 @@ describe('AllocationCategoriesPage', () => {
 
   describe('Edit button', () => {
     it('opens the dialog with the selected category', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
@@ -106,7 +104,8 @@ describe('AllocationCategoriesPage', () => {
     });
 
     it('opens the dialog in view mode', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
@@ -117,7 +116,8 @@ describe('AllocationCategoriesPage', () => {
 
   describe('Add Allocation Category button', () => {
     it('opens the dialog with an empty category', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -127,7 +127,8 @@ describe('AllocationCategoriesPage', () => {
     });
 
     it('opens the dialog in edit mode', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -137,59 +138,60 @@ describe('AllocationCategoriesPage', () => {
   });
 
   describe('Refresh button', () => {
-    it('calls fetchAll', async () => {
-      const wrapper = createWrapper();
+    it('calls the API to fetch all categories again', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
+      expect(allocationCategoryApi.getAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
     });
   });
 
   describe('on save', () => {
-    it('calls store.save with the category data', async () => {
-      const wrapper = createWrapper();
+    it('calls the API to update the category when it has an id', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       await dialog.vm.$emit('save', category1);
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.save).toHaveBeenCalledWith(category1);
+      expect(allocationCategoryApi.update).toHaveBeenCalledWith(category1);
     });
 
     it('closes the dialog and shows a success toast after a successful save', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       await dialog.vm.$emit('save', category1);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(false);
       expect(mockNotifySuccess).toHaveBeenCalledWith('Allocation category saved');
     });
 
     it('keeps the dialog open and shows an error toast when save fails', async () => {
-      const errorMessage = 'Save failed';
-      mockStore.save.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
-      const wrapper = createWrapper();
+      vi.mocked(allocationCategoryApi.update).mockRejectedValue(new Error('Server error'));
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       await dialog.vm.$emit('save', category1);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(true);
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
 
     it('does not show an error toast on a clean mount', async () => {
-      createWrapper();
-      await nextTick();
+      createWrapper(pinia);
+      await flushPromises();
 
       expect(mockNotifyError).not.toHaveBeenCalled();
     });

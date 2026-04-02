@@ -1,14 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
+import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BankAccountsPage from './BankAccountsPage.vue';
-import type { BankAccountData } from './bankAccount.types';
+import { useHeadingStore } from '../toolbar/headingStore';
+import { bankAccountApi } from './bankAccountApi';
+import { buildBankAccount } from '../../test/factories';
 
-const mockSetHeading = vi.fn();
-vi.mock('../toolbar/headingStore', () => ({
-  useHeadingStore: () => ({ setHeading: mockSetHeading }),
+vi.mock('./bankAccountApi', () => ({
+  bankAccountApi: {
+    getAll: vi.fn(),
+    getInstitutions: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+  },
 }));
 
 const mockNotifyError = vi.fn();
@@ -21,22 +26,8 @@ vi.mock('../notifications/useNotifications', () => ({
   }),
 }));
 
-const openAccount: BankAccountData = { id: 1, name: 'Savings Account', status: 'open' };
-const closedAccount: BankAccountData = { id: 2, name: 'Old Account', status: 'closed' };
-
-const mockStore = reactive({
-  bankAccounts: [openAccount, closedAccount] as BankAccountData[],
-  institutions: [] as unknown[],
-  loading: false,
-  error: null as string | null,
-  fetchAll: vi.fn().mockResolvedValue(undefined),
-  fetchInstitutions: vi.fn().mockResolvedValue(undefined),
-  save: vi.fn().mockResolvedValue(undefined),
-});
-
-vi.mock('./bankAccountStore', () => ({
-  useBankAccountStore: () => mockStore,
-}));
+const openAccount = buildBankAccount({ id: 1, name: 'Savings Account', status: 'open' });
+const closedAccount = buildBankAccount({ id: 2, name: 'Old Account', status: 'closed' });
 
 const DialogStub = {
   name: 'BankAccountEditDialog',
@@ -45,65 +36,70 @@ const DialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function createWrapper() {
+function createWrapper(pinia: Pinia): VueWrapper {
   return mount(BankAccountsPage, {
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
       stubs: { BankAccountEditDialog: DialogStub },
     },
   });
 }
 
 describe('BankAccountsPage', () => {
+  let pinia: Pinia;
+
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.bankAccounts = [openAccount, closedAccount];
-    mockStore.institutions = [];
-    mockStore.error = null;
-    mockStore.fetchAll.mockResolvedValue(undefined);
-    mockStore.fetchInstitutions.mockResolvedValue(undefined);
-    mockStore.save.mockResolvedValue(undefined);
+    vi.mocked(bankAccountApi.getAll).mockResolvedValue([openAccount, closedAccount]);
+    vi.mocked(bankAccountApi.getInstitutions).mockResolvedValue([]);
+    vi.mocked(bankAccountApi.create).mockResolvedValue(openAccount);
+    vi.mocked(bankAccountApi.update).mockResolvedValue(openAccount);
   });
 
   describe('on mount', () => {
     it('sets the page heading to "Setup Bank Accounts"', async () => {
-      createWrapper();
-      await nextTick();
+      createWrapper(pinia);
+      await flushPromises();
 
-      expect(mockSetHeading).toHaveBeenCalledWith('Setup Bank Accounts');
+      const headingStore = useHeadingStore();
+      expect(headingStore.heading).toBe('Setup Bank Accounts');
     });
 
-    it('calls fetchAll on mount', async () => {
-      createWrapper();
-      await nextTick();
+    it('calls the API to fetch all bank accounts on mount', async () => {
+      createWrapper(pinia);
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalled();
+      expect(bankAccountApi.getAll).toHaveBeenCalled();
     });
 
-    it('calls fetchInstitutions on mount', async () => {
-      createWrapper();
-      await nextTick();
+    it('calls the API to fetch institutions on mount', async () => {
+      createWrapper(pinia);
+      await flushPromises();
 
-      expect(mockStore.fetchInstitutions).toHaveBeenCalled();
+      expect(bankAccountApi.getInstitutions).toHaveBeenCalled();
     });
   });
 
   describe('account list', () => {
-    it('renders open account names', () => {
-      const wrapper = createWrapper();
+    it('renders open account names', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       expect(wrapper.text()).toContain(openAccount.name);
     });
 
-    it('hides closed accounts by default', () => {
-      const wrapper = createWrapper();
+    it('hides closed accounts by default', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       expect(wrapper.text()).not.toContain(closedAccount.name);
     });
 
     it('shows closed accounts when the toggle is on', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       const toggleInput = wrapper.find('[data-testid="show-closed-toggle"] input');
       await toggleInput.setValue(true);
@@ -113,8 +109,9 @@ describe('BankAccountsPage', () => {
   });
 
   describe('closed account display', () => {
-    it('applies the closed class to closed account names', async () => {
-      const wrapper = createWrapper();
+    it('applies the closed class to closed account rows', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
 
       const names = wrapper.findAll('.account-name');
@@ -123,8 +120,9 @@ describe('BankAccountsPage', () => {
       expect(closedName!.classes()).toContain('account-name--closed');
     });
 
-    it('does not apply the closed class to open account names', () => {
-      const wrapper = createWrapper();
+    it('does not apply the closed class to open account rows', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       const names = wrapper.findAll('.account-name');
       const openName = names.find((el) => el.text().includes(openAccount.name!));
@@ -133,7 +131,8 @@ describe('BankAccountsPage', () => {
     });
 
     it('shows a Closed tag for closed accounts', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find('[data-testid="show-closed-toggle"] input').setValue(true);
 
       const items = wrapper.findAll('.ec-item-list__item');
@@ -145,8 +144,9 @@ describe('BankAccountsPage', () => {
       expect(tag.props('icon')).toBe('pi pi-ban');
     });
 
-    it('does not show a Closed tag for open accounts', () => {
-      const wrapper = createWrapper();
+    it('does not show a Closed tag for open accounts', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       const items = wrapper.findAll('.ec-item-list__item');
       const openItem = items.find((item) => item.text().includes(openAccount.name!));
@@ -157,7 +157,8 @@ describe('BankAccountsPage', () => {
 
   describe('View button', () => {
     it('opens the dialog with the selected account', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       const viewBtn = wrapper.find('[data-testid="view-btn-1"]');
       await viewBtn.trigger('click');
@@ -168,7 +169,8 @@ describe('BankAccountsPage', () => {
     });
 
     it('opens the dialog in view mode', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       const viewBtn = wrapper.find('[data-testid="view-btn-1"]');
       await viewBtn.trigger('click');
@@ -180,7 +182,8 @@ describe('BankAccountsPage', () => {
 
   describe('Add Bank Account button', () => {
     it('opens the dialog with an empty account', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -190,7 +193,8 @@ describe('BankAccountsPage', () => {
     });
 
     it('opens the dialog in edit mode', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
@@ -200,60 +204,61 @@ describe('BankAccountsPage', () => {
   });
 
   describe('Refresh button', () => {
-    it('calls fetchAll and fetchInstitutions', async () => {
-      const wrapper = createWrapper();
+    it('calls the API to fetch accounts and institutions again', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
 
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
-      expect(mockStore.fetchInstitutions).toHaveBeenCalledTimes(2);
+      expect(bankAccountApi.getAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
+      expect(bankAccountApi.getInstitutions).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('on save', () => {
-    it('calls store.save with the account data', async () => {
-      const wrapper = createWrapper();
+    it('calls the API to update the account when it has an id', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BankAccountEditDialog' });
       await dialog.vm.$emit('save', openAccount);
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.save).toHaveBeenCalledWith(openAccount);
+      expect(bankAccountApi.update).toHaveBeenCalledWith(openAccount);
     });
 
     it('closes the dialog and shows a success toast after a successful save', async () => {
-      const wrapper = createWrapper();
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BankAccountEditDialog' });
       await dialog.vm.$emit('save', openAccount);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(false);
       expect(mockNotifySuccess).toHaveBeenCalledWith('Bank account saved');
     });
 
     it('keeps the dialog open and shows an error toast when save fails', async () => {
-      const errorMessage = 'Save failed';
-      mockStore.save.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
-      const wrapper = createWrapper();
+      vi.mocked(bankAccountApi.update).mockRejectedValue(new Error('Server error'));
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'BankAccountEditDialog' });
       await dialog.vm.$emit('save', openAccount);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(true);
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
 
     it('does not show an error toast on a clean mount', async () => {
-      createWrapper();
-      await nextTick();
+      createWrapper(pinia);
+      await flushPromises();
 
       expect(mockNotifyError).not.toHaveBeenCalled();
     });
