@@ -1,7 +1,6 @@
 <template>
-  <div class="sink-funds-page">
-    <!-- Zone 1: Toolbar -->
-    <div class="toolbar">
+  <EcPageLayout page-name="sink-funds" variant="fixed">
+    <template #toolbar>
       <div class="toolbar-left">
         <Select
           v-model="selectedSinkFundId"
@@ -48,26 +47,24 @@
           />
         </template>
       </div>
-    </div>
+    </template>
 
-    <!-- Content card: placeholder for table (subtask 2) and summary (subtask 3) -->
-    <div class="content-card">
-      <div v-if="store.loading" class="loading-placeholder" data-testid="loading-placeholder">
-        Loading…
-      </div>
-      <div v-else-if="!store.sinkFund" class="empty-placeholder" data-testid="empty-placeholder">
-        Select a sink fund to view obligations.
-      </div>
-      <SinkFundAllocationTable v-else />
+    <div v-if="store.loading" class="loading-placeholder" data-testid="loading-placeholder">
+      Loading…
     </div>
+    <div v-else-if="!store.sinkFund" class="empty-placeholder" data-testid="empty-placeholder">
+      Select a sink fund to view obligations.
+    </div>
+    <SinkFundAllocationTable v-else />
 
     <SinkFundTransferDialog v-model:visible="showTransferDialog" />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import ToggleSwitch from 'primevue/toggleswitch';
@@ -131,24 +128,6 @@ function onAddObligation() {
 </script>
 
 <style scoped>
-.sink-funds-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
 .toolbar-left {
   display: flex;
   align-items: center;
@@ -178,17 +157,6 @@ function onAddObligation() {
   color: var(--p-text-color);
   white-space: nowrap;
   cursor: pointer;
-}
-
-.content-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--p-surface-300);
-  border-radius: 6px;
-  background-color: var(--p-surface-0);
-  margin-bottom: 0.75rem;
 }
 
 .loading-placeholder,

@@ -1,6 +1,6 @@
 <template>
-  <div class="special-event-detail-page">
-    <div class="toolbar">
+  <EcPageLayout page-name="special-event-detail" variant="fixed">
+    <template #toolbar>
       <Button
         v-tooltip="'Return to special events list'"
         icon="pi pi-arrow-left"
@@ -29,7 +29,7 @@
         :loading="store.loading"
         @click="refresh"
       />
-    </div>
+    </template>
 
     <div class="header-card" data-testid="event-header">
       <h2 class="event-name">{{ event?.name }}</h2>
@@ -40,26 +40,24 @@
       </div>
     </div>
 
-    <div class="content-card">
-      <DataTable :value="allocations" data-testid="allocations-table">
-        <Column field="name" header="Allocation" />
-        <Column field="budget_name" header="Budget" />
-        <Column field="allocation_category_name" header="Category" />
-        <Column field="amount" header="Amount" style="text-align: right">
-          <template #body="{ data }">
-            {{ centsToDollars(data.amount) }}
-          </template>
-        </Column>
-        <Column field="spent" header="Spent" style="text-align: right">
-          <template #body="{ data }">
-            {{ centsToDollars(data.spent) }}
-          </template>
-          <template #footer>
-            <span class="total-label">{{ centsToDollars(totalSpent) }}</span>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
+    <DataTable :value="allocations" data-testid="allocations-table">
+      <Column field="name" header="Allocation" />
+      <Column field="budget_name" header="Budget" />
+      <Column field="allocation_category_name" header="Category" />
+      <Column field="amount" header="Amount" style="text-align: right">
+        <template #body="{ data }">
+          {{ centsToDollars(data.amount) }}
+        </template>
+      </Column>
+      <Column field="spent" header="Spent" style="text-align: right">
+        <template #body="{ data }">
+          {{ centsToDollars(data.spent) }}
+        </template>
+        <template #footer>
+          <span class="total-label">{{ centsToDollars(totalSpent) }}</span>
+        </template>
+      </Column>
+    </DataTable>
 
     <SpecialEventForm
       :visible="formVisible"
@@ -67,12 +65,13 @@
       @update:visible="formVisible = $event"
       @submit="onSubmit"
     />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -137,22 +136,6 @@ async function onSubmit(data: Partial<SpecialEventData>) {
 </script>
 
 <style scoped>
-.special-event-detail-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
 .header-card {
   padding: 1rem 1.5rem;
   border: 1px solid var(--p-surface-300);
@@ -171,17 +154,6 @@ async function onSubmit(data: Partial<SpecialEventData>) {
   gap: 1.5rem;
   color: var(--p-surface-600);
   font-size: 0.9rem;
-}
-
-.content-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  border: 1px solid var(--p-surface-300);
-  border-radius: 6px;
-  background-color: var(--p-surface-0);
-  margin-bottom: 0.75rem;
 }
 
 .total-label {

@@ -1,7 +1,6 @@
 <template>
-  <div class="account-balances-page">
-    <!-- Toolbar -->
-    <div class="toolbar">
+  <EcPageLayout page-name="account-balances" variant="fixed">
+    <template #toolbar>
       <div class="toolbar-left">
         <Button
           label="Adjust Account Balances"
@@ -21,7 +20,7 @@
           <span>Include Closed Accounts?</span>
         </label>
       </div>
-    </div>
+    </template>
 
     <!-- Summary Strip -->
     <AccountBalanceSummaryStrip v-if="!store.loading && !store.error" />
@@ -71,11 +70,12 @@
 
     <!-- Adjust Balances Dialog -->
     <AdjustBalancesDialog v-model:visible="showAdjustDialog" :accounts="store.accounts" />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { useHeadingStore } from '../toolbar/headingStore';
@@ -100,24 +100,6 @@ async function onToggleChanged() {
 </script>
 
 <style scoped>
-.account-balances-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
 .toolbar-left {
   display: flex;
   align-items: center;

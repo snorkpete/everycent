@@ -1,7 +1,6 @@
 <template>
-  <div class="budgets-page">
-    <!-- Toolbar -->
-    <div class="toolbar">
+  <EcPageLayout page-name="budgets" variant="fixed">
+    <template #toolbar>
       <div class="toolbar-left">
         <Button
           label="Add New Budget"
@@ -28,71 +27,68 @@
           @click="store.fetchAll()"
         />
       </div>
-    </div>
+    </template>
 
-    <!-- Budget List -->
-    <div class="content-card">
-      <table class="budget-table">
-        <thead>
-          <tr>
-            <th class="name-col">Budget</th>
-            <th class="status-col">Status</th>
-            <th class="actions-col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="budget in store.budgets" :key="budget.id" data-testid="budget-row">
-            <td class="name-cell">
-              <a
-                class="budget-name-link"
-                :data-testid="`budget-name-link-${budget.id}`"
-                @click.prevent="goToBudget(budget)"
-                >{{ budget.name }}</a
-              >
-            </td>
-            <td class="status-cell">
-              <span
-                class="status-badge"
-                :class="budget.status === 'open' ? 'status-open' : 'status-closed'"
-                :data-testid="`status-${budget.id}`"
-              >
-                {{ budget.status }}
-              </span>
-            </td>
-            <td class="actions-cell">
-              <Button
-                label="View"
-                size="small"
-                outlined
-                :data-testid="`view-btn-${budget.id}`"
-                @click="goToBudget(budget)"
-              />
-              <Button
-                v-if="store.canCopy(budget)"
-                label="Copy"
-                size="small"
-                outlined
-                severity="info"
-                :data-testid="`copy-btn-${budget.id}`"
-                @click="confirmCopy(budget)"
-              />
-              <Button
-                v-if="store.canClose(budget)"
-                label="Close"
-                size="small"
-                outlined
-                severity="danger"
-                :data-testid="`close-btn-${budget.id}`"
-                @click="confirmClose(budget)"
-              />
-            </td>
-          </tr>
-          <tr v-if="store.budgets.length === 0 && !store.loading">
-            <td colspan="3" class="empty-cell">No budgets found.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <table class="budget-table">
+      <thead>
+        <tr>
+          <th class="name-col">Budget</th>
+          <th class="status-col">Status</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="budget in store.budgets" :key="budget.id" data-testid="budget-row">
+          <td class="name-cell">
+            <a
+              class="budget-name-link"
+              :data-testid="`budget-name-link-${budget.id}`"
+              @click.prevent="goToBudget(budget)"
+              >{{ budget.name }}</a
+            >
+          </td>
+          <td class="status-cell">
+            <span
+              class="status-badge"
+              :class="budget.status === 'open' ? 'status-open' : 'status-closed'"
+              :data-testid="`status-${budget.id}`"
+            >
+              {{ budget.status }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <Button
+              label="View"
+              size="small"
+              outlined
+              :data-testid="`view-btn-${budget.id}`"
+              @click="goToBudget(budget)"
+            />
+            <Button
+              v-if="store.canCopy(budget)"
+              label="Copy"
+              size="small"
+              outlined
+              severity="info"
+              :data-testid="`copy-btn-${budget.id}`"
+              @click="confirmCopy(budget)"
+            />
+            <Button
+              v-if="store.canClose(budget)"
+              label="Close"
+              size="small"
+              outlined
+              severity="danger"
+              :data-testid="`close-btn-${budget.id}`"
+              @click="confirmClose(budget)"
+            />
+          </td>
+        </tr>
+        <tr v-if="store.budgets.length === 0 && !store.loading">
+          <td colspan="3" class="empty-cell">No budgets found.</td>
+        </tr>
+      </tbody>
+    </table>
 
     <ConfirmDialog />
 
@@ -101,12 +97,13 @@
       @update:visible="showAddDialog = $event"
       @save="onAddBudget"
     />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from 'primevue/useconfirm';
@@ -202,24 +199,6 @@ async function onAddBudget(startDate: string) {
 </script>
 
 <style scoped>
-.budgets-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
 .toolbar-left {
   display: flex;
   align-items: center;
@@ -230,17 +209,6 @@ async function onAddBudget(startDate: string) {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-}
-
-.content-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  border: 1px solid var(--p-surface-300);
-  border-radius: 6px;
-  background-color: var(--p-surface-0);
-  margin-bottom: 0.75rem;
 }
 
 /* ── Table ── */

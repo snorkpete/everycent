@@ -1,5 +1,5 @@
 <template>
-  <div class="institutions-page">
+  <EcPageLayout page-name="institutions">
     <ul class="institution-list">
       <li v-for="institution in store.institutions" :key="institution.id" class="institution-item">
         <span class="institution-name">{{ institution.name }}</span>
@@ -31,12 +31,13 @@
       @update:visible="dialogVisible = $event"
       @save="onSave"
     />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import Button from 'primevue/button';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useInstitutionStore } from './institutionStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -84,13 +85,6 @@ async function onSave(institution: InstitutionData) {
 </script>
 
 <style scoped>
-.institutions-page {
-  padding: 1rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
 .institution-list {
   list-style: none;
   padding: 0;

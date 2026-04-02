@@ -1,7 +1,6 @@
 <template>
-  <div class="budget-page">
-    <!-- Toolbar -->
-    <div class="toolbar">
+  <EcPageLayout page-name="budget" variant="fixed">
+    <template #toolbar>
       <div class="toolbar-left">
         <Button
           label="Back to Budget List"
@@ -37,7 +36,7 @@
           />
         </template>
       </div>
-    </div>
+    </template>
 
     <!-- Budget Summary Strip -->
     <BudgetSummaryStrip />
@@ -51,12 +50,13 @@
         <BudgetAllocationList />
       </div>
     </div>
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useBudgetStore } from './budgetStore';
@@ -106,24 +106,6 @@ async function onCancel() {
 </script>
 
 <style scoped>
-.budget-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
 .toolbar-left {
   display: flex;
   align-items: center;
