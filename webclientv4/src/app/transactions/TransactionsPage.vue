@@ -101,7 +101,7 @@
     <!-- Zones 2 + 3: Summary Bar + Table (unified card) -->
     <div class="content-card">
       <TransactionSummary
-        :transactions="store.isEditMode ? store.draftTransactions : store.transactions"
+        :transactions="store.transactions"
         :bank-account="store.selectedBankAccount ?? undefined"
         :allocations="store.allocations"
       />
@@ -158,7 +158,7 @@ function onFetch(params: { budgetId: number; bankAccountId: number }) {
 
 async function onSave() {
   try {
-    await store.save(store.draftTransactions);
+    await store.save(store.transactions);
     store.exitEditMode();
     notifications.success('Transactions saved');
   } catch {

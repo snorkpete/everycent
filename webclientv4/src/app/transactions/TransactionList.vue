@@ -27,7 +27,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="(transaction, index) in store.draftTransactions"
+          v-for="(transaction, index) in store.transactions"
           :key="transaction.id ?? `new-${index}`"
           data-testid="transaction-row"
           :class="{
@@ -216,12 +216,12 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 );
 
 const allDeleted = computed(
-  () => store.draftTransactions.length > 0 && store.draftTransactions.every((t) => t.deleted),
+  () => store.transactions.length > 0 && store.transactions.every((t) => t.deleted),
 );
 
 function toggleDeleteAll() {
   const newState = !allDeleted.value;
-  store.draftTransactions.forEach((t) => {
+  store.transactions.forEach((t) => {
     t.deleted = newState;
   });
 }

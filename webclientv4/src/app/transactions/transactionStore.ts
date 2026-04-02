@@ -1,4 +1,4 @@
-import { ref, computed, toRaw } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { transactionApi } from './transactionApi';
 import { budgetApi } from '../budgets/budgetApi';
@@ -12,7 +12,6 @@ import { useSettingsStore } from '../settings/settingsStore';
 
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref<TransactionData[]>([]);
-  const draftTransactions = ref<TransactionData[]>([]);
   const isEditMode = ref(false);
   const allocations = ref<AllocationData[]>([]);
   const sinkFundAllocations = ref<SinkFundAllocationData[]>([]);
@@ -27,10 +26,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     loading.value = true;
     error.value = null;
     try {
-      const [, loadedAccounts] = await Promise.all([
-        fetchBudgets(),
-        bankAccountApi.getOpen(),
-      ]);
+      const [, loadedAccounts] = await Promise.all([fetchBudgets(), bankAccountApi.getOpen()]);
       bankAccounts.value = loadedAccounts;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load metadata';
@@ -68,7 +64,6 @@ export const useTransactionStore = defineStore('transactions', () => {
       }
 
       await Promise.all(promises);
-      draftTransactions.value = structuredClone(toRaw(transactions.value));
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load transactions';
     } finally {
@@ -107,7 +102,6 @@ export const useTransactionStore = defineStore('transactions', () => {
   }
 
   function enterEditMode() {
-    draftTransactions.value = structuredClone(toRaw(transactions.value));
     isEditMode.value = true;
   }
 
@@ -115,14 +109,19 @@ export const useTransactionStore = defineStore('transactions', () => {
     isEditMode.value = false;
   }
 
-  function cancelEdit() {
-    draftTransactions.value = structuredClone(toRaw(transactions.value));
+  async function cancelEdit() {
     isEditMode.value = false;
+    if (selectedBankAccount.value && selectedBudget.value) {
+      await fetch({
+        budgetId: selectedBudget.value.id!,
+        bankAccountId: selectedBankAccount.value.id!,
+      });
+    }
   }
 
   function addTransaction() {
     const status = selectedBankAccount.value?.is_credit_card ? 'unpaid' : 'paid';
-    draftTransactions.value.push({ withdrawal_amount: 0, deposit_amount: 0, status });
+    transactions.value.push({ withdrawal_amount: 0, deposit_amount: 0, status });
   }
 
   function deleteTransaction(transaction: TransactionData) {
@@ -151,7 +150,7 @@ export const useTransactionStore = defineStore('transactions', () => {
     if (!isAutoAllocateEligible()) return;
 
     // Only suggest for unallocated, non-deleted transactions
-    const candidates = draftTransactions.value
+    const candidates = transactions.value
       .map((tx, index) => ({ tx, index }))
       .filter(({ tx }) => !tx.allocation_id && !tx.deleted && tx.description);
 
@@ -166,7 +165,7 @@ export const useTransactionStore = defineStore('transactions', () => {
 
       const candidate = candidates[i];
       if (!candidate) continue;
-      const tx = draftTransactions.value[candidate.index];
+      const tx = transactions.value[candidate.index];
       if (!tx) continue;
       tx.allocation_id = suggestion.allocation_id;
       tx.auto_match_type = suggestion.match_type as MatchType;
@@ -177,10 +176,10 @@ export const useTransactionStore = defineStore('transactions', () => {
     if (!isEditMode.value) {
       enterEditMode();
     }
-    draftTransactions.value.push(...imported.map((t) => ({ ...t, newlyImported: true })));
+    transactions.value.push(...imported.map((t) => ({ ...t, newlyImported: true })));
   }
 
-  const selectedTransactions = computed(() => draftTransactions.value.filter((t) => t.selected));
+  const selectedTransactions = computed(() => transactions.value.filter((t) => t.selected));
 
   const selectedTotal = computed(() =>
     selectedTransactions.value.reduce((sum, t) => {
@@ -190,7 +189,7 @@ export const useTransactionStore = defineStore('transactions', () => {
   );
 
   function clearSelections() {
-    draftTransactions.value.forEach((t) => {
+    transactions.value.forEach((t) => {
       t.selected = false;
     });
   }
@@ -207,7 +206,6 @@ export const useTransactionStore = defineStore('transactions', () => {
 
   return {
     transactions,
-    draftTransactions,
     isEditMode,
     allocations,
     sinkFundAllocations,

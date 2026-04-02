@@ -54,7 +54,6 @@ const sampleAllocations: AllocationData[] = [{ id: 1, name: 'Food', amount: 2000
 
 const mockStore = reactive({
   transactions: sampleTransactions as TransactionData[],
-  draftTransactions: sampleTransactions as TransactionData[],
   isEditMode: false,
   allocations: sampleAllocations as AllocationData[],
   sinkFundAllocations: [] as unknown[],
@@ -137,7 +136,6 @@ describe('TransactionsPage', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     mockStore.transactions = sampleTransactions;
-    mockStore.draftTransactions = sampleTransactions;
     mockStore.isEditMode = false;
     mockStore.allocations = sampleAllocations;
     mockStore.sinkFundAllocations = [];
@@ -195,38 +193,11 @@ describe('TransactionsPage', () => {
   });
 
   describe('TransactionSummary props', () => {
-    it('passes committed transactions when not in edit mode', () => {
+    it('passes transactions to TransactionSummary', () => {
       const wrapper = createWrapper();
 
       const summary = wrapper.findComponent({ name: 'TransactionSummary' });
       expect(summary.props('transactions')).toEqual(sampleTransactions);
-    });
-
-    it('passes draft transactions when in edit mode', async () => {
-      const draftTransactions: TransactionData[] = [
-        {
-          id: 1,
-          description: 'Groceries',
-          withdrawal_amount: 5000,
-          deposit_amount: 0,
-          status: 'paid',
-        },
-        {
-          id: 2,
-          description: 'New draft',
-          withdrawal_amount: 1000,
-          deposit_amount: 0,
-          status: 'paid',
-        },
-      ];
-      mockStore.isEditMode = true;
-      mockStore.draftTransactions = draftTransactions;
-
-      const wrapper = createWrapper();
-      await nextTick();
-
-      const summary = wrapper.findComponent({ name: 'TransactionSummary' });
-      expect(summary.props('transactions')).toEqual(draftTransactions);
     });
 
     it('passes bankAccount to TransactionSummary', () => {
@@ -299,16 +270,16 @@ describe('TransactionsPage', () => {
   });
 
   describe('toolbar — save', () => {
-    it('calls store.save with draftTransactions when Save is clicked', async () => {
+    it('calls store.save with transactions when Save is clicked', async () => {
       mockStore.isEditMode = true;
       const wrapper = createWrapper();
       await nextTick();
-      const draftTransactions = mockStore.draftTransactions;
+      const transactions = mockStore.transactions;
 
       await wrapper.find(SAVE_BTN).trigger('click');
       await nextTick();
 
-      expect(mockStore.save).toHaveBeenCalledWith(draftTransactions);
+      expect(mockStore.save).toHaveBeenCalledWith(transactions);
     });
 
     it('calls store.exitEditMode after saving', async () => {
