@@ -24,10 +24,14 @@ export const useBankAccountStore = defineStore('bankAccounts', () => {
   }
 
   async function fetchInstitutions() {
+    loading.value = true;
+    error.value = null;
     try {
       institutions.value = await bankAccountApi.getInstitutions();
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load institutions';
+    } finally {
+      loading.value = false;
     }
   }
 

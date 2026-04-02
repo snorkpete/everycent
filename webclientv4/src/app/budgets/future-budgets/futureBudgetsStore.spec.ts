@@ -2,27 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useFutureBudgetsStore } from './futureBudgetsStore';
 import { futureBudgetsApi } from './futureBudgetsApi';
-import type { FutureBudgetData } from './futureBudgets.types';
+import { buildFutureBudget } from '../../../test/factories';
 
 vi.mock('./futureBudgetsApi', () => ({
   futureBudgetsApi: {
     getFutureBudgets: vi.fn(),
     getAllocationCategories: vi.fn(),
-    getSettings: vi.fn(),
     massUpdate: vi.fn(),
   },
 }));
-
-const makeBudget = (overrides: Partial<FutureBudgetData> = {}): FutureBudgetData => ({
-  id: 1,
-  name: 'Jan 2025',
-  start_date: '2025-01-01',
-  end_date: '2025-01-31',
-  status: 'open',
-  incomes: [],
-  allocations: [],
-  ...overrides,
-});
 
 describe('futureBudgetsStore', () => {
   beforeEach(() => {
@@ -30,24 +18,20 @@ describe('futureBudgetsStore', () => {
     vi.clearAllMocks();
     vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([]);
     vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue([]);
-    vi.mocked(futureBudgetsApi.getSettings).mockResolvedValue({});
   });
 
   describe('fetchAll', () => {
-    it('fetches and stores budgets, categories, and settings', async () => {
-      const budgets = [makeBudget()];
+    it('fetches and stores budgets and categories', async () => {
+      const budgets = [buildFutureBudget()];
       const categories = [{ id: 1, name: 'Fixed' }];
-      const settings = { husband: 'Alice', wife: 'Bob' };
       vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue(budgets);
       vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue(categories);
-      vi.mocked(futureBudgetsApi.getSettings).mockResolvedValue(settings);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
 
       expect(store.budgets).toEqual(budgets);
       expect(store.allocationCategories).toEqual(categories);
-      expect(store.settings).toEqual(settings);
     });
 
     it('sets loading true during fetch and false after', async () => {
@@ -93,7 +77,7 @@ describe('futureBudgetsStore', () => {
     });
 
     it('indexes incomes by name then budget id', async () => {
-      const budget = makeBudget({
+      const budget = buildFutureBudget({
         id: 1,
         name: 'Jan 2025',
         incomes: [{ id: 10, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 }],
@@ -111,12 +95,12 @@ describe('futureBudgetsStore', () => {
     });
 
     it('merges same income name across multiple budgets using budget id', async () => {
-      const budget1 = makeBudget({
+      const budget1 = buildFutureBudget({
         id: 1,
         name: 'Jan 2025',
         incomes: [{ id: 10, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 }],
       });
-      const budget2 = makeBudget({
+      const budget2 = buildFutureBudget({
         id: 2,
         name: 'Feb 2025',
         incomes: [{ id: 20, name: 'Salary', amount: 520000, budget_id: 2, bank_account_id: 1 }],
@@ -137,7 +121,7 @@ describe('futureBudgetsStore', () => {
 
   describe('incomeNames', () => {
     it('returns list of income names', async () => {
-      const budget = makeBudget({
+      const budget = buildFutureBudget({
         incomes: [
           { id: 1, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 },
           { id: 2, name: 'Bonus', amount: 100000, budget_id: 1, bank_account_id: 1 },
@@ -154,7 +138,7 @@ describe('futureBudgetsStore', () => {
 
   describe('allocationDisplayData', () => {
     it('indexes allocations by category id, then name, then budget id', async () => {
-      const budget = makeBudget({
+      const budget = buildFutureBudget({
         id: 1,
         name: 'Jan 2025',
         allocations: [
@@ -184,7 +168,7 @@ describe('futureBudgetsStore', () => {
 
   describe('totalIncomeForBudget', () => {
     it('sums all income amounts for the given budget', () => {
-      const budget = makeBudget({
+      const budget = buildFutureBudget({
         incomes: [
           { id: 1, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 },
           { id: 2, name: 'Bonus', amount: 100000, budget_id: 1, bank_account_id: 1 },
@@ -198,13 +182,13 @@ describe('futureBudgetsStore', () => {
 
     it('returns 0 for a budget with no incomes', () => {
       const store = useFutureBudgetsStore();
-      expect(store.totalIncomeForBudget(makeBudget())).toBe(0);
+      expect(store.totalIncomeForBudget(buildFutureBudget({ incomes: [] }))).toBe(0);
     });
   });
 
   describe('totalAllocationsForBudget', () => {
     it('sums all allocation amounts for the given budget', () => {
-      const budget = makeBudget({
+      const budget = buildFutureBudget({
         allocations: [
           { id: 1, name: 'Rent', amount: 150000, budget_id: 1, allocation_category_id: 1 },
           { id: 2, name: 'Food', amount: 50000, budget_id: 1, allocation_category_id: 1 },
@@ -218,13 +202,13 @@ describe('futureBudgetsStore', () => {
 
     it('returns 0 for a budget with no allocations', () => {
       const store = useFutureBudgetsStore();
-      expect(store.totalAllocationsForBudget(makeBudget())).toBe(0);
+      expect(store.totalAllocationsForBudget(buildFutureBudget({ allocations: [] }))).toBe(0);
     });
   });
 
   describe('discretionaryForBudget', () => {
     it('returns total income minus total allocations', () => {
-      const budget = makeBudget({
+      const budget = buildFutureBudget({
         incomes: [{ id: 1, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 }],
         allocations: [
           { id: 1, name: 'Rent', amount: 150000, budget_id: 1, allocation_category_id: 1 },
@@ -254,7 +238,7 @@ describe('futureBudgetsStore', () => {
     });
 
     it('updates store.budgets with refreshed data after mass update', async () => {
-      const updatedBudget = makeBudget({
+      const updatedBudget = buildFutureBudget({
         incomes: [
           { id: 1, name: 'Updated Salary', amount: 600000, budget_id: 1, bank_account_id: 1 },
         ],

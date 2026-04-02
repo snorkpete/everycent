@@ -91,6 +91,19 @@ export const useSinkFundStore = defineStore('sinkFund', () => {
     isEditMode.value = false;
   }
 
+  function addObligation() {
+    if (!sinkFund.value) return;
+    if (!sinkFund.value.sink_fund_allocations) {
+      sinkFund.value.sink_fund_allocations = [];
+    }
+    sinkFund.value.sink_fund_allocations.push({
+      name: '',
+      amount: 0,
+      status: 'open',
+      unsaved: true,
+    });
+  }
+
   async function cancelEdit() {
     if (!sinkFund.value?.id) return;
     isEditMode.value = false;
@@ -114,6 +127,7 @@ export const useSinkFundStore = defineStore('sinkFund', () => {
     save,
     enterEditMode,
     exitEditMode,
+    addObligation,
     cancelEdit,
   };
 });

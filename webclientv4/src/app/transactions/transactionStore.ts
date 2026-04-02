@@ -8,7 +8,7 @@ import type { TransactionData, AllocationData, SinkFundAllocationData } from './
 import type { MatchType } from '../budgets/autoAllocate.types';
 import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
-import { useSettingsStore } from '../settings/settingsStore';
+import { isAutoAllocateEligible } from '../bank-accounts/isAutoAllocateEligible';
 
 export const useTransactionStore = defineStore('transactions', () => {
   const transactions = ref<TransactionData[]>([]);
@@ -137,17 +137,9 @@ export const useTransactionStore = defineStore('transactions', () => {
     transaction.status = allocationId > 0 ? 'paid' : 'unpaid';
   }
 
-  function isAutoAllocateEligible(): boolean {
-    const account = selectedBankAccount.value;
-    if (!account) return false;
-    if (account.is_credit_card) return true;
-    const settingsStore = useSettingsStore();
-    return account.id === settingsStore.settings.primary_budget_account_id;
-  }
-
   async function autoAllocate() {
     if (!selectedBudget.value?.id) return;
-    if (!isAutoAllocateEligible()) return;
+    if (!isAutoAllocateEligible(selectedBankAccount.value)) return;
 
     // Only suggest for unallocated, non-deleted transactions
     const candidates = transactions.value

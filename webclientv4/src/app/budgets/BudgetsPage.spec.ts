@@ -6,6 +6,7 @@ import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import BudgetsPage from './BudgetsPage.vue';
 import type { BudgetData } from './budget.types';
+import { buildBudget } from '../../test/factories';
 
 // Selectors
 const ADD_BTN = '[data-testid="add-budget-btn"]';
@@ -47,20 +48,9 @@ const AddBudgetDialogStub = {
   emits: ['update:visible', 'save'],
 };
 
-function makeBudget(overrides: Partial<BudgetData> = {}): BudgetData {
-  return {
-    id: 1,
-    name: 'Jan 2025',
-    start_date: '2025-01-01',
-    end_date: '2025-01-31',
-    status: 'open',
-    ...overrides,
-  };
-}
-
-const budget1 = makeBudget({ id: 1, name: 'Mar 2025', status: 'open' });
-const budget2 = makeBudget({ id: 2, name: 'Feb 2025', status: 'open' });
-const budget3 = makeBudget({ id: 3, name: 'Jan 2025', status: 'closed' });
+const budget1 = buildBudget({ id: 1, name: 'Mar 2025', status: 'open' });
+const budget2 = buildBudget({ id: 2, name: 'Feb 2025', status: 'open' });
+const budget3 = buildBudget({ id: 3, name: 'Jan 2025', status: 'closed' });
 
 // Mock useConfirm — capture the last require call so tests can invoke accept
 let lastConfirmCall: { accept?: () => void } = {};

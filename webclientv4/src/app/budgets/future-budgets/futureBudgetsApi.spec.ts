@@ -39,18 +39,6 @@ describe('futureBudgetsApi', () => {
     });
   });
 
-  describe('getSettings', () => {
-    it('calls GET /settings and returns data', async () => {
-      const settings = { husband: 'Alice', wife: 'Bob' };
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: settings });
-
-      const result = await futureBudgetsApi.getSettings();
-
-      expect(apiGateway.get).toHaveBeenCalledWith('/settings');
-      expect(result).toEqual(settings);
-    });
-  });
-
   describe('massUpdate', () => {
     it('calls POST /budgets/mass_update with payload and returns data', async () => {
       const payload: MassUpdatePayload = {

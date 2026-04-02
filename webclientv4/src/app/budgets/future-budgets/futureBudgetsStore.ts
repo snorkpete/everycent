@@ -2,13 +2,11 @@ import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { futureBudgetsApi } from './futureBudgetsApi';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
-import type { SettingsData } from '../../settings/settings.types';
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 
 export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
   const budgets = ref<FutureBudgetData[]>([]);
   const allocationCategories = ref<AllocationCategoryData[]>([]);
-  const settings = ref<SettingsData>({});
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -63,14 +61,12 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
     loading.value = true;
     error.value = null;
     try {
-      const [fetchedBudgets, fetchedCategories, fetchedSettings] = await Promise.all([
+      const [fetchedBudgets, fetchedCategories] = await Promise.all([
         futureBudgetsApi.getFutureBudgets(),
         futureBudgetsApi.getAllocationCategories(),
-        futureBudgetsApi.getSettings(),
       ]);
       budgets.value = fetchedBudgets;
       allocationCategories.value = fetchedCategories;
-      settings.value = fetchedSettings;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load future budgets';
     } finally {
@@ -95,7 +91,6 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
   return {
     budgets,
     allocationCategories,
-    settings,
     loading,
     error,
     incomeDisplayData,

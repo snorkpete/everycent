@@ -4,20 +4,9 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetMassEditDialog from './BudgetMassEditDialog.vue';
-import type { FutureBudgetData } from './futureBudgets.types';
 import { centsToDollars } from '../../shared/util/cents-to-dollars';
 import { DialogStub } from '../../../test/stubs';
-
-const makeBudget = (overrides: Partial<FutureBudgetData> = {}): FutureBudgetData => ({
-  id: 1,
-  name: 'Jan 2025',
-  start_date: '2025-01-01',
-  end_date: '2025-01-31',
-  status: 'open',
-  incomes: [],
-  allocations: [],
-  ...overrides,
-});
+import { buildFutureBudget } from '../../../test/factories';
 
 function createWrapper(props: Record<string, unknown> = {}) {
   return mount(BudgetMassEditDialog, {
@@ -25,7 +14,7 @@ function createWrapper(props: Record<string, unknown> = {}) {
       visible: true,
       type: 'income',
       name: 'Salary',
-      budgets: [makeBudget()],
+      budgets: [buildFutureBudget()],
       amountsPerBudget: {},
       ...props,
     },
@@ -67,7 +56,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('populates amount from amountsPerBudget for existing entry', async () => {
-      const budget = makeBudget({ id: 1, name: 'Jan 2025' });
+      const budget = buildFutureBudget({ id: 1, name: 'Jan 2025' });
       const wrapper = createWrapper({
         visible: false,
         budgets: [budget],
@@ -81,7 +70,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('defaults amount to 0 for budgets not in amountsPerBudget', async () => {
-      const budget = makeBudget({ name: 'Jan 2025' });
+      const budget = buildFutureBudget({ name: 'Jan 2025' });
       const wrapper = createWrapper({
         visible: false,
         budgets: [budget],
@@ -95,7 +84,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('reinitialises the form when the dialog reopens', async () => {
-      const budget = makeBudget({ name: 'Jan 2025' });
+      const budget = buildFutureBudget({ name: 'Jan 2025' });
       const wrapper = createWrapper({
         visible: true,
         name: 'Old Name',
@@ -133,7 +122,7 @@ describe('BudgetMassEditDialog', () => {
 
   describe('Save button', () => {
     it('emits save with income payload', async () => {
-      const budget = makeBudget({ id: 5, name: 'Jan 2025' });
+      const budget = buildFutureBudget({ id: 5, name: 'Jan 2025' });
       const wrapper = createWrapper({
         visible: false,
         type: 'income',
@@ -156,7 +145,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('emits save with allocation payload including category id and is_fixed_amount', async () => {
-      const budget = makeBudget({ id: 5, name: 'Jan 2025' });
+      const budget = buildFutureBudget({ id: 5, name: 'Jan 2025' });
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -181,7 +170,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('uses the edited name value in the payload', async () => {
-      const budget = makeBudget({ id: 5, name: 'Jan 2025' });
+      const budget = buildFutureBudget({ id: 5, name: 'Jan 2025' });
       const wrapper = createWrapper({
         visible: false,
         type: 'income',
@@ -213,7 +202,10 @@ describe('BudgetMassEditDialog', () => {
 
   describe('column headers', () => {
     it('shows budget names as column headers', () => {
-      const budgets = [makeBudget({ name: 'Jan 2025' }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const budgets = [
+        buildFutureBudget({ name: 'Jan 2025' }),
+        buildFutureBudget({ id: 2, name: 'Feb 2025' }),
+      ];
       const wrapper = createWrapper({ budgets });
 
       expect(wrapper.text()).toContain('Jan 2025');
@@ -223,7 +215,7 @@ describe('BudgetMassEditDialog', () => {
 
   describe('is_fixed_amount — allocation type', () => {
     it('shows a Fixed? checkbox row for allocation type', async () => {
-      const budget = makeBudget({ id: 1 });
+      const budget = buildFutureBudget({ id: 1 });
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -245,7 +237,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('initialises checkbox from amountsPerBudget is_fixed_amount value', async () => {
-      const budget = makeBudget({ id: 1 });
+      const budget = buildFutureBudget({ id: 1 });
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -261,7 +253,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('defaults checkbox to false when is_fixed_amount not provided', async () => {
-      const budget = makeBudget({ id: 1 });
+      const budget = buildFutureBudget({ id: 1 });
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -277,7 +269,7 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('includes is_fixed_amount in save payload', async () => {
-      const budget = makeBudget({ id: 5 });
+      const budget = buildFutureBudget({ id: 5 });
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -303,7 +295,10 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('shows a Set All Fixed checkbox', async () => {
-      const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const budgets = [
+        buildFutureBudget({ id: 1 }),
+        buildFutureBudget({ id: 2, name: 'Feb 2025' }),
+      ];
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -322,7 +317,10 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('set all fixed checkbox sets all per-budget checkboxes to checked', async () => {
-      const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const budgets = [
+        buildFutureBudget({ id: 1 }),
+        buildFutureBudget({ id: 2, name: 'Feb 2025' }),
+      ];
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -347,7 +345,10 @@ describe('BudgetMassEditDialog', () => {
     });
 
     it('set all fixed checkbox unchecks all per-budget checkboxes when unchecked', async () => {
-      const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const budgets = [
+        buildFutureBudget({ id: 1 }),
+        buildFutureBudget({ id: 2, name: 'Feb 2025' }),
+      ];
       const wrapper = createWrapper({
         visible: false,
         type: 'allocation',
@@ -389,7 +390,7 @@ describe('BudgetMassEditDialog', () => {
       const initialFoodAllocation = 30000;
       const updatedFoodAllocation = 40000;
 
-      const budget = makeBudget({
+      const budget = buildFutureBudget({
         id: 1,
         incomes: [{ id: 1, name: 'Salary', amount: income, budget_id: 1, bank_account_id: 1 }],
         allocations: [
