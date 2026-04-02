@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { mount, flushPromises } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import AccountBalancesPage from './AccountBalancesPage.vue';
-import type { AccountBalanceData } from './accountBalance.types';
+import { buildAccountBalance } from '../../test/factories/accountBalanceFactory';
 
 // Selectors
 const INCLUDE_CLOSED_TOGGLE = '[data-testid="include-closed-toggle"]';
@@ -16,60 +16,39 @@ const NON_CASH_ASSETS_TABLE = '[data-testid="non-cash-assets-table"]';
 const CREDIT_CARDS_TABLE = '[data-testid="credit-cards-table"]';
 const LOANS_TABLE = '[data-testid="loans-table"]';
 
+vi.mock('./accountBalanceApi', () => ({
+  accountBalanceApi: {
+    getAll: vi.fn(),
+    adjustBalances: vi.fn(),
+  },
+}));
+
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
   useHeadingStore: () => ({ setHeading: mockSetHeading }),
 }));
 
-const currentAccount: AccountBalanceData = {
+const currentAccount = buildAccountBalance({
   id: 1,
   name: 'Joint Checking',
   account_type: 'checking_account',
   account_category: 'current',
   is_cash: true,
-  closing_date: '2026-03-24',
-  next_closing_date: '2026-04-24',
   closing_balance: 100000,
   expected_closing_balance: 90000,
   current_balance: 100000,
-};
+});
 
-const creditCardAccount: AccountBalanceData = {
+const creditCardAccount = buildAccountBalance({
   id: 2,
   name: 'Amro Credit Card',
   account_type: 'credit_card',
   account_category: 'liability',
   is_cash: true,
-  closing_date: '2026-03-24',
-  next_closing_date: '2026-04-24',
   closing_balance: 0,
   expected_closing_balance: 0,
   current_balance: 0,
-};
-
-const mockStore = reactive({
-  accounts: [currentAccount] as AccountBalanceData[],
-  includeClosed: false,
-  loading: false,
-  error: null as string | null,
-  currentAccounts: [currentAccount] as AccountBalanceData[],
-  cashAssetAccounts: [] as AccountBalanceData[],
-  nonCashAssetAccounts: [] as AccountBalanceData[],
-  creditCardAccounts: [] as AccountBalanceData[],
-  loanAccounts: [] as AccountBalanceData[],
-  totalAssets: 0,
-  totalLiabilities: 0,
-  netCurrentCash: 100000,
-  netCashAssets: 0,
-  netNonCashAssets: 0,
-  netWorth: 100000,
-  fetch: vi.fn().mockResolvedValue(undefined),
-  adjustBalances: vi.fn().mockResolvedValue(undefined),
 });
-
-vi.mock('./accountBalanceStore', () => ({
-  useAccountBalanceStore: () => mockStore,
-}));
 
 const ToggleSwitchStub = {
   name: 'ToggleSwitch',
@@ -97,99 +76,122 @@ const SummaryStripStub = {
   template: '<div data-testid="account-balance-summary-strip" />',
 };
 
-function createWrapper(): VueWrapper {
-  return mount(AccountBalancesPage, {
-    global: {
-      plugins: [PrimeVue, createPinia()],
-      stubs: {
-        ToggleSwitch: ToggleSwitchStub,
-        AccountCategoryTable: CategoryTableStub,
-        AdjustBalancesDialog: AdjustDialogStub,
-        AccountBalanceSummaryStrip: SummaryStripStub,
-      },
-    },
-  });
-}
-
 describe('AccountBalancesPage', () => {
+  let pinia: Pinia;
+
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.loading = false;
-    mockStore.error = null;
-    mockStore.accounts = [currentAccount];
-    mockStore.currentAccounts = [currentAccount];
-    mockStore.cashAssetAccounts = [];
-    mockStore.nonCashAssetAccounts = [];
-    mockStore.creditCardAccounts = [];
-    mockStore.loanAccounts = [];
-    mockStore.totalAssets = 0;
-    mockStore.totalLiabilities = 0;
-    mockStore.netCurrentCash = 100000;
-    mockStore.netCashAssets = 0;
-    mockStore.netNonCashAssets = 0;
-    mockStore.netWorth = 100000;
-    mockStore.includeClosed = false;
-    mockStore.fetch.mockResolvedValue(undefined);
   });
+
+  async function setupApi(accounts = [currentAccount]) {
+    const { accountBalanceApi } = await import('./accountBalanceApi');
+    vi.mocked(accountBalanceApi.getAll).mockResolvedValue(accounts);
+    vi.mocked(accountBalanceApi.adjustBalances).mockResolvedValue({ success: true });
+    return accountBalanceApi;
+  }
+
+  function createWrapper(): VueWrapper {
+    return mount(AccountBalancesPage, {
+      global: {
+        plugins: [PrimeVue, pinia],
+        stubs: {
+          ToggleSwitch: ToggleSwitchStub,
+          AccountCategoryTable: CategoryTableStub,
+          AdjustBalancesDialog: AdjustDialogStub,
+          AccountBalanceSummaryStrip: SummaryStripStub,
+        },
+      },
+    });
+  }
 
   describe('on mount', () => {
     it('sets the page heading to "Account Balances"', async () => {
+      await setupApi();
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Account Balances');
     });
 
-    it('calls store.fetch on mount', async () => {
+    it('calls accountBalanceApi.getAll on mount', async () => {
+      const api = await setupApi();
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetch).toHaveBeenCalled();
+      expect(api.getAll).toHaveBeenCalledWith(false);
     });
   });
 
   describe('layout', () => {
-    it('renders include closed accounts toggle', () => {
+    it('renders include closed accounts toggle', async () => {
+      await setupApi();
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(INCLUDE_CLOSED_TOGGLE).exists()).toBe(true);
     });
 
-    it('renders Adjust Account Balances button', () => {
+    it('renders Adjust Account Balances button', async () => {
+      await setupApi();
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(ADJUST_BALANCES_BTN).exists()).toBe(true);
     });
 
-    it('renders summary strip', () => {
+    it('renders summary strip', async () => {
+      await setupApi();
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="account-balance-summary-strip"]').exists()).toBe(true);
     });
 
-    it('hides summary strip when loading', () => {
-      mockStore.loading = true;
+    it('hides summary strip when loading', async () => {
+      const { accountBalanceApi } = await import('./accountBalanceApi');
+      let resolveGetAll!: (value: never[]) => void;
+      vi.mocked(accountBalanceApi.getAll).mockImplementation(
+        () => new Promise((resolve) => (resolveGetAll = resolve)),
+      );
+
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="account-balance-summary-strip"]').exists()).toBe(false);
+
+      resolveGetAll([]);
+      await flushPromises();
     });
 
-    it('hides summary strip when error', () => {
-      mockStore.error = 'Failed';
+    it('hides summary strip when error', async () => {
+      const { accountBalanceApi } = await import('./accountBalanceApi');
+      vi.mocked(accountBalanceApi.getAll).mockRejectedValue(new Error('Failed'));
+      // Store re-throws after setting error — suppress the unhandled rejection from the
+      // fire-and-forget store.fetch() call in onMounted.
+      const suppress = () => {};
+      process.on('unhandledRejection', suppress);
+
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('[data-testid="account-balance-summary-strip"]').exists()).toBe(false);
+      process.off('unhandledRejection', suppress);
     });
 
-    it('renders category tables that have accounts', () => {
+    it('renders category tables that have accounts', async () => {
+      await setupApi([currentAccount]);
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(CURRENT_ACCOUNTS_TABLE).exists()).toBe(true);
     });
 
-    it('hides category tables with no accounts', () => {
+    it('hides category tables with no accounts', async () => {
+      await setupApi([currentAccount]);
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(CASH_ASSETS_TABLE).exists()).toBe(false);
       expect(wrapper.find(NON_CASH_ASSETS_TABLE).exists()).toBe(false);
@@ -197,17 +199,20 @@ describe('AccountBalancesPage', () => {
       expect(wrapper.find(LOANS_TABLE).exists()).toBe(false);
     });
 
-    it('shows category tables when accounts are populated', () => {
-      mockStore.creditCardAccounts = [creditCardAccount];
+    it('shows category tables when accounts are populated', async () => {
+      await setupApi([currentAccount, creditCardAccount]);
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(CREDIT_CARDS_TABLE).exists()).toBe(true);
     });
   });
 
   describe('category table props', () => {
-    it('passes currentAccounts to Current Accounts table', () => {
+    it('passes currentAccounts to Current Accounts table', async () => {
+      await setupApi([currentAccount]);
       const wrapper = createWrapper();
+      await flushPromises();
 
       const tables = wrapper.findAllComponents({ name: 'AccountCategoryTable' });
       expect(tables[0].props('heading')).toBe('Current Accounts');
@@ -216,72 +221,108 @@ describe('AccountBalancesPage', () => {
   });
 
   describe('loading state', () => {
-    it('shows loading message when loading', () => {
-      mockStore.loading = true;
+    it('shows loading message when loading', async () => {
+      const { accountBalanceApi } = await import('./accountBalanceApi');
+      let resolveGetAll!: (value: never[]) => void;
+      vi.mocked(accountBalanceApi.getAll).mockImplementation(
+        () => new Promise((resolve) => (resolveGetAll = resolve)),
+      );
+
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('.loading-message').exists()).toBe(true);
       expect(wrapper.find('.loading-message').text()).toBe('Loading...');
+
+      resolveGetAll([]);
+      await flushPromises();
     });
 
-    it('hides content when loading', () => {
-      mockStore.loading = true;
+    it('hides content when loading', async () => {
+      const { accountBalanceApi } = await import('./accountBalanceApi');
+      let resolveGetAll!: (value: never[]) => void;
+      vi.mocked(accountBalanceApi.getAll).mockImplementation(
+        () => new Promise((resolve) => (resolveGetAll = resolve)),
+      );
+
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(CURRENT_ACCOUNTS_TABLE).exists()).toBe(false);
+
+      resolveGetAll([]);
+      await flushPromises();
     });
   });
 
   describe('error state', () => {
-    it('shows error message when error is set', () => {
-      mockStore.error = 'Failed to load';
+    it('shows error message when error is set', async () => {
+      const { accountBalanceApi } = await import('./accountBalanceApi');
+      vi.mocked(accountBalanceApi.getAll).mockRejectedValue(new Error('Failed to load'));
+      // Store re-throws after setting error — suppress the unhandled rejection from the
+      // fire-and-forget store.fetch() call in onMounted.
+      const suppress = () => {};
+      process.on('unhandledRejection', suppress);
+
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find('.error-message').exists()).toBe(true);
       expect(wrapper.find('.error-message').text()).toBe('Failed to load');
+      process.off('unhandledRejection', suppress);
     });
   });
 
-  describe('toolbar — include closed toggle', () => {
-    it('calls store.fetch when toggle is changed', async () => {
+  describe('toolbar -- include closed toggle', () => {
+    it('calls accountBalanceApi.getAll when toggle is changed', async () => {
+      const api = await setupApi();
       const wrapper = createWrapper();
+      await flushPromises();
       vi.clearAllMocks();
+      vi.mocked(api.getAll).mockResolvedValue([currentAccount]);
 
       await wrapper.find(INCLUDE_CLOSED_TOGGLE).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetch).toHaveBeenCalled();
+      expect(api.getAll).toHaveBeenCalledWith(true);
     });
   });
 
-  describe('toolbar — adjust balances button', () => {
+  describe('toolbar -- adjust balances button', () => {
     it('opens adjust balances dialog when button is clicked', async () => {
+      await setupApi();
       const wrapper = createWrapper();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'AdjustBalancesDialog' });
       expect(dialog.props('visible')).toBe(false);
 
       await wrapper.find(ADJUST_BALANCES_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(true);
     });
 
-    it('passes store.accounts to adjust balances dialog', () => {
+    it('passes store.accounts to adjust balances dialog', async () => {
+      await setupApi([currentAccount]);
       const wrapper = createWrapper();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'AdjustBalancesDialog' });
       expect(dialog.props('accounts')).toEqual([currentAccount]);
     });
 
     it('closes adjust balances dialog when update:visible emits false', async () => {
+      await setupApi();
       const wrapper = createWrapper();
+      await flushPromises();
+
       await wrapper.find(ADJUST_BALANCES_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'AdjustBalancesDialog' });
       await dialog.vm.$emit('update:visible', false);
-      await nextTick();
+      await flushPromises();
 
       expect(dialog.props('visible')).toBe(false);
     });
