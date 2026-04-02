@@ -117,16 +117,7 @@ async function onCancel() {
 }
 
 function onAddObligation() {
-  if (!store.sinkFund) return;
-  if (!store.sinkFund.sink_fund_allocations) {
-    store.sinkFund.sink_fund_allocations = [];
-  }
-  store.sinkFund.sink_fund_allocations.push({
-    name: '',
-    amount: 0,
-    status: 'open',
-    unsaved: true,
-  });
+  store.addObligation();
 }
 </script>
 

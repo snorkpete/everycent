@@ -212,6 +212,47 @@ describe('sinkFundStore', () => {
     });
   });
 
+  describe('addObligation', () => {
+    it('does nothing if sinkFund is null', () => {
+      const store = useSinkFundStore();
+      store.sinkFund = null;
+
+      store.addObligation();
+
+      expect(store.sinkFund).toBeNull();
+    });
+
+    it('initialises sink_fund_allocations array if missing', () => {
+      const store = useSinkFundStore();
+      store.sinkFund = makeSinkFund({ sink_fund_allocations: undefined });
+
+      store.addObligation();
+
+      expect(store.sinkFund!.sink_fund_allocations).toHaveLength(1);
+    });
+
+    it('appends a new obligation with default values', () => {
+      const store = useSinkFundStore();
+      store.sinkFund = makeSinkFund({ sink_fund_allocations: [] });
+
+      store.addObligation();
+
+      expect(store.sinkFund!.sink_fund_allocations).toEqual([
+        { name: '', amount: 0, status: 'open', unsaved: true },
+      ]);
+    });
+
+    it('appends to existing obligations', () => {
+      const existing = makeAllocation({ id: 1, name: 'Existing' });
+      const store = useSinkFundStore();
+      store.sinkFund = makeSinkFund({ sink_fund_allocations: [existing] });
+
+      store.addObligation();
+
+      expect(store.sinkFund!.sink_fund_allocations).toHaveLength(2);
+    });
+  });
+
   describe('cancelEdit', () => {
     it('exits edit mode and re-fetches the sink fund', async () => {
       const fund = makeSinkFund();

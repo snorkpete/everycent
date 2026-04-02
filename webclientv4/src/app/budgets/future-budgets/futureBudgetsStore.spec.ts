@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useFutureBudgetsStore } from './futureBudgetsStore';
+import { useSettingsStore } from '../../settings/settingsStore';
 import { futureBudgetsApi } from './futureBudgetsApi';
 import type { FutureBudgetData } from './futureBudgets.types';
 
@@ -8,7 +9,6 @@ vi.mock('./futureBudgetsApi', () => ({
   futureBudgetsApi: {
     getFutureBudgets: vi.fn(),
     getAllocationCategories: vi.fn(),
-    getSettings: vi.fn(),
     massUpdate: vi.fn(),
   },
 }));
@@ -30,24 +30,29 @@ describe('futureBudgetsStore', () => {
     vi.clearAllMocks();
     vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([]);
     vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue([]);
-    vi.mocked(futureBudgetsApi.getSettings).mockResolvedValue({});
   });
 
   describe('fetchAll', () => {
-    it('fetches and stores budgets, categories, and settings', async () => {
+    it('fetches and stores budgets and categories', async () => {
       const budgets = [makeBudget()];
       const categories = [{ id: 1, name: 'Fixed' }];
-      const settings = { husband: 'Alice', wife: 'Bob' };
       vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue(budgets);
       vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue(categories);
-      vi.mocked(futureBudgetsApi.getSettings).mockResolvedValue(settings);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
 
       expect(store.budgets).toEqual(budgets);
       expect(store.allocationCategories).toEqual(categories);
-      expect(store.settings).toEqual(settings);
+    });
+
+    it('reads settings from settingsStore', () => {
+      const settingsStore = useSettingsStore();
+      settingsStore.settings = { husband: 'Alice', wife: 'Bob' };
+
+      const store = useFutureBudgetsStore();
+
+      expect(store.settings).toEqual({ husband: 'Alice', wife: 'Bob' });
     });
 
     it('sets loading true during fetch and false after', async () => {

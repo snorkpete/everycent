@@ -7,7 +7,7 @@ import { useCurrentAndPastBudgets } from '../budgets/useCurrentAndPastBudgets';
 import type { MatchType } from '../budgets/autoAllocate.types';
 import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
-import { useSettingsStore } from '../settings/settingsStore';
+import { isAutoAllocateEligible } from '../bank-accounts/isAutoAllocateEligible';
 import type { CamtAccountResult } from '../transactions/importers/camt053Parser';
 import type { PreviewBankAccount, UnmatchedIban, SaveResponse } from './import.types';
 
@@ -62,10 +62,7 @@ export const useImportStore = defineStore('import', () => {
     loading.value = true;
     error.value = null;
     try {
-      const [, loadedAccounts] = await Promise.all([
-        fetchBudgets(),
-        bankAccountApi.getOpen(),
-      ]);
+      const [, loadedAccounts] = await Promise.all([fetchBudgets(), bankAccountApi.getOpen()]);
       bankAccounts.value = loadedAccounts;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load metadata';
@@ -211,11 +208,8 @@ export const useImportStore = defineStore('import', () => {
   }
 
   function isAccountAutoAllocateEligible(bankAccountId: number): boolean {
-    const ba = bankAccounts.value.find((a) => a.id === bankAccountId);
-    if (!ba) return false;
-    if (ba.is_credit_card) return true;
-    const settingsStore = useSettingsStore();
-    return ba.id === settingsStore.settings.primary_budget_account_id;
+    const ba = bankAccounts.value.find((a) => a.id === bankAccountId) ?? null;
+    return isAutoAllocateEligible(ba);
   }
 
   async function autoAllocate() {

@@ -72,6 +72,7 @@ const mockStore = reactive({
   save: vi.fn().mockResolvedValue(undefined),
   enterEditMode: vi.fn(),
   exitEditMode: vi.fn(),
+  addObligation: vi.fn(),
   cancelEdit: vi.fn().mockResolvedValue(undefined),
 });
 
@@ -263,7 +264,7 @@ describe('SinkFundsPage', () => {
   });
 
   describe('toolbar — add obligation', () => {
-    it('adds a new empty allocation to sinkFund when Add Obligation is clicked', async () => {
+    it('calls store.addObligation when Add Obligation is clicked', async () => {
       mockStore.isEditMode = true;
       mockStore.sinkFund = { ...sinkFundA, sink_fund_allocations: [] };
       const wrapper = createWrapper();
@@ -271,23 +272,7 @@ describe('SinkFundsPage', () => {
 
       await wrapper.find(ADD_OBLIGATION_BTN).trigger('click');
 
-      expect(mockStore.sinkFund.sink_fund_allocations).toHaveLength(1);
-      expect(mockStore.sinkFund.sink_fund_allocations![0]).toMatchObject({
-        name: '',
-        amount: 0,
-        status: 'open',
-        unsaved: true,
-      });
-    });
-
-    it('does nothing when Add Obligation is clicked and sinkFund is null', async () => {
-      mockStore.isEditMode = true;
-      mockStore.sinkFund = null;
-      const wrapper = createWrapper();
-      await nextTick();
-
-      // Should not throw
-      await wrapper.find(ADD_OBLIGATION_BTN).trigger('click');
+      expect(mockStore.addObligation).toHaveBeenCalled();
     });
   });
 
