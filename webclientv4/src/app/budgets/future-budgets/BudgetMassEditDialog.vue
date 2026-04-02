@@ -1,10 +1,12 @@
 <template>
-  <Dialog
+  <EcFormDialog
     :visible="visible"
     :header="dialogTitle"
-    modal
-    :style="{ width: '72rem', maxWidth: '95vw' }"
+    width="72rem"
+    :dialog-style="{ maxWidth: '95vw' }"
+    :always-edit="true"
     @update:visible="$emit('update:visible', $event)"
+    @save="saveChanges"
   >
     <div class="dialog-body">
       <table class="mass-edit-table" :style="tableStyle">
@@ -20,11 +22,7 @@
         <tbody>
           <tr>
             <td class="sticky-col">
-              <InputText
-                v-model="formName"
-                class="name-input"
-                data-testid="name-input"
-              />
+              <InputText v-model="formName" class="name-input" data-testid="name-input" />
             </td>
             <td v-for="(_, i) in amounts" :key="amounts[i].budget_id">
               <EcMoneyField
@@ -67,7 +65,10 @@
             <tr class="info-row">
               <td class="info-label sticky-col">Already Allocated</td>
               <td v-for="row in amounts" :key="row.budget_id">
-                <EcMoneyDisplay :model-value="row.totalAllocationsWithoutCurrent" highlight-mode="none" />
+                <EcMoneyDisplay
+                  :model-value="row.totalAllocationsWithoutCurrent"
+                  highlight-mode="none"
+                />
               </td>
             </tr>
             <tr class="info-row">
@@ -86,26 +87,13 @@
         </tbody>
       </table>
     </div>
-
-    <template #footer>
-      <div class="dialog-footer">
-        <Button label="Save" data-testid="save-btn" @click="saveChanges" />
-        <Button
-          label="Cancel"
-          severity="secondary"
-          data-testid="cancel-btn"
-          @click="$emit('update:visible', false)"
-        />
-      </div>
-    </template>
-  </Dialog>
+  </EcFormDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import EcFormDialog from '../../shared/form/form-dialog/EcFormDialog.vue';
 import EcMoneyField from '../../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../../shared/form/money-field/EcMoneyDisplay.vue';
 import { budgetHeaderLines } from './budgetHeaderLines';
@@ -142,9 +130,7 @@ function buildAmounts(): AmountRow[] {
     const originalAmount = existing.amount;
 
     const budgetIncome =
-      props.type === 'allocation'
-        ? budget.incomes.reduce((sum, i) => sum + i.amount, 0)
-        : 0;
+      props.type === 'allocation' ? budget.incomes.reduce((sum, i) => sum + i.amount, 0) : 0;
 
     const totalAllocationsWithoutCurrent =
       props.type === 'allocation'
@@ -157,7 +143,7 @@ function buildAmounts(): AmountRow[] {
       budget_id: budget.id,
       budgetIncome,
       totalAllocationsWithoutCurrent,
-      is_fixed_amount: ('is_fixed_amount' in existing) ? existing.is_fixed_amount : false,
+      is_fixed_amount: 'is_fixed_amount' in existing ? existing.is_fixed_amount : false,
     };
   });
 }
@@ -272,12 +258,6 @@ function onSetAllFixedChange(checked: boolean) {
 .info-label {
   font-size: 0.85rem;
   color: var(--p-text-muted-color);
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 
 /* Amount inputs fill their fixed column width */
