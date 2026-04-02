@@ -1,7 +1,7 @@
 # Task: Extract BaseEditDialog component
 
 **ID:** extract-baseeditdialog-component
-**Status:** in-progress
+**Status:** done
 **Branch:** task/extract-baseeditdialog-component
 **Autonomous:** true
 **Priority:** high
@@ -25,19 +25,19 @@ Supports three modes: view/edit toggle (default), always-edit, and view-only. Co
 
 ## Acceptance Criteria
 
-- [ ] `EcFormDialog.vue` exists at `src/app/shared/form/form-dialog/`
-- [ ] Props: `visible` (v-model), `header`, `width` (default `'30rem'`), `initialEditMode`, `alwaysEdit`, `saveLabel`/`cancelLabel`/`editLabel`/`closeLabel`, `saveDisabled`, `dialogStyle`
-- [ ] Slots: `default` (scoped `{ editMode }`), `footer-extra` (scoped `{ editMode }`)
-- [ ] Emits: `update:visible`, `save`, `cancel`
-- [ ] View/edit mode: shows Make Changes/Close in view, Save/Cancel in edit; manages editMode internally; resets editMode on dialog reopen
-- [ ] Always-edit mode: always shows Save/Cancel; Cancel emits `cancel` then closes
-- [ ] Cancel emits in all modes; parent decides what to do (reset form, close for new items, etc.)
-- [ ] Consistent data-testids: `save-btn`, `cancel-btn`, `edit-btn`, `close-btn`
-- [ ] 5 consumers migrated: InstitutionEditDialog, AllocationCategoryEditDialog, BankAccountEditDialog, SpecialEventForm, BudgetMassEditDialog
-- [ ] SpecialEventForm testid updated from `submit-btn` to `save-btn` (Cypress tests updated if affected)
-- [ ] Full test coverage on EcFormDialog (27 scenarios covering view mode, edit mode, always-edit, dialog chrome, footer-extra slot, reset on reopen)
-- [ ] All existing consumer tests pass after migration
-- [ ] No dead CSS (.form-fields, .dialog-footer) remains in migrated consumers
+- [x] `EcFormDialog.vue` exists at `src/app/shared/form/form-dialog/`
+- [x] Props: `visible` (v-model), `header`, `width` (default `'30rem'`), `initialEditMode`, `alwaysEdit`, `saveLabel`/`cancelLabel`/`editLabel`/`closeLabel`, `saveDisabled`, `dialogStyle`
+- [x] Slots: `default` (scoped `{ editMode }`), `footer-extra` (scoped `{ editMode }`)
+- [x] Emits: `update:visible`, `save`, `cancel`
+- [x] View/edit mode: shows Make Changes/Close in view, Save/Cancel in edit; manages editMode internally; resets editMode on dialog reopen
+- [x] Always-edit mode: always shows Save/Cancel; Cancel emits `cancel` then closes
+- [x] Cancel emits in all modes; parent decides what to do (reset form, close for new items, etc.)
+- [x] Consistent data-testids: `save-btn`, `cancel-btn`, `edit-btn`, `close-btn`
+- [x] 5 consumers migrated: InstitutionEditDialog, AllocationCategoryEditDialog, BankAccountEditDialog, SpecialEventForm, BudgetMassEditDialog
+- [x] SpecialEventForm testid updated from `submit-btn` to `save-btn` (Cypress tests updated if affected)
+- [x] Full test coverage on EcFormDialog (27 scenarios covering view mode, edit mode, always-edit, dialog chrome, footer-extra slot, reset on reopen)
+- [x] All existing consumer tests pass after migration
+- [x] No dead CSS (.form-fields, .dialog-footer) remains in migrated consumers
 
 ---
 
