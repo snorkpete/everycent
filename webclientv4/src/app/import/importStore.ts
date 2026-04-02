@@ -208,8 +208,8 @@ export const useImportStore = defineStore('import', () => {
   }
 
   function isAccountAutoAllocateEligible(bankAccountId: number): boolean {
-    const ba = bankAccounts.value.find((a) => a.id === bankAccountId) ?? null;
-    return isAutoAllocateEligible(ba);
+    const bankAccount = bankAccounts.value.find((a) => a.id === bankAccountId) ?? null;
+    return isAutoAllocateEligible(bankAccount);
   }
 
   async function autoAllocate() {

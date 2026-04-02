@@ -4,7 +4,7 @@
     :header="dialogTitle"
     modal
     :closable="true"
-    :style="{ width: '31.25rem' }"
+    :style="{ width: '32rem' }"
     @update:visible="$emit('update:visible', $event)"
   >
     <div v-if="loading" class="loading-state" data-testid="loading-state">

@@ -1,15 +1,12 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { futureBudgetsApi } from './futureBudgetsApi';
-import { useSettingsStore } from '../../settings/settingsStore';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 
 export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
   const budgets = ref<FutureBudgetData[]>([]);
   const allocationCategories = ref<AllocationCategoryData[]>([]);
-  const settingsStore = useSettingsStore();
-  const settings = computed(() => settingsStore.settings);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -94,7 +91,6 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
   return {
     budgets,
     allocationCategories,
-    settings,
     loading,
     error,
     incomeDisplayData,

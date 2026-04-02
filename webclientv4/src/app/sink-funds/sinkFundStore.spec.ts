@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
-import type { SinkFundData } from './sinkFund.types';
+import { buildSinkFund, buildSinkFundAllocation } from '../../test/factories';
 
 vi.mock('./sinkFundApi', () => ({
   sinkFundApi: {
@@ -12,24 +12,6 @@ vi.mock('./sinkFundApi', () => ({
     transfer: vi.fn(),
   },
 }));
-
-const makeAllocation = (overrides = {}) => ({
-  id: 1,
-  name: 'Car repairs',
-  amount: 10000,
-  status: 'open',
-  current_balance: 5000,
-  target: 20000,
-  ...overrides,
-});
-
-const makeSinkFund = (overrides: Partial<SinkFundData> = {}): SinkFundData => ({
-  id: 3,
-  name: 'Rainy Day Fund',
-  current_balance: 80000,
-  sink_fund_allocations: [makeAllocation()],
-  ...overrides,
-});
 
 describe('sinkFundStore', () => {
   beforeEach(() => {
@@ -89,7 +71,7 @@ describe('sinkFundStore', () => {
 
   describe('fetchDetail', () => {
     it('fetches and stores the sink fund detail', async () => {
-      const fund = makeSinkFund();
+      const fund = buildSinkFund();
       vi.mocked(sinkFundApi.get).mockResolvedValue(fund);
 
       const store = useSinkFundStore();
@@ -103,7 +85,7 @@ describe('sinkFundStore', () => {
       let loadingDuringCall = false;
       vi.mocked(sinkFundApi.get).mockImplementation(async () => {
         loadingDuringCall = useSinkFundStore().loading;
-        return makeSinkFund();
+        return buildSinkFund();
       });
 
       const store = useSinkFundStore();
@@ -134,7 +116,7 @@ describe('sinkFundStore', () => {
     });
 
     it('calls sinkFundApi.save with the current sink fund', async () => {
-      const fund = makeSinkFund();
+      const fund = buildSinkFund();
       vi.mocked(sinkFundApi.save).mockResolvedValue(fund);
 
       const store = useSinkFundStore();
@@ -145,7 +127,7 @@ describe('sinkFundStore', () => {
     });
 
     it('updates sinkFund with the saved response', async () => {
-      const fund = makeSinkFund();
+      const fund = buildSinkFund();
       const saved = { ...fund, current_balance: 90000 };
       vi.mocked(sinkFundApi.save).mockResolvedValue(saved);
 
@@ -157,7 +139,7 @@ describe('sinkFundStore', () => {
     });
 
     it('exits edit mode after successful save', async () => {
-      const fund = makeSinkFund();
+      const fund = buildSinkFund();
       vi.mocked(sinkFundApi.save).mockResolvedValue(fund);
 
       const store = useSinkFundStore();
@@ -169,7 +151,7 @@ describe('sinkFundStore', () => {
     });
 
     it('sets error and re-throws on failure', async () => {
-      const fund = makeSinkFund();
+      const fund = buildSinkFund();
       vi.mocked(sinkFundApi.save).mockRejectedValue(new Error('Save failed'));
 
       const store = useSinkFundStore();
@@ -181,7 +163,7 @@ describe('sinkFundStore', () => {
     });
 
     it('sets loading to true during save and false after', async () => {
-      const fund = makeSinkFund();
+      const fund = buildSinkFund();
       let loadingDuringSave = false;
       vi.mocked(sinkFundApi.save).mockImplementation(async () => {
         loadingDuringSave = useSinkFundStore().loading;
@@ -224,7 +206,7 @@ describe('sinkFundStore', () => {
 
     it('initialises sink_fund_allocations array if missing', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({ sink_fund_allocations: undefined });
+      store.sinkFund = buildSinkFund({ sink_fund_allocations: undefined });
 
       store.addObligation();
 
@@ -233,7 +215,7 @@ describe('sinkFundStore', () => {
 
     it('appends a new obligation with default values', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({ sink_fund_allocations: [] });
+      store.sinkFund = buildSinkFund({ sink_fund_allocations: [] });
 
       store.addObligation();
 
@@ -243,9 +225,9 @@ describe('sinkFundStore', () => {
     });
 
     it('appends to existing obligations', () => {
-      const existing = makeAllocation({ id: 1, name: 'Existing' });
+      const existing = buildSinkFundAllocation({ id: 1, name: 'Existing' });
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({ sink_fund_allocations: [existing] });
+      store.sinkFund = buildSinkFund({ sink_fund_allocations: [existing] });
 
       store.addObligation();
 
@@ -255,7 +237,7 @@ describe('sinkFundStore', () => {
 
   describe('cancelEdit', () => {
     it('exits edit mode and re-fetches the sink fund', async () => {
-      const fund = makeSinkFund();
+      const fund = buildSinkFund();
       vi.mocked(sinkFundApi.get).mockResolvedValue(fund);
 
       const store = useSinkFundStore();
@@ -280,10 +262,10 @@ describe('sinkFundStore', () => {
   describe('visibleAllocations', () => {
     it('returns only open allocations when showDeactivated is false', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         sink_fund_allocations: [
-          makeAllocation({ id: 1, status: 'open' }),
-          makeAllocation({ id: 2, status: 'closed' }),
+          buildSinkFundAllocation({ id: 1, status: 'open' }),
+          buildSinkFundAllocation({ id: 2, status: 'closed' }),
         ],
       });
       store.showDeactivated = false;
@@ -294,10 +276,10 @@ describe('sinkFundStore', () => {
 
     it('returns all allocations when showDeactivated is true', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         sink_fund_allocations: [
-          makeAllocation({ id: 1, status: 'open' }),
-          makeAllocation({ id: 2, status: 'closed' }),
+          buildSinkFundAllocation({ id: 1, status: 'open' }),
+          buildSinkFundAllocation({ id: 2, status: 'closed' }),
         ],
       });
       store.showDeactivated = true;
@@ -316,10 +298,10 @@ describe('sinkFundStore', () => {
   describe('totalAssignedBalance', () => {
     it('sums current_balance of all allocations', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         sink_fund_allocations: [
-          makeAllocation({ current_balance: 5000 }),
-          makeAllocation({ id: 2, current_balance: 3000 }),
+          buildSinkFundAllocation({ current_balance: 5000 }),
+          buildSinkFundAllocation({ id: 2, current_balance: 3000 }),
         ],
       });
 
@@ -328,7 +310,7 @@ describe('sinkFundStore', () => {
 
     it('returns 0 when there are no allocations', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({ sink_fund_allocations: [] });
+      store.sinkFund = buildSinkFund({ sink_fund_allocations: [] });
 
       expect(store.totalAssignedBalance).toBe(0);
     });
@@ -344,9 +326,9 @@ describe('sinkFundStore', () => {
   describe('unassignedBalance', () => {
     it('returns sinkFund.current_balance minus totalAssignedBalance', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         current_balance: 80000,
-        sink_fund_allocations: [makeAllocation({ current_balance: 5000 })],
+        sink_fund_allocations: [buildSinkFundAllocation({ current_balance: 5000 })],
       });
 
       expect(store.unassignedBalance).toBe(75000);
@@ -363,11 +345,11 @@ describe('sinkFundStore', () => {
   describe('totalTarget', () => {
     it('sums target of visible allocations where target > 0', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         sink_fund_allocations: [
-          makeAllocation({ id: 1, status: 'open', target: 20000 }),
-          makeAllocation({ id: 2, status: 'open', target: 0 }),
-          makeAllocation({ id: 3, status: 'open', target: 10000 }),
+          buildSinkFundAllocation({ id: 1, status: 'open', target: 20000 }),
+          buildSinkFundAllocation({ id: 2, status: 'open', target: 0 }),
+          buildSinkFundAllocation({ id: 3, status: 'open', target: 10000 }),
         ],
       });
 
@@ -376,10 +358,10 @@ describe('sinkFundStore', () => {
 
     it('excludes closed allocations when showDeactivated is false', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         sink_fund_allocations: [
-          makeAllocation({ id: 1, status: 'open', target: 20000 }),
-          makeAllocation({ id: 2, status: 'closed', target: 10000 }),
+          buildSinkFundAllocation({ id: 1, status: 'open', target: 20000 }),
+          buildSinkFundAllocation({ id: 2, status: 'closed', target: 10000 }),
         ],
       });
       store.showDeactivated = false;
@@ -391,11 +373,11 @@ describe('sinkFundStore', () => {
   describe('totalOutstanding', () => {
     it('sums (current_balance - target) for visible allocations where target > 0', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         sink_fund_allocations: [
-          makeAllocation({ id: 1, status: 'open', current_balance: 5000, target: 20000 }),
-          makeAllocation({ id: 2, status: 'open', current_balance: 8000, target: 10000 }),
-          makeAllocation({ id: 3, status: 'open', current_balance: 2000, target: 0 }),
+          buildSinkFundAllocation({ id: 1, status: 'open', current_balance: 5000, target: 20000 }),
+          buildSinkFundAllocation({ id: 2, status: 'open', current_balance: 8000, target: 10000 }),
+          buildSinkFundAllocation({ id: 3, status: 'open', current_balance: 2000, target: 0 }),
         ],
       });
 
@@ -405,10 +387,15 @@ describe('sinkFundStore', () => {
 
     it('excludes closed allocations when showDeactivated is false', () => {
       const store = useSinkFundStore();
-      store.sinkFund = makeSinkFund({
+      store.sinkFund = buildSinkFund({
         sink_fund_allocations: [
-          makeAllocation({ id: 1, status: 'open', current_balance: 5000, target: 20000 }),
-          makeAllocation({ id: 2, status: 'closed', current_balance: 9000, target: 10000 }),
+          buildSinkFundAllocation({ id: 1, status: 'open', current_balance: 5000, target: 20000 }),
+          buildSinkFundAllocation({
+            id: 2,
+            status: 'closed',
+            current_balance: 9000,
+            target: 10000,
+          }),
         ],
       });
       store.showDeactivated = false;

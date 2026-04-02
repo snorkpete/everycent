@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { nextTick, reactive } from 'vue';
 import { mount } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { setActivePinia, createPinia, getActivePinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import FutureBudgetsPage from './FutureBudgetsPage.vue';
+import { useSettingsStore } from '../../settings/settingsStore';
 import type { FutureBudgetData } from './futureBudgets.types';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
 import type { MassUpdatePayload } from './futureBudgets.types';
@@ -48,12 +49,6 @@ const fixedCategory: AllocationCategoryData = { id: 3, name: 'Fixed' };
 const mockStore = reactive({
   budgets: [jan2025, feb2025] as FutureBudgetData[],
   allocationCategories: [fixedCategory] as AllocationCategoryData[],
-  settings: { family_type: 'couple', husband: 'Alice', wife: 'Bob' } as {
-    family_type?: string;
-    husband?: string;
-    wife?: string;
-    single_person?: string;
-  },
   loading: false,
   error: null as string | null,
   incomeDisplayData: {
@@ -95,7 +90,7 @@ const DialogStub = {
 function createWrapper() {
   return mount(FutureBudgetsPage, {
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, getActivePinia()!],
       stubs: { BudgetMassEditDialog: DialogStub },
     },
   });
@@ -108,7 +103,8 @@ describe('FutureBudgetsPage', () => {
     mockStore.fetchAll.mockResolvedValue(undefined);
     mockStore.massUpdate.mockResolvedValue(undefined);
     mockStore.error = null;
-    mockStore.settings = { family_type: 'couple', husband: 'Alice', wife: 'Bob' };
+    const settingsStore = useSettingsStore();
+    settingsStore.settings = { family_type: 'couple', husband: 'Alice', wife: 'Bob' };
   });
 
   describe('on mount', () => {
@@ -245,7 +241,8 @@ describe('FutureBudgetsPage', () => {
 
     describe('when family_type is single', () => {
       beforeEach(() => {
-        mockStore.settings = { family_type: 'single', single_person: 'Charlie' };
+        const settingsStore = useSettingsStore();
+        settingsStore.settings = { family_type: 'single', single_person: 'Charlie' };
       });
 
       it('shows a single person row', () => {
@@ -267,7 +264,8 @@ describe('FutureBudgetsPage', () => {
 
     describe('when family_type is not set', () => {
       beforeEach(() => {
-        mockStore.settings = {};
+        const settingsStore = useSettingsStore();
+        settingsStore.settings = {};
       });
 
       it('shows no per-person rows', () => {

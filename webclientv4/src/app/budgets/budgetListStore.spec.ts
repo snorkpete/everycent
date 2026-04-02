@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useBudgetListStore } from './budgetListStore';
 import { budgetApi } from './budgetApi';
+import { buildBudget } from '../../test/factories';
 import type { BudgetData } from './budget.types';
 
 vi.mock('./budgetApi', () => ({
@@ -14,17 +15,6 @@ vi.mock('./budgetApi', () => ({
   },
 }));
 
-function makeBudget(overrides: Partial<BudgetData> = {}): BudgetData {
-  return {
-    id: 1,
-    name: 'Jan 2025',
-    start_date: '2025-01-01',
-    end_date: '2025-01-31',
-    status: 'open',
-    ...overrides,
-  };
-}
-
 describe('budgetListStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -33,7 +23,7 @@ describe('budgetListStore', () => {
 
   describe('fetchAll', () => {
     it('loads budgets from the API', async () => {
-      const budgets = [makeBudget({ id: 1 }), makeBudget({ id: 2, name: 'Feb 2025' })];
+      const budgets = [buildBudget({ id: 1 }), buildBudget({ id: 2, name: 'Feb 2025' })];
       vi.mocked(budgetApi.getAll).mockResolvedValue(budgets);
 
       const store = useBudgetListStore();
@@ -74,8 +64,8 @@ describe('budgetListStore', () => {
 
   describe('canCopy', () => {
     it('returns true for the first budget in the list', async () => {
-      const first = makeBudget({ id: 1 });
-      const second = makeBudget({ id: 2 });
+      const first = buildBudget({ id: 1 });
+      const second = buildBudget({ id: 2 });
       vi.mocked(budgetApi.getAll).mockResolvedValue([first, second]);
 
       const store = useBudgetListStore();
@@ -85,8 +75,8 @@ describe('budgetListStore', () => {
     });
 
     it('returns false for non-first budgets', async () => {
-      const first = makeBudget({ id: 1 });
-      const second = makeBudget({ id: 2 });
+      const first = buildBudget({ id: 1 });
+      const second = buildBudget({ id: 2 });
       vi.mocked(budgetApi.getAll).mockResolvedValue([first, second]);
 
       const store = useBudgetListStore();
@@ -98,9 +88,9 @@ describe('budgetListStore', () => {
 
   describe('canClose', () => {
     it('returns true for the last open budget', async () => {
-      const open1 = makeBudget({ id: 1, status: 'open' });
-      const open2 = makeBudget({ id: 2, status: 'open' });
-      const closed = makeBudget({ id: 3, status: 'closed' });
+      const open1 = buildBudget({ id: 1, status: 'open' });
+      const open2 = buildBudget({ id: 2, status: 'open' });
+      const closed = buildBudget({ id: 3, status: 'closed' });
       vi.mocked(budgetApi.getAll).mockResolvedValue([open1, open2, closed]);
 
       const store = useBudgetListStore();
@@ -110,8 +100,8 @@ describe('budgetListStore', () => {
     });
 
     it('returns false for non-last open budgets', async () => {
-      const open1 = makeBudget({ id: 1, status: 'open' });
-      const open2 = makeBudget({ id: 2, status: 'open' });
+      const open1 = buildBudget({ id: 1, status: 'open' });
+      const open2 = buildBudget({ id: 2, status: 'open' });
       vi.mocked(budgetApi.getAll).mockResolvedValue([open1, open2]);
 
       const store = useBudgetListStore();
@@ -121,8 +111,8 @@ describe('budgetListStore', () => {
     });
 
     it('returns false for closed budgets', async () => {
-      const open1 = makeBudget({ id: 1, status: 'open' });
-      const closed = makeBudget({ id: 2, status: 'closed' });
+      const open1 = buildBudget({ id: 1, status: 'open' });
+      const closed = buildBudget({ id: 2, status: 'closed' });
       vi.mocked(budgetApi.getAll).mockResolvedValue([open1, closed]);
 
       const store = useBudgetListStore();
@@ -132,7 +122,7 @@ describe('budgetListStore', () => {
     });
 
     it('returns false when there are no open budgets', async () => {
-      const closed = makeBudget({ id: 1, status: 'closed' });
+      const closed = buildBudget({ id: 1, status: 'closed' });
       vi.mocked(budgetApi.getAll).mockResolvedValue([closed]);
 
       const store = useBudgetListStore();
@@ -273,7 +263,7 @@ describe('budgetListStore', () => {
 
   describe('addBudget', () => {
     it('creates a budget and refreshes the list', async () => {
-      vi.mocked(budgetApi.create).mockResolvedValue(makeBudget());
+      vi.mocked(budgetApi.create).mockResolvedValue(buildBudget());
       vi.mocked(budgetApi.getAll).mockResolvedValue([]);
 
       const store = useBudgetListStore();
@@ -297,7 +287,7 @@ describe('budgetListStore', () => {
 
       expect(store.loading).toBe(true);
 
-      resolveCreate(makeBudget());
+      resolveCreate(buildBudget());
       await promise;
 
       expect(store.loading).toBe(false);

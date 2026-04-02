@@ -145,24 +145,24 @@
           </tr>
 
           <!-- ── Per-person discretionary (moved out of tfoot so footer stays single-row) ── -->
-          <template v-if="store.settings.family_type === 'couple'">
+          <template v-if="settingsStore.settings.family_type === 'couple'">
             <tr class="person-row" data-testid="husband-row">
-              <td>{{ store.settings.husband ?? 'Husband' }}'s Amount</td>
+              <td>{{ settingsStore.settings.husband ?? 'Husband' }}'s Amount</td>
               <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
                 {{ centsToDollars(store.discretionaryForBudget(budget) / 2) }}
               </td>
             </tr>
             <tr class="person-row" data-testid="wife-row">
-              <td>{{ store.settings.wife ?? 'Wife' }}'s Amount</td>
+              <td>{{ settingsStore.settings.wife ?? 'Wife' }}'s Amount</td>
               <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
                 {{ centsToDollars(store.discretionaryForBudget(budget) / 2) }}
               </td>
             </tr>
           </template>
 
-          <template v-else-if="store.settings.family_type === 'single'">
+          <template v-else-if="settingsStore.settings.family_type === 'single'">
             <tr class="person-row" data-testid="single-person-row">
-              <td>{{ store.settings.single_person ?? 'Person' }}'s Amount</td>
+              <td>{{ settingsStore.settings.single_person ?? 'Person' }}'s Amount</td>
               <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
                 {{ centsToDollars(store.discretionaryForBudget(budget)) }}
               </td>
@@ -211,6 +211,7 @@ import { ref, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
 import { useHeadingStore } from '../../toolbar/headingStore';
 import { useFutureBudgetsStore } from './futureBudgetsStore';
+import { useSettingsStore } from '../../settings/settingsStore';
 import { useNotifications } from '../../notifications/useNotifications';
 import BudgetMassEditDialog from './BudgetMassEditDialog.vue';
 import { centsToDollars } from '../../shared/util/cents-to-dollars';
@@ -219,6 +220,7 @@ import type { AllocationCategoryData } from '../../allocation-categories/allocat
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 
 const store = useFutureBudgetsStore();
+const settingsStore = useSettingsStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
 

@@ -64,14 +64,16 @@ export function useAllocationGrouping(
 
     // Collapsed mode: return a single synthetic row representing all fixed allocations
     const totals = totalsForCategory(category, true);
-    return [{
-      id: 0,
-      name: 'Fixed',
-      amount: totals.amount,
-      spent: totals.spent,
-      allocation_category_id: category.id,
-      is_fixed_amount: true,
-    }];
+    return [
+      {
+        id: 0,
+        name: 'Fixed',
+        amount: totals.amount,
+        spent: totals.spent,
+        allocation_category_id: category.id,
+        is_fixed_amount: true,
+      },
+    ];
   }
 
   function adjustableAllocations(category: AllocationCategoryData): AllocationData[] {
@@ -96,10 +98,6 @@ export function useAllocationGrouping(
 
   function categoryTotals(category: AllocationCategoryData): AllocationTotals {
     return totalsForCategory(category, null);
-  }
-
-  function fixedCategoryTotals(category: AllocationCategoryData): AllocationTotals {
-    return totalsForCategory(category, true);
   }
 
   const grandTotals = computed<AllocationTotals>(() => {
