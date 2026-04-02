@@ -1,5 +1,5 @@
 <template>
-  <div class="future-budgets-page">
+  <EcPageLayout page-name="future-budgets">
     <div class="page-header">
       <Button
         v-tooltip="'Toggle between showing all allocations and variable-only mode'"
@@ -203,12 +203,13 @@
       @update:visible="dialogVisible = $event"
       @save="onSave"
     />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
+import EcPageLayout from '../../shared/layout/EcPageLayout.vue';
 import { useHeadingStore } from '../../toolbar/headingStore';
 import { useFutureBudgetsStore } from './futureBudgetsStore';
 import { useNotifications } from '../../notifications/useNotifications';
@@ -348,13 +349,6 @@ async function onSave(payload: MassUpdatePayload) {
 </script>
 
 <style scoped>
-.future-budgets-page {
-  padding: 1rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
 /* ── Page header ── */
 .page-header {
   display: flex;

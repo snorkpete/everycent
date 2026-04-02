@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-page">
+  <EcPageLayout page-name="settings">
     <div class="form-fields">
       <EcListField
         :model-value="formData.primary_budget_account_id"
@@ -61,12 +61,13 @@
         <Button label="Make Changes" data-testid="edit-btn" @click="editMode = true" />
       </template>
     </div>
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSettingsStore } from './settingsStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -81,7 +82,8 @@ const notifications = useNotifications();
 
 const editMode = ref(false);
 
-type SettingsFormData = SettingsData & Required<Pick<SettingsData, 'husband' | 'wife' | 'single_person'>>;
+type SettingsFormData = SettingsData &
+  Required<Pick<SettingsData, 'husband' | 'wife' | 'single_person'>>;
 
 function toFormData(s: SettingsData): SettingsFormData {
   return {
@@ -159,13 +161,6 @@ function cancelEdit() {
 </script>
 
 <style scoped>
-.settings-page {
-  padding: 1rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
 .form-fields {
   display: flex;
   flex-direction: column;

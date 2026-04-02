@@ -1,5 +1,5 @@
 <template>
-  <div class="allocation-categories-page">
+  <EcPageLayout page-name="allocation-categories">
     <ul class="category-list">
       <li v-for="category in store.allocationCategories" :key="category.id" class="category-item">
         <span class="category-name">{{ category.name }}</span>
@@ -25,12 +25,13 @@
       @update:visible="dialogVisible = $event"
       @save="onSave"
     />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import Button from 'primevue/button';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useAllocationCategoryStore } from './allocationCategoryStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -78,13 +79,6 @@ async function onSave(category: AllocationCategoryData) {
 </script>
 
 <style scoped>
-.allocation-categories-page {
-  padding: 1rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
 .category-list {
   list-style: none;
   padding: 0;

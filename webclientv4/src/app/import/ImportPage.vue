@@ -1,7 +1,6 @@
 <template>
-  <div class="import-page">
-    <!-- Toolbar -->
-    <div class="toolbar">
+  <EcPageLayout page-name="import" variant="fixed">
+    <template #toolbar>
       <div class="toolbar-left">
         <label class="budget-label">Budget:</label>
         <Select
@@ -36,7 +35,7 @@
           />
         </router-link>
       </div>
-    </div>
+    </template>
 
     <!-- Content area -->
     <div class="content-area">
@@ -274,12 +273,13 @@
         </router-link>
       </template>
     </div>
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import FileUpload from 'primevue/fileupload';
@@ -393,24 +393,6 @@ function previewRowClass(transaction: ImportTransaction) {
 </script>
 
 <style scoped>
-.import-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
 .toolbar-left {
   display: flex;
   align-items: center;

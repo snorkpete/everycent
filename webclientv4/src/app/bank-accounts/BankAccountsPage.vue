@@ -1,5 +1,5 @@
 <template>
-  <div class="bank-accounts-page">
+  <EcPageLayout page-name="bank-accounts">
     <div class="controls" data-testid="controls">
       <label class="toggle-label">
         <ToggleSwitch
@@ -50,12 +50,13 @@
       @update:visible="dialogVisible = $event"
       @save="onSave"
     />
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Tag from 'primevue/tag';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { useHeadingStore } from '../toolbar/headingStore';
@@ -111,15 +112,6 @@ async function onSave(account: BankAccountData) {
 </script>
 
 <style scoped>
-.bank-accounts-page {
-  padding: 1rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: 100%;
-  overflow: auto;
-}
-
 .controls {
   display: flex;
   align-items: center;

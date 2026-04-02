@@ -1,7 +1,6 @@
 <template>
-  <div class="transactions-page">
-    <!-- Zone 1: Toolbar -->
-    <div class="toolbar">
+  <EcPageLayout page-name="transactions" variant="fixed">
+    <template #toolbar>
       <div class="toolbar-left">
         <TransactionSearchForm @fetch="onFetch" />
       </div>
@@ -90,7 +89,7 @@
           />
         </template>
       </div>
-    </div>
+    </template>
 
     <!-- Import Dialog -->
     <TransactionImportDialog v-model:visible="showImportDialog" @imported="onImport" />
@@ -98,24 +97,22 @@
     <!-- Transfer Dialog -->
     <AccountTransferDialog v-model:visible="showTransferDialog" @transferred="onTransferred" />
 
-    <!-- Zones 2 + 3: Summary Bar + Table (unified card) -->
-    <div class="content-card">
-      <TransactionSummary
-        :transactions="store.transactions"
-        :bank-account="store.selectedBankAccount ?? undefined"
-        :allocations="store.allocations"
-      />
-      <TransactionList
-        :wrap-descriptions="wrapDescriptions"
-        :show-calculator-column="showCalculatorColumn"
-      />
-    </div>
-  </div>
+    <TransactionSummary
+      :transactions="store.transactions"
+      :bank-account="store.selectedBankAccount ?? undefined"
+      :allocations="store.allocations"
+    />
+    <TransactionList
+      :wrap-descriptions="wrapDescriptions"
+      :show-calculator-column="showCalculatorColumn"
+    />
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
@@ -204,24 +201,6 @@ function navigateToImport() {
 </script>
 
 <style scoped>
-.transactions-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
 .toolbar-left {
   display: flex;
   align-items: center;
@@ -249,16 +228,5 @@ function navigateToImport() {
   background-color: var(--p-surface-300);
   margin: 0 0.25rem;
   flex-shrink: 0;
-}
-
-.content-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--p-surface-300);
-  border-radius: 6px;
-  background-color: var(--p-surface-0);
-  margin-bottom: 0.75rem;
 }
 </style>
