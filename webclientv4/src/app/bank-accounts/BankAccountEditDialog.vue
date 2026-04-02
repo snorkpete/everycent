@@ -1,12 +1,14 @@
 <template>
-  <Dialog
+  <EcFormDialog
     :visible="visible"
     header="Bank Account Details"
-    modal
-    :style="{ width: '40rem' }"
-    @update:visible="close"
+    width="40rem"
+    :initial-edit-mode="initialEditMode"
+    @update:visible="$emit('update:visible', $event)"
+    @save="saveChanges"
+    @cancel="cancel"
   >
-    <div class="form-fields">
+    <template #default="{ editMode }">
       <EcTextField v-model="formData.name" label="Name" :edit-mode="editMode" />
 
       <EcListField
@@ -86,27 +88,13 @@
           :edit-mode="editMode"
         />
       </div>
-    </div>
-
-    <template #footer>
-      <div class="dialog-footer">
-        <template v-if="editMode">
-          <Button label="Save" data-testid="save-btn" @click="saveChanges" />
-          <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="cancel" />
-        </template>
-        <template v-else>
-          <Button label="Make Changes" data-testid="edit-btn" @click="editMode = true" />
-          <Button label="Close" severity="secondary" data-testid="close-btn" @click="close" />
-        </template>
-      </div>
     </template>
-  </Dialog>
+  </EcFormDialog>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
+import { reactive, computed, watch } from 'vue';
+import EcFormDialog from '../shared/form/form-dialog/EcFormDialog.vue';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import EcListField from '../shared/form/list-field/EcListField.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
@@ -124,8 +112,6 @@ const emit = defineEmits<{
   'update:visible': [value: boolean];
   save: [account: BankAccountData];
 }>();
-
-const editMode = ref(props.initialEditMode);
 
 function toBankAccountFormData(account: BankAccountData): BankAccountFormData {
   return {
@@ -152,7 +138,6 @@ watch(
   (isVisible) => {
     if (isVisible) {
       Object.assign(formData, toBankAccountFormData(props.bankAccount));
-      editMode.value = props.initialEditMode;
     }
   },
 );
@@ -224,34 +209,16 @@ function saveChanges() {
 function cancel() {
   if (formData.id) {
     Object.assign(formData, toBankAccountFormData(props.bankAccount));
-    editMode.value = false;
   } else {
     emit('update:visible', false);
   }
 }
-
-function close() {
-  emit('update:visible', false);
-}
 </script>
 
 <style scoped>
-.form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
 .section-heading {
   font-size: 1rem;
   font-weight: 600;
   margin: 0.5rem 0 0;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 </style>

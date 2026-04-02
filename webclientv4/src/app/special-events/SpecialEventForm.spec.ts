@@ -49,12 +49,12 @@ describe('SpecialEventForm', () => {
     });
   });
 
-  describe('submit button label', () => {
+  describe('save button label', () => {
     it('shows "Add" when creating a new event', () => {
       const wrapper = createWrapper({ specialEvent: null });
 
-      const submitBtn = wrapper.find('[data-testid="submit-btn"]');
-      expect(submitBtn.text()).toBe('Add');
+      const saveBtn = wrapper.find('[data-testid="save-btn"]');
+      expect(saveBtn.text()).toBe('Add');
     });
 
     it('shows "Save" when editing an existing event', () => {
@@ -62,8 +62,8 @@ describe('SpecialEventForm', () => {
         specialEvent: { id: 1, name: 'Birthday', budget_amount: 50000 },
       });
 
-      const submitBtn = wrapper.find('[data-testid="submit-btn"]');
-      expect(submitBtn.text()).toBe('Save');
+      const saveBtn = wrapper.find('[data-testid="save-btn"]');
+      expect(saveBtn.text()).toBe('Save');
     });
   });
 
@@ -80,7 +80,7 @@ describe('SpecialEventForm', () => {
       vm.formData.start_date = '2026-06-15';
       await nextTick();
 
-      await wrapper.find('[data-testid="submit-btn"]').trigger('click');
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
       expect(wrapper.emitted('submit')).toBeTruthy();
       expect(wrapper.emitted('submit')![0][0]).toEqual({
@@ -95,7 +95,7 @@ describe('SpecialEventForm', () => {
         specialEvent: { id: 5, name: 'Birthday', budget_amount: 50000 },
       });
 
-      await wrapper.find('[data-testid="submit-btn"]').trigger('click');
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
       expect(wrapper.emitted('submit')).toBeTruthy();
       expect(wrapper.emitted('submit')![0][0]).toMatchObject({ id: 5 });
@@ -111,19 +111,19 @@ describe('SpecialEventForm', () => {
       vm.formData.start_date = '';
       await nextTick();
 
-      await wrapper.find('[data-testid="submit-btn"]').trigger('click');
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
       const emitted = wrapper.emitted('submit')![0][0] as Partial<SpecialEventData>;
       expect(emitted).not.toHaveProperty('start_date');
     });
   });
 
-  describe('submit button disabled state', () => {
+  describe('save button disabled state', () => {
     it('is disabled when name is empty', () => {
       const wrapper = createWrapper({ specialEvent: null });
 
-      const submitBtn = wrapper.find('[data-testid="submit-btn"]');
-      expect(submitBtn.attributes('disabled')).toBeDefined();
+      const saveBtn = wrapper.find('[data-testid="save-btn"]');
+      expect(saveBtn.attributes('disabled')).toBeDefined();
     });
 
     it('is enabled when name is provided', async () => {
@@ -131,8 +131,8 @@ describe('SpecialEventForm', () => {
         specialEvent: { id: 1, name: 'Birthday', budget_amount: 50000 },
       });
 
-      const submitBtn = wrapper.find('[data-testid="submit-btn"]');
-      expect(submitBtn.attributes('disabled')).toBeUndefined();
+      const saveBtn = wrapper.find('[data-testid="save-btn"]');
+      expect(saveBtn.attributes('disabled')).toBeUndefined();
     });
   });
 
