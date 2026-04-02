@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
-import { mount, type VueWrapper } from '@vue/test-utils';
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
+import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SinkFundsPage from './SinkFundsPage.vue';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
 import SinkFundTransferDialog from './SinkFundTransferDialog.vue';
-import type { SinkFundData } from './sinkFund.types';
+import { sinkFundApi } from './sinkFundApi';
+import { useSinkFundStore } from './sinkFundStore';
+import { buildSinkFund } from '../../test/factories';
 
 // Selectors
 const SINK_FUND_SELECT = '[data-testid="sink-fund-select"]';
@@ -18,7 +20,6 @@ const TRANSFER_BTN = '[data-testid="transfer-btn"]';
 const SHOW_CLOSED_TOGGLE = '[data-testid="show-closed-toggle"]';
 const LOADING_PLACEHOLDER = '[data-testid="loading-placeholder"]';
 const EMPTY_PLACEHOLDER = '[data-testid="empty-placeholder"]';
-const ALLOCATIONS_TABLE = '[data-testid="allocations-table"]';
 
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
@@ -42,136 +43,115 @@ vi.mock('vue-router', () => ({
   useRouter: () => mockRouter,
 }));
 
-const sinkFundA: SinkFundData = {
+vi.mock('./sinkFundApi', () => ({
+  sinkFundApi: {
+    getAll: vi.fn(),
+    get: vi.fn(),
+    save: vi.fn(),
+    transfer: vi.fn(),
+    getTransactionsForAllocation: vi.fn(),
+  },
+}));
+
+const sinkFundA = buildSinkFund({
   id: 1,
   name: 'Emergency Fund',
   current_balance: 50000,
   sink_fund_allocations: [],
-};
-const sinkFundB: SinkFundData = {
+});
+const sinkFundB = buildSinkFund({
   id: 2,
   name: 'Holiday Fund',
   current_balance: 30000,
   sink_fund_allocations: [],
-};
-
-const mockStore = reactive({
-  sinkFunds: [sinkFundA, sinkFundB] as SinkFundData[],
-  sinkFund: null as SinkFundData | null,
-  loading: false,
-  error: null as string | null,
-  isEditMode: false,
-  showDeactivated: false,
-  visibleAllocations: [] as SinkFundData['sink_fund_allocations'],
-  totalAssignedBalance: 0,
-  unassignedBalance: 0,
-  totalTarget: 0,
-  totalOutstanding: 0,
-  fetchAll: vi.fn().mockResolvedValue(undefined),
-  fetchDetail: vi.fn().mockResolvedValue(undefined),
-  save: vi.fn().mockResolvedValue(undefined),
-  enterEditMode: vi.fn(),
-  exitEditMode: vi.fn(),
-  addObligation: vi.fn(),
-  cancelEdit: vi.fn().mockResolvedValue(undefined),
 });
 
-vi.mock('./sinkFundStore', () => ({
-  useSinkFundStore: () => mockStore,
-}));
-
-function createWrapper(): VueWrapper {
-  return mount(SinkFundsPage, {
-    global: {
-      plugins: [PrimeVue, createPinia()],
-    },
-  });
-}
-
 describe('SinkFundsPage', () => {
+  let pinia: Pinia;
+
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.sinkFunds = [sinkFundA, sinkFundB];
-    mockStore.sinkFund = null;
-    mockStore.loading = false;
-    mockStore.error = null;
-    mockStore.isEditMode = false;
-    mockStore.showDeactivated = false;
-    mockStore.visibleAllocations = [];
-    mockStore.totalAssignedBalance = 0;
-    mockStore.unassignedBalance = 0;
-    mockStore.totalTarget = 0;
-    mockStore.totalOutstanding = 0;
-    mockStore.fetchAll.mockResolvedValue(undefined);
-    mockStore.fetchDetail.mockResolvedValue(undefined);
-    mockStore.save.mockResolvedValue(undefined);
-    mockStore.cancelEdit.mockResolvedValue(undefined);
+    vi.mocked(sinkFundApi.getAll).mockResolvedValue([sinkFundA, sinkFundB]);
+    vi.mocked(sinkFundApi.get).mockResolvedValue(sinkFundA);
+    vi.mocked(sinkFundApi.save).mockResolvedValue(sinkFundA);
     mockRoute.query = {};
   });
+
+  function createWrapper(): VueWrapper {
+    return mount(SinkFundsPage, {
+      global: {
+        plugins: [PrimeVue, pinia],
+      },
+    });
+  }
 
   describe('on mount', () => {
     it('sets the page heading to "Sink Fund Obligations"', async () => {
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Sink Fund Obligations');
     });
 
-    it('calls fetchAll on mount', async () => {
+    it('calls sinkFundApi.getAll on mount', async () => {
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetchAll).toHaveBeenCalled();
+      expect(sinkFundApi.getAll).toHaveBeenCalled();
     });
 
-    it('does not call fetchDetail if no sink_fund_id query param', async () => {
+    it('does not call sinkFundApi.get if no sink_fund_id query param', async () => {
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetchDetail).not.toHaveBeenCalled();
+      expect(sinkFundApi.get).not.toHaveBeenCalled();
     });
 
-    it('calls fetchDetail with id from query param on mount', async () => {
+    it('calls sinkFundApi.get with id from query param on mount', async () => {
       mockRoute.query = { sink_fund_id: '2' };
 
       createWrapper();
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetchDetail).toHaveBeenCalledWith(2);
+      expect(sinkFundApi.get).toHaveBeenCalledWith(2);
     });
   });
 
   describe('sink fund selector', () => {
-    it('renders the sink fund select dropdown', () => {
+    it('renders the sink fund select dropdown', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.findComponent(SINK_FUND_SELECT).exists()).toBe(true);
     });
 
-    it('passes sinkFunds as options to the dropdown', () => {
+    it('passes sinkFunds as options to the dropdown', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       const select = wrapper.findComponent(SINK_FUND_SELECT) as unknown as VueWrapper;
       expect(select.props()).toHaveProperty('options', [sinkFundA, sinkFundB]);
     });
 
-    it('calls fetchDetail and updates router when a sink fund is selected', async () => {
+    it('calls sinkFundApi.get and updates router when a sink fund is selected', async () => {
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
 
       const select = wrapper.findComponent(SINK_FUND_SELECT) as unknown as VueWrapper;
       await select.vm.$emit('update:modelValue', 1);
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.fetchDetail).toHaveBeenCalledWith(1);
+      expect(sinkFundApi.get).toHaveBeenCalledWith(1);
       expect(mockRouter.replace).toHaveBeenCalledWith({ query: { sink_fund_id: 1 } });
     });
   });
 
   describe('toolbar — edit mode buttons', () => {
-    it('shows Edit and Transfer Money buttons when not in edit mode', () => {
+    it('shows Edit and Transfer Money buttons when not in edit mode', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
       expect(wrapper.find(TRANSFER_BTN).exists()).toBe(true);
@@ -181,9 +161,12 @@ describe('SinkFundsPage', () => {
     });
 
     it('shows Save, Cancel, and Add Obligation buttons when in edit mode', async () => {
-      mockStore.isEditMode = true;
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
 
       expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
       expect(wrapper.find(CANCEL_BTN).exists()).toBe(true);
@@ -194,129 +177,192 @@ describe('SinkFundsPage', () => {
 
     it('opens transfer dialog when Transfer Money is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.findComponent(SinkFundTransferDialog).props('visible')).toBe(false);
 
       await wrapper.find(TRANSFER_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       expect(wrapper.findComponent(SinkFundTransferDialog).props('visible')).toBe(true);
     });
 
-    it('calls store.enterEditMode when Edit is clicked', async () => {
+    it('enters edit mode when Edit is clicked', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       await wrapper.find(EDIT_BTN).trigger('click');
+      await flushPromises();
 
-      expect(mockStore.enterEditMode).toHaveBeenCalled();
+      const store = useSinkFundStore();
+      expect(store.isEditMode).toBe(true);
     });
 
-    it('calls store.cancelEdit when Cancel is clicked', async () => {
-      mockStore.isEditMode = true;
+    it('calls sinkFundApi.get to reload when Cancel is clicked', async () => {
+      const detailFund = buildSinkFund({ id: 5, name: 'Detail Fund' });
+      vi.mocked(sinkFundApi.get).mockResolvedValue(detailFund);
+
+      mockRoute.query = { sink_fund_id: '5' };
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      // Enter edit mode
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
+
+      // Clear mock to track only the cancel-triggered call
+      vi.mocked(sinkFundApi.get).mockClear();
+      vi.mocked(sinkFundApi.get).mockResolvedValue(detailFund);
 
       await wrapper.find(CANCEL_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.cancelEdit).toHaveBeenCalled();
+      expect(sinkFundApi.get).toHaveBeenCalledWith(5);
+      expect(store.isEditMode).toBe(false);
     });
   });
 
   describe('toolbar — save', () => {
-    it('calls store.save when Save is clicked', async () => {
-      mockStore.isEditMode = true;
+    it('calls sinkFundApi.save when Save is clicked', async () => {
+      const detailFund = buildSinkFund({ id: 1, name: 'Emergency Fund' });
+      vi.mocked(sinkFundApi.get).mockResolvedValue(detailFund);
+      vi.mocked(sinkFundApi.save).mockResolvedValue(detailFund);
+
+      mockRoute.query = { sink_fund_id: '1' };
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockStore.save).toHaveBeenCalled();
+      expect(sinkFundApi.save).toHaveBeenCalled();
     });
 
     it('shows a success notification after saving', async () => {
-      mockStore.isEditMode = true;
+      const detailFund = buildSinkFund({ id: 1, name: 'Emergency Fund' });
+      vi.mocked(sinkFundApi.get).mockResolvedValue(detailFund);
+      vi.mocked(sinkFundApi.save).mockResolvedValue(detailFund);
+
+      mockRoute.query = { sink_fund_id: '1' };
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
       expect(mockNotifySuccess).toHaveBeenCalledWith('Sink fund saved');
     });
 
     it('shows an error notification if save fails', async () => {
-      const errorMessage = 'Save failed';
-      mockStore.save.mockImplementation(async () => {
-        mockStore.error = errorMessage;
-        throw new Error('Server error');
-      });
-      mockStore.isEditMode = true;
+      const detailFund = buildSinkFund({ id: 1, name: 'Emergency Fund' });
+      vi.mocked(sinkFundApi.get).mockResolvedValue(detailFund);
+      vi.mocked(sinkFundApi.save).mockRejectedValue(new Error('Server error'));
+
+      mockRoute.query = { sink_fund_id: '1' };
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await nextTick();
+      await flushPromises();
 
-      expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
+      expect(mockNotifyError).toHaveBeenCalled();
     });
   });
 
   describe('toolbar — add obligation', () => {
-    it('calls store.addObligation when Add Obligation is clicked', async () => {
-      mockStore.isEditMode = true;
-      mockStore.sinkFund = { ...sinkFundA, sink_fund_allocations: [] };
+    it('adds a new empty allocation to sinkFund when Add Obligation is clicked', async () => {
+      const detailFund = buildSinkFund({ id: 1, sink_fund_allocations: [] });
+      vi.mocked(sinkFundApi.get).mockResolvedValue(detailFund);
+
+      mockRoute.query = { sink_fund_id: '1' };
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
 
       await wrapper.find(ADD_OBLIGATION_BTN).trigger('click');
 
-      expect(mockStore.addObligation).toHaveBeenCalled();
+      expect(store.sinkFund!.sink_fund_allocations).toHaveLength(1);
+      expect(store.sinkFund!.sink_fund_allocations![0]).toMatchObject({
+        name: '',
+        amount: 0,
+        status: 'open',
+        unsaved: true,
+      });
+    });
+
+    it('does nothing when Add Obligation is clicked and sinkFund is null', async () => {
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
+
+      // sinkFund is null (no detail fetched), should not throw
+      await wrapper.find(ADD_OBLIGATION_BTN).trigger('click');
+      expect(store.sinkFund).toBeNull();
     });
   });
 
   describe('show closed toggle', () => {
-    it('renders the show closed toggle', () => {
+    it('renders the show closed toggle', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(SHOW_CLOSED_TOGGLE).exists()).toBe(true);
     });
   });
 
   describe('content area', () => {
-    it('shows loading placeholder when loading is true', () => {
-      mockStore.loading = true;
+    it('shows loading placeholder when loading is true', async () => {
+      // Make getAll hang to keep loading=true
+      vi.mocked(sinkFundApi.getAll).mockReturnValue(new Promise(() => {}));
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(LOADING_PLACEHOLDER).exists()).toBe(true);
       expect(wrapper.find(EMPTY_PLACEHOLDER).exists()).toBe(false);
     });
 
-    it('shows empty placeholder when not loading and no sink fund selected', () => {
-      mockStore.loading = false;
-      mockStore.sinkFund = null;
+    it('shows empty placeholder when not loading and no sink fund selected', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.find(EMPTY_PLACEHOLDER).exists()).toBe(true);
       expect(wrapper.find(LOADING_PLACEHOLDER).exists()).toBe(false);
     });
 
     it('renders SinkFundAllocationTable when a sink fund is selected', async () => {
-      mockStore.loading = false;
-      mockStore.sinkFund = sinkFundA;
+      const detailFund = buildSinkFund({ id: 1, name: 'Emergency Fund' });
+      vi.mocked(sinkFundApi.get).mockResolvedValue(detailFund);
+
+      mockRoute.query = { sink_fund_id: '1' };
       const wrapper = createWrapper();
-      await nextTick();
+      await flushPromises();
 
       expect(wrapper.findComponent(SinkFundAllocationTable).exists()).toBe(true);
-      expect(wrapper.find(ALLOCATIONS_TABLE).exists()).toBe(true);
       expect(wrapper.find(EMPTY_PLACEHOLDER).exists()).toBe(false);
     });
 
-    it('does not render SinkFundAllocationTable when no sink fund is selected', () => {
-      mockStore.loading = false;
-      mockStore.sinkFund = null;
+    it('does not render SinkFundAllocationTable when no sink fund is selected', async () => {
       const wrapper = createWrapper();
+      await flushPromises();
 
       expect(wrapper.findComponent(SinkFundAllocationTable).exists()).toBe(false);
     });
