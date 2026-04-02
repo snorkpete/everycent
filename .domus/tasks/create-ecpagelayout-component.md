@@ -1,7 +1,7 @@
 # Task: Create EcPageLayout component
 
 **ID:** create-ecpagelayout-component
-**Status:** in-progress
+**Status:** done
 **Branch:** task/create-ecpagelayout-component
 **Autonomous:** true
 **Priority:** high
@@ -23,19 +23,19 @@ Current consumers: BankAccountsPage, AllocationCategoriesPage, InstitutionsPage,
 
 ## Acceptance Criteria
 
-- [ ] `EcPageLayout.vue` exists at `src/app/shared/layout/EcPageLayout.vue`
-- [ ] Props: `pageName` (string, required), `variant` (`'scrollable' | 'fixed'`, default `'scrollable'`)
-- [ ] Slots: `toolbar`, `default`
-- [ ] Toolbar slot wrapper: `display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0`
-- [ ] Scrollable variant: `padding: 1rem 1.5rem 1.5rem`, `gap: 1rem`, `height: 100%`, `overflow: auto`
-- [ ] Fixed variant: `padding: 0.75rem 1.5rem 0`, `gap: 0`, `height: 100%`, `overflow: hidden`. Default slot wrapped in content card (bordered card, flex: 1, overflow: auto, background, border-radius)
-- [ ] Full test coverage on EcPageLayout
-- [ ] All 13 pages migrated:
+- [x] `EcPageLayout.vue` exists at `src/app/shared/layout/EcPageLayout.vue`
+- [x] Props: `pageName` (string, required), `variant` (`'scrollable' | 'fixed'`, default `'scrollable'`)
+- [x] Slots: `toolbar`, `default`
+- [x] Toolbar slot wrapper: `display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0`
+- [x] Scrollable variant: `padding: 1rem 1.5rem 1.5rem`, `gap: 1rem`, `height: 100%`, `overflow: auto`
+- [x] Fixed variant: `padding: 0.75rem 1.5rem 0`, `gap: 0`, `height: 100%`, `overflow: hidden`. Default slot wrapped in content card (bordered card, flex: 1, overflow: auto, background, border-radius)
+- [x] Full test coverage on EcPageLayout
+- [x] All 13 pages migrated:
   - Scrollable: InstitutionsPage, AllocationCategoriesPage, BankAccountsPage, FutureBudgetsPage, SettingsPage
   - Fixed: TransactionsPage, BudgetPage, BudgetsPage, SinkFundsPage, ImportPage, AccountBalancesPage, SpecialEventsPage, SpecialEventDetailPage
-- [ ] Page-wrapper CSS removed from all migrated consumers
-- [ ] Content-card CSS removed from fixed-variant consumers
-- [ ] All existing consumer tests pass after migration
+- [x] Page-wrapper CSS removed from all migrated consumers
+- [x] Content-card CSS removed from fixed-variant consumers
+- [x] All existing consumer tests pass after migration
 
 ---
 
