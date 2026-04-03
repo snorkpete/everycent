@@ -34,7 +34,14 @@ import { computed, useId } from 'vue';
 import Select from 'primevue/select';
 import type { ListItem, ListGroup } from './ec-list-field.types';
 
-const { modelValue, label = '', editMode, items, groupBy, filterable } = defineProps<{
+const {
+  modelValue,
+  label = '',
+  editMode,
+  items,
+  groupBy,
+  filterable,
+} = defineProps<{
   modelValue: number | string | boolean | null | undefined;
   label?: string;
   editMode: boolean;

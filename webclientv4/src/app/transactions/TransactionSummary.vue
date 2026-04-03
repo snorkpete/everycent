@@ -4,15 +4,27 @@
     <div class="summary-grid">
       <div class="summary-cell">
         <span class="summary-label">Last Balance</span>
-        <EcMoneyDisplay :model-value="lastBankBalance" emphasis="subtotal" data-testid="last-bank-balance" />
+        <EcMoneyDisplay
+          :model-value="lastBankBalance"
+          emphasis="subtotal"
+          data-testid="last-bank-balance"
+        />
       </div>
       <div class="summary-cell summary-cell--center">
         <span class="summary-label">Transactions</span>
-        <EcMoneyDisplay :model-value="transactionTotal" emphasis="subtotal" data-testid="transaction-total" />
+        <EcMoneyDisplay
+          :model-value="transactionTotal"
+          emphasis="subtotal"
+          data-testid="transaction-total"
+        />
       </div>
       <div class="summary-cell summary-cell--right">
         <span class="summary-label">Bank Balance</span>
-        <EcMoneyDisplay :model-value="currentBankBalance" emphasis="subtotal" data-testid="current-bank-balance" />
+        <EcMoneyDisplay
+          :model-value="currentBankBalance"
+          emphasis="subtotal"
+          data-testid="current-bank-balance"
+        />
       </div>
     </div>
 
@@ -22,11 +34,19 @@
       <div class="summary-cell">
         <template v-if="showBudgetBalance">
           <span class="summary-label">Budget Balance</span>
-          <EcMoneyDisplay :model-value="currentBudgetBalance" emphasis="subtotal" data-testid="current-budget-balance" />
+          <EcMoneyDisplay
+            :model-value="currentBudgetBalance"
+            emphasis="subtotal"
+            data-testid="current-budget-balance"
+          />
         </template>
         <template v-else-if="showUnpaidBalance">
           <span class="summary-label">Unpaid Balance</span>
-          <EcMoneyDisplay :model-value="unpaidBalance" emphasis="subtotal" data-testid="unpaid-balance" />
+          <EcMoneyDisplay
+            :model-value="unpaidBalance"
+            emphasis="subtotal"
+            data-testid="unpaid-balance"
+          />
         </template>
       </div>
 
@@ -212,10 +232,14 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
 
 /* Fade transition for calculator total */
 .calc-fade-enter-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 .calc-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 .calc-fade-enter-from {
   opacity: 0;

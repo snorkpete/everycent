@@ -10,7 +10,11 @@ import { Emphasis } from '../../constants/emphasis';
 import type { HighlightMode as HighlightModeType } from '../../constants/highlightMode';
 import type { Emphasis as EmphasisType } from '../../constants/emphasis';
 
-const { modelValue = 0, highlightMode = HighlightMode.Balance, emphasis = Emphasis.Item } = defineProps<{
+const {
+  modelValue = 0,
+  highlightMode = HighlightMode.Balance,
+  emphasis = Emphasis.Item,
+} = defineProps<{
   modelValue?: number | null;
   highlightMode?: HighlightModeType;
   emphasis?: EmphasisType;

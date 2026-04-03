@@ -111,5 +111,4 @@ const store = useAccountBalanceStore();
   height: 1.2rem;
   background-color: var(--p-surface-300);
 }
-
 </style>

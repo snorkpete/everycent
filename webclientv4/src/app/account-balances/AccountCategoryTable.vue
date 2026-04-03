@@ -2,7 +2,9 @@
   <div class="account-category-table">
     <h3 class="section-heading">
       <span>{{ heading }}</span>
-      <span class="heading-total"><EcMoneyDisplay :model-value="totalCurrentBalance" emphasis="subtotal" /></span>
+      <span class="heading-total"
+        ><EcMoneyDisplay :model-value="totalCurrentBalance" emphasis="subtotal"
+      /></span>
     </h3>
     <table class="account-table">
       <thead>
@@ -191,5 +193,4 @@ const totalCurrentBalance = computed(() =>
   color: var(--p-text-muted-color);
   cursor: help;
 }
-
 </style>

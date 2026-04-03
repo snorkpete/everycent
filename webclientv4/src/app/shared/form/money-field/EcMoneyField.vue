@@ -41,7 +41,12 @@ import EcMoneyDisplay from './EcMoneyDisplay.vue';
 import { HighlightMode } from '../../constants/highlightMode';
 import type { HighlightMode as HighlightModeType } from '../../constants/highlightMode';
 
-const { label = '', editMode, highlightMode, inline } = defineProps<{
+const {
+  label = '',
+  editMode,
+  highlightMode,
+  inline,
+} = defineProps<{
   label?: string;
   editMode: boolean;
   highlightMode?: HighlightModeType;
