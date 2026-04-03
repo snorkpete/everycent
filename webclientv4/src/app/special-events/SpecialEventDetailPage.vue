@@ -34,8 +34,8 @@
     <div class="header-card" data-testid="event-header">
       <h2 class="event-name">{{ event?.name }}</h2>
       <div class="event-summary">
-        <span>Budgeted: {{ centsToDollars(event?.budget_amount) }}</span>
-        <span>Actual: {{ centsToDollars(event?.actual_amount) }}</span>
+        <span>Budgeted: <EcMoneyDisplay :model-value="event?.budget_amount ?? 0" highlight-mode="none" /></span>
+        <span>Actual: <EcMoneyDisplay :model-value="event?.actual_amount ?? 0" highlight-mode="none" /></span>
         <span v-if="event?.start_date">Start: {{ formatDate(event.start_date) }}</span>
       </div>
     </div>
@@ -46,15 +46,15 @@
       <Column field="allocation_category_name" header="Category" />
       <Column field="amount" header="Amount" style="text-align: right">
         <template #body="{ data }">
-          {{ centsToDollars(data.amount) }}
+          <EcMoneyDisplay :model-value="data.amount ?? 0" highlight-mode="none" />
         </template>
       </Column>
       <Column field="spent" header="Spent" style="text-align: right">
         <template #body="{ data }">
-          {{ centsToDollars(data.spent) }}
+          <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
         </template>
         <template #footer>
-          <span class="total-label">{{ centsToDollars(totalSpent) }}</span>
+          <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" emphasis="total" />
         </template>
       </Column>
     </DataTable>
@@ -78,8 +78,8 @@ import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { formatDate } from '../shared/util/format-date';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
 import type { SpecialEventData } from './specialEvent.types';
 
@@ -156,7 +156,4 @@ async function onSubmit(data: Partial<SpecialEventData>) {
   font-size: 0.9rem;
 }
 
-.total-label {
-  font-weight: bold;
-}
 </style>

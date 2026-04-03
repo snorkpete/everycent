@@ -10,7 +10,7 @@
         <div class="bar-track">
           <div class="bar-fill bar-need" :style="{ width: needsPercentage + '%' }"></div>
         </div>
-        <span class="bar-amount">{{ centsToDollars(needsAmount) }}</span>
+        <EcMoneyDisplay class="bar-amount" :model-value="needsAmount" highlight-mode="none" />
         <span class="bar-percent">{{ needsPercentage }}%</span>
       </div>
       <div class="bar-row" data-testid="wants-row">
@@ -18,7 +18,7 @@
         <div class="bar-track">
           <div class="bar-fill bar-want" :style="{ width: wantsPercentage + '%' }"></div>
         </div>
-        <span class="bar-amount">{{ centsToDollars(wantsAmount) }}</span>
+        <EcMoneyDisplay class="bar-amount" :model-value="wantsAmount" highlight-mode="none" />
         <span class="bar-percent">{{ wantsPercentage }}%</span>
       </div>
       <div class="bar-row" data-testid="savings-row">
@@ -26,7 +26,7 @@
         <div class="bar-track">
           <div class="bar-fill bar-savings" :style="{ width: savingsPercentage + '%' }"></div>
         </div>
-        <span class="bar-amount">{{ centsToDollars(savingsAmount) }}</span>
+        <EcMoneyDisplay class="bar-amount" :model-value="savingsAmount" highlight-mode="none" />
         <span class="bar-percent">{{ savingsPercentage }}%</span>
       </div>
     </div>
@@ -39,15 +39,11 @@
     >
       <div class="detail-row" data-testid="wife-amount-row">
         <span class="detail-label">{{ wife }}'s Discretionary</span>
-        <span class="detail-amount">{{
-          centsToDollars(Math.floor(totalDiscretionaryAmount / 2))
-        }}</span>
+        <EcMoneyDisplay class="detail-amount" :model-value="Math.floor(totalDiscretionaryAmount / 2)" highlight-mode="none" />
       </div>
       <div class="detail-row" data-testid="husband-amount-row">
         <span class="detail-label">{{ husband }}'s Discretionary</span>
-        <span class="detail-amount">{{
-          centsToDollars(Math.floor(totalDiscretionaryAmount / 2))
-        }}</span>
+        <EcMoneyDisplay class="detail-amount" :model-value="Math.floor(totalDiscretionaryAmount / 2)" highlight-mode="none" />
       </div>
     </div>
   </div>
@@ -58,7 +54,7 @@ import { computed } from 'vue';
 import { useBudgetStore } from './budgetStore';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useWantsNeedsBudgetBreakdown } from './useWantsNeedsBudgetBreakdown';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 
 const budgetStore = useBudgetStore();
 const settingsStore = useSettingsStore();

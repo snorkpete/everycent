@@ -149,9 +149,9 @@
               {{ store.getBankAccountName(account.bank_account_id) }}
             </h3>
             <div class="balance-summary" data-testid="balance-summary">
-              <span>Balance: {{ centsToDollars(account.current_balance) }}</span>
-              <span>Net change: {{ centsToDollars(accountNet(account)) }}</span>
-              <span>Projected: {{ centsToDollars(accountProjectedBalance(account)) }}</span>
+              <span>Balance: <EcMoneyDisplay :model-value="account.current_balance" highlight-mode="none" /></span>
+              <span>Net change: <EcMoneyDisplay :model-value="accountNet(account)" highlight-mode="none" /></span>
+              <span>Projected: <EcMoneyDisplay :model-value="accountProjectedBalance(account)" highlight-mode="none" /></span>
             </div>
           </div>
 
@@ -178,9 +178,9 @@
                   <td class="col-date">{{ formatDate(transaction.transaction_date ?? '') }}</td>
                   <td class="col-description">{{ transaction.description }}</td>
                   <td class="col-money right">
-                    {{ centsToDollars(transaction.withdrawal_amount) }}
+                    <EcMoneyDisplay :model-value="transaction.withdrawal_amount ?? 0" highlight-mode="none" />
                   </td>
-                  <td class="col-money right">{{ centsToDollars(transaction.deposit_amount) }}</td>
+                  <td class="col-money right"><EcMoneyDisplay :model-value="transaction.deposit_amount ?? 0" highlight-mode="none" /></td>
                   <td class="col-allocation">
                     <span
                       v-if="transaction.allocation_id && transaction.auto_match_type"
@@ -288,8 +288,8 @@ import { useHeadingStore } from '../toolbar/headingStore';
 import { useImportStore } from './importStore';
 import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { formatDate } from '../shared/util/format-date';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import { formatSkipReasons } from './formatSkipReasons';
 import type { ImportTransaction, PreviewBankAccount } from './import.types';
 

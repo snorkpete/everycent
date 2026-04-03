@@ -26,19 +26,17 @@
       </Column>
       <Column field="budget_amount" header="Budget" style="text-align: right">
         <template #body="{ data }">
-          {{ centsToDollars(data.budget_amount) }}
+          <EcMoneyDisplay :model-value="data.budget_amount ?? 0" highlight-mode="none" />
         </template>
       </Column>
       <Column field="actual_amount" header="Actual" style="text-align: right">
         <template #body="{ data }">
-          {{ centsToDollars(data.actual_amount) }}
+          <EcMoneyDisplay :model-value="data.actual_amount ?? 0" highlight-mode="none" />
         </template>
       </Column>
       <Column header="Difference" style="text-align: right">
         <template #body="{ data }">
-          <span :class="differenceClass(data)">
-            {{ centsToDollars(calculateDifference(data)) }}
-          </span>
+          <EcMoneyDisplay :model-value="calculateDifference(data)" highlight-mode="balance" />
         </template>
       </Column>
       <Column header="Actions" style="width: 120px; text-align: center">
@@ -111,8 +109,8 @@ import Dialog from 'primevue/dialog';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { formatDate } from '../shared/util/format-date';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
 import type { SpecialEventData } from './specialEvent.types';
 
@@ -185,13 +183,6 @@ async function onSubmit(data: Partial<SpecialEventData>) {
 function calculateDifference(event: SpecialEventData): number {
   return (event.budget_amount ?? 0) - (event.actual_amount ?? 0);
 }
-
-function differenceClass(event: SpecialEventData): string {
-  const diff = calculateDifference(event);
-  if (diff < 0) return 'negative';
-  if (diff > 0) return 'positive';
-  return '';
-}
 </script>
 
 <style scoped>
@@ -203,14 +194,6 @@ function differenceClass(event: SpecialEventData): string {
 
 .event-link:hover {
   text-decoration: underline;
-}
-
-.negative {
-  color: var(--p-red-600);
-}
-
-.positive {
-  color: var(--p-green-600);
 }
 
 .dialog-footer {
