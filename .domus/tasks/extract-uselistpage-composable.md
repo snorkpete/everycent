@@ -1,7 +1,7 @@
 # Task: Extract useListPage composable
 
 **ID:** extract-uselistpage-composable
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
