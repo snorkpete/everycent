@@ -46,8 +46,8 @@
                 {{ name }}
               </button>
             </td>
-            <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-              {{ displayAmount(incomeAmountFor(name, budget)) }}
+            <td v-for="budget in store.budgets" :key="budget.id">
+              <EcMoneyDisplay :model-value="incomeAmountFor(name, budget)" :highlight-mode="HighlightMode.None" />
             </td>
           </tr>
 
@@ -65,8 +65,12 @@
 
           <tr class="total-row" data-testid="total-income-row">
             <th>Total Income</th>
-            <th v-for="budget in store.budgets" :key="budget.id" class="amount-cell amount-income">
-              {{ centsToDollars(store.totalIncomeForBudget(budget)) }}
+            <th v-for="budget in store.budgets" :key="budget.id">
+              <EcMoneyDisplay
+                :model-value="store.totalIncomeForBudget(budget)"
+                :highlight-mode="HighlightMode.Income"
+                :emphasis="Emphasis.Subtotal"
+              />
             </th>
           </tr>
 
@@ -78,8 +82,8 @@
           <template v-for="category in store.allocationCategories" :key="category.id">
             <tr class="category-header" :data-testid="`category-header-${category.id}`">
               <td>{{ category.name }}</td>
-              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-                {{ displayAmount(categoryTotalFor(category, budget)) }}
+              <td v-for="budget in store.budgets" :key="budget.id">
+                <EcMoneyDisplay :model-value="categoryTotalFor(category, budget)" :highlight-mode="HighlightMode.None" />
               </td>
             </tr>
 
@@ -90,8 +94,8 @@
               :data-testid="`fixed-subtotal-${category.id}`"
             >
               <td>Fixed</td>
-              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-                {{ displayAmount(fixedTotalForCategory(category, budget)) }}
+              <td v-for="budget in store.budgets" :key="budget.id">
+                <EcMoneyDisplay :model-value="fixedTotalForCategory(category, budget)" :highlight-mode="HighlightMode.None" />
               </td>
             </tr>
 
@@ -119,8 +123,8 @@
                   ></i>
                 </button>
               </td>
-              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-                {{ displayAmount(allocationAmountFor(category, allocName, budget)) }}
+              <td v-for="budget in store.budgets" :key="budget.id">
+                <EcMoneyDisplay :model-value="allocationAmountFor(category, allocName, budget)" :highlight-mode="HighlightMode.None" />
               </td>
             </tr>
 
@@ -139,8 +143,12 @@
 
           <tr class="total-row" data-testid="total-allocations-row">
             <th>Total Allocations</th>
-            <th v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-              {{ centsToDollars(store.totalAllocationsForBudget(budget)) }}
+            <th v-for="budget in store.budgets" :key="budget.id">
+              <EcMoneyDisplay
+                :model-value="store.totalAllocationsForBudget(budget)"
+                :highlight-mode="HighlightMode.None"
+                :emphasis="Emphasis.Total"
+              />
             </th>
           </tr>
 
@@ -148,14 +156,14 @@
           <template v-if="settingsStore.settings.family_type === 'couple'">
             <tr class="person-row" data-testid="husband-row">
               <td>{{ settingsStore.settings.husband ?? 'Husband' }}'s Amount</td>
-              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-                {{ centsToDollars(store.discretionaryForBudget(budget) / 2) }}
+              <td v-for="budget in store.budgets" :key="budget.id">
+                <EcMoneyDisplay :model-value="store.discretionaryForBudget(budget) / 2" :highlight-mode="HighlightMode.None" />
               </td>
             </tr>
             <tr class="person-row" data-testid="wife-row">
               <td>{{ settingsStore.settings.wife ?? 'Wife' }}'s Amount</td>
-              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-                {{ centsToDollars(store.discretionaryForBudget(budget) / 2) }}
+              <td v-for="budget in store.budgets" :key="budget.id">
+                <EcMoneyDisplay :model-value="store.discretionaryForBudget(budget) / 2" :highlight-mode="HighlightMode.None" />
               </td>
             </tr>
           </template>
@@ -163,8 +171,8 @@
           <template v-else-if="settingsStore.settings.family_type === 'single'">
             <tr class="person-row" data-testid="single-person-row">
               <td>{{ settingsStore.settings.single_person ?? 'Person' }}'s Amount</td>
-              <td v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-                {{ centsToDollars(store.discretionaryForBudget(budget)) }}
+              <td v-for="budget in store.budgets" :key="budget.id">
+                <EcMoneyDisplay :model-value="store.discretionaryForBudget(budget)" :highlight-mode="HighlightMode.None" />
               </td>
             </tr>
           </template>
@@ -174,19 +182,22 @@
         <tfoot>
           <tr v-if="variableOnly" class="fixed-total-row" data-testid="fixed-total-row">
             <th>Fixed Total</th>
-            <th v-for="budget in store.budgets" :key="budget.id" class="amount-cell">
-              {{ displayAmount(totalFixedForBudget(budget)) }}
+            <th v-for="budget in store.budgets" :key="budget.id">
+              <EcMoneyDisplay
+                :model-value="totalFixedForBudget(budget)"
+                :highlight-mode="HighlightMode.None"
+                :emphasis="Emphasis.Total"
+              />
             </th>
           </tr>
           <tr class="total-row total-row--prominent" data-testid="total-discretionary-row">
             <th>Total Discretionary Money</th>
-            <th
-              v-for="budget in store.budgets"
-              :key="budget.id"
-              class="amount-cell"
-              :class="discretionaryClass(store.discretionaryForBudget(budget))"
-            >
-              {{ centsToDollars(store.discretionaryForBudget(budget)) }}
+            <th v-for="budget in store.budgets" :key="budget.id">
+              <EcMoneyDisplay
+                :model-value="store.discretionaryForBudget(budget)"
+                :highlight-mode="HighlightMode.Balance"
+                :emphasis="Emphasis.Total"
+              />
             </th>
           </tr>
         </tfoot>
@@ -215,7 +226,9 @@ import { useFutureBudgetsStore } from './futureBudgetsStore';
 import { useSettingsStore } from '../../settings/settingsStore';
 import { useNotifications } from '../../notifications/useNotifications';
 import BudgetMassEditDialog from './BudgetMassEditDialog.vue';
-import { centsToDollars } from '../../shared/util/cents-to-dollars';
+import EcMoneyDisplay from '../../shared/form/money-field/EcMoneyDisplay.vue';
+import { HighlightMode } from '../../shared/constants/highlightMode';
+import { Emphasis } from '../../shared/constants/emphasis';
 import { budgetHeaderLines } from './budgetHeaderLines';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
@@ -238,16 +251,6 @@ onMounted(() => {
   headingStore.setHeading('Future Budgets');
   store.fetchAll();
 });
-
-function displayAmount(cents: number): string {
-  return cents === 0 ? '—' : centsToDollars(cents);
-}
-
-function discretionaryClass(cents: number): string {
-  if (cents > 0) return 'amount-positive';
-  if (cents < 0) return 'amount-negative';
-  return 'amount-zero';
-}
 
 function incomeAmountFor(name: string, budget: FutureBudgetData): number {
   return store.incomeDisplayData[name]?.[budget.id]?.amount ?? 0;
@@ -531,9 +534,10 @@ async function onSave(payload: MassUpdatePayload) {
   text-align: right;
 }
 
-.amount-cell {
+/* Budget body cells: right-align to match column headers */
+.budgets-table td + td,
+.budgets-table tbody th + th {
   text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 /* ── Budget header two-line ── */
@@ -547,26 +551,6 @@ async function onSave(payload: MassUpdatePayload) {
   font-size: 0.72rem;
   font-weight: 400;
   color: var(--p-text-muted-color);
-}
-
-/* ── Amount colour classes ── */
-.amount-positive {
-  color: var(--p-green-600);
-  font-weight: 700;
-}
-
-.amount-negative {
-  color: var(--p-red-600);
-  font-weight: 700;
-}
-
-.amount-zero {
-  color: var(--p-text-muted-color);
-}
-
-.amount-income {
-  color: var(--p-primary-600);
-  font-weight: 600;
 }
 
 /* ── Fixed subtotal row ── */

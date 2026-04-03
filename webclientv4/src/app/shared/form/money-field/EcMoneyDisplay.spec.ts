@@ -105,6 +105,31 @@ describe('EcMoneyDisplay', () => {
     });
   });
 
+  describe('highlightMode: income', () => {
+    it('applies income class regardless of value', () => {
+      const wrapper = createWrapper({ modelValue: 500000, highlightMode: HighlightMode.Income });
+      const span = wrapper.find('.money-display');
+
+      expect(span.classes()).toContain('income');
+    });
+
+    it('applies income class for zero value', () => {
+      const wrapper = createWrapper({ modelValue: 0, highlightMode: HighlightMode.Income });
+      const span = wrapper.find('.money-display');
+
+      expect(span.classes()).toContain('income');
+    });
+
+    it('does not apply positive, negative, or muted classes', () => {
+      const wrapper = createWrapper({ modelValue: 500000, highlightMode: HighlightMode.Income });
+      const span = wrapper.find('.money-display');
+
+      expect(span.classes()).not.toContain('positive');
+      expect(span.classes()).not.toContain('negative');
+      expect(span.classes()).not.toContain('muted');
+    });
+  });
+
   describe('highlightMode: difference', () => {
     it('applies positive class when value is zero', () => {
       const wrapper = createWrapper({ modelValue: 0, highlightMode: HighlightMode.Difference });
