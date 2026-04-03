@@ -1,7 +1,7 @@
 # Task: Fix pre-commit hooks being bypassed in worktree agents
 
 **ID:** fix-pre-commit-hooks-being-bypassed-in-worktree-agents
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-02
