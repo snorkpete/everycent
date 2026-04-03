@@ -10,7 +10,6 @@ import { DialogStub } from '../../test/stubs';
 // Selectors
 const SAVE_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
-const DATE_PICKER = '[data-testid="start-date-picker"]';
 
 function createWrapper(props: Partial<{ visible: boolean }> = {}): VueWrapper {
   return mount(AddBudgetDialog, {
@@ -34,7 +33,7 @@ describe('AddBudgetDialog', () => {
   describe('rendering', () => {
     it('renders the date picker', () => {
       const wrapper = createWrapper();
-      expect(wrapper.find(DATE_PICKER).exists()).toBe(true);
+      expect(wrapper.findComponent({ name: 'DatePicker' }).exists()).toBe(true);
     });
 
     it('renders the Save button', () => {
@@ -117,7 +116,7 @@ describe('AddBudgetDialog', () => {
       await wrapper.setProps({ visible: true });
       await nextTick();
 
-      // Save button should be disabled (date was reset to null)
+      // Save button should be disabled (date was reset to empty string)
       const saveBtn = wrapper.find(SAVE_BTN);
       expect(saveBtn.attributes('disabled')).toBeDefined();
     });

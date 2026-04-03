@@ -1,64 +1,54 @@
 <template>
-  <Dialog
+  <EcFormDialog
     :visible="visible"
     header="Transfer Money"
-    modal
-    :style="{ width: '22rem' }"
-    @update:visible="close"
+    width="22rem"
+    :always-edit="true"
+    :save-disabled="!canSave"
+    @update:visible="$emit('update:visible', $event)"
+    @save="onSave"
   >
-    <div class="transfer-fields">
-      <!-- Transfer From -->
-      <div class="field">
-        <label class="field-label">Transfer From</label>
-        <Select
-          v-model="form.existing_allocation_id"
-          :options="transferOptions"
-          option-label="label"
-          option-value="value"
-          placeholder="Select allocation"
-          data-testid="from-select"
-          class="w-full"
-        />
-      </div>
-
-      <!-- Transfer To -->
-      <div class="field">
-        <label class="field-label">Transfer To</label>
-        <Select
-          v-model="form.new_allocation_id"
-          :options="transferOptions"
-          option-label="label"
-          option-value="value"
-          placeholder="Select allocation"
-          data-testid="to-select"
-          class="w-full"
-        />
-      </div>
-
-      <!-- Amount -->
-      <div class="field">
-        <EcMoneyField v-model="form.amount" label="Amount" :edit-mode="true" />
-      </div>
+    <!-- Transfer From -->
+    <div class="field">
+      <label class="field-label">Transfer From</label>
+      <Select
+        v-model="form.existing_allocation_id"
+        :options="transferOptions"
+        option-label="label"
+        option-value="value"
+        placeholder="Select allocation"
+        data-testid="from-select"
+        class="w-full"
+      />
     </div>
 
-    <template #footer>
-      <div class="dialog-footer">
-        <Button label="Save" data-testid="save-btn" :disabled="!canSave" @click="onSave" />
-        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
-      </div>
-    </template>
-  </Dialog>
+    <!-- Transfer To -->
+    <div class="field">
+      <label class="field-label">Transfer To</label>
+      <Select
+        v-model="form.new_allocation_id"
+        :options="transferOptions"
+        option-label="label"
+        option-value="value"
+        placeholder="Select allocation"
+        data-testid="to-select"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Amount -->
+    <EcMoneyField v-model="form.amount" label="Amount" :edit-mode="true" />
+  </EcFormDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
 import Select from 'primevue/select';
 import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
 import { useNotifications } from '../notifications/useNotifications';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
+import EcFormDialog from '../shared/form/form-dialog/EcFormDialog.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import type { SinkFundTransferFormData } from './sinkFund.types';
 
@@ -144,21 +134,10 @@ async function onSave() {
   }
 }
 
-function close() {
-  emit('update:visible', false);
-}
-
 defineExpose({ form });
 </script>
 
 <style scoped>
-.transfer-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -169,11 +148,5 @@ defineExpose({ form });
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--p-text-color);
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 </style>

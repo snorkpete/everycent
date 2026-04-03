@@ -39,10 +39,7 @@
     </div>
 
     <template #footer>
-      <div class="dialog-footer">
-        <Button label="Save" data-testid="save-btn" @click="onSave" />
-        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
-      </div>
+      <EcDialogFooter @save="onSave" @cancel="close" />
     </template>
   </Dialog>
 </template>
@@ -50,7 +47,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
+import EcDialogFooter from '../shared/form/form-dialog/EcDialogFooter.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import { useAccountBalanceStore } from './accountBalanceStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -153,11 +150,5 @@ defineExpose({ adjustments });
 
 .current-balance-row td {
   background-color: var(--p-surface-50);
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 </style>

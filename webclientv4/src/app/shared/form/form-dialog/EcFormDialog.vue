@@ -11,31 +11,25 @@
     </div>
 
     <template #footer>
-      <div class="dialog-footer">
+      <EcDialogFooter
+        v-if="alwaysEdit || editMode"
+        :save-label="saveLabel"
+        :cancel-label="cancelLabel"
+        :save-disabled="saveDisabled"
+        @save="$emit('save')"
+        @cancel="handleCancel"
+      >
         <slot name="footer-extra" :edit-mode="editMode" />
-        <template v-if="alwaysEdit || editMode">
-          <Button
-            :label="saveLabel"
-            data-testid="save-btn"
-            :disabled="saveDisabled"
-            @click="$emit('save')"
-          />
-          <Button
-            :label="cancelLabel"
-            severity="secondary"
-            data-testid="cancel-btn"
-            @click="handleCancel"
-          />
-        </template>
-        <template v-else>
-          <Button :label="editLabel" data-testid="edit-btn" @click="editMode = true" />
-          <Button
-            :label="closeLabel"
-            severity="secondary"
-            data-testid="close-btn"
-            @click="$emit('update:visible', false)"
-          />
-        </template>
+      </EcDialogFooter>
+      <div v-else class="dialog-footer">
+        <slot name="footer-extra" :edit-mode="editMode" />
+        <Button :label="editLabel" data-testid="edit-btn" @click="editMode = true" />
+        <Button
+          :label="closeLabel"
+          severity="secondary"
+          data-testid="close-btn"
+          @click="$emit('update:visible', false)"
+        />
       </div>
     </template>
   </Dialog>
@@ -45,6 +39,7 @@
 import { ref, computed, watch, type CSSProperties } from 'vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
+import EcDialogFooter from './EcDialogFooter.vue';
 
 const {
   visible,

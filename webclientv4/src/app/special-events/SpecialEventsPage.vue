@@ -70,31 +70,7 @@
       @submit="onSubmit"
     />
 
-    <Dialog
-      :visible="deleteDialogVisible"
-      header="Confirm Delete"
-      modal
-      :style="{ width: '25rem' }"
-      @update:visible="deleteDialogVisible = $event"
-    >
-      <p>Are you sure you want to delete "{{ eventToDelete?.name }}"?</p>
-      <template #footer>
-        <div class="dialog-footer">
-          <Button
-            label="Delete"
-            severity="danger"
-            data-testid="confirm-delete-btn"
-            @click="deleteEvent"
-          />
-          <Button
-            label="Cancel"
-            severity="secondary"
-            data-testid="cancel-delete-btn"
-            @click="deleteDialogVisible = false"
-          />
-        </div>
-      </template>
-    </Dialog>
+    <ConfirmDialog />
   </EcPageLayout>
 </template>
 
@@ -105,7 +81,8 @@ import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
+import ConfirmDialog from 'primevue/confirmdialog';
+import { useConfirm } from 'primevue/useconfirm';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -118,11 +95,10 @@ const router = useRouter();
 const store = useSpecialEventStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
+const confirm = useConfirm();
 
 const formVisible = ref(false);
 const selectedEvent = ref<SpecialEventData | null>(null);
-const deleteDialogVisible = ref(false);
-const eventToDelete = ref<SpecialEventData | null>(null);
 
 onMounted(() => {
   headingStore.setHeading('Special Events');
@@ -148,17 +124,21 @@ function viewEvent(event: SpecialEventData) {
 }
 
 function confirmDelete(event: SpecialEventData) {
-  eventToDelete.value = event;
-  deleteDialogVisible.value = true;
+  confirm.require({
+    header: 'Confirm Delete',
+    message: `Are you sure you want to delete "${event.name}"?`,
+    acceptLabel: 'Delete',
+    rejectLabel: 'Cancel',
+    acceptClass: 'p-button-danger',
+    accept: () => deleteEvent(event),
+  });
 }
 
-async function deleteEvent() {
-  if (!eventToDelete.value?.id) return;
+async function deleteEvent(event: SpecialEventData) {
+  if (!event.id) return;
   try {
-    await store.remove(eventToDelete.value.id);
+    await store.remove(event.id);
     notifications.success('Special event deleted');
-    deleteDialogVisible.value = false;
-    eventToDelete.value = null;
   } catch {
     notifications.error(store.error ?? 'Failed to delete special event');
   }
@@ -194,11 +174,5 @@ function calculateDifference(event: SpecialEventData): number {
 
 .event-link:hover {
   text-decoration: underline;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 </style>

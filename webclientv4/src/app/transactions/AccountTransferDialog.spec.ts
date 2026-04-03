@@ -12,7 +12,7 @@ import type { AllocationData, BudgetData, SinkFundAllocationData } from './trans
 import { DialogStub } from '../../test/stubs';
 
 // Selectors
-const TRANSFER_BTN = '[data-testid="transfer-btn"]';
+const TRANSFER_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
 const FROM_SELECT = '[data-testid="from-account-select"]';
 const TO_SELECT = '[data-testid="to-account-select"]';

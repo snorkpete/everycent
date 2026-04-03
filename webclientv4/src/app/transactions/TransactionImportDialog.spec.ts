@@ -11,7 +11,7 @@ import { transactionImporter } from './importers/transactionImporter';
 import { DialogStub } from '../../test/stubs';
 
 // Selectors
-const IMPORT_BTN = '[data-testid="import-btn"]';
+const IMPORT_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
 const TEXTAREA = '[data-testid="import-textarea"]';
 const FORMAT_SELECT = '[data-testid="import-format-select"]';

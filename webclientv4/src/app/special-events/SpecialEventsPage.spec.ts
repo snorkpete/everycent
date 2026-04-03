@@ -6,7 +6,6 @@ import PrimeVue from 'primevue/config';
 import SpecialEventsPage from './SpecialEventsPage.vue';
 import { specialEventApi } from './specialEventApi';
 import { useHeadingStore } from '../toolbar/headingStore';
-import { DialogStub } from '../../test/stubs';
 import { buildSpecialEvent } from '../../test/factories';
 
 vi.mock('./specialEventApi', () => ({
@@ -36,6 +35,16 @@ vi.mock('vue-router', () => ({
   useRoute: () => ({ path: '/special-events', query: {} }),
 }));
 
+// Stub useConfirm — capture the last require call so tests can invoke accept/reject
+let lastConfirmCall: { accept?: () => void; reject?: () => void } = {};
+vi.mock('primevue/useconfirm', () => ({
+  useConfirm: () => ({
+    require: (opts: { accept?: () => void; reject?: () => void }) => {
+      lastConfirmCall = opts;
+    },
+  }),
+}));
+
 const event1 = buildSpecialEvent({
   id: 1,
   name: 'Birthday Party',
@@ -59,13 +68,18 @@ const FormStub = {
   emits: ['update:visible', 'submit'],
 };
 
+const ConfirmDialogStub = {
+  name: 'ConfirmDialog',
+  template: '<div data-testid="confirm-dialog" />',
+};
+
 function createWrapper(pinia: Pinia): VueWrapper {
   return mount(SpecialEventsPage, {
     global: {
       plugins: [PrimeVue, pinia],
       stubs: {
         SpecialEventForm: FormStub,
-        Dialog: DialogStub,
+        ConfirmDialog: ConfirmDialogStub,
       },
     },
   });
@@ -78,6 +92,7 @@ describe('SpecialEventsPage', () => {
     pinia = createPinia();
     setActivePinia(pinia);
     vi.clearAllMocks();
+    lastConfirmCall = {};
     vi.mocked(specialEventApi.getAll).mockResolvedValue([event1, event2]);
     vi.mocked(specialEventApi.create).mockResolvedValue(event1);
     vi.mocked(specialEventApi.update).mockResolvedValue(event1);
@@ -181,17 +196,13 @@ describe('SpecialEventsPage', () => {
   });
 
   describe('delete button', () => {
-    it('opens the delete confirmation dialog', async () => {
+    it('opens the delete confirmation via useConfirm', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
       await wrapper.find('[data-testid="delete-btn-1"]').trigger('click');
 
-      expect(wrapper.text()).toContain('Birthday Party');
-      const dialog = wrapper
-        .findAllComponents({ name: 'Dialog' })
-        .find((c) => c.props('header') === 'Confirm Delete');
-      expect(dialog?.props('visible')).toBe(true);
+      expect(lastConfirmCall.accept).toBeDefined();
     });
 
     it('has a tooltip', async () => {
@@ -204,15 +215,14 @@ describe('SpecialEventsPage', () => {
   });
 
   describe('confirm delete', () => {
-    it('calls specialEventApi.delete and shows success notification', async () => {
+    it('calls specialEventApi.delete and shows success notification when confirmed', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      // Open delete dialog
       await wrapper.find('[data-testid="delete-btn-1"]').trigger('click');
 
-      // Confirm delete
-      await wrapper.find('[data-testid="confirm-delete-btn"]').trigger('click');
+      // Invoke the accept callback (user clicked Delete)
+      await lastConfirmCall.accept?.();
       await flushPromises();
 
       expect(specialEventApi.delete).toHaveBeenCalledWith(1);
@@ -227,24 +237,20 @@ describe('SpecialEventsPage', () => {
       await flushPromises();
 
       await wrapper.find('[data-testid="delete-btn-1"]').trigger('click');
-      await wrapper.find('[data-testid="confirm-delete-btn"]').trigger('click');
+      await lastConfirmCall.accept?.();
       await flushPromises();
 
       expect(mockNotifyError).toHaveBeenCalledWith('Server error');
     });
 
-    it('cancel button closes the delete dialog', async () => {
+    it('does not delete when rejection (cancel) occurs', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
       await wrapper.find('[data-testid="delete-btn-1"]').trigger('click');
 
-      await wrapper.find('[data-testid="cancel-delete-btn"]').trigger('click');
-
-      const dialog = wrapper
-        .findAllComponents({ name: 'Dialog' })
-        .find((c) => c.props('header') === 'Confirm Delete');
-      expect(dialog?.props('visible')).toBe(false);
+      // Do not call accept — just verify delete was not called
+      expect(specialEventApi.delete).not.toHaveBeenCalled();
     });
   });
 
