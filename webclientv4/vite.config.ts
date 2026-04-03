@@ -18,5 +18,23 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['src/test/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text'],
+      include: ['src/**/*.{ts,vue}'],
+      exclude: [
+        'src/test/**',
+        'src/**/*.spec.ts',
+        'src/**/*.d.ts',
+        'src/**/*.types.ts',
+        'src/main.ts',
+      ],
+      thresholds: {
+        statements: 90,
+        branches: 85,
+        functions: 85,
+        lines: 90,
+      },
+    },
   },
 });
