@@ -1,7 +1,7 @@
 # Task: Add actions slot to EcItemList for page action buttons
 
 **ID:** add-actions-slot-to-ecitemlist-for-page-action-buttons
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-02

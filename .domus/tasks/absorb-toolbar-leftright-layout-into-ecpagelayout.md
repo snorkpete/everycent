@@ -1,7 +1,7 @@
 # Task: Absorb toolbar left/right layout into EcPageLayout
 
 **ID:** absorb-toolbar-leftright-layout-into-ecpagelayout
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-02

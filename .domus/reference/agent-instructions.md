@@ -85,6 +85,8 @@ When the user says "dispatch", "run the worker on X", "dispatch this task", or s
 
 Only dispatch tasks that are `ready` status. If the task is not ready, advance it first or ask the user.
 
+After dispatch, the Foreman manages the review cycle. Do not merge worker output without user approval — see `.domus/reference/staff/roles/foreman.md` for the full protocol.
+
 ## Updating the base branch config
 
 Run `domus config set-branch [<branch>]` when the user explicitly mentions the domus branch config — e.g. "set the domus branch", "update the domus branch config", "change the domus base branch". If no branch is given, the current git branch is detected automatically. Do not trigger on generic git branch mentions.

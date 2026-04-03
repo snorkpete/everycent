@@ -14,6 +14,16 @@ Read these in order:
 
 Do not start work until you have read the task file and execution log.
 
+## Branch setup
+
+Before starting work, create a descriptive branch from the task ID:
+
+```
+git checkout -b <task-id>
+```
+
+All commits go on this branch. The auto-generated worktree branch serves as a marker of where the worktree was created — do not commit to it directly.
+
 ## The --root flag
 
 You are running in a worktree. All `.domus/` writes must go to the main working directory, not your worktree's copy. Use the `--root` flag on all domus commands:

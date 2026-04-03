@@ -22,10 +22,24 @@ Read the task's current status and decide what to do.
 **How to dispatch a Worker:**
 
 1. Validate the task is dispatchable: `domus dispatch <task-id>` (validates ready + autonomous, calls `domus task start`)
-2. Launch a Worker subagent with `isolation: "worktree"`, passing the task ID and the `--root` path to the main repo
-3. The first instruction in the Worker prompt must be: **read and follow `.domus/reference/staff/roles/worker.md`**. This is non-negotiable — the Worker role file contains the full execution protocol (logging, review, merge, close-out). Without it, Workers skip critical steps.
+2. Launch a Worker subagent with `isolation: "worktree"`, `model: "sonnet"`, passing the task ID and the `--root` path to the main repo
+3. The first instruction in the Worker prompt must be: **read and follow `.domus/reference/staff/roles/worker.md`**. This is non-negotiable — the Worker role file contains the full execution protocol (logging, branching, review, close-out). Without it, Workers skip critical steps.
 
 The Worker reads the task file and execution log on start. If the execution log has entries, the Worker resumes from the last completed step.
+
+**After the Worker completes:**
+
+4. Report the descriptive branch name and worktree path to the user
+5. Provide the review command: `git log <branch> --not master -p`
+6. Keep the worktree alive — do not clean up until merge or explicit cancellation
+
+**If the user has feedback:**
+
+7. Try to resume the existing Worker via SendMessage with the feedback
+8. If the Worker is unreachable, launch a new Worker in the same worktree, briefing it on what was built and what to change
+9. The Worker commits again on the same branch; report for re-review
+
+**Only proceed to Merge and Close when the user explicitly approves.**
 
 ### Advance
 
@@ -43,6 +57,8 @@ Always log when you advance. The log is the record of why the transition happene
 ### Merge and Close
 
 Merge the task's worktree branch into the base branch (usually master).
+
+**Pre-merge gate:** Do not merge until the user explicitly approves. "Looks good", "merge it", "go" are approvals. Silence is not.
 
 **Pre-merge check:** Verify the task's acceptance criteria are met before merging. If they are not, route back to the Worker instead.
 

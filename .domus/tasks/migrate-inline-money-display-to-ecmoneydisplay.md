@@ -14,23 +14,31 @@
 
 ## What This Task Is
 
-DUP-CSS-08 from the 2026-04-02 audit. Multiple files format money inline with `centsToDollars()` and define their own CSS colour classes (.amount-positive, .amount-negative, .amount-muted, .amount-zero, .positive, .negative). Same semantic meaning, different class names across files.
+DUP-CSS-08 from the 2026-04-02 audit. Multiple files format money inline with `centsToDollars()` and define their own CSS colour classes. EcMoneyDisplay already handles money colouring via `highlightMode`. This task migrates the 8 straightforward files where existing EcMoneyDisplay props are sufficient.
 
-EcMoneyDisplay already handles money colouring via `highlightMode`. The fix is to migrate all inline money formatting to EcMoneyDisplay. For edge cases where EcMoneyDisplay doesn't fit today (e.g. inside a `<th>` or summary footer), extend the component rather than working around it.
+**Principle:** EcMoneyDisplay is the single source of truth for how money looks.
 
-**Principle:** EcMoneyDisplay is the single source of truth for how money looks. If it can't handle a context, we extend it.
+FutureBudgetsPage is excluded — it has a custom `.amount-income` highlight that needs a separate design decision. See `migrate-futurebudgetspage-money-display-to-ecmoneydisplay`.
 
-**Current duplication:**
-- SinkFundAllocationTable.vue:289-300 (.amount-positive, .amount-negative, .amount-muted)
-- FutureBudgetsPage.vue:551-563 (.amount-positive, .amount-negative, .amount-zero)
-- BudgetSummaryStrip.vue:137-147 (.amount-positive, .amount-negative, .amount-zero)
-- SpecialEventsPage.vue:209-214 (.negative, .positive)
+---
+
+## Files to migrate
+
+1. **AllocationTransactionsDialog.vue** — plain `centsToDollars()` with `.amount-cell` CSS. No colors. → `highlight-mode="None"`
+2. **SpecialEventDetailPage.vue** — plain display, bold total. → `emphasis="Total"`, `highlight-mode="None"`
+3. **SpecialEventAllocationsEditor.vue** — same pattern as detail page. → `emphasis` varies, `highlight-mode="None"`
+4. **ImportPage.vue** — plain display, right-aligned. → `highlight-mode="None"`
+5. **BudgetSummary.vue** — plain display in bar chart context, `.bar-amount` CSS. → `highlight-mode="None"`
+6. **SpecialEventsPage.vue** — positive/negative via `.positive`/`.negative` classes. → `highlight-mode="Balance"`
+7. **BudgetSummaryStrip.vue** — positive/negative/zero via `.amount-*` classes. → `highlight-mode="Balance"`
+8. **SinkFundAllocationTable.vue** — positive/negative/muted via `.amount-*` classes. → `highlight-mode="Balance"`
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] All inline centsToDollars() + colour class usages identified
-- [ ] EcMoneyDisplay extended if needed for summary/th/footer contexts
-- [ ] All files migrated to EcMoneyDisplay
-- [ ] All duplicated money colour CSS classes removed
+- [ ] All 8 files migrated to use EcMoneyDisplay instead of `centsToDollars()` + custom CSS
+- [ ] All duplicated money colour CSS classes removed from migrated files
+- [ ] No new CSS for money display introduced
+- [ ] All existing tests pass
+- [ ] Any tests that referenced removed CSS classes are updated
