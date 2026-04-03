@@ -4,7 +4,7 @@
     :header="dialogTitle"
     modal
     :closable="true"
-    :style="{ width: '500px' }"
+    :style="{ width: '32rem' }"
     @update:visible="$emit('update:visible', $event)"
   >
     <div v-if="loading" class="loading-state" data-testid="loading-state">
@@ -36,13 +36,13 @@
           >
             <td>{{ formatDate(transaction.transaction_date ?? '') }}</td>
             <td>{{ transaction.description }}</td>
-            <td class="amount-cell">{{ centsToDollars(transaction.net_amount ?? 0) }}</td>
+            <td class="amount-col"><EcMoneyDisplay :model-value="transaction.net_amount ?? 0" highlight-mode="none" /></td>
           </tr>
         </tbody>
         <tfoot>
           <tr class="total-row" data-testid="total-row">
             <td colspan="2">Total</td>
-            <td class="amount-cell">{{ centsToDollars(total) }}</td>
+            <td class="amount-col"><EcMoneyDisplay :model-value="total" highlight-mode="none" emphasis="total" /></td>
           </tr>
         </tfoot>
       </table>
@@ -53,8 +53,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
-import { centsToDollars } from './util/cents-to-dollars';
 import { formatDate } from './util/format-date';
+import EcMoneyDisplay from './form/money-field/EcMoneyDisplay.vue';
 import type { TransactionData } from '../transactions/transaction.types';
 
 const props = defineProps<{
@@ -144,11 +144,6 @@ watch(
   position: sticky;
   bottom: 0;
   background-color: var(--p-surface-0);
-}
-
-.amount-cell {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 .total-row {

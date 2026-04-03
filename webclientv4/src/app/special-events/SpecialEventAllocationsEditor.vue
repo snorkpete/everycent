@@ -20,8 +20,8 @@
     <div v-if="store.currentSpecialEvent" class="header-card" data-testid="event-header">
       <h2 class="event-name">{{ store.currentSpecialEvent.name }}</h2>
       <div class="event-summary">
-        <span>Budgeted: {{ centsToDollars(store.currentSpecialEvent.budget_amount) }}</span>
-        <span>Actual: {{ centsToDollars(totalSpent) }}</span>
+        <span>Budgeted: <EcMoneyDisplay :model-value="store.currentSpecialEvent.budget_amount ?? 0" highlight-mode="none" /></span>
+        <span>Actual: <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" /></span>
       </div>
     </div>
 
@@ -39,7 +39,7 @@
             style="text-align: right"
           >
             <template #body="{ data }">
-              {{ centsToDollars(data.amount) }}
+              <EcMoneyDisplay :model-value="data.amount ?? 0" highlight-mode="none" />
             </template>
           </Column>
           <Column
@@ -49,10 +49,10 @@
             style="text-align: right"
           >
             <template #body="{ data }">
-              {{ centsToDollars(data.spent) }}
+              <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
             </template>
             <template #footer>
-              <span class="total-label">{{ centsToDollars(totalSpent) }}</span>
+              <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" emphasis="total" />
             </template>
           </Column>
           <Column header="" style="width: 3rem; text-align: center">
@@ -108,12 +108,12 @@
           </Column>
           <Column header="Budgeted" header-style="text-align: right" style="text-align: right">
             <template #body="{ data: row }">
-              <span v-if="!row._isCategoryHeader">{{ centsToDollars(row.amount) }}</span>
+              <EcMoneyDisplay v-if="!row._isCategoryHeader" :model-value="row.amount ?? 0" highlight-mode="none" />
             </template>
           </Column>
           <Column header="Spent" header-style="text-align: right" style="text-align: right">
             <template #body="{ data: row }">
-              <span v-if="!row._isCategoryHeader">{{ centsToDollars(row.spent) }}</span>
+              <EcMoneyDisplay v-if="!row._isCategoryHeader" :model-value="row.spent ?? 0" highlight-mode="none" />
             </template>
           </Column>
           <Column header="" style="width: 3rem; text-align: center">
@@ -146,7 +146,7 @@ import Select from 'primevue/select';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import { budgetApi } from '../budgets/budgetApi';
 import { allocationCategoryApi } from '../allocation-categories/allocationCategoryApi';
 import type { SpecialEventAllocationData } from './specialEvent.types';
@@ -395,7 +395,4 @@ onMounted(async () => {
   font-weight: bold;
 }
 
-.total-label {
-  font-weight: bold;
-}
 </style>

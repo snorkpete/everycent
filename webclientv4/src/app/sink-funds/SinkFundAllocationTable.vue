@@ -17,7 +17,7 @@
         <!-- Summary row: Sink Fund Account Balance -->
         <tr class="summary-row" data-testid="summary-row-balance">
           <td>Sink Fund Account Balance</td>
-          <td class="amount-cell">{{ centsToDollars(store.sinkFund?.current_balance ?? 0) }}</td>
+          <td class="amount-cell"><EcMoneyDisplay :model-value="store.sinkFund?.current_balance ?? 0" highlight-mode="none" /></td>
           <td></td>
           <td></td>
           <td></td>
@@ -35,7 +35,7 @@
               data-testid="unassigned-tooltip"
             ></i>
           </td>
-          <td class="amount-cell">{{ centsToDollars(store.unassignedBalance) }}</td>
+          <td class="amount-cell"><EcMoneyDisplay :model-value="store.unassignedBalance" highlight-mode="none" /></td>
           <td></td>
           <td></td>
           <td></td>
@@ -76,7 +76,7 @@
               >
                 <i class="pi pi-eye"></i>
               </button>
-              <span>{{ centsToDollars(allocation.current_balance ?? 0) }}</span>
+              <EcMoneyDisplay :model-value="allocation.current_balance ?? 0" highlight-mode="none" />
             </span>
           </td>
 
@@ -88,12 +88,12 @@
               label=""
               :edit-mode="true"
             />
-            <span v-else>{{ centsToDollars(allocation.target ?? 0) }}</span>
+            <EcMoneyDisplay v-else :model-value="allocation.target ?? 0" highlight-mode="none" />
           </td>
 
           <!-- Outstanding -->
-          <td class="amount-cell" :class="outstandingClass(outstanding(allocation))">
-            {{ centsToDollars(outstanding(allocation)) }}
+          <td class="amount-cell">
+            <EcMoneyDisplay :model-value="outstanding(allocation)" highlight-mode="balance" />
           </td>
 
           <!-- Comment -->
@@ -146,10 +146,10 @@
       <tfoot>
         <tr class="total-row" data-testid="total-row">
           <th>Total</th>
-          <th class="amount-cell">{{ centsToDollars(store.totalAssignedBalance) }}</th>
-          <th class="amount-cell">{{ centsToDollars(store.totalTarget) }}</th>
-          <th class="amount-cell" :class="outstandingClass(store.totalOutstanding)">
-            {{ centsToDollars(store.totalOutstanding) }}
+          <th class="amount-cell"><EcMoneyDisplay :model-value="store.totalAssignedBalance" highlight-mode="none" /></th>
+          <th class="amount-cell"><EcMoneyDisplay :model-value="store.totalTarget" highlight-mode="none" /></th>
+          <th class="amount-cell">
+            <EcMoneyDisplay :model-value="store.totalOutstanding" highlight-mode="balance" />
           </th>
           <th></th>
           <th></th>
@@ -172,8 +172,8 @@ import { ref } from 'vue';
 import Tooltip from 'primevue/tooltip';
 import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData } from './sinkFund.types';
 
@@ -189,12 +189,6 @@ function outstanding(allocation: SinkFundAllocationData): number {
   const target = allocation.target ?? 0;
   if (target === 0) return 0;
   return (allocation.current_balance ?? 0) - target;
-}
-
-function outstandingClass(value: number): string {
-  if (value > 0) return 'amount-positive';
-  if (value < 0) return 'amount-negative';
-  return 'amount-muted';
 }
 
 function toggleDeleted(allocation: SinkFundAllocationData) {
@@ -284,19 +278,6 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
 .allocations-table thead th.target-col,
 .allocations-table thead th.outstanding-col {
   text-align: right;
-}
-
-/* ── Outstanding colour classes ── */
-.amount-positive {
-  color: var(--p-green-600);
-}
-
-.amount-negative {
-  color: var(--p-red-600);
-}
-
-.amount-muted {
-  color: var(--p-text-muted-color);
 }
 
 /* ── Summary rows (sticky below header) ── */

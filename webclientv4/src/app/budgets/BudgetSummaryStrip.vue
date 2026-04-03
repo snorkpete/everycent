@@ -2,30 +2,32 @@
   <div v-if="budgetStore.budget" class="summary-strip" data-testid="budget-summary-strip">
     <div class="strip-item">
       <span class="strip-label">Income</span>
-      <span class="strip-value">{{ centsToDollars(totalIncome) }}</span>
+      <EcMoneyDisplay class="strip-value" :model-value="totalIncome" highlight-mode="none" />
     </div>
     <div class="strip-divider"></div>
     <div class="strip-item">
       <span class="strip-label">Allocated</span>
-      <span class="strip-value">{{ centsToDollars(totalAllocations) }}</span>
+      <EcMoneyDisplay class="strip-value" :model-value="totalAllocations" highlight-mode="none" />
     </div>
     <div class="strip-divider"></div>
     <div class="strip-item">
       <span class="strip-label">Unallocated</span>
-      <span class="strip-value" :class="discretionaryClass" data-testid="unallocated-amount">
-        {{ centsToDollars(discretionaryTotal) }}
-      </span>
+      <EcMoneyDisplay
+        class="strip-value"
+        :model-value="discretionaryTotal"
+        highlight-mode="balance"
+        data-testid="unallocated-amount"
+      />
     </div>
     <div class="strip-divider"></div>
     <div class="strip-item">
       <span class="strip-label">{{ discretionaryLabel }}</span>
-      <span
+      <EcMoneyDisplay
         class="strip-value discretionary-value"
-        :class="discretionaryClass"
+        :model-value="perPersonAmount"
+        highlight-mode="balance"
         data-testid="discretionary-amount"
-      >
-        {{ centsToDollars(perPersonAmount) }}
-      </span>
+      />
     </div>
     <div class="strip-item needs-wants-savings">
       <span v-tooltip="'Needs'" class="nws-pill nws-need">N {{ needsPercentage }}%</span>
@@ -40,7 +42,7 @@ import { computed } from 'vue';
 import { useBudgetStore } from './budgetStore';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useWantsNeedsBudgetBreakdown } from './useWantsNeedsBudgetBreakdown';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 
 const budgetStore = useBudgetStore();
 const settingsStore = useSettingsStore();
@@ -75,12 +77,6 @@ const discretionaryLabel = computed(() => {
     return `${singlePerson.value}'s Discretionary`;
   }
   return `${wife.value} / ${husband.value}`;
-});
-
-const discretionaryClass = computed(() => {
-  if (discretionaryTotal.value < 0) return 'amount-negative';
-  if (discretionaryTotal.value === 0) return 'amount-zero';
-  return 'amount-positive';
 });
 
 const { needsPercentage, savingsPercentage, wantsPercentage } = useWantsNeedsBudgetBreakdown(
@@ -132,18 +128,6 @@ const { needsPercentage, savingsPercentage, wantsPercentage } = useWantsNeedsBud
 .discretionary-value {
   font-size: 1.05rem;
   font-weight: 700;
-}
-
-.amount-positive {
-  color: var(--p-green-600);
-}
-
-.amount-negative {
-  color: var(--p-red-600);
-}
-
-.amount-zero {
-  color: var(--p-text-muted-color);
 }
 
 /* Needs/Wants/Savings pills */
