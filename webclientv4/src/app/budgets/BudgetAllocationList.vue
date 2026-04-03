@@ -161,9 +161,9 @@
             <td v-if="store.isEditMode" class="center-cell">
               <EcDeleteButton
                 v-if="isEditable(allocation)"
-                :deleted="allocation.deleted ?? false"
+                :deleted="allocation.deleted"
                 item-label="allocation"
-                :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
+                test-id-prefix="allocation"
                 @toggle="toggleDeleted(allocation)"
               />
             </td>

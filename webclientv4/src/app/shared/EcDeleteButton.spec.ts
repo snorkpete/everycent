@@ -5,14 +5,16 @@ import EcDeleteButton from './EcDeleteButton.vue';
 import { getTooltipValue } from '../../test/tooltip-helper';
 
 function createWrapper({
-  deleted = false,
+  deleted = false as boolean | null | undefined,
   itemLabel = 'item',
+  testIdPrefix = '',
 }: {
-  deleted?: boolean;
+  deleted?: boolean | null | undefined;
   itemLabel?: string;
+  testIdPrefix?: string;
 } = {}): VueWrapper {
   return mount(EcDeleteButton, {
-    props: { deleted, itemLabel },
+    props: { deleted, itemLabel, testIdPrefix },
     global: { plugins: [PrimeVue] },
   });
 }
@@ -71,6 +73,87 @@ describe('EcDeleteButton', () => {
       const btn = wrapper.find('button');
 
       expect(getTooltipValue(btn)).toBe('Restore this deleted transaction');
+    });
+  });
+
+  describe('null and undefined deleted prop', () => {
+    it('treats null as not deleted (shows trash icon)', () => {
+      const wrapper = createWrapper({ deleted: null });
+
+      expect(wrapper.find('.pi-trash').exists()).toBe(true);
+      expect(wrapper.find('.pi-undo').exists()).toBe(false);
+    });
+
+    it('treats null as not deleted (shows danger severity)', () => {
+      const wrapper = createWrapper({ deleted: null });
+      const btn = wrapper.find('button');
+
+      expect(btn.classes()).toContain('p-button-danger');
+    });
+
+    it('treats null as not deleted (shows delete tooltip)', () => {
+      const wrapper = createWrapper({ deleted: null, itemLabel: 'transaction' });
+      const btn = wrapper.find('button');
+
+      expect(getTooltipValue(btn)).toBe('Delete this transaction');
+    });
+
+    it('treats undefined as not deleted (shows trash icon)', () => {
+      const wrapper = createWrapper({ deleted: undefined });
+
+      expect(wrapper.find('.pi-trash').exists()).toBe(true);
+      expect(wrapper.find('.pi-undo').exists()).toBe(false);
+    });
+
+    it('treats undefined as not deleted (shows danger severity)', () => {
+      const wrapper = createWrapper({ deleted: undefined });
+      const btn = wrapper.find('button');
+
+      expect(btn.classes()).toContain('p-button-danger');
+    });
+  });
+
+  describe('testIdPrefix prop', () => {
+    it('sets delete-btn testid when not deleted', () => {
+      const wrapper = createWrapper({ deleted: false, testIdPrefix: 'row-5' });
+      const btn = wrapper.find('button');
+
+      expect(btn.attributes('data-testid')).toBe('row-5-delete-btn');
+    });
+
+    it('sets restore-btn testid when deleted', () => {
+      const wrapper = createWrapper({ deleted: true, testIdPrefix: 'row-5' });
+      const btn = wrapper.find('button');
+
+      expect(btn.attributes('data-testid')).toBe('row-5-restore-btn');
+    });
+
+    it('sets restore-btn testid when deleted is null treated as false — no, null is not deleted', () => {
+      const wrapper = createWrapper({ deleted: null, testIdPrefix: 'row-5' });
+      const btn = wrapper.find('button');
+
+      expect(btn.attributes('data-testid')).toBe('row-5-delete-btn');
+    });
+
+    it('omits data-testid attribute when testIdPrefix is not provided', () => {
+      const wrapper = createWrapper({ deleted: false });
+      const btn = wrapper.find('button');
+
+      expect(btn.attributes('data-testid')).toBeUndefined();
+    });
+
+    it('omits data-testid attribute when testIdPrefix is empty string', () => {
+      const wrapper = createWrapper({ deleted: false, testIdPrefix: '' });
+      const btn = wrapper.find('button');
+
+      expect(btn.attributes('data-testid')).toBeUndefined();
+    });
+
+    it('supports compound prefix strings', () => {
+      const wrapper = createWrapper({ deleted: false, testIdPrefix: 'account-0-tx-2' });
+      const btn = wrapper.find('button');
+
+      expect(btn.attributes('data-testid')).toBe('account-0-tx-2-delete-btn');
     });
   });
 

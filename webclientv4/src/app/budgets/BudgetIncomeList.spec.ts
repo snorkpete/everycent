@@ -14,7 +14,11 @@ const ADD_INCOME_BTN = '[data-testid="add-income-btn"]';
 const NAME_INPUT = '[data-testid="income-name-input"]';
 
 function deleteBtn(index: number): string {
-  return `[data-testid="delete-income-btn-${index}"]`;
+  return `[data-testid="income-${index}-delete-btn"]`;
+}
+
+function restoreBtn(index: number): string {
+  return `[data-testid="income-${index}-restore-btn"]`;
 }
 
 const sampleIncomes: IncomeData[] = [
@@ -273,7 +277,7 @@ describe('BudgetIncomeList', () => {
 
       await wrapper.find(deleteBtn(0)).trigger('click');
       await nextTick();
-      await wrapper.find(deleteBtn(0)).trigger('click');
+      await wrapper.find(restoreBtn(0)).trigger('click');
       await nextTick();
 
       expect(mockStore.budget!.incomes[0].deleted).toBe(false);
@@ -295,7 +299,7 @@ describe('BudgetIncomeList', () => {
 
       await wrapper.find(deleteBtn(0)).trigger('click');
       await nextTick();
-      await wrapper.find(deleteBtn(0)).trigger('click');
+      await wrapper.find(restoreBtn(0)).trigger('click');
       await nextTick();
 
       const firstRow = wrapper.findAll(INCOME_ROW)[0];
@@ -303,13 +307,13 @@ describe('BudgetIncomeList', () => {
       expect(firstRow.classes()).not.toContain('ec-deleted');
     });
 
-    it('shows undo icon on delete button when income is deleted', async () => {
+    it('shows undo icon on restore button when income is deleted', async () => {
       const wrapper = createWrapper();
 
       await wrapper.find(deleteBtn(0)).trigger('click');
       await nextTick();
 
-      const btn = wrapper.find(deleteBtn(0));
+      const btn = wrapper.find(restoreBtn(0));
 
       expect(btn.find('.pi-undo').exists()).toBe(true);
     });
@@ -334,13 +338,13 @@ describe('BudgetIncomeList', () => {
       expect(totalRow.text()).toContain(expectedTotal);
     });
 
-    it('updates delete button title when income is deleted', async () => {
+    it('updates restore button title when income is deleted', async () => {
       const wrapper = createWrapper();
 
       await wrapper.find(deleteBtn(0)).trigger('click');
       await nextTick();
 
-      const btn = wrapper.find(deleteBtn(0));
+      const btn = wrapper.find(restoreBtn(0));
 
       expect(getTooltipValue(btn)).toContain('Restore');
     });

@@ -225,9 +225,9 @@
                   <td class="col-action">
                     <EcDeleteButton
                       v-if="transaction.import_status !== 'duplicate'"
-                      :deleted="transaction.deleted ?? false"
+                      :deleted="transaction.deleted"
                       item-label="transaction"
-                      :data-testid="`delete-toggle-${accountIndex}-${txIndex}`"
+                      :test-id-prefix="`delete-toggle-${accountIndex}-${txIndex}`"
                       @toggle="store.toggleDeleteTransaction(accountIndex, txIndex)"
                     />
                   </td>

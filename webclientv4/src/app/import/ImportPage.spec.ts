@@ -374,15 +374,15 @@ describe('ImportPage', () => {
       await nextTick();
 
       // First row (new) has delete toggle, second row (duplicate) does not
-      expect(wrapper.find('[data-testid="delete-toggle-0-0"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="delete-toggle-0-1"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="delete-toggle-0-0-delete-btn"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="delete-toggle-0-1-delete-btn"]').exists()).toBe(false);
     });
 
     it('calls toggleDeleteTransaction when delete button clicked', async () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      await wrapper.find('[data-testid="delete-toggle-0-0"]').trigger('click');
+      await wrapper.find('[data-testid="delete-toggle-0-0-delete-btn"]').trigger('click');
 
       expect(mockStore.toggleDeleteTransaction).toHaveBeenCalledWith(0, 0);
     });

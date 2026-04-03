@@ -109,9 +109,9 @@
           <!-- Actions (edit mode only) -->
           <td v-if="store.isEditMode" class="center-cell action-buttons">
             <EcDeleteButton
-              :deleted="allocation.deleted ?? false"
+              :deleted="allocation.deleted"
               item-label="obligation"
-              :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
+              test-id-prefix="obligation"
               @toggle="toggleDeleted(allocation)"
             />
             <button

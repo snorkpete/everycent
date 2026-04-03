@@ -50,9 +50,9 @@
 
           <td v-if="store.isEditMode" class="col-actions">
             <EcDeleteButton
-              :deleted="income.deleted ?? false"
+              :deleted="income.deleted"
               item-label="income"
-              :data-testid="`delete-income-btn-${index}`"
+              :test-id-prefix="`income-${index}`"
               @toggle="toggleDeleted(income)"
             />
           </td>

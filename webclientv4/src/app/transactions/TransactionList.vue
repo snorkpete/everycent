@@ -142,9 +142,9 @@
           <td class="col-action">
             <EcDeleteButton
               v-if="store.isEditMode"
-              :deleted="transaction.deleted ?? false"
+              :deleted="transaction.deleted"
               item-label="transaction"
-              :data-testid="transaction.deleted ? `undo-delete-btn-${index}` : `delete-btn-${index}`"
+              :test-id-prefix="`transaction-${index}`"
               @toggle="transaction.deleted ? store.undoDeleteTransaction(transaction) : store.deleteTransaction(transaction)"
             />
           </td>
