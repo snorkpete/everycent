@@ -1,8 +1,9 @@
 # Task: Migrate inline money display to EcMoneyDisplay
 
 **ID:** migrate-inline-money-display-to-ecmoneydisplay
-**Status:** raw
-**Autonomous:** false
+**Status:** done
+**Branch:** task/migrate-inline-money-display-to-ecmoneydisplay
+**Autonomous:** true
 **Priority:** high
 **Captured:** 2026-04-02
 **Parent:** none
@@ -37,8 +38,8 @@ FutureBudgetsPage is excluded — it has a custom `.amount-income` highlight tha
 
 ## Acceptance Criteria
 
-- [ ] All 8 files migrated to use EcMoneyDisplay instead of `centsToDollars()` + custom CSS
-- [ ] All duplicated money colour CSS classes removed from migrated files
-- [ ] No new CSS for money display introduced
-- [ ] All existing tests pass
-- [ ] Any tests that referenced removed CSS classes are updated
+- [x] All 8 files migrated to use EcMoneyDisplay instead of `centsToDollars()` + custom CSS
+- [x] All duplicated money colour CSS classes removed from migrated files
+- [x] No new CSS for money display introduced
+- [x] All existing tests pass
+- [x] Any tests that referenced removed CSS classes are updated

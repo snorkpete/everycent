@@ -19,11 +19,16 @@ Read the task's current status and decide what to do.
 | `done`, `cancelled`, `deferred` | Task is not dispatchable. Report status and stop |
 | `raw`, `proposed` | Task needs refinement first. Route to Taskmaster |
 
+**Concurrency limit:**
+
+Before dispatching, count active worktrees: `git worktree list`. Subtract 1 for the main worktree — the remainder is workers (running + awaiting review). If count >= 5, refuse the dispatch: "5 workers already active (running or awaiting review). Merge or clean up existing worktrees first." Do not queue — just refuse.
+
 **How to dispatch a Worker:**
 
-1. Validate the task is dispatchable: `domus dispatch <task-id>` (validates ready + autonomous, calls `domus task start`)
-2. Launch a Worker subagent with `isolation: "worktree"`, `model: "sonnet"`, passing the task ID and the `--root` path to the main repo
-3. The first instruction in the Worker prompt must be: **read and follow `.domus/reference/staff/roles/worker.md`**. This is non-negotiable — the Worker role file contains the full execution protocol (logging, branching, review, close-out). Without it, Workers skip critical steps.
+1. Check concurrency limit (see above)
+2. Validate the task is dispatchable: `domus dispatch <task-id>` (validates ready + autonomous, calls `domus task start`)
+3. Launch a Worker subagent with `isolation: "worktree"`, `model: "sonnet"`, passing the task ID and the `--root` path to the main repo
+4. The first instruction in the Worker prompt must be: **read and follow `.domus/reference/staff/roles/worker.md`**. This is non-negotiable — the Worker role file contains the full execution protocol (logging, branching, review, close-out). Without it, Workers skip critical steps.
 
 The Worker reads the task file and execution log on start. If the execution log has entries, the Worker resumes from the last completed step.
 
