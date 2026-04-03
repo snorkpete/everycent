@@ -1,25 +1,23 @@
 <template>
   <EcPageLayout page-name="account-balances" variant="fixed">
-    <template #toolbar>
-      <div class="toolbar-left">
-        <Button
-          label="Adjust Account Balances"
-          data-testid="adjust-balances-btn"
-          outlined
-          size="small"
-          @click="showAdjustDialog = true"
+    <template #toolbar-left>
+      <Button
+        label="Adjust Account Balances"
+        data-testid="adjust-balances-btn"
+        outlined
+        size="small"
+        @click="showAdjustDialog = true"
+      />
+    </template>
+    <template #toolbar-right>
+      <label class="toggle-label">
+        <ToggleSwitch
+          v-model="store.includeClosed"
+          data-testid="include-closed-toggle"
+          @update:model-value="onToggleChanged"
         />
-      </div>
-      <div class="toolbar-right">
-        <label class="toggle-label">
-          <ToggleSwitch
-            v-model="store.includeClosed"
-            data-testid="include-closed-toggle"
-            @update:model-value="onToggleChanged"
-          />
-          <span>Include Closed Accounts?</span>
-        </label>
-      </div>
+        <span>Include Closed Accounts?</span>
+      </label>
     </template>
 
     <!-- Summary Strip -->
@@ -100,21 +98,6 @@ async function onToggleChanged() {
 </script>
 
 <style scoped>
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
 .toggle-label {
   display: flex;
   align-items: center;

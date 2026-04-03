@@ -1,41 +1,39 @@
 <template>
   <EcPageLayout page-name="budget" variant="fixed">
-    <template #toolbar>
-      <div class="toolbar-left">
+    <template #toolbar-left>
+      <Button
+        label="Back to Budget List"
+        icon="pi pi-arrow-left"
+        outlined
+        size="small"
+        data-testid="back-btn"
+        @click="router.push('/budgets')"
+      />
+      <a
+        :href="`#/transactions?budget_id=${route.params.id}`"
+        class="view-transactions-link"
+        data-testid="view-transactions-btn"
+        >View Transactions</a
+      >
+    </template>
+    <template #toolbar-right>
+      <Button
+        v-if="!store.isEditMode"
+        label="Edit"
+        data-testid="edit-btn"
+        size="small"
+        @click="store.enterEditMode()"
+      />
+      <template v-else>
+        <Button label="Save" data-testid="save-btn" size="small" @click="onSave" />
         <Button
-          label="Back to Budget List"
-          icon="pi pi-arrow-left"
-          outlined
+          label="Cancel"
+          severity="secondary"
+          data-testid="cancel-btn"
           size="small"
-          data-testid="back-btn"
-          @click="router.push('/budgets')"
+          @click="onCancel"
         />
-        <a
-          :href="`#/transactions?budget_id=${route.params.id}`"
-          class="view-transactions-link"
-          data-testid="view-transactions-btn"
-          >View Transactions</a
-        >
-      </div>
-      <div class="toolbar-right">
-        <Button
-          v-if="!store.isEditMode"
-          label="Edit"
-          data-testid="edit-btn"
-          size="small"
-          @click="store.enterEditMode()"
-        />
-        <template v-else>
-          <Button label="Save" data-testid="save-btn" size="small" @click="onSave" />
-          <Button
-            label="Cancel"
-            severity="secondary"
-            data-testid="cancel-btn"
-            size="small"
-            @click="onCancel"
-          />
-        </template>
-      </div>
+      </template>
     </template>
 
     <!-- Budget Summary Strip -->
@@ -106,21 +104,6 @@ async function onCancel() {
 </script>
 
 <style scoped>
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
 .content-area {
   flex: 1;
   min-height: 0;

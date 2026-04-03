@@ -1,16 +1,17 @@
 <template>
   <div class="ec-page-layout" :class="`ec-page-layout--${variant}`" :data-page="pageName">
-    <div v-if="$slots.toolbar" class="ec-page-layout__toolbar">
+    <div v-if="$slots['toolbar-left'] || $slots['toolbar-right']" class="ec-page-layout__toolbar">
+      <div class="ec-page-layout__toolbar-left">
+        <slot name="toolbar-left" />
+      </div>
+      <div class="ec-page-layout__toolbar-right">
+        <slot name="toolbar-right" />
+      </div>
+    </div>
+    <div v-else-if="$slots.toolbar" class="ec-page-layout__toolbar">
       <slot name="toolbar" />
     </div>
-    <template v-if="variant === 'fixed'">
-      <div class="ec-page-layout__content-card">
-        <slot />
-      </div>
-    </template>
-    <template v-else>
-      <slot />
-    </template>
+    <slot />
   </div>
 </template>
 
@@ -48,13 +49,18 @@ const { pageName, variant = 'scrollable' } = defineProps<{
   flex-shrink: 0;
 }
 
-.ec-page-layout__content-card {
-  flex: 1;
+.ec-page-layout__toolbar-left {
   display: flex;
-  flex-direction: column;
-  overflow: auto;
-  border: 1px solid var(--p-surface-300);
-  border-radius: 6px;
-  background-color: var(--p-surface-0);
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ec-page-layout__toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
 }
 </style>

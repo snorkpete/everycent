@@ -1,61 +1,62 @@
 <template>
   <EcPageLayout page-name="sink-funds" variant="fixed">
-    <template #toolbar>
-      <div class="toolbar-left">
-        <Select
-          v-model="selectedSinkFundId"
-          :options="store.sinkFunds"
-          option-label="name"
-          option-value="id"
-          placeholder="Select Sink Fund"
-          data-testid="sink-fund-select"
-          @update:model-value="onSinkFundChange"
+    <template #toolbar-left>
+      <Select
+        v-model="selectedSinkFundId"
+        :options="store.sinkFunds"
+        option-label="name"
+        option-value="id"
+        placeholder="Select Sink Fund"
+        data-testid="sink-fund-select"
+        @update:model-value="onSinkFundChange"
+      />
+    </template>
+    <template #toolbar-right>
+      <ToggleSwitch
+        v-model="store.showDeactivated"
+        data-testid="show-closed-toggle"
+        input-id="show-closed-toggle"
+      />
+      <label for="show-closed-toggle" class="toggle-label">Show Closed Obligations?</label>
+      <EcToolbarSeparator />
+      <template v-if="!store.isEditMode">
+        <Button
+          label="Transfer Money"
+          size="small"
+          data-testid="transfer-btn"
+          @click="showTransferDialog = true"
         />
-      </div>
-      <div class="toolbar-right">
-        <ToggleSwitch
-          v-model="store.showDeactivated"
-          data-testid="show-closed-toggle"
-          input-id="show-closed-toggle"
+        <Button label="Edit" size="small" data-testid="edit-btn" @click="store.enterEditMode()" />
+      </template>
+      <template v-else>
+        <Button
+          label="Add Obligation"
+          outlined
+          size="small"
+          data-testid="add-obligation-btn"
+          @click="onAddObligation"
         />
-        <label for="show-closed-toggle" class="toggle-label">Show Closed Obligations?</label>
-        <span class="toolbar-separator" />
-        <template v-if="!store.isEditMode">
-          <Button
-            label="Transfer Money"
-            size="small"
-            data-testid="transfer-btn"
-            @click="showTransferDialog = true"
-          />
-          <Button label="Edit" size="small" data-testid="edit-btn" @click="store.enterEditMode()" />
-        </template>
-        <template v-else>
-          <Button
-            label="Add Obligation"
-            outlined
-            size="small"
-            data-testid="add-obligation-btn"
-            @click="onAddObligation"
-          />
-          <Button label="Save" size="small" data-testid="save-btn" @click="onSave" />
-          <Button
-            label="Cancel"
-            severity="secondary"
-            size="small"
-            data-testid="cancel-btn"
-            @click="onCancel"
-          />
-        </template>
-      </div>
+        <Button label="Save" size="small" data-testid="save-btn" @click="onSave" />
+        <Button
+          label="Cancel"
+          severity="secondary"
+          size="small"
+          data-testid="cancel-btn"
+          @click="onCancel"
+        />
+      </template>
     </template>
 
-    <div v-if="store.loading" class="loading-placeholder" data-testid="loading-placeholder">
-      Loading…
+    <!-- Content card -->
+    <div class="content-card">
+      <div v-if="store.loading" class="loading-placeholder" data-testid="loading-placeholder">
+        Loading…
+      </div>
+      <div v-else-if="!store.sinkFund" class="empty-placeholder" data-testid="empty-placeholder">
+        Select a sink fund to view obligations.
+      </div>
+      <SinkFundAllocationTable v-else />
     </div>
-    <div v-else-if="!store.sinkFund" class="empty-placeholder" data-testid="empty-placeholder">
-      Select a sink fund to view obligations.
-    </div>
-    <SinkFundAllocationTable v-else />
 
     <SinkFundTransferDialog v-model:visible="showTransferDialog" />
   </EcPageLayout>
@@ -65,6 +66,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
+import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import ToggleSwitch from 'primevue/toggleswitch';
@@ -119,35 +121,22 @@ function onAddObligation() {
 </script>
 
 <style scoped>
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
-.toolbar-separator {
-  display: block;
-  width: 1px;
-  height: 1.25rem;
-  background-color: var(--p-surface-300);
-  margin: 0 0.25rem;
-  flex-shrink: 0;
-}
-
 .toggle-label {
   font-size: 0.875rem;
   color: var(--p-text-color);
   white-space: nowrap;
   cursor: pointer;
+}
+
+.content-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--p-surface-300);
+  border-radius: 6px;
+  background-color: var(--p-surface-0);
+  margin-bottom: 0.75rem;
 }
 
 .loading-placeholder,

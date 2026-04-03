@@ -1,40 +1,38 @@
 <template>
   <EcPageLayout page-name="import" variant="fixed">
-    <template #toolbar>
-      <div class="toolbar-left">
-        <label class="budget-label">Budget:</label>
-        <Select
-          v-model="selectedBudgetId"
-          :options="store.currentAndPastBudgets"
-          option-label="name"
-          option-value="id"
-          placeholder="Select budget"
-          data-testid="budget-select"
-          class="budget-select"
-          @update:model-value="onBudgetChange"
+    <template #toolbar-left>
+      <label class="budget-label">Budget:</label>
+      <Select
+        v-model="selectedBudgetId"
+        :options="store.currentAndPastBudgets"
+        option-label="name"
+        option-value="id"
+        placeholder="Select budget"
+        data-testid="budget-select"
+        class="budget-select"
+        @update:model-value="onBudgetChange"
+      />
+      <Message
+        v-if="store.selectedBudget && !store.isBudgetCurrent"
+        severity="warn"
+        :closable="false"
+        data-testid="budget-warning"
+        class="budget-warning"
+      >
+        Warning: This is not the current budget.
+      </Message>
+    </template>
+    <template #toolbar-right>
+      <router-link :to="{ name: 'transactions' }" class="nav-link">
+        <Button
+          icon="pi pi-arrow-left"
+          label="Transactions"
+          text
+          severity="secondary"
+          size="small"
+          data-testid="back-to-transactions-btn"
         />
-        <Message
-          v-if="store.selectedBudget && !store.isBudgetCurrent"
-          severity="warn"
-          :closable="false"
-          data-testid="budget-warning"
-          class="budget-warning"
-        >
-          Warning: This is not the current budget.
-        </Message>
-      </div>
-      <div class="toolbar-right">
-        <router-link :to="{ name: 'transactions' }" class="nav-link">
-          <Button
-            icon="pi pi-arrow-left"
-            label="Transactions"
-            text
-            severity="secondary"
-            size="small"
-            data-testid="back-to-transactions-btn"
-          />
-        </router-link>
-      </div>
+      </router-link>
     </template>
 
     <!-- Content area -->
@@ -393,21 +391,6 @@ function previewRowClass(transaction: ImportTransaction) {
 </script>
 
 <style scoped>
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
 .budget-label {
   font-weight: 600;
   font-size: 0.875rem;
