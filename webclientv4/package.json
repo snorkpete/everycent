@@ -19,7 +19,7 @@
     "cypress:seed-dev-db": "tsx cypress/scripts/seed-dev-db.ts",
     "cypress:run:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress run",
     "cypress:open:dev": "CYPRESS_DATABASE_NAME=everycent_dev_4 cypress open",
-    "prepare": "cd .. && husky webclientv4/.husky"
+    "prepare": "cd .. && git config core.hooksPath webclientv4/.husky"
   },
   "lint-staged": {
     "src/**/*.{ts,vue}": [
