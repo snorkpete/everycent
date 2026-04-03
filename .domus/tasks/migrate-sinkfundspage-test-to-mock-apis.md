@@ -1,8 +1,9 @@
 # Task: Migrate SinkFundsPage test to mock APIs
 
 **ID:** migrate-sinkfundspage-test-to-mock-apis
-**Status:** proposed
-**Autonomous:** false
+**Status:** done
+**Branch:** task/migrate-sinkfundspage-test-to-mock-apis
+**Autonomous:** true
 **Priority:** high
 **Captured:** 2026-04-02
 **Parent:** migrate-page-tests-to-mock-apis-not-stores
@@ -50,6 +51,7 @@ Migrate SinkFundsPage.spec.ts from mocking sinkFundStore to mocking sinkFundApi.
 - `store.fetchDetail(id)` → `sinkFundApi.get(id)`
 - `store.save()` → `sinkFundApi.save(sinkFund)` (sets `isEditMode = false` on success)
 - `store.cancelEdit()` → re-calls `sinkFundApi.get(id)` to reload
+- `store.addObligation()` → pure client-side (pushes empty allocation to array, no API call)
 
 **Key detail:** Store has computed properties (`visibleAllocations`, `totalAssignedBalance`, `unassignedBalance`, `totalTarget`, `totalOutstanding`) all derived from `sinkFund.sink_fund_allocations`. Build allocations with specific `status`, `current_balance`, and `target` to exercise these.
 

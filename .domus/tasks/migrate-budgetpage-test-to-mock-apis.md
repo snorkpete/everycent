@@ -1,8 +1,9 @@
 # Task: Migrate BudgetPage test to mock APIs
 
 **ID:** migrate-budgetpage-test-to-mock-apis
-**Status:** proposed
-**Autonomous:** false
+**Status:** done
+**Branch:** task/migrate-budgetpage-test-to-mock-apis
+**Autonomous:** true
 **Priority:** high
 **Captured:** 2026-04-02
 **Parent:** migrate-page-tests-to-mock-apis-not-stores
@@ -52,5 +53,7 @@ Migrate BudgetPage.spec.ts from mocking budgetStore to mocking budgetApi. Store 
 - `settingsStore` — mock `settingsApi.get()` to return `buildSettings()`, then the real store works
 
 **Key detail:** `budgetStore.fetch()` calls both `budgetApi.get()` and `allocationCategoryApi.getAll()` in parallel. Both mocks must return valid data for the store to populate.
+
+**Baseline note:** Audit-quick-fixes established `useSettingsStore()` as the standard for settings access. Check whether BudgetPage.spec.ts already uses real settingsStore or still mocks it — if already migrated, skip that step.
 
 **Reference:** `LoginPage.spec.ts` follows this pattern. `docs/vue-coding-rules.md` has the conventions.

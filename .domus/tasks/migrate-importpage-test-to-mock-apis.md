@@ -1,8 +1,9 @@
 # Task: Migrate ImportPage test to mock APIs
 
 **ID:** migrate-importpage-test-to-mock-apis
-**Status:** proposed
-**Autonomous:** false
+**Status:** done
+**Branch:** task/migrate-importpage-test-to-mock-apis
+**Autonomous:** true
 **Priority:** high
 **Captured:** 2026-04-02
 **Parent:** migrate-page-tests-to-mock-apis-not-stores

@@ -1,7 +1,7 @@
 # Task: Migrate page tests to mock APIs not stores
 
 **ID:** migrate-page-tests-to-mock-apis-not-stores
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
