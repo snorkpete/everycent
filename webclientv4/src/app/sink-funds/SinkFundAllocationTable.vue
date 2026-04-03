@@ -1,6 +1,6 @@
 <template>
   <div class="allocation-list">
-    <table class="allocations-table" data-testid="allocations-table">
+    <table class="ec-budget-table allocations-table" data-testid="allocations-table">
       <thead>
         <tr>
           <th class="name-col">Name</th>
@@ -17,7 +17,7 @@
         <!-- Summary row: Sink Fund Account Balance -->
         <tr class="summary-row" data-testid="summary-row-balance">
           <td>Sink Fund Account Balance</td>
-          <td class="amount-cell"><EcMoneyDisplay :model-value="store.sinkFund?.current_balance ?? 0" highlight-mode="none" /></td>
+          <td class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.sinkFund?.current_balance ?? 0" highlight-mode="none" /></td>
           <td></td>
           <td></td>
           <td></td>
@@ -35,7 +35,7 @@
               data-testid="unassigned-tooltip"
             ></i>
           </td>
-          <td class="amount-cell"><EcMoneyDisplay :model-value="store.unassignedBalance" highlight-mode="none" /></td>
+          <td class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.unassignedBalance" highlight-mode="none" /></td>
           <td></td>
           <td></td>
           <td></td>
@@ -58,14 +58,14 @@
               v-if="store.isEditMode"
               v-model="allocation.name"
               type="text"
-              class="p-inputtext cell-input"
+              class="p-inputtext ec-budget-table__cell-input"
               data-testid="allocation-name-input"
             />
             <span v-else>{{ allocation.name }}</span>
           </td>
 
           <!-- Current Balance (always read-only) -->
-          <td class="amount-cell">
+          <td class="ec-budget-table__amount-cell">
             <span class="balance-cell">
               <EcShowTransactionsButton
                 data-testid="show-transactions-btn"
@@ -76,7 +76,7 @@
           </td>
 
           <!-- Target -->
-          <td class="amount-cell">
+          <td class="ec-budget-table__amount-cell">
             <EcMoneyField
               v-if="store.isEditMode"
               v-model="allocation.target"
@@ -87,7 +87,7 @@
           </td>
 
           <!-- Outstanding -->
-          <td class="amount-cell">
+          <td class="ec-budget-table__amount-cell">
             <EcMoneyDisplay :model-value="outstanding(allocation)" highlight-mode="balance" />
           </td>
 
@@ -97,7 +97,7 @@
               v-if="store.isEditMode"
               v-model="allocation.comment"
               type="text"
-              class="p-inputtext cell-input"
+              class="p-inputtext ec-budget-table__cell-input"
               data-testid="allocation-comment-input"
             />
             <span v-else>{{ allocation.comment }}</span>
@@ -107,7 +107,7 @@
           <td>{{ allocation.status }}</td>
 
           <!-- Actions (edit mode only) -->
-          <td v-if="store.isEditMode" class="center-cell action-buttons">
+          <td v-if="store.isEditMode" class="ec-budget-table__center-cell action-buttons">
             <EcDeleteButton
               :deleted="allocation.deleted"
               item-label="obligation"
@@ -139,9 +139,9 @@
       <tfoot>
         <tr class="total-row" data-testid="total-row">
           <th>Total</th>
-          <th class="amount-cell"><EcMoneyDisplay :model-value="store.totalAssignedBalance" highlight-mode="none" /></th>
-          <th class="amount-cell"><EcMoneyDisplay :model-value="store.totalTarget" highlight-mode="none" /></th>
-          <th class="amount-cell">
+          <th class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.totalAssignedBalance" highlight-mode="none" /></th>
+          <th class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.totalTarget" highlight-mode="none" /></th>
+          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay :model-value="store.totalOutstanding" highlight-mode="balance" />
           </th>
           <th></th>
@@ -202,6 +202,9 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
 </script>
 
 <style scoped>
+/* Shared budget table base — imported unscoped (Vue limitation) */
+@import '../shared/styles/budget-table.css';
+
 .allocation-list {
   min-height: 0;
   overflow: auto;
@@ -210,34 +213,16 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
 
 /* ── Base table ── */
 .allocations-table {
-  width: 100%;
   table-layout: fixed;
-  border-collapse: collapse;
-  font-size: 0.875rem;
   --thead-height: 2.5rem;
   --summary-row-height: 2rem;
 }
 
 .allocations-table th,
 .allocations-table td {
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* ── Sticky header ── */
-.allocations-table thead th {
-  height: var(--thead-height);
-  font-weight: 600;
-  background-color: var(--p-surface-50);
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  border-bottom: none;
-  box-shadow: 0 2px 0 var(--p-surface-300);
 }
 
 /* ── Column widths ── */
@@ -263,12 +248,7 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   width: 6%;
 }
 
-/* ── Amount cells ── */
-.amount-cell {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
+/* ── Amount column header alignment ── */
 .allocations-table thead th.balance-col,
 .allocations-table thead th.target-col,
 .allocations-table thead th.outstanding-col {
@@ -280,7 +260,7 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   font-weight: 700;
   background-color: var(--p-surface-50);
   position: sticky;
-  z-index: 9;
+  z-index: var(--z-summary-row, 9);
 }
 
 .summary-row:nth-of-type(1) td {
@@ -298,17 +278,6 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   align-items: center;
   justify-content: flex-end;
   gap: 0.25rem;
-}
-
-/* ── Edit mode inputs ── */
-.cell-input {
-  width: 100%;
-  font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
-}
-
-.center-cell {
-  text-align: center;
 }
 
 /* ── Action buttons ── */
@@ -345,21 +314,5 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   font-size: 0.8rem;
   color: var(--p-text-muted-color);
   cursor: help;
-}
-
-/* ── Sticky footer ── */
-.allocations-table tfoot th {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  background-color: var(--p-surface-100);
-  border-top: 3px solid var(--p-surface-400);
-  border-bottom: none;
-  font-weight: 600;
-}
-
-/* ── Row hover ── */
-.allocations-table tbody tr:hover td {
-  background-color: var(--p-surface-100);
 }
 </style>

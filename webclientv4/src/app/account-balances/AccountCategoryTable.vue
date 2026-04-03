@@ -6,7 +6,7 @@
         ><EcMoneyDisplay :model-value="totalCurrentBalance" emphasis="subtotal"
       /></span>
     </h3>
-    <table class="account-table">
+    <table class="ec-budget-table account-table">
       <thead>
         <tr>
           <th class="col-name">Name</th>
@@ -99,6 +99,9 @@ const totalCurrentBalance = computed(() =>
 </script>
 
 <style scoped>
+/* Shared budget table base — imported unscoped (Vue limitation) */
+@import '../../shared/styles/budget-table.css';
+
 .account-category-table {
   padding: 0.75rem 1rem;
 }
@@ -120,30 +123,11 @@ const totalCurrentBalance = computed(() =>
   font-size: 0.875rem;
 }
 
-.account-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
-
-.account-table th,
-.account-table td {
-  padding: 0.375rem 0.5rem;
-  text-align: left;
-  border-bottom: 1px solid var(--p-surface-200);
-}
-
+/* ── Header — smaller muted text ── */
 .account-table thead th {
-  font-weight: 600;
   color: var(--p-text-muted-color);
   font-size: 0.8125rem;
   white-space: nowrap;
-  background-color: var(--p-surface-50);
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  border-bottom: none;
-  box-shadow: 0 2px 0 var(--p-surface-300);
 }
 
 .account-table .money-cell {
@@ -156,12 +140,12 @@ const totalCurrentBalance = computed(() =>
   white-space: nowrap;
 }
 
+/* ── Footer — different border style than shared default ── */
 .total-row th {
-  font-weight: 600;
   border-top: 2px solid var(--p-surface-300);
   border-bottom: none;
-  background-color: var(--p-surface-100);
   font-size: 0.9375rem;
+  /* bg-color and font-weight come from ec-budget-table shared rules */
 }
 
 .account-table .total-label {
@@ -169,7 +153,8 @@ const totalCurrentBalance = computed(() =>
   color: var(--p-text-muted-color);
 }
 
-.account-table tbody tr:hover {
+/* ── Row hover — lighter than shared default ── */
+.account-table tbody tr:hover td {
   background-color: var(--p-surface-50);
 }
 

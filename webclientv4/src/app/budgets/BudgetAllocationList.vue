@@ -11,7 +11,7 @@
         @click="toggleFixedDetail"
       />
     </div>
-    <table class="allocations-table">
+    <table class="ec-budget-table allocations-table">
       <thead>
         <tr>
           <th class="name-col">Name</th>
@@ -28,23 +28,23 @@
       <tbody>
         <template v-for="category in store.allocationCategories" :key="category.id">
           <!-- Category sub-header -->
-          <tr class="category-header" :data-testid="`category-header-${category.id}`">
+          <tr class="ec-budget-table__category-header" :data-testid="`category-header-${category.id}`">
             <td>{{ category.name }}</td>
-            <td class="amount-cell">
+            <td class="ec-budget-table__amount-cell">
               <EcMoneyDisplay
                 :model-value="categoryTotals(category).amount"
                 emphasis="subtotal"
                 highlight-mode="none"
               />
             </td>
-            <td class="amount-cell">
+            <td class="ec-budget-table__amount-cell">
               <EcMoneyDisplay
                 :model-value="categoryTotals(category).spent"
                 emphasis="subtotal"
                 highlight-mode="none"
               />
             </td>
-            <td class="amount-cell">
+            <td class="ec-budget-table__amount-cell">
               <EcMoneyDisplay
                 :model-value="categoryTotals(category).remaining"
                 emphasis="subtotal"
@@ -64,7 +64,7 @@
             ]"
             :key="allocation.id || `${category.id}-${index}`"
             :class="{
-              'fixed-subtotal-row': isSummaryRow(allocation),
+              'ec-budget-table__fixed-subtotal': isSummaryRow(allocation),
               'ec-deleted': allocation.deleted,
             }"
             :data-testid="
@@ -76,7 +76,7 @@
                 v-if="isEditable(allocation)"
                 v-model="allocation.name"
                 type="text"
-                class="p-inputtext cell-input"
+                class="p-inputtext ec-budget-table__cell-input"
                 data-testid="allocation-name-input"
               />
               <span v-else>
@@ -84,11 +84,11 @@
                 <i
                   v-if="allocation.is_fixed_amount && !isSummaryRow(allocation)"
                   v-tooltip="'Fixed allocation'"
-                  class="pi pi-lock fixed-icon"
+                  class="pi pi-lock ec-budget-table__fixed-icon"
                 ></i>
               </span>
             </td>
-            <td class="amount-cell">
+            <td class="ec-budget-table__amount-cell">
               <EcMoneyField
                 v-if="isEditable(allocation)"
                 v-model="allocation.amount"
@@ -102,7 +102,7 @@
                 highlight-mode="none"
               />
             </td>
-            <td class="amount-cell">
+            <td class="ec-budget-table__amount-cell">
               <span class="spent-cell">
                 <EcShowTransactionsButton
                   v-if="!isSummaryRow(allocation)"
@@ -116,7 +116,7 @@
                 />
               </span>
             </td>
-            <td class="amount-cell">
+            <td class="ec-budget-table__amount-cell">
               <EcMoneyDisplay
                 :model-value="remaining(allocation)"
                 :emphasis="emphasisFor(allocation)"
@@ -137,7 +137,7 @@
                 titleCase(allocation.allocation_class)
               }}</span>
             </td>
-            <td class="center-cell">
+            <td class="ec-budget-table__center-cell">
               <input
                 v-if="isEditable(allocation)"
                 v-model="allocation.is_fixed_amount"
@@ -153,12 +153,12 @@
                 v-if="isEditable(allocation)"
                 v-model="allocation.comment"
                 type="text"
-                class="p-inputtext cell-input"
+                class="p-inputtext ec-budget-table__cell-input"
                 data-testid="allocation-comment-input"
               />
               <span v-else-if="!isSummaryRow(allocation)">{{ allocation.comment }}</span>
             </td>
-            <td v-if="store.isEditMode" class="center-cell">
+            <td v-if="store.isEditMode" class="ec-budget-table__center-cell">
               <EcDeleteButton
                 v-if="isEditable(allocation)"
                 :deleted="allocation.deleted"
@@ -172,12 +172,12 @@
           <!-- Add allocation button -->
           <tr
             v-if="store.isEditMode"
-            class="add-row"
+            class="ec-budget-table__add-row"
             :data-testid="`add-allocation-row-${category.id}`"
           >
             <td :colspan="8">
               <button
-                class="add-link"
+                class="ec-budget-table__add-link"
                 :data-testid="`add-allocation-btn-${category.id}`"
                 @click="addAllocation(category)"
               >
@@ -189,23 +189,23 @@
       </tbody>
 
       <tfoot>
-        <tr v-if="!isFixedDetailVisible" class="fixed-total-row" data-testid="fixed-total-row">
+        <tr v-if="!isFixedDetailVisible" class="ec-budget-table__fixed-total" data-testid="fixed-total-row">
           <th>Fixed Total</th>
-          <th class="amount-cell">
+          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay
               :model-value="fixedTotals.amount"
               emphasis="total"
               highlight-mode="none"
             />
           </th>
-          <th class="amount-cell">
+          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay
               :model-value="fixedTotals.spent"
               emphasis="total"
               highlight-mode="none"
             />
           </th>
-          <th class="amount-cell">
+          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay :model-value="fixedTotals.remaining" emphasis="total" />
           </th>
           <th></th>
@@ -215,21 +215,21 @@
         </tr>
         <tr class="total-row" data-testid="total-row">
           <th>Total</th>
-          <th class="amount-cell">
+          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay
               :model-value="grandTotals.amount"
               emphasis="total"
               highlight-mode="none"
             />
           </th>
-          <th class="amount-cell">
+          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay
               :model-value="grandTotals.spent"
               emphasis="total"
               highlight-mode="none"
             />
           </th>
-          <th class="amount-cell">
+          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay :model-value="grandTotals.remaining" emphasis="total" />
           </th>
           <th></th>
@@ -346,6 +346,9 @@ function addAllocation(category: AllocationCategoryData) {
 </script>
 
 <style scoped>
+/* Shared budget table base — imported unscoped (Vue limitation) */
+@import '../shared/styles/budget-table.css';
+
 .allocation-list {
   min-height: 0;
 }
@@ -360,66 +363,15 @@ function addAllocation(category: AllocationCategoryData) {
 
 /* ── Base table ── */
 .allocations-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
   --thead-height: 2.5rem;
 }
 
 .allocations-table th,
 .allocations-table td {
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
   white-space: nowrap;
 }
 
-/* ── Sticky header ── */
-.allocations-table thead th {
-  height: var(--thead-height);
-  font-weight: 600;
-  background-color: var(--p-surface-50);
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  border-bottom: none;
-  box-shadow: 0 2px 0 var(--p-surface-300);
-}
-
-/* ── Sticky category headers ── */
-.allocations-table .category-header td {
-  position: sticky;
-  top: var(--thead-height);
-  z-index: 5;
-  background-color: var(--p-primary-50);
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 0.55rem 0.75rem;
-  border-top: 2px solid var(--p-primary-200);
-}
-
-.allocations-table .category-header td:first-child {
-  z-index: 15;
-  box-shadow: inset 3px 0 0 var(--p-primary-400);
-}
-
-/* ── Sticky footer ── */
-.allocations-table tfoot th {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  background-color: var(--p-surface-100);
-  border-top: 3px solid var(--p-surface-400);
-  border-bottom: none;
-  font-weight: 600;
-}
-
-/* ── Amount cells ── */
-.amount-cell {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
+/* ── Amount column header alignment ── */
 .allocations-table thead th.amount-col,
 .allocations-table thead th.spent-col,
 .allocations-table thead th.remaining-col {
@@ -457,13 +409,7 @@ function addAllocation(category: AllocationCategoryData) {
   gap: 0.25rem;
 }
 
-/* ── Edit mode inputs ── */
-.cell-input {
-  width: 100%;
-  font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
-}
-
+/* ── Class select (edit mode) ── */
 .cell-select {
   width: 100%;
   font-size: 0.85rem;
@@ -473,64 +419,9 @@ function addAllocation(category: AllocationCategoryData) {
   background-color: var(--p-surface-0);
 }
 
-.center-cell {
-  text-align: center;
-}
-
-/* ── Add allocation link ── */
-.add-row td {
-  padding-top: 0.2rem;
-  padding-bottom: 0.4rem;
-  border-bottom: none;
-}
-
-.add-link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--p-primary-color);
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-family: inherit;
-  font-weight: 500;
-  opacity: 0.65;
-  transition: opacity 0.15s;
-}
-
-.add-link:hover {
-  opacity: 1;
-}
-
 /* ── Class display ── */
 .class-display {
   font-size: 0.85rem;
 }
 
-/* ── Fixed indicator icon ── */
-.fixed-icon {
-  font-size: 0.75rem;
-  margin-left: 0.35rem;
-  color: var(--p-text-muted-color);
-}
-
-/* ── Fixed subtotal row ── */
-.fixed-subtotal-row td {
-  background-color: var(--p-surface-100);
-  font-weight: 600;
-  color: var(--p-text-color);
-  border-bottom: 2px solid var(--p-surface-200);
-}
-
-/* ── Fixed total row (footer) ── */
-.fixed-total-row th {
-  background-color: var(--p-surface-50);
-  font-weight: 500;
-  font-style: italic;
-  color: var(--p-text-muted-color);
-}
-
-/* ── Row hover ── */
-.allocations-table tbody tr:hover td {
-  background-color: var(--p-surface-100);
-}
 </style>

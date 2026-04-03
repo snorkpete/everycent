@@ -14,7 +14,7 @@
       />
     </div>
 
-    <table class="income-table">
+    <table class="ec-budget-table income-table">
       <thead>
         <tr>
           <th class="col-name">Name</th>
@@ -107,6 +107,9 @@ function toggleDeleted(income: IncomeData) {
 </script>
 
 <style scoped>
+/* Shared budget table base — imported unscoped (Vue limitation) */
+@import '../shared/styles/budget-table.css';
+
 .budget-income-list {
   padding: 0.75rem 1rem;
 }
@@ -128,37 +131,15 @@ function toggleDeleted(income: IncomeData) {
 }
 
 /* ── Table ── */
-.income-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
-
 .income-table th,
 .income-table td {
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
   white-space: nowrap;
 }
 
-/* ── Sticky header ── */
-.income-table thead th {
-  font-weight: 600;
-  background-color: var(--p-surface-50);
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  border-bottom: none;
-  box-shadow: 0 2px 0 var(--p-surface-300);
-}
-
-/* ── Footer ── */
+/* ── Footer — thinner top border than shared default ── */
 .income-table tfoot th {
-  font-weight: 600;
-  background-color: var(--p-surface-100);
   border-top: 2px solid var(--p-surface-400);
-  border-bottom: none;
+  /* position/z-index/bg/font-weight come from ec-budget-table shared rules */
 }
 
 /* ── Columns ── */
@@ -182,10 +163,5 @@ function toggleDeleted(income: IncomeData) {
   width: 100%;
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
-}
-
-/* ── Row hover ── */
-.income-table tbody tr:hover td {
-  background-color: var(--p-surface-100);
 }
 </style>

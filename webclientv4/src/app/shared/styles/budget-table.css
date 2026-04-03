@@ -1,0 +1,145 @@
+/*
+  budget-table.css — shared styles for the budget table family.
+
+  Import at the top of <style scoped> in consumer components:
+    @import '../../shared/styles/budget-table.css';
+
+  NOTE: @import inside <style scoped> is NOT scoped by Vue — these rules are
+  injected globally. The `ec-budget-table` prefix keeps them from colliding.
+*/
+
+/* Z-index scale for sticky table elements */
+.ec-budget-table {
+  --z-table-row: 1;
+  --z-category-header: 5;
+  --z-summary-row: 9;
+  --z-table-header: 10;
+  --z-table-footer: 10;
+  --z-category-accent: 15;
+  --z-corner: 20;
+}
+
+/* ── Base table ── */
+.ec-budget-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+/* ── Cell padding ── */
+.ec-budget-table th,
+.ec-budget-table td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--p-surface-200);
+}
+
+/* ── Sticky header ── */
+.ec-budget-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-table-header);
+  background-color: var(--p-surface-50);
+  font-weight: 600;
+  text-align: left;
+  border-bottom: none;
+  box-shadow: 0 2px 0 var(--p-surface-300);
+}
+
+/* ── Sticky footer ── */
+.ec-budget-table tfoot th {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-table-footer);
+  background-color: var(--p-surface-100);
+  border-top: 3px solid var(--p-surface-400);
+  border-bottom: none;
+  font-weight: 600;
+}
+
+/* ── Row hover ── */
+.ec-budget-table tbody tr:hover td {
+  background-color: var(--p-surface-100);
+}
+
+/* ── Amount cell (right-aligned, tabular numerals) ── */
+.ec-budget-table__amount-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Center cell ── */
+.ec-budget-table__center-cell {
+  text-align: center;
+}
+
+/* ── Edit mode input ── */
+.ec-budget-table__cell-input {
+  width: 100%;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* ── Add row ── */
+.ec-budget-table__add-row td {
+  padding-top: 0.2rem;
+  padding-bottom: 0.4rem;
+  border-bottom: none;
+}
+
+/* ── Add link button ── */
+.ec-budget-table__add-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--p-primary-color);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 500;
+  opacity: 0.65;
+  transition: opacity 0.15s;
+}
+
+.ec-budget-table__add-link:hover {
+  opacity: 1;
+}
+
+/* ── Sticky category header rows ── */
+.ec-budget-table__category-header td {
+  position: sticky;
+  top: var(--thead-height);
+  z-index: var(--z-category-header);
+  background-color: var(--p-primary-50);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.75rem;
+  border-top: 2px solid var(--p-primary-200);
+}
+
+.ec-budget-table__category-header td:first-child {
+  z-index: var(--z-category-accent);
+  box-shadow: inset 3px 0 0 var(--p-primary-400);
+}
+
+/* ── Fixed allocation subtotal rows ── */
+.ec-budget-table__fixed-subtotal td {
+  background-color: var(--p-surface-100);
+  font-weight: 600;
+  color: var(--p-text-color);
+  border-bottom: 2px solid var(--p-surface-200);
+}
+
+/* ── Fixed allocation total rows (footer) ── */
+.ec-budget-table__fixed-total th {
+  background-color: var(--p-surface-50);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--p-text-muted-color);
+}
+
+/* ── Lock icon for fixed allocations ── */
+.ec-budget-table__fixed-icon {
+  font-size: 0.75rem;
+  margin-left: 0.35rem;
+  color: var(--p-text-muted-color);
+}

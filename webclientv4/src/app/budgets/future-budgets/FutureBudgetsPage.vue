@@ -19,7 +19,7 @@
     </div>
 
     <div class="table-wrapper">
-      <table class="budgets-table">
+      <table class="ec-budget-table budgets-table">
         <thead>
           <tr>
             <th class="name-col"></th>
@@ -51,10 +51,10 @@
             </td>
           </tr>
 
-          <tr class="add-row" data-testid="add-income-row">
+          <tr class="ec-budget-table__add-row" data-testid="add-income-row">
             <td :colspan="colSpan">
               <button
-                class="add-link"
+                class="ec-budget-table__add-link"
                 data-testid="add-income-btn"
                 @click="openIncomeDialog('New Income')"
               >
@@ -80,7 +80,7 @@
           </tr>
 
           <template v-for="category in store.allocationCategories" :key="category.id">
-            <tr class="category-header" :data-testid="`category-header-${category.id}`">
+            <tr class="ec-budget-table__category-header" :data-testid="`category-header-${category.id}`">
               <td>{{ category.name }}</td>
               <td v-for="budget in store.budgets" :key="budget.id">
                 <EcMoneyDisplay :model-value="categoryTotalFor(category, budget)" :highlight-mode="HighlightMode.None" />
@@ -90,7 +90,7 @@
             <!-- Fixed subtotal row (variable-only mode) — below category header -->
             <tr
               v-if="variableOnly && hasFixedAllocationsInCategory(category)"
-              class="fixed-subtotal-row"
+              class="ec-budget-table__fixed-subtotal"
               :data-testid="`fixed-subtotal-${category.id}`"
             >
               <td>Fixed</td>
@@ -114,12 +114,12 @@
                   <i
                     v-if="category.id != null && isFixedInAllBudgets(category.id, allocName)"
                     v-tooltip="'Fixed in all budgets'"
-                    class="pi pi-lock fixed-icon fixed-icon--all"
+                    class="pi pi-lock ec-budget-table__fixed-icon fixed-icon--all"
                   ></i>
                   <i
                     v-else-if="category.id != null && isFixedInSomeBudgets(category.id, allocName)"
                     v-tooltip="'Fixed in some budgets'"
-                    class="pi pi-lock-open fixed-icon fixed-icon--some"
+                    class="pi pi-lock-open ec-budget-table__fixed-icon fixed-icon--some"
                   ></i>
                 </button>
               </td>
@@ -128,10 +128,10 @@
               </td>
             </tr>
 
-            <tr class="add-row" :data-testid="`add-allocation-row-${category.id}`">
+            <tr class="ec-budget-table__add-row" :data-testid="`add-allocation-row-${category.id}`">
               <td :colspan="colSpan">
                 <button
-                  class="add-link"
+                  class="ec-budget-table__add-link"
                   :data-testid="`add-allocation-btn-${category.id}`"
                   @click="openAllocationDialog(category, 'New Allocation')"
                 >
@@ -180,7 +180,7 @@
 
         <!-- Single-row tfoot enables position: sticky; bottom: 0 -->
         <tfoot>
-          <tr v-if="variableOnly" class="fixed-total-row" data-testid="fixed-total-row">
+          <tr v-if="variableOnly" class="ec-budget-table__fixed-total" data-testid="fixed-total-row">
             <th>Fixed Total</th>
             <th v-for="budget in store.budgets" :key="budget.id">
               <EcMoneyDisplay
@@ -354,6 +354,9 @@ async function onSave(payload: MassUpdatePayload) {
 </script>
 
 <style scoped>
+/* Shared budget table base — imported unscoped (Vue limitation) */
+@import '../../shared/styles/budget-table.css';
+
 /* ── Page header ── */
 .page-header {
   display: flex;
@@ -372,9 +375,6 @@ async function onSave(payload: MassUpdatePayload) {
 
 /* ── Base table ── */
 .budgets-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
   /*
     Fixed thead height so the sticky category-header top offset is exact.
     If you change the two-line header font sizes, update this too.
@@ -384,26 +384,7 @@ async function onSave(payload: MassUpdatePayload) {
 
 .budgets-table th,
 .budgets-table td {
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
   white-space: nowrap;
-}
-
-/* ────────────────────────────
-   STICKY: header (top)
-   z-index 10 so it sits above category headers (5) and regular rows
-──────────────────────────── */
-.budgets-table thead th {
-  height: var(--thead-height);
-  font-weight: 600;
-  background-color: var(--p-surface-50);
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  /* box-shadow replaces border-bottom to avoid border-collapse artifacts */
-  border-bottom: none;
-  box-shadow: 0 2px 0 var(--p-surface-300);
 }
 
 /* Budget column headers right-aligned to match the amounts below */
@@ -411,59 +392,46 @@ async function onSave(payload: MassUpdatePayload) {
   text-align: right;
 }
 
-/* ────────────────────────────
-   STICKY: footer (bottom)
-   Single row in tfoot — position: sticky bottom just works
-──────────────────────────── */
+/* ── Footer — extra bottom padding for visual breathing room ── */
 .budgets-table tfoot th {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  background-color: var(--p-surface-100);
-  border-top: 3px solid var(--p-surface-400);
-  border-bottom: none;
   padding-bottom: 10px;
 }
 
 /* ────────────────────────────
    STICKY: first column (left)
-   z-index 1 so regular rows scroll cleanly behind it
+   z-index var(--z-table-row) so regular rows scroll cleanly behind it
 ──────────────────────────── */
 .budgets-table td:first-child,
 .budgets-table th:first-child {
   position: sticky;
   left: 0;
-  z-index: 1;
+  z-index: var(--z-table-row);
   background-color: var(--p-surface-0);
 }
 
 /* Corner: thead ─ highest z-index beats both sticky axes */
 .budgets-table thead th:first-child {
-  z-index: 20;
+  z-index: var(--z-corner);
   background-color: var(--p-surface-50);
 }
 
 /* Corner: tfoot */
 .budgets-table tfoot th:first-child {
-  z-index: 20;
+  z-index: var(--z-corner);
   background-color: var(--p-surface-100);
 }
 
 /* ────────────────────────────
    STICKY: category headers
-   Sit just below the thead, above regular rows.
-   Each one is pushed off as the next scrolls into position.
+   The shared ec-budget-table__category-header rules set position/top/z-index/bg.
+   Override background for FutureBudgetsPage (uses surface-50, not primary-50).
 ──────────────────────────── */
-.budgets-table .category-header td {
-  position: sticky;
-  top: var(--thead-height);
-  z-index: 5;
+.budgets-table .ec-budget-table__category-header td {
   background-color: var(--p-surface-50);
 }
 
-/* Category header first cell: above sticky first-column regular rows (z-index 1) */
-.budgets-table .category-header td:first-child {
-  z-index: 15;
+/* Category header first cell: above sticky first-column regular rows */
+.budgets-table .ec-budget-table__category-header td:first-child {
   background-color: var(--p-surface-50);
 }
 
@@ -482,17 +450,9 @@ async function onSave(payload: MassUpdatePayload) {
   background-color: var(--p-surface-100);
 }
 
-/* ── Category headers — slightly larger, left accent bar ── */
-.category-header td {
-  font-weight: 700;
-  font-size: 0.9rem;
-  padding: 0.55rem 0.75rem;
-  border-top: 2px solid var(--p-primary-200);
-}
-
-.category-header td:first-child {
-  /* Coloured left border accent via box-shadow to avoid border-collapse issues */
-  box-shadow: inset 3px 0 0 var(--p-primary-400);
+/* ── Fixed subtotal row — extra font-size vs shared default ── */
+.ec-budget-table__fixed-subtotal td {
+  font-size: 0.95rem;
 }
 
 /* ── Total rows ── */
@@ -553,25 +513,7 @@ async function onSave(payload: MassUpdatePayload) {
   color: var(--p-text-muted-color);
 }
 
-/* ── Fixed subtotal row ── */
-.fixed-subtotal-row td {
-  background-color: var(--p-surface-100);
-  font-weight: 600;
-  color: var(--p-text-color);
-  font-size: 0.95rem;
-  border-bottom: 2px solid var(--p-surface-200);
-}
-
-/* ── Fixed total row (footer) ── */
-.fixed-total-row th {
-  background-color: var(--p-surface-50);
-  font-weight: 500;
-  font-style: italic;
-  color: var(--p-text-muted-color);
-}
-
-/* ── Row hover ── */
-.budgets-table tbody tr:hover td,
+/* ── Row hover — also applies to th cells and first-child ── */
 .budgets-table tbody tr:hover th {
   background-color: var(--p-surface-100);
 }
@@ -599,38 +541,9 @@ async function onSave(payload: MassUpdatePayload) {
   text-decoration-color: currentColor;
 }
 
-/* ── Fixed indicator icon ── */
-.fixed-icon {
-  font-size: 0.75rem;
-  margin-left: 0.35rem;
-}
-
+/* ── Fixed indicator icon modifiers ── */
 .fixed-icon--all,
 .fixed-icon--some {
   color: var(--p-text-muted-color);
-}
-
-/* ── Add link ── */
-.add-row td {
-  padding-top: 0.2rem;
-  padding-bottom: 0.4rem;
-  border-bottom: none;
-}
-
-.add-link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--p-primary-color);
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-family: inherit;
-  font-weight: 500;
-  opacity: 0.65;
-  transition: opacity 0.15s;
-}
-
-.add-link:hover {
-  opacity: 1;
 }
 </style>
