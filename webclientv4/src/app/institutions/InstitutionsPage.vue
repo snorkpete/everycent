@@ -10,18 +10,17 @@
           @click="editInstitution(institution)"
         />
       </template>
+      <template #page-actions>
+        <Button label="Add Institution" data-testid="add-btn" @click="addInstitution" />
+        <Button
+          label="Refresh"
+          severity="secondary"
+          data-testid="refresh-btn"
+          :loading="store.loading"
+          @click="refresh"
+        />
+      </template>
     </EcItemList>
-
-    <div class="page-actions">
-      <Button label="Add Institution" data-testid="add-btn" @click="addInstitution" />
-      <Button
-        label="Refresh"
-        severity="secondary"
-        data-testid="refresh-btn"
-        :loading="store.loading"
-        @click="refresh"
-      />
-    </div>
 
     <InstitutionEditDialog
       :visible="dialogVisible"
@@ -87,10 +86,5 @@ async function onSave(institution: InstitutionData) {
 <style scoped>
 .institution-name {
   font-size: 0.9rem;
-}
-
-.page-actions {
-  display: flex;
-  gap: 0.75rem;
 }
 </style>

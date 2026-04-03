@@ -1,21 +1,5 @@
 <template>
   <EcPageLayout page-name="bank-accounts">
-    <div class="controls" data-testid="controls">
-      <label class="toggle-label">
-        <ToggleSwitch
-          v-model="showClosed"
-          data-testid="show-closed-toggle"
-          input-id="show-closed"
-        />
-        <span>Show Closed Accounts</span>
-      </label>
-
-      <div class="page-actions">
-        <Button label="Add Bank Account" data-testid="add-btn" @click="addAccount" />
-        <Button label="Refresh" severity="secondary" data-testid="refresh-btn" @click="refresh" />
-      </div>
-    </div>
-
     <EcItemList :items="visibleAccounts" key-field="id">
       <template #item="{ item: account }">
         <span
@@ -38,6 +22,20 @@
           @click="viewAccount(account)"
         />
       </template>
+      <template #controls>
+        <label class="toggle-label">
+          <ToggleSwitch
+            v-model="showClosed"
+            data-testid="show-closed-toggle"
+            input-id="show-closed"
+          />
+          <span>Show Closed Accounts</span>
+        </label>
+      </template>
+      <template #page-actions>
+        <Button label="Add Bank Account" data-testid="add-btn" @click="addAccount" />
+        <Button label="Refresh" severity="secondary" data-testid="refresh-btn" @click="refresh" />
+      </template>
     </EcItemList>
 
     <BankAccountEditDialog
@@ -54,13 +52,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
-import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Tag from 'primevue/tag';
 import ToggleSwitch from 'primevue/toggleswitch';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
+import EcItemList from '../shared/layout/EcItemList.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useBankAccountStore } from './bankAccountStore';
 import { useNotifications } from '../notifications/useNotifications';
-import EcItemList from '../shared/layout/EcItemList.vue';
 import BankAccountEditDialog from './BankAccountEditDialog.vue';
 import type { BankAccountData } from './bankAccount.types';
 
@@ -111,12 +109,6 @@ async function onSave(account: BankAccountData) {
 </script>
 
 <style scoped>
-.controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .toggle-label {
   display: flex;
   align-items: center;
@@ -134,10 +126,5 @@ async function onSave(account: BankAccountData) {
 
 .status-tag {
   font-size: 0.75rem;
-}
-
-.page-actions {
-  display: flex;
-  gap: 0.75rem;
 }
 </style>

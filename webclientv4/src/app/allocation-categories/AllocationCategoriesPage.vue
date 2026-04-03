@@ -10,12 +10,11 @@
           @click="editCategory(category)"
         />
       </template>
+      <template #page-actions>
+        <Button label="Add Allocation Category" data-testid="add-btn" @click="addCategory" />
+        <Button label="Refresh" severity="secondary" data-testid="refresh-btn" @click="refresh" />
+      </template>
     </EcItemList>
-
-    <div class="page-actions">
-      <Button label="Add Allocation Category" data-testid="add-btn" @click="addCategory" />
-      <Button label="Refresh" severity="secondary" data-testid="refresh-btn" @click="refresh" />
-    </div>
 
     <AllocationCategoryEditDialog
       :visible="dialogVisible"
@@ -81,10 +80,5 @@ async function onSave(category: AllocationCategoryData) {
 <style scoped>
 .category-name {
   font-size: 0.9rem;
-}
-
-.page-actions {
-  display: flex;
-  gap: 0.75rem;
 }
 </style>

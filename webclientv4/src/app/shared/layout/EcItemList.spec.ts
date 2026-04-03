@@ -19,6 +19,8 @@ function createWrapper(
     items?: TestItem[];
     keyField?: string;
     actionsRight?: boolean;
+    actionsPosition?: 'top' | 'bottom';
+    slots?: Record<string, string>;
   } = {},
 ): VueWrapper {
   return mount(EcItemList, {
@@ -26,9 +28,11 @@ function createWrapper(
       items: options.items ?? items,
       ...(options.keyField !== undefined && { keyField: options.keyField }),
       ...(options.actionsRight !== undefined && { actionsRight: options.actionsRight }),
+      ...(options.actionsPosition !== undefined && { actionsPosition: options.actionsPosition }),
     },
     slots: {
       item: `<template #item="{ item }"><span class="item-content">{{ item.name }}</span><button class="action-btn">Edit</button></template>`,
+      ...options.slots,
     },
   });
 }
@@ -75,22 +79,18 @@ describe('EcItemList', () => {
     });
 
     it('uses a custom key field when provided', () => {
-      const customItems = [
-        { id: 1, name: 'Alpha', code: 'A' },
-        { id: 2, name: 'Beta', code: 'B' },
-      ];
-
-      const wrapper = mount(EcItemList, {
-        props: { items: customItems, keyField: 'code' },
-        slots: {
-          item: `<template #item="{ item }"><span>{{ item.name }}</span></template>`,
-        },
+      const wrapper = createWrapper({
+        items: [
+          { id: 1, name: 'Alpha', code: 'A' },
+          { id: 2, name: 'Beta', code: 'B' },
+        ],
+        keyField: 'code',
       });
 
       const listItems = wrapper.findAll('li.ec-item-list__item');
       expect(listItems).toHaveLength(2);
-      expect(listItems[0].text()).toBe('Alpha');
-      expect(listItems[1].text()).toBe('Beta');
+      expect(listItems[0].text()).toContain('Alpha');
+      expect(listItems[1].text()).toContain('Beta');
     });
   });
 
@@ -113,6 +113,99 @@ describe('EcItemList', () => {
       expect(wrapper.find('ul.ec-item-list').classes()).not.toContain(
         'ec-item-list--actions-right',
       );
+    });
+  });
+
+  describe('#page-actions slot', () => {
+    it('renders content in an action bar', () => {
+      const wrapper = createWrapper({
+        slots: {
+          'page-actions': '<button class="test-action">Add</button>',
+        },
+      });
+
+      const actionBar = wrapper.find('.ec-item-list__action-bar');
+      expect(actionBar.exists()).toBe(true);
+      expect(actionBar.find('.test-action').exists()).toBe(true);
+    });
+
+    it('wraps page-actions content in a flex container', () => {
+      const wrapper = createWrapper({
+        slots: {
+          'page-actions': '<button>Add</button><button>Refresh</button>',
+        },
+      });
+
+      const actionsWrapper = wrapper.find('.ec-item-list__page-actions');
+      expect(actionsWrapper.exists()).toBe(true);
+      expect(actionsWrapper.findAll('button')).toHaveLength(2);
+    });
+  });
+
+  describe('#controls slot', () => {
+    it('renders content in an action bar', () => {
+      const wrapper = createWrapper({
+        slots: {
+          controls: '<label class="test-control">Toggle</label>',
+        },
+      });
+
+      const actionBar = wrapper.find('.ec-item-list__action-bar');
+      expect(actionBar.exists()).toBe(true);
+      expect(actionBar.find('.test-control').exists()).toBe(true);
+    });
+  });
+
+  describe('action bar with both slots', () => {
+    it('renders both slots in the same action bar row', () => {
+      const wrapper = createWrapper({
+        slots: {
+          controls: '<label class="test-control">Toggle</label>',
+          'page-actions': '<button class="test-action">Add</button>',
+        },
+      });
+
+      const actionBars = wrapper.findAll('.ec-item-list__action-bar');
+      expect(actionBars).toHaveLength(1);
+      expect(actionBars[0].find('.test-control').exists()).toBe(true);
+      expect(actionBars[0].find('.test-action').exists()).toBe(true);
+    });
+  });
+
+  describe('action bar visibility', () => {
+    it('does not render the action bar when neither slot is provided', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('.ec-item-list__action-bar').exists()).toBe(false);
+    });
+  });
+
+  describe('actionsPosition prop', () => {
+    it('defaults to top (no bottom modifier class on action bar)', () => {
+      const wrapper = createWrapper({
+        slots: {
+          'page-actions': '<button>Add</button>',
+        },
+      });
+
+      const actionBar = wrapper.find('.ec-item-list__action-bar');
+      expect(actionBar.exists()).toBe(true);
+      expect(actionBar.classes()).not.toContain('ec-item-list__action-bar--bottom');
+    });
+
+    it('puts action bar after list when actionsPosition is bottom', () => {
+      const wrapper = createWrapper({
+        actionsPosition: 'bottom',
+        slots: {
+          'page-actions': '<button>Add</button>',
+        },
+      });
+
+      const container = wrapper.find('.ec-item-list-container');
+      // With CSS order, DOM order stays the same but visual order changes
+      // Check that the action bar has the bottom modifier class
+      const actionBar = container.find('.ec-item-list__action-bar');
+      expect(actionBar.classes()).toContain('ec-item-list__action-bar--bottom');
     });
   });
 });
