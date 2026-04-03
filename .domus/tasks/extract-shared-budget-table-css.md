@@ -1,7 +1,7 @@
 # Task: Extract shared budget table CSS
 
 **ID:** extract-shared-budget-table-css
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-02
