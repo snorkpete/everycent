@@ -10,16 +10,28 @@ const lifestyle: AllocationCategoryData = { id: 20, name: 'Lifestyle' };
 function buildAllocations(): AllocationData[] {
   return [
     {
-      id: 1, name: 'Groceries', amount: 50000, spent: 30000,
-      allocation_category_id: 10, is_fixed_amount: false,
+      id: 1,
+      name: 'Groceries',
+      amount: 50000,
+      spent: 30000,
+      allocation_category_id: 10,
+      is_fixed_amount: false,
     },
     {
-      id: 2, name: 'Rent', amount: 100000, spent: 100000,
-      allocation_category_id: 10, is_fixed_amount: true,
+      id: 2,
+      name: 'Rent',
+      amount: 100000,
+      spent: 100000,
+      allocation_category_id: 10,
+      is_fixed_amount: true,
     },
     {
-      id: 3, name: 'Entertainment', amount: 20000, spent: 25000,
-      allocation_category_id: 20, is_fixed_amount: false,
+      id: 3,
+      name: 'Entertainment',
+      amount: 20000,
+      spent: 25000,
+      allocation_category_id: 20,
+      is_fixed_amount: false,
     },
   ];
 }
@@ -166,7 +178,7 @@ describe('useAllocationGrouping', () => {
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('Fixed');
       expect(result[0].amount).toBe(100000); // Rent amount
-      expect(result[0].spent).toBe(100000);  // Rent spent
+      expect(result[0].spent).toBe(100000); // Rent spent
     });
 
     it('returns empty array when no fixed allocations even when collapsed', () => {

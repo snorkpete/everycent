@@ -3,10 +3,9 @@ import { ref, type Ref } from 'vue';
 import { useWantsNeedsBudgetBreakdown } from './useWantsNeedsBudgetBreakdown';
 import type { AllocationData } from '../transactions/transaction.types';
 
-function setup({
-  allocations = [] as AllocationData[],
-  totalIncome = 0,
-} = {}): ReturnType<typeof useWantsNeedsBudgetBreakdown> & {
+function setup({ allocations = [] as AllocationData[], totalIncome = 0 } = {}): ReturnType<
+  typeof useWantsNeedsBudgetBreakdown
+> & {
   allocationsRef: Ref<AllocationData[]>;
   totalIncomeRef: Ref<number>;
 } {

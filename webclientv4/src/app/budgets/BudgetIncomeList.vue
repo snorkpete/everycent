@@ -65,7 +65,9 @@
       <tfoot>
         <tr data-testid="income-total-row">
           <th class="col-name">Total</th>
-          <th class="col-amount"><EcMoneyDisplay :model-value="totalAmount" emphasis="total" highlight-mode="none" /></th>
+          <th class="col-amount">
+            <EcMoneyDisplay :model-value="totalAmount" emphasis="total" highlight-mode="none" />
+          </th>
           <th v-if="store.isEditMode" class="col-actions"></th>
         </tr>
       </tfoot>
@@ -194,5 +196,4 @@ function toggleDeleted(income: IncomeData) {
 .income-table tbody tr:hover td {
   background-color: var(--p-surface-100);
 }
-
 </style>

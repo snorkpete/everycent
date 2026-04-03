@@ -123,9 +123,7 @@ describe('EcMoneyField', () => {
 
       await wrapper.find('input').setValue(dollarInput);
 
-      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
-        expectedCents,
-      ]);
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expectedCents]);
     });
 
     it('handles input with commas by stripping them before converting', async () => {
@@ -135,9 +133,7 @@ describe('EcMoneyField', () => {
 
       await wrapper.find('input').setValue(dollarInput);
 
-      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([
-        expectedCents,
-      ]);
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expectedCents]);
     });
 
     it('emits 0 for non-numeric input', async () => {
@@ -268,7 +264,11 @@ describe('EcMoneyField', () => {
 
     describe('edit mode', () => {
       it('applies positive styling to input when value is zero', () => {
-        const wrapper = createWrapper({ editMode: true, modelValue: 0, highlightMode: 'difference' });
+        const wrapper = createWrapper({
+          editMode: true,
+          modelValue: 0,
+          highlightMode: 'difference',
+        });
         const input = wrapper.find('.money-input');
 
         expect(input.classes()).toContain('positive');
@@ -276,7 +276,11 @@ describe('EcMoneyField', () => {
       });
 
       it('applies negative styling to input when value is positive', () => {
-        const wrapper = createWrapper({ editMode: true, modelValue: 500, highlightMode: 'difference' });
+        const wrapper = createWrapper({
+          editMode: true,
+          modelValue: 500,
+          highlightMode: 'difference',
+        });
         const input = wrapper.find('.money-input');
 
         expect(input.classes()).toContain('negative');
@@ -284,7 +288,11 @@ describe('EcMoneyField', () => {
       });
 
       it('applies negative styling to input when value is negative', () => {
-        const wrapper = createWrapper({ editMode: true, modelValue: -500, highlightMode: 'difference' });
+        const wrapper = createWrapper({
+          editMode: true,
+          modelValue: -500,
+          highlightMode: 'difference',
+        });
         const input = wrapper.find('.money-input');
 
         expect(input.classes()).toContain('negative');
