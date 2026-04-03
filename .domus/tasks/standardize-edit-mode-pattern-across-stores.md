@@ -1,5 +1,6 @@
 # Task: Standardize edit mode pattern across stores
 
+**Status:** done
 **ID:** standardize-edit-mode-pattern-across-stores
 **Status:** done
 **Autonomous:** false

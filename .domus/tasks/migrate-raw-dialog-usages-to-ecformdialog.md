@@ -1,8 +1,10 @@
 # Task: Migrate raw Dialog usages to EcFormDialog
 
+**Status:** done
+**Branch:** task/migrate-raw-dialog-usages-to-ecformdialog
 **ID:** migrate-raw-dialog-usages-to-ecformdialog
-**Status:** raw
-**Autonomous:** false
+**Status:** proposed
+**Autonomous:** true
 **Priority:** high
 **Captured:** 2026-04-02
 **Parent:** none
@@ -14,28 +16,52 @@
 
 ## What This Task Is
 
-DUP-CSS-04 + DUP-CSS-05 from the 2026-04-02 audit. Four dialogs duplicate `.dialog-footer` CSS, three duplicate `.field` + `.field-label` form layout CSS. EcFormDialog already owns both patterns.
+DUP-CSS-04 + DUP-CSS-05 from the 2026-04-02 audit. Multiple dialogs duplicate `.dialog-footer` and `.field`/`.field-label` CSS that EcFormDialog already owns. Goal: every dialog with footer buttons gets consistent styling from a single source of truth.
 
-**Approach:** Try EcFormDialog first (baseline). Fall back to extracting an `EcDialogFooter` component only for dialogs that genuinely don't fit EcFormDialog's model.
+**UX lens:** Users should see identical button placement, ordering, and styling in every dialog. Muscle memory — Save is always in the same spot, Cancel always looks the same.
 
-**Rationale:** Copying exact CSS to get the same visual result means the visual result is an implicit contract with no single source of truth. If the dialog footer look changes, you're hunting through files.
+---
 
-**Current duplication:**
-- `.dialog-footer`: TransactionImportDialog.vue:132-136, AccountTransferDialog.vue:377-381, SinkFundTransferDialog.vue:174-178, SpecialEventsPage.vue:216-220
-- `.field` + `.field-label`: TransactionImportDialog.vue:115-126, AccountTransferDialog.vue:360-370, SinkFundTransferDialog.vue:155-167
+## Design (refined 2026-04-03)
 
-**Dialogs to assess:**
-- TransactionImportDialog — file upload + preview, custom layout
-- AccountTransferDialog — complex form with conditional fields
-- SinkFundTransferDialog — simpler transfer form
-- SpecialEventsPage delete confirmation — custom confirmation, not a form dialog
+### Part 1: Migrate 4 form dialogs to EcFormDialog
+
+All use `alwaysEdit: true` since they're action dialogs (create/transfer/import), not view/edit dialogs.
+
+| Dialog | Fields | Notes |
+|--------|--------|-------|
+| **AddBudgetDialog** | 1 (date picker) | Simplest candidate, cleanest win |
+| **SinkFundTransferDialog** | 3 (from, to, amount) | Straightforward transfer form |
+| **AccountTransferDialog** | 8+ (conditional rendering by account type) | Most complex, but standard form layout |
+| **TransactionImportDialog** | 2 (format select, textarea) | Standard form, lowest priority |
+
+### Part 2: Extract EcDialogFooter from EcFormDialog
+
+EcFormDialog's footer pattern should be extracted into a standalone `EcDialogFooter` component. Then:
+- EcFormDialog uses EcDialogFooter internally (single source of truth)
+- AdjustBalancesDialog uses raw Dialog + EcDialogFooter (consistent footer, custom table body)
+
+This gives consistent footer UX even for dialogs whose body doesn't fit EcFormDialog's form-fields layout.
+
+### Part 3: Replace delete confirmation with PrimeVue useConfirm
+
+SpecialEventsPage has a custom delete confirmation dialog. Replace with PrimeVue's `useConfirm` composable + `<ConfirmDialog />`. The confirm logic moves into the delete handler — no custom dialog needed.
+
+### Not migrated
+
+**AllocationTransactionsDialog** — read-only data display with no footer buttons. No UX consistency issue since there's nothing to be inconsistent with.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] Each dialog assessed for EcFormDialog compatibility
-- [ ] Compatible dialogs migrated to EcFormDialog
-- [ ] Incompatible dialogs use EcDialogFooter (if needed)
-- [ ] All .dialog-footer CSS duplication eliminated
-- [ ] All .field/.field-label CSS duplication eliminated (use Ec form components or shared utility)
+- [x] AddBudgetDialog migrated to EcFormDialog with `alwaysEdit: true`
+- [x] SinkFundTransferDialog migrated to EcFormDialog with `alwaysEdit: true`
+- [x] AccountTransferDialog migrated to EcFormDialog with `alwaysEdit: true`
+- [x] TransactionImportDialog migrated to EcFormDialog with `alwaysEdit: true`
+- [x] EcDialogFooter extracted from EcFormDialog's footer; EcFormDialog uses it internally
+- [x] AdjustBalancesDialog uses raw Dialog + EcDialogFooter for consistent footer
+- [x] SpecialEventsPage delete confirmation replaced with PrimeVue `useConfirm` + `ConfirmDialog`
+- [x] All duplicated `.dialog-footer` CSS removed
+- [x] All duplicated `.field`/`.field-label` CSS removed
+- [x] All existing tests pass

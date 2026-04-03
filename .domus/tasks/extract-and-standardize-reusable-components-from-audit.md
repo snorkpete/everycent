@@ -1,7 +1,7 @@
 # Task: Extract and standardize reusable components from audit
 
 **ID:** extract-and-standardize-reusable-components-from-audit
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-03-28
