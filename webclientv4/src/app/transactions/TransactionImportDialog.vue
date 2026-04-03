@@ -1,60 +1,48 @@
 <template>
-  <Dialog
+  <EcFormDialog
     :visible="visible"
     header="Import Transactions"
-    modal
-    :style="{ width: '44rem' }"
-    @update:visible="close"
+    width="44rem"
+    :always-edit="true"
+    save-label="Import"
+    :save-disabled="!selectedFormat || !store.selectedBudget"
+    @update:visible="$emit('update:visible', $event)"
+    @save="runImport"
   >
-    <div class="import-fields">
-      <div class="field">
-        <label class="field-label">Import Format</label>
-        <Select
-          v-model="selectedFormat"
-          :options="importFormats"
-          option-label="name"
-          option-value="id"
-          placeholder="Select format"
-          data-testid="import-format-select"
-          class="w-full"
-        />
-      </div>
-
-      <div class="field">
-        <label class="field-label">Paste bank statement data</label>
-        <Textarea
-          v-model="rawInput"
-          rows="12"
-          class="w-full import-textarea"
-          placeholder="Paste the raw text from your bank statement here"
-          data-testid="import-textarea"
-        />
-      </div>
+    <div class="field">
+      <label class="field-label">Import Format</label>
+      <Select
+        v-model="selectedFormat"
+        :options="importFormats"
+        option-label="name"
+        option-value="id"
+        placeholder="Select format"
+        data-testid="import-format-select"
+        class="w-full"
+      />
     </div>
 
-    <template #footer>
-      <div class="dialog-footer">
-        <Button
-          label="Import"
-          data-testid="import-btn"
-          :disabled="!selectedFormat || !store.selectedBudget"
-          @click="runImport"
-        />
-        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
-      </div>
-    </template>
-  </Dialog>
+    <div class="field">
+      <label class="field-label">Paste bank statement data</label>
+      <Textarea
+        v-model="rawInput"
+        rows="12"
+        class="w-full import-textarea"
+        placeholder="Paste the raw text from your bank statement here"
+        data-testid="import-textarea"
+      />
+    </div>
+  </EcFormDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
 import Select from 'primevue/select';
 import Textarea from 'primevue/textarea';
 import type { TransactionData } from './transaction.types';
 import { useTransactionStore } from './transactionStore';
 import { transactionImporter } from './importers/transactionImporter';
+import EcFormDialog from '../shared/form/form-dialog/EcFormDialog.vue';
 
 const props = defineProps<{
   visible: boolean;
@@ -98,20 +86,9 @@ function runImport() {
   emit('imported', all);
   emit('update:visible', false);
 }
-
-function close() {
-  emit('update:visible', false);
-}
 </script>
 
 <style scoped>
-.import-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -127,11 +104,5 @@ function close() {
 .import-textarea {
   font-family: monospace;
   font-size: 0.8125rem;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 </style>

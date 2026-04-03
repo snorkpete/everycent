@@ -1,164 +1,147 @@
 <template>
-  <Dialog
+  <EcFormDialog
     :visible="visible"
     header="Bank Account Transfer"
-    modal
-    :style="{ width: '36rem' }"
-    @update:visible="close"
+    width="36rem"
+    :always-edit="true"
+    save-label="Transfer"
+    :save-disabled="!canTransfer"
+    @update:visible="$emit('update:visible', $event)"
+    @save="runTransfer"
   >
-    <div class="transfer-fields">
-      <!-- From account -->
-      <div class="field">
-        <label class="field-label">From Account</label>
-        <Select
-          v-model="form.from_id"
-          :options="bankAccountsWithBalances"
-          option-label="name"
-          option-value="id"
-          placeholder="Select account"
-          data-testid="from-account-select"
-          class="w-full"
-          @update:model-value="onFromAccountChange"
-        >
-          <template #option="{ option }">
-            {{ option.name }} ({{ formatBalance(option.current_balance ?? 0) }})
-          </template>
-        </Select>
-        <span
-          v-if="newFromBalance !== null"
-          class="balance-preview"
-          data-testid="from-balance-preview"
-        >
-          New balance: {{ formatBalance(newFromBalance) }}
-        </span>
-      </div>
-
-      <!-- From allocation (regular account) -->
-      <div v-if="fromAccount && !fromAccount.is_sink_fund" class="field">
-        <label class="field-label">From Allocation (optional)</label>
-        <Select
-          v-model="form.from_allocation_id"
-          :options="groupedAllocations"
-          option-group-label="label"
-          option-group-children="items"
-          option-label="name"
-          option-value="id"
-          placeholder="Select allocation"
-          data-testid="from-allocation-select"
-          class="w-full"
-          show-clear
-        />
-      </div>
-
-      <!-- From sink fund allocation -->
-      <div v-if="fromAccount && fromAccount.is_sink_fund" class="field">
-        <label class="field-label">From Sink Fund Allocation (optional)</label>
-        <Select
-          v-model="form.from_sink_fund_allocation_id"
-          :options="sinkFundAllocationsFrom"
-          option-label="name"
-          option-value="id"
-          placeholder="Select sink fund allocation"
-          data-testid="from-sink-fund-select"
-          class="w-full"
-          show-clear
-        />
-      </div>
-
-      <!-- To account -->
-      <div class="field">
-        <label class="field-label">To Account</label>
-        <Select
-          v-model="form.to_id"
-          :options="bankAccountsWithBalances"
-          option-label="name"
-          option-value="id"
-          placeholder="Select account"
-          data-testid="to-account-select"
-          class="w-full"
-          @update:model-value="onToAccountChange"
-        >
-          <template #option="{ option }">
-            {{ option.name }} ({{ formatBalance(option.current_balance ?? 0) }})
-          </template>
-        </Select>
-        <span v-if="newToBalance !== null" class="balance-preview" data-testid="to-balance-preview">
-          New balance: {{ formatBalance(newToBalance) }}
-        </span>
-      </div>
-
-      <!-- To allocation (regular account) -->
-      <div v-if="toAccount && !toAccount.is_sink_fund" class="field">
-        <label class="field-label">To Allocation (optional)</label>
-        <Select
-          v-model="form.to_allocation_id"
-          :options="groupedAllocations"
-          option-group-label="label"
-          option-group-children="items"
-          option-label="name"
-          option-value="id"
-          placeholder="Select allocation"
-          data-testid="to-allocation-select"
-          class="w-full"
-          show-clear
-        />
-      </div>
-
-      <!-- To sink fund allocation -->
-      <div v-if="toAccount && toAccount.is_sink_fund" class="field">
-        <label class="field-label">To Sink Fund Allocation (optional)</label>
-        <Select
-          v-model="form.to_sink_fund_allocation_id"
-          :options="sinkFundAllocationsTo"
-          option-label="name"
-          option-value="id"
-          placeholder="Select sink fund allocation"
-          data-testid="to-sink-fund-select"
-          class="w-full"
-          show-clear
-        />
-      </div>
-
-      <!-- Date -->
-      <div class="field">
-        <EcDateField v-model="form.date" label="Date" :edit-mode="true" />
-      </div>
-
-      <!-- Description -->
-      <div class="field">
-        <label class="field-label">Description</label>
-        <InputText
-          v-model="form.description"
-          placeholder="Description (optional)"
-          data-testid="description-input"
-          class="w-full"
-        />
-      </div>
-
-      <!-- Amount -->
-      <div class="field">
-        <EcMoneyField v-model="form.amount" label="Amount" :edit-mode="true" />
-      </div>
+    <!-- From account -->
+    <div class="field">
+      <label class="field-label">From Account</label>
+      <Select
+        v-model="form.from_id"
+        :options="bankAccountsWithBalances"
+        option-label="name"
+        option-value="id"
+        placeholder="Select account"
+        data-testid="from-account-select"
+        class="w-full"
+        @update:model-value="onFromAccountChange"
+      >
+        <template #option="{ option }">
+          {{ option.name }} ({{ formatBalance(option.current_balance ?? 0) }})
+        </template>
+      </Select>
+      <span
+        v-if="newFromBalance !== null"
+        class="balance-preview"
+        data-testid="from-balance-preview"
+      >
+        New balance: {{ formatBalance(newFromBalance) }}
+      </span>
     </div>
 
-    <template #footer>
-      <div class="dialog-footer">
-        <Button
-          label="Transfer"
-          data-testid="transfer-btn"
-          :disabled="!canTransfer"
-          @click="runTransfer"
-        />
-        <Button label="Cancel" severity="secondary" data-testid="cancel-btn" @click="close" />
-      </div>
-    </template>
-  </Dialog>
+    <!-- From allocation (regular account) -->
+    <div v-if="fromAccount && !fromAccount.is_sink_fund" class="field">
+      <label class="field-label">From Allocation (optional)</label>
+      <Select
+        v-model="form.from_allocation_id"
+        :options="groupedAllocations"
+        option-group-label="label"
+        option-group-children="items"
+        option-label="name"
+        option-value="id"
+        placeholder="Select allocation"
+        data-testid="from-allocation-select"
+        class="w-full"
+        show-clear
+      />
+    </div>
+
+    <!-- From sink fund allocation -->
+    <div v-if="fromAccount && fromAccount.is_sink_fund" class="field">
+      <label class="field-label">From Sink Fund Allocation (optional)</label>
+      <Select
+        v-model="form.from_sink_fund_allocation_id"
+        :options="sinkFundAllocationsFrom"
+        option-label="name"
+        option-value="id"
+        placeholder="Select sink fund allocation"
+        data-testid="from-sink-fund-select"
+        class="w-full"
+        show-clear
+      />
+    </div>
+
+    <!-- To account -->
+    <div class="field">
+      <label class="field-label">To Account</label>
+      <Select
+        v-model="form.to_id"
+        :options="bankAccountsWithBalances"
+        option-label="name"
+        option-value="id"
+        placeholder="Select account"
+        data-testid="to-account-select"
+        class="w-full"
+        @update:model-value="onToAccountChange"
+      >
+        <template #option="{ option }">
+          {{ option.name }} ({{ formatBalance(option.current_balance ?? 0) }})
+        </template>
+      </Select>
+      <span v-if="newToBalance !== null" class="balance-preview" data-testid="to-balance-preview">
+        New balance: {{ formatBalance(newToBalance) }}
+      </span>
+    </div>
+
+    <!-- To allocation (regular account) -->
+    <div v-if="toAccount && !toAccount.is_sink_fund" class="field">
+      <label class="field-label">To Allocation (optional)</label>
+      <Select
+        v-model="form.to_allocation_id"
+        :options="groupedAllocations"
+        option-group-label="label"
+        option-group-children="items"
+        option-label="name"
+        option-value="id"
+        placeholder="Select allocation"
+        data-testid="to-allocation-select"
+        class="w-full"
+        show-clear
+      />
+    </div>
+
+    <!-- To sink fund allocation -->
+    <div v-if="toAccount && toAccount.is_sink_fund" class="field">
+      <label class="field-label">To Sink Fund Allocation (optional)</label>
+      <Select
+        v-model="form.to_sink_fund_allocation_id"
+        :options="sinkFundAllocationsTo"
+        option-label="name"
+        option-value="id"
+        placeholder="Select sink fund allocation"
+        data-testid="to-sink-fund-select"
+        class="w-full"
+        show-clear
+      />
+    </div>
+
+    <!-- Date -->
+    <EcDateField v-model="form.date" label="Date" :edit-mode="true" />
+
+    <!-- Description -->
+    <div class="field">
+      <label class="field-label">Description</label>
+      <InputText
+        v-model="form.description"
+        placeholder="Description (optional)"
+        data-testid="description-input"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Amount -->
+    <EcMoneyField v-model="form.amount" label="Amount" :edit-mode="true" />
+  </EcFormDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
 import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
 import { bankAccountApi } from '../bank-accounts/bankAccountApi';
@@ -166,6 +149,7 @@ import { transactionApi } from './transactionApi';
 import { useTransactionStore } from './transactionStore';
 import { useNotifications } from '../notifications/useNotifications';
 import { centsToDollars } from '../shared/util/cents-to-dollars';
+import EcFormDialog from '../shared/form/form-dialog/EcFormDialog.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcDateField from '../shared/form/date-field/EcDateField.vue';
 import type { BankAccountData, AccountTransferData } from '../bank-accounts/bankAccount.types';
@@ -341,22 +325,11 @@ async function runTransfer() {
   }
 }
 
-function close() {
-  emit('update:visible', false);
-}
-
 // Expose internal state and handlers for testing
 defineExpose({ form, onFromAccountChange, onToAccountChange });
 </script>
 
 <style scoped>
-.transfer-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -373,11 +346,5 @@ defineExpose({ form, onFromAccountChange, onToAccountChange });
   font-size: 0.8125rem;
   color: var(--p-text-muted-color);
   text-align: right;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 </style>
