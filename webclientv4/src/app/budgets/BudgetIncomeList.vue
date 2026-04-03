@@ -27,7 +27,7 @@
         <tr
           v-for="(income, index) in incomes"
           :key="income.id ?? `new-${index}`"
-          :class="{ 'row-deleted': income.deleted }"
+          :class="{ 'ec-deleted': income.deleted }"
           data-testid="income-row"
         >
           <td class="col-name">
@@ -49,14 +49,11 @@
           </td>
 
           <td v-if="store.isEditMode" class="col-actions">
-            <Button
-              v-tooltip="income.deleted ? 'Undo delete' : 'Delete this income'"
-              :icon="income.deleted ? 'pi pi-undo' : 'pi pi-trash'"
-              severity="danger"
-              text
-              size="small"
-              :data-testid="`delete-income-btn-${index}`"
-              @click="toggleDeleted(income)"
+            <EcDeleteButton
+              :deleted="income.deleted"
+              item-label="income"
+              :test-id-prefix="`income-${index}`"
+              @toggle="toggleDeleted(income)"
             />
           </td>
         </tr>
@@ -81,6 +78,7 @@ import Button from 'primevue/button';
 import { useBudgetStore } from './budgetStore';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import type { IncomeData } from './budget.types';
 
 const store = useBudgetStore();
@@ -184,12 +182,6 @@ function toggleDeleted(income: IncomeData) {
   width: 100%;
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
-}
-
-/* ── Deleted row ── */
-.row-deleted td {
-  opacity: 0.4;
-  text-decoration: line-through;
 }
 
 /* ── Row hover ── */

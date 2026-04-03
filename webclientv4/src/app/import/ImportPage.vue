@@ -223,19 +223,12 @@
                     />
                   </td>
                   <td class="col-action">
-                    <Button
+                    <EcDeleteButton
                       v-if="transaction.import_status !== 'duplicate'"
-                      v-tooltip="
-                        transaction.deleted
-                          ? 'Restore this transaction'
-                          : 'Exclude this transaction from import'
-                      "
-                      :icon="transaction.deleted ? 'pi pi-undo' : 'pi pi-trash'"
-                      :severity="transaction.deleted ? 'secondary' : 'danger'"
-                      text
-                      size="small"
-                      :data-testid="`delete-toggle-${accountIndex}-${txIndex}`"
-                      @click="store.toggleDeleteTransaction(accountIndex, txIndex)"
+                      :deleted="transaction.deleted"
+                      item-label="transaction"
+                      :test-id-prefix="`delete-toggle-${accountIndex}-${txIndex}`"
+                      @toggle="store.toggleDeleteTransaction(accountIndex, txIndex)"
                     />
                   </td>
                 </tr>
@@ -279,6 +272,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import Select from 'primevue/select';
 import FileUpload from 'primevue/fileupload';
 import Message from 'primevue/message';

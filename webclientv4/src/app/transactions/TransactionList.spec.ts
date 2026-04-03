@@ -275,7 +275,7 @@ describe('TransactionList', () => {
       await nextTick();
       vi.spyOn(store, 'deleteTransaction');
 
-      await wrapper.find('[data-testid="delete-btn-0"]').trigger('click');
+      await wrapper.find('[data-testid="transaction-0-delete-btn"]').trigger('click');
 
       expect(store.deleteTransaction).toHaveBeenCalledWith(store.transactions[0]);
     });
@@ -297,7 +297,7 @@ describe('TransactionList', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      expect(wrapper.find('[data-testid="delete-btn-0"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="transaction-0-delete-btn"]').exists()).toBe(false);
     });
 
     it('shows undo button for deleted transactions', async () => {
@@ -315,7 +315,7 @@ describe('TransactionList', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      expect(wrapper.find('[data-testid="undo-delete-btn-0"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="transaction-0-restore-btn"]').exists()).toBe(true);
     });
 
     it('calls store.undoDeleteTransaction when undo button is clicked', async () => {
@@ -334,7 +334,7 @@ describe('TransactionList', () => {
       await nextTick();
       vi.spyOn(store, 'undoDeleteTransaction');
 
-      await wrapper.find('[data-testid="undo-delete-btn-0"]').trigger('click');
+      await wrapper.find('[data-testid="transaction-0-restore-btn"]').trigger('click');
 
       expect(store.undoDeleteTransaction).toHaveBeenCalledWith(store.transactions[0]);
     });
@@ -357,7 +357,7 @@ describe('TransactionList', () => {
       await nextTick();
 
       const rows = wrapper.findAll(TRANSACTION_ROW);
-      expect(rows[0].classes()).toContain('transaction-row--deleted');
+      expect(rows[0].classes()).toContain('ec-deleted');
     });
   });
 });

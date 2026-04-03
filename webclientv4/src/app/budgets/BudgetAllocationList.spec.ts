@@ -21,8 +21,8 @@ const UNALLOCATED_BADGE = '[data-testid="unallocated-badge"]';
 const SHOW_TRANSACTIONS_BTN = '[data-testid="show-transactions-btn"]';
 const ADD_ALLOCATION_BTN = (id: number) => `[data-testid="add-allocation-btn-${id}"]`;
 const ADD_ALLOCATION_ROW = (id: number) => `[data-testid="add-allocation-row-${id}"]`;
-const DELETE_BTN = '[data-testid="delete-btn"]';
-const UNDO_DELETE_BTN = '[data-testid="undo-delete-btn"]';
+const DELETE_BTN = '[data-testid="allocation-delete-btn"]';
+const UNDO_DELETE_BTN = '[data-testid="allocation-restore-btn"]';
 const NAME_INPUT = '[data-testid="allocation-name-input"]';
 const CLASS_SELECT = '[data-testid="allocation-class-select"]';
 const FIXED_CHECKBOX = '[data-testid="allocation-fixed-checkbox"]';
@@ -481,7 +481,7 @@ describe('BudgetAllocationList', () => {
       await nextTick();
 
       const button = wrapper.find(DELETE_BTN);
-      expect(getTooltipValue(button)).toBe('Delete allocation');
+      expect(getTooltipValue(button)).toBe('Delete this allocation');
     });
 
     it('toggles deleted flag when delete button is clicked', async () => {
@@ -503,7 +503,7 @@ describe('BudgetAllocationList', () => {
 
       const undoBtn = wrapper.find(UNDO_DELETE_BTN);
       expect(undoBtn.exists()).toBe(true);
-      expect(getTooltipValue(undoBtn)).toBe('Undo delete');
+      expect(getTooltipValue(undoBtn)).toBe('Restore this deleted allocation');
     });
 
     it('applies deleted-row class to deleted allocations', async () => {
@@ -513,7 +513,7 @@ describe('BudgetAllocationList', () => {
 
       // Groceries is adjustable, so it's in the adjustable rows section
       const groceriesRow = findRowByName(wrapper, 'Groceries')!;
-      expect(groceriesRow.classes()).toContain('deleted-row');
+      expect(groceriesRow.classes()).toContain('ec-deleted');
     });
 
     it('excludes deleted allocations from category subtotals', async () => {

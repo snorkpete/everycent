@@ -19,3 +19,8 @@ body {
 .right {
   text-align: right;
 }
+
+.ec-deleted {
+  opacity: 0.4;
+  text-decoration: line-through;
+}

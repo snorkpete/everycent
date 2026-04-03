@@ -48,8 +48,7 @@
           v-for="(allocation, index) in store.visibleAllocations"
           :key="allocation.id || `new-${index}`"
           :class="{
-            'deleted-row': allocation.deleted,
-            'closed-row': allocation.status === 'closed',
+            'ec-deleted': allocation.deleted || allocation.status === 'closed',
           }"
           data-testid="allocation-row"
         >
@@ -68,14 +67,10 @@
           <!-- Current Balance (always read-only) -->
           <td class="amount-cell">
             <span class="balance-cell">
-              <button
-                v-tooltip="'Show transactions for this allocation'"
-                class="eye-btn"
+              <EcShowTransactionsButton
                 data-testid="show-transactions-btn"
                 @click="onShowTransactions(allocation)"
-              >
-                <i class="pi pi-eye"></i>
-              </button>
+              />
               <EcMoneyDisplay :model-value="allocation.current_balance ?? 0" highlight-mode="none" />
             </span>
           </td>
@@ -113,14 +108,12 @@
 
           <!-- Actions (edit mode only) -->
           <td v-if="store.isEditMode" class="center-cell action-buttons">
-            <button
-              v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete this obligation'"
-              :class="allocation.deleted ? '' : 'delete-btn'"
-              :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
-              @click="toggleDeleted(allocation)"
-            >
-              <i :class="allocation.deleted ? 'pi pi-undo' : 'pi pi-trash'"></i>
-            </button>
+            <EcDeleteButton
+              :deleted="allocation.deleted"
+              item-label="obligation"
+              test-id-prefix="obligation"
+              @toggle="toggleDeleted(allocation)"
+            />
             <button
               v-if="allocation.status === 'open'"
               v-tooltip="'Close this obligation'"
@@ -174,6 +167,8 @@ import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
+import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData } from './sinkFund.types';
 
@@ -305,26 +300,6 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   gap: 0.25rem;
 }
 
-.eye-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
-  line-height: 1;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-tr:hover .eye-btn {
-  opacity: 1;
-}
-
-.eye-btn:hover {
-  color: var(--p-primary-color);
-}
-
 /* ── Edit mode inputs ── */
 .cell-input {
   width: 100%;
@@ -362,18 +337,6 @@ tr:hover .eye-btn {
 
 .reactivate-btn:hover {
   color: var(--p-green-600);
-}
-
-/* ── Deleted row ── */
-.deleted-row {
-  opacity: 0.4;
-  text-decoration: line-through;
-}
-
-/* ── Closed row (shown via toggle) ── */
-.closed-row {
-  opacity: 0.4;
-  text-decoration: line-through;
 }
 
 /* ── Unassigned info tooltip icon ── */

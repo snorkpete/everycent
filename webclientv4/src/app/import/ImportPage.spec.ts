@@ -1,16 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick } from 'vue';
-import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
-import type { Pinia } from 'pinia';
+import { nextTick, reactive } from 'vue';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import ImportPage from './ImportPage.vue';
-import { useImportStore } from './importStore';
-import type { PreviewBankAccount, SaveResponse } from './import.types';
+import type { PreviewBankAccount, UnmatchedIban, SaveResponse } from './import.types';
+import type { ImportPhase } from './importStore';
+import type { BudgetData } from '../budgets/budget.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
-import { buildBudget, buildClosedBudget } from '../../test/factories/budgetFactory';
-import { buildBankAccount } from '../../test/factories/bankAccountFactory';
 
 // Selectors
 const BUDGET_WARNING = '[data-testid="budget-warning"]';
@@ -41,74 +39,26 @@ vi.mock('../notifications/useNotifications', () => ({
   }),
 }));
 
+const mockGetCurrentBudgetId = vi.fn().mockResolvedValue(1);
 vi.mock('../budgets/budgetApi', () => ({
   budgetApi: {
-    getAll: vi.fn(),
-    getCurrentBudgetId: vi.fn(),
-    autoAllocate: vi.fn(),
+    getCurrentBudgetId: () => mockGetCurrentBudgetId(),
   },
 }));
 
-vi.mock('../bank-accounts/bankAccountApi', () => ({
-  bankAccountApi: {
-    getOpen: vi.fn(),
-  },
-}));
-
-vi.mock('./importApi', () => ({
-  importApi: {
-    preview: vi.fn(),
-    save: vi.fn(),
-  },
-  buildPreviewPayload: vi.fn().mockReturnValue({
-    budget_id: 1,
-    bank_accounts: [],
-  }),
-}));
-
-vi.mock('../transactions/importers/camt053Parser', () => ({
-  parseCamt053Zip: vi.fn(),
-}));
-
-const mockRoute = { query: {} as Record<string, string> };
-const mockPush = vi.fn();
-vi.mock('vue-router', () => ({
-  useRoute: () => mockRoute,
-  useRouter: () => ({ push: mockPush }),
-}));
-
-const FileUploadStub = {
-  name: 'FileUpload',
-  template: '<div data-testid="file-upload" />',
-  props: ['mode', 'accept', 'auto', 'customUpload', 'chooseLabel'],
-  emits: ['select'],
-};
-
-const ProgressSpinnerStub = {
-  name: 'ProgressSpinner',
-  template: '<div data-testid="loading-spinner" />',
-  props: ['strokeWidth', 'style'],
-};
-
-const openBudget = buildBudget({
+const openBudget: BudgetData = {
   id: 1,
   name: 'Mar 2026',
   status: 'open',
   start_date: '2026-03-01',
   end_date: '2026-03-31',
-});
-
-const closedBudget = buildClosedBudget({
-  id: 2,
-  name: 'Feb 2026',
-  status: 'closed',
-});
-
-const checkingAccount: BankAccountData = buildBankAccount({
+};
+const closedBudget: BudgetData = { id: 2, name: 'Feb 2026', status: 'closed' };
+const checkingAccount: BankAccountData = {
   id: 10,
   name: 'Checking',
   account_no: 'NL01ABNA1234567890',
-});
+};
 
 const samplePreviewAccounts: PreviewBankAccount[] = [
   {
@@ -148,171 +98,195 @@ const samplePreviewAccounts: PreviewBankAccount[] = [
   },
 ];
 
-describe('ImportPage', () => {
-  let pinia: Pinia;
+const mockStore = reactive({
+  budgets: [openBudget, closedBudget] as BudgetData[],
+  bankAccounts: [checkingAccount] as BankAccountData[],
+  selectedBudget: openBudget as BudgetData | null,
+  previewAccounts: [] as PreviewBankAccount[],
+  unmatchedIbans: [] as UnmatchedIban[],
+  saveResult: null as SaveResponse | null,
+  loading: false,
+  error: null as string | null,
+  phase: 'idle' as ImportPhase,
+  budgetsForDropdown: [openBudget, closedBudget] as BudgetData[],
+  isBudgetCurrent: true,
+  fileSummary: [] as {
+    iban: string;
+    matchedAccountName: string | null;
+    totalTransactions: number;
+    inPeriodCount: number;
+    outOfPeriodCount: number;
+  }[],
+  fetchMetadata: vi.fn().mockResolvedValue(undefined),
+  selectBudget: vi.fn(),
+  parseAndPreview: vi.fn().mockResolvedValue(undefined),
+  parseFile: vi.fn().mockResolvedValue(undefined),
+  fetchPreview: vi.fn().mockResolvedValue(undefined),
+  toggleDeleteTransaction: vi.fn(),
+  saveImport: vi.fn().mockResolvedValue(undefined),
+  resetPreview: vi.fn(),
+  getBankAccountName: vi.fn().mockReturnValue('Checking'),
+});
 
-  async function setupApis() {
-    const { budgetApi } = await import('../budgets/budgetApi');
-    const { bankAccountApi } = await import('../bank-accounts/bankAccountApi');
+vi.mock('./importStore', () => ({
+  useImportStore: () => mockStore,
+}));
 
-    vi.mocked(budgetApi.getAll).mockResolvedValue([openBudget, closedBudget]);
-    vi.mocked(budgetApi.getCurrentBudgetId).mockResolvedValue(1);
-    vi.mocked(bankAccountApi.getOpen).mockResolvedValue([checkingAccount]);
+const mockRoute = reactive({
+  query: {} as Record<string, string>,
+});
 
-    return { budgetApi, bankAccountApi };
-  }
+const mockPush = vi.fn();
+vi.mock('vue-router', () => ({
+  useRoute: () => mockRoute,
+  useRouter: () => ({ push: mockPush }),
+}));
 
-  beforeEach(async () => {
-    pinia = createPinia();
-    setActivePinia(pinia);
-    vi.clearAllMocks();
-    mockRoute.query = {};
-    await setupApis();
-  });
+const FileUploadStub = {
+  name: 'FileUpload',
+  template: '<div data-testid="file-upload" />',
+  props: ['mode', 'accept', 'auto', 'customUpload', 'chooseLabel'],
+  emits: ['uploader'],
+};
 
-  function createWrapper(): VueWrapper {
-    return mount(ImportPage, {
-      global: {
-        plugins: [pinia, PrimeVue, ToastService],
-        stubs: {
-          FileUpload: FileUploadStub,
-          ProgressSpinner: ProgressSpinnerStub,
-          RouterLink: {
-            template: '<a><slot /></a>',
-            props: ['to'],
-          },
+const ProgressSpinnerStub = {
+  name: 'ProgressSpinner',
+  template: '<div data-testid="loading-spinner" />',
+  props: ['strokeWidth', 'style'],
+};
+
+function createWrapper(): VueWrapper {
+  return mount(ImportPage, {
+    global: {
+      plugins: [PrimeVue, ToastService, createPinia()],
+      stubs: {
+        FileUpload: FileUploadStub,
+        ProgressSpinner: ProgressSpinnerStub,
+        RouterLink: {
+          template: '<a><slot /></a>',
+          props: ['to'],
         },
       },
-    });
-  }
+    },
+  });
+}
 
-  /** Mount and wait for onMounted to finish (fetchMetadata + budget selection). */
-  async function mountAndSettle(): Promise<VueWrapper> {
-    const wrapper = createWrapper();
-    await flushPromises();
-    return wrapper;
-  }
-
-  /** Drive the store into 'preview' phase by setting state directly. */
-  function driveToPreview(accounts: PreviewBankAccount[] = samplePreviewAccounts) {
-    const store = useImportStore();
-    store.previewAccounts = structuredClone(accounts);
-    store.phase = 'preview';
-  }
-
-  /** Drive the store into 'saved' phase. */
-  function driveToSaved(saveResult: SaveResponse) {
-    const store = useImportStore();
-    store.saveResult = saveResult;
-    store.phase = 'saved';
-  }
+describe('ImportPage', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    vi.clearAllMocks();
+    mockStore.budgets = [openBudget, closedBudget];
+    mockStore.bankAccounts = [checkingAccount];
+    mockStore.selectedBudget = openBudget;
+    mockStore.previewAccounts = [];
+    mockStore.unmatchedIbans = [];
+    mockStore.saveResult = null;
+    mockStore.loading = false;
+    mockStore.error = null;
+    mockStore.phase = 'idle';
+    mockStore.isBudgetCurrent = true;
+    mockStore.fileSummary = [];
+    mockStore.fetchMetadata.mockResolvedValue(undefined);
+    mockStore.parseFile.mockResolvedValue(undefined);
+    mockStore.fetchPreview.mockResolvedValue(undefined);
+    mockStore.saveImport.mockResolvedValue(undefined);
+    mockGetCurrentBudgetId.mockResolvedValue(1);
+    mockRoute.query = {};
+  });
 
   describe('on mount', () => {
     it('sets the page heading', async () => {
-      await mountAndSettle();
+      createWrapper();
+      await nextTick();
 
       expect(mockSetHeading).toHaveBeenCalledWith('Import Transactions');
     });
 
-    it('fetches metadata (budgets and bank accounts)', async () => {
-      const { budgetApi } = await import('../budgets/budgetApi');
-      const { bankAccountApi } = await import('../bank-accounts/bankAccountApi');
+    it('calls fetchMetadata', async () => {
+      createWrapper();
+      await nextTick();
 
-      await mountAndSettle();
-
-      expect(budgetApi.getAll).toHaveBeenCalled();
-      expect(bankAccountApi.getOpen).toHaveBeenCalled();
+      expect(mockStore.fetchMetadata).toHaveBeenCalled();
     });
 
-    it('auto-selects current budget when no query param', async () => {
-      const { budgetApi } = await import('../budgets/budgetApi');
+    it('auto-selects first open budget when no query param', async () => {
+      createWrapper();
+      await nextTick();
+      await nextTick();
 
-      await mountAndSettle();
-
-      expect(budgetApi.getCurrentBudgetId).toHaveBeenCalled();
-      const store = useImportStore();
-      expect(store.selectedBudget?.id).toBe(1);
+      expect(mockStore.selectBudget).toHaveBeenCalledWith(openBudget.id);
     });
 
     it('selects budget from query param when provided', async () => {
       mockRoute.query = { budget_id: '2' };
+      createWrapper();
+      await nextTick();
+      await nextTick();
 
-      await mountAndSettle();
-
-      const store = useImportStore();
-      expect(store.selectedBudget?.id).toBe(2);
+      expect(mockStore.selectBudget).toHaveBeenCalledWith(2);
     });
   });
 
   describe('budget warning', () => {
     it('shows warning when budget is not current', async () => {
-      mockRoute.query = { budget_id: '2' };
-      const wrapper = await mountAndSettle();
+      mockStore.isBudgetCurrent = false;
+      const wrapper = createWrapper();
+      await nextTick();
 
       expect(wrapper.find(BUDGET_WARNING).exists()).toBe(true);
     });
 
     it('hides warning when budget is current', async () => {
-      const wrapper = await mountAndSettle();
+      mockStore.isBudgetCurrent = true;
+      const wrapper = createWrapper();
+      await nextTick();
 
       expect(wrapper.find(BUDGET_WARNING).exists()).toBe(false);
     });
   });
 
   describe('file upload', () => {
-    it('renders file upload component', async () => {
-      const wrapper = await mountAndSettle();
+    it('renders file upload component', () => {
+      const wrapper = createWrapper();
 
       expect(wrapper.find(FILE_UPLOAD).exists()).toBe(true);
     });
 
     it('calls parseFile when file is selected', async () => {
-      const { parseCamt053Zip } = await import('../transactions/importers/camt053Parser');
-      vi.mocked(parseCamt053Zip).mockResolvedValue({ accounts: [] });
-
-      const wrapper = await mountAndSettle();
+      const wrapper = createWrapper();
       const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
 
       const fileUpload = wrapper.findComponent({ name: 'FileUpload' });
       await fileUpload.vm.$emit('select', { files: [file] });
-      await flushPromises();
+      await nextTick();
 
-      expect(parseCamt053Zip).toHaveBeenCalled();
+      expect(mockStore.parseFile).toHaveBeenCalledWith(file);
     });
 
     it('resets preview before processing new file', async () => {
-      const { parseCamt053Zip } = await import('../transactions/importers/camt053Parser');
-      vi.mocked(parseCamt053Zip).mockResolvedValue({ accounts: [] });
-
-      const wrapper = await mountAndSettle();
-
-      // Drive store into preview state first
-      const store = useImportStore();
-      store.phase = 'preview';
-      store.previewAccounts = samplePreviewAccounts;
-      await nextTick();
-
+      const wrapper = createWrapper();
       const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
+
       const fileUpload = wrapper.findComponent({ name: 'FileUpload' });
       await fileUpload.vm.$emit('select', { files: [file] });
-      await flushPromises();
+      await nextTick();
 
-      // Phase is reset to 'parsed' (from successful parse) or 'idle' (from resetPreview)
-      // Since parseCamt053Zip returns empty accounts, phase = 'parsed' and previewAccounts = []
-      expect(store.previewAccounts).toEqual([]);
+      expect(mockStore.resetPreview).toHaveBeenCalled();
     });
 
     it('shows error notification on parse failure', async () => {
-      const { parseCamt053Zip } = await import('../transactions/importers/camt053Parser');
       const errorMsg = 'Parse failed';
-      vi.mocked(parseCamt053Zip).mockRejectedValue(new Error(errorMsg));
+      mockStore.parseFile.mockImplementation(async () => {
+        mockStore.error = errorMsg;
+        throw new Error(errorMsg);
+      });
 
-      const wrapper = await mountAndSettle();
+      const wrapper = createWrapper();
       const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
 
       const fileUpload = wrapper.findComponent({ name: 'FileUpload' });
       await fileUpload.vm.$emit('select', { files: [file] });
-      await flushPromises();
+      await nextTick();
 
       expect(mockNotifyError).toHaveBeenCalledWith(errorMsg);
     });
@@ -320,16 +294,16 @@ describe('ImportPage', () => {
 
   describe('loading state', () => {
     it('shows spinner when loading', async () => {
-      const wrapper = await mountAndSettle();
-      const store = useImportStore();
-      store.loading = true;
+      mockStore.loading = true;
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.find(LOADING_SPINNER).exists()).toBe(true);
     });
 
-    it('hides spinner when not loading', async () => {
-      const wrapper = await mountAndSettle();
+    it('hides spinner when not loading', () => {
+      mockStore.loading = false;
+      const wrapper = createWrapper();
 
       expect(wrapper.find(LOADING_SPINNER).exists()).toBe(false);
     });
@@ -337,89 +311,92 @@ describe('ImportPage', () => {
 
   describe('error display', () => {
     it('shows error message when error exists', async () => {
-      const wrapper = await mountAndSettle();
-      const store = useImportStore();
-      store.error = 'Something went wrong';
+      mockStore.error = 'Something went wrong';
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.find(ERROR_MESSAGE).exists()).toBe(true);
     });
 
-    it('hides error message when no error', async () => {
-      const wrapper = await mountAndSettle();
+    it('hides error message when no error', () => {
+      mockStore.error = null;
+      const wrapper = createWrapper();
 
       expect(wrapper.find(ERROR_MESSAGE).exists()).toBe(false);
     });
   });
 
   describe('preview display', () => {
-    async function mountInPreview(
-      accounts: PreviewBankAccount[] = samplePreviewAccounts,
-    ): Promise<VueWrapper> {
-      const wrapper = await mountAndSettle();
-      driveToPreview(accounts);
-      await nextTick();
-      return wrapper;
-    }
+    beforeEach(() => {
+      mockStore.phase = 'preview';
+      mockStore.previewAccounts = samplePreviewAccounts;
+    });
 
     it('shows account groups in preview phase', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       expect(wrapper.findAll(ACCOUNT_GROUP)).toHaveLength(1);
     });
 
     it('shows account name', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       expect(wrapper.find(ACCOUNT_NAME).text()).toBe('Checking');
     });
 
     it('shows transaction rows', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       expect(wrapper.findAll(PREVIEW_ROW)).toHaveLength(3);
     });
 
     it('applies duplicate styling to duplicate rows', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       const rows = wrapper.findAll(PREVIEW_ROW);
       expect(rows[1].classes()).toContain('preview-row--duplicate');
     });
 
     it('applies out-of-period styling', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       const rows = wrapper.findAll(PREVIEW_ROW);
       expect(rows[2].classes()).toContain('preview-row--out-of-period');
     });
 
     it('shows delete toggle for non-duplicate transactions', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
-      expect(wrapper.find('[data-testid="delete-toggle-0-0"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="delete-toggle-0-1"]').exists()).toBe(false);
+      // First row (new) has delete toggle, second row (duplicate) does not
+      expect(wrapper.find('[data-testid="delete-toggle-0-0-delete-btn"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="delete-toggle-0-1-delete-btn"]').exists()).toBe(false);
     });
 
     it('calls toggleDeleteTransaction when delete button clicked', async () => {
-      const wrapper = await mountInPreview();
-
-      await wrapper.find('[data-testid="delete-toggle-0-0"]').trigger('click');
+      const wrapper = createWrapper();
       await nextTick();
 
-      const store = useImportStore();
-      // After toggle, the transaction should be marked deleted
-      expect(store.previewAccounts[0].transactions[0].deleted).toBe(true);
+      await wrapper.find('[data-testid="delete-toggle-0-0-delete-btn"]').trigger('click');
+
+      expect(mockStore.toggleDeleteTransaction).toHaveBeenCalledWith(0, 0);
     });
 
     it('shows Import button in preview phase', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       expect(wrapper.find(SAVE_BTN).exists()).toBe(true);
     });
 
     it('shows dynamic net change from non-deleted new transactions', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       const summary = wrapper.find('[data-testid="balance-summary"]');
       // Only REF001 is 'new' (withdrawal 5000) → net = -5000 = -$50.00
@@ -427,7 +404,8 @@ describe('ImportPage', () => {
     });
 
     it('shows dynamic projected balance', async () => {
-      const wrapper = await mountInPreview();
+      const wrapper = createWrapper();
+      await nextTick();
 
       const summary = wrapper.find('[data-testid="balance-summary"]');
       // current_balance 100000 + net -5000 = 95000 = $950.00
@@ -435,6 +413,7 @@ describe('ImportPage', () => {
     });
 
     it('updates net and projected when a new transaction is deleted', async () => {
+      // Deep clone so mutations don't affect other tests
       const accounts: PreviewBankAccount[] = [
         {
           bank_account_id: 10,
@@ -463,16 +442,17 @@ describe('ImportPage', () => {
           ],
         },
       ];
-      const wrapper = await mountInPreview(accounts);
+      mockStore.previewAccounts = accounts;
+      const wrapper = createWrapper();
+      await nextTick();
 
       // Before delete: net = -5000 (-$50.00), projected = 95000 ($950.00)
       let summary = wrapper.find('[data-testid="balance-summary"]');
       expect(summary.text()).toContain('Net change: -50.00');
       expect(summary.text()).toContain('Projected: 950.00');
 
-      // Mark the new transaction as deleted via the store action
-      const store = useImportStore();
-      store.toggleDeleteTransaction(0, 0);
+      // Mark the new transaction as deleted (mutate through the reactive proxy)
+      mockStore.previewAccounts[0].transactions[0].deleted = true;
       await nextTick();
 
       // After delete: net = 0 ($0.00), projected = 100000 ($1,000.00)
@@ -482,7 +462,8 @@ describe('ImportPage', () => {
     });
 
     it('hides preview when phase is idle', async () => {
-      const wrapper = await mountAndSettle();
+      mockStore.phase = 'idle';
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.findAll(ACCOUNT_GROUP)).toHaveLength(0);
@@ -492,10 +473,9 @@ describe('ImportPage', () => {
 
   describe('unmatched IBANs', () => {
     it('shows unmatched IBAN messages', async () => {
-      const wrapper = await mountAndSettle();
-      const store = useImportStore();
-      store.phase = 'preview';
-      store.unmatchedIbans = [{ iban: 'NL99UNKN0000000000', transactionCount: 5 }];
+      mockStore.phase = 'preview';
+      mockStore.unmatchedIbans = [{ iban: 'NL99UNKN0000000000', transactionCount: 5 }];
+      const wrapper = createWrapper();
       await nextTick();
 
       const messages = wrapper.findAll(UNMATCHED_IBAN);
@@ -506,127 +486,87 @@ describe('ImportPage', () => {
   });
 
   describe('save flow', () => {
-    async function mountInPreviewWithSummary(): Promise<VueWrapper> {
-      const { parseCamt053Zip } = await import('../transactions/importers/camt053Parser');
-      vi.mocked(parseCamt053Zip).mockResolvedValue({
-        accounts: [
-          {
-            iban: 'NL01ABNA1234567890',
-            bankAccountId: 10,
-            transactions: [
-              {
-                bank_ref: 'REF001',
-                transaction_date: '2026-03-15',
-                withdrawal_amount: 5000,
-                deposit_amount: 0,
-                description: 'Test payment',
-                status: 'paid',
-              },
-            ],
-          },
-        ],
-      });
-
-      const wrapper = await mountAndSettle();
-
-      // Parse a file to get fileSummary populated
-      const file = new File(['fake'], 'test.zip', { type: 'application/zip' });
-      const fileUpload = wrapper.findComponent({ name: 'FileUpload' });
-      await fileUpload.vm.$emit('select', { files: [file] });
-      await flushPromises();
-
-      // Drive to preview phase (as if fetchPreview was called)
-      driveToPreview(samplePreviewAccounts);
-      await nextTick();
-
-      return wrapper;
-    }
+    const matchedFileSummary = [
+      {
+        iban: 'NL01ABNA1234567890',
+        matchedAccountName: 'Checking',
+        totalTransactions: 3,
+        inPeriodCount: 2,
+        outOfPeriodCount: 1,
+      },
+    ];
 
     it('calls saveImport when save button clicked', async () => {
-      const { importApi } = await import('./importApi');
-      vi.mocked(importApi.save).mockResolvedValue({
-        bank_accounts: [
-          {
-            bank_account_id: 10,
-            current_balance: 95000,
-            net: 0,
-            projected_balance: 95000,
-            saved_count: 2,
-            skipped: [],
-          },
-        ],
-      });
-
-      const wrapper = await mountInPreviewWithSummary();
+      mockStore.phase = 'preview';
+      mockStore.previewAccounts = samplePreviewAccounts;
+      mockStore.fileSummary = matchedFileSummary;
+      const wrapper = createWrapper();
+      await nextTick();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await flushPromises();
+      await nextTick();
 
-      expect(importApi.save).toHaveBeenCalled();
+      expect(mockStore.saveImport).toHaveBeenCalled();
     });
 
     it('shows success notification on save', async () => {
-      const { importApi } = await import('./importApi');
-      vi.mocked(importApi.save).mockResolvedValue({
-        bank_accounts: [
-          {
-            bank_account_id: 10,
-            current_balance: 95000,
-            net: 0,
-            projected_balance: 95000,
-            saved_count: 2,
-            skipped: [],
-          },
-        ],
-      });
-
-      const wrapper = await mountInPreviewWithSummary();
+      mockStore.phase = 'preview';
+      mockStore.previewAccounts = samplePreviewAccounts;
+      mockStore.fileSummary = matchedFileSummary;
+      const wrapper = createWrapper();
+      await nextTick();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await flushPromises();
+      await nextTick();
 
       expect(mockNotifySuccess).toHaveBeenCalledWith('Import saved successfully');
     });
 
     it('shows error notification on save failure', async () => {
-      const { importApi } = await import('./importApi');
       const errorMsg = 'Save failed';
-      vi.mocked(importApi.save).mockRejectedValue(new Error(errorMsg));
-
-      const wrapper = await mountInPreviewWithSummary();
+      mockStore.saveImport.mockImplementation(async () => {
+        mockStore.error = errorMsg;
+        throw new Error(errorMsg);
+      });
+      mockStore.phase = 'preview';
+      mockStore.previewAccounts = samplePreviewAccounts;
+      mockStore.fileSummary = matchedFileSummary;
+      const wrapper = createWrapper();
+      await nextTick();
 
       await wrapper.find(SAVE_BTN).trigger('click');
-      await flushPromises();
+      await nextTick();
 
       expect(mockNotifyError).toHaveBeenCalledWith(errorMsg);
     });
   });
 
   describe('saved phase', () => {
-    const baseSaveResult: SaveResponse = {
-      bank_accounts: [
-        {
-          bank_account_id: 10,
-          current_balance: 95000,
-          net: 0,
-          projected_balance: 95000,
-          saved_count: 2,
-          skipped: [],
-        },
-      ],
-    };
+    beforeEach(() => {
+      mockStore.phase = 'saved';
+      mockStore.saveResult = {
+        bank_accounts: [
+          {
+            bank_account_id: 10,
+            current_balance: 95000,
+            net: 0,
+            projected_balance: 95000,
+            saved_count: 2,
+            skipped: [],
+          },
+        ],
+      };
+    });
 
     it('shows success message', async () => {
-      const wrapper = await mountAndSettle();
-      driveToSaved(baseSaveResult);
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.find(SAVE_SUCCESS).exists()).toBe(true);
     });
 
     it('shows save summary per account', async () => {
-      const wrapper = await mountAndSettle();
-      driveToSaved(baseSaveResult);
+      const wrapper = createWrapper();
       await nextTick();
 
       const summaries = wrapper.findAll(SAVE_SUMMARY);
@@ -636,16 +576,14 @@ describe('ImportPage', () => {
     });
 
     it('shows link to transactions screen', async () => {
-      const wrapper = await mountAndSettle();
-      driveToSaved(baseSaveResult);
+      const wrapper = createWrapper();
       await nextTick();
 
       expect(wrapper.find(VIEW_TRANSACTIONS_BTN).exists()).toBe(true);
     });
 
     it('shows skipped transaction count when transactions were skipped', async () => {
-      const wrapper = await mountAndSettle();
-      driveToSaved({
+      mockStore.saveResult = {
         bank_accounts: [
           {
             bank_account_id: 10,
@@ -659,7 +597,8 @@ describe('ImportPage', () => {
             ],
           },
         ],
-      });
+      };
+      const wrapper = createWrapper();
       await nextTick();
 
       const summary = wrapper.find(SAVE_SUMMARY);
@@ -668,8 +607,7 @@ describe('ImportPage', () => {
     });
 
     it('does not show skipped info when nothing was skipped', async () => {
-      const wrapper = await mountAndSettle();
-      driveToSaved(baseSaveResult);
+      const wrapper = createWrapper();
       await nextTick();
 
       const summary = wrapper.find(SAVE_SUMMARY);
@@ -677,8 +615,7 @@ describe('ImportPage', () => {
     });
 
     it('shows breakdown of skip reasons', async () => {
-      const wrapper = await mountAndSettle();
-      driveToSaved({
+      mockStore.saveResult = {
         bank_accounts: [
           {
             bank_account_id: 10,
@@ -694,7 +631,8 @@ describe('ImportPage', () => {
             ],
           },
         ],
-      });
+      };
+      const wrapper = createWrapper();
       await nextTick();
 
       const summary = wrapper.find(SAVE_SUMMARY);

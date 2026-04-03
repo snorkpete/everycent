@@ -65,7 +65,7 @@
             :key="allocation.id || `${category.id}-${index}`"
             :class="{
               'fixed-subtotal-row': isSummaryRow(allocation),
-              'deleted-row': allocation.deleted,
+              'ec-deleted': allocation.deleted,
             }"
             :data-testid="
               isSummaryRow(allocation) ? `fixed-subtotal-${category.id}` : 'allocation-row'
@@ -104,15 +104,11 @@
             </td>
             <td class="amount-cell">
               <span class="spent-cell">
-                <button
+                <EcShowTransactionsButton
                   v-if="!isSummaryRow(allocation)"
-                  v-tooltip="'Show transactions for this allocation'"
-                  class="eye-btn"
                   data-testid="show-transactions-btn"
                   @click="showTransactions(allocation)"
-                >
-                  <i class="pi pi-eye"></i>
-                </button>
+                />
                 <EcMoneyDisplay
                   :model-value="allocation.spent ?? 0"
                   :emphasis="emphasisFor(allocation)"
@@ -163,15 +159,13 @@
               <span v-else-if="!isSummaryRow(allocation)">{{ allocation.comment }}</span>
             </td>
             <td v-if="store.isEditMode" class="center-cell">
-              <button
+              <EcDeleteButton
                 v-if="isEditable(allocation)"
-                v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
-                class="delete-btn"
-                :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
-                @click="toggleDeleted(allocation)"
-              >
-                <i :class="allocation.deleted ? 'pi pi-undo' : 'pi pi-trash'"></i>
-              </button>
+                :deleted="allocation.deleted"
+                item-label="allocation"
+                test-id-prefix="allocation"
+                @toggle="toggleDeleted(allocation)"
+              />
             </td>
           </tr>
 
@@ -268,6 +262,8 @@ import { allocationClasses } from '../shared/constants/allocationClasses';
 import { Emphasis } from '../shared/constants/emphasis';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
+import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { budgetApi } from './budgetApi';
 import type { AllocationData } from '../transactions/transaction.types';
@@ -461,26 +457,6 @@ function addAllocation(category: AllocationCategoryData) {
   gap: 0.25rem;
 }
 
-.eye-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
-  line-height: 1;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-tr:hover .eye-btn {
-  opacity: 1;
-}
-
-.eye-btn:hover {
-  color: var(--p-primary-color);
-}
-
 /* ── Edit mode inputs ── */
 .cell-input {
   width: 100%;
@@ -499,26 +475,6 @@ tr:hover .eye-btn {
 
 .center-cell {
   text-align: center;
-}
-
-/* ── Delete button ── */
-.delete-btn {
-  background: none;
-  border: none;
-  padding: 0.2rem;
-  cursor: pointer;
-  color: var(--p-text-muted-color);
-  font-size: 0.9rem;
-}
-
-.delete-btn:hover {
-  color: var(--p-red-600);
-}
-
-/* ── Deleted row ── */
-.deleted-row {
-  opacity: 0.4;
-  text-decoration: line-through;
 }
 
 /* ── Add allocation link ── */
