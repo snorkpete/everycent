@@ -28,6 +28,10 @@ const highlightClasses = computed(() => {
   const value = modelValue ?? 0;
   if (highlightMode === HighlightMode.None) return {};
 
+  if (highlightMode === HighlightMode.Income) {
+    return { income: true };
+  }
+
   if (highlightMode === HighlightMode.Balance) {
     return {
       positive: value > 0,
@@ -82,5 +86,9 @@ const highlightClasses = computed(() => {
 
 .muted {
   color: var(--p-text-muted-color);
+}
+
+.income {
+  color: var(--p-primary-600);
 }
 </style>
