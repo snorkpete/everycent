@@ -287,7 +287,7 @@ describe('BudgetIncomeList', () => {
 
       const firstRow = wrapper.findAll(INCOME_ROW)[0];
 
-      expect(firstRow.classes()).toContain('row-deleted');
+      expect(firstRow.classes()).toContain('ec-deleted');
     });
 
     it('removes deleted styling when deletion is undone', async () => {
@@ -300,7 +300,7 @@ describe('BudgetIncomeList', () => {
 
       const firstRow = wrapper.findAll(INCOME_ROW)[0];
 
-      expect(firstRow.classes()).not.toContain('row-deleted');
+      expect(firstRow.classes()).not.toContain('ec-deleted');
     });
 
     it('shows undo icon on delete button when income is deleted', async () => {
@@ -342,7 +342,7 @@ describe('BudgetIncomeList', () => {
 
       const btn = wrapper.find(deleteBtn(0));
 
-      expect(getTooltipValue(btn)).toContain('Undo');
+      expect(getTooltipValue(btn)).toContain('Restore');
     });
   });
 

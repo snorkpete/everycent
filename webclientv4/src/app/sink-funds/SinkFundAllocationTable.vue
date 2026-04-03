@@ -17,7 +17,7 @@
         <!-- Summary row: Sink Fund Account Balance -->
         <tr class="summary-row" data-testid="summary-row-balance">
           <td>Sink Fund Account Balance</td>
-          <td class="amount-cell">{{ centsToDollars(store.sinkFund?.current_balance ?? 0) }}</td>
+          <td class="amount-cell"><EcMoneyDisplay :model-value="store.sinkFund?.current_balance ?? 0" highlight-mode="none" /></td>
           <td></td>
           <td></td>
           <td></td>
@@ -35,7 +35,7 @@
               data-testid="unassigned-tooltip"
             ></i>
           </td>
-          <td class="amount-cell">{{ centsToDollars(store.unassignedBalance) }}</td>
+          <td class="amount-cell"><EcMoneyDisplay :model-value="store.unassignedBalance" highlight-mode="none" /></td>
           <td></td>
           <td></td>
           <td></td>
@@ -48,8 +48,7 @@
           v-for="(allocation, index) in store.visibleAllocations"
           :key="allocation.id || `new-${index}`"
           :class="{
-            'deleted-row': allocation.deleted,
-            'closed-row': allocation.status === 'closed',
+            'ec-deleted': allocation.deleted || allocation.status === 'closed',
           }"
           data-testid="allocation-row"
         >
@@ -68,15 +67,11 @@
           <!-- Current Balance (always read-only) -->
           <td class="amount-cell">
             <span class="balance-cell">
-              <button
-                v-tooltip="'Show transactions for this allocation'"
-                class="eye-btn"
+              <EcShowTransactionsButton
                 data-testid="show-transactions-btn"
                 @click="onShowTransactions(allocation)"
-              >
-                <i class="pi pi-eye"></i>
-              </button>
-              <span>{{ centsToDollars(allocation.current_balance ?? 0) }}</span>
+              />
+              <EcMoneyDisplay :model-value="allocation.current_balance ?? 0" highlight-mode="none" />
             </span>
           </td>
 
@@ -88,12 +83,12 @@
               label=""
               :edit-mode="true"
             />
-            <span v-else>{{ centsToDollars(allocation.target ?? 0) }}</span>
+            <EcMoneyDisplay v-else :model-value="allocation.target ?? 0" highlight-mode="none" />
           </td>
 
           <!-- Outstanding -->
-          <td class="amount-cell" :class="outstandingClass(outstanding(allocation))">
-            {{ centsToDollars(outstanding(allocation)) }}
+          <td class="amount-cell">
+            <EcMoneyDisplay :model-value="outstanding(allocation)" highlight-mode="balance" />
           </td>
 
           <!-- Comment -->
@@ -113,14 +108,12 @@
 
           <!-- Actions (edit mode only) -->
           <td v-if="store.isEditMode" class="center-cell action-buttons">
-            <button
-              v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete this obligation'"
-              :class="allocation.deleted ? '' : 'delete-btn'"
+            <EcDeleteButton
+              :deleted="allocation.deleted ?? false"
+              item-label="obligation"
               :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
-              @click="toggleDeleted(allocation)"
-            >
-              <i :class="allocation.deleted ? 'pi pi-undo' : 'pi pi-trash'"></i>
-            </button>
+              @toggle="toggleDeleted(allocation)"
+            />
             <button
               v-if="allocation.status === 'open'"
               v-tooltip="'Close this obligation'"
@@ -146,10 +139,10 @@
       <tfoot>
         <tr class="total-row" data-testid="total-row">
           <th>Total</th>
-          <th class="amount-cell">{{ centsToDollars(store.totalAssignedBalance) }}</th>
-          <th class="amount-cell">{{ centsToDollars(store.totalTarget) }}</th>
-          <th class="amount-cell" :class="outstandingClass(store.totalOutstanding)">
-            {{ centsToDollars(store.totalOutstanding) }}
+          <th class="amount-cell"><EcMoneyDisplay :model-value="store.totalAssignedBalance" highlight-mode="none" /></th>
+          <th class="amount-cell"><EcMoneyDisplay :model-value="store.totalTarget" highlight-mode="none" /></th>
+          <th class="amount-cell">
+            <EcMoneyDisplay :model-value="store.totalOutstanding" highlight-mode="balance" />
           </th>
           <th></th>
           <th></th>
@@ -172,8 +165,10 @@ import { ref } from 'vue';
 import Tooltip from 'primevue/tooltip';
 import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
+import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData } from './sinkFund.types';
 
@@ -189,12 +184,6 @@ function outstanding(allocation: SinkFundAllocationData): number {
   const target = allocation.target ?? 0;
   if (target === 0) return 0;
   return (allocation.current_balance ?? 0) - target;
-}
-
-function outstandingClass(value: number): string {
-  if (value > 0) return 'amount-positive';
-  if (value < 0) return 'amount-negative';
-  return 'amount-muted';
 }
 
 function toggleDeleted(allocation: SinkFundAllocationData) {
@@ -286,19 +275,6 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   text-align: right;
 }
 
-/* ── Outstanding colour classes ── */
-.amount-positive {
-  color: var(--p-green-600);
-}
-
-.amount-negative {
-  color: var(--p-red-600);
-}
-
-.amount-muted {
-  color: var(--p-text-muted-color);
-}
-
 /* ── Summary rows (sticky below header) ── */
 .summary-row td {
   font-weight: 700;
@@ -322,26 +298,6 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   align-items: center;
   justify-content: flex-end;
   gap: 0.25rem;
-}
-
-.eye-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
-  line-height: 1;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-tr:hover .eye-btn {
-  opacity: 1;
-}
-
-.eye-btn:hover {
-  color: var(--p-primary-color);
 }
 
 /* ── Edit mode inputs ── */
@@ -381,18 +337,6 @@ tr:hover .eye-btn {
 
 .reactivate-btn:hover {
   color: var(--p-green-600);
-}
-
-/* ── Deleted row ── */
-.deleted-row {
-  opacity: 0.4;
-  text-decoration: line-through;
-}
-
-/* ── Closed row (shown via toggle) ── */
-.closed-row {
-  opacity: 0.4;
-  text-decoration: line-through;
 }
 
 /* ── Unassigned info tooltip icon ── */

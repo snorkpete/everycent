@@ -27,11 +27,11 @@
       </thead>
       <tbody>
         <tr
-          v-for="(transaction, index) in store.draftTransactions"
+          v-for="(transaction, index) in store.transactions"
           :key="transaction.id ?? `new-${index}`"
           data-testid="transaction-row"
           :class="{
-            'transaction-row--deleted': transaction.deleted,
+            'ec-deleted': transaction.deleted,
             'transaction-row--newly-imported': transaction.newlyImported,
           }"
         >
@@ -140,25 +140,12 @@
             />
           </td>
           <td class="col-action">
-            <Button
-              v-if="store.isEditMode && !transaction.deleted"
-              v-tooltip="'Delete this transaction'"
-              icon="pi pi-trash"
-              severity="danger"
-              text
-              size="small"
-              :data-testid="`delete-btn-${index}`"
-              @click="store.deleteTransaction(transaction)"
-            />
-            <Button
-              v-if="store.isEditMode && transaction.deleted"
-              v-tooltip="'Restore this deleted transaction'"
-              icon="pi pi-undo"
-              severity="secondary"
-              text
-              size="small"
-              :data-testid="`undo-delete-btn-${index}`"
-              @click="store.undoDeleteTransaction(transaction)"
+            <EcDeleteButton
+              v-if="store.isEditMode"
+              :deleted="transaction.deleted ?? false"
+              item-label="transaction"
+              :data-testid="transaction.deleted ? `undo-delete-btn-${index}` : `delete-btn-${index}`"
+              @toggle="transaction.deleted ? store.undoDeleteTransaction(transaction) : store.deleteTransaction(transaction)"
             />
           </td>
         </tr>
@@ -188,6 +175,7 @@ import EcDateField from '../shared/form/date-field/EcDateField.vue';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import EcListField from '../shared/form/list-field/EcListField.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
 import type { TransactionData } from './transaction.types';
 import { useTransactionStore } from './transactionStore';
@@ -216,12 +204,12 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
 );
 
 const allDeleted = computed(
-  () => store.draftTransactions.length > 0 && store.draftTransactions.every((t) => t.deleted),
+  () => store.transactions.length > 0 && store.transactions.every((t) => t.deleted),
 );
 
 function toggleDeleteAll() {
   const newState = !allDeleted.value;
-  store.draftTransactions.forEach((t) => {
+  store.transactions.forEach((t) => {
     t.deleted = newState;
   });
 }
@@ -311,11 +299,6 @@ function autoAllocationClass(transaction: TransactionData) {
 
 .transactions-table tbody tr:nth-child(even) {
   background-color: var(--p-surface-50);
-}
-
-.transaction-row--deleted {
-  opacity: 0.4;
-  text-decoration: line-through;
 }
 
 .transaction-row--newly-imported .col-date {

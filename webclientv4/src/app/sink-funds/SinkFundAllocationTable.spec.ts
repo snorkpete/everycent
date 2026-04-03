@@ -211,32 +211,32 @@ describe('SinkFundAllocationTable', () => {
       expect(rows[1].findAll('td')[3].text()).toBe('0.00');
     });
 
-    it('applies amount-negative class when outstanding is negative', () => {
+    it('applies negative class when outstanding is negative', () => {
       const wrapper = createWrapper();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
-      const outstandingCell = rows[0].findAll('td')[3];
-      expect(outstandingCell.classes()).toContain('amount-negative');
+      const outstandingDisplay = rows[0].findAll('td')[3].find('.money-display');
+      expect(outstandingDisplay.classes()).toContain('negative');
     });
 
-    it('applies amount-positive class when outstanding is positive', async () => {
+    it('applies positive class when outstanding is positive', async () => {
       mockStore.visibleAllocations = [{ ...openAllocation, current_balance: 60000, target: 50000 }];
       const wrapper = createWrapper();
       await nextTick();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
-      const outstandingCell = rows[0].findAll('td')[3];
-      expect(outstandingCell.classes()).toContain('amount-positive');
+      const outstandingDisplay = rows[0].findAll('td')[3].find('.money-display');
+      expect(outstandingDisplay.classes()).toContain('positive');
     });
 
-    it('applies amount-muted class when outstanding is zero', async () => {
+    it('applies muted class when outstanding is zero', async () => {
       mockStore.visibleAllocations = [{ ...openAllocation, current_balance: 50000, target: 50000 }];
       const wrapper = createWrapper();
       await nextTick();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
-      const outstandingCell = rows[0].findAll('td')[3];
-      expect(outstandingCell.classes()).toContain('amount-muted');
+      const outstandingDisplay = rows[0].findAll('td')[3].find('.money-display');
+      expect(outstandingDisplay.classes()).toContain('muted');
     });
 
     it('displays allocation comment', () => {
@@ -277,20 +277,20 @@ describe('SinkFundAllocationTable', () => {
       expect(dialog.props('allocationName')).toBe(openAllocation.name);
     });
 
-    it('applies closed-row styling to closed allocations', async () => {
+    it('applies ec-deleted styling to closed allocations', async () => {
       mockStore.visibleAllocations = [{ ...closedAllocation }];
       const wrapper = createWrapper();
       await nextTick();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
-      expect(rows[0].classes()).toContain('closed-row');
+      expect(rows[0].classes()).toContain('ec-deleted');
     });
 
-    it('does not apply closed-row styling to open allocations', () => {
+    it('does not apply ec-deleted styling to open allocations', () => {
       const wrapper = createWrapper();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
-      expect(rows[0].classes()).not.toContain('closed-row');
+      expect(rows[0].classes()).not.toContain('ec-deleted');
     });
   });
 
@@ -386,7 +386,7 @@ describe('SinkFundAllocationTable', () => {
       const rows = wrapper.findAll(ALLOCATION_ROW);
       const undoBtn = rows[0].find(UNDO_DELETE_BTN);
       expect(undoBtn.exists()).toBe(true);
-      expect(getTooltipValue(undoBtn)).toBe('Undo delete');
+      expect(getTooltipValue(undoBtn)).toBe('Restore this deleted obligation');
     });
 
     it('applies deleted-row styling when allocation is deleted', async () => {
@@ -395,7 +395,7 @@ describe('SinkFundAllocationTable', () => {
       await nextTick();
 
       const rows = wrapper.findAll(ALLOCATION_ROW);
-      expect(rows[0].classes()).toContain('deleted-row');
+      expect(rows[0].classes()).toContain('ec-deleted');
     });
 
     it('renders deactivate button with correct title for open allocations', async () => {

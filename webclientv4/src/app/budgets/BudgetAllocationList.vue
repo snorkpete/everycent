@@ -1,187 +1,244 @@
 <template>
   <div class="allocation-list">
-      <div class="allocation-toolbar">
-        <Button
-          :label="isFixedDetailVisible ? 'All Allocations' : 'Variable Only'"
-          :icon="isFixedDetailVisible ? 'pi pi-filter' : 'pi pi-filter-fill'"
-          :outlined="isFixedDetailVisible"
-          size="small"
-          data-testid="variable-only-toggle"
-          v-tooltip="'Toggle between showing all allocations and variable-only mode'"
-          @click="toggleFixedDetail"
-        />
-      </div>
-      <table class="allocations-table">
-        <thead>
-          <tr>
-            <th class="name-col">Name</th>
-            <th class="amount-col">Amount</th>
-            <th class="spent-col">Spent</th>
-            <th class="remaining-col">Remaining</th>
-            <th class="class-col">Class</th>
-            <th class="fixed-col">Fixed?</th>
-            <th class="comment-col">Comment</th>
-            <th v-if="store.isEditMode" class="action-col"></th>
+    <div class="allocation-toolbar">
+      <Button
+        v-tooltip="'Toggle between showing all allocations and variable-only mode'"
+        :label="isFixedDetailVisible ? 'All Allocations' : 'Variable Only'"
+        :icon="isFixedDetailVisible ? 'pi pi-filter' : 'pi pi-filter-fill'"
+        :outlined="isFixedDetailVisible"
+        size="small"
+        data-testid="variable-only-toggle"
+        @click="toggleFixedDetail"
+      />
+    </div>
+    <table class="allocations-table">
+      <thead>
+        <tr>
+          <th class="name-col">Name</th>
+          <th class="amount-col">Amount</th>
+          <th class="spent-col">Spent</th>
+          <th class="remaining-col">Remaining</th>
+          <th class="class-col">Class</th>
+          <th class="fixed-col">Fixed?</th>
+          <th class="comment-col">Comment</th>
+          <th v-if="store.isEditMode" class="action-col"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <template v-for="category in store.allocationCategories" :key="category.id">
+          <!-- Category sub-header -->
+          <tr class="category-header" :data-testid="`category-header-${category.id}`">
+            <td>{{ category.name }}</td>
+            <td class="amount-cell">
+              <EcMoneyDisplay
+                :model-value="categoryTotals(category).amount"
+                emphasis="subtotal"
+                highlight-mode="none"
+              />
+            </td>
+            <td class="amount-cell">
+              <EcMoneyDisplay
+                :model-value="categoryTotals(category).spent"
+                emphasis="subtotal"
+                highlight-mode="none"
+              />
+            </td>
+            <td class="amount-cell">
+              <EcMoneyDisplay
+                :model-value="categoryTotals(category).remaining"
+                emphasis="subtotal"
+              />
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td v-if="store.isEditMode"></td>
           </tr>
-        </thead>
 
-        <tbody>
-          <template v-for="category in store.allocationCategories" :key="category.id">
-            <!-- Category sub-header -->
-            <tr class="category-header" :data-testid="`category-header-${category.id}`">
-              <td>{{ category.name }}</td>
-              <td class="amount-cell"><EcMoneyDisplay :model-value="categoryTotals(category).amount" emphasis="subtotal" highlight-mode="none" /></td>
-              <td class="amount-cell"><EcMoneyDisplay :model-value="categoryTotals(category).spent" emphasis="subtotal" highlight-mode="none" /></td>
-              <td class="amount-cell"><EcMoneyDisplay :model-value="categoryTotals(category).remaining" emphasis="subtotal" /></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td v-if="store.isEditMode"></td>
-            </tr>
-
-            <!-- Allocation rows (fixed first, then adjustable) -->
-            <tr
-              v-for="(allocation, index) in [...fixedAllocations(category), ...adjustableAllocations(category)]"
-              :key="allocation.id || `${category.id}-${index}`"
-              :class="{ 'fixed-subtotal-row': isSummaryRow(allocation), 'deleted-row': allocation.deleted }"
-              :data-testid="isSummaryRow(allocation) ? `fixed-subtotal-${category.id}` : 'allocation-row'"
-            >
-              <td>
-                <input
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.name"
-                  type="text"
-                  class="p-inputtext cell-input"
-                  data-testid="allocation-name-input"
-                />
-                <span v-else>
-                  {{ allocation.name }}
-                  <i
-                    v-if="allocation.is_fixed_amount && !isSummaryRow(allocation)"
-                    class="pi pi-lock fixed-icon"
-                    v-tooltip="'Fixed allocation'"
-                  ></i>
-                </span>
-              </td>
-              <td class="amount-cell">
-                <EcMoneyField
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.amount"
-                  label=""
-                  :edit-mode="true"
+          <!-- Allocation rows (fixed first, then adjustable) -->
+          <tr
+            v-for="(allocation, index) in [
+              ...fixedAllocations(category),
+              ...adjustableAllocations(category),
+            ]"
+            :key="allocation.id || `${category.id}-${index}`"
+            :class="{
+              'fixed-subtotal-row': isSummaryRow(allocation),
+              'ec-deleted': allocation.deleted,
+            }"
+            :data-testid="
+              isSummaryRow(allocation) ? `fixed-subtotal-${category.id}` : 'allocation-row'
+            "
+          >
+            <td>
+              <input
+                v-if="isEditable(allocation)"
+                v-model="allocation.name"
+                type="text"
+                class="p-inputtext cell-input"
+                data-testid="allocation-name-input"
+              />
+              <span v-else>
+                {{ allocation.name }}
+                <i
+                  v-if="allocation.is_fixed_amount && !isSummaryRow(allocation)"
+                  v-tooltip="'Fixed allocation'"
+                  class="pi pi-lock fixed-icon"
+                ></i>
+              </span>
+            </td>
+            <td class="amount-cell">
+              <EcMoneyField
+                v-if="isEditable(allocation)"
+                v-model="allocation.amount"
+                label=""
+                :edit-mode="true"
+              />
+              <EcMoneyDisplay
+                v-else
+                :model-value="allocation.amount ?? 0"
+                :emphasis="emphasisFor(allocation)"
+                highlight-mode="none"
+              />
+            </td>
+            <td class="amount-cell">
+              <span class="spent-cell">
+                <EcShowTransactionsButton
+                  v-if="!isSummaryRow(allocation)"
+                  data-testid="show-transactions-btn"
+                  @click="showTransactions(allocation)"
                 />
                 <EcMoneyDisplay
-                  v-else
-                  :model-value="allocation.amount ?? 0"
+                  :model-value="allocation.spent ?? 0"
                   :emphasis="emphasisFor(allocation)"
                   highlight-mode="none"
                 />
-              </td>
-              <td class="amount-cell">
-                <span class="spent-cell">
-                  <button
-                    v-if="!isSummaryRow(allocation)"
-                    class="eye-btn"
-                    v-tooltip="'Show transactions for this allocation'"
-                    data-testid="show-transactions-btn"
-                    @click="showTransactions(allocation)"
-                  >
-                    <i class="pi pi-eye"></i>
-                  </button>
-                  <EcMoneyDisplay
-                    :model-value="allocation.spent ?? 0"
-                    :emphasis="emphasisFor(allocation)"
-                    highlight-mode="none"
-                  />
-                </span>
-              </td>
-              <td class="amount-cell">
-                <EcMoneyDisplay
-                  :model-value="remaining(allocation)"
-                  :emphasis="emphasisFor(allocation)"
-                />
-              </td>
-              <td>
-                <select
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.allocation_class"
-                  class="cell-select"
-                  data-testid="allocation-class-select"
-                >
-                  <option v-for="cls in allocationClasses" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
-                </select>
-                <span v-else-if="!isSummaryRow(allocation)" class="class-display">{{ titleCase(allocation.allocation_class) }}</span>
-              </td>
-              <td class="center-cell">
-                <input
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.is_fixed_amount"
-                  type="checkbox"
-                  data-testid="allocation-fixed-checkbox"
-                />
-                <span v-else-if="!isSummaryRow(allocation)">{{ allocation.is_fixed_amount ? 'Yes' : 'No' }}</span>
-              </td>
-              <td>
-                <input
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.comment"
-                  type="text"
-                  class="p-inputtext cell-input"
-                  data-testid="allocation-comment-input"
-                />
-                <span v-else-if="!isSummaryRow(allocation)">{{ allocation.comment }}</span>
-              </td>
-              <td v-if="store.isEditMode" class="center-cell">
-                <button
-                  v-if="isEditable(allocation)"
-                  class="delete-btn"
-                  v-tooltip="allocation.deleted ? 'Undo delete' : 'Delete allocation'"
-                  :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
-                  @click="toggleDeleted(allocation)"
-                >
-                  <i :class="allocation.deleted ? 'pi pi-undo' : 'pi pi-trash'"></i>
-                </button>
-              </td>
-            </tr>
-
-            <!-- Add allocation button -->
-            <tr v-if="store.isEditMode" class="add-row" :data-testid="`add-allocation-row-${category.id}`">
-              <td :colspan="8">
-                <button
-                  class="add-link"
-                  :data-testid="`add-allocation-btn-${category.id}`"
-                  @click="addAllocation(category)"
-                >
-                  + Add {{ category.name }} Allocation
-                </button>
-              </td>
-            </tr>
-          </template>
-        </tbody>
-
-        <tfoot>
-          <tr v-if="!isFixedDetailVisible" class="fixed-total-row" data-testid="fixed-total-row">
-            <th>Fixed Total</th>
-            <th class="amount-cell"><EcMoneyDisplay :model-value="fixedTotals.amount" emphasis="total" highlight-mode="none" /></th>
-            <th class="amount-cell"><EcMoneyDisplay :model-value="fixedTotals.spent" emphasis="total" highlight-mode="none" /></th>
-            <th class="amount-cell"><EcMoneyDisplay :model-value="fixedTotals.remaining" emphasis="total" /></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th v-if="store.isEditMode"></th>
+              </span>
+            </td>
+            <td class="amount-cell">
+              <EcMoneyDisplay
+                :model-value="remaining(allocation)"
+                :emphasis="emphasisFor(allocation)"
+              />
+            </td>
+            <td>
+              <select
+                v-if="isEditable(allocation)"
+                v-model="allocation.allocation_class"
+                class="cell-select"
+                data-testid="allocation-class-select"
+              >
+                <option v-for="cls in allocationClasses" :key="cls.id" :value="cls.id">
+                  {{ cls.name }}
+                </option>
+              </select>
+              <span v-else-if="!isSummaryRow(allocation)" class="class-display">{{
+                titleCase(allocation.allocation_class)
+              }}</span>
+            </td>
+            <td class="center-cell">
+              <input
+                v-if="isEditable(allocation)"
+                v-model="allocation.is_fixed_amount"
+                type="checkbox"
+                data-testid="allocation-fixed-checkbox"
+              />
+              <span v-else-if="!isSummaryRow(allocation)">{{
+                allocation.is_fixed_amount ? 'Yes' : 'No'
+              }}</span>
+            </td>
+            <td>
+              <input
+                v-if="isEditable(allocation)"
+                v-model="allocation.comment"
+                type="text"
+                class="p-inputtext cell-input"
+                data-testid="allocation-comment-input"
+              />
+              <span v-else-if="!isSummaryRow(allocation)">{{ allocation.comment }}</span>
+            </td>
+            <td v-if="store.isEditMode" class="center-cell">
+              <EcDeleteButton
+                v-if="isEditable(allocation)"
+                :deleted="allocation.deleted ?? false"
+                item-label="allocation"
+                :data-testid="allocation.deleted ? 'undo-delete-btn' : 'delete-btn'"
+                @toggle="toggleDeleted(allocation)"
+              />
+            </td>
           </tr>
-          <tr class="total-row" data-testid="total-row">
-            <th>Total</th>
-            <th class="amount-cell"><EcMoneyDisplay :model-value="grandTotals.amount" emphasis="total" highlight-mode="none" /></th>
-            <th class="amount-cell"><EcMoneyDisplay :model-value="grandTotals.spent" emphasis="total" highlight-mode="none" /></th>
-            <th class="amount-cell"><EcMoneyDisplay :model-value="grandTotals.remaining" emphasis="total" /></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th v-if="store.isEditMode"></th>
+
+          <!-- Add allocation button -->
+          <tr
+            v-if="store.isEditMode"
+            class="add-row"
+            :data-testid="`add-allocation-row-${category.id}`"
+          >
+            <td :colspan="8">
+              <button
+                class="add-link"
+                :data-testid="`add-allocation-btn-${category.id}`"
+                @click="addAllocation(category)"
+              >
+                + Add {{ category.name }} Allocation
+              </button>
+            </td>
           </tr>
-        </tfoot>
-      </table>
+        </template>
+      </tbody>
+
+      <tfoot>
+        <tr v-if="!isFixedDetailVisible" class="fixed-total-row" data-testid="fixed-total-row">
+          <th>Fixed Total</th>
+          <th class="amount-cell">
+            <EcMoneyDisplay
+              :model-value="fixedTotals.amount"
+              emphasis="total"
+              highlight-mode="none"
+            />
+          </th>
+          <th class="amount-cell">
+            <EcMoneyDisplay
+              :model-value="fixedTotals.spent"
+              emphasis="total"
+              highlight-mode="none"
+            />
+          </th>
+          <th class="amount-cell">
+            <EcMoneyDisplay :model-value="fixedTotals.remaining" emphasis="total" />
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th v-if="store.isEditMode"></th>
+        </tr>
+        <tr class="total-row" data-testid="total-row">
+          <th>Total</th>
+          <th class="amount-cell">
+            <EcMoneyDisplay
+              :model-value="grandTotals.amount"
+              emphasis="total"
+              highlight-mode="none"
+            />
+          </th>
+          <th class="amount-cell">
+            <EcMoneyDisplay
+              :model-value="grandTotals.spent"
+              emphasis="total"
+              highlight-mode="none"
+            />
+          </th>
+          <th class="amount-cell">
+            <EcMoneyDisplay :model-value="grandTotals.remaining" emphasis="total" />
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th v-if="store.isEditMode"></th>
+        </tr>
+      </tfoot>
+    </table>
     <div class="unallocated-badge" data-testid="unallocated-badge">
       Unallocated: <EcMoneyDisplay :model-value="unallocated" />
     </div>
@@ -205,6 +262,8 @@ import { allocationClasses } from '../shared/constants/allocationClasses';
 import { Emphasis } from '../shared/constants/emphasis';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
+import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { budgetApi } from './budgetApi';
 import type { AllocationData } from '../transactions/transaction.types';
@@ -215,8 +274,8 @@ const store = useBudgetStore();
 
 const allocations = computed(() => store.budget?.allocations ?? []);
 const categories = computed(() => store.allocationCategories);
-const totalIncome = computed(() =>
-  store.budget?.incomes?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0,
+const totalIncome = computed(
+  () => store.budget?.incomes?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0,
 );
 
 const {
@@ -282,7 +341,7 @@ function addAllocation(category: AllocationCategoryData) {
     budget_id: store.budget.id,
     allocation_category_id: category.id,
   };
-  store.budget.allocations.push(newAllocation);
+  store.addAllocation(newAllocation);
 }
 </script>
 
@@ -332,7 +391,7 @@ function addAllocation(category: AllocationCategoryData) {
   position: sticky;
   top: var(--thead-height);
   z-index: 5;
-  background-color: var(--p-primary-50, #f0f4ff);
+  background-color: var(--p-primary-50);
   font-weight: 700;
   font-size: 0.9rem;
   padding: 0.55rem 0.75rem;
@@ -368,13 +427,27 @@ function addAllocation(category: AllocationCategoryData) {
 }
 
 /* ── Column widths ── */
-.name-col { width: 30%; }
-.amount-col { width: 13%; }
-.spent-col { width: 13%; }
-.remaining-col { width: 13%; }
-.class-col { width: 10%; }
-.fixed-col { width: 8%; }
-.action-col { width: 5%; }
+.name-col {
+  width: 30%;
+}
+.amount-col {
+  width: 13%;
+}
+.spent-col {
+  width: 13%;
+}
+.remaining-col {
+  width: 13%;
+}
+.class-col {
+  width: 10%;
+}
+.fixed-col {
+  width: 8%;
+}
+.action-col {
+  width: 5%;
+}
 
 /* ── Spent cell with eye icon ── */
 .spent-cell {
@@ -382,26 +455,6 @@ function addAllocation(category: AllocationCategoryData) {
   align-items: center;
   justify-content: flex-end;
   gap: 0.25rem;
-}
-
-.eye-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
-  line-height: 1;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-tr:hover .eye-btn {
-  opacity: 1;
-}
-
-.eye-btn:hover {
-  color: var(--p-primary-color);
 }
 
 /* ── Edit mode inputs ── */
@@ -422,26 +475,6 @@ tr:hover .eye-btn {
 
 .center-cell {
   text-align: center;
-}
-
-/* ── Delete button ── */
-.delete-btn {
-  background: none;
-  border: none;
-  padding: 0.2rem;
-  cursor: pointer;
-  color: var(--p-text-muted-color);
-  font-size: 0.9rem;
-}
-
-.delete-btn:hover {
-  color: #dc2626;
-}
-
-/* ── Deleted row ── */
-.deleted-row {
-  opacity: 0.4;
-  text-decoration: line-through;
 }
 
 /* ── Add allocation link ── */

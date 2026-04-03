@@ -481,7 +481,7 @@ describe('BudgetAllocationList', () => {
       await nextTick();
 
       const button = wrapper.find(DELETE_BTN);
-      expect(getTooltipValue(button)).toBe('Delete allocation');
+      expect(getTooltipValue(button)).toBe('Delete this allocation');
     });
 
     it('toggles deleted flag when delete button is clicked', async () => {
@@ -503,7 +503,7 @@ describe('BudgetAllocationList', () => {
 
       const undoBtn = wrapper.find(UNDO_DELETE_BTN);
       expect(undoBtn.exists()).toBe(true);
-      expect(getTooltipValue(undoBtn)).toBe('Undo delete');
+      expect(getTooltipValue(undoBtn)).toBe('Restore this deleted allocation');
     });
 
     it('applies deleted-row class to deleted allocations', async () => {
@@ -513,7 +513,7 @@ describe('BudgetAllocationList', () => {
 
       // Groceries is adjustable, so it's in the adjustable rows section
       const groceriesRow = findRowByName(wrapper, 'Groceries')!;
-      expect(groceriesRow.classes()).toContain('deleted-row');
+      expect(groceriesRow.classes()).toContain('ec-deleted');
     });
 
     it('excludes deleted allocations from category subtotals', async () => {

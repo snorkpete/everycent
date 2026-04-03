@@ -81,7 +81,7 @@ describe('TransactionList', () => {
     pinia = createPinia();
     setActivePinia(pinia);
     store = useTransactionStore();
-    store.draftTransactions = [...sampleTransactions];
+    store.transactions = [...sampleTransactions];
     store.isEditMode = false;
     store.allocations = sampleAllocations;
     store.sinkFundAllocations = sampleSinkFundAllocations;
@@ -144,7 +144,7 @@ describe('TransactionList', () => {
 
   describe('paid column', () => {
     it('shows checkmark icon for paid transactions in view mode', () => {
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -160,7 +160,7 @@ describe('TransactionList', () => {
     });
 
     it('does not show checkmark icon for unpaid transactions in view mode', () => {
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -177,7 +177,7 @@ describe('TransactionList', () => {
 
     it('shows checkbox in edit mode instead of icon', async () => {
       store.isEditMode = true;
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -208,7 +208,7 @@ describe('TransactionList', () => {
     });
 
     it('shows calculator checkboxes when showCalculatorColumn is true', () => {
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -261,7 +261,7 @@ describe('TransactionList', () => {
 
     it('calls store.deleteTransaction with the transaction when delete button is clicked', async () => {
       store.isEditMode = true;
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -277,14 +277,14 @@ describe('TransactionList', () => {
 
       await wrapper.find('[data-testid="delete-btn-0"]').trigger('click');
 
-      expect(store.deleteTransaction).toHaveBeenCalledWith(store.draftTransactions[0]);
+      expect(store.deleteTransaction).toHaveBeenCalledWith(store.transactions[0]);
     });
   });
 
   describe('undo delete', () => {
     it('hides delete button for already-deleted transactions', async () => {
       store.isEditMode = true;
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -302,7 +302,7 @@ describe('TransactionList', () => {
 
     it('shows undo button for deleted transactions', async () => {
       store.isEditMode = true;
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -320,7 +320,7 @@ describe('TransactionList', () => {
 
     it('calls store.undoDeleteTransaction when undo button is clicked', async () => {
       store.isEditMode = true;
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -336,14 +336,14 @@ describe('TransactionList', () => {
 
       await wrapper.find('[data-testid="undo-delete-btn-0"]').trigger('click');
 
-      expect(store.undoDeleteTransaction).toHaveBeenCalledWith(store.draftTransactions[0]);
+      expect(store.undoDeleteTransaction).toHaveBeenCalledWith(store.transactions[0]);
     });
   });
 
   describe('deleted transaction display', () => {
     it('applies deleted class to rows where deleted is true', async () => {
       store.isEditMode = true;
-      store.draftTransactions = [
+      store.transactions = [
         {
           id: 1,
           description: 'Groceries',
@@ -357,7 +357,7 @@ describe('TransactionList', () => {
       await nextTick();
 
       const rows = wrapper.findAll(TRANSACTION_ROW);
-      expect(rows[0].classes()).toContain('transaction-row--deleted');
+      expect(rows[0].classes()).toContain('ec-deleted');
     });
   });
 });

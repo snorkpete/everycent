@@ -1,42 +1,39 @@
 <template>
-  <div class="import-page">
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <label class="budget-label">Budget:</label>
-        <Select
-          v-model="selectedBudgetId"
-          :options="store.currentAndPastBudgets"
-          option-label="name"
-          option-value="id"
-          placeholder="Select budget"
-          data-testid="budget-select"
-          class="budget-select"
-          @update:model-value="onBudgetChange"
+  <EcPageLayout page-name="import" variant="fixed">
+    <template #toolbar-left>
+      <label class="budget-label">Budget:</label>
+      <Select
+        v-model="selectedBudgetId"
+        :options="store.currentAndPastBudgets"
+        option-label="name"
+        option-value="id"
+        placeholder="Select budget"
+        data-testid="budget-select"
+        class="budget-select"
+        @update:model-value="onBudgetChange"
+      />
+      <Message
+        v-if="store.selectedBudget && !store.isBudgetCurrent"
+        severity="warn"
+        :closable="false"
+        data-testid="budget-warning"
+        class="budget-warning"
+      >
+        Warning: This is not the current budget.
+      </Message>
+    </template>
+    <template #toolbar-right>
+      <router-link :to="{ name: 'transactions' }" class="nav-link">
+        <Button
+          icon="pi pi-arrow-left"
+          label="Transactions"
+          text
+          severity="secondary"
+          size="small"
+          data-testid="back-to-transactions-btn"
         />
-        <Message
-          v-if="store.selectedBudget && !store.isBudgetCurrent"
-          severity="warn"
-          :closable="false"
-          data-testid="budget-warning"
-          class="budget-warning"
-        >
-          Warning: This is not the current budget.
-        </Message>
-      </div>
-      <div class="toolbar-right">
-        <router-link :to="{ name: 'transactions' }" class="nav-link">
-          <Button
-            icon="pi pi-arrow-left"
-            label="Transactions"
-            text
-            severity="secondary"
-            size="small"
-            data-testid="back-to-transactions-btn"
-          />
-        </router-link>
-      </div>
-    </div>
+      </router-link>
+    </template>
 
     <!-- Content area -->
     <div class="content-area">
@@ -152,9 +149,9 @@
               {{ store.getBankAccountName(account.bank_account_id) }}
             </h3>
             <div class="balance-summary" data-testid="balance-summary">
-              <span>Balance: {{ centsToDollars(account.current_balance) }}</span>
-              <span>Net change: {{ centsToDollars(accountNet(account)) }}</span>
-              <span>Projected: {{ centsToDollars(accountProjectedBalance(account)) }}</span>
+              <span>Balance: <EcMoneyDisplay :model-value="account.current_balance" highlight-mode="none" /></span>
+              <span>Net change: <EcMoneyDisplay :model-value="accountNet(account)" highlight-mode="none" /></span>
+              <span>Projected: <EcMoneyDisplay :model-value="accountProjectedBalance(account)" highlight-mode="none" /></span>
             </div>
           </div>
 
@@ -181,9 +178,9 @@
                   <td class="col-date">{{ formatDate(transaction.transaction_date ?? '') }}</td>
                   <td class="col-description">{{ transaction.description }}</td>
                   <td class="col-money right">
-                    {{ centsToDollars(transaction.withdrawal_amount) }}
+                    <EcMoneyDisplay :model-value="transaction.withdrawal_amount ?? 0" highlight-mode="none" />
                   </td>
-                  <td class="col-money right">{{ centsToDollars(transaction.deposit_amount) }}</td>
+                  <td class="col-money right"><EcMoneyDisplay :model-value="transaction.deposit_amount ?? 0" highlight-mode="none" /></td>
                   <td class="col-allocation">
                     <span
                       v-if="transaction.allocation_id && transaction.auto_match_type"
@@ -226,19 +223,12 @@
                     />
                   </td>
                   <td class="col-action">
-                    <Button
+                    <EcDeleteButton
                       v-if="transaction.import_status !== 'duplicate'"
-                      v-tooltip="
-                        transaction.deleted
-                          ? 'Restore this transaction'
-                          : 'Exclude this transaction from import'
-                      "
-                      :icon="transaction.deleted ? 'pi pi-undo' : 'pi pi-trash'"
-                      :severity="transaction.deleted ? 'secondary' : 'danger'"
-                      text
-                      size="small"
+                      :deleted="transaction.deleted ?? false"
+                      item-label="transaction"
                       :data-testid="`delete-toggle-${accountIndex}-${txIndex}`"
-                      @click="store.toggleDeleteTransaction(accountIndex, txIndex)"
+                      @toggle="store.toggleDeleteTransaction(accountIndex, txIndex)"
                     />
                   </td>
                 </tr>
@@ -274,13 +264,15 @@
         </router-link>
       </template>
     </div>
-  </div>
+  </EcPageLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import Button from 'primevue/button';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import Select from 'primevue/select';
 import FileUpload from 'primevue/fileupload';
 import Message from 'primevue/message';
@@ -290,8 +282,8 @@ import { useHeadingStore } from '../toolbar/headingStore';
 import { useImportStore } from './importStore';
 import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
 import { formatDate } from '../shared/util/format-date';
+import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import { formatSkipReasons } from './formatSkipReasons';
 import type { ImportTransaction, PreviewBankAccount } from './import.types';
 
@@ -393,39 +385,6 @@ function previewRowClass(transaction: ImportTransaction) {
 </script>
 
 <style scoped>
-.import-page {
-  padding: 0.75rem 1.5rem 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
 .budget-label {
   font-weight: 600;
   font-size: 0.875rem;
