@@ -1,7 +1,7 @@
 # Task: Tweak Prettier settings and reformat all files
 
 **ID:** tweak-prettier-settings-and-reformat-all-files
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-02
