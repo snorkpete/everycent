@@ -479,6 +479,11 @@ function addAllocation(category: AllocationCategoryData) {
   width: auto;
 }
 
+.allocations-table.mobile td:last-child,
+.allocations-table.mobile th:last-child {
+  padding-right: 0.75rem;
+}
+
 /* ── Mobile name cell with chevron ── */
 .mobile-name-cell {
   display: flex;
