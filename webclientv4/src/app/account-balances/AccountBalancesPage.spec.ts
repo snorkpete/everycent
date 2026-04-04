@@ -10,6 +10,7 @@ import { buildAccountBalance } from '../../test/factories/accountBalanceFactory'
 // Selectors
 const INCLUDE_CLOSED_TOGGLE = '[data-testid="include-closed-toggle"]';
 const ADJUST_BALANCES_BTN = '[data-testid="adjust-balances-btn"]';
+const DASH_ZERO_TOGGLE = '[data-testid="dash-zero-toggle"]';
 const CURRENT_ACCOUNTS_TABLE = '[data-testid="current-accounts-table"]';
 const CASH_ASSETS_TABLE = '[data-testid="cash-assets-table"]';
 const NON_CASH_ASSETS_TABLE = '[data-testid="non-cash-assets-table"]';
@@ -61,7 +62,7 @@ const ToggleSwitchStub = {
 const CategoryTableStub = {
   name: 'AccountCategoryTable',
   template: '<div :data-testid="$attrs[\'data-testid\']" />',
-  props: ['heading', 'accounts'],
+  props: ['heading', 'accounts', 'dashIfZero'],
 };
 
 const AdjustDialogStub = {
@@ -285,6 +286,37 @@ describe('AccountBalancesPage', () => {
       await flushPromises();
 
       expect(api.getAll).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('toolbar -- dash-if-zero toggle', () => {
+    it('renders the dash-if-zero toggle button', async () => {
+      await setupApi();
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.find(DASH_ZERO_TOGGLE).exists()).toBe(true);
+    });
+
+    it('defaults dashIfZero to true on category tables', async () => {
+      await setupApi([currentAccount]);
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const table = wrapper.findComponent({ name: 'AccountCategoryTable' });
+      expect(table.props('dashIfZero')).toBe(true);
+    });
+
+    it('toggles dashIfZero to false when clicked', async () => {
+      await setupApi([currentAccount]);
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      await wrapper.find(DASH_ZERO_TOGGLE).trigger('click');
+      await flushPromises();
+
+      const table = wrapper.findComponent({ name: 'AccountCategoryTable' });
+      expect(table.props('dashIfZero')).toBe(false);
     });
   });
 

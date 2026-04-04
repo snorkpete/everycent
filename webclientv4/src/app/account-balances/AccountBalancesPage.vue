@@ -11,7 +11,7 @@
     </template>
     <template #toolbar-right>
       <Button
-        v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
+        v-tooltip="'Show zero balances as dashes'"
         :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
         text
         severity="secondary"
@@ -114,6 +114,11 @@ async function onToggleChanged() {
 </script>
 
 <style scoped>
+:deep(.icon-btn--active.p-button) {
+  background-color: var(--p-primary-50);
+  color: var(--p-primary-color);
+}
+
 .toggle-label {
   display: flex;
   align-items: center;
