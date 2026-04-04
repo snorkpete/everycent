@@ -77,6 +77,7 @@ class BankAccountsController < ApplicationController
                                              :user_id, :institution_id, :opening_balance, :account_category,
                                              :allow_default_allocations, :status,
                                              :import_format,
-                                             :statement_day, :payment_due_day)
+                                             :statement_day, :payment_due_day,
+                                             :asset_bank_account_id)
     end
 end

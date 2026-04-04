@@ -32,7 +32,7 @@ class BankAccountWithBalanceSerializer < ActiveModel::Serializer
              :account_no,
              :user_id, :institution_id, :opening_balance, :closing_balance, :current_balance,
              :allow_default_allocations, :is_sink_fund, :is_credit_card, :status, :import_format,
-             :statement_day, :payment_due_day,
+             :statement_day, :payment_due_day, :asset_bank_account_id,
              :statement_day_ordinal, :payment_due_day_ordinal,
              :current_period_statement_start,
              :current_period_statement_end,

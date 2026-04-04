@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_22_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_04_134933) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -71,6 +71,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_000000) do
     t.boolean "is_cash", default: true
     t.string "import_format", default: ""
     t.bigint "household_id"
+    t.integer "asset_bank_account_id"
+    t.index ["asset_bank_account_id"], name: "index_bank_accounts_on_asset_bank_account_id"
     t.index ["household_id"], name: "index_bank_accounts_on_household_id"
     t.index ["institution_id"], name: "index_bank_accounts_on_institution_id"
     t.index ["user_id"], name: "index_bank_accounts_on_user_id"
@@ -249,6 +251,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_000000) do
   add_foreign_key "allocation_categories", "households", on_update: :cascade
   add_foreign_key "allocations", "households", on_update: :cascade
   add_foreign_key "allocations", "special_events"
+  add_foreign_key "bank_accounts", "bank_accounts", column: "asset_bank_account_id"
   add_foreign_key "bank_accounts", "households", on_update: :cascade
   add_foreign_key "budgets", "households", on_update: :cascade
   add_foreign_key "incomes", "households", on_update: :cascade
