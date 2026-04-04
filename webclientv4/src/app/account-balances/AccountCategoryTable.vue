@@ -3,7 +3,10 @@
     <h3 class="section-heading">
       <span>{{ heading }}</span>
       <span class="heading-total"
-        ><EcMoneyDisplay :model-value="totalCurrentBalance" emphasis="subtotal"
+        ><EcMoneyDisplay
+          :model-value="totalCurrentBalance"
+          emphasis="subtotal"
+          :dash-if-zero="dashIfZero"
       /></span>
     </h3>
     <table class="ec-budget-table account-table">
