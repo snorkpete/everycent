@@ -40,9 +40,9 @@ describe('Allocation Categories', () => {
     cy.contains('Transport').should('be.visible');
   });
 
-  it('opens the dialog in view mode when Edit is clicked', () => {
+  it('opens the dialog in view mode when View is clicked', () => {
     cy.visitAuthenticated(pagePath);
-    cy.contains('li', 'Food').find('[data-testid^="edit-btn-"]').click();
+    cy.contains('li', 'Food').find('[data-testid^="view-btn-"]').click();
     cy.get('.p-dialog').should('be.visible');
     cy.get('[data-testid="edit-btn"]').should('be.visible');
     cy.get('[data-testid="close-btn"]').should('be.visible');

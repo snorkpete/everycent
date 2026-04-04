@@ -2,11 +2,17 @@
   <EcPageLayout page-name="institutions">
     <EcItemList :items="store.institutions" key-field="id">
       <template #item="{ item: institution }">
-        <span class="institution-name">{{ institution.name }}</span>
+        <a
+          class="institution-name"
+          href="#"
+          :data-testid="`institution-link-${institution.id}`"
+          @click.prevent="editInstitution(institution)"
+          >{{ institution.name }}</a
+        >
         <Button
-          label="Edit"
+          label="View"
           size="small"
-          :data-testid="`edit-btn-${institution.id}`"
+          :data-testid="`view-btn-${institution.id}`"
           @click="editInstitution(institution)"
         />
       </template>
@@ -86,5 +92,12 @@ async function onSave(institution: InstitutionData) {
 <style scoped>
 .institution-name {
   font-size: 0.9rem;
+  color: var(--p-primary-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.institution-name:hover {
+  text-decoration: underline;
 }
 </style>

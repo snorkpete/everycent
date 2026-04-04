@@ -1,55 +1,57 @@
 <template>
   <EcPageLayout page-name="settings">
-    <div class="form-fields">
-      <EcListField
-        :model-value="formData.primary_budget_account_id"
-        label="Primary Budget Account"
-        :edit-mode="editMode"
-        :items="bankAccountItems"
-        data-testid="primary-budget-account"
-        @update:model-value="onPrimaryBudgetAccountChange"
-      />
-
-      <EcListField
-        :model-value="formData.default_allocation_category_id_for_special_events"
-        label="Default Allocation Category for Special Events"
-        :edit-mode="editMode"
-        :items="allocationCategoryItems"
-        data-testid="default-allocation-category"
-        @update:model-value="onDefaultAllocationCategoryChange"
-      />
-
-      <EcListField
-        :model-value="formData.family_type"
-        label="Type of Household"
-        :edit-mode="editMode"
-        :items="familyTypeItems"
-        data-testid="family-type"
-        @update:model-value="onFamilyTypeChange"
-      />
-
-      <template v-if="formData.family_type === 'single'">
-        <EcTextField
-          v-model="formData.single_person"
-          label="Person's Name"
+    <div class="settings-card" data-testid="settings-card">
+      <div class="form-fields">
+        <EcListField
+          :model-value="formData.primary_budget_account_id"
+          label="Primary Budget Account"
           :edit-mode="editMode"
-          data-testid="single-person"
+          :items="bankAccountItems"
+          data-testid="primary-budget-account"
+          @update:model-value="onPrimaryBudgetAccountChange"
         />
-      </template>
-      <template v-else-if="formData.family_type === 'couple'">
-        <EcTextField
-          v-model="formData.husband"
-          label="Husband's Name"
+
+        <EcListField
+          :model-value="formData.default_allocation_category_id_for_special_events"
+          label="Default Allocation Category for Special Events"
           :edit-mode="editMode"
-          data-testid="husband"
+          :items="allocationCategoryItems"
+          data-testid="default-allocation-category"
+          @update:model-value="onDefaultAllocationCategoryChange"
         />
-        <EcTextField
-          v-model="formData.wife"
-          label="Wife's Name"
+
+        <EcListField
+          :model-value="formData.family_type"
+          label="Type of Household"
           :edit-mode="editMode"
-          data-testid="wife"
+          :items="familyTypeItems"
+          data-testid="family-type"
+          @update:model-value="onFamilyTypeChange"
         />
-      </template>
+
+        <template v-if="formData.family_type === 'single'">
+          <EcTextField
+            v-model="formData.single_person"
+            label="Person's Name"
+            :edit-mode="editMode"
+            data-testid="single-person"
+          />
+        </template>
+        <template v-else-if="formData.family_type === 'couple'">
+          <EcTextField
+            v-model="formData.husband"
+            label="Husband's Name"
+            :edit-mode="editMode"
+            data-testid="husband"
+          />
+          <EcTextField
+            v-model="formData.wife"
+            label="Wife's Name"
+            :edit-mode="editMode"
+            data-testid="wife"
+          />
+        </template>
+      </div>
     </div>
 
     <div class="page-actions">
@@ -161,6 +163,14 @@ function cancelEdit() {
 </script>
 
 <style scoped>
+.settings-card {
+  border: 1px solid var(--p-surface-300);
+  border-radius: 6px;
+  background-color: var(--p-surface-0);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
 .form-fields {
   display: flex;
   flex-direction: column;

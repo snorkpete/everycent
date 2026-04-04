@@ -82,21 +82,43 @@ describe('AllocationCategoriesPage', () => {
       expect(wrapper.text()).toContain(category2.name);
     });
 
-    it('renders an Edit button for each category', async () => {
+    it('renders a View button for each category', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      expect(wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).exists()).toBe(true);
-      expect(wrapper.find(`[data-testid="edit-btn-${category2.id}"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="view-btn-${category1.id}"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="view-btn-${category2.id}"]`).exists()).toBe(true);
+    });
+
+    it('renders a clickable name link for each category', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      expect(wrapper.find(`[data-testid="category-link-${category1.id}"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="category-link-${category2.id}"]`).exists()).toBe(true);
     });
   });
 
-  describe('Edit button', () => {
+  describe('category name link', () => {
+    it('opens the dialog with the selected category in view mode', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      await wrapper.find(`[data-testid="category-link-${category1.id}"]`).trigger('click');
+
+      const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
+      expect(dialog.props('visible')).toBe(true);
+      expect(dialog.props('allocationCategory')).toEqual(category1);
+      expect(dialog.props('initialEditMode')).toBe(false);
+    });
+  });
+
+  describe('View button', () => {
     it('opens the dialog with the selected category', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       expect(dialog.props('visible')).toBe(true);
@@ -107,7 +129,7 @@ describe('AllocationCategoriesPage', () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       expect(dialog.props('initialEditMode')).toBe(false);
@@ -153,7 +175,7 @@ describe('AllocationCategoriesPage', () => {
     it('calls the API to update the category when it has an id', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
-      await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       await dialog.vm.$emit('save', category1);
@@ -165,7 +187,7 @@ describe('AllocationCategoriesPage', () => {
     it('closes the dialog and shows a success toast after a successful save', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
-      await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       await dialog.vm.$emit('save', category1);
@@ -179,7 +201,7 @@ describe('AllocationCategoriesPage', () => {
       vi.mocked(allocationCategoryApi.update).mockRejectedValue(new Error('Server error'));
       const wrapper = createWrapper(pinia);
       await flushPromises();
-      await wrapper.find(`[data-testid="edit-btn-${category1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${category1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'AllocationCategoryEditDialog' });
       await dialog.vm.$emit('save', category1);
