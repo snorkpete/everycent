@@ -100,7 +100,7 @@ const totalCurrentBalance = computed(() =>
 
 <style scoped>
 /* Shared budget table base — imported unscoped (Vue limitation) */
-@import '../../shared/styles/budget-table.css';
+@import '../shared/styles/budget-table.css';
 
 .account-category-table {
   padding: 0.75rem 1rem;

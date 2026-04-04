@@ -14,13 +14,18 @@ const {
   modelValue = 0,
   highlightMode = HighlightMode.Balance,
   emphasis = Emphasis.Item,
+  dashIfZero = false,
 } = defineProps<{
   modelValue?: number | null;
   highlightMode?: HighlightModeType;
   emphasis?: EmphasisType;
+  dashIfZero?: boolean;
 }>();
 
-const formattedValue = computed(() => centsToDollars(modelValue));
+const formattedValue = computed(() => {
+  if (dashIfZero && (modelValue ?? 0) === 0) return '—';
+  return centsToDollars(modelValue);
+});
 
 const emphasisClass = computed(() => `emphasis-${emphasis}`);
 

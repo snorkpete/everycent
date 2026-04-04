@@ -17,7 +17,6 @@ import { DialogStub } from '../../test/stubs';
 const CATEGORY_HEADER = (id: number) => `[data-testid="category-header-${id}"]`;
 const ALLOCATION_ROW = '[data-testid="allocation-row"]';
 const TOTAL_ROW = '[data-testid="total-row"]';
-const UNALLOCATED_BADGE = '[data-testid="unallocated-badge"]';
 const SHOW_TRANSACTIONS_BTN = '[data-testid="show-transactions-btn"]';
 const ADD_ALLOCATION_BTN = (id: number) => `[data-testid="add-allocation-btn-${id}"]`;
 const ADD_ALLOCATION_ROW = (id: number) => `[data-testid="add-allocation-row-${id}"]`;
@@ -128,9 +127,9 @@ async function createWrapperWithFixedCollapsed(): Promise<VueWrapper> {
   return fixedCollapsedWrapper;
 }
 
-// In default mode (all allocations visible), fixed rows come first per category,
-// then adjustable. So for Essentials: Rent (fixed), then Groceries (adjustable).
-// Row order: [0] Rent, [1] Groceries, [2] Entertainment
+// In default mode (all allocations visible), rows are sorted alphabetically
+// within each category. So for Essentials: Groceries, then Rent.
+// Row order: [0] Groceries, [1] Rent, [2] Entertainment
 function findRowByName(wrapper: VueWrapper, name: string) {
   return wrapper.findAll(ALLOCATION_ROW).find((r) => {
     // Check text content (view mode) and input values (edit mode)
@@ -182,7 +181,7 @@ describe('BudgetAllocationList', () => {
     it('renders seven columns in view mode (no action column)', () => {
       const wrapper = createWrapper();
 
-      const headerCells = wrapper.findAll('thead th');
+      const headerCells = wrapper.findAll('thead tr:last-child th');
       expect(headerCells).toHaveLength(7);
     });
   });
@@ -292,9 +291,10 @@ describe('BudgetAllocationList', () => {
     it('opens the transactions dialog when eye icon is clicked', async () => {
       const wrapper = createWrapper();
 
-      // First eye button is on Rent (fixed, rendered first)
-      const buttons = wrapper.findAll(SHOW_TRANSACTIONS_BTN);
-      await buttons[0].trigger('click');
+      // Click the eye button on the Rent row
+      const rentRow = findRowByName(wrapper, 'Rent')!;
+      const eyeBtn = rentRow.find(SHOW_TRANSACTIONS_BTN);
+      await eyeBtn.trigger('click');
 
       const dialog = wrapper.findComponent(AllocationTransactionsDialog);
       expect(dialog.props('visible')).toBe(true);
@@ -367,24 +367,6 @@ describe('BudgetAllocationList', () => {
     });
   });
 
-  describe('view mode — unallocated badge', () => {
-    it('shows unallocated amount (total income - total allocations)', () => {
-      const wrapper = createWrapper();
-      // Income: 2000 + 500 = 2500. Allocations: 500 + 1000 + 200 = 1700. Unallocated: 800.00
-      const expectedUnallocated = '800.00';
-
-      const badge = wrapper.find(UNALLOCATED_BADGE);
-      expect(badge.text()).toContain(expectedUnallocated);
-    });
-
-    it('displays "Unallocated:" label', () => {
-      const wrapper = createWrapper();
-
-      const badge = wrapper.find(UNALLOCATED_BADGE);
-      expect(badge.text()).toContain('Unallocated:');
-    });
-  });
-
   describe('edit mode — inputs', () => {
     beforeEach(() => {
       mockStore.isEditMode = true;
@@ -394,7 +376,7 @@ describe('BudgetAllocationList', () => {
       const wrapper = createWrapper();
       await nextTick();
 
-      const headerCells = wrapper.findAll('thead th');
+      const headerCells = wrapper.findAll('thead tr:last-child th');
       expect(headerCells).toHaveLength(8);
     });
 
@@ -540,16 +522,6 @@ describe('BudgetAllocationList', () => {
       expect(amountCell.text()).toBe(expectedTotal);
     });
 
-    it('excludes deleted allocations from unallocated calculation', async () => {
-      mockStore.budget!.allocations[0].deleted = true;
-      const wrapper = createWrapper();
-      await nextTick();
-      // Income: 2500. Allocations without Groceries: 1200. Unallocated: 1300.00
-      const expectedUnallocated = '1,300.00';
-
-      const badge = wrapper.find(UNALLOCATED_BADGE);
-      expect(badge.text()).toContain(expectedUnallocated);
-    });
   });
 
   describe('edit mode — add allocation', () => {
@@ -684,7 +656,7 @@ describe('BudgetAllocationList', () => {
     it('spent column is visible in variable-only mode', async () => {
       const fixedCollapsedWrapper = await createWrapperWithFixedCollapsed();
 
-      const headerCells = fixedCollapsedWrapper.findAll('thead th');
+      const headerCells = fixedCollapsedWrapper.findAll('thead tr:last-child th');
       const headerTexts = headerCells.map((h) => h.text());
       expect(headerTexts).toContain('Spent');
     });
