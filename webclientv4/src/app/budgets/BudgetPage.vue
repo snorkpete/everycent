@@ -2,6 +2,16 @@
   <EcPageLayout page-name="budget" variant="fixed">
     <template #toolbar-left>
       <Button
+        v-if="isMobile"
+        v-tooltip="'Back to budget list'"
+        icon="pi pi-arrow-left"
+        outlined
+        size="small"
+        data-testid="back-btn"
+        @click="router.push('/budgets')"
+      />
+      <Button
+        v-else
         label="Back to Budget List"
         icon="pi pi-arrow-left"
         outlined
@@ -9,7 +19,19 @@
         data-testid="back-btn"
         @click="router.push('/budgets')"
       />
+      <Button
+        v-if="isMobile"
+        v-tooltip="'View transactions for this budget'"
+        icon="pi pi-list"
+        text
+        severity="secondary"
+        size="small"
+        as="a"
+        :href="`#/transactions?budget_id=${route.params.id}`"
+        data-testid="view-transactions-btn"
+      />
       <a
+        v-else
         :href="`#/transactions?budget_id=${route.params.id}`"
         class="view-transactions-link"
         data-testid="view-transactions-btn"
@@ -60,10 +82,12 @@ import { useHeadingStore } from '../toolbar/headingStore';
 import { useBudgetStore } from './budgetStore';
 import { useNotifications } from '../notifications/useNotifications';
 import { useSettingsStore } from '../settings/settingsStore';
+import { useResponsive } from '../shared/composables/useResponsive';
 import BudgetIncomeList from './BudgetIncomeList.vue';
 import BudgetAllocationList from './BudgetAllocationList.vue';
 import BudgetSummaryStrip from './BudgetSummaryStrip.vue';
 
+const { isMobile } = useResponsive();
 const route = useRoute();
 const router = useRouter();
 const store = useBudgetStore();

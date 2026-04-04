@@ -14,7 +14,7 @@
       />
     </div>
 
-    <table class="ec-budget-table income-table">
+    <table class="ec-budget-table income-table" :class="{ mobile: isMobile }">
       <thead>
         <tr>
           <th class="col-name">Name</th>
@@ -76,11 +76,13 @@
 import { computed } from 'vue';
 import Button from 'primevue/button';
 import { useBudgetStore } from './budgetStore';
+import { useResponsive } from '../shared/composables/useResponsive';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import type { IncomeData } from './budget.types';
 
+const { isMobile } = useResponsive();
 const store = useBudgetStore();
 
 const incomes = computed(() => store.budget?.incomes ?? []);
@@ -163,5 +165,20 @@ function toggleDeleted(income: IncomeData) {
   width: 100%;
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
+}
+
+/* ── Mobile: relax min-widths, allow wrap ── */
+.income-table.mobile th,
+.income-table.mobile td {
+  white-space: normal;
+  padding: 0.4rem 0.5rem;
+}
+
+.income-table.mobile .col-name {
+  min-width: 0;
+}
+
+.income-table.mobile .col-amount {
+  min-width: 0;
 }
 </style>

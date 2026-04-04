@@ -2,12 +2,31 @@
   <EcPageLayout page-name="budgets" variant="fixed">
     <template #toolbar-left>
       <Button
+        v-if="isMobile"
+        v-tooltip="'Add new budget'"
+        icon="pi pi-plus"
+        size="small"
+        data-testid="add-budget-btn"
+        @click="showAddDialog = true"
+      />
+      <Button
+        v-else
         label="Add New Budget"
         size="small"
         data-testid="add-budget-btn"
         @click="showAddDialog = true"
       />
       <Button
+        v-if="isMobile"
+        v-tooltip="'Reopen last closed budget'"
+        icon="pi pi-history"
+        severity="warn"
+        size="small"
+        data-testid="reopen-btn"
+        @click="confirmReopenLast"
+      />
+      <Button
+        v-else
         label="Reopen Last Budget"
         severity="warn"
         size="small"
@@ -27,8 +46,59 @@
       />
     </template>
 
-    <!-- Budget List -->
-    <div class="content-card">
+    <!-- Mobile: Card list -->
+    <div v-if="isMobile" class="budget-cards">
+      <div
+        v-for="budget in store.budgets"
+        :key="budget.id"
+        class="budget-card"
+        data-testid="budget-row"
+        @click="goToBudget(budget)"
+      >
+        <div class="budget-card__header">
+          <span class="budget-card__name" :data-testid="`budget-name-link-${budget.id}`">
+            {{ budget.name }}
+          </span>
+          <span
+            class="status-badge"
+            :class="budget.status === 'open' ? 'status-open' : 'status-closed'"
+            :data-testid="`status-${budget.id}`"
+          >
+            {{ budget.status }}
+          </span>
+        </div>
+        <div
+          v-if="store.canCopy(budget) || store.canClose(budget)"
+          class="budget-card__actions"
+          @click.stop
+        >
+          <Button
+            v-if="store.canCopy(budget)"
+            label="Copy"
+            size="small"
+            outlined
+            severity="info"
+            :data-testid="`copy-btn-${budget.id}`"
+            @click="confirmCopy(budget)"
+          />
+          <Button
+            v-if="store.canClose(budget)"
+            label="Close"
+            size="small"
+            outlined
+            severity="danger"
+            :data-testid="`close-btn-${budget.id}`"
+            @click="confirmClose(budget)"
+          />
+        </div>
+      </div>
+      <div v-if="store.budgets.length === 0 && !store.loading" class="empty-cell">
+        No budgets found.
+      </div>
+    </div>
+
+    <!-- Desktop: Table -->
+    <div v-else class="content-card">
       <table class="budget-table">
         <thead>
           <tr>
@@ -111,9 +181,11 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useBudgetListStore } from './budgetListStore';
 import { useNotifications } from '../notifications/useNotifications';
+import { useResponsive } from '../shared/composables/useResponsive';
 import AddBudgetDialog from './AddBudgetDialog.vue';
 import type { BudgetData } from './budget.types';
 
+const { isMobile } = useResponsive();
 const store = useBudgetListStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
@@ -137,6 +209,7 @@ function confirmCopy(budget: BudgetData) {
     message: 'Are you sure you want to COPY this budget?',
     acceptLabel: 'Copy',
     rejectLabel: 'Cancel',
+    rejectClass: 'p-button-secondary p-button-text',
     accept: () => onCopy(budget),
   });
 }
@@ -148,6 +221,7 @@ function confirmClose(budget: BudgetData) {
     acceptLabel: 'Close',
     rejectLabel: 'Cancel',
     acceptClass: 'p-button-danger',
+    rejectClass: 'p-button-secondary p-button-text',
     accept: () => onClose(budget),
   });
 }
@@ -158,7 +232,9 @@ function confirmReopenLast() {
     message: 'Are you sure you want to open the last closed budget?',
     acceptLabel: 'Reopen',
     rejectLabel: 'Cancel',
-    accept: () => onReopenLast(),
+    acceptClass: 'p-button-danger',
+    rejectClass: 'p-button-secondary p-button-text',
+    accept: onReopenLast,
   });
 }
 
@@ -299,6 +375,52 @@ async function onAddBudget(startDate: string) {
 /* ── Row hover ── */
 .budget-table tbody tr:hover td {
   background-color: var(--p-surface-50);
+}
+
+/* ── Mobile cards ── */
+.budget-cards {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: var(--p-surface-100);
+  padding: 0.5rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.budget-card {
+  border: 1px solid var(--p-surface-300);
+  border-radius: 6px;
+  background-color: var(--p-surface-0);
+  padding: 0.75rem;
+  cursor: pointer;
+}
+
+.budget-card:active {
+  background-color: var(--p-surface-50);
+}
+
+.budget-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.budget-card__name {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--p-primary-color);
+}
+
+.budget-card__actions {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
 }
 
 /* ── Empty state ── */
