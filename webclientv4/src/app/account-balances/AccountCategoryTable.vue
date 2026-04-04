@@ -36,13 +36,25 @@
           </td>
           <td>{{ account.institution?.name ?? '' }}</td>
           <td class="money-cell">
-            <EcMoneyDisplay :model-value="account.closing_balance" highlight-mode="none" />
+            <EcMoneyDisplay
+              :model-value="account.closing_balance"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
           </td>
           <td class="money-cell">
-            <EcMoneyDisplay :model-value="account.expected_closing_balance" highlight-mode="none" />
+            <EcMoneyDisplay
+              :model-value="account.expected_closing_balance"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
           </td>
           <td class="money-cell">
-            <EcMoneyDisplay :model-value="account.current_balance" highlight-mode="none" />
+            <EcMoneyDisplay
+              :model-value="account.current_balance"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
           </td>
         </tr>
       </tbody>
@@ -50,13 +62,28 @@
         <tr class="total-row">
           <th colspan="2" class="total-label">Total</th>
           <th class="money-cell">
-            <EcMoneyDisplay :model-value="totalClosingBalance" emphasis="total" />
+            <EcMoneyDisplay
+              :model-value="totalClosingBalance"
+              emphasis="total"
+              highlight-mode="balance"
+              :dash-if-zero="dashIfZero"
+            />
           </th>
           <th class="money-cell">
-            <EcMoneyDisplay :model-value="totalExpectedClosingBalance" emphasis="total" />
+            <EcMoneyDisplay
+              :model-value="totalExpectedClosingBalance"
+              emphasis="total"
+              highlight-mode="balance"
+              :dash-if-zero="dashIfZero"
+            />
           </th>
           <th class="money-cell">
-            <EcMoneyDisplay :model-value="totalCurrentBalance" emphasis="total" />
+            <EcMoneyDisplay
+              :model-value="totalCurrentBalance"
+              emphasis="total"
+              highlight-mode="balance"
+              :dash-if-zero="dashIfZero"
+            />
           </th>
         </tr>
       </tfoot>
@@ -73,6 +100,7 @@ import type { AccountBalanceData } from './accountBalance.types';
 const props = defineProps<{
   heading: string;
   accounts: AccountBalanceData[];
+  dashIfZero?: boolean;
 }>();
 
 const firstAccount = computed(() => props.accounts[0] ?? null);
@@ -103,7 +131,22 @@ const totalCurrentBalance = computed(() =>
 @import '../shared/styles/budget-table.css';
 
 .account-category-table {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 0 0;
+}
+
+.account-category-table .account-table {
+  /* Table spans full card width; cells handle horizontal padding */
+  width: 100%;
+}
+
+.account-table td:first-child,
+.account-table th:first-child {
+  padding-left: 1rem;
+}
+
+.account-table td:last-child,
+.account-table th:last-child {
+  padding-right: 1rem;
 }
 
 .section-heading {
@@ -113,6 +156,7 @@ const totalCurrentBalance = computed(() =>
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 0.5rem;
+  padding: 0 1rem;
   color: var(--p-text-color);
 }
 
