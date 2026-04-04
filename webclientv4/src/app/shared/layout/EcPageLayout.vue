@@ -1,5 +1,9 @@
 <template>
-  <div class="ec-page-layout" :class="`ec-page-layout--${variant}`" :data-page="pageName">
+  <div
+    class="ec-page-layout"
+    :class="[`ec-page-layout--${variant}`, { 'ec-page-layout--mobile': isMobile }]"
+    :data-page="pageName"
+  >
     <div v-if="$slots['toolbar-left'] || $slots['toolbar-right']" class="ec-page-layout__toolbar">
       <div class="ec-page-layout__toolbar-left">
         <slot name="toolbar-left" />
@@ -16,10 +20,14 @@
 </template>
 
 <script setup lang="ts">
+import { useResponsive } from '../composables/useResponsive';
+
 const { pageName, variant = 'scrollable' } = defineProps<{
   pageName: string;
   variant?: 'scrollable' | 'fixed';
 }>();
+
+const { isMobile } = useResponsive();
 </script>
 
 <style scoped>
@@ -62,5 +70,14 @@ const { pageName, variant = 'scrollable' } = defineProps<{
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
+}
+
+/* ── Mobile: tighter side padding ── */
+.ec-page-layout--mobile.ec-page-layout--scrollable {
+  padding: 0.75rem 0.75rem 1rem;
+}
+
+.ec-page-layout--mobile.ec-page-layout--fixed {
+  padding: 0.5rem 0.75rem 0;
 }
 </style>

@@ -1,5 +1,47 @@
 <template>
-  <div v-if="budgetStore.budget" class="summary-strip" data-testid="budget-summary-strip">
+  <!-- Mobile: stacked grid -->
+  <div
+    v-if="budgetStore.budget && isMobile"
+    class="summary-strip summary-strip--mobile"
+    data-testid="budget-summary-strip"
+  >
+    <div class="strip-grid">
+      <div class="strip-item">
+        <span class="strip-label">Income</span>
+        <EcMoneyDisplay class="strip-value" :model-value="totalIncome" highlight-mode="none" />
+      </div>
+      <div class="strip-item">
+        <span class="strip-label">Allocated</span>
+        <EcMoneyDisplay class="strip-value" :model-value="totalAllocations" highlight-mode="none" />
+      </div>
+      <div class="strip-item">
+        <span class="strip-label">Unallocated</span>
+        <EcMoneyDisplay
+          class="strip-value"
+          :model-value="discretionaryTotal"
+          highlight-mode="balance"
+          data-testid="unallocated-amount"
+        />
+      </div>
+      <div class="strip-item">
+        <span class="strip-label">{{ discretionaryLabel }}</span>
+        <EcMoneyDisplay
+          class="strip-value"
+          :model-value="perPersonAmount"
+          highlight-mode="balance"
+          data-testid="discretionary-amount"
+        />
+      </div>
+    </div>
+    <div class="nws-row">
+      <span v-tooltip="'Needs'" class="nws-pill nws-need">N {{ needsPercentage }}%</span>
+      <span v-tooltip="'Wants'" class="nws-pill nws-want">W {{ wantsPercentage }}%</span>
+      <span v-tooltip="'Savings'" class="nws-pill nws-savings">S {{ savingsPercentage }}%</span>
+    </div>
+  </div>
+
+  <!-- Desktop: horizontal strip -->
+  <div v-else-if="budgetStore.budget" class="summary-strip" data-testid="budget-summary-strip">
     <div class="strip-item">
       <span class="strip-label">Income</span>
       <EcMoneyDisplay class="strip-value" :model-value="totalIncome" highlight-mode="none" />
@@ -40,10 +82,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useBudgetStore } from './budgetStore';
+import { useResponsive } from '../shared/composables/useResponsive';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useWantsNeedsBudgetBreakdown } from './useWantsNeedsBudgetBreakdown';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 
+const { isMobile } = useResponsive();
 const budgetStore = useBudgetStore();
 const settingsStore = useSettingsStore();
 
@@ -157,5 +201,26 @@ const { needsPercentage, savingsPercentage, wantsPercentage } = useWantsNeedsBud
 .nws-savings {
   background-color: var(--p-green-100);
   color: var(--p-green-800);
+}
+
+/* ── Mobile stacked layout ── */
+.summary-strip--mobile {
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.strip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.nws-row {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: center;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--p-surface-200);
 }
 </style>
