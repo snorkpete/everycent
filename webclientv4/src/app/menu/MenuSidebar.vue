@@ -101,7 +101,10 @@ function logout() {
   router.push('/login');
 }
 
-const menuItems = buildMenuItems(logout, (path) => router.push(path));
+const menuItems = buildMenuItems(logout, (path) => {
+  drawerVisible.value = false;
+  router.push(path);
+});
 
 // PanelMenu uses different props for active class depending on item depth:
 //   depth 0 (top-level panel headers) → headerClass → targets .p-panelmenu-header
