@@ -77,6 +77,7 @@ const editMode = ref(alwaysEdit || initialEditMode);
 
 const mergedStyle = computed(() => ({
   width,
+  maxWidth: '95vw',
   ...dialogStyle,
 }));
 

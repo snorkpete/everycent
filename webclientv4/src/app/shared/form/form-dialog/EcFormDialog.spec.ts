@@ -197,18 +197,18 @@ describe('EcFormDialog', () => {
       expect(dialog.props('header')).toBe('My Header');
     });
 
-    it('uses default width of 30rem', () => {
+    it('uses default width of 30rem with max-width constraint', () => {
       const wrapper = createWrapper();
 
       const dialog = wrapper.findComponent({ name: 'Dialog' });
-      expect(dialog.props('style')).toEqual({ width: '30rem' });
+      expect(dialog.props('style')).toEqual({ width: '30rem', maxWidth: '95vw' });
     });
 
-    it('merges dialogStyle with width', () => {
-      const wrapper = createWrapper({ width: '72rem', dialogStyle: { maxWidth: '95vw' } });
+    it('merges dialogStyle with width and allows overriding maxWidth', () => {
+      const wrapper = createWrapper({ width: '72rem', dialogStyle: { maxWidth: '80vw' } });
 
       const dialog = wrapper.findComponent({ name: 'Dialog' });
-      expect(dialog.props('style')).toEqual({ width: '72rem', maxWidth: '95vw' });
+      expect(dialog.props('style')).toEqual({ width: '72rem', maxWidth: '80vw' });
     });
   });
 

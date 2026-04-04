@@ -23,12 +23,12 @@ vi.mock('../../auth/authApi', () => ({
   },
 }));
 
-const isDesktop = ref(true);
-vi.mock('@vueuse/core', () => ({
-  useBreakpoints: () => ({
-    greaterOrEqual: () => isDesktop,
+const isCompact = ref(false);
+vi.mock('../shared/composables/useResponsive', () => ({
+  useResponsive: () => ({
+    isMobile: ref(false),
+    isCompact,
   }),
-  breakpointsPrimeFlex: {},
 }));
 
 describe('MenuSidebar', () => {
@@ -60,7 +60,7 @@ describe('MenuSidebar', () => {
 
   describe('desktop (≥992px)', () => {
     beforeEach(() => {
-      isDesktop.value = true;
+      isCompact.value = false;
     });
 
     it('renders a static sidebar', () => {
@@ -109,7 +109,7 @@ describe('MenuSidebar', () => {
 
   describe('active menu and auto-expand', () => {
     beforeEach(() => {
-      isDesktop.value = true;
+      isCompact.value = false;
     });
 
     function setupHeader() {
@@ -146,7 +146,7 @@ describe('MenuSidebar', () => {
 
   describe('mobile (<992px)', () => {
     beforeEach(() => {
-      isDesktop.value = false;
+      isCompact.value = true;
     });
 
     it('does not render the static sidebar', () => {
@@ -170,6 +170,21 @@ describe('MenuSidebar', () => {
 
       expect(document.body.textContent).toContain('Home');
       expect(document.body.textContent).toContain('Reports');
+    });
+
+    it('closes the drawer when route changes', async () => {
+      createWrapper();
+
+      await wrapper.find('[data-testid="menu-toggle"]').trigger('click');
+      await nextTick();
+      await flushPromises();
+      expect(document.body.textContent).toContain('Home');
+
+      mockRoute.path = '/budgets';
+      await nextTick();
+      await flushPromises();
+
+      expect(document.querySelector('[data-testid="mobile-drawer"]')).toBeNull();
     });
   });
 });

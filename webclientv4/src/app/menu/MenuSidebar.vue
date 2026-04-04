@@ -35,13 +35,13 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
-import { useBreakpoints, breakpointsPrimeFlex } from '@vueuse/core';
 import PanelMenu from 'primevue/panelmenu';
 import Button from 'primevue/button';
 import Drawer from 'primevue/drawer';
 import { updatePrimaryPalette } from '@primeuix/themes';
 import { useAuthStore } from '../../auth/authStore';
 import { useRouter, useRoute } from 'vue-router';
+import { useResponsive } from '../shared/composables/useResponsive';
 import { buildMenuItems } from './menuItems';
 import type { AppMenuItem } from './menuItems';
 
@@ -75,8 +75,8 @@ onMounted(() => {
   }
 });
 
-const breakpoints = useBreakpoints(breakpointsPrimeFlex);
-const isDesktop = breakpoints.greaterOrEqual('lg');
+const { isCompact } = useResponsive();
+const isDesktop = computed(() => !isCompact.value);
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -88,6 +88,13 @@ watch(isDesktop, (desktop) => {
     drawerVisible.value = false;
   }
 });
+
+watch(
+  () => route.path,
+  () => {
+    drawerVisible.value = false;
+  },
+);
 
 function logout() {
   authStore.logOut();
