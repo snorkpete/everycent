@@ -1,7 +1,7 @@
 # Task: Mobile layout: transactions
 
 **ID:** mobile-layout-transactions
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-04
