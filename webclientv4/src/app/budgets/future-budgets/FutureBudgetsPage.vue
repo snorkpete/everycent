@@ -1,15 +1,6 @@
 <template>
-  <EcPageLayout page-name="future-budgets">
+  <EcPageLayout page-name="future-budgets" variant="fixed">
     <div class="page-header">
-      <Button
-        v-tooltip="'Toggle between showing all allocations and variable-only mode'"
-        :label="variableOnly ? 'Variable Only' : 'All Allocations'"
-        :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
-        :outlined="!variableOnly"
-        size="small"
-        data-testid="variable-only-toggle"
-        @click="variableOnly = !variableOnly"
-      />
       <Button
         label="Refresh"
         severity="secondary"
@@ -21,6 +12,30 @@
     <div class="table-wrapper">
       <table class="ec-budget-table budgets-table">
         <thead>
+          <tr class="toolbar-row">
+            <th :colspan="colSpan" class="toolbar-cell">
+              <div class="toolbar">
+                <Button
+                  v-tooltip="'Toggle between showing all allocations and variable-only mode'"
+                  :label="variableOnly ? 'Variable Only' : 'All Allocations'"
+                  :icon="variableOnly ? 'pi pi-filter-fill' : 'pi pi-filter'"
+                  :outlined="!variableOnly"
+                  size="small"
+                  data-testid="variable-only-toggle"
+                  @click="variableOnly = !variableOnly"
+                />
+                <Button
+                  v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
+                  :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
+                  :outlined="!dashIfZero"
+                  text
+                  size="small"
+                  data-testid="dash-zero-toggle"
+                  @click="dashIfZero = !dashIfZero"
+                />
+              </div>
+            </th>
+          </tr>
           <tr>
             <th class="name-col"></th>
             <th v-for="budget in store.budgets" :key="budget.id" class="budget-col">
@@ -47,7 +62,11 @@
               </button>
             </td>
             <td v-for="budget in store.budgets" :key="budget.id">
-              <EcMoneyDisplay :model-value="incomeAmountFor(name, budget)" :highlight-mode="HighlightMode.None" />
+              <EcMoneyDisplay
+                :model-value="incomeAmountFor(name, budget)"
+                :highlight-mode="HighlightMode.None"
+                :dash-if-zero="dashIfZero"
+              />
             </td>
           </tr>
 
@@ -70,6 +89,7 @@
                 :model-value="store.totalIncomeForBudget(budget)"
                 :highlight-mode="HighlightMode.Income"
                 :emphasis="Emphasis.Subtotal"
+                :dash-if-zero="dashIfZero"
               />
             </th>
           </tr>
@@ -80,10 +100,17 @@
           </tr>
 
           <template v-for="category in store.allocationCategories" :key="category.id">
-            <tr class="ec-budget-table__category-header" :data-testid="`category-header-${category.id}`">
+            <tr
+              class="ec-budget-table__category-header"
+              :data-testid="`category-header-${category.id}`"
+            >
               <td>{{ category.name }}</td>
               <td v-for="budget in store.budgets" :key="budget.id">
-                <EcMoneyDisplay :model-value="categoryTotalFor(category, budget)" :highlight-mode="HighlightMode.None" />
+                <EcMoneyDisplay
+                  :model-value="categoryTotalFor(category, budget)"
+                  :highlight-mode="HighlightMode.Balance"
+                  :dash-if-zero="dashIfZero"
+                />
               </td>
             </tr>
 
@@ -93,9 +120,13 @@
               class="ec-budget-table__fixed-subtotal"
               :data-testid="`fixed-subtotal-${category.id}`"
             >
-              <td>Fixed</td>
+              <td>Fixed Allocations</td>
               <td v-for="budget in store.budgets" :key="budget.id">
-                <EcMoneyDisplay :model-value="fixedTotalForCategory(category, budget)" :highlight-mode="HighlightMode.None" />
+                <EcMoneyDisplay
+                  :model-value="fixedTotalForCategory(category, budget)"
+                  :highlight-mode="HighlightMode.None"
+                  :dash-if-zero="dashIfZero"
+                />
               </td>
             </tr>
 
@@ -124,7 +155,11 @@
                 </button>
               </td>
               <td v-for="budget in store.budgets" :key="budget.id">
-                <EcMoneyDisplay :model-value="allocationAmountFor(category, allocName, budget)" :highlight-mode="HighlightMode.None" />
+                <EcMoneyDisplay
+                  :model-value="allocationAmountFor(category, allocName, budget)"
+                  :highlight-mode="HighlightMode.None"
+                  :dash-if-zero="dashIfZero"
+                />
               </td>
             </tr>
 
@@ -148,6 +183,7 @@
                 :model-value="store.totalAllocationsForBudget(budget)"
                 :highlight-mode="HighlightMode.None"
                 :emphasis="Emphasis.Total"
+                :dash-if-zero="dashIfZero"
               />
             </th>
           </tr>
@@ -157,13 +193,21 @@
             <tr class="person-row" data-testid="husband-row">
               <td>{{ settingsStore.settings.husband ?? 'Husband' }}'s Amount</td>
               <td v-for="budget in store.budgets" :key="budget.id">
-                <EcMoneyDisplay :model-value="store.discretionaryForBudget(budget) / 2" :highlight-mode="HighlightMode.None" />
+                <EcMoneyDisplay
+                  :model-value="store.discretionaryForBudget(budget) / 2"
+                  :highlight-mode="HighlightMode.Balance"
+                  :dash-if-zero="dashIfZero"
+                />
               </td>
             </tr>
             <tr class="person-row" data-testid="wife-row">
               <td>{{ settingsStore.settings.wife ?? 'Wife' }}'s Amount</td>
               <td v-for="budget in store.budgets" :key="budget.id">
-                <EcMoneyDisplay :model-value="store.discretionaryForBudget(budget) / 2" :highlight-mode="HighlightMode.None" />
+                <EcMoneyDisplay
+                  :model-value="store.discretionaryForBudget(budget) / 2"
+                  :highlight-mode="HighlightMode.Balance"
+                  :dash-if-zero="dashIfZero"
+                />
               </td>
             </tr>
           </template>
@@ -172,7 +216,11 @@
             <tr class="person-row" data-testid="single-person-row">
               <td>{{ settingsStore.settings.single_person ?? 'Person' }}'s Amount</td>
               <td v-for="budget in store.budgets" :key="budget.id">
-                <EcMoneyDisplay :model-value="store.discretionaryForBudget(budget)" :highlight-mode="HighlightMode.None" />
+                <EcMoneyDisplay
+                  :model-value="store.discretionaryForBudget(budget)"
+                  :highlight-mode="HighlightMode.Balance"
+                  :dash-if-zero="dashIfZero"
+                />
               </td>
             </tr>
           </template>
@@ -180,13 +228,18 @@
 
         <!-- Single-row tfoot enables position: sticky; bottom: 0 -->
         <tfoot>
-          <tr v-if="variableOnly" class="ec-budget-table__fixed-total" data-testid="fixed-total-row">
+          <tr
+            v-if="variableOnly"
+            class="ec-budget-table__fixed-total"
+            data-testid="fixed-total-row"
+          >
             <th>Fixed Total</th>
             <th v-for="budget in store.budgets" :key="budget.id">
               <EcMoneyDisplay
                 :model-value="totalFixedForBudget(budget)"
                 :highlight-mode="HighlightMode.None"
                 :emphasis="Emphasis.Total"
+                :dash-if-zero="dashIfZero"
               />
             </th>
           </tr>
@@ -197,6 +250,7 @@
                 :model-value="store.discretionaryForBudget(budget)"
                 :highlight-mode="HighlightMode.Balance"
                 :emphasis="Emphasis.Total"
+                :dash-if-zero="dashIfZero"
               />
             </th>
           </tr>
@@ -244,6 +298,7 @@ const dialogName = ref('');
 const dialogAmountsPerBudget = ref<Record<number, { id: number; amount: number }>>({});
 const dialogCategoryId = ref<number | undefined>(undefined);
 const variableOnly = ref(false);
+const dashIfZero = ref(true);
 
 const colSpan = computed(() => store.budgets.length + 1);
 
@@ -268,7 +323,9 @@ function categoryTotalFor(category: AllocationCategoryData, budget: FutureBudget
 
 function allocationNamesFor(category: AllocationCategoryData): string[] {
   if (category.id == null) return [];
-  const allNames = Object.keys(store.allocationDisplayData[category.id] ?? {});
+  const allNames = Object.keys(store.allocationDisplayData[category.id] ?? {}).sort((a, b) =>
+    a.localeCompare(b),
+  );
   if (!variableOnly.value) return allNames;
   return allNames.filter((name) => !isFixedInAllBudgets(category.id!, name));
 }
@@ -362,13 +419,15 @@ async function onSave(payload: MassUpdatePayload) {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+  padding: 0.75rem 1.5rem 0;
 }
 
-/* ── Table wrapper: the scroll container — both axes ── */
+/* ── Table wrapper: sole scroll container — both axes ── */
 .table-wrapper {
+  flex: 1;
+  min-height: 0;
   overflow-x: auto;
   overflow-y: auto;
-  max-height: calc(100vh - 7rem);
   border: 1px solid var(--p-surface-200);
   border-radius: 6px;
 }
@@ -377,9 +436,20 @@ async function onSave(payload: MassUpdatePayload) {
 .budgets-table {
   /*
     Fixed thead height so the sticky category-header top offset is exact.
-    If you change the two-line header font sizes, update this too.
+    Toolbar row (~2.2rem) + budget header row (~3.5rem).
   */
-  --thead-height: 3.5rem;
+  --thead-height: 6.5rem;
+}
+
+/* ── Toolbar row in thead ── */
+.toolbar-cell {
+  padding: 0.3rem 0.75rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
 }
 
 .budgets-table th,
@@ -390,11 +460,6 @@ async function onSave(payload: MassUpdatePayload) {
 /* Budget column headers right-aligned to match the amounts below */
 .budgets-table thead th.budget-col {
   text-align: right;
-}
-
-/* ── Footer — extra bottom padding for visual breathing room ── */
-.budgets-table tfoot th {
-  padding-bottom: 10px;
 }
 
 /* ────────────────────────────
@@ -418,21 +483,31 @@ async function onSave(payload: MassUpdatePayload) {
 /* Corner: tfoot */
 .budgets-table tfoot th:first-child {
   z-index: var(--z-corner);
-  background-color: var(--p-surface-100);
+}
+
+/* ── Footer — override shared bottom for proper sticky ── */
+.budgets-table tfoot th {
+  bottom: 0;
 }
 
 /* ────────────────────────────
    STICKY: category headers
-   The shared ec-budget-table__category-header rules set position/top/z-index/bg.
-   Override background for FutureBudgetsPage (uses surface-50, not primary-50).
+   Override shared primary tint with neutral surface tones.
+   Must re-declare z-index here because the first-column sticky
+   rule above (.budgets-table td:first-child) flattens it to z-table-row.
 ──────────────────────────── */
 .budgets-table .ec-budget-table__category-header td {
-  background-color: var(--p-surface-50);
+  z-index: var(--z-category-header);
+  background-color: var(--p-surface-100);
+  border-top: 2px solid var(--p-surface-300);
+  /* TODO: replace hardcoded value with a calculated approach */
+  top: 50px;
 }
 
-/* Category header first cell: above sticky first-column regular rows */
 .budgets-table .ec-budget-table__category-header td:first-child {
-  background-color: var(--p-surface-50);
+  z-index: var(--z-category-accent);
+  background-color: var(--p-surface-100);
+  box-shadow: inset 3px 0 0 var(--p-surface-400);
 }
 
 /* ── Section headers ── */
@@ -455,22 +530,36 @@ async function onSave(payload: MassUpdatePayload) {
   font-size: 0.95rem;
 }
 
-/* ── Total rows ── */
+/* ── Section total rows (Total Income, Total Allocations) ── */
 .total-row th {
   font-weight: 600;
-  background-color: var(--p-surface-100);
+  background-color: var(--p-surface-200);
   box-shadow: inset 0 2px 0 var(--p-surface-400);
-  border-bottom: 1px solid var(--p-surface-200);
+  border-bottom: 1px solid var(--p-surface-300);
 }
 
 .budgets-table .total-row th:first-child {
-  background-color: var(--p-surface-100);
+  background-color: var(--p-surface-200);
 }
 
+/* ── Prominent footer total (Discretionary Money) ── */
 .total-row--prominent th {
   font-weight: 700;
   font-size: 0.9rem;
-  background-color: var(--p-surface-100);
+  background-color: var(--p-surface-300);
+}
+
+.budgets-table .total-row--prominent th:first-child {
+  background-color: var(--p-surface-300);
+}
+
+/* ── Add links: hover-only ── */
+.budgets-table .ec-budget-table__add-link {
+  opacity: 0;
+}
+
+.budgets-table .ec-budget-table__add-row:hover .ec-budget-table__add-link {
+  opacity: 0.65;
 }
 
 /* ── Per-person rows ── */
@@ -496,7 +585,7 @@ async function onSave(payload: MassUpdatePayload) {
 
 /* Budget body cells: right-align to match column headers */
 .budgets-table td + td,
-.budgets-table tbody th + th {
+.budgets-table th + th {
   text-align: right;
 }
 

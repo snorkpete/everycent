@@ -55,7 +55,11 @@ export function useAllocationGrouping(
     } else if (fixedFilter === false) {
       result = result.filter((a) => !a.is_fixed_amount);
     }
-    return result;
+    return result.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''));
+  }
+
+  function allVisibleAllocations(category: AllocationCategoryData): AllocationData[] {
+    return visibleForCategory(category, null);
   }
 
   function fixedAllocations(category: AllocationCategoryData): AllocationData[] {
@@ -78,6 +82,13 @@ export function useAllocationGrouping(
 
   function adjustableAllocations(category: AllocationCategoryData): AllocationData[] {
     return visibleForCategory(category, false);
+  }
+
+  function allocationsForCategory(category: AllocationCategoryData): AllocationData[] {
+    if (isFixedDetailVisible.value) {
+      return allVisibleAllocations(category);
+    }
+    return [...fixedAllocations(category), ...adjustableAllocations(category)];
   }
 
   function totalsForCategory(
@@ -120,6 +131,7 @@ export function useAllocationGrouping(
   const unallocated = computed(() => totalIncome.value - grandTotals.value.amount);
 
   return {
+    allocationsForCategory,
     fixedAllocations,
     adjustableAllocations,
     categoryTotals,

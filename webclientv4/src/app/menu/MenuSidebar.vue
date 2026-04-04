@@ -1,7 +1,7 @@
 <template>
   <aside v-if="isDesktop" class="desktop-sidebar" data-testid="desktop-sidebar">
     <div class="brand">
-      <img src="/everycent-icon.jpeg" alt="EveryCent" class="brand-logo" />
+      <img src="/everycent-icon-v2.png" alt="EveryCent" class="brand-logo" />
       <span>EveryCent</span>
     </div>
     <PanelMenu v-model:expanded-keys="expandedKeys" :model="activeMenuItems" />
@@ -99,13 +99,39 @@ const menuItems = buildMenuItems(logout, (path) => router.push(path));
 // PanelMenu uses different props for active class depending on item depth:
 //   depth 0 (top-level panel headers) → headerClass → targets .p-panelmenu-header
 //   depth 1+ (sub-items rendered by PanelMenuList) → class → targets .p-panelmenu-item
-function applyActiveClass(items: AppMenuItem[], currentPath: string, depth = 0): AppMenuItem[] {
+function isRouteActive(routePath: string, currentPath: string, allRoutePaths: string[]): boolean {
+  if (routePath === currentPath) return true;
+  // For sub-route highlighting: match if the current path starts with this route,
+  // but only if no more-specific sibling route also matches.
+  if (routePath !== '/' && currentPath.startsWith(routePath + '/')) {
+    return !allRoutePaths.some(
+      (other) =>
+        other !== routePath && other.startsWith(routePath + '/') && currentPath.startsWith(other),
+    );
+  }
+  return false;
+}
+
+function collectRoutePaths(items: AppMenuItem[]): string[] {
+  return items.flatMap((item) => {
+    if (item.items) return collectRoutePaths(item.items);
+    return item.routePath ? [item.routePath] : [];
+  });
+}
+
+function applyActiveClass(
+  items: AppMenuItem[],
+  currentPath: string,
+  depth = 0,
+  allRoutePaths?: string[],
+): AppMenuItem[] {
+  const paths = allRoutePaths ?? collectRoutePaths(items);
   return items.map((item) => {
     if (item.separator) return item;
     if (item.items) {
-      return { ...item, items: applyActiveClass(item.items, currentPath, depth + 1) };
+      return { ...item, items: applyActiveClass(item.items, currentPath, depth + 1, paths) };
     }
-    if (!item.routePath || item.routePath !== currentPath) return item;
+    if (!item.routePath || !isRouteActive(item.routePath, currentPath, paths)) return item;
     return depth === 0 ? { ...item, headerClass: 'ec-active' } : { ...item, class: 'ec-active' };
   });
 }

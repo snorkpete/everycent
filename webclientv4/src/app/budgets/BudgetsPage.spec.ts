@@ -7,7 +7,6 @@ import type { VueWrapper } from '@vue/test-utils';
 import BudgetsPage from './BudgetsPage.vue';
 import { buildBudget } from '../../test/factories';
 import type { BudgetData } from './budget.types';
-import { buildBudget } from '../../test/factories';
 
 // Selectors
 const ADD_BTN = '[data-testid="add-budget-btn"]';

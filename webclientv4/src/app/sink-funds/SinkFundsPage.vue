@@ -12,6 +12,16 @@
       />
     </template>
     <template #toolbar-right>
+      <Button
+        v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
+        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
+        text
+        severity="secondary"
+        size="small"
+        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+        data-testid="dash-zero-toggle"
+        @click="dashIfZero = !dashIfZero"
+      />
       <ToggleSwitch
         v-model="store.showDeactivated"
         data-testid="show-closed-toggle"
@@ -55,7 +65,7 @@
       <div v-else-if="!store.sinkFund" class="empty-placeholder" data-testid="empty-placeholder">
         Select a sink fund to view obligations.
       </div>
-      <SinkFundAllocationTable v-else />
+      <SinkFundAllocationTable v-else :dash-if-zero="dashIfZero" />
     </div>
 
     <SinkFundTransferDialog v-model:visible="showTransferDialog" />
@@ -82,6 +92,7 @@ const store = useSinkFundStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
 
+const dashIfZero = ref(true);
 const selectedSinkFundId = ref<number | null>(null);
 const showTransferDialog = ref(false);
 
@@ -121,6 +132,11 @@ function onAddObligation() {
 </script>
 
 <style scoped>
+:deep(.icon-btn--active.p-button) {
+  background-color: var(--p-primary-50);
+  color: var(--p-primary-color);
+}
+
 .toggle-label {
   font-size: 0.875rem;
   color: var(--p-text-color);

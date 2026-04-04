@@ -17,7 +17,13 @@
         <!-- Summary row: Sink Fund Account Balance -->
         <tr class="summary-row" data-testid="summary-row-balance">
           <td>Sink Fund Account Balance</td>
-          <td class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.sinkFund?.current_balance ?? 0" highlight-mode="none" /></td>
+          <td class="ec-budget-table__amount-cell">
+            <EcMoneyDisplay
+              :model-value="store.sinkFund?.current_balance ?? 0"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
+          </td>
           <td></td>
           <td></td>
           <td></td>
@@ -35,7 +41,13 @@
               data-testid="unassigned-tooltip"
             ></i>
           </td>
-          <td class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.unassignedBalance" highlight-mode="none" /></td>
+          <td class="ec-budget-table__amount-cell">
+            <EcMoneyDisplay
+              :model-value="store.unassignedBalance"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
+          </td>
           <td></td>
           <td></td>
           <td></td>
@@ -71,7 +83,11 @@
                 data-testid="show-transactions-btn"
                 @click="onShowTransactions(allocation)"
               />
-              <EcMoneyDisplay :model-value="allocation.current_balance ?? 0" highlight-mode="none" />
+              <EcMoneyDisplay
+                :model-value="allocation.current_balance ?? 0"
+                highlight-mode="none"
+                :dash-if-zero="dashIfZero"
+              />
             </span>
           </td>
 
@@ -83,12 +99,21 @@
               label=""
               :edit-mode="true"
             />
-            <EcMoneyDisplay v-else :model-value="allocation.target ?? 0" highlight-mode="none" />
+            <EcMoneyDisplay
+              v-else
+              :model-value="allocation.target ?? 0"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
           </td>
 
           <!-- Outstanding -->
           <td class="ec-budget-table__amount-cell">
-            <EcMoneyDisplay :model-value="outstanding(allocation)" highlight-mode="balance" />
+            <EcMoneyDisplay
+              :model-value="outstanding(allocation)"
+              highlight-mode="balance"
+              :dash-if-zero="dashIfZero"
+            />
           </td>
 
           <!-- Comment -->
@@ -139,10 +164,26 @@
       <tfoot>
         <tr class="total-row" data-testid="total-row">
           <th>Total</th>
-          <th class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.totalAssignedBalance" highlight-mode="none" /></th>
-          <th class="ec-budget-table__amount-cell"><EcMoneyDisplay :model-value="store.totalTarget" highlight-mode="none" /></th>
           <th class="ec-budget-table__amount-cell">
-            <EcMoneyDisplay :model-value="store.totalOutstanding" highlight-mode="balance" />
+            <EcMoneyDisplay
+              :model-value="store.totalAssignedBalance"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
+          </th>
+          <th class="ec-budget-table__amount-cell">
+            <EcMoneyDisplay
+              :model-value="store.totalTarget"
+              highlight-mode="none"
+              :dash-if-zero="dashIfZero"
+            />
+          </th>
+          <th class="ec-budget-table__amount-cell">
+            <EcMoneyDisplay
+              :model-value="store.totalOutstanding"
+              highlight-mode="balance"
+              :dash-if-zero="dashIfZero"
+            />
           </th>
           <th></th>
           <th></th>
@@ -171,6 +212,10 @@ import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData } from './sinkFund.types';
+
+const { dashIfZero = false } = defineProps<{
+  dashIfZero?: boolean;
+}>();
 
 const vTooltip = Tooltip;
 
@@ -216,6 +261,11 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   table-layout: fixed;
   --thead-height: 2.5rem;
   --summary-row-height: 2rem;
+}
+
+/* Override shared budget-table footer offset for this table */
+.allocations-table tfoot th {
+  bottom: 0;
 }
 
 .allocations-table th,
@@ -272,12 +322,21 @@ function onShowTransactions(allocation: SinkFundAllocationData) {
   box-shadow: 0 2px 0 var(--p-surface-300);
 }
 
-/* ── Balance cell with eye icon ── */
+/* ── Balance cell with eye icon (visible on hover only) ── */
 .balance-cell {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.25rem;
+}
+
+.balance-cell :deep(.p-button) {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.balance-cell:hover :deep(.p-button) {
+  opacity: 1;
 }
 
 /* ── Action buttons ── */

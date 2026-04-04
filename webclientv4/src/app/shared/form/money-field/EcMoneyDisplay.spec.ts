@@ -153,6 +153,44 @@ describe('EcMoneyDisplay', () => {
     });
   });
 
+  describe('dashIfZero', () => {
+    it('displays a dash instead of 0.00 when dashIfZero is true and value is zero', () => {
+      const wrapper = createWrapper({ modelValue: 0, dashIfZero: true });
+
+      expect(wrapper.text()).toBe('—');
+    });
+
+    it('displays a dash for null value when dashIfZero is true', () => {
+      const wrapper = createWrapper({ modelValue: null, dashIfZero: true });
+
+      expect(wrapper.text()).toBe('—');
+    });
+
+    it('displays a dash for undefined value when dashIfZero is true', () => {
+      const wrapper = createWrapper({ modelValue: undefined, dashIfZero: true });
+
+      expect(wrapper.text()).toBe('—');
+    });
+
+    it('displays the formatted value for non-zero values when dashIfZero is true', () => {
+      const wrapper = createWrapper({ modelValue: 1550, dashIfZero: true });
+
+      expect(wrapper.text()).toBe('15.50');
+    });
+
+    it('displays 0.00 when dashIfZero is false', () => {
+      const wrapper = createWrapper({ modelValue: 0, dashIfZero: false });
+
+      expect(wrapper.text()).toBe('0.00');
+    });
+
+    it('defaults to showing 0.00 when dashIfZero is not provided', () => {
+      const wrapper = createWrapper({ modelValue: 0 });
+
+      expect(wrapper.text()).toBe('0.00');
+    });
+  });
+
   describe('emphasis', () => {
     it('applies emphasis-item class by default', () => {
       const wrapper = createWrapper({ modelValue: 1550 });

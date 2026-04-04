@@ -1,18 +1,31 @@
 <template>
   <div class="allocation-list">
-    <div class="allocation-toolbar">
-      <Button
-        v-tooltip="'Toggle between showing all allocations and variable-only mode'"
-        :label="isFixedDetailVisible ? 'All Allocations' : 'Variable Only'"
-        :icon="isFixedDetailVisible ? 'pi pi-filter' : 'pi pi-filter-fill'"
-        :outlined="isFixedDetailVisible"
-        size="small"
-        data-testid="variable-only-toggle"
-        @click="toggleFixedDetail"
-      />
-    </div>
     <table class="ec-budget-table allocations-table">
       <thead>
+        <tr class="allocation-toolbar-row">
+          <th :colspan="store.isEditMode ? 8 : 7" class="allocation-toolbar-cell">
+            <div class="allocation-toolbar">
+              <Button
+                v-tooltip="'Toggle between showing all allocations and variable-only mode'"
+                :label="isFixedDetailVisible ? 'All Allocations' : 'Variable Only'"
+                :icon="isFixedDetailVisible ? 'pi pi-filter' : 'pi pi-filter-fill'"
+                :outlined="isFixedDetailVisible"
+                size="small"
+                data-testid="variable-only-toggle"
+                @click="toggleFixedDetail"
+              />
+              <Button
+                v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
+                :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
+                :outlined="!dashIfZero"
+                text
+                size="small"
+                data-testid="dash-zero-toggle"
+                @click="dashIfZero = !dashIfZero"
+              />
+            </div>
+          </th>
+        </tr>
         <tr>
           <th class="name-col">Name</th>
           <th class="amount-col">Amount</th>
@@ -56,12 +69,9 @@
             <td v-if="store.isEditMode"></td>
           </tr>
 
-          <!-- Allocation rows (fixed first, then adjustable) -->
+          <!-- Allocation rows -->
           <tr
-            v-for="(allocation, index) in [
-              ...fixedAllocations(category),
-              ...adjustableAllocations(category),
-            ]"
+            v-for="(allocation, index) in allocationsForCategory(category)"
             :key="allocation.id || `${category.id}-${index}`"
             :class="{
               'ec-budget-table__fixed-subtotal': isSummaryRow(allocation),
@@ -99,6 +109,7 @@
                 v-else
                 :model-value="allocation.amount ?? 0"
                 :emphasis="emphasisFor(allocation)"
+                :dash-if-zero="dashIfZero"
                 highlight-mode="none"
               />
             </td>
@@ -112,6 +123,7 @@
                 <EcMoneyDisplay
                   :model-value="allocation.spent ?? 0"
                   :emphasis="emphasisFor(allocation)"
+                  :dash-if-zero="dashIfZero"
                   highlight-mode="none"
                 />
               </span>
@@ -120,6 +132,7 @@
               <EcMoneyDisplay
                 :model-value="remaining(allocation)"
                 :emphasis="emphasisFor(allocation)"
+                :dash-if-zero="dashIfZero"
               />
             </td>
             <td>
@@ -239,9 +252,6 @@
         </tr>
       </tfoot>
     </table>
-    <div class="unallocated-badge" data-testid="unallocated-badge">
-      Unallocated: <EcMoneyDisplay :model-value="unallocated" />
-    </div>
     <AllocationTransactionsDialog
       :visible="dialogVisible"
       :allocation-id="selectedAllocationId"
@@ -279,18 +289,18 @@ const totalIncome = computed(
 );
 
 const {
-  fixedAllocations,
-  adjustableAllocations,
+  allocationsForCategory,
   categoryTotals,
   grandTotals,
   fixedTotals,
-  unallocated,
   isFixedDetailVisible,
   showFixedDetail,
   hideFixedDetail,
 } = useAllocationGrouping(allocations, categories, totalIncome, {
   displayDeletedAllocations: computed(() => store.isEditMode),
 });
+
+const dashIfZero = ref(false);
 
 // Row helpers — drive all template conditionals
 function isSummaryRow(allocation: AllocationData): boolean {
@@ -301,8 +311,8 @@ function isEditable(allocation: AllocationData): boolean {
   return store.isEditMode && !isSummaryRow(allocation);
 }
 
-function emphasisFor(allocation: AllocationData): EmphasisType {
-  return isSummaryRow(allocation) ? Emphasis.Subtotal : Emphasis.Item;
+function emphasisFor(_allocation: AllocationData): EmphasisType {
+  return Emphasis.Item;
 }
 
 function remaining(allocation: AllocationData): number {
@@ -353,17 +363,32 @@ function addAllocation(category: AllocationCategoryData) {
   min-height: 0;
 }
 
-/* ── Toolbar ── */
+/* ── Toolbar (inside sticky thead, sits above column headers) ── */
+.allocation-toolbar-row th {
+  top: 0 !important;
+  z-index: 11 !important;
+}
+
+.allocation-toolbar-cell {
+  padding: 0.25rem 0.75rem !important;
+  border-bottom: 1px solid var(--p-surface-200) !important;
+  box-shadow: none !important;
+}
+
+/* Column header row sits below toolbar */
+.allocations-table thead tr:nth-child(2) th {
+  top: 2.25rem !important;
+}
+
 .allocation-toolbar {
   display: flex;
   align-items: center;
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
+  gap: 0.25rem;
 }
 
 /* ── Base table ── */
 .allocations-table {
-  --thead-height: 2.5rem;
+  --thead-height: 4.75rem;
 }
 
 .allocations-table th,
@@ -401,12 +426,21 @@ function addAllocation(category: AllocationCategoryData) {
   width: 5%;
 }
 
-/* ── Spent cell with eye icon ── */
+/* ── Spent cell with eye icon (visible on hover only) ── */
 .spent-cell {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.25rem;
+}
+
+.spent-cell :deep(.p-button) {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.spent-cell:hover :deep(.p-button) {
+  opacity: 1;
 }
 
 /* ── Class select (edit mode) ── */
@@ -422,6 +456,11 @@ function addAllocation(category: AllocationCategoryData) {
 /* ── Class display ── */
 .class-display {
   font-size: 0.85rem;
+}
+
+/* ── Row animation for variable-only toggle ── */
+.allocations-table tbody tr {
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 </style>

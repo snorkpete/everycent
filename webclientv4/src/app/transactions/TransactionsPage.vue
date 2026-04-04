@@ -5,6 +5,16 @@
     </template>
     <template #toolbar-right>
       <Button
+        v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
+        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
+        text
+        severity="secondary"
+        size="small"
+        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+        data-testid="dash-zero-toggle"
+        @click="dashIfZero = !dashIfZero"
+      />
+      <Button
         v-tooltip="
           'Toggle description wrapping — truncates long descriptions by default; wrap shows the full text'
         "
@@ -105,6 +115,7 @@
       <TransactionList
         :wrap-descriptions="wrapDescriptions"
         :show-calculator-column="showCalculatorColumn"
+        :dash-if-zero="dashIfZero"
       />
     </div>
   </EcPageLayout>
@@ -133,6 +144,7 @@ const headingStore = useHeadingStore();
 const settingsStore = useSettingsStore();
 const notifications = useNotifications();
 
+const dashIfZero = ref(true);
 const wrapDescriptions = ref(false);
 const showCalculatorColumn = ref(false);
 const showImportDialog = ref(false);

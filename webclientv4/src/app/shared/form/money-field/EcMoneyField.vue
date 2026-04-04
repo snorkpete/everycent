@@ -28,7 +28,11 @@
     </template>
     <template v-else>
       <span v-if="!inline" class="label">{{ label }}</span>
-      <EcMoneyDisplay :model-value="model" :highlight-mode="highlightMode ?? HighlightMode.None" />
+      <EcMoneyDisplay
+        :model-value="model"
+        :highlight-mode="highlightMode ?? HighlightMode.None"
+        :dash-if-zero="dashIfZero"
+      />
     </template>
   </div>
 </template>
@@ -46,11 +50,13 @@ const {
   editMode,
   highlightMode,
   inline,
+  dashIfZero = false,
 } = defineProps<{
   label?: string;
   editMode: boolean;
   highlightMode?: HighlightModeType;
   inline?: boolean;
+  dashIfZero?: boolean;
 }>();
 
 const model = defineModel<number>({ default: 0 });

@@ -21,6 +21,25 @@
       >
         Warning: This is not the current budget.
       </Message>
+      <FileUpload
+        mode="basic"
+        accept=".zip"
+        custom-upload
+        auto
+        choose-label="Select ZIP file"
+        data-testid="file-upload"
+        @select="onFileSelect"
+      />
+      <ProgressSpinner
+        v-if="store.loading"
+        class="loading-spinner"
+        data-testid="loading-spinner"
+        stroke-width="4"
+        style="width: 2rem; height: 2rem"
+      />
+      <span v-if="store.loading" class="loading-text" data-testid="loading-text"
+        >Processing...</span
+      >
     </template>
     <template #toolbar-right>
       <router-link :to="{ name: 'transactions' }" class="nav-link">
@@ -37,29 +56,6 @@
 
     <!-- Content area -->
     <div class="content-area">
-      <!-- File Upload -->
-      <div class="upload-section">
-        <FileUpload
-          mode="basic"
-          accept=".zip"
-          custom-upload
-          auto
-          choose-label="Select ZIP file"
-          data-testid="file-upload"
-          @select="onFileSelect"
-        />
-        <ProgressSpinner
-          v-if="store.loading"
-          class="loading-spinner"
-          data-testid="loading-spinner"
-          stroke-width="4"
-          style="width: 2rem; height: 2rem"
-        />
-        <span v-if="store.loading" class="loading-text" data-testid="loading-text"
-          >Processing...</span
-        >
-      </div>
-
       <!-- Error display -->
       <Message
         v-if="store.error"
@@ -149,9 +145,20 @@
               {{ store.getBankAccountName(account.bank_account_id) }}
             </h3>
             <div class="balance-summary" data-testid="balance-summary">
-              <span>Balance: <EcMoneyDisplay :model-value="account.current_balance" highlight-mode="none" /></span>
-              <span>Net change: <EcMoneyDisplay :model-value="accountNet(account)" highlight-mode="none" /></span>
-              <span>Projected: <EcMoneyDisplay :model-value="accountProjectedBalance(account)" highlight-mode="none" /></span>
+              <span
+                >Balance:
+                <EcMoneyDisplay :model-value="account.current_balance" highlight-mode="none"
+              /></span>
+              <span
+                >Net change:
+                <EcMoneyDisplay :model-value="accountNet(account)" highlight-mode="none"
+              /></span>
+              <span
+                >Projected:
+                <EcMoneyDisplay
+                  :model-value="accountProjectedBalance(account)"
+                  highlight-mode="none"
+              /></span>
             </div>
           </div>
 
@@ -178,9 +185,19 @@
                   <td class="col-date">{{ formatDate(transaction.transaction_date ?? '') }}</td>
                   <td class="col-description">{{ transaction.description }}</td>
                   <td class="col-money right">
-                    <EcMoneyDisplay :model-value="transaction.withdrawal_amount ?? 0" highlight-mode="none" />
+                    <EcMoneyDisplay
+                      :model-value="transaction.withdrawal_amount ?? 0"
+                      highlight-mode="none"
+                      dash-if-zero
+                    />
                   </td>
-                  <td class="col-money right"><EcMoneyDisplay :model-value="transaction.deposit_amount ?? 0" highlight-mode="none" /></td>
+                  <td class="col-money right">
+                    <EcMoneyDisplay
+                      :model-value="transaction.deposit_amount ?? 0"
+                      highlight-mode="none"
+                      dash-if-zero
+                    />
+                  </td>
                   <td class="col-allocation">
                     <span
                       v-if="transaction.allocation_id && transaction.auto_match_type"
@@ -408,12 +425,6 @@ function previewRowClass(transaction: ImportTransaction) {
   padding-bottom: 1rem;
 }
 
-.upload-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 .loading-spinner {
   flex-shrink: 0;
 }
@@ -449,7 +460,9 @@ function previewRowClass(transaction: ImportTransaction) {
   background-color: var(--p-surface-50);
 }
 
-.right {
+.right,
+.summary-table th.right,
+.summary-table td.right {
   text-align: right;
 }
 
@@ -483,6 +496,9 @@ function previewRowClass(transaction: ImportTransaction) {
   padding: 0.75rem 1rem;
   background-color: var(--p-surface-50);
   border-bottom: 1px solid var(--p-surface-300);
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .account-name {
@@ -499,8 +515,7 @@ function previewRowClass(transaction: ImportTransaction) {
 }
 
 .table-scroll {
-  max-height: 50vh;
-  overflow: auto;
+  overflow: visible;
 }
 
 .preview-table {
@@ -521,9 +536,13 @@ function previewRowClass(transaction: ImportTransaction) {
   text-align: left;
   background-color: var(--p-surface-50);
   position: sticky;
-  top: 0;
+  top: 3rem;
   z-index: 1;
   box-shadow: 0 1px 0 var(--p-surface-300);
+}
+
+.preview-table th.right {
+  text-align: right;
 }
 
 .col-date {
@@ -551,6 +570,7 @@ function previewRowClass(transaction: ImportTransaction) {
 
 .preview-row--duplicate {
   opacity: 0.4;
+  text-decoration: line-through;
 }
 
 .preview-row--deleted {
