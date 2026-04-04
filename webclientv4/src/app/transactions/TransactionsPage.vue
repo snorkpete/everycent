@@ -1,9 +1,104 @@
 <template>
   <EcPageLayout page-name="transactions" variant="fixed">
-    <template #toolbar-left>
+    <!-- Mobile: stacked selectors above toolbar -->
+    <template v-if="isMobile" #toolbar>
+      <div class="mobile-toolbar">
+        <div class="mobile-selectors">
+          <Select
+            v-model="searchState.selectedBankAccountId"
+            :options="store.bankAccounts"
+            option-label="name"
+            option-value="id"
+            placeholder="Bank Account"
+            data-testid="bank-account-select"
+            class="mobile-select"
+            @update:model-value="onBankAccountChange"
+          />
+          <Select
+            v-model="searchState.selectedBudgetId"
+            :options="store.currentAndPastBudgets"
+            option-label="name"
+            option-value="id"
+            placeholder="Budget"
+            data-testid="budget-select"
+            class="mobile-select"
+            @update:model-value="onBudgetChange"
+          />
+        </div>
+        <div class="mobile-actions">
+          <Button
+            v-tooltip="'Go to budget'"
+            icon="pi pi-book"
+            text
+            severity="secondary"
+            size="small"
+            as="a"
+            :href="budgetLink"
+            data-testid="go-to-budget-link"
+          />
+          <Button
+            v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
+            :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
+            text
+            severity="secondary"
+            size="small"
+            :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+            data-testid="dash-zero-toggle"
+            @click="dashIfZero = !dashIfZero"
+          />
+          <Button
+            v-tooltip="'Refresh transactions'"
+            icon="pi pi-refresh"
+            text
+            severity="secondary"
+            size="small"
+            data-testid="refresh-btn"
+            @click="onRefresh"
+          />
+          <Button
+            v-tooltip="'Import or transfer transactions'"
+            icon="pi pi-upload"
+            text
+            severity="secondary"
+            size="small"
+            data-testid="import-menu-btn"
+            @click="toggleImportMenu"
+          />
+          <Menu ref="importMenuRef" :model="importMenuItems" :popup="true" />
+          <Button
+            v-if="!store.isEditMode"
+            label="Edit"
+            data-testid="edit-btn"
+            size="small"
+            @click="store.enterEditMode()"
+          />
+          <template v-else>
+            <Button
+              v-tooltip="'Add new transaction'"
+              icon="pi pi-plus"
+              outlined
+              size="small"
+              data-testid="add-btn-mobile"
+              @click="store.addTransaction()"
+            />
+            <Button label="Save" data-testid="save-btn" size="small" @click="onSave" />
+            <Button
+              label="Cancel"
+              severity="secondary"
+              data-testid="cancel-btn"
+              size="small"
+              @click="onCancel"
+            />
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <!-- Desktop: original toolbar -->
+    <template v-if="!isMobile" #toolbar-left>
       <TransactionSearchForm @fetch="onFetch" />
     </template>
-    <template #toolbar-right>
+    <template v-if="!isMobile" #toolbar-right>
       <Button
         v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
         :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
@@ -114,7 +209,7 @@
       />
       <TransactionList
         :wrap-descriptions="wrapDescriptions"
-        :show-calculator-column="showCalculatorColumn"
+        :show-calculator-column="!isMobile && showCalculatorColumn"
         :dash-if-zero="dashIfZero"
       />
     </div>
@@ -122,15 +217,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
 import Button from 'primevue/button';
+import Menu from 'primevue/menu';
+import Select from 'primevue/select';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useNotifications } from '../notifications/useNotifications';
+import { useResponsive } from '../shared/composables/useResponsive';
 import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
 import TransactionSummary from './TransactionSummary.vue';
@@ -138,6 +236,8 @@ import TransactionImportDialog from './TransactionImportDialog.vue';
 import AccountTransferDialog from './AccountTransferDialog.vue';
 import type { TransactionData } from './transaction.types';
 
+const { isMobile } = useResponsive();
+const route = useRoute();
 const router = useRouter();
 const store = useTransactionStore();
 const headingStore = useHeadingStore();
@@ -150,11 +250,104 @@ const showCalculatorColumn = ref(false);
 const showImportDialog = ref(false);
 const showTransferDialog = ref(false);
 
+// Mobile: inline search state (mirrors TransactionSearchForm for mobile toolbar)
+const searchState = ref({
+  selectedBankAccountId: null as number | null,
+  selectedBudgetId: null as number | null,
+  initialised: false,
+});
+
+const budgetLink = computed(() => {
+  if (searchState.value.selectedBudgetId) {
+    return `#/budgets/${searchState.value.selectedBudgetId}`;
+  }
+  return '#/budgets';
+});
+
+// Mobile: popup menu for import/transfer actions
+const importMenuRef = ref();
+const importMenuItems = computed(() => [
+  {
+    label: 'Import',
+    icon: 'pi pi-upload',
+    command: () => {
+      showImportDialog.value = true;
+    },
+  },
+  {
+    label: 'Import CAMT',
+    icon: 'pi pi-file',
+    command: () => navigateToImport(),
+  },
+  {
+    label: 'Transfer',
+    icon: 'pi pi-arrow-right-arrow-left',
+    command: () => {
+      showTransferDialog.value = true;
+    },
+  },
+]);
+
+function toggleImportMenu(event: Event) {
+  importMenuRef.value.toggle(event);
+}
+
 onMounted(() => {
   headingStore.setHeading('Transactions');
   store.fetchMetadata();
   settingsStore.fetchAll();
+  initMobileSearch();
 });
+
+// Mobile: initialise selectors from URL or defaults once metadata loads
+function initMobileSearch() {
+  if (!isMobile.value) return;
+  const unwatch = watch(
+    () => store.bankAccounts,
+    (accounts) => {
+      if (searchState.value.initialised || accounts.length === 0) return;
+
+      const queryBudgetId = route.query.budget_id ? Number(route.query.budget_id) : null;
+      const queryBankAccountId = route.query.bank_account_id
+        ? Number(route.query.bank_account_id)
+        : null;
+
+      const firstAccount = accounts[0];
+      const firstBudget = store.currentAndPastBudgets[0];
+
+      searchState.value.selectedBankAccountId = queryBankAccountId ?? firstAccount?.id ?? null;
+      searchState.value.selectedBudgetId = queryBudgetId ?? firstBudget?.id ?? null;
+
+      searchState.value.initialised = true;
+      emitMobileFetch();
+      unwatch();
+    },
+    { immediate: true },
+  );
+}
+
+function onBankAccountChange() {
+  emitMobileFetch();
+}
+
+function onBudgetChange() {
+  emitMobileFetch();
+}
+
+function emitMobileFetch() {
+  if (searchState.value.selectedBudgetId && searchState.value.selectedBankAccountId) {
+    router.replace({
+      query: {
+        budget_id: searchState.value.selectedBudgetId,
+        bank_account_id: searchState.value.selectedBankAccountId,
+      },
+    });
+    store.fetch({
+      budgetId: searchState.value.selectedBudgetId,
+      bankAccountId: searchState.value.selectedBankAccountId,
+    });
+  }
+}
 
 function toggleCalculatorColumn() {
   showCalculatorColumn.value = !showCalculatorColumn.value;
@@ -234,5 +427,29 @@ function navigateToImport() {
   border-radius: 6px;
   background-color: var(--p-surface-0);
   margin-bottom: 0.75rem;
+}
+
+/* ── Mobile toolbar ── */
+.mobile-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.mobile-selectors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mobile-select {
+  width: 100%;
+}
+
+.mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 </style>

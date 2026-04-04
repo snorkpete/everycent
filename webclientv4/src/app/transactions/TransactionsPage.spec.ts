@@ -38,8 +38,10 @@ vi.mock('../notifications/useNotifications', () => ({
 }));
 
 const mockPush = vi.fn();
+const mockReplace = vi.fn();
 vi.mock('vue-router', () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: mockPush, replace: mockReplace }),
+  useRoute: () => ({ params: {}, query: {} }),
 }));
 
 // Mock all APIs used by the real stores
