@@ -90,7 +90,8 @@ RSpec.describe Setting, type: :model do
           husband: 'Kion',
           wife: 'Patrice',
           primary_budget_account_id: @bank_account.id,
-          family_type: 'couple'
+          family_type: 'couple',
+          default_allocation_category_id_for_special_events: nil
       })
     end
 
@@ -104,7 +105,8 @@ RSpec.describe Setting, type: :model do
       expect(Setting.as_hash).to eq ({
           primary_budget_account_id: @bank_account.id,
           family_type: 'single',
-          single_person: 'Jason'
+          single_person: 'Jason',
+          default_allocation_category_id_for_special_events: nil
       })
     end
   end

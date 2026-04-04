@@ -1,7 +1,7 @@
 <template>
   <aside v-if="isDesktop" class="desktop-sidebar" data-testid="desktop-sidebar">
     <div class="brand">
-      <img src="/everycent-icon-v2.jpeg" alt="EveryCent" class="brand-logo" />
+      <img src="/everycent-icon-v2.png" alt="EveryCent" class="brand-logo" />
       <span>EveryCent</span>
     </div>
     <PanelMenu v-model:expanded-keys="expandedKeys" :model="activeMenuItems" />

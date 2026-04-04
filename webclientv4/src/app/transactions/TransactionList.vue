@@ -104,6 +104,7 @@
             <EcMoneyField
               label=""
               :edit-mode="store.isEditMode"
+              :dash-if-zero="dashIfZero"
               :model-value="transaction.withdrawal_amount ?? 0"
               @update:model-value="transaction.withdrawal_amount = $event"
             />
@@ -112,6 +113,7 @@
             <EcMoneyField
               label=""
               :edit-mode="store.isEditMode"
+              :dash-if-zero="dashIfZero"
               :model-value="transaction.deposit_amount ?? 0"
               @update:model-value="transaction.deposit_amount = $event"
             />
@@ -145,7 +147,11 @@
               :deleted="transaction.deleted"
               item-label="transaction"
               :test-id-prefix="`transaction-${index}`"
-              @toggle="transaction.deleted ? store.undoDeleteTransaction(transaction) : store.deleteTransaction(transaction)"
+              @toggle="
+                transaction.deleted
+                  ? store.undoDeleteTransaction(transaction)
+                  : store.deleteTransaction(transaction)
+              "
             />
           </td>
         </tr>
@@ -180,9 +186,10 @@ import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
 import type { TransactionData } from './transaction.types';
 import { useTransactionStore } from './transactionStore';
 
-defineProps<{
+const { dashIfZero = false } = defineProps<{
   wrapDescriptions?: boolean;
   showCalculatorColumn?: boolean;
+  dashIfZero?: boolean;
 }>();
 
 const store = useTransactionStore();
