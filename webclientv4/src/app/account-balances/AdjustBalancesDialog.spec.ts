@@ -50,6 +50,7 @@ const checkingAccount: AccountBalanceData = {
   closing_balance: 100000,
   expected_closing_balance: 90000,
   current_balance: 100000,
+  asset_bank_account_id: null,
 };
 
 const savingsAccount: AccountBalanceData = {
@@ -63,6 +64,7 @@ const savingsAccount: AccountBalanceData = {
   closing_balance: 200000,
   expected_closing_balance: 200000,
   current_balance: 200000,
+  asset_bank_account_id: null,
 };
 
 function createWrapper(

@@ -69,6 +69,46 @@ RSpec.describe BankAccount, :type => :model do
     end
   end
 
+  context "asset_bank_account association" do
+    it "belongs_to asset_bank_account" do
+      asset = create(:bank_account, account_category: 'asset')
+      loan = create(:bank_account, account_category: 'liability', asset_bank_account: asset)
+      expect(loan.asset_bank_account).to eq asset
+    end
+
+    it "has_many loans" do
+      asset = create(:bank_account, account_category: 'asset')
+      loan1 = create(:bank_account, account_category: 'liability', asset_bank_account: asset)
+      loan2 = create(:bank_account, account_category: 'liability', asset_bank_account: asset)
+      expect(asset.loans).to match_array([loan1, loan2])
+    end
+  end
+
+  context "asset_bank_account_id validation" do
+    it "is valid when a liability has an asset_bank_account_id" do
+      asset = create(:bank_account, account_category: 'asset')
+      loan = build(:bank_account, account_category: 'liability', asset_bank_account: asset)
+      expect(loan).to be_valid
+    end
+
+    it "is invalid when a non-liability has an asset_bank_account_id" do
+      asset = create(:bank_account, account_category: 'asset')
+      other_asset = build(:bank_account, account_category: 'asset', asset_bank_account: asset)
+      expect(other_asset).not_to be_valid
+      expect(other_asset.errors[:asset_bank_account_id]).to include('can only be set on liability accounts')
+    end
+
+    it "is valid when a non-liability has no asset_bank_account_id" do
+      account = build(:bank_account, account_category: 'asset', asset_bank_account: nil)
+      expect(account).to be_valid
+    end
+
+    it "is valid when a liability has no asset_bank_account_id" do
+      account = build(:bank_account, account_category: 'liability', asset_bank_account: nil)
+      expect(account).to be_valid
+    end
+  end
+
   include_examples "CreditCard"
   include_examples "SinkFund"
   include_examples "ManualBalanceAdjustments"

@@ -44,6 +44,7 @@ function createWrapper(props: Record<string, unknown> = {}) {
       bankAccount: existingAccount,
       initialEditMode: false,
       institutions,
+      bankAccounts: [],
       ...props,
     },
     global: {
@@ -225,6 +226,117 @@ describe('BankAccountEditDialog', () => {
       await nextTick();
 
       expect(wrapper.find('[data-testid="credit-card-section"]').exists()).toBe(true);
+    });
+  });
+
+  describe('asset link field', () => {
+    const loanAccount: BankAccountData = {
+      id: 50,
+      name: 'Car Loan',
+      account_type: 'normal',
+      account_category: 'liability',
+      is_cash: false,
+      status: 'open',
+      asset_bank_account_id: null,
+    };
+
+    const houseAsset: BankAccountData = {
+      id: 10,
+      name: 'House',
+      account_category: 'asset',
+      is_cash: false,
+      status: 'open',
+    };
+
+    const carAsset: BankAccountData = {
+      id: 11,
+      name: 'Car',
+      account_category: 'asset',
+      is_cash: false,
+      status: 'open',
+    };
+
+    const closedAsset: BankAccountData = {
+      id: 12,
+      name: 'Old Apartment',
+      account_category: 'asset',
+      is_cash: false,
+      status: 'closed',
+    };
+
+    const cashAsset: BankAccountData = {
+      id: 13,
+      name: 'Savings',
+      account_category: 'asset',
+      is_cash: true,
+      status: 'open',
+    };
+
+    it('does not show the asset link field for an asset account', () => {
+      const wrapper = createWrapper({ bankAccount: existingAccount });
+      expect(wrapper.find('[data-testid="asset-link-field"]').exists()).toBe(false);
+    });
+
+    it('does not show the asset link field for a credit card', () => {
+      const wrapper = createWrapper({ bankAccount: creditCardAccount });
+      expect(wrapper.find('[data-testid="asset-link-field"]').exists()).toBe(false);
+    });
+
+    it('shows the asset link field for a non-credit-card liability', () => {
+      const wrapper = createWrapper({ bankAccount: loanAccount });
+      expect(wrapper.find('[data-testid="asset-link-field"]').exists()).toBe(true);
+    });
+
+    it('lists only open, non-cash asset accounts, sorted alphabetically by name', () => {
+      const wrapper = createWrapper({
+        bankAccount: loanAccount,
+        bankAccounts: [houseAsset, carAsset, closedAsset, cashAsset, loanAccount],
+      });
+
+      const field = wrapper.find('[data-testid="asset-link-field"]').findComponent(EcListField);
+      const items = field.props('items') as { id: number; name: string }[];
+      expect(items.map((i) => i.name)).toEqual(['Car', 'House']);
+    });
+
+    it('binds the current saved asset_bank_account_id to the field', () => {
+      const linkedLoan: BankAccountData = { ...loanAccount, asset_bank_account_id: 10 };
+      const wrapper = createWrapper({
+        bankAccount: linkedLoan,
+        bankAccounts: [houseAsset, carAsset],
+      });
+
+      const field = wrapper.find('[data-testid="asset-link-field"]').findComponent(EcListField);
+      expect(field.props('modelValue')).toBe(10);
+    });
+
+    it('save emits asset_bank_account_id as null for non-liability accounts', async () => {
+      const wrapper = createWrapper({
+        bankAccount: { ...existingAccount, asset_bank_account_id: 10 },
+        initialEditMode: true,
+      });
+
+      const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
+      await saveBtn.trigger('click');
+
+      const emitted = wrapper.emitted('save');
+      expect(emitted![0][0]).toMatchObject({ asset_bank_account_id: null });
+    });
+
+    it('save emits asset_bank_account_id as null for credit card accounts', async () => {
+      const wrapper = createWrapper({
+        bankAccount: {
+          ...creditCardAccount,
+          account_category: 'liability',
+          asset_bank_account_id: 10,
+        },
+        initialEditMode: true,
+      });
+
+      const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
+      await saveBtn.trigger('click');
+
+      const emitted = wrapper.emitted('save');
+      expect(emitted![0][0]).toMatchObject({ asset_bank_account_id: null });
     });
   });
 });

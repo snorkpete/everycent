@@ -73,6 +73,16 @@
         @update:model-value="formData.status = $event as string | undefined"
       />
 
+      <EcListField
+        v-if="isLinkableLoan"
+        :model-value="formData.asset_bank_account_id ?? null"
+        label="Loan Against Asset"
+        :edit-mode="editMode"
+        :items="linkableAssetItems"
+        data-testid="asset-link-field"
+        @update:model-value="formData.asset_bank_account_id = $event as number | null"
+      />
+
       <div v-if="isCreditCard" data-testid="credit-card-section">
         <h3 class="section-heading">Credit Card Related</h3>
         <EcTextField
@@ -105,6 +115,7 @@ const props = defineProps<{
   visible: boolean;
   bankAccount: BankAccountData;
   institutions: InstitutionData[];
+  bankAccounts: BankAccountData[];
   initialEditMode: boolean;
 }>();
 
@@ -128,6 +139,7 @@ function toBankAccountFormData(account: BankAccountData): BankAccountFormData {
     status: account.status,
     statement_day: account.statement_day != null ? String(account.statement_day) : '',
     payment_due_day: account.payment_due_day != null ? String(account.payment_due_day) : '',
+    asset_bank_account_id: account.asset_bank_account_id ?? null,
   };
 }
 
@@ -144,10 +156,28 @@ watch(
 
 const isCreditCard = computed(() => formData.account_type === 'credit_card');
 
+const isLinkableLoan = computed(
+  () => formData.account_category === 'liability' && formData.account_type !== 'credit_card',
+);
+
 const institutionItems = computed<ListItem[]>(() =>
   props.institutions
     .filter((i): i is { id: number; name: string } => i.id != null && i.name != null)
     .map((i) => ({ id: i.id, name: i.name })),
+);
+
+const linkableAssetItems = computed<ListItem[]>(() =>
+  props.bankAccounts
+    .filter(
+      (a): a is BankAccountData & { id: number; name: string } =>
+        a.account_category === 'asset' &&
+        a.is_cash === false &&
+        a.status === 'open' &&
+        a.id != null &&
+        a.name != null,
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((a) => ({ id: a.id, name: a.name })),
 );
 
 const accountFeatureTypes: ListItem[] = [
@@ -199,6 +229,10 @@ function toBankAccountData(form: BankAccountFormData): BankAccountData {
     status: form.status,
     statement_day: form.statement_day !== '' ? parseInt(form.statement_day, 10) : undefined,
     payment_due_day: form.payment_due_day !== '' ? parseInt(form.payment_due_day, 10) : undefined,
+    asset_bank_account_id:
+      form.account_category === 'liability' && form.account_type !== 'credit_card'
+        ? (form.asset_bank_account_id ?? null)
+        : null,
   };
 }
 

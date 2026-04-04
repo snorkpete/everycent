@@ -16,6 +16,7 @@ const savingsAccount: AccountBalanceData = {
   closing_balance: 100000,
   expected_closing_balance: 90000,
   current_balance: 110000,
+  asset_bank_account_id: null,
   institution: { id: 1, name: 'ABN Amro' },
 };
 
@@ -30,6 +31,7 @@ const checkingAccount: AccountBalanceData = {
   closing_balance: 50000,
   expected_closing_balance: 45000,
   current_balance: 55000,
+  asset_bank_account_id: null,
 };
 
 const sinkFundAccount: AccountBalanceData = {
@@ -43,6 +45,7 @@ const sinkFundAccount: AccountBalanceData = {
   closing_balance: 200000,
   expected_closing_balance: 180000,
   current_balance: 220000,
+  asset_bank_account_id: null,
 };
 
 function createWrapper(heading: string, accounts: AccountBalanceData[]): VueWrapper {
@@ -236,6 +239,89 @@ describe('AccountCategoryTable', () => {
       expect(footerCells[1].text()).toBe('0.00');
       expect(footerCells[2].text()).toBe('0.00');
       expect(footerCells[3].text()).toBe('0.00');
+    });
+  });
+
+  describe('assets with nested loans', () => {
+    const houseWithLoans: AccountBalanceData = {
+      id: 10,
+      name: 'House',
+      account_type: 'normal',
+      account_category: 'asset',
+      is_cash: false,
+      closing_date: '2026-03-24',
+      next_closing_date: '2026-04-24',
+      closing_balance: 500000,
+      expected_closing_balance: 500000,
+      current_balance: 500000,
+      asset_bank_account_id: null,
+      loans: [
+        {
+          id: 11,
+          name: 'Mortgage A',
+          account_type: 'normal',
+          account_category: 'liability',
+          is_cash: false,
+          closing_date: '2026-03-24',
+          next_closing_date: '2026-04-24',
+          closing_balance: -200000,
+          expected_closing_balance: -200000,
+          current_balance: -200000,
+          asset_bank_account_id: 10,
+        },
+        {
+          id: 12,
+          name: 'Mortgage B',
+          account_type: 'normal',
+          account_category: 'liability',
+          is_cash: false,
+          closing_date: '2026-03-24',
+          next_closing_date: '2026-04-24',
+          closing_balance: -100000,
+          expected_closing_balance: -100000,
+          current_balance: -100000,
+          asset_bank_account_id: 10,
+        },
+      ],
+    };
+
+    it('renders a row for each nested loan', () => {
+      const wrapper = createWrapper('Non-Cash Assets', [houseWithLoans]);
+
+      expect(wrapper.text()).toContain('Mortgage A');
+      expect(wrapper.text()).toContain('Mortgage B');
+    });
+
+    it('renders an equity row showing asset balance minus loan balances', () => {
+      const wrapper = createWrapper('Non-Cash Assets', [houseWithLoans]);
+
+      const equityRow = wrapper.find('.equity-row');
+      expect(equityRow.exists()).toBe(true);
+      expect(equityRow.text()).toContain('Equity');
+      // 500000 + (-200000) + (-100000) = 200000 cents = 2,000.00
+      expect(equityRow.text()).toContain('2,000.00');
+    });
+
+    it('does not render equity row when asset has no loans', () => {
+      const assetWithoutLoans: AccountBalanceData = { ...houseWithLoans, loans: [] };
+      const wrapper = createWrapper('Non-Cash Assets', [assetWithoutLoans]);
+
+      expect(wrapper.find('.equity-row').exists()).toBe(false);
+    });
+
+    it('section total sums asset and nested loans', () => {
+      const wrapper = createWrapper('Non-Cash Assets', [houseWithLoans]);
+
+      const footerCells = wrapper.findAll('tfoot th');
+      // 500000 + (-200000) + (-100000) = 200000 cents = 2,000.00
+      expect(footerCells[3].text()).toBe('2,000.00');
+    });
+
+    it('heading total sums asset and nested loans', () => {
+      const wrapper = createWrapper('Non-Cash Assets', [houseWithLoans]);
+
+      const heading = wrapper.find('.section-heading');
+      expect(heading.text()).toContain('2,000.00');
     });
   });
 });

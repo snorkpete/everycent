@@ -1,5 +1,5 @@
 <template>
-  <EcPageLayout page-name="account-balances" variant="fixed">
+  <EcPageLayout page-name="account-balances" variant="fixed" content-bg>
     <template #toolbar-left>
       <Button
         label="Adjust Account Balances"
@@ -10,6 +10,16 @@
       />
     </template>
     <template #toolbar-right>
+      <Button
+        v-tooltip="'Show zero balances as dashes'"
+        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
+        text
+        severity="secondary"
+        size="small"
+        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+        data-testid="dash-zero-toggle"
+        @click="dashIfZero = !dashIfZero"
+      />
       <label class="toggle-label">
         <ToggleSwitch
           v-model="store.includeClosed"
@@ -32,6 +42,7 @@
           <AccountCategoryTable
             heading="Current Accounts"
             :accounts="store.currentAccounts"
+            :dash-if-zero="dashIfZero"
             data-testid="current-accounts-table"
           />
         </div>
@@ -39,13 +50,15 @@
           <AccountCategoryTable
             heading="Cash Assets"
             :accounts="store.cashAssetAccounts"
+            :dash-if-zero="dashIfZero"
             data-testid="cash-assets-table"
           />
         </div>
-        <div v-if="store.nonCashAssetAccounts.length" class="content-card">
+        <div v-if="store.physicalAssetAccounts.length" class="content-card">
           <AccountCategoryTable
             heading="Non Cash Assets"
-            :accounts="store.nonCashAssetAccounts"
+            :accounts="store.physicalAssetAccounts"
+            :dash-if-zero="dashIfZero"
             data-testid="non-cash-assets-table"
           />
         </div>
@@ -53,13 +66,15 @@
           <AccountCategoryTable
             heading="Credit Cards"
             :accounts="store.creditCardAccounts"
+            :dash-if-zero="dashIfZero"
             data-testid="credit-cards-table"
           />
         </div>
         <div v-if="store.loanAccounts.length" class="content-card">
           <AccountCategoryTable
-            heading="Loans"
+            heading="Other Loans"
             :accounts="store.loanAccounts"
+            :dash-if-zero="dashIfZero"
             data-testid="loans-table"
           />
         </div>
@@ -85,6 +100,7 @@ import AdjustBalancesDialog from './AdjustBalancesDialog.vue';
 const headingStore = useHeadingStore();
 const store = useAccountBalanceStore();
 
+const dashIfZero = ref(true);
 const showAdjustDialog = ref(false);
 
 onMounted(() => {
@@ -98,6 +114,11 @@ async function onToggleChanged() {
 </script>
 
 <style scoped>
+:deep(.icon-btn--active.p-button) {
+  background-color: var(--p-primary-50);
+  color: var(--p-primary-color);
+}
+
 .toggle-label {
   display: flex;
   align-items: center;

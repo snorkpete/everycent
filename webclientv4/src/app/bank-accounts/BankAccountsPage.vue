@@ -2,24 +2,52 @@
   <EcPageLayout page-name="bank-accounts">
     <EcItemList :items="visibleAccounts" key-field="id">
       <template #item="{ item: account }">
-        <span
-          class="account-name"
-          :class="{ 'account-name--closed': account.status === 'closed' }"
-          >{{ account.name }}</span
-        >
-        <Tag
-          v-if="account.status === 'closed'"
-          value="Closed"
-          severity="warn"
-          icon="pi pi-ban"
-          class="status-tag"
-          data-testid="closed-tag"
-        />
+        <span class="account-info">
+          <a
+            class="account-name"
+            :class="{ 'account-name--closed': account.status === 'closed' }"
+            href="#"
+            :data-testid="`account-link-${account.id}`"
+            @click.prevent="viewAccount(account as BankAccountData)"
+            >{{ account.name }}</a
+          >
+          <i
+            v-if="account.is_sink_fund"
+            v-tooltip.top="{ value: 'Sink fund account', showDelay: 0, hideDelay: 0 }"
+            class="pi pi-wallet type-icon"
+          />
+          <i
+            v-if="account.is_credit_card"
+            v-tooltip.top="{ value: 'Credit card account', showDelay: 0, hideDelay: 0 }"
+            class="pi pi-credit-card type-icon"
+          />
+          <Tag
+            v-if="account.status === 'closed'"
+            value="Closed"
+            severity="warn"
+            icon="pi pi-ban"
+            class="status-tag"
+            data-testid="closed-tag"
+          />
+        </span>
+        <span class="account-meta">
+          <span
+            v-if="(account as BankAccountData).institution?.name"
+            class="institution-name"
+            >{{ (account as BankAccountData).institution?.name }}</span
+          >
+          <Tag
+            v-if="account.account_category"
+            :value="categoryLabel(account.account_category as string)"
+            :severity="categorySeverity(account.account_category as string)"
+            class="category-tag"
+          />
+        </span>
         <Button
           label="View"
           size="small"
           :data-testid="`view-btn-${account.id}`"
-          @click="viewAccount(account)"
+          @click="viewAccount(account as BankAccountData)"
         />
       </template>
       <template #controls>
@@ -43,6 +71,7 @@
       :bank-account="selectedAccount"
       :initial-edit-mode="dialogEditMode"
       :institutions="store.institutions"
+      :bank-accounts="store.bankAccounts"
       @update:visible="dialogVisible = $event"
       @save="onSave"
     />
@@ -97,6 +126,24 @@ function addAccount() {
   dialogVisible.value = true;
 }
 
+function categoryLabel(category: string): string {
+  const labels: Record<string, string> = {
+    asset: 'Asset',
+    liability: 'Liability',
+    current: 'Current',
+  };
+  return labels[category] ?? category;
+}
+
+function categorySeverity(category: string): string {
+  const severities: Record<string, string> = {
+    asset: 'success',
+    liability: 'danger',
+    current: 'info',
+  };
+  return severities[category] ?? 'secondary';
+}
+
 async function onSave(account: BankAccountData) {
   try {
     await store.save(account);
@@ -116,15 +163,50 @@ async function onSave(account: BankAccountData) {
   cursor: pointer;
 }
 
+.account-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
 .account-name {
   font-size: 0.9rem;
+  color: var(--p-primary-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.account-name:hover {
+  text-decoration: underline;
 }
 
 .account-name--closed {
   color: var(--p-text-muted-color);
 }
 
+.type-icon {
+  font-size: 0.75rem;
+  color: var(--p-text-muted-color);
+  cursor: help;
+}
+
 .status-tag {
   font-size: 0.75rem;
+}
+
+.account-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: 0.75rem;
+}
+
+.institution-name {
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+}
+
+.category-tag {
+  font-size: 0.7rem;
 }
 </style>

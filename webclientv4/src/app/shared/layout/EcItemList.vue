@@ -82,6 +82,10 @@ const {
   border-bottom: none;
 }
 
+.ec-item-list__item:hover {
+  background-color: var(--p-surface-50);
+}
+
 .ec-item-list--actions-right .ec-item-list__item > :last-child {
   margin-left: auto;
 }

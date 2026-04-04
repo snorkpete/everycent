@@ -9,7 +9,9 @@ export interface AccountBalanceData {
   closing_balance: number;
   expected_closing_balance: number;
   current_balance: number;
+  asset_bank_account_id: number | null;
   institution?: { id: number; name: string };
+  loans?: AccountBalanceData[];
 }
 
 export interface BalanceAdjustmentData {

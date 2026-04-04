@@ -15,6 +15,7 @@ export function buildAccountBalance(overrides?: Partial<AccountBalanceData>): Ac
     closing_balance: 100000,
     expected_closing_balance: 95000,
     current_balance: 100000,
+    asset_bank_account_id: null,
     ...overrides,
   };
 }

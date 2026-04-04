@@ -31,6 +31,7 @@ export interface BankAccountData {
   previous_period_statement_end?: string;
   current_period_payment_due?: number;
   previous_period_payment_due?: number;
+  asset_bank_account_id?: number | null;
   institution?: InstitutionData;
 }
 
@@ -67,4 +68,5 @@ export interface BankAccountFormData {
   status?: string;
   statement_day: string;
   payment_due_day: string;
+  asset_bank_account_id?: number | null;
 }

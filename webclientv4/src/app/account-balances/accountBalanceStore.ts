@@ -48,7 +48,7 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
     accounts.value.filter((a) => a.account_category === 'asset' && a.is_cash),
   );
 
-  const nonCashAssetAccounts = computed(() =>
+  const physicalAssetAccounts = computed(() =>
     accounts.value.filter((a) => a.account_category === 'asset' && !a.is_cash),
   );
 
@@ -60,21 +60,28 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
     accounts.value.filter((a) => a.account_category === 'liability' && !a.is_cash),
   );
 
+  // Flatten top-level accounts + nested loans so totals include loan balances
+  // that the backend has nested under their parent asset. Only flattens one
+  // level: nested loans do not themselves carry a loans array.
+  const flatAccounts = computed<AccountBalanceData[]>(() =>
+    accounts.value.flatMap((a) => [a, ...(a.loans ?? [])]),
+  );
+
   // Summary totals
   const totalAssets = computed(() =>
-    accounts.value
+    flatAccounts.value
       .filter((a) => a.account_category === 'asset')
       .reduce((sum, a) => sum + a.current_balance, 0),
   );
 
   const totalLiabilities = computed(() =>
-    accounts.value
+    flatAccounts.value
       .filter((a) => a.account_category === 'liability')
       .reduce((sum, a) => sum + a.current_balance, 0),
   );
 
   const netCurrentCash = computed(() =>
-    accounts.value
+    flatAccounts.value
       .filter(
         (a) =>
           a.account_category === 'current' || (a.account_category === 'liability' && a.is_cash),
@@ -83,20 +90,22 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
   );
 
   const netCashAssets = computed(() =>
-    accounts.value
+    flatAccounts.value
       .filter((a) => a.account_category === 'asset' && a.is_cash)
       .reduce((sum, a) => sum + a.current_balance, 0),
   );
 
   const netNonCashAssets = computed(() =>
-    accounts.value
+    flatAccounts.value
       .filter(
         (a) => (a.account_category === 'asset' || a.account_category === 'liability') && !a.is_cash,
       )
       .reduce((sum, a) => sum + a.current_balance, 0),
   );
 
-  const netWorth = computed(() => accounts.value.reduce((sum, a) => sum + a.current_balance, 0));
+  const netWorth = computed(() =>
+    flatAccounts.value.reduce((sum, a) => sum + a.current_balance, 0),
+  );
 
   return {
     accounts,
@@ -107,7 +116,7 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
     adjustBalances,
     currentAccounts,
     cashAssetAccounts,
-    nonCashAssetAccounts,
+    physicalAssetAccounts,
     creditCardAccounts,
     loanAccounts,
     totalAssets,
