@@ -71,6 +71,7 @@
       :bank-account="selectedAccount"
       :initial-edit-mode="dialogEditMode"
       :institutions="store.institutions"
+      :bank-accounts="store.bankAccounts"
       @update:visible="dialogVisible = $event"
       @save="onSave"
     />

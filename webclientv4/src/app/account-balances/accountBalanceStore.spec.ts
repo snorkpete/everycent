@@ -22,6 +22,7 @@ const currentAccount: AccountBalanceData = {
   closing_balance: 100000,
   expected_closing_balance: 90000,
   current_balance: 100000,
+  asset_bank_account_id: null,
 };
 
 const cashAsset: AccountBalanceData = {
@@ -35,6 +36,7 @@ const cashAsset: AccountBalanceData = {
   closing_balance: 200000,
   expected_closing_balance: 200000,
   current_balance: 200000,
+  asset_bank_account_id: null,
 };
 
 const nonCashAsset: AccountBalanceData = {
@@ -48,6 +50,7 @@ const nonCashAsset: AccountBalanceData = {
   closing_balance: 500000,
   expected_closing_balance: 500000,
   current_balance: 500000,
+  asset_bank_account_id: null,
 };
 
 const creditCard: AccountBalanceData = {
@@ -61,12 +64,13 @@ const creditCard: AccountBalanceData = {
   closing_balance: -30000,
   expected_closing_balance: -25000,
   current_balance: -30000,
+  asset_bank_account_id: null,
 };
 
 const loan: AccountBalanceData = {
   id: 5,
   name: 'Mortgage',
-  account_type: 'loan',
+  account_type: 'normal',
   account_category: 'liability',
   is_cash: false,
   closing_date: '2026-03-24',
@@ -74,6 +78,7 @@ const loan: AccountBalanceData = {
   closing_balance: -1000000,
   expected_closing_balance: -1000000,
   current_balance: -1000000,
+  asset_bank_account_id: null,
 };
 
 const allAccounts = [currentAccount, cashAsset, nonCashAsset, creditCard, loan];
@@ -244,9 +249,9 @@ describe('accountBalanceStore', () => {
       expect(store.cashAssetAccounts).toEqual([cashAsset]);
     });
 
-    it('nonCashAssetAccounts filters by asset + !is_cash', async () => {
+    it('physicalAssetAccounts filters by asset + !is_cash', async () => {
       const store = useAccountBalanceStore();
-      expect(store.nonCashAssetAccounts).toEqual([nonCashAsset]);
+      expect(store.physicalAssetAccounts).toEqual([nonCashAsset]);
     });
 
     it('creditCardAccounts filters by liability + is_cash', async () => {
@@ -302,6 +307,66 @@ describe('accountBalanceStore', () => {
       const store = useAccountBalanceStore();
       // 100000 + 200000 + 500000 + (-30000) + (-1000000) = -230000
       expect(store.netWorth).toBe(-230000);
+    });
+  });
+
+  describe('nested loan totals', () => {
+    // House asset with one nested loan (loan is excluded from top-level by backend)
+    const house: AccountBalanceData = {
+      id: 10,
+      name: 'House',
+      account_type: 'normal',
+      account_category: 'asset',
+      is_cash: false,
+      closing_date: '2026-03-24',
+      next_closing_date: '2026-04-24',
+      closing_balance: 500000,
+      expected_closing_balance: 500000,
+      current_balance: 500000,
+      asset_bank_account_id: null,
+      loans: [
+        {
+          id: 11,
+          name: 'Mortgage',
+          account_type: 'normal',
+          account_category: 'liability',
+          is_cash: false,
+          closing_date: '2026-03-24',
+          next_closing_date: '2026-04-24',
+          closing_balance: -300000,
+          expected_closing_balance: -300000,
+          current_balance: -300000,
+          asset_bank_account_id: 10,
+        },
+      ],
+    };
+
+    beforeEach(async () => {
+      vi.mocked(accountBalanceApi.getAll).mockResolvedValue([house]);
+      const store = useAccountBalanceStore();
+      await store.fetch();
+    });
+
+    it('includes nested loan balances in totalLiabilities', () => {
+      const store = useAccountBalanceStore();
+      expect(store.totalLiabilities).toBe(-300000);
+    });
+
+    it('includes nested loan balances in netNonCashAssets', () => {
+      const store = useAccountBalanceStore();
+      // house(500000) + mortgage(-300000) = 200000
+      expect(store.netNonCashAssets).toBe(200000);
+    });
+
+    it('includes nested loan balances in netWorth', () => {
+      const store = useAccountBalanceStore();
+      // house(500000) + mortgage(-300000) = 200000
+      expect(store.netWorth).toBe(200000);
+    });
+
+    it('totalAssets remains only asset-category accounts', () => {
+      const store = useAccountBalanceStore();
+      expect(store.totalAssets).toBe(500000);
     });
   });
 });

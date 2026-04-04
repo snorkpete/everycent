@@ -24,42 +24,102 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="account in accounts" :key="account.id">
-          <td>
-            <span class="name-cell">
-              <router-link :to="`/transactions?bank_account_id=${account.id}`">{{
-                account.name
-              }}</router-link>
-              <i
-                v-if="account.account_type === 'sink_fund'"
-                v-tooltip.top="{ value: 'Sink fund account', showDelay: 0, hideDelay: 0 }"
-                class="pi pi-wallet sink-fund-icon"
+        <template v-for="account in accounts" :key="account.id">
+          <tr>
+            <td>
+              <span class="name-cell">
+                <router-link :to="`/transactions?bank_account_id=${account.id}`">{{
+                  account.name
+                }}</router-link>
+                <i
+                  v-if="account.account_type === 'sink_fund'"
+                  v-tooltip.top="{ value: 'Sink fund account', showDelay: 0, hideDelay: 0 }"
+                  class="pi pi-wallet sink-fund-icon"
+                />
+              </span>
+            </td>
+            <td>{{ account.institution?.name ?? '' }}</td>
+            <td class="money-cell">
+              <EcMoneyDisplay
+                :model-value="account.closing_balance"
+                highlight-mode="none"
+                :dash-if-zero="dashIfZero"
               />
-            </span>
-          </td>
-          <td>{{ account.institution?.name ?? '' }}</td>
-          <td class="money-cell">
-            <EcMoneyDisplay
-              :model-value="account.closing_balance"
-              highlight-mode="none"
-              :dash-if-zero="dashIfZero"
-            />
-          </td>
-          <td class="money-cell">
-            <EcMoneyDisplay
-              :model-value="account.expected_closing_balance"
-              highlight-mode="none"
-              :dash-if-zero="dashIfZero"
-            />
-          </td>
-          <td class="money-cell">
-            <EcMoneyDisplay
-              :model-value="account.current_balance"
-              highlight-mode="none"
-              :dash-if-zero="dashIfZero"
-            />
-          </td>
-        </tr>
+            </td>
+            <td class="money-cell">
+              <EcMoneyDisplay
+                :model-value="account.expected_closing_balance"
+                highlight-mode="none"
+                :dash-if-zero="dashIfZero"
+              />
+            </td>
+            <td class="money-cell">
+              <EcMoneyDisplay
+                :model-value="account.current_balance"
+                highlight-mode="none"
+                :dash-if-zero="dashIfZero"
+              />
+            </td>
+          </tr>
+          <tr v-for="loan in account.loans ?? []" :key="loan.id" class="loan-row">
+            <td>
+              <span class="name-cell loan-name">
+                <router-link :to="`/transactions?bank_account_id=${loan.id}`">{{
+                  loan.name
+                }}</router-link>
+              </span>
+            </td>
+            <td>{{ loan.institution?.name ?? '' }}</td>
+            <td class="money-cell">
+              <EcMoneyDisplay
+                :model-value="loan.closing_balance"
+                highlight-mode="balance"
+                :dash-if-zero="dashIfZero"
+              />
+            </td>
+            <td class="money-cell">
+              <EcMoneyDisplay
+                :model-value="loan.expected_closing_balance"
+                highlight-mode="balance"
+                :dash-if-zero="dashIfZero"
+              />
+            </td>
+            <td class="money-cell">
+              <EcMoneyDisplay
+                :model-value="loan.current_balance"
+                highlight-mode="balance"
+                :dash-if-zero="dashIfZero"
+              />
+            </td>
+          </tr>
+          <tr v-if="(account.loans?.length ?? 0) > 0" class="equity-row">
+            <th colspan="2" class="equity-label">Equity</th>
+            <th class="money-cell">
+              <EcMoneyDisplay
+                :model-value="equityFor(account, 'closing_balance')"
+                emphasis="subtotal"
+                highlight-mode="balance"
+                :dash-if-zero="dashIfZero"
+              />
+            </th>
+            <th class="money-cell">
+              <EcMoneyDisplay
+                :model-value="equityFor(account, 'expected_closing_balance')"
+                emphasis="subtotal"
+                highlight-mode="balance"
+                :dash-if-zero="dashIfZero"
+              />
+            </th>
+            <th class="money-cell">
+              <EcMoneyDisplay
+                :model-value="equityFor(account, 'current_balance')"
+                emphasis="subtotal"
+                highlight-mode="balance"
+                :dash-if-zero="dashIfZero"
+              />
+            </th>
+          </tr>
+        </template>
       </tbody>
       <tfoot>
         <tr class="total-row">
@@ -116,16 +176,27 @@ const nextClosingDateLabel = computed(() =>
   firstAccount.value ? formatDate(firstAccount.value.next_closing_date) : '',
 );
 
+type BalanceField = 'closing_balance' | 'expected_closing_balance' | 'current_balance';
+
+function equityFor(account: AccountBalanceData, field: BalanceField): number {
+  const loanTotal = (account.loans ?? []).reduce((sum, l) => sum + l[field], 0);
+  return account[field] + loanTotal;
+}
+
+const flattenedAccounts = computed<AccountBalanceData[]>(() =>
+  props.accounts.flatMap((a) => [a, ...(a.loans ?? [])]),
+);
+
 const totalClosingBalance = computed(() =>
-  props.accounts.reduce((sum, a) => sum + a.closing_balance, 0),
+  flattenedAccounts.value.reduce((sum, a) => sum + a.closing_balance, 0),
 );
 
 const totalExpectedClosingBalance = computed(() =>
-  props.accounts.reduce((sum, a) => sum + a.expected_closing_balance, 0),
+  flattenedAccounts.value.reduce((sum, a) => sum + a.expected_closing_balance, 0),
 );
 
 const totalCurrentBalance = computed(() =>
-  props.accounts.reduce((sum, a) => sum + a.current_balance, 0),
+  flattenedAccounts.value.reduce((sum, a) => sum + a.current_balance, 0),
 );
 </script>
 
@@ -224,5 +295,21 @@ const totalCurrentBalance = computed(() =>
   font-size: 0.75rem;
   color: var(--p-text-muted-color);
   cursor: help;
+}
+
+.loan-name {
+  padding-left: 1.25rem;
+}
+
+.equity-row th {
+  border-top: 1px dashed var(--p-surface-300);
+  border-bottom: none;
+  background-color: transparent;
+}
+
+.equity-row .equity-label {
+  text-align: right;
+  color: var(--p-text-muted-color);
+  font-weight: 500;
 }
 </style>

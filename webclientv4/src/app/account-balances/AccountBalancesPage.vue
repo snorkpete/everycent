@@ -54,10 +54,10 @@
             data-testid="cash-assets-table"
           />
         </div>
-        <div v-if="store.nonCashAssetAccounts.length" class="content-card">
+        <div v-if="store.physicalAssetAccounts.length" class="content-card">
           <AccountCategoryTable
             heading="Non Cash Assets"
-            :accounts="store.nonCashAssetAccounts"
+            :accounts="store.physicalAssetAccounts"
             :dash-if-zero="dashIfZero"
             data-testid="non-cash-assets-table"
           />
@@ -72,7 +72,7 @@
         </div>
         <div v-if="store.loanAccounts.length" class="content-card">
           <AccountCategoryTable
-            heading="Loans"
+            heading="Other Loans"
             :accounts="store.loanAccounts"
             :dash-if-zero="dashIfZero"
             data-testid="loans-table"
