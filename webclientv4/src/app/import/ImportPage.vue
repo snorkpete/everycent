@@ -496,6 +496,9 @@ function previewRowClass(transaction: ImportTransaction) {
   padding: 0.75rem 1rem;
   background-color: var(--p-surface-50);
   border-bottom: 1px solid var(--p-surface-300);
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .account-name {
@@ -512,8 +515,7 @@ function previewRowClass(transaction: ImportTransaction) {
 }
 
 .table-scroll {
-  max-height: 50vh;
-  overflow: auto;
+  overflow: visible;
 }
 
 .preview-table {
@@ -534,7 +536,7 @@ function previewRowClass(transaction: ImportTransaction) {
   text-align: left;
   background-color: var(--p-surface-50);
   position: sticky;
-  top: 0;
+  top: 3rem;
   z-index: 1;
   box-shadow: 0 1px 0 var(--p-surface-300);
 }
