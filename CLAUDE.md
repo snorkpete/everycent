@@ -117,6 +117,14 @@ Full sequence for landing a completed worktree branch:
 - **Default: branch new worktrees from master**, not from current work. Specify otherwise if the new branch explicitly depends on in-progress work.
 - Ask before switching context away from a worktree (don't silently switch to the main worktree).
 
+## Worker Dispatch Protocol
+
+- **Model**: dispatch background worktree agents with `model: "sonnet"`. Implementation tasks don't need Opus — cheaper and faster.
+- **Branch discipline**: the scaffold `worktree-agent-*` branch stays frozen. Actual commits must land on the task branch. After dispatch, confirm with `cat .git/worktrees/<name>/HEAD`.
+- **Full cycle**: dispatch → worker commits on task branch → verify commit exists → show diff to user → wait for explicit approval → merge → clean up worktree and branch.
+- **Verification is mandatory**: workers can follow some protocol steps while silently skipping others (e.g., log start, log completion, advance task — but skip the commit). "Worker reported done" does not mean all steps completed. Before reporting to the user, independently verify each step — especially: `git -C <worktree> log --oneline -1` to confirm a commit exists.
+- **Review before merge**: keep the worktree alive after the worker finishes. Show the diff (`git log <branch> --not master -p`), then stop and wait for approval before merging to ready-for-prod.
+
 ## Domus Workflow
 See `.domus/reference/agent-instructions.md` for domus workflow rules (task lifecycle, dispatch, CLI commands, staff roles).
 
