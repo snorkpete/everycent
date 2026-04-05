@@ -41,6 +41,8 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 Machine-specific development info (test user credentials, etc.) lives in `.claude/local-dev.md` (gitignored).
 
 ## Build & Release
+> v3 (Angular) is frozen; v1 (AngularJS) is dormant. This section is only for occasional rebuilds during the Vue v4 cutover — skip entirely once v4 is the default (pending reports migration).
+
 1. Build Angular: `cd webclientv3 && npm run build` (outputs to /public)
 2. Build v1 legacy: `cd webclient && gulp` (outputs to /public/v1)
 3. Commit: `git add . && git commit -m "build of static assets"`
