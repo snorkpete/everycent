@@ -18,6 +18,24 @@ Call `router.replace({ query: { ... } })` in `emitFetch()` when selection change
 - **matchMedia mock** — global mock in `src/test/setup.ts`, required by PrimeVue DatePicker and Select. Do not remove it.
 - **Always use npm scripts** — use `npm run dev`, `npm run build`, `npm run test`, never invoke tools directly (`npx vite`, `npx vitest`, etc.). If an npm script fails, fix the underlying problem (install deps, fix PATH) rather than bypassing the script.
 - **TypeScript** — type-check with `npm run type-check` (runs `vue-tsc -b --noEmit`, the `-b` flag is essential). If type-check reports stale errors, clear the build cache: `rm node_modules/.tmp/tsconfig.app.tsbuildinfo`.
+- **Worktree node_modules** — symlinked `node_modules` (e.g. from another worktree) break Vite asset resolution (primeicons fonts fail via `@fs` route). Always run `bun install` inside each worktree — do not symlink.
+
+## Mobile Development Pattern
+
+Separate mobile layouts into dedicated components, not inline `v-if` branches inside the shared template.
+
+**Pattern:** container component uses `v-if="isMobile"` / `v-else` to select between a mobile-specific component and the desktop component. Mobile-specific files are named `*Mobile.vue` (e.g. `SinkFundsToolbarMobile.vue`, `SinkFundAllocationListMobile.vue`).
+
+**Why:** The prior approach (scattered `v-if="isMobile"` inside TransactionsPage/BudgetsPage) creates template soup. Separate components give mobile and desktop layouts independent codepaths with no shared template noise.
+
+**Card/list pattern for mobile list screens:**
+- Render items as `<li>` cards, not table rows
+- Tap the card (`@click` on `<li>`) to expand hidden detail rows
+- `@click.stop` on interactive elements inside the expanded section to prevent collapse
+- 2×2 grid for secondary fields, full-width action button at bottom of expanded section
+- Never reuse table layouts as mobile layouts — use card/list primitives
+
+**Reference implementation:** `SinkFundsPage.vue`, `SinkFundsToolbarMobile.vue`, `SinkFundAllocationListMobile.vue`.
 
 ## Coding Conventions
 

@@ -155,3 +155,18 @@ Page specs are mini-integration tests — mount real child components, mock only
 - Unit-level isolation belongs in the child component's own spec, not in the page spec.
 - If a child component requires complex setup that bleeds into the page spec, that's a smell in the child, not a reason to stub.
 - Reference: `HomePage.spec.ts` — API mock only, real `WhatsNew` component mounted.
+
+## Store Testing: Real Pinia, Not Reactive Mocks
+
+Use a real Pinia store (via `createPinia()`) and mock at the API layer — not a hand-rolled reactive mock object.
+
+**Why:** A reactive `mockStore` doesn't exercise the store's actions, getters, or state transitions. When the store interface changes, mock-store tests pass silently while the real behavior breaks.
+
+**How to apply:**
+- Add `createPinia()` to `global.plugins` in the mount helper
+- Seed state by calling store actions (e.g. `await store.fetchList()`) with a mocked API response
+- Use factories from `src/test/factories/` for domain objects passed to mocked API responses
+- Never create a hand-built `const mockStore = { list: ref([...]), ... }` and inject it via `provide`
+- This applies to pre-existing specs too — when modifying a spec that uses a reactive mock store, migrate it to the real Pinia pattern
+
+**Reference:** `SinkFundAllocationListMobile.spec.ts`
