@@ -1,12 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick, reactive } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
+import SinkFundAllocationListMobile from './SinkFundAllocationListMobile.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import type { SinkFundAllocationData, SinkFundData } from './sinkFund.types';
 import { getTooltipValue } from '../../test/tooltip-helper';
+
+const isMobile = ref(false);
+vi.mock('../shared/composables/useResponsive', () => ({
+  useResponsive: () => ({
+    isMobile,
+    isCompact: ref(false),
+  }),
+}));
 
 // Selectors
 const ALLOCATIONS_TABLE = '[data-testid="allocations-table"]';
@@ -92,6 +101,7 @@ describe('SinkFundAllocationTable', () => {
     mockStore.unassignedBalance = 70000;
     mockStore.totalTarget = 50000;
     mockStore.totalOutstanding = -25000;
+    isMobile.value = false;
   });
 
   describe('table structure', () => {
@@ -481,6 +491,37 @@ describe('SinkFundAllocationTable', () => {
       const totalRow = wrapper.find(TOTAL_ROW);
       const cells = totalRow.findAll('th');
       expect(cells[3].text()).toContain('250.00');
+    });
+  });
+
+  describe('responsive rendering', () => {
+    it('renders the desktop table when not mobile', () => {
+      isMobile.value = false;
+
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(ALLOCATIONS_TABLE).exists()).toBe(true);
+      expect(wrapper.findComponent(SinkFundAllocationListMobile).exists()).toBe(false);
+    });
+
+    it('renders SinkFundAllocationListMobile when mobile', () => {
+      isMobile.value = true;
+
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(ALLOCATIONS_TABLE).exists()).toBe(false);
+      expect(wrapper.findComponent(SinkFundAllocationListMobile).exists()).toBe(true);
+    });
+
+    it('passes dashIfZero prop to the mobile list', () => {
+      isMobile.value = true;
+
+      const wrapper = mount(SinkFundAllocationTable, {
+        props: { dashIfZero: true },
+        global: { plugins: [PrimeVue, createPinia()] },
+      });
+
+      expect(wrapper.findComponent(SinkFundAllocationListMobile).props('dashIfZero')).toBe(true);
     });
   });
 });
