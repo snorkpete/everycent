@@ -13,11 +13,16 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 - ✅ Session A — Memory cleanup (52→47 files, 5 retirements + merges + frontmatter sweep)
 - ✅ Session B1 — Git/worktree rules → CLAUDE.md (47→38 files, Confidence Signaling removed, 4 new sections, Heroku mappings)
 - ✅ Session B2 — Worker Dispatch Protocol → CLAUDE.md (38→34 files, 1 new section)
-- ✅ Session-recap agent spec updated at `~/.claude/agents/session-recap.md` (session-aware writes + volatile-content exclusions)
+- ✅ Session B3 — Debugging + Browser Testing → CLAUDE.md (34→29 files, 2 new sections)
+- ✅ Session B4 — Refactor discipline + Design philosophy + PrimeVue builtins → CLAUDE.md + webclientv4/CLAUDE.md (29→24 files, 2 new project sections + 1 webclientv4 line for PrimeVue)
+- ✅ Session B5 — Housekeeping commits + domus meta-rule + bang-assertion nuance → CLAUDE.md (24→19 files, 1 new section + Domus Workflow expansion + Pre-Commit rule inline nuance)
+- ✅ Session-recap agent spec refined twice at `~/.claude/agents/session-recap.md` (session-aware writes, volatile-content exclusions, mid-session change detection, checkout guard, MIGRATION_PLAN.md removed)
+- ✅ Global `~/.claude/CLAUDE.md` updated with rewritten rules + Interaction Style + Delegation + Where Things Go sections
+- ✅ 2 side memory files captured during parallel session: `feedback_page_spec_integration_style.md` (staged for Session E migration to vue-testing-patterns.md), `feedback_worktree_main_ask_first.md` (useful half promoted to Worktree Branching subsection, contradicting half retired)
 
-**Memory at 34 files** (target: ~11).
+**Memory at 19 files** (target: ~11).
 
-**Next batch to execute: B3** (Debugging + Browser Testing — 5 memory files → 2 new CLAUDE.md sections).
+**Next batch to execute: Session D** — `/docs/` structure + code doc migrations (4 more memory files retire after migration: useResponsive, EcMoneyDisplay, bank_account_api sort, ics_import_research)
 
 **Execution pattern that's working:** dispatch a general-purpose agent with `model: "sonnet"`, tight scope (4-5 files per batch), explicit branch guard ("do not switch branches, do not commit"), verify + commit in main session.
 
@@ -27,13 +32,11 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 - Context bloat from showing full diffs inline (use `git diff --stat` first, full diff only if needed)
 
 **Remaining work order (proposed):**
-1. B3 — Debugging + Browser Testing (5 files, 2 sections)
-2. B4 — Refactor discipline + Design philosophy + PrimeVue best practices (5 files, 3 sections)
-3. B5 — Housekeeping commits + task_capture_fields + bang-assertions nuance (5 files, 2 sections + 1 inline edit)
-4. Session C — Global CLAUDE.md rewrite + Interaction Style/Delegation/Where Things Go (3 more memory retirements)
-5. Session D — `/docs/` structure + code doc migrations (4 more memory retirements)
-6. Session E — webclientv4 updates + vue-testing-patterns.md creation (3 more memory retirements)
-7. Session F — Hooks (interactive, NOT agent)
+1. Session D — `/docs/` structure + code doc migrations (useResponsive → JSDoc, EcMoneyDisplay → JSDoc, bank_account_api → inline comments on controller, ics_import_research → `/docs/decisions/ics-import.md` ADR) — 4 more memory retirements
+2. Session E — webclientv4 updates (TypeScript Notes, useResponsive reference, fix broken docs reference) + `webclientv4/docs/vue-testing-patterns.md` creation (from `testing-patterns.md` + `feedback_composable_spec_setup.md` + `feedback_refactor_to_factories.md` + the staged `feedback_page_spec_integration_style.md`) — 4 more memory retirements
+3. Session C-followup — retire `feedback_no_cheerleading.md`, `feedback_linus_hat_default.md`, `feedback_frame_uncertainty.md` (content already in global CLAUDE.md Interaction Style)
+4. Session F — Hooks (interactive, NOT agent)
+5. Final cleanup: migrate `claude_test_user.md` to `.claude/local-dev.md` (gitignored); convert vocabulary JSONL → markdown; shrink project CLAUDE.md vocab section; move `feedback_session_context_management.md` to user-level
 
 **When resuming:**
 1. `git -C /Users/kion/code/everycent status` — verify on `memory-audit` branch
