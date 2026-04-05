@@ -1,6 +1,17 @@
 <template>
   <EcPageLayout page-name="sink-funds" variant="fixed">
-    <template #toolbar-left>
+    <template v-if="isMobile" #toolbar>
+      <SinkFundsToolbarMobile
+        v-model:dash-if-zero="dashIfZero"
+        :selected-sink-fund-id="selectedSinkFundId"
+        @update:selected-sink-fund-id="onSinkFundChange"
+        @transfer="showTransferDialog = true"
+        @save="onSave"
+        @cancel="onCancel"
+        @add-obligation="onAddObligation"
+      />
+    </template>
+    <template v-if="!isMobile" #toolbar-left>
       <Select
         v-model="selectedSinkFundId"
         :options="store.sinkFunds"
@@ -11,7 +22,7 @@
         @update:model-value="onSinkFundChange"
       />
     </template>
-    <template #toolbar-right>
+    <template v-if="!isMobile" #toolbar-right>
       <Button
         v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
         :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
@@ -85,12 +96,15 @@ import { useSinkFundStore } from './sinkFundStore';
 import { useNotifications } from '../notifications/useNotifications';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
 import SinkFundTransferDialog from './SinkFundTransferDialog.vue';
+import SinkFundsToolbarMobile from './SinkFundsToolbarMobile.vue';
+import { useResponsive } from '../shared/composables/useResponsive';
 
 const route = useRoute();
 const router = useRouter();
 const store = useSinkFundStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
+const { isMobile } = useResponsive();
 
 const dashIfZero = ref(true);
 const selectedSinkFundId = ref<number | null>(null);
