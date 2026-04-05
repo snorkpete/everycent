@@ -64,6 +64,7 @@ const mockStore = reactive({
   visibleAllocations: [] as SinkFundAllocationData[],
   totalAssignedBalance: 0,
   unassignedBalance: 0,
+  isEditMode: false,
 });
 
 vi.mock('./sinkFundStore', () => ({
@@ -90,9 +91,10 @@ describe('SinkFundAllocationListMobile', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     mockStore.sinkFund = { ...sinkFund };
-    mockStore.visibleAllocations = [openAllocation, zeroTargetAllocation];
+    mockStore.visibleAllocations = [{ ...openAllocation }, { ...zeroTargetAllocation }];
     mockStore.totalAssignedBalance = 30000;
     mockStore.unassignedBalance = 70000;
+    mockStore.isEditMode = false;
   });
 
   describe('summary strip', () => {
@@ -141,7 +143,7 @@ describe('SinkFundAllocationListMobile', () => {
     });
 
     it('applies closed class to closed allocations', async () => {
-      mockStore.visibleAllocations = [openAllocation, closedAllocation];
+      mockStore.visibleAllocations = [{ ...openAllocation }, { ...closedAllocation }];
 
       const wrapper = createWrapper();
 
@@ -265,6 +267,166 @@ describe('SinkFundAllocationListMobile', () => {
       const wrapper = createWrapper();
 
       expect(wrapper.findAll(OBLIGATION_CARD)).toHaveLength(0);
+    });
+  });
+
+  describe('edit mode', () => {
+    const NAME_INPUT = '[data-testid="allocation-name-input"]';
+    const TARGET_INPUT = '[data-testid="allocation-target-input"]';
+    const COMMENT_INPUT = '[data-testid="allocation-comment-input"]';
+    const DELETE_BTN = '[data-testid="obligation-delete-btn"]';
+    const UNDO_DELETE_BTN = '[data-testid="obligation-restore-btn"]';
+    const DEACTIVATE_BTN = '[data-testid="deactivate-btn"]';
+    const REACTIVATE_BTN = '[data-testid="reactivate-btn"]';
+
+    beforeEach(() => {
+      mockStore.isEditMode = true;
+    });
+
+    it('renders name input in collapsed card', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(NAME_INPUT).exists()).toBe(true);
+    });
+
+    it('does not render name span when in edit mode', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(CARD_NAME).exists()).toBe(false);
+    });
+
+    it('clicking the name input does not expand the card', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find(NAME_INPUT).trigger('click');
+
+      expect(wrapper.find(CARD_DETAIL).exists()).toBe(false);
+    });
+
+    it('updates allocation.name when name input changes', async () => {
+      const wrapper = createWrapper();
+
+      const input = wrapper.find(NAME_INPUT);
+      await input.setValue('New Name');
+
+      expect(mockStore.visibleAllocations[0].name).toBe('New Name');
+    });
+
+    it('shows target input, comment input, delete and deactivate buttons when expanded', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find('.card-chevron').trigger('click');
+
+      expect(wrapper.find(TARGET_INPUT).exists()).toBe(true);
+      expect(wrapper.find(COMMENT_INPUT).exists()).toBe(true);
+      expect(wrapper.find(DELETE_BTN).exists()).toBe(true);
+      expect(wrapper.find(DEACTIVATE_BTN).exists()).toBe(true);
+    });
+
+    it('does not show View Transactions button in edit mode', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find('.card-chevron').trigger('click');
+
+      expect(wrapper.find(VIEW_TRANSACTIONS_BTN).exists()).toBe(false);
+    });
+
+    it('updates allocation.comment when comment input changes', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find('.card-chevron').trigger('click');
+      const input = wrapper.find(COMMENT_INPUT);
+      await input.setValue('Updated comment');
+
+      expect(mockStore.visibleAllocations[0].comment).toBe('Updated comment');
+    });
+
+    it('toggles allocation.deleted when delete button is clicked', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.find(DELETE_BTN).trigger('click');
+
+      expect(mockStore.visibleAllocations[0].deleted).toBe(true);
+    });
+
+    it('shows undo button and can restore when allocation is deleted', async () => {
+      mockStore.visibleAllocations[0].deleted = true;
+
+      const wrapper = createWrapper();
+
+      await wrapper.find('.card-chevron').trigger('click');
+      expect(wrapper.find(UNDO_DELETE_BTN).exists()).toBe(true);
+
+      await wrapper.find(UNDO_DELETE_BTN).trigger('click');
+      expect(mockStore.visibleAllocations[0].deleted).toBe(false);
+    });
+
+    it('closes an open allocation when deactivate is clicked', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.find(DEACTIVATE_BTN).trigger('click');
+
+      expect(mockStore.visibleAllocations[0].status).toBe('closed');
+    });
+
+    it('shows reactivate button for closed allocations and reopens them', async () => {
+      mockStore.visibleAllocations[0].status = 'closed';
+
+      const wrapper = createWrapper();
+
+      await wrapper.find('.card-chevron').trigger('click');
+      expect(wrapper.find(REACTIVATE_BTN).exists()).toBe(true);
+      expect(wrapper.find(DEACTIVATE_BTN).exists()).toBe(false);
+
+      await wrapper.find(REACTIVATE_BTN).trigger('click');
+      expect(mockStore.visibleAllocations[0].status).toBe('open');
+    });
+
+    it('applies ec-deleted class to card when allocation.deleted is true', () => {
+      mockStore.visibleAllocations[0].deleted = true;
+
+      const wrapper = createWrapper();
+
+      expect(wrapper.findAll(OBLIGATION_CARD)[0].classes()).toContain('ec-deleted');
+    });
+
+    it('applies both closed and deleted classes when both apply', () => {
+      mockStore.visibleAllocations[0].status = 'closed';
+      mockStore.visibleAllocations[0].deleted = true;
+
+      const wrapper = createWrapper();
+
+      const classes = wrapper.findAll(OBLIGATION_CARD)[0].classes();
+      expect(classes).toContain('obligation-card--closed');
+      expect(classes).toContain('ec-deleted');
+    });
+
+    it('expands a card in edit mode via <li> click when clicking outside the name input', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
+
+      expect(wrapper.find(CARD_DETAIL).exists()).toBe(true);
+    });
+
+    it('can expand and collapse an unsaved allocation (no id) via its negative key', async () => {
+      // New obligations added via store.addObligation() have no id
+      mockStore.visibleAllocations = [
+        { ...openAllocation },
+        { name: '', amount: 0, status: 'open', unsaved: true },
+      ];
+
+      const wrapper = createWrapper();
+      const unsavedCard = wrapper.findAll(OBLIGATION_CARD)[1];
+
+      await unsavedCard.trigger('click');
+      expect(wrapper.findAll(CARD_DETAIL)).toHaveLength(1);
+      expect(unsavedCard.find(CARD_DETAIL).exists()).toBe(true);
+
+      await unsavedCard.trigger('click');
+      expect(wrapper.find(CARD_DETAIL).exists()).toBe(false);
     });
   });
 });

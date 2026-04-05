@@ -24,7 +24,10 @@
         v-for="(allocation, index) in store.visibleAllocations"
         :key="keyFor(allocation, index)"
         class="obligation-card"
-        :class="{ 'obligation-card--closed': allocation.status === 'closed' }"
+        :class="{
+          'obligation-card--closed': allocation.status === 'closed',
+          'ec-deleted': allocation.deleted,
+        }"
         data-testid="obligation-card"
         @click="toggleExpanded(keyFor(allocation, index))"
       >
@@ -33,7 +36,15 @@
             class="pi card-chevron"
             :class="isExpanded(keyFor(allocation, index)) ? 'pi-chevron-down' : 'pi-chevron-right'"
           ></i>
-          <span class="card-name" data-testid="card-name">{{ allocation.name }}</span>
+          <input
+            v-if="store.isEditMode"
+            v-model="allocation.name"
+            type="text"
+            class="p-inputtext card-name-input"
+            data-testid="allocation-name-input"
+            @click.stop
+          />
+          <span v-else class="card-name" data-testid="card-name">{{ allocation.name }}</span>
           <span class="card-balance" data-testid="card-balance">
             <EcMoneyDisplay
               :model-value="allocation.current_balance ?? 0"
@@ -43,15 +54,26 @@
           </span>
         </div>
 
+        <!-- @click.stop prevents interactions inside the expanded detail (editable fields,
+             action buttons) from bubbling up to the <li> and collapsing the card. -->
         <div
           v-if="isExpanded(keyFor(allocation, index))"
           class="card-detail"
           data-testid="card-detail"
+          @click.stop
         >
           <div class="detail-grid">
             <span class="detail-item" data-testid="detail-target">
               <span class="detail-label">Target</span>
+              <EcMoneyField
+                v-if="store.isEditMode"
+                v-model="allocation.target"
+                label=""
+                :edit-mode="true"
+                data-testid="allocation-target-input"
+              />
               <EcMoneyDisplay
+                v-else
                 :model-value="allocation.target ?? 0"
                 highlight-mode="none"
                 :dash-if-zero="dashIfZero"
@@ -71,10 +93,46 @@
             </span>
             <span class="detail-item" data-testid="detail-comment">
               <span class="detail-label">Comment</span>
-              <span class="detail-value">{{ allocation.comment || '—' }}</span>
+              <input
+                v-if="store.isEditMode"
+                v-model="allocation.comment"
+                type="text"
+                class="p-inputtext"
+                data-testid="allocation-comment-input"
+              />
+              <span v-else class="detail-value">{{ allocation.comment || '—' }}</span>
             </span>
           </div>
+          <div v-if="store.isEditMode" class="edit-actions">
+            <EcDeleteButton
+              :deleted="allocation.deleted"
+              item-label="obligation"
+              test-id-prefix="obligation"
+              @toggle="toggleDeleted(allocation)"
+            />
+            <button
+              v-if="allocation.status === 'open'"
+              type="button"
+              class="status-btn"
+              data-testid="deactivate-btn"
+              @click="toggleStatus(allocation)"
+            >
+              <i class="pi pi-ban"></i>
+              <span>Close</span>
+            </button>
+            <button
+              v-else
+              type="button"
+              class="status-btn status-btn--reactivate"
+              data-testid="reactivate-btn"
+              @click="toggleStatus(allocation)"
+            >
+              <i class="pi pi-check-circle"></i>
+              <span>Reopen</span>
+            </button>
+          </div>
           <Button
+            v-else
             label="View Transactions"
             icon="pi pi-eye"
             outlined
@@ -110,6 +168,8 @@
 import { ref } from 'vue';
 import Button from 'primevue/button';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
+import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
@@ -148,6 +208,14 @@ function onViewTransactions(allocation: SinkFundAllocationData): void {
   selectedAllocationId.value = allocation.id ?? 0;
   selectedAllocationName.value = allocation.name ?? '';
   dialogVisible.value = true;
+}
+
+function toggleDeleted(allocation: SinkFundAllocationData): void {
+  allocation.deleted = !allocation.deleted;
+}
+
+function toggleStatus(allocation: SinkFundAllocationData): void {
+  allocation.status = allocation.status === 'open' ? 'closed' : 'open';
 }
 </script>
 
@@ -224,6 +292,13 @@ function onViewTransactions(allocation: SinkFundAllocationData): void {
   white-space: nowrap;
 }
 
+.card-name-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
 .card-balance {
   font-weight: 600;
   white-space: nowrap;
@@ -265,6 +340,35 @@ function onViewTransactions(allocation: SinkFundAllocationData): void {
 
 .view-transactions-btn {
   width: 100%;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.status-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: none;
+  border: 1px solid var(--p-surface-300);
+  border-radius: 4px;
+  color: var(--p-text-muted-color);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.status-btn:hover {
+  border-color: var(--p-red-400);
+  color: var(--p-red-600);
+}
+
+.status-btn--reactivate:hover {
+  border-color: var(--p-green-400);
+  color: var(--p-green-600);
 }
 
 .totals-footer {
