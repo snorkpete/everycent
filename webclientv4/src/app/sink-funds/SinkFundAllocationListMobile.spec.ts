@@ -109,6 +109,26 @@ describe('SinkFundAllocationListMobile', () => {
       // 100000 current_balance - (25000 + 5000 assigned) = 70000 = "700.00"
       expect(wrapper.find(SUMMARY_CELL_UNASSIGNED).text()).toContain('700.00');
     });
+
+    it('applies balance highlight to the unassigned amount', () => {
+      const wrapper = createWrapper();
+
+      const display = wrapper.find(SUMMARY_CELL_UNASSIGNED).find('.money-display');
+      expect(display.classes()).toContain('positive');
+    });
+
+    it('applies negative balance highlight when unassigned is negative (overspent)', () => {
+      // Assign more than the account balance to create a negative unassigned
+      store.sinkFund = buildSinkFund({
+        current_balance: 10000,
+        sink_fund_allocations: [buildOpen({ current_balance: 25000 })],
+      });
+
+      const wrapper = createWrapper();
+
+      const display = wrapper.find(SUMMARY_CELL_UNASSIGNED).find('.money-display');
+      expect(display.classes()).toContain('negative');
+    });
   });
 
   describe('obligation cards', () => {

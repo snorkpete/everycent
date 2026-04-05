@@ -13,7 +13,7 @@
         <span class="summary-label">Unassigned</span>
         <EcMoneyDisplay
           :model-value="store.unassignedBalance"
-          highlight-mode="none"
+          highlight-mode="balance"
           :dash-if-zero="dashIfZero"
         />
       </div>
@@ -240,6 +240,7 @@ function toggleStatus(allocation: SinkFundAllocationData): void {
 .summary-cell {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 0.125rem;
 }
 
