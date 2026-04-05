@@ -1,7 +1,49 @@
 # Memory Audit Plan (2026-04-04)
 
 Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/memory/`.
-Phase 1 (memory review) complete. Phase 2 (CLAUDE.md reviews) pending.
+
+## Session Status (for resuming in a fresh session)
+
+**Branch:** `memory-audit` (NOT master — a mid-session branch-switch by another session caused the B1 agent's edits to land on master temporarily; recovered via stash+checkout)
+
+**Do NOT run `session-recap` for this audit session** — use this plan as the resume document instead. The next-up.md file is managed by the audit itself; recap would be circular.
+
+**Completed batches:**
+- ✅ Plan committed
+- ✅ Session A — Memory cleanup (52→47 files, 5 retirements + merges + frontmatter sweep)
+- ✅ Session B1 — Git/worktree rules → CLAUDE.md (47→38 files, Confidence Signaling removed, 4 new sections, Heroku mappings)
+- ✅ Session B2 — Worker Dispatch Protocol → CLAUDE.md (38→34 files, 1 new section)
+- ✅ Session-recap agent spec updated at `~/.claude/agents/session-recap.md` (session-aware writes + volatile-content exclusions)
+
+**Memory at 34 files** (target: ~11).
+
+**Next batch to execute: B3** (Debugging + Browser Testing — 5 memory files → 2 new CLAUDE.md sections).
+
+**Execution pattern that's working:** dispatch a general-purpose agent with `model: "sonnet"`, tight scope (4-5 files per batch), explicit branch guard ("do not switch branches, do not commit"), verify + commit in main session.
+
+**Known risks to guard against:**
+- Branch-switching during agent runs (mitigated by explicit guard in prompts)
+- Agent writing fresh plan file when it can't find an existing one (mitigated now — plan is committed)
+- Context bloat from showing full diffs inline (use `git diff --stat` first, full diff only if needed)
+
+**Remaining work order (proposed):**
+1. B3 — Debugging + Browser Testing (5 files, 2 sections)
+2. B4 — Refactor discipline + Design philosophy + PrimeVue best practices (5 files, 3 sections)
+3. B5 — Housekeeping commits + task_capture_fields + bang-assertions nuance (5 files, 2 sections + 1 inline edit)
+4. Session C — Global CLAUDE.md rewrite + Interaction Style/Delegation/Where Things Go (3 more memory retirements)
+5. Session D — `/docs/` structure + code doc migrations (4 more memory retirements)
+6. Session E — webclientv4 updates + vue-testing-patterns.md creation (3 more memory retirements)
+7. Session F — Hooks (interactive, NOT agent)
+
+**When resuming:**
+1. `git -C /Users/kion/code/everycent status` — verify on `memory-audit` branch
+2. Read this plan file for full context
+3. Pick next batch (currently B3)
+4. Dispatch agent with the batch scope from section B of this plan
+
+---
+
+Phase 1 (memory review) complete. Phase 2 (CLAUDE.md reviews) in progress.
 
 ---
 
