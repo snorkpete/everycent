@@ -291,7 +291,7 @@ Flagged but NOT extracting now — consolidating into CLAUDE.md first per do-wor
 
 > **Note (2026-04-05):** Use agents judiciously in interactive sessions — move planned execution work to agents to preserve main conversation context. This extends the existing Delegation rule (which only covers investigation/exploration) to execution work: if a session task is well-defined enough to run unattended, dispatch it.
 
-> **Open discussion (2026-04-05):** Should we add an explicit rule "don't use main worktree unless explicitly told — default to a separate worktree"? The main-worktree-branch-switching problem keeps happening (just bit us mid-execution). Related: defaulting to worktrees would naturally co-exist with the "branch from master by default" flip.
+> **Resolved (2026-04-05):** "Default to separate worktree" rule added to project CLAUDE.md's Worktrees subsection (scoped to everycent — pattern user adopted here, may or may not apply to other projects). Related Delegation rule extended in global CLAUDE.md to cover planned execution work, not just investigations.
 
 > **Follow-up (2026-04-05):** Verify the `issue #38287` reference added by the B1 agent in the Landing Worktree Branches step 6 — could be real callback or hallucinated. Capture as a domus task.
 

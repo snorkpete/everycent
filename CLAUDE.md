@@ -136,8 +136,9 @@ Full sequence for landing a completed worktree branch:
 6. Clean up: `git worktree remove <path>` then `git branch -d <branch>`. Always merge before removing — worktree cleanup can silently delete branches with unmerged commits (issue #38287).
 7. Later (at deploy time): `git merge ready-for-prod --ff-only` on master.
 
-### Worktree Branching
+### Worktrees
 
+- **Default to a separate worktree** for non-trivial work. The main worktree is the user's active workspace (dev server, open files). Only operate on the main worktree when explicitly told to.
 - **Default: branch new worktrees from master**, not from current work. Specify otherwise if the new branch explicitly depends on in-progress work.
 - **Ask before switching the main worktree's branch** (checkout, merge, rebase). The user runs the dev server there — switching branches disrupts their running session. Treat it like interrupting a running test suite.
 
