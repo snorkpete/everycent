@@ -284,6 +284,79 @@ describe('SinkFundAllocationListMobile', () => {
 
       expect(wrapper.findAll(OBLIGATION_CARD)).toHaveLength(0);
     });
+
+    it('shows an empty state message with Edit hint when not in edit mode', () => {
+      store.sinkFund = buildSinkFund({ sink_fund_allocations: [] });
+
+      const wrapper = createWrapper();
+
+      const emptyState = wrapper.find('[data-testid="empty-state"]');
+      expect(emptyState.exists()).toBe(true);
+      expect(emptyState.text()).toContain('Tap Edit');
+    });
+
+    it('shows an empty state message with + hint when in edit mode', () => {
+      store.sinkFund = buildSinkFund({ sink_fund_allocations: [] });
+      store.isEditMode = true;
+
+      const wrapper = createWrapper();
+
+      const emptyState = wrapper.find('[data-testid="empty-state"]');
+      expect(emptyState.exists()).toBe(true);
+      expect(emptyState.text()).toContain('+');
+    });
+
+    it('does not render the empty state when there are allocations', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false);
+    });
+  });
+
+  describe('auto-expand new obligations', () => {
+    it('auto-expands a newly added unsaved obligation', async () => {
+      store.isEditMode = true;
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(CARD_DETAIL).exists()).toBe(false);
+
+      store.addObligation();
+      await wrapper.vm.$nextTick();
+
+      const cards = wrapper.findAll(OBLIGATION_CARD);
+      const lastCard = cards[cards.length - 1];
+      expect(lastCard.find(CARD_DETAIL).exists()).toBe(true);
+    });
+
+    it('does not auto-expand when an existing allocation is shown (not unsaved)', async () => {
+      const wrapper = createWrapper();
+
+      // Add a saved allocation (no unsaved flag)
+      store.sinkFund?.sink_fund_allocations?.push(
+        buildSinkFundAllocation({ id: 99, name: 'Saved one' }),
+      );
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find(CARD_DETAIL).exists()).toBe(false);
+    });
+  });
+
+  describe('unsaved marker', () => {
+    it('applies obligation-card--unsaved class to unsaved allocations', () => {
+      store.sinkFund = buildSinkFund({
+        current_balance: 100000,
+        sink_fund_allocations: [
+          buildOpen(),
+          buildSinkFundAllocation({ id: undefined, name: '', unsaved: true, status: 'open' }),
+        ],
+      });
+
+      const wrapper = createWrapper();
+
+      const cards = wrapper.findAll(OBLIGATION_CARD);
+      expect(cards[0].classes()).not.toContain('obligation-card--unsaved');
+      expect(cards[1].classes()).toContain('obligation-card--unsaved');
+    });
   });
 
   describe('edit mode', () => {

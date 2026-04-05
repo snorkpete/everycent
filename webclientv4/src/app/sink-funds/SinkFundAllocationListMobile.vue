@@ -19,13 +19,22 @@
       </div>
     </div>
 
-    <ul class="cards-list">
+    <div v-if="store.visibleAllocations.length === 0" class="empty-state" data-testid="empty-state">
+      {{
+        store.isEditMode
+          ? 'No obligations yet. Tap + to add one.'
+          : 'No obligations yet. Tap Edit to add one.'
+      }}
+    </div>
+
+    <ul v-else class="cards-list">
       <li
         v-for="(allocation, index) in store.visibleAllocations"
         :key="keyFor(allocation, index)"
         class="obligation-card"
         :class="{
           'obligation-card--closed': allocation.status === 'closed',
+          'obligation-card--unsaved': allocation.unsaved,
           'ec-deleted': allocation.deleted,
         }"
         data-testid="obligation-card"
@@ -165,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Button from 'primevue/button';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
@@ -189,6 +198,20 @@ const selectedAllocationName = ref('');
 function keyFor(allocation: SinkFundAllocationData, index: number): number {
   return allocation.id ?? -(index + 1);
 }
+
+// Auto-expand a newly added obligation so the user can fill it in immediately.
+watch(
+  () => store.visibleAllocations.length,
+  (newLen, oldLen) => {
+    if (newLen > oldLen) {
+      const lastIndex = newLen - 1;
+      const lastAllocation = store.visibleAllocations[lastIndex];
+      if (lastAllocation?.unsaved) {
+        expandedId.value = keyFor(lastAllocation, lastIndex);
+      }
+    }
+  },
+);
 
 function isExpanded(key: number): boolean {
   return expandedId.value === key;
@@ -223,6 +246,8 @@ function toggleStatus(allocation: SinkFundAllocationData): void {
 .mobile-allocation-list {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .summary-strip {
@@ -232,9 +257,7 @@ function toggleStatus(allocation: SinkFundAllocationData): void {
   padding: 0.5rem 0.75rem;
   background-color: var(--p-surface-50);
   border-bottom: 1px solid var(--p-surface-300);
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  flex-shrink: 0;
 }
 
 .summary-cell {
@@ -256,6 +279,19 @@ function toggleStatus(allocation: SinkFundAllocationData): void {
   padding: 0;
   margin: 0;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--p-text-muted-color);
+  font-size: 0.875rem;
 }
 
 .obligation-card {
@@ -271,6 +307,12 @@ function toggleStatus(allocation: SinkFundAllocationData): void {
 
 .obligation-card--closed {
   opacity: 0.55;
+}
+
+.obligation-card--unsaved {
+  border-left: 3px solid var(--p-primary-400);
+  padding-left: calc(0.75rem - 3px);
+  background-color: var(--p-primary-50);
 }
 
 .card-main {
@@ -380,8 +422,7 @@ function toggleStatus(allocation: SinkFundAllocationData): void {
   background-color: var(--p-surface-50);
   border-top: 1px solid var(--p-surface-300);
   font-weight: 700;
-  position: sticky;
-  bottom: 0;
+  flex-shrink: 0;
 }
 
 .totals-label {
