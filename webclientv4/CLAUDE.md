@@ -38,6 +38,7 @@ Key rules:
 - **Icon-only buttons must have a `v-tooltip`** explaining what the button does in plain language (not just the action — what it achieves). Never use the native HTML `title` attribute — always use PrimeVue's `v-tooltip` directive.
 - **Use PrimeVue design tokens for colors** — never hardcode hex colors or rgba values in CSS. Use `var(--p-green-600)`, `var(--p-red-600)`, `var(--p-surface-*)`, `var(--p-text-muted-color)`, etc. Exception: MenuSidebar theme preview swatches.
 - Use `bankAccountApi.getOpen()` for dropdowns/selection UI — returns open accounts sorted by category
+- **Check PrimeVue built-in props before building custom behavior.** Use `mcp__primevue__get_component_props` to see all available props — PrimeVue components are feature-rich and often cover common needs (e.g. `showClear`, `filter`, `editable`, `fluid`). Only build custom solutions when PrimeVue genuinely doesn't support the behavior.
 
 ## Testing
 

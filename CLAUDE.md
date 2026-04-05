@@ -78,6 +78,10 @@ Prerequisite: user must have run `heroku login` in their terminal session.
 - Apply any remaining feedback from the review before committing.
 - Display a summary of what was changed as a result of the review feedback.
 
+### Refactor Discipline
+- **Refactors need active review.** Stage changes for review at each step, explain trade-offs, and invite discussion. Don't batch large changes silently — the risk is subtle regressions, and the user wants to stay close to these changes.
+- **Push back on scope.** Flag proactively when a change pulls in more than necessary, when a better design alternative exists, when changes should be separate commits/tasks, or when files are touched without material benefit.
+
 ## Debugging: Pre-Fix Validation Sequence
 Before investigating unexpected browser behavior or making code changes to fix a bug:
 1. **Confirm servers are running.** Check Rails (`lsof -i :3000`) and Vite (`lsof -i :4200`) before chasing code-level causes — missing server is a common culprit.
@@ -87,6 +91,11 @@ Before investigating unexpected browser behavior or making code changes to fix a
 ## Browser Testing & Automation
 - **Use only `mcp__claude-in-chrome__*` tools.** Never mix with `mcp__chrome-devtools__*` — they connect to different browser contexts and produce confused results (wrong tab screenshots, about:blank snapshots).
 - **Use DevTools device emulation for mobile testing** (Cmd+Shift+M in DevTools). Never use `resize_window` — resizing affects all tabs in the window and disrupts other open sessions.
+
+## Design Philosophy
+
+- **Reference implementations over written rules.** When creating a new file, read the reference implementation and match its pattern. When modifying an existing file, follow the file's own style — it is the reference. Exception: if the task is explicitly moving away from the existing style (a refactor), the canonical reference implementation takes precedence.
+- **Extract components through the UX lens, not code-dedup.** The right question is "does the next developer get consistent UX for free?" — not "how many lines does this save?" If using a shared component means correct layout/behaviour without custom CSS or copy-paste, extract it even if line savings are modest. Custom CSS in layout code is a smell that hints at a hidden reusable component.
 
 ## Migration Context
 Active migration from Angular 14 to Vue 3 (webclientv4). Migration state tracked in `domus task list`.
