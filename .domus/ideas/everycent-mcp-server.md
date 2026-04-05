@@ -1,7 +1,7 @@
 # Idea: Everycent MCP Server
 
 **Captured:** 2026-03-10
-**Status:** raw
+**Status:** abandoned
 
 ---
 

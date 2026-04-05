@@ -1,28 +1,93 @@
 # Idea: Natural Language Querying (NLQ) for Everycent
 
 **Captured:** 2026-03-26
+**Last refined:** 2026-04-05
 **Status:** raw
+
+---
+
+## Next Ideation
+
+**Nail down the very first analyze-tool.** What single tool, answering which test-set question end-to-end, kicks off phase 1? This is the next oracle session on this idea.
 
 ---
 
 ## The Idea
 
-Enable users to query their personal finance data in plain English — e.g. "how many times have we gone over budget on food?" — without needing to know SQL, category names, or how the data is structured.
+A natural-language analysis layer over 12 years of everycent budgeting data (two countries, two life stages). User types a question in a Vue chat interface → LLM receives it via MCP → LLM calls analyze-shaped tools → LLM returns the answer.
 
-Three technologies, each doing what it does best:
-- **LLM (via MCP)** — understands user intent and translates it into a query plan
-- **pgvector** — resolves fuzzy natural language entity references ("food" → allocation IDs for "Groceries", "Supermarket", "Eating out")
-- **SQL** — performs the actual aggregation, comparison, and arithmetic
-
-Architecture: user types query → LLM receives via MCP → LLM generates query plan → pgvector resolves entities → SQL executes → answer returned.
-
-The MCP server exposes Everycent's database as a set of tools the LLM can call. The LLM decides which tools to use and in what order based on the user's question.
-
-**Key insight:** pgvector alone cannot answer natural language questions. It is a fuzzy entity resolver — it maps natural language terms to database rows. The LLM handles intent, SQL handles math. All three layers are required.
+This is the umbrella project. It subsumes the earlier `everycent-mcp-server` idea, which turned out to be an architectural component rather than a separate initiative.
 
 ---
 
-## Vector Field Design
+## Why This Is Worth Doing
+
+**Product value**
+- 12 years of data is an LLM-shaped dataset: hard to extract value via pre-built reports, natural fit for reasoning
+- Enables "where is everycent failing us?" analysis — surfaces product gaps that dashboards can't (budget structures that lie, missing annual support, under-used special events)
+- Cross-context comparison (Trinidad vs Netherlands) is the kind of qualitative question SQL alone can't easily answer
+- Non-technical user (wife) may actually use the power of the data via chat in a way the current UI doesn't unlock
+
+**Personal/dev value — the primary driver**
+- Develop product intuition for AI the way I have it for web. Open the black box.
+- Concrete dogfooding of "how do you build AI into a product usefully" — not a toy project
+- Learn what makes a good MCP tool (analysis-shaped, domain-aware) vs a bad one (CRUD wrapper that may as well be direct table access)
+
+---
+
+## Architecture
+
+**Responsibility split:**
+- **Rails `/api/mcp/` endpoints** — where the query logic lives. Analysis-shaped, not CRUD. Reuses Rails models, auth, testability. Separate namespace from UI-oriented endpoints.
+- **MCP server** — thin translation layer. No business logic. No direct SQL. Likely TypeScript (Go ruled out once Go-specific learning was deprioritized).
+- **MCP transport** — HTTP/SSE (required for Vue app embedding in phase 2).
+- **Vue chat UI** — phase 2. Calls an agent SDK which in turn calls the MCP server.
+
+**Anti-pattern explicitly ruled out:**
+CRUD tools like `get_transactions(filters)`. If tools just expose tables in a fancier wrapper, they add no value beyond direct DB access. Tools must encode domain knowledge — e.g. `analyze_budget_variance(category, period)`, `find_structural_budget_gaps()`.
+
+**Build principle:** thinnest end-to-end slice first — one tool, one endpoint, one working query — then expand based on actual usage.
+
+---
+
+## Phased Plan
+
+### Phase 1: Foundations + MCP server (dogfooded via Claude Code)
+- Google auth in place (parallel to existing devise; chat access gated behind Google-only). See `google-auth-migration`.
+- Rails `/api/mcp/` endpoints — start with one analyze-tool end-to-end
+- TypeScript MCP server wrapping those endpoints
+- Tested via Claude Code as the MCP client — no UI yet
+- Success criterion: answer a real question from the test set that I hadn't pre-built a report for
+
+### Phase 2: Chat UI inside everycent
+- Vue chat component, agent SDK integration (calls LLM, handles tool-calling loop)
+- Gated behind Google auth (cost control — pay-per-use LLM)
+- Exposes the same MCP server built in phase 1
+
+### Phase 3: Embeddings layer (learning-driven, possibly overkill)
+- pgvector column on transactions + allocations for semantic entity resolution
+- Batch embed historical data, real-time embed new records + query strings
+- Add vector search as an MCP tool
+- Justified by learning even if SQL + LLM reasoning could handle most queries without it
+
+---
+
+## Test Set (drives first tool design)
+
+Real questions from my own budgeting life. The system works when it can answer ones I didn't pre-build:
+
+1. What do we overspend on most? Where are our biggest budgeting failures?
+2. Where is our budget lying to us consistently (budgeted vs actual patterns)?
+3. Any annual patterns we aren't properly catering for? (monthly model has gaps)
+4. Which months do we regularly go over?
+5. How much do vacations typically cost us? Are we missing special events we should have logged?
+6. What have we learnt comparing Trinidad (previous household) vs Netherlands (current)?
+
+Several of these aren't "reports" — they're product critique. The chat doubles as a tool for surfacing gaps in everycent itself.
+
+---
+
+## Vector Field Design (phase 3)
 
 ### `transactions.embedding` (vector)
 Built from concatenated string at insert/update time:
@@ -40,9 +105,7 @@ Built from:
 ```
 Purpose: find budget line items by meaning — e.g. "food budget", "entertainment", "fixed costs"
 
----
-
-## Embedding Strategy
+## Embedding Strategy (phase 3)
 
 - **At write time:** embed and store immediately for new records
 - **Batch (historical):** embed in bulk off-peak. Rows without embeddings don't appear in semantic search until processed.
@@ -56,9 +119,7 @@ Purpose: find budget line items by meaning — e.g. "food budget", "entertainmen
 
 At personal-use scale, OpenAI API is pragmatic. Self-hosted if privacy becomes a concern.
 
----
-
-## Example Query Walkthrough
+## Example Query Walkthrough (phase 3)
 
 **User asks:** "How many times have we gone over budget on food purchases?"
 
@@ -72,29 +133,22 @@ At personal-use scale, OpenAI API is pragmatic. Self-hosted if privacy becomes a
 
 ---
 
-## Implementation Steps
-
-1. Enable `pgvector` extension in Postgres (`CREATE EXTENSION vector`)
-2. Add `embedding vector(1536)` column to `transactions` and `allocations`
-3. Add an embedding service (API wrapper around OpenAI or Ollama) callable from Rails
-4. Add callbacks/jobs to generate embeddings on insert/update
-5. Run batch job to embed existing records
-6. Add vector search as a tool in the MCP server
-7. Wire up LLM to use vector search + SQL tools to answer natural language queries
-
----
-
-## Why This Is Worth Doing
-
-Turns the budget data from a static record into something you can interrogate conversationally. The spending-analysis skill already does ad-hoc queries, but requires someone who understands the schema. NLQ removes that barrier entirely.
-
----
-
 ## Open Questions / Things to Explore
 
-- Which embedding model to use — OpenAI (simple, cheap at personal scale) vs self-hosted (privacy)?
-- Privacy posture: acceptable to send transaction descriptions to OpenAI?
-- Which MCP-compatible client will be the primary interface?
+**Phase 1 (first up):**
+- What is the very first analyze-tool? Probably something that answers one of the test-set questions end-to-end.
+- TypeScript confirmed as MCP server language?
+- How to structure the `/api/mcp/` Rails namespace — controllers, serializers, tool contracts.
+
+**Phase 2:**
+- Which agent SDK — Anthropic's directly, or something higher-level?
+- Cost budgeting / usage caps — how to prevent runaway spend.
+
+**Phase 3:**
+- Which embedding model — OpenAI (simple, cheap at personal scale) vs self-hosted (privacy)?
+- Acceptable to send transaction descriptions to OpenAI?
 - Confidence threshold for vector search results — how to handle low-confidence matches?
-- How many distinct allocations/categories exist? Small set may not need vector search at all.
-- Could this be prototyped with just the spending-analysis skill + smarter prompting before building full infrastructure?
+- Could SQL + analyze-tools alone (no embeddings) already answer the full test set? If so, phase 3 is pure learning investment.
+
+**Cross-cutting:**
+- When does the MCP server get exposed to external MCP clients (Claude Code / Claude Desktop) as a product feature vs kept internal?
