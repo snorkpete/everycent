@@ -24,10 +24,11 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 - ✅ ADR location move — ics-import.md relocated from research/ to docs/decisions/ (ADR convention, commit 93baf95db)
 - ✅ Default-worktree rule added to project CLAUDE.md (commit 9fe7b6900)
 - ✅ Session E — vue-testing-patterns.md expanded (8 sections from testing-patterns.md + factories migrate-on-touch), composable setup() convention → vue-coding-rules.md, TypeScript bullet + fixed docs reference in webclientv4/CLAUDE.md (12→9 files)
+- ✅ Accumulated follow-ups — pruned project_next-up.md (removed migrated TypeScript Notes), claude_test_user.md → .claude/local-dev.md (gitignored) + project CLAUDE.md reference, feedback_session_context_management.md → global CLAUDE.md "Session Context" section, frontmatter sweep (all present), created domus task `migrate-all-spects-files-to-use-test-factories` for retirement criteria (9→7 files)
 
-**Memory at 9 files** (target: ~11 — under target).
+**Memory at 7 files** (well under ~11 target). Memory migration COMPLETE.
 
-**Next batch to execute:** Accumulated follow-ups + Phase 2 CLAUDE.md reviews (see below).
+**Next batch to execute:** Phase 2 CLAUDE.md reviews (see below).
 
 **Execution pattern that's working:** dispatch a general-purpose agent with `model: "sonnet"`, tight scope (4-5 files per batch), explicit branch guard ("do not switch branches, do not commit"), verify + commit in main session.
 
@@ -37,14 +38,14 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 - Context bloat from showing full diffs inline (use `git diff --stat` first, full diff only if needed)
 
 **Remaining work order (proposed):**
-1. Accumulated follow-ups: prune `project_next-up.md` (strip git state/status sections), migrate `claude_test_user.md` → `.claude/local-dev.md` (gitignored), move `feedback_session_context_management.md` to user-level, frontmatter sweep on remaining memory files, create domus task for factories migration retirement criteria
-2. Phase 2 CLAUDE.md reviews: remove Confidence Signaling (already in global Interaction Style), shrink vocabulary section (27 → 3 lines, move details to `vocabulary/INSTRUCTIONS.md`), convert `vocabulary.jsonl` → `vocabulary.md`, annotate Build & Release (v3 frozen, v1 dormant)
-3. Session F — Hooks (interactive, NOT agent)
+1. Phase 2 CLAUDE.md reviews: remove Confidence Signaling (already in global Interaction Style), shrink vocabulary section (27 → 3 lines, move details to `vocabulary/INSTRUCTIONS.md`), convert `vocabulary.jsonl` → `vocabulary.md`, annotate Build & Release (v3 frozen, v1 dormant)
+2. Session F — Hooks (interactive, NOT agent): branch check on commit, reject `&&` in bash, pre-commit gauntlet, strip Co-Authored-By
+3. Skill extraction (deferred, do-work-first): `/build-release`, `/deploy`, `/commit`, `/review`, `/update-vocab` — only extract once we've felt which procedures actually repeat
 
 **When resuming:**
 1. `git -C /Users/kion/code/everycent status` — verify on `memory-audit` branch
 2. Read this plan file for full context
-3. Pick next batch (accumulated follow-ups)
+3. Pick next batch (Phase 2 CLAUDE.md reviews)
 
 ---
 
