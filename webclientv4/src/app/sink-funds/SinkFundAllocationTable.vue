@@ -1,6 +1,7 @@
 <template>
   <div class="allocation-list">
-    <table class="ec-budget-table allocations-table" data-testid="allocations-table">
+    <SinkFundAllocationListMobile v-if="isMobile" :dash-if-zero="dashIfZero" />
+    <table v-else class="ec-budget-table allocations-table" data-testid="allocations-table">
       <thead>
         <tr>
           <th class="name-col">Name</th>
@@ -192,6 +193,7 @@
       </tfoot>
     </table>
     <AllocationTransactionsDialog
+      v-if="!isMobile"
       :visible="dialogVisible"
       :allocation-id="selectedAllocationId"
       :allocation-name="selectedAllocationName"
@@ -211,6 +213,8 @@ import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
+import SinkFundAllocationListMobile from './SinkFundAllocationListMobile.vue';
+import { useResponsive } from '../shared/composables/useResponsive';
 import type { SinkFundAllocationData } from './sinkFund.types';
 
 const { dashIfZero = false } = defineProps<{
@@ -220,6 +224,7 @@ const { dashIfZero = false } = defineProps<{
 const vTooltip = Tooltip;
 
 const store = useSinkFundStore();
+const { isMobile } = useResponsive();
 
 const dialogVisible = ref(false);
 const selectedAllocationId = ref(0);

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import type { Pinia } from 'pinia';
@@ -6,9 +7,18 @@ import PrimeVue from 'primevue/config';
 import SinkFundsPage from './SinkFundsPage.vue';
 import SinkFundAllocationTable from './SinkFundAllocationTable.vue';
 import SinkFundTransferDialog from './SinkFundTransferDialog.vue';
+import SinkFundsToolbarMobile from './SinkFundsToolbarMobile.vue';
 import { sinkFundApi } from './sinkFundApi';
 import { useSinkFundStore } from './sinkFundStore';
 import { buildSinkFund } from '../../test/factories';
+
+const isMobile = ref(false);
+vi.mock('../shared/composables/useResponsive', () => ({
+  useResponsive: () => ({
+    isMobile,
+    isCompact: ref(false),
+  }),
+}));
 
 // Selectors
 const SINK_FUND_SELECT = '[data-testid="sink-fund-select"]';
@@ -77,6 +87,7 @@ describe('SinkFundsPage', () => {
     vi.mocked(sinkFundApi.get).mockResolvedValue(sinkFundA);
     vi.mocked(sinkFundApi.save).mockResolvedValue(sinkFundA);
     mockRoute.query = {};
+    isMobile.value = false;
   });
 
   function createWrapper(): VueWrapper {
@@ -365,6 +376,110 @@ describe('SinkFundsPage', () => {
       await flushPromises();
 
       expect(wrapper.findComponent(SinkFundAllocationTable).exists()).toBe(false);
+    });
+  });
+
+  describe('responsive toolbar', () => {
+    it('renders desktop toolbar when isMobile is false', async () => {
+      isMobile.value = false;
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(SinkFundsToolbarMobile).exists()).toBe(false);
+      expect(wrapper.find(EDIT_BTN).exists()).toBe(true);
+    });
+
+    it('renders SinkFundsToolbarMobile when isMobile is true', async () => {
+      isMobile.value = true;
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(SinkFundsToolbarMobile).exists()).toBe(true);
+    });
+
+    it('triggers sink fund fetch when mobile toolbar emits update:selectedSinkFundId', async () => {
+      isMobile.value = true;
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const mobileToolbar = wrapper.findComponent(SinkFundsToolbarMobile);
+      await mobileToolbar.vm.$emit('update:selectedSinkFundId', 2);
+      await flushPromises();
+
+      expect(sinkFundApi.get).toHaveBeenCalledWith(2);
+      expect(mockRouter.replace).toHaveBeenCalledWith({ query: { sink_fund_id: 2 } });
+    });
+
+    it('opens transfer dialog when mobile toolbar emits transfer', async () => {
+      isMobile.value = true;
+      mockRoute.query = { sink_fund_id: '1' };
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const mobileToolbar = wrapper.findComponent(SinkFundsToolbarMobile);
+      await mobileToolbar.vm.$emit('transfer');
+      await flushPromises();
+
+      const dialog = wrapper.findComponent(SinkFundTransferDialog);
+      expect(dialog.props('visible')).toBe(true);
+    });
+
+    it('saves the sink fund when mobile toolbar emits save', async () => {
+      isMobile.value = true;
+      mockRoute.query = { sink_fund_id: '1' };
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      await flushPromises();
+
+      const mobileToolbar = wrapper.findComponent(SinkFundsToolbarMobile);
+      await mobileToolbar.vm.$emit('save');
+      await flushPromises();
+
+      expect(sinkFundApi.save).toHaveBeenCalled();
+    });
+
+    it('exits edit mode when mobile toolbar emits cancel', async () => {
+      isMobile.value = true;
+      mockRoute.query = { sink_fund_id: '1' };
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      expect(store.isEditMode).toBe(true);
+
+      const mobileToolbar = wrapper.findComponent(SinkFundsToolbarMobile);
+      await mobileToolbar.vm.$emit('cancel');
+      await flushPromises();
+
+      expect(store.isEditMode).toBe(false);
+    });
+
+    it('adds an obligation when mobile toolbar emits addObligation', async () => {
+      isMobile.value = true;
+      mockRoute.query = { sink_fund_id: '1' };
+
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const store = useSinkFundStore();
+      store.enterEditMode();
+      const countBefore = store.sinkFund?.sink_fund_allocations.length ?? 0;
+
+      const mobileToolbar = wrapper.findComponent(SinkFundsToolbarMobile);
+      await mobileToolbar.vm.$emit('addObligation');
+      await flushPromises();
+
+      expect(store.sinkFund?.sink_fund_allocations.length).toBe(countBefore + 1);
     });
   });
 });
