@@ -41,6 +41,8 @@ webclient/.idea/
 webclientv3/.idea/
 
 .claude/worktrees/
+.claude/local-dev.md
+.claude/settings.local.json
 
 # ignore the production builds for now - will have to figure out solution long term
 public/v2

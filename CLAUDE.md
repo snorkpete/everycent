@@ -37,6 +37,9 @@ Auth mounted at `/auth` (devise_token_auth). Key resources:
 PostgreSQL. Key tables: users, households, budgets, incomes, allocations,
 allocation_categories, bank_accounts, transactions, sink_funds, institutions, settings.
 
+## Local Dev Notes
+Machine-specific development info (test user credentials, etc.) lives in `.claude/local-dev.md` (gitignored).
+
 ## Build & Release
 1. Build Angular: `cd webclientv3 && npm run build` (outputs to /public)
 2. Build v1 legacy: `cd webclient && gulp` (outputs to /public/v1)
