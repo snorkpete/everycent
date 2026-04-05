@@ -19,10 +19,13 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 - ✅ Session-recap agent spec refined twice at `~/.claude/agents/session-recap.md` (session-aware writes, volatile-content exclusions, mid-session change detection, checkout guard, MIGRATION_PLAN.md removed)
 - ✅ Global `~/.claude/CLAUDE.md` updated with rewritten rules + Interaction Style + Delegation + Where Things Go sections
 - ✅ 2 side memory files captured during parallel session: `feedback_page_spec_integration_style.md` (staged for Session E migration to vue-testing-patterns.md), `feedback_worktree_main_ask_first.md` (useful half promoted to Worktree Branching subsection, contradicting half retired)
+- ✅ Session C-followup — retire feedback_no_cheerleading.md, feedback_linus_hat_default.md, feedback_frame_uncertainty.md (content already in global CLAUDE.md Interaction Style) (19→16 files)
+- ✅ Session D — JSDoc on useResponsive.ts + EcMoneyDisplay.vue, inline comments on BankAccountsController#index + bankAccountApi methods, ADR at docs/decisions/ics-import.md (16→12 files)
+- ✅ ADR location move — ics-import.md relocated from research/ to docs/decisions/ (ADR convention, commit 93baf95db)
 
-**Memory at 19 files** (target: ~11).
+**Memory at 12 files** (target: ~11).
 
-**Next batch to execute: Session D** — `/docs/` structure + code doc migrations (4 more memory files retire after migration: useResponsive, EcMoneyDisplay, bank_account_api sort, ics_import_research)
+**Next batch to execute: Session E** — webclientv4/ updates (CLAUDE.md + vue-coding-rules.md + vue-testing-patterns.md creation)
 
 **Execution pattern that's working:** dispatch a general-purpose agent with `model: "sonnet"`, tight scope (4-5 files per batch), explicit branch guard ("do not switch branches, do not commit"), verify + commit in main session.
 
@@ -32,16 +35,14 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 - Context bloat from showing full diffs inline (use `git diff --stat` first, full diff only if needed)
 
 **Remaining work order (proposed):**
-1. Session D — `/docs/` structure + code doc migrations (useResponsive → JSDoc, EcMoneyDisplay → JSDoc, bank_account_api → inline comments on controller, ics_import_research → `/docs/decisions/ics-import.md` ADR) — 4 more memory retirements
-2. Session E — webclientv4 updates (TypeScript Notes, useResponsive reference, fix broken docs reference) + `webclientv4/docs/vue-testing-patterns.md` creation (from `testing-patterns.md` + `feedback_composable_spec_setup.md` + `feedback_refactor_to_factories.md` + the staged `feedback_page_spec_integration_style.md`) — 4 more memory retirements
-3. Session C-followup — retire `feedback_no_cheerleading.md`, `feedback_linus_hat_default.md`, `feedback_frame_uncertainty.md` (content already in global CLAUDE.md Interaction Style)
-4. Session F — Hooks (interactive, NOT agent)
-5. Final cleanup: migrate `claude_test_user.md` to `.claude/local-dev.md` (gitignored); convert vocabulary JSONL → markdown; shrink project CLAUDE.md vocab section; move `feedback_session_context_management.md` to user-level
+1. Session E — webclientv4 updates (TypeScript Notes, useResponsive reference, fix broken docs reference) + `webclientv4/docs/vue-testing-patterns.md` creation (from `testing-patterns.md` + `feedback_composable_spec_setup.md` + `feedback_refactor_to_factories.md` + the staged `feedback_page_spec_integration_style.md`) — 4 more memory retirements
+2. Session F — Hooks (interactive, NOT agent)
+3. Final cleanup: migrate `claude_test_user.md` to `.claude/local-dev.md` (gitignored); convert vocabulary JSONL → markdown; shrink project CLAUDE.md vocab section; move `feedback_session_context_management.md` to user-level
 
 **When resuming:**
 1. `git -C /Users/kion/code/everycent status` — verify on `memory-audit` branch
 2. Read this plan file for full context
-3. Pick next batch (currently B3)
+3. Pick next batch (currently Session E)
 4. Dispatch agent with the batch scope from section B of this plan
 
 ---
