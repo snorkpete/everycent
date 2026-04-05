@@ -78,6 +78,16 @@ Prerequisite: user must have run `heroku login` in their terminal session.
 - Apply any remaining feedback from the review before committing.
 - Display a summary of what was changed as a result of the review feedback.
 
+## Debugging: Pre-Fix Validation Sequence
+Before investigating unexpected browser behavior or making code changes to fix a bug:
+1. **Confirm servers are running.** Check Rails (`lsof -i :3000`) and Vite (`lsof -i :4200`) before chasing code-level causes — missing server is a common culprit.
+2. **Reproduce before fixing.** For a reported visual or layout bug, first confirm you can see the problem (screenshot, DOM inspection, measurement). Only then make changes, so the fix can be validated against the original problem.
+3. **Get visual confirmation before updating tests.** After a visual change, show the result and wait for user sign-off before fixing failing tests — tests are downstream of the visual decision, and revisions make test churn wasteful.
+
+## Browser Testing & Automation
+- **Use only `mcp__claude-in-chrome__*` tools.** Never mix with `mcp__chrome-devtools__*` — they connect to different browser contexts and produce confused results (wrong tab screenshots, about:blank snapshots).
+- **Use DevTools device emulation for mobile testing** (Cmd+Shift+M in DevTools). Never use `resize_window` — resizing affects all tabs in the window and disrupts other open sessions.
+
 ## Migration Context
 Active migration from Angular 14 to Vue 3 (webclientv4). Migration state tracked in `domus task list`.
 
@@ -115,7 +125,7 @@ Full sequence for landing a completed worktree branch:
 ### Worktree Branching
 
 - **Default: branch new worktrees from master**, not from current work. Specify otherwise if the new branch explicitly depends on in-progress work.
-- Ask before switching context away from a worktree (don't silently switch to the main worktree).
+- **Ask before switching the main worktree's branch** (checkout, merge, rebase). The user runs the dev server there — switching branches disrupts their running session. Treat it like interrupting a running test suite.
 
 ## Worker Dispatch Protocol
 
