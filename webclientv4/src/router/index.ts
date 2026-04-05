@@ -22,7 +22,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../HomePage.vue'),
+      component: () => import('../app/home/HomePage.vue'),
       // No meta.title — home page uses the bare "EveryCent" app name
     },
     {
