@@ -1,11 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { reactive } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SinkFundAllocationListMobile from './SinkFundAllocationListMobile.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
-import type { SinkFundAllocationData, SinkFundData } from './sinkFund.types';
+import { useSinkFundStore } from './sinkFundStore';
+import { buildSinkFund, buildSinkFundAllocation } from '../../test/factories';
+
+vi.mock('./sinkFundApi', () => ({
+  sinkFundApi: {
+    getTransactionsForAllocation: vi.fn().mockResolvedValue([]),
+  },
+}));
 
 // Selectors
 const SUMMARY_STRIP = '[data-testid="summary-strip"]';
@@ -22,79 +28,64 @@ const DETAIL_COMMENT = '[data-testid="detail-comment"]';
 const VIEW_TRANSACTIONS_BTN = '[data-testid="view-transactions-btn"]';
 const TOTALS_FOOTER = '[data-testid="totals-footer"]';
 
-const openAllocation: SinkFundAllocationData = {
-  id: 10,
-  name: 'Car Insurance',
-  current_balance: 25000,
-  target: 50000,
-  comment: 'Annual premium',
-  status: 'open',
-  deleted: false,
-};
+let pinia: Pinia;
+let store: ReturnType<typeof useSinkFundStore>;
 
-const closedAllocation: SinkFundAllocationData = {
-  id: 11,
-  name: 'Old Goal',
-  current_balance: 10000,
-  target: 10000,
-  comment: 'Done',
-  status: 'closed',
-  deleted: false,
-};
+function buildOpen(overrides = {}) {
+  return buildSinkFundAllocation({
+    id: 10,
+    name: 'Car Insurance',
+    current_balance: 25000,
+    target: 50000,
+    comment: 'Annual premium',
+    status: 'open',
+    ...overrides,
+  });
+}
 
-const zeroTargetAllocation: SinkFundAllocationData = {
-  id: 12,
-  name: 'No Target',
-  current_balance: 5000,
-  target: 0,
-  comment: '',
-  status: 'open',
-  deleted: false,
-};
+function buildClosed(overrides = {}) {
+  return buildSinkFundAllocation({
+    id: 11,
+    name: 'Old Goal',
+    current_balance: 10000,
+    target: 10000,
+    comment: 'Done',
+    status: 'closed',
+    ...overrides,
+  });
+}
 
-const sinkFund: SinkFundData = {
-  id: 1,
-  name: 'Emergency Fund',
-  current_balance: 100000,
-  sink_fund_allocations: [openAllocation, zeroTargetAllocation],
-};
-
-const mockStore = reactive({
-  sinkFund: null as SinkFundData | null,
-  visibleAllocations: [] as SinkFundAllocationData[],
-  totalAssignedBalance: 0,
-  unassignedBalance: 0,
-  isEditMode: false,
-});
-
-vi.mock('./sinkFundStore', () => ({
-  useSinkFundStore: () => mockStore,
-}));
-
-vi.mock('./sinkFundApi', () => ({
-  sinkFundApi: {
-    getTransactionsForAllocation: vi.fn().mockResolvedValue([]),
-  },
-}));
+function buildZeroTarget(overrides = {}) {
+  return buildSinkFundAllocation({
+    id: 12,
+    name: 'No Target',
+    current_balance: 5000,
+    target: 0,
+    comment: '',
+    status: 'open',
+    ...overrides,
+  });
+}
 
 function createWrapper(): VueWrapper {
   return mount(SinkFundAllocationListMobile, {
     props: { dashIfZero: false },
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
     },
   });
 }
 
 describe('SinkFundAllocationListMobile', () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
     vi.clearAllMocks();
-    mockStore.sinkFund = { ...sinkFund };
-    mockStore.visibleAllocations = [{ ...openAllocation }, { ...zeroTargetAllocation }];
-    mockStore.totalAssignedBalance = 30000;
-    mockStore.unassignedBalance = 70000;
-    mockStore.isEditMode = false;
+    store = useSinkFundStore();
+    store.sinkFund = buildSinkFund({
+      current_balance: 100000,
+      sink_fund_allocations: [buildOpen(), buildZeroTarget()],
+    });
   });
 
   describe('summary strip', () => {
@@ -115,6 +106,7 @@ describe('SinkFundAllocationListMobile', () => {
     it('displays unassigned balance in the unassigned cell', () => {
       const wrapper = createWrapper();
 
+      // 100000 current_balance - (25000 + 5000 assigned) = 70000 = "700.00"
       expect(wrapper.find(SUMMARY_CELL_UNASSIGNED).text()).toContain('700.00');
     });
   });
@@ -142,8 +134,12 @@ describe('SinkFundAllocationListMobile', () => {
       expect(wrapper.find(CARD_DETAIL).exists()).toBe(false);
     });
 
-    it('applies closed class to closed allocations', async () => {
-      mockStore.visibleAllocations = [{ ...openAllocation }, { ...closedAllocation }];
+    it('applies closed class to closed allocations when shown', async () => {
+      store.sinkFund = buildSinkFund({
+        current_balance: 100000,
+        sink_fund_allocations: [buildOpen(), buildClosed()],
+      });
+      store.showDeactivated = true;
 
       const wrapper = createWrapper();
 
@@ -200,10 +196,9 @@ describe('SinkFundAllocationListMobile', () => {
     it('outstanding is zero when allocation has no target', async () => {
       const wrapper = createWrapper();
 
-      // Expand the zeroTargetAllocation (second card)
+      // Expand the zeroTarget allocation (second card)
       await wrapper.findAll(OBLIGATION_CARD)[1].trigger('click');
 
-      // When target=0, outstanding should be 0 (not current_balance - 0)
       expect(wrapper.find(DETAIL_OUTSTANDING).text()).toContain('0.00');
     });
 
@@ -256,13 +251,14 @@ describe('SinkFundAllocationListMobile', () => {
     it('displays total assigned balance', () => {
       const wrapper = createWrapper();
 
+      // 25000 + 5000 = 30000 = "300.00"
       expect(wrapper.find(TOTALS_FOOTER).text()).toContain('300.00');
     });
   });
 
   describe('empty state', () => {
     it('renders no cards when there are no visible allocations', () => {
-      mockStore.visibleAllocations = [];
+      store.sinkFund = buildSinkFund({ sink_fund_allocations: [] });
 
       const wrapper = createWrapper();
 
@@ -280,7 +276,7 @@ describe('SinkFundAllocationListMobile', () => {
     const REACTIVATE_BTN = '[data-testid="reactivate-btn"]';
 
     beforeEach(() => {
-      mockStore.isEditMode = true;
+      store.isEditMode = true;
     });
 
     it('renders name input in collapsed card', () => {
@@ -309,13 +305,13 @@ describe('SinkFundAllocationListMobile', () => {
       const input = wrapper.find(NAME_INPUT);
       await input.setValue('New Name');
 
-      expect(mockStore.visibleAllocations[0].name).toBe('New Name');
+      expect(store.sinkFund?.sink_fund_allocations?.[0].name).toBe('New Name');
     });
 
     it('shows target input, comment input, delete and deactivate buttons when expanded', async () => {
       const wrapper = createWrapper();
 
-      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
 
       expect(wrapper.find(TARGET_INPUT).exists()).toBe(true);
       expect(wrapper.find(COMMENT_INPUT).exists()).toBe(true);
@@ -326,7 +322,7 @@ describe('SinkFundAllocationListMobile', () => {
     it('does not show View Transactions button in edit mode', async () => {
       const wrapper = createWrapper();
 
-      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
 
       expect(wrapper.find(VIEW_TRANSACTIONS_BTN).exists()).toBe(false);
     });
@@ -334,58 +330,68 @@ describe('SinkFundAllocationListMobile', () => {
     it('updates allocation.comment when comment input changes', async () => {
       const wrapper = createWrapper();
 
-      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
       const input = wrapper.find(COMMENT_INPUT);
       await input.setValue('Updated comment');
 
-      expect(mockStore.visibleAllocations[0].comment).toBe('Updated comment');
+      expect(store.sinkFund?.sink_fund_allocations?.[0].comment).toBe('Updated comment');
     });
 
     it('toggles allocation.deleted when delete button is clicked', async () => {
       const wrapper = createWrapper();
 
-      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
       await wrapper.find(DELETE_BTN).trigger('click');
 
-      expect(mockStore.visibleAllocations[0].deleted).toBe(true);
+      expect(store.sinkFund?.sink_fund_allocations?.[0].deleted).toBe(true);
     });
 
     it('shows undo button and can restore when allocation is deleted', async () => {
-      mockStore.visibleAllocations[0].deleted = true;
+      store.sinkFund = buildSinkFund({
+        current_balance: 100000,
+        sink_fund_allocations: [buildOpen({ deleted: true }), buildZeroTarget()],
+      });
 
       const wrapper = createWrapper();
 
-      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
       expect(wrapper.find(UNDO_DELETE_BTN).exists()).toBe(true);
 
       await wrapper.find(UNDO_DELETE_BTN).trigger('click');
-      expect(mockStore.visibleAllocations[0].deleted).toBe(false);
+      expect(store.sinkFund?.sink_fund_allocations?.[0].deleted).toBe(false);
     });
 
     it('closes an open allocation when deactivate is clicked', async () => {
       const wrapper = createWrapper();
 
-      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
       await wrapper.find(DEACTIVATE_BTN).trigger('click');
 
-      expect(mockStore.visibleAllocations[0].status).toBe('closed');
+      expect(store.sinkFund?.sink_fund_allocations?.[0].status).toBe('closed');
     });
 
     it('shows reactivate button for closed allocations and reopens them', async () => {
-      mockStore.visibleAllocations[0].status = 'closed';
+      store.sinkFund = buildSinkFund({
+        current_balance: 100000,
+        sink_fund_allocations: [buildClosed()],
+      });
+      store.showDeactivated = true;
 
       const wrapper = createWrapper();
 
-      await wrapper.find('.card-chevron').trigger('click');
+      await wrapper.findAll(OBLIGATION_CARD)[0].trigger('click');
       expect(wrapper.find(REACTIVATE_BTN).exists()).toBe(true);
       expect(wrapper.find(DEACTIVATE_BTN).exists()).toBe(false);
 
       await wrapper.find(REACTIVATE_BTN).trigger('click');
-      expect(mockStore.visibleAllocations[0].status).toBe('open');
+      expect(store.sinkFund?.sink_fund_allocations?.[0].status).toBe('open');
     });
 
     it('applies ec-deleted class to card when allocation.deleted is true', () => {
-      mockStore.visibleAllocations[0].deleted = true;
+      store.sinkFund = buildSinkFund({
+        current_balance: 100000,
+        sink_fund_allocations: [buildOpen({ deleted: true }), buildZeroTarget()],
+      });
 
       const wrapper = createWrapper();
 
@@ -393,8 +399,11 @@ describe('SinkFundAllocationListMobile', () => {
     });
 
     it('applies both closed and deleted classes when both apply', () => {
-      mockStore.visibleAllocations[0].status = 'closed';
-      mockStore.visibleAllocations[0].deleted = true;
+      store.sinkFund = buildSinkFund({
+        current_balance: 100000,
+        sink_fund_allocations: [buildOpen({ deleted: true, status: 'closed' })],
+      });
+      store.showDeactivated = true;
 
       const wrapper = createWrapper();
 
@@ -412,11 +421,13 @@ describe('SinkFundAllocationListMobile', () => {
     });
 
     it('can expand and collapse an unsaved allocation (no id) via its negative key', async () => {
-      // New obligations added via store.addObligation() have no id
-      mockStore.visibleAllocations = [
-        { ...openAllocation },
-        { name: '', amount: 0, status: 'open', unsaved: true },
-      ];
+      store.sinkFund = buildSinkFund({
+        current_balance: 100000,
+        sink_fund_allocations: [
+          buildOpen(),
+          buildSinkFundAllocation({ id: undefined, name: '', status: 'open' }),
+        ],
+      });
 
       const wrapper = createWrapper();
       const unsavedCard = wrapper.findAll(OBLIGATION_CARD)[1];
