@@ -74,10 +74,8 @@ function buildZeroTarget(overrides = {}) {
   });
 }
 
-// Reference values for assertions (DO NOT mutate — use fresh buildXxx() calls for store state)
+// Reference values for assertions (DO NOT mutate — use fresh buildOpen() calls for store state)
 const openAllocation = buildOpen();
-const closedAllocation = buildClosed();
-const zeroTargetAllocation = buildZeroTarget();
 
 let pinia: Pinia;
 let store: ReturnType<typeof useSinkFundStore>;
