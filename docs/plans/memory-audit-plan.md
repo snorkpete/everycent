@@ -244,6 +244,12 @@ Flagged but NOT extracting now — consolidating into CLAUDE.md first per do-wor
 
 **Approach:** interactive session where Claude explains hook mechanics as we implement each. User new to hooks — learning-oriented.
 
+> **Note (2026-04-05):** Use agents judiciously in interactive sessions — move planned execution work to agents to preserve main conversation context. This extends the existing Delegation rule (which only covers investigation/exploration) to execution work: if a session task is well-defined enough to run unattended, dispatch it.
+
+> **Open discussion (2026-04-05):** Should we add an explicit rule "don't use main worktree unless explicitly told — default to a separate worktree"? The main-worktree-branch-switching problem keeps happening (just bit us mid-execution). Related: defaulting to worktrees would naturally co-exist with the "branch from master by default" flip.
+
+> **Follow-up (2026-04-05):** Verify the `issue #38287` reference added by the B1 agent in the Landing Worktree Branches step 6 — could be real callback or hallucinated. Capture as a domus task.
+
 ---
 
 ## Execution strategy

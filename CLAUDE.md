@@ -19,9 +19,6 @@ Three frontend generations:
 
 Backend: `app/` (Rails controllers, models, serializers), `config/`, `db/`, `spec/`.
 
-## Confidence Signaling
-When stating facts about library behavior, API details, or code not read in this session, flag your confidence level. Use "I believe" or "I'm not certain" when working from training knowledge rather than something verified in the current session. It's fine to be wrong — just signal when you're working from memory vs. evidence so the user can decide whether to vet it.
-
 ## Backend Conventions
 - RESTful JSON API with ActiveModel::Serializers for responses
 - All models use `acts_as_tenant :household` for data scoping
@@ -47,6 +44,11 @@ allocation_categories, bank_accounts, transactions, sink_funds, institutions, se
 
 ## Deployment
 Prerequisite: user must have run `heroku login` in their terminal session.
+
+**Heroku app mapping:**
+- **Production**: `everycent` (eu region) — git remote `heroku`
+- **Staging**: `everycent-staging` (eu region) — git remote `staging`
+- `everycent-euro` is a **separate app**, not the production app for this repo
 
 1. Build Vue assets: `cd webclientv4 && npm run build` (outputs to /public/v4)
 2. Commit the built assets: `git add public/ && git commit -m "production build"`
@@ -87,6 +89,33 @@ For detailed coding rules, see `webclientv4/docs/vue-coding-rules.md`.
 - **Single-commit feature branch → ready-for-prod**: fast-forward (default `git merge`)
 - **Multi-commit feature branch → ready-for-prod**: `--no-ff` (keeps commits grouped in history)
 - **ready-for-prod → master**: `--ff-only` (ready-for-prod is just a staging technicality, no merge commits needed)
+- **Before committing**: run `git branch --show-current` and verify you're on the expected feature branch (not master). Commits have landed on wrong branches before.
+- **When master moves ahead**: rebase the feature branch onto master (`git rebase master`) rather than merging. Keeps history linear. Only use `--no-ff` merges for multi-commit branches into ready-for-prod.
+- **Never stash** on the main worktree when merging. Commit first, or use ready-for-prod. Stash creates hidden state and the ready-for-prod pattern makes it unnecessary.
+
+## Ready-for-Prod Pattern
+
+`ready-for-prod` is a mutex workaround: use it as the merge target when `master` is checked out in another worktree.
+
+- **Invariant:** `ready-for-prod` must always be a fast-forward from master. If `git merge ready-for-prod --ff-only` fails, treat as an error — don't resolve silently.
+- **Sync immediately before merging:** run `git merge master --ff-only` on `ready-for-prod` right before merging in a feature branch. If master moves between that sync and the merge, re-sync. Don't sync early and trust it stays current.
+
+## Landing Worktree Branches
+
+Full sequence for landing a completed worktree branch:
+
+1. Sync `ready-for-prod` to master: `git checkout ready-for-prod && git merge master --ff-only`
+2. Identify the correct branch to merge — check `cat .git/worktrees/<name>/HEAD`. The scaffold `worktree-agent-*` branch stays frozen; commits land on the task branch. Merge the task branch.
+3. Merge feature into `ready-for-prod` (single-commit: ff; multi-commit: `--no-ff`)
+4. **Stop here.** Show the diff summary and wait for explicit user approval before merging to master.
+5. Update task status: `domus task advance` (repeat until done). Commit `.domus/tasks/*.md` + `tasks.jsonl` as a chore commit on `ready-for-prod`.
+6. Clean up: `git worktree remove <path>` then `git branch -d <branch>`. Always merge before removing — worktree cleanup can silently delete branches with unmerged commits (issue #38287).
+7. Later (at deploy time): `git merge ready-for-prod --ff-only` on master.
+
+### Worktree Branching
+
+- **Default: branch new worktrees from master**, not from current work. Specify otherwise if the new branch explicitly depends on in-progress work.
+- Ask before switching context away from a worktree (don't silently switch to the main worktree).
 
 ## Domus Workflow
 See `.domus/reference/agent-instructions.md` for domus workflow rules (task lifecycle, dispatch, CLI commands, staff roles).
