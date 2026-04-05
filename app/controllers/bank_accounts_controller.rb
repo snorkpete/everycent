@@ -9,6 +9,14 @@ class BankAccountsController < ApplicationController
   end
   before_action :set_bank_account, only: [:show, :edit, :update, :destroy]
 
+  # Two code paths with different sort/filter behaviour:
+  #
+  # - include_current_balance=true: open accounts only, sorted alphabetically
+  #   by name (no category ordering). Used by Account Balances screen.
+  #
+  # - default: sorted by account_category_order (current accounts first, then
+  #   alphabetical within category). Open-only unless include_closed=true.
+  #   Used by dropdowns (correct default selection) and setup screens.
   def index
     if params[:include_current_balance]
       @bank_accounts = BankAccount.includes(:transactions).where(status: 'open').order(:name)
