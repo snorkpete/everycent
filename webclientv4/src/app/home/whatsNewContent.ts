@@ -12,6 +12,11 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: 'Sink Funds now works on your phone',
+    body: "Open a sink fund on mobile and you'll see a card-based list instead of a crammed table. Tap a card to peek at the target, outstanding, and comment; hit Edit to rename, retarget, or deactivate obligations the same way you would on desktop.",
+    date: '2026-04-05',
+  },
+  {
     title: 'Use Everycent comfortably on your phone',
     body: 'The Transactions list and the Budget view have been reworked for small screens, so you can add a transaction or check the budget without needing your laptop.',
     date: '2026-04-04',
