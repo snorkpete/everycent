@@ -70,7 +70,7 @@ Prerequisite: user must have run `heroku login` in their terminal session.
 - Before staging, restore `package-lock.json` if it was modified incidentally (`git checkout -- webclientv4/package-lock.json`). Only commit lockfile changes when the task specifically involves adding, removing, or updating dependencies.
 - **Never use `--no-verify`** to bypass pre-commit hooks. If hooks fail, fix the underlying issue. Using `--no-verify` requires explicit permission from the user.
 - **Never add `eslint-disable` comments** to suppress lint errors without explicit permission from the user. Fix the code instead. This includes pre-existing violations in files you touch — if you modify a file and encounter existing lint errors, fix them.
-- **Never bypass TypeScript errors** with `@ts-ignore`, `@ts-expect-error`, or bang assertions (`!`). Fix with proper type guards. Suppression requires explicit permission. This includes pre-existing type errors in files you touch — if you modify a file and it has existing type errors, fix them.
+- **Never bypass TypeScript errors** with `@ts-ignore`, `@ts-expect-error`, or bang assertions (`!`). Fix with proper type guards. Suppression requires explicit permission. This includes pre-existing type errors in files you touch — if you modify a file and it has existing type errors, fix them. In prod code: use null guards or early returns. In spec files: use typed helpers or restructure so types flow correctly. Only use `!` when you can clearly articulate why the value is guaranteed to exist and there is no cleaner alternative.
 
 ## Code Review (Vue App - webclientv4)
 - Before committing any changes, run the `senior-code-reviewer` agent over all modified files.
@@ -112,6 +112,11 @@ For detailed coding rules, see `webclientv4/docs/vue-coding-rules.md`.
 - **When master moves ahead**: rebase the feature branch onto master (`git rebase master`) rather than merging. Keeps history linear. Only use `--no-ff` merges for multi-commit branches into ready-for-prod.
 - **Never stash** on the main worktree when merging. Commit first, or use ready-for-prod. Stash creates hidden state and the ready-for-prod pattern makes it unnecessary.
 
+## Housekeeping Commits
+- **Direct to master** for `.domus/`, `CLAUDE.md`, and `vocabulary/` changes — no feature branch needed. These are docs/housekeeping, not code.
+- **Vocabulary changes get their own commits** (separate from feature work) so the evolving vocabulary is reviewable in git log.
+- **When staging `.domus/` changes**, always include the index files (`tasks.jsonl`, `ideas.jsonl`) alongside any `.md` files — staging only the `.md` files causes index drift.
+
 ## Ready-for-Prod Pattern
 
 `ready-for-prod` is a mutex workaround: use it as the merge target when `master` is checked out in another worktree.
@@ -146,6 +151,7 @@ Full sequence for landing a completed worktree branch:
 
 ## Domus Workflow
 See `.domus/reference/agent-instructions.md` for domus workflow rules (task lifecycle, dispatch, CLI commands, staff roles).
+- **Don't assume task frontmatter fields** — domus evolves and field names go stale. Let the CLI generate frontmatter and read the actual created file rather than reporting from memory.
 
 ## Cypress E2E Tests
 See `webclientv4/cypress/CLAUDE.md` for E2E test rules (typing into PrimeVue inputs, DB setup).
