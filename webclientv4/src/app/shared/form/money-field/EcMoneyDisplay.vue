@@ -2,6 +2,27 @@
   <span :class="['money-display', emphasisClass, highlightClasses]">{{ formattedValue }}</span>
 </template>
 
+<!--
+  EcMoneyDisplay — read-only money display.
+
+  Replaces scattered inline money formatting. All money values rendered for
+  display (not input) should use this component.
+
+  Props:
+  - modelValue: cents value (formatted via centsToDollars)
+  - highlightMode: color coding (default: Balance)
+      - None       — no color classes
+      - Balance    — green if positive, red if negative, muted if zero
+      - Difference — green if zero (balanced), red if nonzero (off-balance).
+                     Inverse of Balance: in budget contexts, zero is "good".
+      - Income     — income-specific styling
+  - emphasis: font size/weight tier (default: Item)
+      - Item (row), Subtotal, Total, Headline
+  - dashIfZero: shows "—" instead of "0.00" when value is zero (default: false)
+
+  HighlightMode / Emphasis use the const-object + type pattern — see
+  webclientv4/docs/vue-coding-rules.md for the project convention on domain enums.
+-->
 <script setup lang="ts">
 import { computed } from 'vue';
 import { centsToDollars } from '../../util/cents-to-dollars';

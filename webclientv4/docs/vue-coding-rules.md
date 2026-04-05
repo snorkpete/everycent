@@ -196,3 +196,20 @@ vi.mock('./someStore', () => ({
 ## Testing: Assert on Rendered Output
 
 Prefer asserting on what the user sees (rendered text, element presence) over internal state. Use input params to drive assertions when rendered output isn't practical (should be rare).
+
+## Testing: Composable Spec setup() with Named Params
+
+Composable specs should use a `setup()` helper function (the composable equivalent of `createWrapper()` for component specs). Parameters must be named via an options object, not positional.
+
+```typescript
+function setup({ initialValue = 0, someFlag = false } = {}) {
+  const value = ref(initialValue);
+  const flag = ref(someFlag);
+  const result = useMyComposable(value, flag);
+  return { value, flag, ...result };
+}
+```
+
+**Why:** Positional params become unreadable as composables grow. Named params make each test self-documenting.
+
+Reference: `useWantsNeedsBudgetBreakdown.spec.ts`.

@@ -17,6 +17,7 @@ Call `router.replace({ query: { ... } })` in `emitFetch()` when selection change
 - **JetBrains** — open `webclientv4/` as project root to avoid tsconfig resolution issues.
 - **matchMedia mock** — global mock in `src/test/setup.ts`, required by PrimeVue DatePicker and Select. Do not remove it.
 - **Always use npm scripts** — use `npm run dev`, `npm run build`, `npm run test`, never invoke tools directly (`npx vite`, `npx vitest`, etc.). If an npm script fails, fix the underlying problem (install deps, fix PATH) rather than bypassing the script.
+- **TypeScript** — type-check with `npm run type-check` (runs `vue-tsc -b --noEmit`, the `-b` flag is essential). If type-check reports stale errors, clear the build cache: `rm node_modules/.tmp/tsconfig.app.tsbuildinfo`.
 
 ## Coding Conventions
 
@@ -38,11 +39,12 @@ Key rules:
 - **Icon-only buttons must have a `v-tooltip`** explaining what the button does in plain language (not just the action — what it achieves). Never use the native HTML `title` attribute — always use PrimeVue's `v-tooltip` directive.
 - **Use PrimeVue design tokens for colors** — never hardcode hex colors or rgba values in CSS. Use `var(--p-green-600)`, `var(--p-red-600)`, `var(--p-surface-*)`, `var(--p-text-muted-color)`, etc. Exception: MenuSidebar theme preview swatches.
 - Use `bankAccountApi.getOpen()` for dropdowns/selection UI — returns open accounts sorted by category
+- **Check PrimeVue built-in props before building custom behavior.** Use `mcp__primevue__get_component_props` to see all available props — PrimeVue components are feature-rich and often cover common needs (e.g. `showClear`, `filter`, `editable`, `fluid`). Only build custom solutions when PrimeVue genuinely doesn't support the behavior.
 
 ## Testing
 
 - **Mount helper must be named `createWrapper()`** — not `mountPage`, `mountDialog`, `mountComponent`, etc. Must have explicit `: VueWrapper` return type annotation.
-- **PrimeVue Dialog teleports to `document.body`** — always stub in tests (`stubs: { Dialog: DialogStub }`). See `docs/testing-patterns.md` for the stub template.
+- **PrimeVue Dialog teleports to `document.body`** — always stub in tests (`stubs: { Dialog: DialogStub }`). See `docs/vue-testing-patterns.md` for the stub template.
 - **Wallaby for interactive sessions; `npx vitest run <spec> --reporter=verbose` for worktree agents** — Wallaby cannot see worktree files
 - Interceptors live in `src/api/interceptors/` — each has its own spec with full coverage
 
