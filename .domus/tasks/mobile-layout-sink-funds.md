@@ -1,7 +1,7 @@
 # Task: Mobile layout: sink funds
 
 **ID:** mobile-layout-sink-funds
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-04
