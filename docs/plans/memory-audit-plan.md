@@ -25,10 +25,12 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 - ✅ Default-worktree rule added to project CLAUDE.md (commit 9fe7b6900)
 - ✅ Session E — vue-testing-patterns.md expanded (8 sections from testing-patterns.md + factories migrate-on-touch), composable setup() convention → vue-coding-rules.md, TypeScript bullet + fixed docs reference in webclientv4/CLAUDE.md (12→9 files)
 - ✅ Accumulated follow-ups — pruned project_next-up.md (removed migrated TypeScript Notes), claude_test_user.md → .claude/local-dev.md (gitignored) + project CLAUDE.md reference, feedback_session_context_management.md → global CLAUDE.md "Session Context" section, frontmatter sweep (all present), created domus task `migrate-all-spects-files-to-use-test-factories` for retirement criteria (9→7 files)
+- ✅ Phase 2 CLAUDE.md reviews COMPLETE — vocabulary.jsonl → vocabulary.md (two-line entries), Loading/Updating/Growing rules → vocabulary/INSTRUCTIONS.md, Vocabulary section 27→3 lines, Build & Release annotated (v3 frozen, v1 dormant, cutover-only), Deployment section gained `heroku run rails db:migrate` step (commits 4bf946232, 217083079, + pending)
 
 **Memory at 7 files** (well under ~11 target). Memory migration COMPLETE.
+**Phase 2 CLAUDE.md reviews** COMPLETE.
 
-**Next batch to execute:** Phase 2 CLAUDE.md reviews (see below).
+**Next batch to execute:** Phase 3 Hooks (interactive) — see Phase 3 section below.
 
 **Execution pattern that's working:** dispatch a general-purpose agent with `model: "sonnet"`, tight scope (4-5 files per batch), explicit branch guard ("do not switch branches, do not commit"), verify + commit in main session.
 
@@ -45,11 +47,11 @@ Plan for cleaning up `/Users/kion/.claude/projects/-Users-kion-code-everycent/me
 **When resuming:**
 1. `git -C /Users/kion/code/everycent status` — verify on `memory-audit` branch
 2. Read this plan file for full context
-3. Pick next batch (Phase 2 CLAUDE.md reviews)
+3. Pick next batch (Phase 3: hooks)
 
 ---
 
-Phase 1 (memory review) complete. Phase 2 (CLAUDE.md reviews) in progress.
+Phase 1 (memory review) complete. Phase 2 (CLAUDE.md reviews) complete. Phase 3 (hooks) pending.
 
 ---
 

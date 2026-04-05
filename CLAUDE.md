@@ -61,6 +61,7 @@ Prerequisite: user must have run `heroku login` in their terminal session.
    - `git push origin master` — GitHub (code backup)
    - `git push heroku master` — Heroku production deploy
    - `git push staging master:main` — Heroku staging (temporary; pushes master to staging's main branch)
+4. Run migrations on production: `heroku run rails db:migrate` (idempotent — safe to run every deploy)
 
 ## Testing (Vue App - webclientv4)
 - Use test-driven development (TDD). Write tests before implementation.
