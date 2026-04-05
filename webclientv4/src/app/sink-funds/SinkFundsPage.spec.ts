@@ -473,13 +473,13 @@ describe('SinkFundsPage', () => {
 
       const store = useSinkFundStore();
       store.enterEditMode();
-      const countBefore = store.sinkFund?.sink_fund_allocations.length ?? 0;
+      const countBefore = store.sinkFund?.sink_fund_allocations?.length ?? 0;
 
       const mobileToolbar = wrapper.findComponent(SinkFundsToolbarMobile);
       await mobileToolbar.vm.$emit('addObligation');
       await flushPromises();
 
-      expect(store.sinkFund?.sink_fund_allocations.length).toBe(countBefore + 1);
+      expect(store.sinkFund?.sink_fund_allocations?.length).toBe(countBefore + 1);
     });
   });
 });

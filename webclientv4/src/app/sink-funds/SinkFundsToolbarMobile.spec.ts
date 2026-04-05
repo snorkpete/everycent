@@ -67,7 +67,7 @@ describe('SinkFundsToolbarMobile', () => {
       const wrapper = createWrapper({ selectedSinkFundId: 2 });
 
       const select = wrapper.findComponent(SINK_FUND_SELECT) as unknown as VueWrapper;
-      expect(select.props('modelValue')).toBe(2);
+      expect(select.props()).toHaveProperty('modelValue', 2);
     });
 
     it('emits update:selectedSinkFundId when selection changes', async () => {
@@ -119,7 +119,7 @@ describe('SinkFundsToolbarMobile', () => {
       const wrapper = createWrapper();
 
       const toggle = wrapper.findComponent(SHOW_CLOSED_TOGGLE) as unknown as VueWrapper;
-      expect(toggle.props('modelValue')).toBe(true);
+      expect(toggle.props()).toHaveProperty('modelValue', true);
     });
 
     it('updates store.showDeactivated when toggled', async () => {
