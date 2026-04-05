@@ -17,6 +17,7 @@ Call `router.replace({ query: { ... } })` in `emitFetch()` when selection change
 - **JetBrains** — open `webclientv4/` as project root to avoid tsconfig resolution issues.
 - **matchMedia mock** — global mock in `src/test/setup.ts`, required by PrimeVue DatePicker and Select. Do not remove it.
 - **Always use npm scripts** — use `npm run dev`, `npm run build`, `npm run test`, never invoke tools directly (`npx vite`, `npx vitest`, etc.). If an npm script fails, fix the underlying problem (install deps, fix PATH) rather than bypassing the script.
+- **TypeScript** — type-check with `npm run type-check` (runs `vue-tsc -b --noEmit`, the `-b` flag is essential). If type-check reports stale errors, clear the build cache: `rm node_modules/.tmp/tsconfig.app.tsbuildinfo`.
 
 ## Coding Conventions
 
@@ -43,7 +44,7 @@ Key rules:
 ## Testing
 
 - **Mount helper must be named `createWrapper()`** — not `mountPage`, `mountDialog`, `mountComponent`, etc. Must have explicit `: VueWrapper` return type annotation.
-- **PrimeVue Dialog teleports to `document.body`** — always stub in tests (`stubs: { Dialog: DialogStub }`). See `docs/testing-patterns.md` for the stub template.
+- **PrimeVue Dialog teleports to `document.body`** — always stub in tests (`stubs: { Dialog: DialogStub }`). See `docs/vue-testing-patterns.md` for the stub template.
 - **Wallaby for interactive sessions; `npx vitest run <spec> --reporter=verbose` for worktree agents** — Wallaby cannot see worktree files
 - Interceptors live in `src/api/interceptors/` — each has its own spec with full coverage
 
