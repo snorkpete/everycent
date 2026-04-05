@@ -2,11 +2,17 @@
   <EcPageLayout page-name="allocation-categories">
     <EcItemList :items="store.allocationCategories" key-field="id">
       <template #item="{ item: category }">
-        <span class="category-name">{{ category.name }}</span>
+        <a
+          class="category-name"
+          href="#"
+          :data-testid="`category-link-${category.id}`"
+          @click.prevent="editCategory(category)"
+          >{{ category.name }}</a
+        >
         <Button
-          label="Edit"
+          label="View"
           size="small"
-          :data-testid="`edit-btn-${category.id}`"
+          :data-testid="`view-btn-${category.id}`"
           @click="editCategory(category)"
         />
       </template>
@@ -80,5 +86,12 @@ async function onSave(category: AllocationCategoryData) {
 <style scoped>
 .category-name {
   font-size: 0.9rem;
+  color: var(--p-primary-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.category-name:hover {
+  text-decoration: underline;
 }
 </style>

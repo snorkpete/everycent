@@ -84,21 +84,47 @@ describe('InstitutionsPage', () => {
       expect(wrapper.text()).toContain(institution2.name);
     });
 
-    it('renders an Edit button for each institution', async () => {
+    it('renders a View button for each institution', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      expect(wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).exists()).toBe(true);
-      expect(wrapper.find(`[data-testid="edit-btn-${institution2.id}"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="view-btn-${institution1.id}"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="view-btn-${institution2.id}"]`).exists()).toBe(true);
+    });
+
+    it('renders a clickable name link for each institution', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      expect(wrapper.find(`[data-testid="institution-link-${institution1.id}"]`).exists()).toBe(
+        true,
+      );
+      expect(wrapper.find(`[data-testid="institution-link-${institution2.id}"]`).exists()).toBe(
+        true,
+      );
     });
   });
 
-  describe('Edit button', () => {
+  describe('institution name link', () => {
+    it('opens the dialog with the selected institution in view mode', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      await wrapper.find(`[data-testid="institution-link-${institution1.id}"]`).trigger('click');
+
+      const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
+      expect(dialog.props('visible')).toBe(true);
+      expect(dialog.props('institution')).toEqual(institution1);
+      expect(dialog.props('initialEditMode')).toBe(false);
+    });
+  });
+
+  describe('View button', () => {
     it('opens the dialog with the selected institution', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       expect(dialog.props('visible')).toBe(true);
@@ -109,7 +135,7 @@ describe('InstitutionsPage', () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       expect(dialog.props('initialEditMode')).toBe(false);
@@ -181,7 +207,7 @@ describe('InstitutionsPage', () => {
     it('calls the API to update the institution when it has an id', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
-      await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       await dialog.vm.$emit('save', institution1);
@@ -193,7 +219,7 @@ describe('InstitutionsPage', () => {
     it('closes the dialog and shows a success toast after a successful save', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
-      await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       await dialog.vm.$emit('save', institution1);
@@ -207,7 +233,7 @@ describe('InstitutionsPage', () => {
       vi.mocked(institutionApi.update).mockRejectedValue(new Error('Server error'));
       const wrapper = createWrapper(pinia);
       await flushPromises();
-      await wrapper.find(`[data-testid="edit-btn-${institution1.id}"]`).trigger('click');
+      await wrapper.find(`[data-testid="view-btn-${institution1.id}"]`).trigger('click');
 
       const dialog = wrapper.findComponent({ name: 'InstitutionEditDialog' });
       await dialog.vm.$emit('save', institution1);
