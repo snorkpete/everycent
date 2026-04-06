@@ -1,14 +1,16 @@
 # Idea: Natural Language Querying (NLQ) for Everycent
 
 **Captured:** 2026-03-26
-**Last refined:** 2026-04-05
+**Last refined:** 2026-04-06
 **Status:** raw
 
 ---
 
 ## Next Ideation
 
-**Nail down the very first analyze-tool.** What single tool, answering which test-set question end-to-end, kicks off phase 1? This is the next oracle session on this idea.
+~~**Nail down the very first analyze-tool.** — resolved 2026-04-06, see First Tool below.~~
+
+**Next:** Refine into buildable tasks (taskmaster). Phase 1 scope is clear enough to start scoping work.
 
 ---
 
@@ -48,6 +50,18 @@ CRUD tools like `get_transactions(filters)`. If tools just expose tables in a fa
 
 **Build principle:** thinnest end-to-end slice first — one tool, one endpoint, one working query — then expand based on actual usage.
 
+### MCP Tools vs Resources
+
+Mental model established during ideation (2026-04-06):
+
+**Resources = the nouns.** Things that exist in the domain. The LLM reads them for context before making tool calls. Predictable shape, identified by URI. For everycent: allocation categories, budgets, bank accounts. A resource *can* be computed (e.g. `everycent://budgets/2025-03/summary`) — the test isn't "stored vs computed" but "is this a known thing with a predictable shape?"
+
+**Tools = the verbs.** Analysis operations the LLM invokes with parameters. The consumer drives what gets computed. For everycent: overspending analysis, pattern detection, comparisons.
+
+**The key distinction:** a resource answers "show me this thing." A tool answers "find me something interesting." Resources are lookups, tools are discovery. Discovery is the whole point of NLQ.
+
+**Example:** `everycent://budgets/2025-03/overspend` is a valid resource (overspend for a known budget). But `analyze_overspending(period, threshold, group_by)` as a tool lets the LLM figure out *which* budgets are interesting as part of answering the question. The tool unlocks far more flexibility.
+
 ---
 
 ## Phased Plan
@@ -56,8 +70,9 @@ CRUD tools like `get_transactions(filters)`. If tools just expose tables in a fa
 - Google auth in place (parallel to existing devise; chat access gated behind Google-only). See `google-auth-migration`.
 - Rails `/api/mcp/` endpoints — start with one analyze-tool end-to-end
 - TypeScript MCP server wrapping those endpoints
-- Tested via Claude Code as the MCP client — no UI yet
-- Success criterion: answer a real question from the test set that I hadn't pre-built a report for
+- MCP server configurable to target production, staging, or local DB
+- Tested via Claude Code (or Codex) as the MCP client — no UI yet
+- Success criterion: ask "what do we overspend on?" via Claude Code and get a useful, accurate answer from the MCP server
 
 ### Phase 2: Chat UI inside everycent
 - Vue chat component, agent SDK integration (calls LLM, handles tool-calling loop)
@@ -72,12 +87,52 @@ CRUD tools like `get_transactions(filters)`. If tools just expose tables in a fa
 
 ---
 
-## Test Set (drives first tool design)
+## First Tool: Overspending Analysis
+
+**Decided 2026-04-06.** This is the first tool to build end-to-end in phase 1.
+
+### What it does
+Compares budgeted vs actual spending per category, across time, with flexible parameters. One tool that answers multiple questions depending on how the LLM calls it:
+
+- "What do we overspend on most?" → all categories, all time, no threshold
+- "What did we overspend on in 2024?" → all categories, 2024, no threshold
+- "Which months do we overspend on groceries?" → one category, all time, group by month
+- "Where do we overspend by more than €50?" → all categories, all time, threshold 50
+
+### Parameters (indicative, not final)
+- `period` — date range or year (optional, defaults to all time)
+- `category` — filter to specific category (optional, defaults to all)
+- `threshold` — minimum overspend amount to include (optional)
+- `group_by` — how to aggregate: by category, by month, by year (optional)
+
+### Resources it needs
+The LLM needs domain context to call this tool intelligently:
+- **Allocation categories** — what categories exist, so the LLM can map user language to category names
+- **Budgets** — what budget periods exist, date ranges, so the LLM can resolve "last year" or "since we moved to NL"
+
+### Domain logic encoded (not just SQL)
+- "Overspending" = actual transaction total > budgeted allocation amount
+- Excludes manual adjustments
+- Aggregates across multiple allocations within a category
+- Structural categories (Over Budget Supplement, Sink Fund Transfers) excluded — they're mechanisms, not spending
+
+### Validated against real data
+Ran the overspending analysis ad-hoc (2026-04-06) using the spending-analysis skill. Key findings that confirm the tool is useful:
+- **Household Purchases**: over budget by €50-68/mo for 6+ years — budget has never been realistic
+- **Food - Groceries**: variance growing (€24/mo in 2018 → €138/mo in 2025)
+- **Recreation**: most volatile, sometimes 2-3x budget — possibly better served by sink funds
+- **Visitors**: actual is consistently 2-3x budgeted when active
+
+These are exactly the kind of insights NLQ should surface.
+
+---
+
+## Test Set (drives tool design beyond the first)
 
 Real questions from my own budgeting life. The system works when it can answer ones I didn't pre-build:
 
-1. What do we overspend on most? Where are our biggest budgeting failures?
-2. Where is our budget lying to us consistently (budgeted vs actual patterns)?
+1. ~~What do we overspend on most? Where are our biggest budgeting failures?~~ → **first tool**
+2. Where is our budget lying to us consistently (budgeted vs actual patterns)? → **first tool covers this**
 3. Any annual patterns we aren't properly catering for? (monthly model has gaps)
 4. Which months do we regularly go over?
 5. How much do vacations typically cost us? Are we missing special events we should have logged?
@@ -136,9 +191,10 @@ At personal-use scale, OpenAI API is pragmatic. Self-hosted if privacy becomes a
 ## Open Questions / Things to Explore
 
 **Phase 1 (first up):**
-- What is the very first analyze-tool? Probably something that answers one of the test-set questions end-to-end.
+- ~~What is the very first analyze-tool?~~ → resolved: overspending analysis
 - TypeScript confirmed as MCP server language?
 - How to structure the `/api/mcp/` Rails namespace — controllers, serializers, tool contracts.
+- How does the MCP server config for prod/staging/local work? Does it point at different Rails instances, or does the Rails app itself switch DBs?
 
 **Phase 2:**
 - Which agent SDK — Anthropic's directly, or something higher-level?
@@ -149,6 +205,14 @@ At personal-use scale, OpenAI API is pragmatic. Self-hosted if privacy becomes a
 - Acceptable to send transaction descriptions to OpenAI?
 - Confidence threshold for vector search results — how to handle low-confidence matches?
 - Could SQL + analyze-tools alone (no embeddings) already answer the full test set? If so, phase 3 is pure learning investment.
+
+**Design artifacts:**
+- MCP server API needs a **spec** — tool signatures, resource URIs, parameter contracts, response shapes. First time in the project needing a spec (migration work didn't need one because the system was already understood). Use the overspend tool as the trial spec before formalising a format.
+- Tool responses should return raw numbers (budgeted, actual, variance) — the LLM interprets meaning from field names. Tool description must explain domain terms (budgeted = allocation amount, actual = sum of withdrawals excluding manual adjustments).
+- Underspend / overbudgeting is the same tool — negative variance. LLM figures this out without a separate definition.
+
+**Cost optimisation (phase 2+):**
+Three levers that interact: (1) model quality — cheaper models need more hand-holding, (2) context volume — more context costs more per call but reduces errors, (3) reliability tolerance — 95% correct is dramatically cheaper than 99.9%. A cheaper model with tight, well-designed context can outperform an expensive model with sloppy context. The spec work pays off here — it's the foundation for cost optimisation. Start with the best model, get it working, then tune.
 
 **Cross-cutting:**
 - When does the MCP server get exposed to external MCP clients (Claude Code / Claude Desktop) as a product feature vs kept internal?
