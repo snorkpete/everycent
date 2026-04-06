@@ -1,3 +1,9 @@
+---
+name: local-review
+description: Use for interactive hunk-by-hunk review of a commit or diff with the user, applying fixes in real time. Fires on /local-review, optionally followed by a SHA, branch, or range.
+version: 1.0.0
+---
+
 # Local Review
 
 Interactive hunk-by-hunk code review of a commit or diff with the user. Walk through changes together, take feedback, apply fixes in real time.

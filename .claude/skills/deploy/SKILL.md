@@ -1,3 +1,9 @@
+---
+name: deploy
+description: Use to deploy the Vue v4 app to Heroku production from a clean master — updates "What's New", rebuilds static assets, pushes to origin + heroku, runs migrations. Fires on /deploy, "deploy to production", "ship this to prod".
+version: 1.0.0
+---
+
 # Deploy to Production
 
 Deploy the Vue v4 app to Heroku production, starting from "everything committed on master." Updates the "What's New" home page content, rebuilds static assets, pushes to origin + heroku, and runs migrations.

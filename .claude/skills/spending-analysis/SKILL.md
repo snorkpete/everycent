@@ -1,3 +1,9 @@
+---
+name: spending-analysis
+description: Use when the user wants to analyse Everycent spending data via ad-hoc SQL queries. Loads database context (schema, conventions, cents-to-dollars) so the user can direct investigation. Fires on /spending-analysis or "analyse spending".
+version: 1.0.0
+---
+
 # Spending Analysis
 
 You are helping the user analyse their Everycent spending data. Load this context and make it available throughout the session. The user will direct what they want to investigate.

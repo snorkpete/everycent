@@ -1,3 +1,9 @@
+---
+name: pg-pull
+description: Use to pull the Heroku production database down into a new local PostgreSQL database and point the app at it. Fires on /pg-pull or when the user asks to refresh local data from production.
+version: 1.0.0
+---
+
 # Heroku PG Pull
 
 Pull the Heroku production database down into a new local PostgreSQL database and update the app to use it.
