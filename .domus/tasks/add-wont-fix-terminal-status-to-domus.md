@@ -1,7 +1,7 @@
 # Task: Add won't-fix terminal status to domus
 
 **ID:** add-wont-fix-terminal-status-to-domus
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-09

@@ -1,7 +1,7 @@
 # Task: Health check module: won't-fix support in domus (dependency)
 
 **ID:** health-check-module-wont-fix-support-in-domus-dependency
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-09
