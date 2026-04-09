@@ -1,12 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, ref } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import TransactionList from './TransactionList.vue';
+import EcListField from '../shared/form/list-field/EcListField.vue';
 import { useTransactionStore } from './transactionStore';
 import type { TransactionData, AllocationData, SinkFundAllocationData } from './transaction.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
+
+const isMobile = ref(false);
+vi.mock('../shared/composables/useResponsive', () => ({
+  useResponsive: () => ({
+    isMobile,
+    isCompact: ref(false),
+  }),
+}));
 
 // Selectors
 const ADD_BTN = '[data-testid="add-btn"]';
@@ -86,6 +95,7 @@ describe('TransactionList', () => {
     store.allocations = sampleAllocations;
     store.sinkFundAllocations = sampleSinkFundAllocations;
     store.selectedBankAccount = checkingAccount;
+    isMobile.value = false;
     vi.clearAllMocks();
   });
 
@@ -358,6 +368,139 @@ describe('TransactionList', () => {
 
       const rows = wrapper.findAll(TRANSACTION_ROW);
       expect(rows[0].classes()).toContain('ec-deleted');
+    });
+  });
+
+  describe('mobile edit mode allocation row', () => {
+    beforeEach(() => {
+      isMobile.value = true;
+      store.isEditMode = true;
+    });
+
+    it('shows an allocation dropdown row for each transaction in mobile edit mode', async () => {
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const allocationRows = wrapper.findAll('.mobile-edit-allocation-row');
+      expect(allocationRows).toHaveLength(sampleTransactions.length);
+    });
+
+    it('does not show the allocation dropdown row in mobile view mode', async () => {
+      store.isEditMode = false;
+      const wrapper = createWrapper();
+      await nextTick();
+
+      expect(wrapper.find('.mobile-edit-allocation-row').exists()).toBe(false);
+    });
+
+    it('does not show the allocation dropdown row on desktop in edit mode', async () => {
+      isMobile.value = false;
+      const wrapper = createWrapper();
+      await nextTick();
+
+      expect(wrapper.find('.mobile-edit-allocation-row').exists()).toBe(false);
+    });
+
+    it('shows the regular allocation dropdown for a normal account', async () => {
+      store.selectedBankAccount = checkingAccount;
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+          allocation_id: 1,
+        },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const allocationRow = wrapper.find('.mobile-edit-allocation-row');
+      const listField = allocationRow.findComponent(EcListField);
+      expect(listField.exists()).toBe(true);
+      expect(listField.props('modelValue')).toBe(1);
+      expect(listField.props('items')).toEqual(
+        sampleAllocations
+          .filter((a) => a.id != null && a.name != null)
+          .map((a) => ({ ...a, id: a.id, name: a.name })),
+      );
+    });
+
+    it('calls store.onAllocationChange when regular allocation is changed', async () => {
+      store.selectedBankAccount = checkingAccount;
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+          allocation_id: undefined,
+        },
+      ];
+      vi.spyOn(store, 'onAllocationChange');
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const allocationRow = wrapper.find('.mobile-edit-allocation-row');
+      const listField = allocationRow.findComponent(EcListField);
+      await listField.vm.$emit('update:modelValue', 1);
+
+      expect(store.onAllocationChange).toHaveBeenCalledWith(store.transactions[0], 1);
+    });
+
+    it('shows the sink fund allocation dropdown for a sink fund account', async () => {
+      store.selectedBankAccount = sinkFundAccount;
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+          sink_fund_allocation_id: 10,
+        },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const allocationRow = wrapper.find('.mobile-edit-allocation-row');
+      const listField = allocationRow.findComponent(EcListField);
+      expect(listField.exists()).toBe(true);
+      expect(listField.props('modelValue')).toBe(10);
+      expect(listField.props('items')).toEqual(
+        sampleSinkFundAllocations
+          .filter((a) => a.id != null && a.name != null)
+          .map((a) => ({ ...a, id: a.id, name: a.name })),
+      );
+    });
+
+    it('updates sink_fund_allocation_id when sink fund allocation is changed', async () => {
+      store.selectedBankAccount = sinkFundAccount;
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'paid',
+          deleted: false,
+          sink_fund_allocation_id: undefined,
+        },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const allocationRow = wrapper.find('.mobile-edit-allocation-row');
+      const listField = allocationRow.findComponent(EcListField);
+      await listField.vm.$emit('update:modelValue', 10);
+      await nextTick();
+
+      expect(store.transactions[0].sink_fund_allocation_id).toBe(10);
     });
   });
 });

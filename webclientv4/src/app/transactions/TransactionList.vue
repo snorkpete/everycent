@@ -213,6 +213,32 @@
             </td>
           </tr>
 
+          <!-- Mobile edit allocation row -->
+          <tr v-if="isMobile && store.isEditMode" class="mobile-edit-allocation-row">
+            <td colspan="4">
+              <template v-if="store.selectedBankAccount?.is_sink_fund">
+                <EcListField
+                  label=""
+                  :edit-mode="true"
+                  :items="sinkFundAllocationItems"
+                  :model-value="transaction.sink_fund_allocation_id ?? null"
+                  @update:model-value="transaction.sink_fund_allocation_id = $event as number"
+                />
+              </template>
+              <template v-else>
+                <EcListField
+                  label=""
+                  :edit-mode="true"
+                  :items="allocationItems"
+                  group-by="allocation_category"
+                  filterable
+                  :model-value="transaction.allocation_id ?? null"
+                  @update:model-value="store.onAllocationChange(transaction, $event as number)"
+                />
+              </template>
+            </td>
+          </tr>
+
           <!-- Mobile detail row (expandable) -->
           <tr
             v-if="isMobile && !store.isEditMode && isRowExpanded(transaction.id ?? 0)"
@@ -243,10 +269,7 @@
                 <span class="mobile-detail-item">
                   <span class="mobile-detail-label">Status</span>
                   <span class="mobile-detail-value">
-                    <i
-                      v-if="transaction.status === 'paid'"
-                      class="pi pi-check paid-icon"
-                    />
+                    <i v-if="transaction.status === 'paid'" class="pi pi-check paid-icon" />
                     <span v-else>Unpaid</span>
                   </span>
                 </span>
@@ -561,5 +584,17 @@ function autoAllocationClass(transaction: TransactionData) {
 
 .mobile-detail-value {
   font-size: 0.8rem;
+}
+
+/* ── Mobile edit allocation row ── */
+.mobile-edit-allocation-row td {
+  padding: 0.2rem 0.4rem 0.3rem 1rem;
+  background-color: var(--p-surface-50);
+  border-bottom: 1px solid var(--p-surface-200);
+}
+
+.mobile-edit-allocation-row :deep(.ec-list-field),
+.mobile-edit-allocation-row :deep(.p-select) {
+  width: 100%;
 }
 </style>
