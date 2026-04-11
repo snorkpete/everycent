@@ -4,23 +4,21 @@ import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BankAccountsPage from './BankAccountsPage.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
-import { bankAccountApi } from './bankAccountApi';
-import { institutionApi } from '../institutions/institutionApi';
+import apiGateway from '../../api/api-gateway';
+import { buildApiGatewayMock } from '../../test/buildApiGatewayMock';
 import { buildBankAccount } from '../../test/factories';
 
-vi.mock('./bankAccountApi', () => ({
-  bankAccountApi: {
-    getAll: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
+vi.mock('../../api/api-gateway', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
-vi.mock('../institutions/institutionApi', () => ({
-  institutionApi: {
-    getAll: vi.fn(),
-  },
-}));
+const mockApiGateway = buildApiGatewayMock();
 
 const mockNotifyError = vi.fn();
 const mockNotifySuccess = vi.fn();
@@ -58,10 +56,11 @@ describe('BankAccountsPage', () => {
     pinia = createPinia();
     setActivePinia(pinia);
     vi.clearAllMocks();
-    vi.mocked(bankAccountApi.getAll).mockResolvedValue([openAccount, closedAccount]);
-    vi.mocked(institutionApi.getAll).mockResolvedValue([]);
-    vi.mocked(bankAccountApi.create).mockResolvedValue(openAccount);
-    vi.mocked(bankAccountApi.update).mockResolvedValue(openAccount);
+    mockApiGateway.reset();
+    mockApiGateway.get('/bank_accounts', [openAccount, closedAccount]);
+    mockApiGateway.get('/institutions', []);
+    mockApiGateway.post('/bank_accounts', openAccount);
+    mockApiGateway.put('/bank_accounts/1', openAccount);
   });
 
   describe('on mount', () => {
@@ -77,14 +76,14 @@ describe('BankAccountsPage', () => {
       createWrapper(pinia);
       await flushPromises();
 
-      expect(bankAccountApi.getAll).toHaveBeenCalled();
+      expect(apiGateway.get).toHaveBeenCalledWith('/bank_accounts', expect.anything());
     });
 
     it('calls the API to fetch institutions on mount', async () => {
       createWrapper(pinia);
       await flushPromises();
 
-      expect(institutionApi.getAll).toHaveBeenCalled();
+      expect(apiGateway.get).toHaveBeenCalledWith('/institutions');
     });
   });
 
@@ -214,11 +213,12 @@ describe('BankAccountsPage', () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
+      vi.mocked(apiGateway.get).mockClear();
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
       await flushPromises();
 
-      expect(bankAccountApi.getAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
-      expect(institutionApi.getAll).toHaveBeenCalledTimes(2);
+      expect(apiGateway.get).toHaveBeenCalledWith('/bank_accounts', expect.anything());
+      expect(apiGateway.get).toHaveBeenCalledWith('/institutions');
     });
   });
 
@@ -232,7 +232,7 @@ describe('BankAccountsPage', () => {
       await dialog.vm.$emit('save', openAccount);
       await flushPromises();
 
-      expect(bankAccountApi.update).toHaveBeenCalledWith(openAccount);
+      expect(apiGateway.put).toHaveBeenCalledWith('/bank_accounts/1', openAccount);
     });
 
     it('closes the dialog and shows a success toast after a successful save', async () => {
@@ -249,7 +249,7 @@ describe('BankAccountsPage', () => {
     });
 
     it('keeps the dialog open and shows an error toast when save fails', async () => {
-      vi.mocked(bankAccountApi.update).mockRejectedValue(new Error('Server error'));
+      mockApiGateway.rejectPut('/bank_accounts/1', new Error('Server error'));
       const wrapper = createWrapper(pinia);
       await flushPromises();
       await wrapper.find('[data-testid="view-btn-1"]').trigger('click');

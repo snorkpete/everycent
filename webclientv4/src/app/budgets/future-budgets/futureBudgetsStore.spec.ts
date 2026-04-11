@@ -1,37 +1,38 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useFutureBudgetsStore } from './futureBudgetsStore';
-import { futureBudgetsApi } from './futureBudgetsApi';
-import { allocationCategoryApi } from '../../allocation-categories/allocationCategoryApi';
+import apiGateway from '../../../api/api-gateway';
+import { buildApiGatewayMock } from '../../../test/buildApiGatewayMock';
 import { buildFutureBudget } from '../../../test/factories';
 
-vi.mock('./futureBudgetsApi', () => ({
-  futureBudgetsApi: {
-    getFutureBudgets: vi.fn(),
-    massUpdate: vi.fn(),
+vi.mock('../../../api/api-gateway', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
-vi.mock('../../allocation-categories/allocationCategoryApi', () => ({
-  allocationCategoryApi: {
-    getAll: vi.fn(),
-  },
-}));
+const mockApiGateway = buildApiGatewayMock();
 
 describe('futureBudgetsStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
-    vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([]);
-    vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
+    mockApiGateway.reset();
+    mockApiGateway.get('/budgets/future', []);
+    mockApiGateway.get('/allocation_categories', []);
+    mockApiGateway.post('/budgets/mass_update', { success: true });
   });
 
   describe('fetchAll', () => {
     it('fetches and stores budgets and categories', async () => {
       const budgets = [buildFutureBudget()];
       const categories = [{ id: 1, name: 'Fixed' }];
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue(budgets);
-      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(categories);
+      mockApiGateway.get('/budgets/future', budgets);
+      mockApiGateway.get('/allocation_categories', categories);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
@@ -42,9 +43,9 @@ describe('futureBudgetsStore', () => {
 
     it('sets loading true during fetch and false after', async () => {
       let loadingDuringCall = false;
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockImplementation(async () => {
+      vi.mocked(apiGateway.get).mockImplementationOnce(async () => {
         loadingDuringCall = useFutureBudgetsStore().loading;
-        return [];
+        return { data: [] };
       });
 
       const store = useFutureBudgetsStore();
@@ -55,7 +56,7 @@ describe('futureBudgetsStore', () => {
     });
 
     it('sets error message on failure', async () => {
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockRejectedValue(new Error('Network error'));
+      mockApiGateway.rejectGet('/budgets/future', new Error('Network error'));
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
@@ -65,11 +66,12 @@ describe('futureBudgetsStore', () => {
     });
 
     it('clears error on subsequent successful fetch', async () => {
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockRejectedValueOnce(new Error('fail'));
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValueOnce([]);
+      mockApiGateway.rejectGet('/budgets/future', new Error('fail'));
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
+
+      mockApiGateway.get('/budgets/future', []);
       await store.fetchAll();
 
       expect(store.error).toBeNull();
@@ -88,7 +90,7 @@ describe('futureBudgetsStore', () => {
         name: 'Jan 2025',
         incomes: [{ id: 10, name: 'Salary', amount: 500000, budget_id: 1, bank_account_id: 1 }],
       });
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([budget]);
+      mockApiGateway.get('/budgets/future', [budget]);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
@@ -111,7 +113,7 @@ describe('futureBudgetsStore', () => {
         name: 'Feb 2025',
         incomes: [{ id: 20, name: 'Salary', amount: 520000, budget_id: 2, bank_account_id: 1 }],
       });
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([budget1, budget2]);
+      mockApiGateway.get('/budgets/future', [budget1, budget2]);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
@@ -133,7 +135,7 @@ describe('futureBudgetsStore', () => {
           { id: 2, name: 'Bonus', amount: 100000, budget_id: 1, bank_account_id: 1 },
         ],
       });
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([budget]);
+      mockApiGateway.get('/budgets/future', [budget]);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
@@ -157,7 +159,7 @@ describe('futureBudgetsStore', () => {
           },
         ],
       });
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([budget]);
+      mockApiGateway.get('/budgets/future', [budget]);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();
@@ -234,13 +236,12 @@ describe('futureBudgetsStore', () => {
         name: 'Salary',
         amounts: [{ id: 1, amount: 500000, budget_id: 1 }],
       };
-      vi.mocked(futureBudgetsApi.massUpdate).mockResolvedValue({ success: true });
 
       const store = useFutureBudgetsStore();
       await store.massUpdate(payload);
 
-      expect(futureBudgetsApi.massUpdate).toHaveBeenCalledWith(payload);
-      expect(futureBudgetsApi.getFutureBudgets).toHaveBeenCalled();
+      expect(apiGateway.post).toHaveBeenCalledWith('/budgets/mass_update', payload);
+      expect(apiGateway.get).toHaveBeenCalledWith('/budgets/future');
     });
 
     it('updates store.budgets with refreshed data after mass update', async () => {
@@ -249,8 +250,7 @@ describe('futureBudgetsStore', () => {
           { id: 1, name: 'Updated Salary', amount: 600000, budget_id: 1, bank_account_id: 1 },
         ],
       });
-      vi.mocked(futureBudgetsApi.massUpdate).mockResolvedValue({ success: true });
-      vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([updatedBudget]);
+      mockApiGateway.get('/budgets/future', [updatedBudget]);
 
       const store = useFutureBudgetsStore();
       await store.massUpdate({ type: 'income', name: 'Updated Salary', amounts: [] });
@@ -259,7 +259,7 @@ describe('futureBudgetsStore', () => {
     });
 
     it('sets error and re-throws on failure', async () => {
-      vi.mocked(futureBudgetsApi.massUpdate).mockRejectedValue(new Error('Save failed'));
+      mockApiGateway.rejectPost('/budgets/mass_update', new Error('Save failed'));
 
       const store = useFutureBudgetsStore();
       await expect(
@@ -270,7 +270,7 @@ describe('futureBudgetsStore', () => {
     });
 
     it('resets loading to false on failure', async () => {
-      vi.mocked(futureBudgetsApi.massUpdate).mockRejectedValue(new Error('fail'));
+      mockApiGateway.rejectPost('/budgets/mass_update', new Error('fail'));
 
       const store = useFutureBudgetsStore();
       await store.massUpdate({ type: 'income', name: 'Salary', amounts: [] }).catch(() => {});

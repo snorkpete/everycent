@@ -15,10 +15,12 @@ const rule = {
   create(context) {
     const filename = context.filename;
 
-    // Allow api modules (canonical owners) and spec files (mock freely).
-    // Use case-insensitive check — api modules use camelCase (e.g. bankAccountApi.ts).
-    if (/[Aa]pi\.ts$/.test(filename)) return {};
+    // Allow api modules (canonical owners), spec files (mock freely), and
+    // Cypress E2E tests (which sometimes hit the real API for seed setup).
+    if (filename.endsWith('api.ts')) return {};
+    if (filename.endsWith('Api.ts')) return {};
     if (filename.endsWith('.spec.ts')) return {};
+    if (filename.endsWith('.cy.ts')) return {};
 
     const methods = new Set(['get', 'post', 'put', 'delete', 'patch']);
 

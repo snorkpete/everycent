@@ -4,8 +4,8 @@ import { setActivePinia, createPinia } from 'pinia';
 import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import FutureBudgetsPage from './FutureBudgetsPage.vue';
-import { futureBudgetsApi } from './futureBudgetsApi';
-import { allocationCategoryApi } from '../../allocation-categories/allocationCategoryApi';
+import apiGateway from '../../../api/api-gateway';
+import { buildApiGatewayMock } from '../../../test/buildApiGatewayMock';
 import { useSettingsStore } from '../../settings/settingsStore';
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
@@ -33,18 +33,17 @@ vi.mock('../../notifications/useNotifications', () => ({
   }),
 }));
 
-vi.mock('./futureBudgetsApi', () => ({
-  futureBudgetsApi: {
-    getFutureBudgets: vi.fn(),
-    massUpdate: vi.fn(),
+vi.mock('../../../api/api-gateway', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
-vi.mock('../../allocation-categories/allocationCategoryApi', () => ({
-  allocationCategoryApi: {
-    getAll: vi.fn(),
-  },
-}));
+const mockApiGateway = buildApiGatewayMock();
 
 const fixedCategory: AllocationCategoryData = buildAllocationCategory({ id: 3, name: 'Fixed' });
 
@@ -102,9 +101,10 @@ function setupDefaultApiMocks(
   categories: AllocationCategoryData[] = [fixedCategory],
   settings: SettingsData = defaultSettings,
 ) {
-  vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue(budgets);
-  vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(categories);
-  vi.mocked(futureBudgetsApi.massUpdate).mockResolvedValue({ success: true });
+  mockApiGateway.reset();
+  mockApiGateway.get('/budgets/future', budgets);
+  mockApiGateway.get('/allocation_categories', categories);
+  mockApiGateway.post('/budgets/mass_update', { success: true });
   const settingsStore = useSettingsStore();
   settingsStore.settings = settings;
 }
@@ -140,8 +140,8 @@ describe('FutureBudgetsPage', () => {
       createWrapper();
       await flushPromises();
 
-      expect(futureBudgetsApi.getFutureBudgets).toHaveBeenCalled();
-      expect(allocationCategoryApi.getAll).toHaveBeenCalled();
+      expect(apiGateway.get).toHaveBeenCalledWith('/budgets/future');
+      expect(apiGateway.get).toHaveBeenCalledWith('/allocation_categories');
     });
   });
 
@@ -641,11 +641,11 @@ describe('FutureBudgetsPage', () => {
       const wrapper = createWrapper();
       await flushPromises();
 
+      vi.mocked(apiGateway.get).mockClear();
       await wrapper.find('[data-testid="refresh-btn"]').trigger('click');
       await flushPromises();
 
-      // once on mount, once on refresh
-      expect(futureBudgetsApi.getFutureBudgets).toHaveBeenCalledTimes(2);
+      expect(apiGateway.get).toHaveBeenCalledWith('/budgets/future');
     });
   });
 
@@ -656,7 +656,7 @@ describe('FutureBudgetsPage', () => {
       amounts: [{ id: 10, amount: 500000, budget_id: 1 }],
     };
 
-    it('calls futureBudgetsApi.massUpdate with the payload', async () => {
+    it('calls the mass update endpoint with the payload', async () => {
       const wrapper = createWrapper();
       await flushPromises();
       await wrapper.find('[data-testid="edit-income-Salary"]').trigger('click');
@@ -665,7 +665,7 @@ describe('FutureBudgetsPage', () => {
       await dialog.vm.$emit('save', payload);
       await flushPromises();
 
-      expect(futureBudgetsApi.massUpdate).toHaveBeenCalledWith(payload);
+      expect(apiGateway.post).toHaveBeenCalledWith('/budgets/mass_update', payload);
     });
 
     it('closes the dialog and shows success toast after successful save', async () => {
@@ -682,7 +682,7 @@ describe('FutureBudgetsPage', () => {
     });
 
     it('keeps dialog open and shows error toast when save fails', async () => {
-      vi.mocked(futureBudgetsApi.massUpdate).mockRejectedValue(new Error('Server error'));
+      mockApiGateway.rejectPost('/budgets/mass_update', new Error('Server error'));
 
       const wrapper = createWrapper();
       await flushPromises();

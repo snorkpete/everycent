@@ -1,7 +1,11 @@
 /**
  * Tests for no-api-gateway-outside-api-modules ESLint rule.
+ *
+ * Run with: npm run test:eslint-rules
+ *
  * Uses node:test instead of vitest — ESLint's RuleTester calls describe/it
- * internally, which conflicts with vitest's suite tracking.
+ * internally, which conflicts with vitest's suite tracking. See
+ * tools/eslint-rules/README.md for the full rationale.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -44,6 +48,25 @@ describe('no-api-gateway-outside-api-modules', () => {
           {
             filename: '/src/app/bank-accounts/bankAccountApi.spec.ts',
             code: `apiGateway.get('/bank_accounts')`,
+          },
+          {
+            // Store specs mock apiGateway directly per the boundary mocking convention
+            filename: '/src/app/bank-accounts/bankAccountStore.spec.ts',
+            code: `apiGateway.get('/bank_accounts')`,
+          },
+        ],
+        invalid: [],
+      });
+    });
+  });
+
+  it('allows apiGateway calls inside Cypress .cy.ts files', () => {
+    assert.doesNotThrow(() => {
+      tester.run('no-api-gateway-outside-api-modules', rule, {
+        valid: [
+          {
+            filename: '/cypress/e2e/login.cy.ts',
+            code: `apiGateway.post('/auth/sign_in', credentials)`,
           },
         ],
         invalid: [],

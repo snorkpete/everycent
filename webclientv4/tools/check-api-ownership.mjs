@@ -15,6 +15,12 @@ const scriptDir = fileURLToPath(new URL('.', import.meta.url));
 const srcDir = join(scriptDir, '..', 'src');
 
 // Match: apiGateway.(get|post|put|delete|patch)<optional generic>('url' or `/url`)
+//
+// Assumes the URL literal sits on the same logical line as the apiGateway call,
+// after optional whitespace and an optional generic. If anyone ever formats a
+// call across multiple lines (e.g. with a multi-line generic argument), the
+// regex will miss it and this script will silently under-report. Switch to a
+// real AST parse if that becomes a problem.
 const endpointRegex =
   /apiGateway\.(get|post|put|delete|patch)\s*(?:<[^>]*>)?\s*\(\s*[`'"]([^`'"]+)[`'"]/g;
 
@@ -34,7 +40,10 @@ function collectApiFiles(dir) {
     const stat = statSync(full);
     if (stat.isDirectory()) {
       results.push(...collectApiFiles(full));
-    } else if (/[Aa]pi\.ts$/.test(entry) && !entry.endsWith('.spec.ts')) {
+    } else if (
+      (entry.endsWith('api.ts') || entry.endsWith('Api.ts')) &&
+      !entry.endsWith('.spec.ts')
+    ) {
       results.push(full);
     }
   }

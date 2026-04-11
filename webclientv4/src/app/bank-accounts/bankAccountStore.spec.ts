@@ -1,33 +1,34 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useBankAccountStore } from './bankAccountStore';
-import { bankAccountApi } from './bankAccountApi';
-import { institutionApi } from '../institutions/institutionApi';
+import apiGateway from '../../api/api-gateway';
+import { buildApiGatewayMock } from '../../test/buildApiGatewayMock';
 
-vi.mock('./bankAccountApi', () => ({
-  bankAccountApi: {
-    getAll: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
+vi.mock('../../api/api-gateway', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
-vi.mock('../institutions/institutionApi', () => ({
-  institutionApi: {
-    getAll: vi.fn(),
-  },
-}));
+const mockApiGateway = buildApiGatewayMock();
 
 describe('bankAccountStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
+    mockApiGateway.reset();
+    mockApiGateway.get('/bank_accounts', []);
+    mockApiGateway.get('/institutions', []);
   });
 
   describe('fetchAll', () => {
     it('fetches and stores bank accounts', async () => {
       const accounts = [{ id: 1, name: 'Savings' }];
-      vi.mocked(bankAccountApi.getAll).mockResolvedValue(accounts);
+      mockApiGateway.get('/bank_accounts', accounts);
 
       const store = useBankAccountStore();
       await store.fetchAll();
@@ -37,9 +38,9 @@ describe('bankAccountStore', () => {
 
     it('sets loading to true during fetch and false after', async () => {
       let loadingDuringCall = false;
-      vi.mocked(bankAccountApi.getAll).mockImplementation(async () => {
+      vi.mocked(apiGateway.get).mockImplementationOnce(async () => {
         loadingDuringCall = useBankAccountStore().loading;
-        return [];
+        return { data: [] };
       });
 
       const store = useBankAccountStore();
@@ -50,7 +51,7 @@ describe('bankAccountStore', () => {
     });
 
     it('sets error message on failure', async () => {
-      vi.mocked(bankAccountApi.getAll).mockRejectedValue(new Error('Network error'));
+      mockApiGateway.rejectGet('/bank_accounts', new Error('Network error'));
 
       const store = useBankAccountStore();
       await store.fetchAll();
@@ -60,11 +61,12 @@ describe('bankAccountStore', () => {
     });
 
     it('clears error on subsequent successful fetch', async () => {
-      vi.mocked(bankAccountApi.getAll).mockRejectedValueOnce(new Error('fail'));
-      vi.mocked(bankAccountApi.getAll).mockResolvedValueOnce([]);
+      mockApiGateway.rejectGet('/bank_accounts', new Error('fail'));
 
       const store = useBankAccountStore();
       await store.fetchAll();
+
+      mockApiGateway.get('/bank_accounts', []);
       await store.fetchAll();
 
       expect(store.error).toBeNull();
@@ -74,7 +76,7 @@ describe('bankAccountStore', () => {
   describe('fetchInstitutions', () => {
     it('fetches and stores institutions', async () => {
       const institutions = [{ id: 1, name: 'First Bank' }];
-      vi.mocked(institutionApi.getAll).mockResolvedValue(institutions);
+      mockApiGateway.get('/institutions', institutions);
 
       const store = useBankAccountStore();
       await store.fetchInstitutions();
@@ -83,8 +85,6 @@ describe('bankAccountStore', () => {
     });
 
     it('manages loading state', async () => {
-      vi.mocked(institutionApi.getAll).mockResolvedValue([]);
-
       const store = useBankAccountStore();
       const promise = store.fetchInstitutions();
       expect(store.loading).toBe(true);
@@ -94,7 +94,7 @@ describe('bankAccountStore', () => {
     });
 
     it('resets loading on failure', async () => {
-      vi.mocked(institutionApi.getAll).mockRejectedValue(new Error('Timeout'));
+      mockApiGateway.rejectGet('/institutions', new Error('Timeout'));
 
       const store = useBankAccountStore();
       await store.fetchInstitutions();
@@ -104,7 +104,7 @@ describe('bankAccountStore', () => {
     });
 
     it('sets error message on failure', async () => {
-      vi.mocked(institutionApi.getAll).mockRejectedValue(new Error('Timeout'));
+      mockApiGateway.rejectGet('/institutions', new Error('Timeout'));
 
       const store = useBankAccountStore();
       await store.fetchInstitutions();
@@ -116,30 +116,28 @@ describe('bankAccountStore', () => {
   describe('save', () => {
     it('creates a new account when no id is present', async () => {
       const newAccount = { name: 'New Savings' };
-      vi.mocked(bankAccountApi.create).mockResolvedValue({ id: 1, ...newAccount });
-      vi.mocked(bankAccountApi.getAll).mockResolvedValue([]);
+      mockApiGateway.post('/bank_accounts', { id: 1, ...newAccount });
 
       const store = useBankAccountStore();
       await store.save(newAccount);
 
-      expect(bankAccountApi.create).toHaveBeenCalledWith(newAccount);
-      expect(bankAccountApi.update).not.toHaveBeenCalled();
+      expect(apiGateway.post).toHaveBeenCalledWith('/bank_accounts', newAccount);
+      expect(apiGateway.put).not.toHaveBeenCalled();
     });
 
     it('updates an existing account when id is present', async () => {
       const account = { id: 5, name: 'Updated Account' };
-      vi.mocked(bankAccountApi.update).mockResolvedValue(account);
-      vi.mocked(bankAccountApi.getAll).mockResolvedValue([]);
+      mockApiGateway.put('/bank_accounts/5', account);
 
       const store = useBankAccountStore();
       await store.save(account);
 
-      expect(bankAccountApi.update).toHaveBeenCalledWith(account);
-      expect(bankAccountApi.create).not.toHaveBeenCalled();
+      expect(apiGateway.put).toHaveBeenCalledWith('/bank_accounts/5', account);
+      expect(apiGateway.post).not.toHaveBeenCalled();
     });
 
     it('sets error message and re-throws on save failure', async () => {
-      vi.mocked(bankAccountApi.update).mockRejectedValue(new Error('Server error'));
+      mockApiGateway.rejectPut('/bank_accounts/5', new Error('Server error'));
 
       const store = useBankAccountStore();
       await expect(store.save({ id: 5, name: 'Account' })).rejects.toThrow('Server error');
@@ -149,11 +147,10 @@ describe('bankAccountStore', () => {
 
     it('sets loading to true during save and false after', async () => {
       let loadingDuringSave = false;
-      vi.mocked(bankAccountApi.update).mockImplementation(async () => {
+      vi.mocked(apiGateway.put).mockImplementationOnce(async () => {
         loadingDuringSave = useBankAccountStore().loading;
-        return { id: 5 };
+        return { data: { id: 5 } };
       });
-      vi.mocked(bankAccountApi.getAll).mockResolvedValue([]);
 
       const store = useBankAccountStore();
       await store.save({ id: 5, name: 'Account' });
@@ -163,7 +160,7 @@ describe('bankAccountStore', () => {
     });
 
     it('resets loading to false on save failure', async () => {
-      vi.mocked(bankAccountApi.update).mockRejectedValue(new Error('fail'));
+      mockApiGateway.rejectPut('/bank_accounts/5', new Error('fail'));
 
       const store = useBankAccountStore();
       await store.save({ id: 5, name: 'Account' }).catch(() => {});
@@ -173,8 +170,8 @@ describe('bankAccountStore', () => {
 
     it('refreshes bank accounts after save', async () => {
       const refreshed = [{ id: 5, name: 'Updated Account' }];
-      vi.mocked(bankAccountApi.update).mockResolvedValue(refreshed[0]);
-      vi.mocked(bankAccountApi.getAll).mockResolvedValue(refreshed);
+      mockApiGateway.put('/bank_accounts/5', refreshed[0]);
+      mockApiGateway.get('/bank_accounts', refreshed);
 
       const store = useBankAccountStore();
       await store.save({ id: 5, name: 'Updated Account' });

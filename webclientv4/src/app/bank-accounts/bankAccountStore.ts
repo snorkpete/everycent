@@ -2,7 +2,8 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { bankAccountApi } from './bankAccountApi';
 import { institutionApi } from '../institutions/institutionApi';
-import type { BankAccountData, InstitutionData } from './bankAccount.types';
+import type { BankAccountData } from './bankAccount.types';
+import type { InstitutionData } from '../institutions/institution.types';
 
 export const useBankAccountStore = defineStore('bankAccounts', () => {
   const bankAccounts = ref<BankAccountData[]>([]);
