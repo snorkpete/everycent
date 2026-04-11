@@ -1,7 +1,7 @@
 # Task: Implement Google OAuth sign-in for Everycent
 
 **ID:** implement-google-oauth-sign-in-for-everycent
-**Status:** ready
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-09
