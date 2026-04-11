@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { futureBudgetsApi } from './futureBudgetsApi';
+import { allocationCategoryApi } from '../../allocation-categories/allocationCategoryApi';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 
@@ -63,7 +64,7 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
     try {
       const [fetchedBudgets, fetchedCategories] = await Promise.all([
         futureBudgetsApi.getFutureBudgets(),
-        futureBudgetsApi.getAllocationCategories(),
+        allocationCategoryApi.getAll(),
       ]);
       budgets.value = fetchedBudgets;
       allocationCategories.value = fetchedCategories;

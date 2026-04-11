@@ -5,14 +5,20 @@ import PrimeVue from 'primevue/config';
 import BankAccountsPage from './BankAccountsPage.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { bankAccountApi } from './bankAccountApi';
+import { institutionApi } from '../institutions/institutionApi';
 import { buildBankAccount } from '../../test/factories';
 
 vi.mock('./bankAccountApi', () => ({
   bankAccountApi: {
     getAll: vi.fn(),
-    getInstitutions: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+  },
+}));
+
+vi.mock('../institutions/institutionApi', () => ({
+  institutionApi: {
+    getAll: vi.fn(),
   },
 }));
 
@@ -53,7 +59,7 @@ describe('BankAccountsPage', () => {
     setActivePinia(pinia);
     vi.clearAllMocks();
     vi.mocked(bankAccountApi.getAll).mockResolvedValue([openAccount, closedAccount]);
-    vi.mocked(bankAccountApi.getInstitutions).mockResolvedValue([]);
+    vi.mocked(institutionApi.getAll).mockResolvedValue([]);
     vi.mocked(bankAccountApi.create).mockResolvedValue(openAccount);
     vi.mocked(bankAccountApi.update).mockResolvedValue(openAccount);
   });
@@ -78,7 +84,7 @@ describe('BankAccountsPage', () => {
       createWrapper(pinia);
       await flushPromises();
 
-      expect(bankAccountApi.getInstitutions).toHaveBeenCalled();
+      expect(institutionApi.getAll).toHaveBeenCalled();
     });
   });
 
@@ -212,7 +218,7 @@ describe('BankAccountsPage', () => {
       await flushPromises();
 
       expect(bankAccountApi.getAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
-      expect(bankAccountApi.getInstitutions).toHaveBeenCalledTimes(2);
+      expect(institutionApi.getAll).toHaveBeenCalledTimes(2);
     });
   });
 

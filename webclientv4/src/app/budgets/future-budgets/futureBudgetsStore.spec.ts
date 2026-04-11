@@ -2,13 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useFutureBudgetsStore } from './futureBudgetsStore';
 import { futureBudgetsApi } from './futureBudgetsApi';
+import { allocationCategoryApi } from '../../allocation-categories/allocationCategoryApi';
 import { buildFutureBudget } from '../../../test/factories';
 
 vi.mock('./futureBudgetsApi', () => ({
   futureBudgetsApi: {
     getFutureBudgets: vi.fn(),
-    getAllocationCategories: vi.fn(),
     massUpdate: vi.fn(),
+  },
+}));
+
+vi.mock('../../allocation-categories/allocationCategoryApi', () => ({
+  allocationCategoryApi: {
+    getAll: vi.fn(),
   },
 }));
 
@@ -17,7 +23,7 @@ describe('futureBudgetsStore', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue([]);
-    vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue([]);
+    vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
   });
 
   describe('fetchAll', () => {
@@ -25,7 +31,7 @@ describe('futureBudgetsStore', () => {
       const budgets = [buildFutureBudget()];
       const categories = [{ id: 1, name: 'Fixed' }];
       vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue(budgets);
-      vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue(categories);
+      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(categories);
 
       const store = useFutureBudgetsStore();
       await store.fetchAll();

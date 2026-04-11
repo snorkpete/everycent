@@ -29,7 +29,6 @@ vi.mock('../settings/settingsStore', () => ({
 vi.mock('../bank-accounts/bankAccountApi', () => ({
   bankAccountApi: {
     getAll: vi.fn(),
-    getInstitutions: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
     getOpen: vi.fn(),

@@ -37,25 +37,6 @@ describe('bankAccountApi', () => {
     });
   });
 
-  describe('getInstitutions', () => {
-    it('gets /institutions', async () => {
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: [] });
-
-      await bankAccountApi.getInstitutions();
-
-      expect(apiGateway.get).toHaveBeenCalledWith('/institutions');
-    });
-
-    it('returns the response data', async () => {
-      const institutions = [{ id: 1, name: 'First Bank' }];
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: institutions });
-
-      const result = await bankAccountApi.getInstitutions();
-
-      expect(result).toEqual(institutions);
-    });
-  });
-
   describe('create', () => {
     it('posts to /bank_accounts with account data', async () => {
       const account = { name: 'New Account', account_type: 'normal' };

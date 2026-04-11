@@ -5,6 +5,7 @@ import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import FutureBudgetsPage from './FutureBudgetsPage.vue';
 import { futureBudgetsApi } from './futureBudgetsApi';
+import { allocationCategoryApi } from '../../allocation-categories/allocationCategoryApi';
 import { useSettingsStore } from '../../settings/settingsStore';
 import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types';
 import type { AllocationCategoryData } from '../../allocation-categories/allocationCategory.types';
@@ -35,8 +36,13 @@ vi.mock('../../notifications/useNotifications', () => ({
 vi.mock('./futureBudgetsApi', () => ({
   futureBudgetsApi: {
     getFutureBudgets: vi.fn(),
-    getAllocationCategories: vi.fn(),
     massUpdate: vi.fn(),
+  },
+}));
+
+vi.mock('../../allocation-categories/allocationCategoryApi', () => ({
+  allocationCategoryApi: {
+    getAll: vi.fn(),
   },
 }));
 
@@ -97,7 +103,7 @@ function setupDefaultApiMocks(
   settings: SettingsData = defaultSettings,
 ) {
   vi.mocked(futureBudgetsApi.getFutureBudgets).mockResolvedValue(budgets);
-  vi.mocked(futureBudgetsApi.getAllocationCategories).mockResolvedValue(categories);
+  vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(categories);
   vi.mocked(futureBudgetsApi.massUpdate).mockResolvedValue({ success: true });
   const settingsStore = useSettingsStore();
   settingsStore.settings = settings;
@@ -135,7 +141,7 @@ describe('FutureBudgetsPage', () => {
       await flushPromises();
 
       expect(futureBudgetsApi.getFutureBudgets).toHaveBeenCalled();
-      expect(futureBudgetsApi.getAllocationCategories).toHaveBeenCalled();
+      expect(allocationCategoryApi.getAll).toHaveBeenCalled();
     });
   });
 

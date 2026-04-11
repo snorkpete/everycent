@@ -2,13 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useBankAccountStore } from './bankAccountStore';
 import { bankAccountApi } from './bankAccountApi';
+import { institutionApi } from '../institutions/institutionApi';
 
 vi.mock('./bankAccountApi', () => ({
   bankAccountApi: {
     getAll: vi.fn(),
-    getInstitutions: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+  },
+}));
+
+vi.mock('../institutions/institutionApi', () => ({
+  institutionApi: {
+    getAll: vi.fn(),
   },
 }));
 
@@ -68,7 +74,7 @@ describe('bankAccountStore', () => {
   describe('fetchInstitutions', () => {
     it('fetches and stores institutions', async () => {
       const institutions = [{ id: 1, name: 'First Bank' }];
-      vi.mocked(bankAccountApi.getInstitutions).mockResolvedValue(institutions);
+      vi.mocked(institutionApi.getAll).mockResolvedValue(institutions);
 
       const store = useBankAccountStore();
       await store.fetchInstitutions();
@@ -77,7 +83,7 @@ describe('bankAccountStore', () => {
     });
 
     it('manages loading state', async () => {
-      vi.mocked(bankAccountApi.getInstitutions).mockResolvedValue([]);
+      vi.mocked(institutionApi.getAll).mockResolvedValue([]);
 
       const store = useBankAccountStore();
       const promise = store.fetchInstitutions();
@@ -88,7 +94,7 @@ describe('bankAccountStore', () => {
     });
 
     it('resets loading on failure', async () => {
-      vi.mocked(bankAccountApi.getInstitutions).mockRejectedValue(new Error('Timeout'));
+      vi.mocked(institutionApi.getAll).mockRejectedValue(new Error('Timeout'));
 
       const store = useBankAccountStore();
       await store.fetchInstitutions();
@@ -98,7 +104,7 @@ describe('bankAccountStore', () => {
     });
 
     it('sets error message on failure', async () => {
-      vi.mocked(bankAccountApi.getInstitutions).mockRejectedValue(new Error('Timeout'));
+      vi.mocked(institutionApi.getAll).mockRejectedValue(new Error('Timeout'));
 
       const store = useBankAccountStore();
       await store.fetchInstitutions();

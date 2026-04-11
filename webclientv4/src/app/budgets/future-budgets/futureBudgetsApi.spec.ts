@@ -27,18 +27,6 @@ describe('futureBudgetsApi', () => {
     });
   });
 
-  describe('getAllocationCategories', () => {
-    it('calls GET /allocation_categories and returns data', async () => {
-      const categories = [{ id: 1, name: 'Fixed' }];
-      vi.mocked(apiGateway.get).mockResolvedValue({ data: categories });
-
-      const result = await futureBudgetsApi.getAllocationCategories();
-
-      expect(apiGateway.get).toHaveBeenCalledWith('/allocation_categories');
-      expect(result).toEqual(categories);
-    });
-  });
-
   describe('massUpdate', () => {
     it('calls POST /budgets/mass_update with payload and returns data', async () => {
       const payload: MassUpdatePayload = {
