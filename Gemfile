@@ -46,6 +46,9 @@ gem 'rack-cors', :require => 'rack/cors'
 
 gem 'acts_as_tenant'
 
+# Google OAuth ID token verification
+gem 'googleauth'
+
 #for heroku
 group :production do
   gem 'rails_12factor'
@@ -53,6 +56,9 @@ group :production do
 end
 
 group :development, :test do
+  # Load .env for local development
+  gem 'dotenv-rails'
+
   gem 'spring'
   gem 'spring-commands-rspec'
   #gem 'spring-watcher-listen'

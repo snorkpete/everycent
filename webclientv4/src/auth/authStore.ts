@@ -24,6 +24,22 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function logInWithGoogle(credential: string) {
+    error.value = null;
+    try {
+      await authApi.googleSignIn(credential);
+      loggedIn.value = true;
+    } catch (e: unknown) {
+      loggedIn.value = false;
+      if (axios.isAxiosError(e)) {
+        error.value = e.response?.data?.errors?.[0] ?? 'Google sign-in failed';
+      } else {
+        error.value = 'Google sign-in failed';
+      }
+      throw e;
+    }
+  }
+
   function logOut() {
     clearTokens();
     loggedIn.value = false;
@@ -47,5 +63,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { loggedIn, error, logIn, logOut, checkSession };
+  return { loggedIn, error, logIn, logInWithGoogle, logOut, checkSession };
 });

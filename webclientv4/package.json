@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/google.accounts": "^0.0.18",
     "@types/node": "^24.10.1",
     "@types/pg": "^8.11.10",
     "@vitejs/plugin-vue": "^6.0.1",

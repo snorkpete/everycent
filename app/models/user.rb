@@ -52,7 +52,7 @@ class User < ApplicationRecord
 
   protected
   def generate_uid
-    self.provider = 'email'
-    self.uid = self.email if self.uid == ""
+    self.provider = 'email' if provider.blank?
+    self.uid = self.email if uid.blank?
   end
 end

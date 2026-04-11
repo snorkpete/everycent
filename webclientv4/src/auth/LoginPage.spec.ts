@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
+import type { VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import type { Pinia } from 'pinia';
 import LoginPage from './LoginPage.vue';
@@ -10,11 +11,14 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock('./authApi', () => ({
-  authApi: {
-    signIn: vi.fn(),
-    validateToken: vi.fn(),
-    signOut: vi.fn(),
+// Mock at the gateway layer, not authApi — this keeps the real authApi and
+// authStore in the path so we get integration coverage of the code the user
+// actually runs.
+vi.mock('../api/api-gateway', () => ({
+  default: {
+    post: vi.fn(),
+    get: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
@@ -44,9 +48,10 @@ describe('LoginPage', () => {
     setActivePinia(pinia);
     mockPush.mockReset();
     vi.restoreAllMocks();
+    delete (window as Window & { google?: unknown }).google;
   });
 
-  function mountLoginPage() {
+  function createWrapper(): VueWrapper {
     return mount(LoginPage, {
       global: {
         plugins: [pinia],
@@ -55,10 +60,18 @@ describe('LoginPage', () => {
     });
   }
 
-  it('renders the login form', () => {
-    const wrapper = mountLoginPage();
-
+  it('renders the login heading', () => {
+    const wrapper = createWrapper();
     expect(wrapper.find('[data-testid="login-heading"]').text()).toBe('EveryCent - Log In');
+  });
+
+  it('renders the Google button container', () => {
+    const wrapper = createWrapper();
+    expect(wrapper.find('[data-testid="google-button-container"]').exists()).toBe(true);
+  });
+
+  it('renders the password form in dev mode', () => {
+    const wrapper = createWrapper();
     expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="email-input"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="password-input"]').exists()).toBe(true);
@@ -66,84 +79,185 @@ describe('LoginPage', () => {
   });
 
   it('does not show error when store has no error', () => {
-    const wrapper = mountLoginPage();
+    const wrapper = createWrapper();
     expect(wrapper.find('[data-testid="error-message"]').exists()).toBe(false);
   });
 
   it('shows error when store has an error', () => {
     const store = useAuthStore();
-    const errorText = 'Invalid credentials';
-    store.error = errorText;
+    store.error = 'Invalid credentials';
 
-    const wrapper = mountLoginPage();
+    const wrapper = createWrapper();
 
     const errorEl = wrapper.find('[data-testid="error-message"]');
     expect(errorEl.exists()).toBe(true);
-    expect(errorEl.text()).toBe(errorText);
+    expect(errorEl.text()).toBe('Invalid credentials');
   });
 
-  it('calls authStore.logIn and navigates to / on success', async () => {
-    const { authApi } = await import('./authApi');
-    vi.mocked(authApi.signIn).mockResolvedValue({} as Awaited<ReturnType<typeof authApi.signIn>>);
+  describe('password form sign-in', () => {
+    it('calls authStore.logIn and navigates to / on success', async () => {
+      const email = 'user@test.com';
+      const password = 'password123';
+      const apiGateway = (await import('../api/api-gateway')).default;
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
 
-    const email = 'user@test.com';
-    const password = 'password123';
+      const wrapper = createWrapper();
+      await wrapper.find('[data-testid="email-input"]').setValue(email);
+      await wrapper.find('[data-testid="password-input"]').setValue(password);
+      await wrapper.find('[data-testid="login-form"]').trigger('submit');
+      await flushPromises();
 
-    const wrapper = mountLoginPage();
-    await wrapper.find('[data-testid="email-input"]').setValue(email);
-    await wrapper.find('[data-testid="password-input"]').setValue(password);
-
-    await wrapper.find('[data-testid="login-form"]').trigger('submit');
-    await flushPromises();
-
-    expect(authApi.signIn).toHaveBeenCalledWith(email, password);
-    expect(mockPush).toHaveBeenCalledWith('/');
-  });
-
-  it('does not navigate on failed login', async () => {
-    const { authApi } = await import('./authApi');
-    vi.mocked(authApi.signIn).mockRejectedValue({
-      isAxiosError: true,
-      response: { data: { errors: ['Bad credentials'] } },
+      expect(apiGateway.post).toHaveBeenCalledWith('/auth/sign_in', { email, password });
+      expect(mockPush).toHaveBeenCalledWith('/');
     });
 
-    const wrapper = mountLoginPage();
-    await wrapper.find('[data-testid="email-input"]').setValue('user@test.com');
-    await wrapper.find('[data-testid="password-input"]').setValue('wrong');
+    it('does not navigate on failed login', async () => {
+      const email = 'user@test.com';
+      const password = 'wrong';
+      const apiGateway = (await import('../api/api-gateway')).default;
+      vi.mocked(apiGateway.post).mockRejectedValue({
+        isAxiosError: true,
+        response: { data: { errors: ['Bad credentials'] } },
+      });
 
-    await wrapper.find('[data-testid="login-form"]').trigger('submit');
-    await flushPromises();
+      const wrapper = createWrapper();
+      await wrapper.find('[data-testid="email-input"]').setValue(email);
+      await wrapper.find('[data-testid="password-input"]').setValue(password);
+      await wrapper.find('[data-testid="login-form"]').trigger('submit');
+      await flushPromises();
 
-    expect(mockPush).not.toHaveBeenCalled();
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    it('shows loading state during login and clears it after', async () => {
+      const apiGateway = (await import('../api/api-gateway')).default;
+      let resolveSignIn!: (value: { data: Record<string, unknown> }) => void;
+      vi.mocked(apiGateway.post).mockImplementation(
+        () => new Promise((resolve) => (resolveSignIn = resolve)),
+      );
+
+      const wrapper = createWrapper();
+      await wrapper.find('[data-testid="login-form"]').trigger('submit');
+      await flushPromises();
+
+      expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('true');
+
+      resolveSignIn({ data: {} });
+      await flushPromises();
+
+      expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
+    });
+
+    it('clears loading state on failed login', async () => {
+      const apiGateway = (await import('../api/api-gateway')).default;
+      vi.mocked(apiGateway.post).mockRejectedValue(new Error('fail'));
+
+      const wrapper = createWrapper();
+      await wrapper.find('[data-testid="login-form"]').trigger('submit');
+      await flushPromises();
+
+      expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
+    });
   });
 
-  it('shows loading state during login and clears it after', async () => {
-    const { authApi } = await import('./authApi');
-    let resolveSignIn!: (value: Awaited<ReturnType<typeof authApi.signIn>>) => void;
-    vi.mocked(authApi.signIn).mockImplementation(
-      () => new Promise((resolve) => (resolveSignIn = resolve)),
-    );
+  describe('Google sign-in', () => {
+    it('does not call google.accounts.id when window.google is not available', async () => {
+      const initializeSpy = vi.fn();
+      const renderButtonSpy = vi.fn();
 
-    const wrapper = mountLoginPage();
-    await wrapper.find('[data-testid="login-form"]').trigger('submit');
-    await flushPromises();
+      // google is not on window — guard should prevent calls
+      createWrapper();
+      await flushPromises();
 
-    expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('true');
+      expect(initializeSpy).not.toHaveBeenCalled();
+      expect(renderButtonSpy).not.toHaveBeenCalled();
+    });
 
-    resolveSignIn({} as Awaited<ReturnType<typeof authApi.signIn>>);
-    await flushPromises();
+    it('initializes and renders the Google button when window.google is available', async () => {
+      const initializeSpy = vi.fn();
+      const renderButtonSpy = vi.fn();
 
-    expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
-  });
+      (window as Window & { google: unknown }).google = {
+        accounts: {
+          id: {
+            initialize: initializeSpy,
+            renderButton: renderButtonSpy,
+          },
+        },
+      };
 
-  it('clears loading state on failed login', async () => {
-    const { authApi } = await import('./authApi');
-    vi.mocked(authApi.signIn).mockRejectedValue(new Error('fail'));
+      createWrapper();
+      await flushPromises();
 
-    const wrapper = mountLoginPage();
-    await wrapper.find('[data-testid="login-form"]').trigger('submit');
-    await flushPromises();
+      expect(initializeSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          client_id: expect.any(String),
+          callback: expect.any(Function),
+        }),
+      );
+      expect(renderButtonSpy).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        expect.objectContaining({ locale: 'en' }),
+      );
+    });
 
-    expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
+    it('navigates to / after successful Google credential callback', async () => {
+      const apiGateway = (await import('../api/api-gateway')).default;
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
+
+      let capturedCallback: ((response: google.accounts.id.CredentialResponse) => void) | null =
+        null;
+
+      (window as Window & { google: unknown }).google = {
+        accounts: {
+          id: {
+            initialize: (config: google.accounts.id.IdConfiguration) => {
+              capturedCallback = config.callback ?? null;
+            },
+            renderButton: vi.fn(),
+          },
+        },
+      };
+
+      createWrapper();
+      await flushPromises();
+
+      expect(capturedCallback).not.toBeNull();
+      await capturedCallback!({ credential: 'google-id-token', select_by: 'auto' });
+      await flushPromises();
+
+      expect(apiGateway.post).toHaveBeenCalledWith('/auth/google', { credential: 'google-id-token' });
+      expect(mockPush).toHaveBeenCalledWith('/');
+    });
+
+    it('does not navigate when Google credential callback fails', async () => {
+      const apiGateway = (await import('../api/api-gateway')).default;
+      vi.mocked(apiGateway.post).mockRejectedValue({
+        isAxiosError: true,
+        response: { data: { errors: ['No account found for this Google identity'] } },
+      });
+
+      let capturedCallback: ((response: google.accounts.id.CredentialResponse) => void) | null =
+        null;
+
+      (window as Window & { google: unknown }).google = {
+        accounts: {
+          id: {
+            initialize: (config: google.accounts.id.IdConfiguration) => {
+              capturedCallback = config.callback ?? null;
+            },
+            renderButton: vi.fn(),
+          },
+        },
+      };
+
+      createWrapper();
+      await flushPromises();
+
+      await capturedCallback!({ credential: 'bad-token', select_by: 'auto' });
+      await flushPromises();
+
+      expect(mockPush).not.toHaveBeenCalled();
+    });
   });
 });

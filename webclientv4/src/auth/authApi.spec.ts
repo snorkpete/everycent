@@ -30,6 +30,17 @@ describe('authApi', () => {
     });
   });
 
+  describe('googleSignIn', () => {
+    it('posts to /auth/google with the credential', async () => {
+      const credential = 'google-id-token-abc';
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
+
+      await authApi.googleSignIn(credential);
+
+      expect(apiGateway.post).toHaveBeenCalledWith('/auth/google', { credential });
+    });
+  });
+
   describe('validateToken', () => {
     it('gets /auth/validate_token', async () => {
       vi.mocked(apiGateway.get).mockResolvedValue({
