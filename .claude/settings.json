@@ -14,6 +14,6 @@
     ]
   },
   "env": {
-    "PATH": "/Users/kion/.bun/bin:/Users/kion/.local/bin:/Users/kion/.rbenv/shims:/Users/kion/.nvm/versions/node/v24.13.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Postgres.app/Contents/Versions/latest/bin:/Users/kion/.cargo/bin"
+    "PATH": "/Users/kion/code/domus/node_modules/.bin:/Users/kion/code/domus/node_modules/.bin:/Users/kion/code/node_modules/.bin:/Users/kion/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/kion/.bun/bin:/Users/kion/.local/bin:/Users/kion/.rbenv/shims:/Users/kion/.nvm/versions/node/v24.13.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Postgres.app/Contents/Versions/latest/bin:/Users/kion/.cargo/bin"
   }
 }

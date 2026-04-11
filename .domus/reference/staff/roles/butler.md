@@ -8,7 +8,6 @@ Based on the human's intent, load the appropriate role file from `.domus/referen
 
 | Human intent | Role to load |
 |-------------|-------------|
-| Exploring an idea, brainstorming, "what if..." | Oracle |
 | Refining a task, making it worker-ready | Taskmaster |
 | Store health check, data consistency | Doctor |
 | Dispatching a task, pipeline management | Foreman (thin trigger in role-activation-rules.md) |
