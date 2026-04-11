@@ -21,6 +21,7 @@ fi
 # --- Vue: lint-staged (ESLint + Prettier on staged .ts/.vue files) ---
 cd "$worktree_root/webclientv4" || { echo "pre-commit: can't cd to webclientv4"; exit 1; }
 lint-staged
+node tools/check-api-ownership.mjs || { echo "pre-commit: api ownership check failed"; exit 1; }
 
 # --- Rails: run rspec for changed Ruby files ---
 cd "$worktree_root" || { echo "pre-commit: can't cd to repo root"; exit 1; }
