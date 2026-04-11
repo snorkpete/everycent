@@ -12,6 +12,16 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: 'Sign in with Google',
+    body: "The 'Sign in with Google' button on the login page is now the preferred way to log in — your existing account is matched by email, so nothing else changes. Email and password still work as a fallback if you need them.",
+    date: '2026-04-11',
+  },
+  {
+    title: 'Assign allocations on mobile',
+    body: 'Editing a transaction on your phone now shows an allocation dropdown right in the edit row, so you can fix a miscategorised purchase without switching to your laptop.',
+    date: '2026-04-06',
+  },
+  {
     title: 'Sink Funds now works on your phone',
     body: "Open a sink fund on mobile and you'll see a card-based list instead of a crammed table. Tap a card to peek at the target, outstanding, and comment; hit Edit to rename, retarget, or deactivate obligations the same way you would on desktop.",
     date: '2026-04-05',

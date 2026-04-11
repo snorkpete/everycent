@@ -20,7 +20,7 @@ describe('WhatsNew', () => {
     const cards = wrapper.findAll('[data-testid="highlight-card"]');
     // Explicit literal so the test catches regressions in the rendering loop
     // even if the content file grows/shrinks. Update this when HIGHLIGHTS changes.
-    expect(cards).toHaveLength(3);
+    expect(cards).toHaveLength(5);
 
     HIGHLIGHTS.forEach((highlight, i) => {
       const card = cards[i];
@@ -35,9 +35,9 @@ describe('WhatsNew', () => {
   it('formats highlight dates in "D MMM YYYY" form', () => {
     const wrapper = createWrapper();
 
-    // First highlight has date 2026-04-05 → "5 Apr 2026"
+    // First highlight has date 2026-04-11 → "11 Apr 2026"
     const firstCard = wrapper.findAll('[data-testid="highlight-card"]')[0];
-    expect(firstCard.find('[data-testid="highlight-date"]').text()).toBe('5 Apr 2026');
+    expect(firstCard.find('[data-testid="highlight-date"]').text()).toBe('11 Apr 2026');
   });
 
   it('renders the "Also worth knowing" subheading', () => {
