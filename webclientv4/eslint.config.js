@@ -1,6 +1,7 @@
 import pluginVue from 'eslint-plugin-vue';
 import vueTsConfig from '@vue/eslint-config-typescript';
 import vuePrettierConfig from '@vue/eslint-config-prettier';
+import localRules from './tools/eslint-rules/index.js';
 
 export default [
   ...pluginVue.configs['flat/recommended'],
@@ -16,5 +17,9 @@ export default [
         { argsIgnorePattern: '^_', ignoreRestSiblings: true },
       ],
     },
+  },
+  {
+    plugins: { local: localRules },
+    rules: { 'local/no-api-gateway-outside-api-modules': 'error' },
   },
 ];

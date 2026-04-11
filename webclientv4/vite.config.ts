@@ -18,6 +18,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['src/test/setup.ts'],
+    // ESLint rule tests in tools/ use node:test (not vitest) — RuleTester conflicts
+    // with vitest's describe/it tracking. Exclude the tools/ directory entirely.
+    exclude: ['**/node_modules/**', 'tools/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text'],

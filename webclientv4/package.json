@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "type-check": "vue-tsc -b --noEmit",
+    "check:api-ownership": "node tools/check-api-ownership.mjs",
     "lint": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{ts,vue,css}\" \"*.{ts,js,json}\"",
     "cypress:open": "cypress open",
