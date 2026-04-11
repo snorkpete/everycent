@@ -18,7 +18,7 @@ Call `router.replace({ query: { ... } })` in `emitFetch()` when selection change
 - **matchMedia mock** — global mock in `src/test/setup.ts`, required by PrimeVue DatePicker and Select. Do not remove it.
 - **Always use npm scripts** — use `npm run dev`, `npm run build`, `npm run test`, never invoke tools directly (`npx vite`, `npx vitest`, etc.). If an npm script fails, fix the underlying problem (install deps, fix PATH) rather than bypassing the script.
 - **TypeScript** — type-check with `npm run type-check` (runs `vue-tsc -b --noEmit`, the `-b` flag is essential). If type-check reports stale errors, clear the build cache: `rm node_modules/.tmp/tsconfig.app.tsbuildinfo`.
-- **Worktree node_modules** — symlinked `node_modules` (e.g. from another worktree) break Vite asset resolution (primeicons fonts fail via `@fs` route). Always run `bun install` inside each worktree — do not symlink.
+- **Worktree node_modules** — the project uses npm. Run `npm install` inside each worktree — do not symlink from another worktree (symlinked `node_modules` break Vite asset resolution via `@fs`, e.g. primeicons fonts fail). Do not run `bun install` in this project; bun auto-migrates `package-lock.json` to its own `bun.lock`, creating lockfile drift. (A "should we migrate to bun?" discussion is in `project_next-up.md`.)
 
 ## Mobile Development Pattern
 
