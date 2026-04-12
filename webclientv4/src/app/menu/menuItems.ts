@@ -64,7 +64,7 @@ function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
 
 function buildReportsSection(navigate: (path: string) => void): AppMenuItem {
   return {
-    label: '* Reports',
+    label: 'Reports',
     key: 'reports',
     icon: Icon.REPORTING,
     items: [
@@ -75,14 +75,16 @@ function buildReportsSection(navigate: (path: string) => void): AppMenuItem {
         routePath: '/reports/net-worth',
       },
       {
-        label: '* Category Spending Report',
+        label: 'Category Spending Report',
         icon: Icon.CATEGORY_SPENDING,
-        url: '/#/reports/category-spending',
+        command: () => navigate('/reports/category-spending'),
+        routePath: '/reports/category-spending',
       },
       {
-        label: '* Needs vs Wants Report',
+        label: 'Needs vs Wants Report',
         icon: Icon.NEEDS_VS_WANTS,
-        url: '/#/reports/needs-vs-wants',
+        command: () => navigate('/reports/needs-vs-wants'),
+        routePath: '/reports/needs-vs-wants',
       },
     ],
   };

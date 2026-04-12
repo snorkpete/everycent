@@ -11,6 +11,8 @@ const router = createRouter({
     { path: '/', component: { template: '<div />' } },
     { path: '/reports', component: ReportsPage },
     { path: '/reports/net-worth', component: { template: '<div />' } },
+    { path: '/reports/category-spending', component: { template: '<div />' } },
+    { path: '/reports/needs-vs-wants', component: { template: '<div />' } },
   ],
 });
 

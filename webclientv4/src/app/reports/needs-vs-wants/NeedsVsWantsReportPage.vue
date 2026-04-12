@@ -1,9 +1,16 @@
 <template>
-  <EcPageLayout page-name="net-worth-report">
+  <EcPageLayout page-name="needs-vs-wants-report">
     <div v-if="store.loading" class="status-message">Loading...</div>
     <div v-else-if="store.error" class="status-message status-message--error">{{ store.error }}</div>
     <template v-else>
       <div class="report-controls">
+        <SelectButton
+          v-model="viewMode"
+          :options="viewOptions"
+          option-label="label"
+          option-value="value"
+          data-testid="view-toggle"
+        />
         <Select v-model="fromYear" :options="yearOptions" placeholder="From" data-testid="from-year" />
         <span class="year-separator">to</span>
         <Select v-model="toYear" :options="yearOptions" placeholder="To" data-testid="to-year" />
@@ -12,22 +19,48 @@
         <Card class="report-card">
           <template #content>
             <div class="report-table-panel">
-              <DataTable :value="filteredData" size="small" scrollable scroll-height="flex" data-testid="net-worth-table">
-                <Column field="period" header="Period">
-                  <template #body="{ data: row }">
-                    {{ formatPeriod(row.period) }}
-                  </template>
-                </Column>
-                <Column field="net_change" header="Net Change" class="col-money">
-                  <template #body="{ data: row }">
-                    <EcMoneyDisplay :model-value="row.net_change" :emphasis="Emphasis.Item" />
-                  </template>
-                </Column>
-                <Column field="net_worth" header="Net Worth" class="col-money">
-                  <template #body="{ data: row }">
-                    <EcMoneyDisplay :model-value="row.net_worth" :emphasis="Emphasis.Subtotal" :highlight-mode="HighlightMode.None" />
-                  </template>
-                </Column>
+              <DataTable
+                :value="filteredData"
+                size="small"
+                scrollable
+                scroll-height="flex"
+                data-testid="needs-vs-wants-table"
+              >
+                <template v-for="field in visibleFields" :key="field.name">
+                  <Column
+                    v-if="field.name === 'period'"
+                    field="period"
+                    header="Period"
+                  >
+                    <template #body="{ data: row }">
+                      {{ formatPeriod(row.period) }}
+                    </template>
+                  </Column>
+                  <Column
+                    v-else-if="isMoneyField(field.name)"
+                    :field="field.name"
+                    :header="field.label"
+                    class="col-money"
+                  >
+                    <template #body="{ data: row }">
+                      <EcMoneyDisplay
+                        :model-value="(row as NeedsVsWantsRow)[field.name as MoneyFieldKey]"
+                        :emphasis="Emphasis.Item"
+                        :highlight-mode="HighlightMode.None"
+                      />
+                    </template>
+                  </Column>
+                  <Column
+                    v-else
+                    :field="field.name"
+                    :header="field.label"
+                    class="col-money"
+                  >
+                    <template #body="{ data: row }">
+                      {{ (row as NeedsVsWantsRow)[field.name as PctFieldKey] }}%
+                    </template>
+                  </Column>
+                </template>
               </DataTable>
             </div>
           </template>
@@ -37,11 +70,11 @@
             <div class="report-chart-panel">
               <ApexChart
                 v-if="chartReady"
-                type="line"
+                type="bar"
                 :options="chartOptions"
                 :series="chartSeries"
                 height="100%"
-                data-testid="net-worth-chart"
+                data-testid="needs-vs-wants-chart"
               />
             </div>
           </template>
@@ -58,14 +91,28 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Card from 'primevue/card';
 import Select from 'primevue/select';
+import SelectButton from 'primevue/selectbutton';
 import EcPageLayout from '../../shared/layout/EcPageLayout.vue';
 import EcMoneyDisplay from '../../shared/form/money-field/EcMoneyDisplay.vue';
 import { Emphasis } from '../../shared/constants/emphasis';
 import { HighlightMode } from '../../shared/constants/highlightMode';
 import { useHeadingStore } from '../../toolbar/headingStore';
-import { useNetWorthStore } from './netWorthStore';
+import { useNeedsVsWantsStore } from './needsVsWantsStore';
 import { useResponsive } from '../../shared/composables/useResponsive';
-import { centsToDollars } from '../../shared/util/centsToDollars';
+import type { NeedsVsWantsRow } from './needsVsWants.types';
+
+type MoneyFieldKey = 'budgeted_needs' | 'actual_needs' | 'budgeted_wants' | 'actual_wants' | 'budgeted_savings' | 'actual_savings';
+type PctFieldKey = 'budgeted_needs_pct' | 'budgeted_wants_pct' | 'budgeted_savings_pct' | 'actual_needs_pct' | 'actual_wants_pct' | 'actual_savings_pct';
+
+const MONEY_FIELDS = new Set<string>([
+  'budgeted_needs', 'actual_needs',
+  'budgeted_wants', 'actual_wants',
+  'budgeted_savings', 'actual_savings',
+]);
+
+function isMoneyField(name: string): boolean {
+  return MONEY_FIELDS.has(name);
+}
 
 function formatPeriod(period: string): string {
   const [year, month] = period.split('-');
@@ -82,15 +129,23 @@ function getYear(period: string): number {
 }
 
 const headingStore = useHeadingStore();
-const store = useNetWorthStore();
+const store = useNeedsVsWantsStore();
 const { isMobile } = useResponsive();
 
+type ViewMode = 'budgeted' | 'actual';
+
+const viewMode = ref<ViewMode>('budgeted');
 const fromYear = ref<number | null>(null);
 const toYear = ref<number | null>(null);
 const chartReady = ref(false);
 
+const viewOptions = [
+  { label: 'Budgeted', value: 'budgeted' as ViewMode },
+  { label: 'Actual', value: 'actual' as ViewMode },
+];
+
 onMounted(async () => {
-  headingStore.setHeading('Net Worth');
+  headingStore.setHeading('Needs vs Wants');
   await store.fetch().catch(() => {});
   await nextTick();
   chartReady.value = true;
@@ -117,37 +172,45 @@ const filteredData = computed(() => {
   });
 });
 
-const chartSeries = computed(() => [
-  {
-    name: 'Net Worth',
-    data: filteredData.value.map((row) => ({
-      x: formatPeriod(row.period),
-      y: row.net_worth / 100,
-    })),
-  },
-]);
+const visibleFields = computed(() =>
+  store.fields.filter(
+    (f) => f.class === 'all' || f.class === viewMode.value,
+  ),
+);
 
-function formatYAxis(val: number): string {
-  if (val >= 1000) {
-    return `${Math.round(val / 1000)}k`;
+const periods = computed(() => filteredData.value.map((row) => row.period));
+
+const chartSeries = computed(() => {
+  if (viewMode.value === 'budgeted') {
+    return [
+      { name: 'Needs', data: filteredData.value.map((row) => row.budgeted_needs_pct) },
+      { name: 'Wants', data: filteredData.value.map((row) => row.budgeted_wants_pct) },
+      { name: 'Savings', data: filteredData.value.map((row) => row.budgeted_savings_pct) },
+    ];
   }
-  return String(Math.round(val));
-}
+  return [
+    { name: 'Needs', data: filteredData.value.map((row) => row.actual_needs_pct) },
+    { name: 'Wants', data: filteredData.value.map((row) => row.actual_wants_pct) },
+    { name: 'Savings', data: filteredData.value.map((row) => row.actual_savings_pct) },
+  ];
+});
 
 const chartOptions = computed(() => ({
   chart: {
-    id: 'net-worth-chart',
+    id: 'needs-vs-wants-chart',
     toolbar: { show: false },
     animations: { enabled: false },
+    stacked: true,
   },
-  colors: ['#6366f1'],
+  colors: ['#ef4444', '#6366f1', '#22c55e'],
   xaxis: {
     type: 'category' as const,
+    categories: periods.value.map(formatPeriod),
     labels: {
       rotate: -45,
       rotateAlways: false,
       formatter: (label: string) => {
-        const period = filteredData.value.find((row) => formatPeriod(row.period) === label)?.period;
+        const period = periods.value.find((p) => formatPeriod(p) === label);
         if (!period) return label;
         return isJanuary(period) ? label : '';
       },
@@ -155,28 +218,30 @@ const chartOptions = computed(() => ({
     axisTicks: { show: false },
   },
   yaxis: {
+    min: 0,
+    max: 100,
     labels: {
-      formatter: formatYAxis,
+      formatter: (val: number) => `${val}%`,
     },
   },
-  stroke: {
-    curve: 'smooth' as const,
-    width: 2.5,
-  },
-  markers: {
-    size: 0,
-    hover: { size: 5 },
+  dataLabels: {
+    enabled: false,
   },
   tooltip: {
     y: {
-      formatter: (val: number) => centsToDollars(val * 100),
+      formatter: (val: number) => `${val}%`,
     },
   },
   grid: {
     borderColor: 'var(--p-surface-200)',
     strokeDashArray: 3,
   },
-  legend: { show: false },
+  legend: { show: true },
+  plotOptions: {
+    bar: {
+      columnWidth: '80%',
+    },
+  },
 }));
 </script>
 

@@ -8,14 +8,14 @@
         </RouterLink>
       </li>
       <li>
-        <a href="/#/reports/category-spending" class="reports-link" data-testid="category-spending-link">
+        <RouterLink to="/reports/category-spending" class="reports-link" data-testid="category-spending-link">
           Category Spending Report
-        </a>
+        </RouterLink>
       </li>
       <li>
-        <a href="/#/reports/needs-vs-wants" class="reports-link" data-testid="needs-vs-wants-link">
+        <RouterLink to="/reports/needs-vs-wants" class="reports-link" data-testid="needs-vs-wants-link">
           Needs vs Wants Report
-        </a>
+        </RouterLink>
       </li>
     </ul>
   </EcPageLayout>

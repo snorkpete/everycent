@@ -1,6 +1,8 @@
 import apiGateway from '../../api/api-gateway';
 import type { ReportResponse } from './report.types';
 import type { NetWorthRow } from './net-worth/netWorth.types';
+import type { CategorySpendingRow } from './category-spending/categorySpending.types';
+import type { NeedsVsWantsRow } from './needs-vs-wants/needsVsWants.types';
 
 export const reportApi = {
   getNetWorth: () =>
@@ -10,11 +12,11 @@ export const reportApi = {
 
   getCategorySpending: () =>
     apiGateway
-      .get<ReportResponse<Record<string, unknown>>>('/reports/category_spending')
+      .get<ReportResponse<CategorySpendingRow>>('/reports/category_spending')
       .then((r) => r.data),
 
   getNeedsVsWants: () =>
     apiGateway
-      .get<ReportResponse<Record<string, unknown>>>('/reports/needs_vs_wants')
+      .get<ReportResponse<NeedsVsWantsRow>>('/reports/needs_vs_wants')
       .then((r) => r.data),
 };
