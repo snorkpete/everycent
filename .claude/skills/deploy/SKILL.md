@@ -1,12 +1,12 @@
 ---
 name: deploy
-description: Use to deploy the Vue v4 app to Heroku production from a clean master — updates "What's New", rebuilds static assets, pushes to origin + heroku, runs migrations. Fires on /deploy, "deploy to production", "ship this to prod".
-version: 1.0.0
+description: Use to deploy the Vue app to Heroku production from a clean master — updates "What's New", rebuilds static assets, pushes to origin + heroku, runs migrations. Fires on /deploy, "deploy to production", "ship this to prod".
+version: 1.1.0
 ---
 
 # Deploy to Production
 
-Deploy the Vue v4 app to Heroku production, starting from "everything committed on master." Updates the "What's New" home page content, rebuilds static assets, pushes to origin + heroku, and runs migrations.
+Deploy the Vue app to Heroku production, starting from "everything committed on master." Updates the "What's New" home page content, rebuilds static assets, pushes to origin + heroku, and runs migrations.
 
 ## Prerequisites — tell the user this first
 
@@ -70,13 +70,27 @@ git commit -m "chore(home): update what's new for deploy"
 
 If the user decides no update is needed this deploy, skip the commit and continue.
 
-## Step 4 — Build Vue assets
+## Step 4 — Build assets
+
+### Angular (optional)
+
+Ask the user: **"Do you need an Angular rebuild as well? (usually no)"**
+
+If yes, build Angular first (it outputs to `public/v3/`):
+
+```bash
+cd webclientv3 && npm run build
+```
+
+### Vue (always)
 
 ```bash
 cd webclientv4 && npm run build
 ```
 
-This compiles TypeScript + bundles the app. If the build fails, stop and surface the error — do not proceed.
+This compiles TypeScript + bundles the app to `public/`. If either build fails, stop and surface the error — do not proceed.
+
+**Build order matters:** Angular first, then Vue. Vue's `emptyOutDir` is off, so it won't clear `public/v3/`.
 
 ## Step 5 — Commit built assets
 
@@ -84,7 +98,7 @@ This compiles TypeScript + bundles the app. If the build fails, stop and surface
 git status --short public/
 ```
 
-If `public/v4/` changed:
+If `public/` changed:
 
 ```bash
 git add public/
