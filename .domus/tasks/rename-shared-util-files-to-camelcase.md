@@ -1,7 +1,7 @@
 # Task: Rename shared util files to camelCase
 
 **ID:** rename-shared-util-files-to-camelcase
-**Status:** raw
+**Status:** in-progress
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-10
