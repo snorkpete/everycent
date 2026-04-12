@@ -1,7 +1,7 @@
 # Task: Rename SpecialEventForm emit from submit to save
 
 **ID:** rename-specialeventform-emit-from-submit-to-save
-**Status:** in-progress
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-10

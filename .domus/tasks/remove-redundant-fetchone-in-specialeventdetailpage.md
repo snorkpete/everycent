@@ -1,7 +1,7 @@
 # Task: Remove redundant fetchOne in SpecialEventDetailPage
 
 **ID:** remove-redundant-fetchone-in-specialeventdetailpage
-**Status:** in-progress
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-10

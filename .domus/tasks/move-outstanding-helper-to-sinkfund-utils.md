@@ -1,7 +1,7 @@
 # Task: Move outstanding() helper to sinkFund utils
 
 **ID:** move-outstanding-helper-to-sinkfund-utils
-**Status:** in-progress
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-10
