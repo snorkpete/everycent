@@ -1,7 +1,7 @@
 # Task: Enforce single canonical API owner per endpoint
 
 **ID:** enforce-single-canonical-api-owner-per-endpoint
-**Status:** in-progress
+**Status:** done
 **Branch:** task/enforce-single-canonical-api-owner-per-endpoint
 **Autonomous:** true
 **Priority:** high
