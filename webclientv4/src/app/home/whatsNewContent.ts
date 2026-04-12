@@ -12,6 +12,16 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: 'Reports with charts',
+    body: 'The Reports section now has three screens — Net Worth, Category Spending, and Needs vs Wants — each with an interactive chart and a year filter so you can focus on a specific period.',
+    date: '2026-04-12',
+  },
+  {
+    title: 'EveryCent is now the main page',
+    body: "No more typing /v4/ in the URL — the new version loads by default. The old version is still reachable from 'Old Version' in the menu if you need it.",
+    date: '2026-04-12',
+  },
+  {
     title: 'Sign in with Google',
     body: "The 'Sign in with Google' button on the login page is now the preferred way to log in — your existing account is matched by email, so nothing else changes. Email and password still work as a fallback if you need them.",
     date: '2026-04-11',
