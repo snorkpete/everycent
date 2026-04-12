@@ -1,0 +1,1 @@
+import{_ as o,o as c,c as e}from"./index-BKKugBjd.js";const a={},r={class:"ec-toolbar-separator"};function s(t,_){return c(),e("span",r)}const p=o(a,[["render",s],["__scopeId","data-v-b2f433d0"]]);export{p as E};
