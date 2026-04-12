@@ -19,8 +19,15 @@ export default defineConfig({
     globals: true,
     setupFiles: ['src/test/setup.ts'],
     // ESLint rule tests in tools/ use node:test (not vitest) — RuleTester conflicts
-    // with vitest's describe/it tracking. Exclude the tools/ directory entirely.
-    exclude: ['**/node_modules/**', 'tools/**'],
+    // with vitest's describe/it tracking. Exclude tools/ entirely. The other entries
+    // are vitest defaults that must be restated when overriding exclude.
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/cypress/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      'tools/**',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text'],
