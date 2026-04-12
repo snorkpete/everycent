@@ -85,7 +85,7 @@ describe('settingsStore', () => {
   });
 
   describe('save', () => {
-    it('posts settings and stores the response', async () => {
+    it('posts settings and stores the returned settings object', async () => {
       const newSettings = { family_type: 'single' as const, single_person: 'Alex' };
       vi.mocked(settingsApi.save).mockResolvedValue(newSettings);
 
@@ -94,6 +94,17 @@ describe('settingsStore', () => {
 
       expect(settingsApi.save).toHaveBeenCalledWith(newSettings);
       expect(store.settings).toEqual(newSettings);
+    });
+
+    it('stores the settings object after save, not a success flag', async () => {
+      const savedSettings = { family_type: 'couple' as const, husband: 'John', wife: 'Jane' };
+      vi.mocked(settingsApi.save).mockResolvedValue(savedSettings);
+
+      const store = useSettingsStore();
+      await store.save(savedSettings);
+
+      expect(store.settings).not.toHaveProperty('success');
+      expect(store.settings).toEqual(savedSettings);
     });
 
     it('sets error message and re-throws on save failure', async () => {
