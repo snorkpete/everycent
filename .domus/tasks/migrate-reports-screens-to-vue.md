@@ -1,7 +1,7 @@
 # Task: Migrate reports screens to Vue
 
 **ID:** migrate-reports-screens-to-vue
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-03-14
