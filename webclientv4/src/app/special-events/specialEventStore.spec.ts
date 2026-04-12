@@ -199,16 +199,18 @@ describe('specialEventStore', () => {
   });
 
   describe('update', () => {
-    it('updates a special event and refreshes the list', async () => {
+    it('updates a special event, refreshes the list and currentSpecialEvent', async () => {
       const updated = { ...sampleEvent, name: 'Christmas 2026 Updated' };
       vi.mocked(specialEventApi.update).mockResolvedValue(updated);
       vi.mocked(specialEventApi.getAll).mockResolvedValue([updated]);
+      vi.mocked(specialEventApi.getOne).mockResolvedValue(updated);
 
       const store = useSpecialEventStore();
       await store.update(1, { name: 'Christmas 2026 Updated' });
 
       expect(specialEventApi.update).toHaveBeenCalledWith(1, { name: 'Christmas 2026 Updated' });
       expect(store.specialEvents).toEqual([updated]);
+      expect(store.currentSpecialEvent).toEqual(updated);
     });
 
     it('sets loading to true during update and false after', async () => {
@@ -218,6 +220,7 @@ describe('specialEventStore', () => {
         return sampleEvent;
       });
       vi.mocked(specialEventApi.getAll).mockResolvedValue([]);
+      vi.mocked(specialEventApi.getOne).mockResolvedValue(sampleEvent);
 
       const store = useSpecialEventStore();
       await store.update(1, { name: 'Test' });

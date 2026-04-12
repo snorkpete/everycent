@@ -85,8 +85,7 @@ class Report
                                  (select id from allocations where budget_id = b.id and allocation_class = 'savings')), 0) /
                  100.0                                                            as actual_savings
           from budgets b
-          where b.household_id = 96
-      --         where b.household_id = 879
+          where b.household_id = #{household.id}
       )
       select period,
              budgeted_needs,

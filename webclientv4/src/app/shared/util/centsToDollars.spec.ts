@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { centsToDollars } from './cents-to-dollars';
+import { centsToDollars } from './centsToDollars';
 
 describe('centsToDollars', () => {
   it('converts a positive cents value to a formatted dollar string', () => {

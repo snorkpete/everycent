@@ -182,6 +182,7 @@ import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
+import { outstanding } from './sinkFundUtils';
 import type { SinkFundAllocationData } from './sinkFund.types';
 
 defineProps<{
@@ -219,12 +220,6 @@ function isExpanded(key: number): boolean {
 
 function toggleExpanded(key: number): void {
   expandedId.value = expandedId.value === key ? null : key;
-}
-
-function outstanding(allocation: SinkFundAllocationData): number {
-  const target = allocation.target ?? 0;
-  if (target === 0) return 0;
-  return (allocation.current_balance ?? 0) - target;
 }
 
 function onViewTransactions(allocation: SinkFundAllocationData): void {

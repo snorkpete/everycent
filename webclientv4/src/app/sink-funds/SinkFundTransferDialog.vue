@@ -47,7 +47,7 @@ import Select from 'primevue/select';
 import { useSinkFundStore } from './sinkFundStore';
 import { sinkFundApi } from './sinkFundApi';
 import { useNotifications } from '../notifications/useNotifications';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
+import { centsToDollars } from '../shared/util/centsToDollars';
 import EcFormDialog from '../shared/form/form-dialog/EcFormDialog.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import type { SinkFundTransferFormData } from './sinkFund.types';

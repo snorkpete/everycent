@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetMassEditDialog from './BudgetMassEditDialog.vue';
-import { centsToDollars } from '../../shared/util/cents-to-dollars';
+import { centsToDollars } from '../../shared/util/centsToDollars';
 import { DialogStub } from '../../../test/stubs';
 import { buildFutureBudget } from '../../../test/factories';
 

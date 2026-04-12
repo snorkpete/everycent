@@ -118,6 +118,30 @@ const router = createRouter({
       component: () => import('../app/special-events/SpecialEventAllocationsEditor.vue'),
       meta: { title: 'Special Event Allocations' },
     },
+    {
+      path: '/reports',
+      name: 'reports',
+      component: () => import('../app/reports/ReportsPage.vue'),
+      meta: { title: 'Reports' },
+    },
+    {
+      path: '/reports/net-worth',
+      name: 'reports-net-worth',
+      component: () => import('../app/reports/net-worth/NetWorthReportPage.vue'),
+      meta: { title: 'Net Worth Report' },
+    },
+    {
+      path: '/reports/category-spending',
+      name: 'reports-category-spending',
+      component: () => import('../app/reports/category-spending/CategorySpendingReportPage.vue'),
+      meta: { title: 'Category Spending Report' },
+    },
+    {
+      path: '/reports/needs-vs-wants',
+      name: 'reports-needs-vs-wants',
+      component: () => import('../app/reports/needs-vs-wants/NeedsVsWantsReportPage.vue'),
+      meta: { title: 'Needs vs Wants Report' },
+    },
   ],
 });
 

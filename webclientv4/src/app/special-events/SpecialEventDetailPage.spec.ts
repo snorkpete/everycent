@@ -71,7 +71,7 @@ const FormStub = {
   name: 'SpecialEventForm',
   template: '<div data-testid="event-form" />',
   props: ['visible', 'specialEvent'],
-  emits: ['update:visible', 'submit'],
+  emits: ['update:visible', 'save'],
 };
 
 function createWrapper(): VueWrapper {
@@ -299,7 +299,7 @@ describe('SpecialEventDetailPage', () => {
 
       const form = wrapper.findComponent({ name: 'SpecialEventForm' });
       const updatedData = { id: 1, name: 'Updated Birthday', budget_amount: 60000 };
-      await form.vm.$emit('submit', updatedData);
+      await form.vm.$emit('save', updatedData);
       await flushPromises();
 
       expect(mockStore.update).toHaveBeenCalledWith(1, updatedData);
@@ -319,7 +319,7 @@ describe('SpecialEventDetailPage', () => {
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
       const form = wrapper.findComponent({ name: 'SpecialEventForm' });
-      await form.vm.$emit('submit', { id: 1, name: 'Fail Update' });
+      await form.vm.$emit('save', { id: 1, name: 'Fail Update' });
       await nextTick();
 
       expect(mockNotifyError).toHaveBeenCalledWith(errorMessage);
@@ -331,7 +331,7 @@ describe('SpecialEventDetailPage', () => {
       await wrapper.find('[data-testid="edit-btn"]').trigger('click');
 
       const form = wrapper.findComponent({ name: 'SpecialEventForm' });
-      await form.vm.$emit('submit', { name: 'No ID' });
+      await form.vm.$emit('save', { name: 'No ID' });
       await nextTick();
 
       expect(mockStore.update).not.toHaveBeenCalled();

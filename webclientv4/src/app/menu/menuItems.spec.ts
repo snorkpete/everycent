@@ -59,17 +59,17 @@ describe('menuItems', () => {
 
   it('includes expandable Reports section with sub-items', () => {
     const items = buildMenuItems(vi.fn(), vi.fn());
-    const reports = items.find((item) => item.label === '* Reports');
+    const reports = items.find((item) => item.label === 'Reports');
 
     expect(reports).toBeDefined();
     expect(reports!.icon).toBe(Icon.REPORTING);
     expect(reports!.items).toHaveLength(3);
-    expect(reports!.items![0].label).toBe('* Net Worth Report');
+    expect(reports!.items![0].label).toBe('Net Worth Report');
   });
 
   it('Reports section has a key for expandedKeys tracking', () => {
     const items = buildMenuItems(vi.fn(), vi.fn());
-    const reports = items.find((item) => item.label === '* Reports');
+    const reports = items.find((item) => item.label === 'Reports');
 
     expect(reports!.key).toBe('reports');
   });

@@ -67,7 +67,7 @@
       :visible="formVisible"
       :special-event="selectedEvent"
       @update:visible="formVisible = $event"
-      @submit="onSubmit"
+      @save="onSubmit"
     />
 
     <ConfirmDialog />
@@ -86,7 +86,7 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
-import { formatDate } from '../shared/util/format-date';
+import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
 import type { SpecialEventData } from './specialEvent.types';

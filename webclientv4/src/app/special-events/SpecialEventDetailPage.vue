@@ -63,7 +63,7 @@
       :visible="formVisible"
       :special-event="event"
       @update:visible="formVisible = $event"
-      @submit="onSubmit"
+      @save="onSubmit"
     />
   </EcPageLayout>
 </template>
@@ -78,7 +78,7 @@ import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
-import { formatDate } from '../shared/util/format-date';
+import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
 import type { SpecialEventData } from './specialEvent.types';
@@ -126,7 +126,6 @@ async function onSubmit(data: Partial<SpecialEventData>) {
   if (!data.id) return;
   try {
     await store.update(data.id, data);
-    await store.fetchOne(data.id);
     notifications.success('Special event updated');
     formVisible.value = false;
   } catch {
