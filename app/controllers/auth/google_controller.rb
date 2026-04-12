@@ -24,8 +24,6 @@ module Auth
         return
       end
 
-      user.update!(provider: 'google', uid: payload['sub'])
-
       auth_headers = user.create_new_auth_token
       response.headers.merge!(auth_headers)
 
