@@ -9,6 +9,15 @@
         {{ authStore.error }}
       </p>
 
+      <button
+        type="button"
+        class="toggle-link"
+        data-testid="password-toggle"
+        @click="showPasswordForm = !showPasswordForm"
+      >
+        {{ showPasswordForm ? 'Hide password login' : 'Use password instead (not recommended)' }}
+      </button>
+
       <form v-if="showPasswordForm" data-testid="login-form" @submit.prevent="login">
         <div class="field">
           <label for="email">Email</label>
@@ -59,7 +68,7 @@ const password = ref('');
 const loading = ref(false);
 const googleButtonRef = ref<HTMLElement | null>(null);
 
-const showPasswordForm = import.meta.env.DEV;
+const showPasswordForm = ref<boolean>(import.meta.env.DEV);
 
 async function handleGoogleCredential(response: google.accounts.id.CredentialResponse) {
   try {
@@ -151,6 +160,19 @@ async function login() {
 .error {
   color: var(--p-red-600);
   margin-bottom: 1rem;
+}
+
+.toggle-link {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .w-full {

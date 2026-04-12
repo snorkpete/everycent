@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
@@ -78,6 +78,11 @@ describe('LoginPage', () => {
     expect(wrapper.find('[data-testid="login-button"]').text()).toBe('Log In');
   });
 
+  it('always renders the password toggle link', () => {
+    const wrapper = createWrapper();
+    expect(wrapper.find('[data-testid="password-toggle"]').exists()).toBe(true);
+  });
+
   it('does not show error when store has no error', () => {
     const wrapper = createWrapper();
     expect(wrapper.find('[data-testid="error-message"]').exists()).toBe(false);
@@ -92,6 +97,49 @@ describe('LoginPage', () => {
     const errorEl = wrapper.find('[data-testid="error-message"]');
     expect(errorEl.exists()).toBe(true);
     expect(errorEl.text()).toBe('Invalid credentials');
+  });
+
+  describe('password toggle', () => {
+    beforeEach(() => {
+      vi.stubEnv('DEV', false);
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('hides the password form by default in a prod-like environment', () => {
+      const wrapper = createWrapper();
+      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(false);
+    });
+
+    it('reveals the password form when the toggle is clicked', async () => {
+      const wrapper = createWrapper();
+      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(false);
+      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
+      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(true);
+    });
+
+    it('hides the password form again when the toggle is clicked a second time', async () => {
+      const wrapper = createWrapper();
+      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
+      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(true);
+      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
+      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(false);
+    });
+
+    it('shows the correct toggle label when form is hidden', () => {
+      const wrapper = createWrapper();
+      expect(wrapper.find('[data-testid="password-toggle"]').text()).toBe(
+        'Use password instead (not recommended)',
+      );
+    });
+
+    it('shows the correct toggle label when form is visible', async () => {
+      const wrapper = createWrapper();
+      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
+      expect(wrapper.find('[data-testid="password-toggle"]').text()).toBe('Hide password login');
+    });
   });
 
   describe('password form sign-in', () => {
@@ -226,7 +274,9 @@ describe('LoginPage', () => {
       await capturedCallback!({ credential: 'google-id-token', select_by: 'auto' });
       await flushPromises();
 
-      expect(apiGateway.post).toHaveBeenCalledWith('/auth/google', { credential: 'google-id-token' });
+      expect(apiGateway.post).toHaveBeenCalledWith('/auth/google', {
+        credential: 'google-id-token',
+      });
       expect(mockPush).toHaveBeenCalledWith('/');
     });
 
