@@ -215,6 +215,7 @@ import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import SinkFundAllocationListMobile from './SinkFundAllocationListMobile.vue';
 import { useResponsive } from '../shared/composables/useResponsive';
+import { outstanding } from './sinkFundUtils';
 import type { SinkFundAllocationData } from './sinkFund.types';
 
 const { dashIfZero = false } = defineProps<{
@@ -229,12 +230,6 @@ const { isMobile } = useResponsive();
 const dialogVisible = ref(false);
 const selectedAllocationId = ref(0);
 const selectedAllocationName = ref('');
-
-function outstanding(allocation: SinkFundAllocationData): number {
-  const target = allocation.target ?? 0;
-  if (target === 0) return 0;
-  return (allocation.current_balance ?? 0) - target;
-}
 
 function toggleDeleted(allocation: SinkFundAllocationData) {
   allocation.deleted = !allocation.deleted;
