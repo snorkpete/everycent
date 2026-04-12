@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { titleCase } from './title-case';
+import { titleCase } from './titleCase';
 
 describe('titleCase', () => {
   it('capitalises the first letter and lowercases the rest', () => {

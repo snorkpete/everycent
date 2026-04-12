@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
-import { formatDate } from './util/format-date';
+import { formatDate } from './util/formatDate';
 import EcMoneyDisplay from './form/money-field/EcMoneyDisplay.vue';
 import type { TransactionData } from '../transactions/transaction.types';
 

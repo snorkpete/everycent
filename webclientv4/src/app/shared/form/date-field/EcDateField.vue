@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue';
 import DatePicker from 'primevue/datepicker';
-import { formatDate } from '../../util/format-date';
+import { formatDate } from '../../util/formatDate';
 
 const props = defineProps<{
   modelValue: string;

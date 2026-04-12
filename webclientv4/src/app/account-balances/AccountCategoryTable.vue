@@ -156,7 +156,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { formatDate } from '../shared/util/format-date';
+import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import type { AccountBalanceData } from './accountBalance.types';
 

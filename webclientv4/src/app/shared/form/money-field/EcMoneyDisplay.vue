@@ -25,7 +25,7 @@
 -->
 <script setup lang="ts">
 import { computed } from 'vue';
-import { centsToDollars } from '../../util/cents-to-dollars';
+import { centsToDollars } from '../../util/centsToDollars';
 import { HighlightMode } from '../../constants/highlightMode';
 import { Emphasis } from '../../constants/emphasis';
 import type { HighlightMode as HighlightModeType } from '../../constants/highlightMode';

@@ -299,7 +299,7 @@ import { useHeadingStore } from '../toolbar/headingStore';
 import { useImportStore } from './importStore';
 import { budgetApi } from '../budgets/budgetApi';
 import { useNotifications } from '../notifications/useNotifications';
-import { formatDate } from '../shared/util/format-date';
+import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import { formatSkipReasons } from './formatSkipReasons';
 import type { ImportTransaction, PreviewBankAccount } from './import.types';

@@ -320,7 +320,7 @@ import Button from 'primevue/button';
 import { useBudgetStore } from './budgetStore';
 import { useResponsive } from '../shared/composables/useResponsive';
 import { useAllocationGrouping } from './useAllocationGrouping';
-import { titleCase } from '../shared/util/title-case';
+import { titleCase } from '../shared/util/titleCase';
 import { allocationClasses } from '../shared/constants/allocationClasses';
 import { Emphasis } from '../shared/constants/emphasis';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';

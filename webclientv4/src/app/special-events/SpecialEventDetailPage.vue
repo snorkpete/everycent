@@ -78,7 +78,7 @@ import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
-import { formatDate } from '../shared/util/format-date';
+import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
 import type { SpecialEventData } from './specialEvent.types';

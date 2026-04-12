@@ -148,7 +148,7 @@ import { bankAccountApi } from '../bank-accounts/bankAccountApi';
 import { transactionApi } from './transactionApi';
 import { useTransactionStore } from './transactionStore';
 import { useNotifications } from '../notifications/useNotifications';
-import { centsToDollars } from '../shared/util/cents-to-dollars';
+import { centsToDollars } from '../shared/util/centsToDollars';
 import EcFormDialog from '../shared/form/form-dialog/EcFormDialog.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcDateField from '../shared/form/date-field/EcDateField.vue';

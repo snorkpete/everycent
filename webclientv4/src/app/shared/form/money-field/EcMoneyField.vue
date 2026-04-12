@@ -39,8 +39,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, useId } from 'vue';
-import { dollarsToCents } from '../../util/dollars-to-cents';
-import { centsToDollars } from '../../util/cents-to-dollars';
+import { dollarsToCents } from '../../util/dollarsToCents';
+import { centsToDollars } from '../../util/centsToDollars';
 import EcMoneyDisplay from './EcMoneyDisplay.vue';
 import { HighlightMode } from '../../constants/highlightMode';
 import type { HighlightMode as HighlightModeType } from '../../constants/highlightMode';
