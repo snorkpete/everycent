@@ -63,7 +63,7 @@
       :visible="formVisible"
       :special-event="event"
       @update:visible="formVisible = $event"
-      @submit="onSubmit"
+      @save="onSubmit"
     />
   </EcPageLayout>
 </template>

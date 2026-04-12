@@ -65,7 +65,7 @@ const FormStub = {
   name: 'SpecialEventForm',
   template: '<div data-testid="event-form" />',
   props: ['visible', 'specialEvent'],
-  emits: ['update:visible', 'submit'],
+  emits: ['update:visible', 'save'],
 };
 
 const ConfirmDialogStub = {
@@ -263,7 +263,7 @@ describe('SpecialEventsPage', () => {
 
       const form = wrapper.findComponent({ name: 'SpecialEventForm' });
       const newEventData = { name: 'New Event', budget_amount: 10000 };
-      await form.vm.$emit('submit', newEventData);
+      await form.vm.$emit('save', newEventData);
       await flushPromises();
 
       expect(specialEventApi.create).toHaveBeenCalledWith(newEventData);
@@ -280,7 +280,7 @@ describe('SpecialEventsPage', () => {
 
       const form = wrapper.findComponent({ name: 'SpecialEventForm' });
       const updatedData = { id: 1, name: 'Updated Birthday', budget_amount: 60000 };
-      await form.vm.$emit('submit', updatedData);
+      await form.vm.$emit('save', updatedData);
       await flushPromises();
 
       expect(specialEventApi.update).toHaveBeenCalledWith(1, {
@@ -301,7 +301,7 @@ describe('SpecialEventsPage', () => {
       await wrapper.find('[data-testid="add-btn"]').trigger('click');
 
       const form = wrapper.findComponent({ name: 'SpecialEventForm' });
-      await form.vm.$emit('submit', { name: 'Failing Event' });
+      await form.vm.$emit('save', { name: 'Failing Event' });
       await flushPromises();
 
       expect(mockNotifyError).toHaveBeenCalledWith('Server error');
@@ -317,7 +317,7 @@ describe('SpecialEventsPage', () => {
       await wrapper.find('[data-testid="edit-btn-1"]').trigger('click');
 
       const form = wrapper.findComponent({ name: 'SpecialEventForm' });
-      await form.vm.$emit('submit', { id: 1, name: 'Fail Update' });
+      await form.vm.$emit('save', { id: 1, name: 'Fail Update' });
       await flushPromises();
 
       expect(mockNotifyError).toHaveBeenCalledWith('Server error');

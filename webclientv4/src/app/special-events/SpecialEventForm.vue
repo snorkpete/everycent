@@ -29,7 +29,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:visible': [value: boolean];
-  submit: [data: Partial<SpecialEventData>];
+  save: [data: Partial<SpecialEventData>];
 }>();
 
 function toFormData(event: SpecialEventData | null): SpecialEventFormData {
@@ -62,6 +62,6 @@ function submit() {
   if (props.specialEvent?.id) {
     data.id = props.specialEvent.id;
   }
-  emit('submit', data);
+  emit('save', data);
 }
 </script>

@@ -68,7 +68,7 @@ describe('SpecialEventForm', () => {
   });
 
   describe('form submission', () => {
-    it('emits submit with form data for a new event', async () => {
+    it('emits save with form data for a new event', async () => {
       const wrapper = createWrapper({ specialEvent: null });
 
       // The form fields are rendered inside the dialog stub
@@ -82,8 +82,8 @@ describe('SpecialEventForm', () => {
 
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
-      expect(wrapper.emitted('submit')).toBeTruthy();
-      expect(wrapper.emitted('submit')![0][0]).toEqual({
+      expect(wrapper.emitted('save')).toBeTruthy();
+      expect(wrapper.emitted('save')![0][0]).toEqual({
         name: 'Wedding',
         budget_amount: 100000,
         start_date: '2026-06-15',
@@ -97,8 +97,8 @@ describe('SpecialEventForm', () => {
 
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
-      expect(wrapper.emitted('submit')).toBeTruthy();
-      expect(wrapper.emitted('submit')![0][0]).toMatchObject({ id: 5 });
+      expect(wrapper.emitted('save')).toBeTruthy();
+      expect(wrapper.emitted('save')![0][0]).toMatchObject({ id: 5 });
     });
 
     it('omits start_date when it is empty', async () => {
@@ -113,7 +113,7 @@ describe('SpecialEventForm', () => {
 
       await wrapper.find('[data-testid="save-btn"]').trigger('click');
 
-      const emitted = wrapper.emitted('submit')![0][0] as Partial<SpecialEventData>;
+      const emitted = wrapper.emitted('save')![0][0] as Partial<SpecialEventData>;
       expect(emitted).not.toHaveProperty('start_date');
     });
   });

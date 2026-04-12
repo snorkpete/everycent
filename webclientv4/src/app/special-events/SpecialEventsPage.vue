@@ -67,7 +67,7 @@
       :visible="formVisible"
       :special-event="selectedEvent"
       @update:visible="formVisible = $event"
-      @submit="onSubmit"
+      @save="onSubmit"
     />
 
     <ConfirmDialog />
