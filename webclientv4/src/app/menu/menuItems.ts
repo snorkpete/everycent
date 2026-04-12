@@ -62,13 +62,18 @@ function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
   ];
 }
 
-function buildReportsSection(): AppMenuItem {
+function buildReportsSection(navigate: (path: string) => void): AppMenuItem {
   return {
     label: '* Reports',
     key: 'reports',
     icon: Icon.REPORTING,
     items: [
-      { label: '* Net Worth Report', icon: Icon.NET_WORTH, url: '/#/reports/net-worth' },
+      {
+        label: 'Net Worth Report',
+        icon: Icon.NET_WORTH,
+        command: () => navigate('/reports/net-worth'),
+        routePath: '/reports/net-worth',
+      },
       {
         label: '* Category Spending Report',
         icon: Icon.CATEGORY_SPENDING,
@@ -124,7 +129,7 @@ export function buildMenuItems(
   return [
     ...buildMainItems(navigate),
     { separator: true },
-    buildReportsSection(),
+    buildReportsSection(navigate),
     buildSetupSection(navigate),
     { separator: true },
     { label: 'Old Version', icon: Icon.OLD_VERSION, url: '/#/' },

@@ -64,7 +64,7 @@ describe('menuItems', () => {
     expect(reports).toBeDefined();
     expect(reports!.icon).toBe(Icon.REPORTING);
     expect(reports!.items).toHaveLength(3);
-    expect(reports!.items![0].label).toBe('* Net Worth Report');
+    expect(reports!.items![0].label).toBe('Net Worth Report');
   });
 
   it('Reports section has a key for expandedKeys tracking', () => {

@@ -118,6 +118,18 @@ const router = createRouter({
       component: () => import('../app/special-events/SpecialEventAllocationsEditor.vue'),
       meta: { title: 'Special Event Allocations' },
     },
+    {
+      path: '/reports',
+      name: 'reports',
+      component: () => import('../app/reports/ReportsPage.vue'),
+      meta: { title: 'Reports' },
+    },
+    {
+      path: '/reports/net-worth',
+      name: 'reports-net-worth',
+      component: () => import('../app/reports/net-worth/NetWorthReportPage.vue'),
+      meta: { title: 'Net Worth Report' },
+    },
   ],
 });
 
