@@ -105,7 +105,7 @@ Before investigating unexpected browser behavior or making code changes to fix a
 - **Extract components through the UX lens, not code-dedup.** The right question is "does the next developer get consistent UX for free?" — not "how many lines does this save?" If using a shared component means correct layout/behaviour without custom CSS or copy-paste, extract it even if line savings are modest. Custom CSS in layout code is a smell that hints at a hidden reusable component.
 
 ## Migration Context
-Active migration from Angular 14 to Vue 3 (webclientv4). Migration state tracked in `domus task list`.
+Vue 3 migration is functionally complete — Vue serves at `/` (root), Angular at `/v3/` as fallback. Angular code is frozen; no new features should be added to webclientv3.
 
 See `webclientv4/CLAUDE.md` for Vue 3 setup constraints and conventions.
 Reference implementations: store → `transactionStore.ts`, API → `bankAccountApi.ts`, component → `TransactionsPage.vue`.
