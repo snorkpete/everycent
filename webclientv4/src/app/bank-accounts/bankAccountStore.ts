@@ -1,7 +1,9 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { bankAccountApi } from './bankAccountApi';
-import type { BankAccountData, InstitutionData } from './bankAccount.types';
+import { institutionApi } from '../institutions/institutionApi';
+import type { BankAccountData } from './bankAccount.types';
+import type { InstitutionData } from '../institutions/institution.types';
 
 export const useBankAccountStore = defineStore('bankAccounts', () => {
   const bankAccounts = ref<BankAccountData[]>([]);
@@ -27,7 +29,7 @@ export const useBankAccountStore = defineStore('bankAccounts', () => {
     loading.value = true;
     error.value = null;
     try {
-      institutions.value = await bankAccountApi.getInstitutions();
+      institutions.value = await institutionApi.getAll();
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load institutions';
     } finally {

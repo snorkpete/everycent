@@ -1,13 +1,11 @@
 import apiGateway from '../../api/api-gateway';
-import type { BankAccountData, InstitutionData, AccountTransferData } from './bankAccount.types';
+import type { BankAccountData, AccountTransferData } from './bankAccount.types';
 
 export const bankAccountApi = {
   getAll: () =>
     apiGateway
       .get<BankAccountData[]>('/bank_accounts', { params: { include_closed: true } })
       .then((r) => r.data),
-
-  getInstitutions: () => apiGateway.get<InstitutionData[]>('/institutions').then((r) => r.data),
 
   create: (account: BankAccountData) =>
     apiGateway.post<BankAccountData>('/bank_accounts', account).then((r) => r.data),

@@ -109,7 +109,8 @@ import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import EcListField from '../shared/form/list-field/EcListField.vue';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
-import type { BankAccountData, BankAccountFormData, InstitutionData } from './bankAccount.types';
+import type { BankAccountData, BankAccountFormData } from './bankAccount.types';
+import type { InstitutionData } from '../institutions/institution.types';
 
 const props = defineProps<{
   visible: boolean;

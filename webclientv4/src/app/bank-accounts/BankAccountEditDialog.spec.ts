@@ -5,7 +5,8 @@ import PrimeVue from 'primevue/config';
 import EcListField from '../shared/form/list-field/EcListField.vue';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import BankAccountEditDialog from './BankAccountEditDialog.vue';
-import type { BankAccountData, InstitutionData } from './bankAccount.types';
+import type { BankAccountData } from './bankAccount.types';
+import type { InstitutionData } from '../institutions/institution.types';
 import { DialogStub } from '../../test/stubs';
 
 const institutions: InstitutionData[] = [

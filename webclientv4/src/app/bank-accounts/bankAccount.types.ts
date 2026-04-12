@@ -1,7 +1,5 @@
 import type { InstitutionData } from '../institutions/institution.types';
 
-export type { InstitutionData };
-
 export interface BankAccountData {
   id?: number;
   name?: string;

@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Pre-commit safety nets. Each step exits non-zero on failure, blocking the
+# commit. Use `git commit --no-verify` only for genuine emergencies (production
+# hotfixes that can't wait); the default expectation is that the gates pass.
+#
+# Order is rough fastest-to-slowest within each layer so failures surface early.
+
 # Resolve main repo root — works in both main checkout and git worktrees.
 # In a worktree, --git-common-dir returns the absolute path to the main .git dir.
 # In the main checkout, it returns ".git" (relative), so cd ../ gives the repo root.
@@ -21,6 +27,13 @@ fi
 # --- Vue: lint-staged (ESLint + Prettier on staged .ts/.vue files) ---
 cd "$worktree_root/webclientv4" || { echo "pre-commit: can't cd to webclientv4"; exit 1; }
 lint-staged
+node tools/check-api-ownership.mjs || { echo "pre-commit: api ownership check failed"; exit 1; }
+
+# --- Vue: type-check (full project) ---
+npm run type-check || { echo "pre-commit: type-check failed"; exit 1; }
+
+# --- Vue: full test suite (vitest + ESLint rule tests) ---
+npm run test || { echo "pre-commit: vue tests failed"; exit 1; }
 
 # --- Rails: run rspec for changed Ruby files ---
 cd "$worktree_root" || { echo "pre-commit: can't cd to repo root"; exit 1; }

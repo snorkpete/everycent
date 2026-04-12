@@ -172,26 +172,54 @@ function createWrapper(): VueWrapper {
 }
 ```
 
-## Testing: Mock at the API Boundary
+## Testing: Mock at the System Boundary, Not Between Layers
 
-Page specs should mock API modules, not stores. Use real Pinia stores so store logic is exercised.
+Spec files for stores, components, and pages should mock `apiGateway` — the actual HTTP layer — not individual API modules and not stores. The principle: mock at the boundaries of the system (real I/O), let internal layers run for real.
+
+**Why:** mocking an API module stubs out the very code you're indirectly testing. The store calls `someApi.getAll()`, which you've replaced with `vi.fn()`, so the real api module never runs and the test gives you no integration benefit. Mocking `apiGateway` instead means the real api module code executes — your unit test now also verifies the URL it hits, the request shape it sends, and how it unwraps the response. You get integration coverage for free, and the only thing stubbed is the actual network call.
 
 ```typescript
-// ✅ Correct — mock the API, use real store
-vi.mock('./someApi', () => ({
-  someApi: { getAll: vi.fn(), save: vi.fn() },
+// ✅ Correct — mock apiGateway (the system boundary), use real api modules and stores
+import apiGateway from '../../api/api-gateway';
+import { buildApiGatewayMock } from '../../test/buildApiGatewayMock';
+
+vi.mock('../../api/api-gateway', () => ({
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn(), patch: vi.fn() },
 }));
 
-// In tests:
-vi.mocked(someApi.getAll).mockResolvedValue([buildItem()]);
+const mockApiGateway = buildApiGatewayMock();
 
-// ❌ Avoid — mocking the entire store
+beforeEach(() => {
+  mockApiGateway.reset();
+  mockApiGateway.get('/bank_accounts', []);
+});
+
+it('fetches and stores bank accounts', async () => {
+  const accounts = [{ id: 1, name: 'Savings' }];
+  mockApiGateway.get('/bank_accounts', accounts);
+
+  const store = useBankAccountStore();
+  await store.fetchAll();
+
+  expect(store.bankAccounts).toEqual(accounts);
+});
+
+// ❌ Avoid — mocking an API module
+vi.mock('./someApi', () => ({
+  someApi: { getAll: vi.fn() },  // real api module code never runs
+}));
+
+// ❌ Avoid — mocking a store entirely
 vi.mock('./someStore', () => ({
-  useSomeStore: () => mockStore,
+  useSomeStore: () => mockStore,  // real store code never runs either
 }));
 ```
 
-**Exception:** Composables that bridge external services (e.g. `useNotifications` wraps PrimeVue toast) still need mocking because they depend on providers not available in unit tests.
+The `buildApiGatewayMock` helper at `src/test/buildApiGatewayMock.ts` is currently a prototype — the codebase still has many spec files using the old "mock the API module" pattern, and a follow-up task is tracked to convert them. New spec files should use the boundary pattern from the start.
+
+**API spec files are an exception by definition.** A spec for `someApi.spec.ts` exists to test the api module itself, so it mocks `apiGateway` directly without using the helper — see `institutionApi.spec.ts` for the canonical pattern.
+
+**Composables that bridge external services** (e.g. `useNotifications` wraps PrimeVue toast) still need mocking because they depend on providers not available in unit tests. The boundary rule is about HTTP, not about every dependency.
 
 ## Testing: Assert on Rendered Output
 
