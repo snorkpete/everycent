@@ -28,20 +28,6 @@ describe('allocationCategoryStore', () => {
       expect(store.allocationCategories).toEqual(categories);
     });
 
-    it('sets loading to true during fetch and false after', async () => {
-      let loadingDuringCall = false;
-      vi.mocked(allocationCategoryApi.getAll).mockImplementation(async () => {
-        loadingDuringCall = useAllocationCategoryStore().loading;
-        return [];
-      });
-
-      const store = useAllocationCategoryStore();
-      await store.fetchAll();
-
-      expect(loadingDuringCall).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
     it('sets error message on failure', async () => {
       vi.mocked(allocationCategoryApi.getAll).mockRejectedValue(new Error('Network error'));
 
@@ -49,7 +35,6 @@ describe('allocationCategoryStore', () => {
       await store.fetchAll();
 
       expect(store.error).toBe('Network error');
-      expect(store.loading).toBe(false);
     });
 
     it('sets a fallback error message when the rejection is not an Error instance', async () => {
@@ -107,21 +92,6 @@ describe('allocationCategoryStore', () => {
       expect(store.error).toBe('Server error');
     });
 
-    it('sets loading to true during save and false after', async () => {
-      let loadingDuringSave = false;
-      vi.mocked(allocationCategoryApi.update).mockImplementation(async () => {
-        loadingDuringSave = useAllocationCategoryStore().loading;
-        return { id: 3 };
-      });
-      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
-
-      const store = useAllocationCategoryStore();
-      await store.save({ id: 3, name: 'Category' });
-
-      expect(loadingDuringSave).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
     it('sets a fallback error message when the save rejection is not an Error instance', async () => {
       vi.mocked(allocationCategoryApi.update).mockRejectedValue('unexpected');
 
@@ -129,15 +99,6 @@ describe('allocationCategoryStore', () => {
       await store.save({ id: 3, name: 'Category' }).catch(() => {});
 
       expect(store.error).toBe('Failed to save allocation category');
-    });
-
-    it('resets loading to false on save failure', async () => {
-      vi.mocked(allocationCategoryApi.update).mockRejectedValue(new Error('fail'));
-
-      const store = useAllocationCategoryStore();
-      await store.save({ id: 3, name: 'Category' }).catch(() => {});
-
-      expect(store.loading).toBe(false);
     });
 
     it('refreshes allocation categories after save', async () => {

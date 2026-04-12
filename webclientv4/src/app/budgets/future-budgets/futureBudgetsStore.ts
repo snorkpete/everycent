@@ -8,7 +8,6 @@ import type { FutureBudgetData, MassUpdatePayload } from './futureBudgets.types'
 export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
   const budgets = ref<FutureBudgetData[]>([]);
   const allocationCategories = ref<AllocationCategoryData[]>([]);
-  const loading = ref(false);
   const error = ref<string | null>(null);
 
   // incomeDisplayData: { [incomeName]: { [budgetId]: { id, amount } } }
@@ -59,7 +58,6 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
   }
 
   async function fetchAll() {
-    loading.value = true;
     error.value = null;
     try {
       const [fetchedBudgets, fetchedCategories] = await Promise.all([
@@ -70,13 +68,10 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
       allocationCategories.value = fetchedCategories;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load future budgets';
-    } finally {
-      loading.value = false;
     }
   }
 
   async function massUpdate(payload: MassUpdatePayload) {
-    loading.value = true;
     error.value = null;
     try {
       await futureBudgetsApi.massUpdate(payload);
@@ -84,15 +79,12 @@ export const useFutureBudgetsStore = defineStore('futureBudgets', () => {
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to save changes';
       throw e;
-    } finally {
-      loading.value = false;
     }
   }
 
   return {
     budgets,
     allocationCategories,
-    loading,
     error,
     incomeDisplayData,
     incomeNames,

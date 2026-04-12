@@ -19,24 +19,19 @@ export const useTransactionStore = defineStore('transactions', () => {
   const bankAccounts = ref<BankAccountData[]>([]);
   const selectedBankAccount = ref<BankAccountData | null>(null);
   const selectedBudget = ref<BudgetData | null>(null);
-  const loading = ref(false);
   const error = ref<string | null>(null);
 
   async function fetchMetadata() {
-    loading.value = true;
     error.value = null;
     try {
       const [, loadedAccounts] = await Promise.all([fetchBudgets(), bankAccountApi.getOpen()]);
       bankAccounts.value = loadedAccounts;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load metadata';
-    } finally {
-      loading.value = false;
     }
   }
 
   async function fetch(params: { budgetId: number; bankAccountId: number }) {
-    loading.value = true;
     error.value = null;
     sinkFundAllocations.value = [];
     try {
@@ -66,8 +61,6 @@ export const useTransactionStore = defineStore('transactions', () => {
       await Promise.all(promises);
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load transactions';
-    } finally {
-      loading.value = false;
     }
   }
 
@@ -76,7 +69,6 @@ export const useTransactionStore = defineStore('transactions', () => {
       return;
     }
 
-    loading.value = true;
     error.value = null;
     try {
       await transactionApi.save({
@@ -96,8 +88,6 @@ export const useTransactionStore = defineStore('transactions', () => {
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to save transactions';
       throw e;
-    } finally {
-      loading.value = false;
     }
   }
 
@@ -205,7 +195,6 @@ export const useTransactionStore = defineStore('transactions', () => {
     bankAccounts,
     selectedBankAccount,
     selectedBudget,
-    loading,
     error,
     currentAndPastBudgets,
     fetchMetadata,
