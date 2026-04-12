@@ -1,100 +1,25 @@
 <template>
   <EcPageLayout page-name="transactions" variant="fixed">
-    <!-- Mobile: stacked selectors above toolbar -->
+    <!-- Mobile toolbar -->
     <template v-if="isMobile" #toolbar>
-      <div class="mobile-toolbar">
-        <div class="mobile-selectors">
-          <Select
-            v-model="searchState.selectedBankAccountId"
-            :options="store.bankAccounts"
-            option-label="name"
-            option-value="id"
-            placeholder="Bank Account"
-            data-testid="bank-account-select"
-            class="mobile-select"
-            @update:model-value="onBankAccountChange"
-          />
-          <Select
-            v-model="searchState.selectedBudgetId"
-            :options="store.currentAndPastBudgets"
-            option-label="name"
-            option-value="id"
-            placeholder="Budget"
-            data-testid="budget-select"
-            class="mobile-select"
-            @update:model-value="onBudgetChange"
-          />
-        </div>
-        <div class="mobile-actions">
-          <Button
-            v-tooltip="'Go to budget'"
-            icon="pi pi-book"
-            text
-            severity="secondary"
-            size="small"
-            as="a"
-            :href="budgetLink"
-            data-testid="go-to-budget-link"
-          />
-          <Button
-            v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
-            :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
-            text
-            severity="secondary"
-            size="small"
-            :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
-            data-testid="dash-zero-toggle"
-            @click="dashIfZero = !dashIfZero"
-          />
-          <Button
-            v-tooltip="'Refresh transactions'"
-            icon="pi pi-refresh"
-            text
-            severity="secondary"
-            size="small"
-            data-testid="refresh-btn"
-            @click="onRefresh"
-          />
-          <Button
-            v-tooltip="'Import or transfer transactions'"
-            icon="pi pi-upload"
-            text
-            severity="secondary"
-            size="small"
-            data-testid="import-menu-btn"
-            @click="toggleImportMenu"
-          />
-          <Menu ref="importMenuRef" :model="importMenuItems" :popup="true" />
-          <Button
-            v-if="!store.isEditMode"
-            label="Edit"
-            data-testid="edit-btn"
-            size="small"
-            @click="store.enterEditMode()"
-          />
-          <template v-else>
-            <Button
-              v-tooltip="'Add new transaction'"
-              icon="pi pi-plus"
-              outlined
-              size="small"
-              data-testid="add-btn-mobile"
-              @click="store.addTransaction()"
-            />
-            <Button label="Save" data-testid="save-btn" size="small" @click="onSave" />
-            <Button
-              label="Cancel"
-              severity="secondary"
-              data-testid="cancel-btn"
-              size="small"
-              @click="onCancel"
-            />
-          </template>
-        </div>
-      </div>
+      <TransactionsToolbarMobile
+        v-model:dash-if-zero="dashIfZero"
+        :selected-bank-account-id="searchState.selectedBankAccountId"
+        :selected-budget-id="searchState.selectedBudgetId"
+        @update:selected-bank-account-id="onMobileBankAccountChange"
+        @update:selected-budget-id="onMobileBudgetChange"
+        @refresh="onRefresh"
+        @save="onSave"
+        @cancel="onCancel"
+        @add-transaction="store.addTransaction()"
+        @auto-allocate="onAutoAllocate"
+        @show-import-dialog="showImportDialog = true"
+        @show-transfer-dialog="showTransferDialog = true"
+        @navigate-to-import="navigateToImport"
+      />
     </template>
 
-    <!-- Desktop: original toolbar -->
+    <!-- Desktop toolbar -->
     <template v-if="!isMobile" #toolbar-left>
       <TransactionSearchForm @fetch="onFetch" />
     </template>
@@ -200,16 +125,25 @@
     <!-- Transfer Dialog -->
     <AccountTransferDialog v-model:visible="showTransferDialog" @transferred="onTransferred" />
 
-    <!-- Summary Bar + Table (unified card) -->
+    <!-- Summary Bar + List (unified card) -->
     <div class="content-card">
-      <TransactionSummary
+      <TransactionSummaryMobile
+        v-if="isMobile"
         :transactions="store.transactions"
         :bank-account="store.selectedBankAccount ?? undefined"
         :allocations="store.allocations"
       />
+      <TransactionSummary
+        v-else
+        :transactions="store.transactions"
+        :bank-account="store.selectedBankAccount ?? undefined"
+        :allocations="store.allocations"
+      />
+      <TransactionListMobile v-if="isMobile" :dash-if-zero="dashIfZero" />
       <TransactionList
+        v-else
         :wrap-descriptions="wrapDescriptions"
-        :show-calculator-column="!isMobile && showCalculatorColumn"
+        :show-calculator-column="showCalculatorColumn"
         :dash-if-zero="dashIfZero"
       />
     </div>
@@ -217,13 +151,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
 import Button from 'primevue/button';
-import Menu from 'primevue/menu';
-import Select from 'primevue/select';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
 import { useSettingsStore } from '../settings/settingsStore';
@@ -231,7 +163,10 @@ import { useNotifications } from '../notifications/useNotifications';
 import { useResponsive } from '../shared/composables/useResponsive';
 import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
+import TransactionListMobile from './TransactionListMobile.vue';
 import TransactionSummary from './TransactionSummary.vue';
+import TransactionSummaryMobile from './TransactionSummaryMobile.vue';
+import TransactionsToolbarMobile from './TransactionsToolbarMobile.vue';
 import TransactionImportDialog from './TransactionImportDialog.vue';
 import AccountTransferDialog from './AccountTransferDialog.vue';
 import type { TransactionData } from './transaction.types';
@@ -250,47 +185,12 @@ const showCalculatorColumn = ref(false);
 const showImportDialog = ref(false);
 const showTransferDialog = ref(false);
 
-// Mobile: inline search state (mirrors TransactionSearchForm for mobile toolbar)
+// Mobile: inline search state (shared with TransactionsToolbarMobile via props/events)
 const searchState = ref({
   selectedBankAccountId: null as number | null,
   selectedBudgetId: null as number | null,
   initialised: false,
 });
-
-const budgetLink = computed(() => {
-  if (searchState.value.selectedBudgetId) {
-    return `#/budgets/${searchState.value.selectedBudgetId}`;
-  }
-  return '#/budgets';
-});
-
-// Mobile: popup menu for import/transfer actions
-const importMenuRef = ref();
-const importMenuItems = computed(() => [
-  {
-    label: 'Import',
-    icon: 'pi pi-upload',
-    command: () => {
-      showImportDialog.value = true;
-    },
-  },
-  {
-    label: 'Import CAMT',
-    icon: 'pi pi-file',
-    command: () => navigateToImport(),
-  },
-  {
-    label: 'Transfer',
-    icon: 'pi pi-arrow-right-arrow-left',
-    command: () => {
-      showTransferDialog.value = true;
-    },
-  },
-]);
-
-function toggleImportMenu(event: Event) {
-  importMenuRef.value.toggle(event);
-}
 
 onMounted(() => {
   headingStore.setHeading('Transactions');
@@ -319,22 +219,24 @@ function initMobileSearch() {
       searchState.value.selectedBudgetId = queryBudgetId ?? firstBudget?.id ?? null;
 
       searchState.value.initialised = true;
-      emitMobileFetch();
+      fetchMobileTransactions();
       unwatch();
     },
     { immediate: true },
   );
 }
 
-function onBankAccountChange() {
-  emitMobileFetch();
+function onMobileBankAccountChange(id: number) {
+  searchState.value.selectedBankAccountId = id;
+  fetchMobileTransactions();
 }
 
-function onBudgetChange() {
-  emitMobileFetch();
+function onMobileBudgetChange(id: number) {
+  searchState.value.selectedBudgetId = id;
+  fetchMobileTransactions();
 }
 
-function emitMobileFetch() {
+function fetchMobileTransactions() {
   if (searchState.value.selectedBudgetId && searchState.value.selectedBankAccountId) {
     router.replace({
       query: {
@@ -392,9 +294,10 @@ function onImport(transactions: TransactionData[]) {
 }
 
 function onTransferred() {
+  if (!store.selectedBudget?.id || !store.selectedBankAccount?.id) return;
   store.fetch({
-    budgetId: store.selectedBudget!.id!,
-    bankAccountId: store.selectedBankAccount!.id!,
+    budgetId: store.selectedBudget.id,
+    bankAccountId: store.selectedBankAccount.id,
   });
 }
 
@@ -427,29 +330,5 @@ function navigateToImport() {
   border-radius: 6px;
   background-color: var(--p-surface-0);
   margin-bottom: 0.75rem;
-}
-
-/* ── Mobile toolbar ── */
-.mobile-toolbar {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  width: 100%;
-}
-
-.mobile-selectors {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.mobile-select {
-  width: 100%;
-}
-
-.mobile-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
 }
 </style>

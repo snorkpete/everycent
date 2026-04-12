@@ -1,53 +1,5 @@
 <template>
-  <!-- Mobile summary -->
-  <div v-if="isMobile" class="transaction-summary transaction-summary--mobile">
-    <div class="summary-grid-mobile">
-      <div class="summary-cell-mobile">
-        <span class="summary-label">Last Bal</span>
-        <EcMoneyDisplay
-          :model-value="lastBankBalance"
-          emphasis="subtotal"
-          data-testid="last-bank-balance"
-        />
-      </div>
-      <div class="summary-cell-mobile summary-cell-mobile--right">
-        <span class="summary-label">Bank Bal</span>
-        <EcMoneyDisplay
-          :model-value="currentBankBalance"
-          emphasis="subtotal"
-          data-testid="current-bank-balance"
-        />
-      </div>
-      <div class="summary-cell-mobile">
-        <span class="summary-label">Txns</span>
-        <EcMoneyDisplay
-          :model-value="transactionTotal"
-          emphasis="subtotal"
-          data-testid="transaction-total"
-        />
-      </div>
-      <div v-if="showBudgetBalance" class="summary-cell-mobile summary-cell-mobile--right">
-        <span class="summary-label">Diff</span>
-        <EcMoneyDisplay
-          :model-value="budgetDifference"
-          highlight-mode="difference"
-          emphasis="subtotal"
-          data-testid="budget-difference"
-        />
-      </div>
-      <div v-else-if="showUnpaidBalance" class="summary-cell-mobile summary-cell-mobile--right">
-        <span class="summary-label">Unpaid</span>
-        <EcMoneyDisplay
-          :model-value="unpaidBalance"
-          emphasis="subtotal"
-          data-testid="unpaid-balance"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- Desktop summary -->
-  <div v-else class="transaction-summary">
+  <div class="transaction-summary">
     <!-- Row 1: Last Balance | Transactions | Bank Balance -->
     <div class="summary-grid">
       <div class="summary-cell">
@@ -152,7 +104,6 @@ import { computed } from 'vue';
 import Button from 'primevue/button';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useTransactionStore } from './transactionStore';
-import { useResponsive } from '../shared/composables/useResponsive';
 import { total } from '../shared/util/total';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import type { TransactionData, AllocationData } from './transaction.types';
@@ -164,7 +115,6 @@ const { bankAccount, transactions, allocations } = defineProps<{
   allocations: AllocationData[];
 }>();
 
-const { isMobile } = useResponsive();
 const settingsStore = useSettingsStore();
 const store = useTransactionStore();
 
@@ -298,31 +248,5 @@ const unpaidDifference = computed(() => currentBankBalance.value - unpaidBalance
 .calc-fade-leave-to {
   opacity: 0;
   transform: scale(0.95);
-}
-
-/* ── Mobile summary ── */
-.transaction-summary--mobile {
-  padding: 0.3rem 0.5rem;
-}
-
-.summary-grid-mobile {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.15rem 0.75rem;
-  align-items: baseline;
-}
-
-.summary-cell-mobile {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
-}
-
-.summary-cell-mobile--right {
-  justify-content: flex-end;
-}
-
-.summary-cell-mobile :deep(.money-display) {
-  margin-left: auto;
 }
 </style>
