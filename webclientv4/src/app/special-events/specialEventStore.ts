@@ -54,7 +54,10 @@ export const useSpecialEventStore = defineStore('specialEvents', () => {
     error.value = null;
     try {
       await specialEventApi.update(id, data);
-      await fetchAll();
+      await Promise.all([
+        fetchAll(),
+        fetchOne(id),
+      ]);
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to update special event';
       throw e;

@@ -126,7 +126,6 @@ async function onSubmit(data: Partial<SpecialEventData>) {
   if (!data.id) return;
   try {
     await store.update(data.id, data);
-    await store.fetchOne(data.id);
     notifications.success('Special event updated');
     formVisible.value = false;
   } catch {
