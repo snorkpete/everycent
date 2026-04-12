@@ -1,0 +1,1 @@
+import{b as a}from"./index-gmHxltQM.js";const n={getAll:()=>a.get("/institutions").then(t=>t.data),create:t=>a.post("/institutions",t).then(i=>i.data),update:t=>a.put(`/institutions/${t.id}`,t).then(i=>i.data)};export{n as i};

@@ -134,7 +134,7 @@ export function buildMenuItems(
     buildReportsSection(navigate),
     buildSetupSection(navigate),
     { separator: true },
-    { label: 'Old Version', icon: Icon.OLD_VERSION, url: '/#/' },
+    { label: 'Old Version', icon: Icon.OLD_VERSION, url: '/v3/#/' },
     { label: 'Log Out', icon: Icon.LOGOUT, command: onLogout },
   ];
 }

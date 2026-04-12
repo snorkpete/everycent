@@ -108,7 +108,7 @@ describe('menuItems', () => {
     const oldVersion = items.find((item) => item.label === 'Old Version');
 
     expect(oldVersion).toBeDefined();
-    expect(oldVersion!.url).toBe('/#/');
+    expect(oldVersion!.url).toBe('/v3/#/');
   });
 
   it('includes Log Out item that calls the onLogout callback', () => {
