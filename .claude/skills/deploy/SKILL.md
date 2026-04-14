@@ -1,7 +1,7 @@
 ---
 name: deploy
-description: Use to deploy the Vue app to Heroku production from a clean master — updates "What's New", rebuilds static assets, pushes to origin + heroku, runs migrations. Fires on /deploy, "deploy to production", "ship this to prod".
-version: 1.1.0
+description: Use to deploy the Vue app to Heroku production from a clean master — runs tests, updates "What's New", rebuilds static assets, pushes to origin + heroku, runs migrations. Fires on /deploy, "deploy to production", "ship this to prod".
+version: 1.2.0
 ---
 
 # Deploy to Production
@@ -46,7 +46,27 @@ git log origin/master..HEAD --stat
 
 Summarise in plain language which changes are **user-facing** (affect workflow, visible UI, new features) vs **internal** (refactors, test changes, infrastructure). The user-facing ones are candidates for "What's New."
 
-## Step 3 — Update "What's New"
+## Step 3 — Run tests (gate)
+
+Run both suites before touching any commits. If either fails, abort with the failure output and tell the user: "tests failed, aborting deploy — fix and rerun."
+
+Vue unit tests (run from `webclientv4/`):
+
+```bash
+cd webclientv4 && npm run test
+```
+
+Rails tests (run from the **repo root**, not from `webclientv4/` — `cd ..` back up first if you're still in the Vue directory from the previous command):
+
+```bash
+bundle exec rspec
+```
+
+Cypress is intentionally skipped here — it's a separate workstream. Type-checking is covered by the Vue build in Step 5 (`npm run build` fails on TS errors).
+
+Only proceed to Step 4 if both suites pass cleanly.
+
+## Step 4 — Update "What's New"
 
 Read `webclientv4/src/app/home/whatsNewContent.ts`.
 
@@ -70,7 +90,7 @@ git commit -m "chore(home): update what's new for deploy"
 
 If the user decides no update is needed this deploy, skip the commit and continue.
 
-## Step 4 — Build assets
+## Step 5 — Build assets
 
 ### Angular (optional)
 
@@ -92,7 +112,7 @@ This compiles TypeScript + bundles the app to `public/`. If either build fails, 
 
 **Build order matters:** Angular first, then Vue. Vue's `emptyOutDir` is off, so it won't clear `public/v3/`.
 
-## Step 5 — Commit built assets
+## Step 6 — Commit built assets
 
 ```bash
 git status --short public/
@@ -107,9 +127,9 @@ git commit -m "production build"
 
 If nothing changed (rare, but possible if the source changes were non-UI), skip this step.
 
-## Step 6 — Push to remotes
+## Step 7 — Push to remotes
 
-Commits were already reviewed in Steps 2–3 and validated by the build in Step 4. Push sequentially, reporting each:
+Commits were already reviewed in Steps 2 and 4, tests passed in Step 3, and the build validated types in Step 5. Push sequentially, reporting each:
 
 ```bash
 git push origin master
@@ -120,7 +140,7 @@ If either push fails, report `<remote> push failed` and stop — the user will i
 
 **Do not push to `staging`** unless the user explicitly asked for a staging deploy at the start. If requested, run `git push staging master:main` as a third push; on failure, report `staging push failed` and continue (staging failure does not block production).
 
-## Step 7 — Run migrations
+## Step 8 — Run migrations
 
 ```bash
 heroku run rails db:migrate --app everycent
