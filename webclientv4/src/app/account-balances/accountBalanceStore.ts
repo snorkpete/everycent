@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { accountBalanceApi } from './accountBalanceApi';
+import { useReadyStatus } from '../shared/composables/useReadyStatus';
 import type { AccountBalanceData, BalanceAdjustmentData } from './accountBalance.types';
 
 export const useAccountBalanceStore = defineStore('accountBalance', () => {
@@ -107,7 +108,7 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
     flatAccounts.value.reduce((sum, a) => sum + a.current_balance, 0),
   );
 
-  const ready = computed(() => !loading.value && !error.value);
+  const ready = useReadyStatus({ loading, error });
 
   return {
     accounts,

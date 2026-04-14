@@ -1,6 +1,7 @@
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { reportApi } from '../reportApi';
+import { useReadyStatus } from '../../shared/composables/useReadyStatus';
 import type { NeedsVsWantsRow } from './needsVsWants.types';
 import type { ReportFieldConfig } from '../report.types';
 
@@ -25,7 +26,7 @@ export const useNeedsVsWantsStore = defineStore('needsVsWants', () => {
     }
   }
 
-  const ready = computed(() => !loading.value && !error.value);
+  const ready = useReadyStatus({ loading, error });
 
   return {
     data,
