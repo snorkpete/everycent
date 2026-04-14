@@ -369,4 +369,52 @@ describe('accountBalanceStore', () => {
       expect(store.totalAssets).toBe(500000);
     });
   });
+
+  describe('ready computed', () => {
+    it('returns true when not loading and no error', () => {
+      const store = useAccountBalanceStore();
+
+      expect(store.ready).toBe(true);
+    });
+
+    it('returns false when loading is true', async () => {
+      let resolve!: (value: AccountBalanceData[]) => void;
+      vi.mocked(accountBalanceApi.getAll).mockImplementation(
+        () => new Promise((r) => (resolve = r)),
+      );
+
+      const store = useAccountBalanceStore();
+      const fetchPromise = store.fetch();
+
+      expect(store.ready).toBe(false);
+
+      resolve([]);
+      await fetchPromise;
+    });
+
+    it('returns false when error is set', async () => {
+      vi.mocked(accountBalanceApi.getAll).mockRejectedValue(new Error('failed'));
+
+      const store = useAccountBalanceStore();
+      await store.fetch().catch(() => {});
+
+      expect(store.ready).toBe(false);
+    });
+
+    it('returns false when loading is true regardless of prior error state', async () => {
+      let resolve!: (value: AccountBalanceData[]) => void;
+      vi.mocked(accountBalanceApi.getAll).mockImplementation(
+        () => new Promise((r) => (resolve = r)),
+      );
+
+      const store = useAccountBalanceStore();
+      store.error = 'previous error';
+      const fetchPromise = store.fetch();
+
+      expect(store.ready).toBe(false);
+
+      resolve([]);
+      await fetchPromise;
+    });
+  });
 });

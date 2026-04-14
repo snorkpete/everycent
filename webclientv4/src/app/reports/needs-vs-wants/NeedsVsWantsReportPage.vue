@@ -1,8 +1,7 @@
 <template>
   <EcPageLayout page-name="needs-vs-wants-report">
-    <div v-if="store.loading" class="status-message">Loading...</div>
-    <div v-else-if="store.error" class="status-message status-message--error">{{ store.error }}</div>
-    <template v-else>
+    <EcStatusMessage :loading="store.loading" :error="store.error" />
+    <template v-if="store.ready">
       <div class="report-controls">
         <SelectButton
           v-model="viewMode"
@@ -93,6 +92,7 @@ import Card from 'primevue/card';
 import Select from 'primevue/select';
 import SelectButton from 'primevue/selectbutton';
 import EcPageLayout from '../../shared/layout/EcPageLayout.vue';
+import EcStatusMessage from '../../shared/layout/EcStatusMessage.vue';
 import EcMoneyDisplay from '../../shared/form/money-field/EcMoneyDisplay.vue';
 import { Emphasis } from '../../shared/constants/emphasis';
 import { HighlightMode } from '../../shared/constants/highlightMode';
@@ -246,16 +246,6 @@ const chartOptions = computed(() => ({
 </script>
 
 <style scoped>
-.status-message {
-  padding: 1rem;
-  text-align: center;
-  color: var(--p-text-muted-color);
-}
-
-.status-message--error {
-  color: var(--p-red-600);
-}
-
 .report-controls {
   display: flex;
   align-items: center;

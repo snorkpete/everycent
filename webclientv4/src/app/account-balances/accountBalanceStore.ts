@@ -107,11 +107,14 @@ export const useAccountBalanceStore = defineStore('accountBalance', () => {
     flatAccounts.value.reduce((sum, a) => sum + a.current_balance, 0),
   );
 
+  const ready = computed(() => !loading.value && !error.value);
+
   return {
     accounts,
     includeClosed,
     loading,
     error,
+    ready,
     fetch,
     adjustBalances,
     currentAccounts,

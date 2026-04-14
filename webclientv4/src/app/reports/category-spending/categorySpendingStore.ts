@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { reportApi } from '../reportApi';
 import type { CategorySpendingRow } from './categorySpending.types';
@@ -25,11 +25,14 @@ export const useCategorySpendingStore = defineStore('categorySpending', () => {
     }
   }
 
+  const ready = computed(() => !loading.value && !error.value);
+
   return {
     data,
     fields,
     loading,
     error,
+    ready,
     fetch,
   };
 });

@@ -31,13 +31,12 @@
     </template>
 
     <!-- Summary Strip -->
-    <AccountBalanceSummaryStrip v-if="!store.loading && !store.error" />
+    <AccountBalanceSummaryStrip v-if="store.ready" />
 
     <!-- Content -->
     <div class="content-area">
-      <div v-if="store.loading" class="loading-message">Loading...</div>
-      <div v-else-if="store.error" class="error-message">{{ store.error }}</div>
-      <template v-else>
+      <EcStatusMessage :loading="store.loading" :error="store.error" />
+      <template v-if="store.ready">
         <div v-if="store.currentAccounts.length" class="content-card">
           <AccountCategoryTable
             heading="Current Accounts"
@@ -89,6 +88,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
+import EcStatusMessage from '../shared/layout/EcStatusMessage.vue';
 import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { useHeadingStore } from '../toolbar/headingStore';
@@ -142,14 +142,4 @@ async function onToggleChanged() {
   margin-bottom: 0.5rem;
 }
 
-.loading-message,
-.error-message {
-  padding: 1rem;
-  text-align: center;
-  color: var(--p-text-muted-color);
-}
-
-.error-message {
-  color: var(--p-red-600);
-}
 </style>

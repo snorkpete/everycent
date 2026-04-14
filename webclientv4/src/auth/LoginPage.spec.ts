@@ -85,7 +85,7 @@ describe('LoginPage', () => {
 
   it('does not show error when store has no error', () => {
     const wrapper = createWrapper();
-    expect(wrapper.find('[data-testid="error-message"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="status-message"]').exists()).toBe(false);
   });
 
   it('shows error when store has an error', () => {
@@ -94,7 +94,7 @@ describe('LoginPage', () => {
 
     const wrapper = createWrapper();
 
-    const errorEl = wrapper.find('[data-testid="error-message"]');
+    const errorEl = wrapper.find('[data-testid="status-message"]');
     expect(errorEl.exists()).toBe(true);
     expect(errorEl.text()).toBe('Invalid credentials');
   });

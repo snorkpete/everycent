@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { reportApi } from '../reportApi';
 import type { NeedsVsWantsRow } from './needsVsWants.types';
@@ -25,11 +25,14 @@ export const useNeedsVsWantsStore = defineStore('needsVsWants', () => {
     }
   }
 
+  const ready = computed(() => !loading.value && !error.value);
+
   return {
     data,
     fields,
     loading,
     error,
+    ready,
     fetch,
   };
 });

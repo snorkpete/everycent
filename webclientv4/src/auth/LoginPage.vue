@@ -5,9 +5,7 @@
 
       <div ref="googleButtonRef" class="google-button" data-testid="google-button-container" />
 
-      <p v-if="authStore.error" class="error" data-testid="error-message">
-        {{ authStore.error }}
-      </p>
+      <EcStatusMessage :error="authStore.error" />
 
       <button
         type="button"
@@ -59,6 +57,7 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
 import { useAuthStore } from './authStore';
+import EcStatusMessage from '../app/shared/layout/EcStatusMessage.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -155,11 +154,6 @@ async function login() {
 .field label {
   display: block;
   margin-bottom: 0.5rem;
-}
-
-.error {
-  color: var(--p-red-600);
-  margin-bottom: 1rem;
 }
 
 .toggle-link {

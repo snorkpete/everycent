@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { reportApi } from '../reportApi';
 import type { NetWorthRow } from './netWorth.types';
@@ -25,11 +25,14 @@ export const useNetWorthStore = defineStore('netWorth', () => {
     }
   }
 
+  const ready = computed(() => !loading.value && !error.value);
+
   return {
     data,
     fields,
     loading,
     error,
+    ready,
     fetch,
   };
 });

@@ -126,4 +126,52 @@ describe('needsVsWantsStore', () => {
       expect(store.error).toBe('Failed to load needs vs wants data');
     });
   });
+
+  describe('ready computed', () => {
+    it('returns true when not loading and no error', () => {
+      const store = useNeedsVsWantsStore();
+
+      expect(store.ready).toBe(true);
+    });
+
+    it('returns false when loading is true', async () => {
+      let resolve!: (value: { success: boolean; data: never[]; fields: never[] }) => void;
+      vi.mocked(reportApi.getNeedsVsWants).mockImplementation(
+        () => new Promise((r) => (resolve = r)),
+      );
+
+      const store = useNeedsVsWantsStore();
+      const fetchPromise = store.fetch();
+
+      expect(store.ready).toBe(false);
+
+      resolve({ success: true, data: [], fields: [] });
+      await fetchPromise;
+    });
+
+    it('returns false when error is set', async () => {
+      vi.mocked(reportApi.getNeedsVsWants).mockRejectedValue(new Error('failed'));
+
+      const store = useNeedsVsWantsStore();
+      await store.fetch().catch(() => {});
+
+      expect(store.ready).toBe(false);
+    });
+
+    it('returns false when loading is true regardless of prior error state', async () => {
+      let resolve!: (value: { success: boolean; data: never[]; fields: never[] }) => void;
+      vi.mocked(reportApi.getNeedsVsWants).mockImplementation(
+        () => new Promise((r) => (resolve = r)),
+      );
+
+      const store = useNeedsVsWantsStore();
+      store.error = 'previous error';
+      const fetchPromise = store.fetch();
+
+      expect(store.ready).toBe(false);
+
+      resolve({ success: true, data: [], fields: [] });
+      await fetchPromise;
+    });
+  });
 });
