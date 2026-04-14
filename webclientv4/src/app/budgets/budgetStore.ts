@@ -10,11 +10,9 @@ export const useBudgetStore = defineStore('budget', () => {
   const budget = ref<BudgetDetailData | null>(null);
   const allocationCategories = ref<AllocationCategoryData[]>([]);
   const isEditMode = ref(false);
-  const loading = ref(false);
   const error = ref<string | null>(null);
 
   async function fetch(budgetId: number) {
-    loading.value = true;
     error.value = null;
     try {
       const [loadedBudget, loadedCategories] = await Promise.all([
@@ -26,15 +24,12 @@ export const useBudgetStore = defineStore('budget', () => {
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to load budget';
       throw e;
-    } finally {
-      loading.value = false;
     }
   }
 
   async function save() {
     if (!budget.value) return;
 
-    loading.value = true;
     error.value = null;
     try {
       const savedBudget = await budgetApi.save(budget.value);
@@ -43,8 +38,6 @@ export const useBudgetStore = defineStore('budget', () => {
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Failed to save budget';
       throw e;
-    } finally {
-      loading.value = false;
     }
   }
 
@@ -76,7 +69,6 @@ export const useBudgetStore = defineStore('budget', () => {
     budget,
     allocationCategories,
     isEditMode,
-    loading,
     error,
     fetch,
     save,

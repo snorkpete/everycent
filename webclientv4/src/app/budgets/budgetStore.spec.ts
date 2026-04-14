@@ -74,11 +74,6 @@ describe('budgetStore', () => {
       expect(store.isEditMode).toBe(false);
     });
 
-    it('has loading false', () => {
-      const store = useBudgetStore();
-      expect(store.loading).toBe(false);
-    });
-
     it('has null error', () => {
       const store = useBudgetStore();
       expect(store.error).toBeNull();
@@ -117,25 +112,6 @@ describe('budgetStore', () => {
       expect(store.allocationCategories).toEqual(sampleCategories);
     });
 
-    it('sets loading to true while fetching', async () => {
-      let resolveGet: (value: BudgetDetailData) => void;
-      vi.mocked(budgetApi.get).mockImplementation(
-        () =>
-          new Promise((r) => {
-            resolveGet = r;
-          }),
-      );
-      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(sampleCategories);
-      const store = useBudgetStore();
-
-      const fetchPromise = store.fetch(213);
-      expect(store.loading).toBe(true);
-
-      resolveGet!(sampleBudget);
-      await fetchPromise;
-      expect(store.loading).toBe(false);
-    });
-
     it('sets error and re-throws on failure', async () => {
       const apiError = new Error('Network error');
       vi.mocked(budgetApi.get).mockRejectedValue(apiError);
@@ -144,7 +120,6 @@ describe('budgetStore', () => {
 
       await expect(store.fetch(213)).rejects.toThrow('Network error');
       expect(store.error).toBe('Network error');
-      expect(store.loading).toBe(false);
     });
 
     it('clears error before fetching', async () => {
@@ -219,26 +194,6 @@ describe('budgetStore', () => {
       expect(budgetApi.save).not.toHaveBeenCalled();
     });
 
-    it('sets loading while saving', async () => {
-      let resolveSave: (value: BudgetDetailData) => void;
-      vi.mocked(budgetApi.get).mockResolvedValue(sampleBudget);
-      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue(sampleCategories);
-      vi.mocked(budgetApi.save).mockImplementation(
-        () =>
-          new Promise((r) => {
-            resolveSave = r;
-          }),
-      );
-      const store = useBudgetStore();
-      await store.fetch(213);
-
-      const savePromise = store.save();
-      expect(store.loading).toBe(true);
-
-      resolveSave!(sampleBudget);
-      await savePromise;
-      expect(store.loading).toBe(false);
-    });
   });
 
   describe('enterEditMode', () => {

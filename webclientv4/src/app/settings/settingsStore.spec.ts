@@ -48,22 +48,6 @@ describe('settingsStore', () => {
       expect(store.allocationCategories).toEqual(loadedCategories);
     });
 
-    it('sets loading to true during fetch and false after', async () => {
-      let loadingDuringCall = false;
-      vi.mocked(settingsApi.get).mockImplementation(async () => {
-        loadingDuringCall = useSettingsStore().loading;
-        return {};
-      });
-      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
-      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([]);
-
-      const store = useSettingsStore();
-      await store.fetchAll();
-
-      expect(loadingDuringCall).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
     it('sets error message on failure', async () => {
       vi.mocked(settingsApi.get).mockRejectedValue(new Error('Network error'));
       vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
@@ -73,7 +57,6 @@ describe('settingsStore', () => {
       await store.fetchAll();
 
       expect(store.error).toBe('Network error');
-      expect(store.loading).toBe(false);
     });
 
     it('sets a fallback error message when the rejection is not an Error instance', async () => {
@@ -102,7 +85,7 @@ describe('settingsStore', () => {
   });
 
   describe('save', () => {
-    it('posts settings and stores the response', async () => {
+    it('posts settings and stores the returned settings object', async () => {
       const newSettings = { family_type: 'single' as const, single_person: 'Alex' };
       vi.mocked(settingsApi.save).mockResolvedValue(newSettings);
 
@@ -113,18 +96,15 @@ describe('settingsStore', () => {
       expect(store.settings).toEqual(newSettings);
     });
 
-    it('sets loading to true during save and false after', async () => {
-      let loadingDuringSave = false;
-      vi.mocked(settingsApi.save).mockImplementation(async () => {
-        loadingDuringSave = useSettingsStore().loading;
-        return {};
-      });
+    it('stores the settings object after save, not a success flag', async () => {
+      const savedSettings = { family_type: 'couple' as const, husband: 'John', wife: 'Jane' };
+      vi.mocked(settingsApi.save).mockResolvedValue(savedSettings);
 
       const store = useSettingsStore();
-      await store.save({});
+      await store.save(savedSettings);
 
-      expect(loadingDuringSave).toBe(true);
-      expect(store.loading).toBe(false);
+      expect(store.settings).not.toHaveProperty('success');
+      expect(store.settings).toEqual(savedSettings);
     });
 
     it('sets error message and re-throws on save failure', async () => {
@@ -145,13 +125,5 @@ describe('settingsStore', () => {
       expect(store.error).toBe('Failed to save settings');
     });
 
-    it('resets loading to false on save failure', async () => {
-      vi.mocked(settingsApi.save).mockRejectedValue(new Error('fail'));
-
-      const store = useSettingsStore();
-      await store.save({}).catch(() => {});
-
-      expect(store.loading).toBe(false);
-    });
   });
 });

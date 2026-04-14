@@ -232,8 +232,8 @@ describe('AccountBalancesPage', () => {
       const wrapper = createWrapper();
       await flushPromises();
 
-      expect(wrapper.find('.loading-message').exists()).toBe(true);
-      expect(wrapper.find('.loading-message').text()).toBe('Loading...');
+      expect(wrapper.find('[data-testid="status-message"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="status-message"]').text()).toBe('Loading...');
 
       resolveGetAll([]);
       await flushPromises();
@@ -268,8 +268,8 @@ describe('AccountBalancesPage', () => {
       const wrapper = createWrapper();
       await flushPromises();
 
-      expect(wrapper.find('.error-message').exists()).toBe(true);
-      expect(wrapper.find('.error-message').text()).toBe('Failed to load');
+      expect(wrapper.find('[data-testid="status-message"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="status-message"]').text()).toBe('Failed to load');
       process.off('unhandledRejection', suppress);
     });
   });

@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { reportApi } from '../reportApi';
+import { useReadyStatus } from '../../shared/composables/useReadyStatus';
 import type { NetWorthRow } from './netWorth.types';
 import type { ReportFieldConfig } from '../report.types';
 
@@ -25,11 +26,14 @@ export const useNetWorthStore = defineStore('netWorth', () => {
     }
   }
 
+  const ready = useReadyStatus({ loading, error });
+
   return {
     data,
     fields,
     loading,
     error,
+    ready,
     fetch,
   };
 });

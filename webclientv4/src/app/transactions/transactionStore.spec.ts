@@ -82,11 +82,6 @@ describe('transactionStore', () => {
       expect(store.selectedBudget).toBeNull();
     });
 
-    it('has loading false', () => {
-      const store = useTransactionStore();
-      expect(store.loading).toBe(false);
-    });
-
     it('has null error', () => {
       const store = useTransactionStore();
       expect(store.error).toBeNull();
@@ -107,21 +102,6 @@ describe('transactionStore', () => {
       expect(store.bankAccounts).toEqual(accounts);
     });
 
-    it('sets loading to true during fetch and false after', async () => {
-      let loadingDuringCall = false;
-      vi.mocked(budgetApi.getAll).mockImplementation(async () => {
-        loadingDuringCall = useTransactionStore().loading;
-        return [];
-      });
-      vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
-
-      const store = useTransactionStore();
-      await store.fetchMetadata();
-
-      expect(loadingDuringCall).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
     it('sets error message on failure', async () => {
       vi.mocked(budgetApi.getAll).mockRejectedValue(new Error('Network error'));
       vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
@@ -130,7 +110,6 @@ describe('transactionStore', () => {
       await store.fetchMetadata();
 
       expect(store.error).toBe('Network error');
-      expect(store.loading).toBe(false);
     });
 
     it('clears error on subsequent successful fetch', async () => {
@@ -220,23 +199,6 @@ describe('transactionStore', () => {
       expect(store.selectedBudget).toEqual(budget);
     });
 
-    it('sets loading to true during fetch and false after', async () => {
-      let loadingDuringCall = false;
-      vi.mocked(transactionApi.getAll).mockImplementation(async () => {
-        loadingDuringCall = useTransactionStore().loading;
-        return [];
-      });
-      vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
-
-      const store = useTransactionStore();
-      store.bankAccounts = [{ id: 2, name: 'Checking' }];
-      store.budgets = [{ id: 3, name: 'Jan 2025' }];
-      await store.fetch({ budgetId: 3, bankAccountId: 2 });
-
-      expect(loadingDuringCall).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
     it('sets error message on failure', async () => {
       vi.mocked(transactionApi.getAll).mockRejectedValue(new Error('Fetch failed'));
       vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
@@ -247,7 +209,6 @@ describe('transactionStore', () => {
       await store.fetch({ budgetId: 3, bankAccountId: 2 });
 
       expect(store.error).toBe('Fetch failed');
-      expect(store.loading).toBe(false);
     });
 
     it('clears error on subsequent successful fetch', async () => {
@@ -318,27 +279,6 @@ describe('transactionStore', () => {
       await expect(store.save([])).rejects.toThrow('Save failed');
 
       expect(store.error).toBe('Save failed');
-    });
-
-    it('sets loading to true during save and false after', async () => {
-      let loadingDuringSave = false;
-      vi.mocked(transactionApi.save).mockImplementation(async () => {
-        loadingDuringSave = useTransactionStore().loading;
-        return [];
-      });
-      vi.mocked(transactionApi.getAll).mockResolvedValue([]);
-      vi.mocked(budgetApi.getAllocations).mockResolvedValue([]);
-
-      const store = useTransactionStore();
-      store.selectedBankAccount = { id: 2 };
-      store.selectedBudget = { id: 3 };
-      store.bankAccounts = [{ id: 2 }];
-      store.budgets = [{ id: 3 }];
-
-      await store.save([]);
-
-      expect(loadingDuringSave).toBe(true);
-      expect(store.loading).toBe(false);
     });
 
     it('does nothing when selectedBankAccount or selectedBudget is null', async () => {

@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { reportApi } from '../reportApi';
+import { useReadyStatus } from '../../shared/composables/useReadyStatus';
 import type { CategorySpendingRow } from './categorySpending.types';
 import type { ReportFieldConfig } from '../report.types';
 
@@ -25,11 +26,14 @@ export const useCategorySpendingStore = defineStore('categorySpending', () => {
     }
   }
 
+  const ready = useReadyStatus({ loading, error });
+
   return {
     data,
     fields,
     loading,
     error,
+    ready,
     fetch,
   };
 });

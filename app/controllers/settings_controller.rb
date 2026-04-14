@@ -27,6 +27,6 @@ class SettingsController < ApplicationController
       Setting.wife = params[:wife]
     end
 
-    render json: { success: true }
+    render json: Setting.as_hash
   end
 end

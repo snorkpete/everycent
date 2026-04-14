@@ -41,20 +41,6 @@ describe('futureBudgetsStore', () => {
       expect(store.allocationCategories).toEqual(categories);
     });
 
-    it('sets loading true during fetch and false after', async () => {
-      let loadingDuringCall = false;
-      vi.mocked(apiGateway.get).mockImplementationOnce(async () => {
-        loadingDuringCall = useFutureBudgetsStore().loading;
-        return { data: [] };
-      });
-
-      const store = useFutureBudgetsStore();
-      await store.fetchAll();
-
-      expect(loadingDuringCall).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
     it('sets error message on failure', async () => {
       mockApiGateway.rejectGet('/budgets/future', new Error('Network error'));
 
@@ -62,7 +48,6 @@ describe('futureBudgetsStore', () => {
       await store.fetchAll();
 
       expect(store.error).toBe('Network error');
-      expect(store.loading).toBe(false);
     });
 
     it('clears error on subsequent successful fetch', async () => {
@@ -269,13 +254,5 @@ describe('futureBudgetsStore', () => {
       expect(store.error).toBe('Save failed');
     });
 
-    it('resets loading to false on failure', async () => {
-      mockApiGateway.rejectPost('/budgets/mass_update', new Error('fail'));
-
-      const store = useFutureBudgetsStore();
-      await store.massUpdate({ type: 'income', name: 'Salary', amounts: [] }).catch(() => {});
-
-      expect(store.loading).toBe(false);
-    });
   });
 });

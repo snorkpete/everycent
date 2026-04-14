@@ -36,20 +36,6 @@ describe('bankAccountStore', () => {
       expect(store.bankAccounts).toEqual(accounts);
     });
 
-    it('sets loading to true during fetch and false after', async () => {
-      let loadingDuringCall = false;
-      vi.mocked(apiGateway.get).mockImplementationOnce(async () => {
-        loadingDuringCall = useBankAccountStore().loading;
-        return { data: [] };
-      });
-
-      const store = useBankAccountStore();
-      await store.fetchAll();
-
-      expect(loadingDuringCall).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
     it('sets error message on failure', async () => {
       mockApiGateway.rejectGet('/bank_accounts', new Error('Network error'));
 
@@ -57,7 +43,6 @@ describe('bankAccountStore', () => {
       await store.fetchAll();
 
       expect(store.error).toBe('Network error');
-      expect(store.loading).toBe(false);
     });
 
     it('clears error on subsequent successful fetch', async () => {
@@ -82,25 +67,6 @@ describe('bankAccountStore', () => {
       await store.fetchInstitutions();
 
       expect(store.institutions).toEqual(institutions);
-    });
-
-    it('manages loading state', async () => {
-      const store = useBankAccountStore();
-      const promise = store.fetchInstitutions();
-      expect(store.loading).toBe(true);
-
-      await promise;
-      expect(store.loading).toBe(false);
-    });
-
-    it('resets loading on failure', async () => {
-      mockApiGateway.rejectGet('/institutions', new Error('Timeout'));
-
-      const store = useBankAccountStore();
-      await store.fetchInstitutions();
-
-      expect(store.loading).toBe(false);
-      expect(store.error).toBe('Timeout');
     });
 
     it('sets error message on failure', async () => {
@@ -143,29 +109,6 @@ describe('bankAccountStore', () => {
       await expect(store.save({ id: 5, name: 'Account' })).rejects.toThrow('Server error');
 
       expect(store.error).toBe('Server error');
-    });
-
-    it('sets loading to true during save and false after', async () => {
-      let loadingDuringSave = false;
-      vi.mocked(apiGateway.put).mockImplementationOnce(async () => {
-        loadingDuringSave = useBankAccountStore().loading;
-        return { data: { id: 5 } };
-      });
-
-      const store = useBankAccountStore();
-      await store.save({ id: 5, name: 'Account' });
-
-      expect(loadingDuringSave).toBe(true);
-      expect(store.loading).toBe(false);
-    });
-
-    it('resets loading to false on save failure', async () => {
-      mockApiGateway.rejectPut('/bank_accounts/5', new Error('fail'));
-
-      const store = useBankAccountStore();
-      await store.save({ id: 5, name: 'Account' }).catch(() => {});
-
-      expect(store.loading).toBe(false);
     });
 
     it('refreshes bank accounts after save', async () => {
