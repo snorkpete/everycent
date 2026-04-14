@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetsToolbarMobile from './BudgetsToolbarMobile.vue';
 
@@ -8,17 +8,20 @@ const ADD_BTN = '[data-testid="add-budget-btn"]';
 const REOPEN_BTN = '[data-testid="reopen-btn"]';
 const REFRESH_BTN = '[data-testid="refresh-btn"]';
 
+let pinia: Pinia;
+
 function createWrapper(): VueWrapper {
   return mount(BudgetsToolbarMobile, {
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
     },
   });
 }
 
 describe('BudgetsToolbarMobile', () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
   });
   describe('layout', () => {
     it('renders the Add New Budget button', () => {

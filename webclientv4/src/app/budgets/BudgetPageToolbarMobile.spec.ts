@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { setActivePinia, createPinia } from 'pinia';
+import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import BudgetPageToolbarMobile from './BudgetPageToolbarMobile.vue';
 
 const BACK_BTN = '[data-testid="back-btn"]';
 const VIEW_TRANSACTIONS_BTN = '[data-testid="view-transactions-btn"]';
+
+let pinia: Pinia;
 
 function createWrapper(props: { transactionsHref?: string } = {}): VueWrapper {
   return mount(BudgetPageToolbarMobile, {
@@ -13,14 +15,15 @@ function createWrapper(props: { transactionsHref?: string } = {}): VueWrapper {
       transactionsHref: props.transactionsHref ?? '#/transactions?budget_id=1',
     },
     global: {
-      plugins: [PrimeVue, createPinia()],
+      plugins: [PrimeVue, pinia],
     },
   });
 }
 
 describe('BudgetPageToolbarMobile', () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
+    pinia = createPinia();
+    setActivePinia(pinia);
   });
 
   describe('layout', () => {

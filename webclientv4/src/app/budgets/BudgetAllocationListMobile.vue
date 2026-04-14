@@ -1,3 +1,11 @@
+<!--
+  Noted exception: this mobile component uses a <table> layout rather than the
+  card/list pattern described in webclientv4/CLAUDE.md. Allocations are dense
+  and benefit from column alignment even on narrow screens. The expand-on-tap
+  detail row handles secondary fields.
+  TODO: revisit whether a card layout actually serves this screen better once we
+  have real mobile usage feedback — if so, migrate to match SinkFundAllocationListMobile.
+-->
 <template>
   <div class="allocation-list-mobile">
     <table class="ec-budget-table allocations-table-mobile">
@@ -73,8 +81,9 @@
               "
             >
               <td>
-                <span v-if="!isSummaryRow(allocation)" class="mobile-name-cell">
+                <span :class="{ 'mobile-name-cell': !isSummaryRow(allocation) }">
                   <i
+                    v-if="!isSummaryRow(allocation)"
                     class="pi mobile-chevron"
                     :class="
                       isRowExpanded(allocation.id ?? 0) ? 'pi-chevron-down' : 'pi-chevron-right'
@@ -90,21 +99,15 @@
                     @update:model-value="allocation.name = $event"
                   />
                   <i
-                    v-if="!isEditable(allocation) && allocation.is_fixed_amount"
+                    v-if="
+                      !isSummaryRow(allocation) &&
+                      !isEditable(allocation) &&
+                      allocation.is_fixed_amount
+                    "
                     v-tooltip="'Fixed allocation'"
                     class="pi pi-lock ec-budget-table__fixed-icon"
                   ></i>
                 </span>
-                <template v-else>
-                  <EcTextField
-                    :model-value="allocation.name ?? ''"
-                    label=""
-                    inline
-                    :edit-mode="isEditable(allocation)"
-                    data-testid="allocation-name-input"
-                    @update:model-value="allocation.name = $event"
-                  />
-                </template>
               </td>
               <td class="ec-budget-table__amount-cell">
                 <EcMoneyField
@@ -144,6 +147,10 @@
                 <span class="mobile-detail-item">
                   Spent:
                   <EcMoneyDisplay :model-value="allocation.spent ?? 0" highlight-mode="none" />
+                  <EcShowTransactionsButton
+                    data-testid="show-transactions-btn"
+                    @click.stop="showTransactions(allocation)"
+                  />
                 </span>
                 <span class="mobile-detail-item">
                   {{ category.name }}
@@ -226,6 +233,7 @@ import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import EcDeleteButton from '../shared/EcDeleteButton.vue';
+import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { budgetApi } from './budgetApi';
 import type { AllocationData } from '../transactions/transaction.types';
@@ -287,6 +295,12 @@ function remaining(allocation: AllocationData): number {
 const dialogVisible = ref(false);
 const selectedAllocationId = ref(0);
 const selectedAllocationName = ref('');
+
+function showTransactions(allocation: AllocationData) {
+  selectedAllocationId.value = allocation.id ?? 0;
+  selectedAllocationName.value = allocation.name ?? '';
+  dialogVisible.value = true;
+}
 
 function toggleFixedDetail() {
   if (isFixedDetailVisible.value) {

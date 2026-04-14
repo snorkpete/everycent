@@ -57,6 +57,13 @@ const {
 } = useBudgetSummary();
 </script>
 
+<!--
+  TODO: .nws-pill, .strip-label, .strip-value, .strip-item style blocks are
+  duplicated verbatim in BudgetSummaryStrip.vue (desktop). Style duplication
+  between mobile/desktop variants usually signals a missing shared component —
+  consider extracting an EcSummaryStrip / EcNwsPill primitive rather than
+  dropping into a shared stylesheet.
+-->
 <style scoped>
 .summary-strip--mobile {
   display: flex;

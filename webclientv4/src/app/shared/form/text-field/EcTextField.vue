@@ -23,20 +23,20 @@ import InputText from 'primevue/inputtext';
 
 defineOptions({ inheritAttrs: false });
 
-withDefaults(
-  defineProps<{
-    modelValue: string;
-    label: string;
-    editMode: boolean;
-    type?: string;
-    /** When true: hides the label and renders as a single-line inline widget. */
-    inline?: boolean;
-  }>(),
-  {
-    type: 'text',
-    inline: false,
-  },
-);
+const {
+  modelValue,
+  label,
+  editMode,
+  type = 'text',
+  inline = false,
+} = defineProps<{
+  modelValue: string;
+  label: string;
+  editMode: boolean;
+  type?: string;
+  /** When true: hides the label and renders as a single-line inline widget. */
+  inline?: boolean;
+}>();
 
 defineEmits<{
   'update:modelValue': [value: string];
