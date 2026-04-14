@@ -1,7 +1,7 @@
 # Task: Update deploy skill to run tests and abort on failure
 
 **ID:** update-deploy-skill-to-run-tests-and-abort-on-failure
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-11

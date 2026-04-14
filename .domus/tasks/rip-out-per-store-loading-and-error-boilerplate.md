@@ -1,7 +1,7 @@
 # Task: Rip out per-store loading and error boilerplate
 
 **ID:** rip-out-per-store-loading-and-error-boilerplate
-**Status:** raw
+**Status:** in-progress
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-10

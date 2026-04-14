@@ -1,7 +1,7 @@
 # Task: Refactor budget and transaction screens to new mobile dev standards
 
 **ID:** refactor-budget-and-transaction-screens-to-new-mobile-dev-standards
-**Status:** in-progress
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-05

@@ -8,15 +8,9 @@ Always check the existing task list before creating a new task. Run `domus task 
 
 Task markdown files have two distinct parts — use the right tool for each:
 
-- **Metadata fields** (frontmatter: status, autonomous, priority, depends-on, etc.) — always update via `domus task update <id> --field value`. This keeps `tasks.jsonl` in sync. **NEVER edit frontmatter fields directly in the .md file** — this causes silent divergence between the .md and tasks.jsonl, producing incorrect task list displays and broken commands. This applies to all agents, including cleanup/bulk-update agents.
-- **Status transitions** — use `domus task advance <id>` for normal forward progression. Use `domus task cancel`, `domus task defer`, `domus task reopen` for escape hatches. `domus task status` is a Doctor power tool only. **NEVER write Status: lines directly into .md files** — always use the CLI commands above.
+- **Metadata fields** (frontmatter: status, autonomous, priority, depends-on, etc.) — always update via `domus task update <id> --field value`. This keeps `tasks.jsonl` in sync. Direct file edits to frontmatter will silently diverge from the index and break `domus task overview` and other commands.
+- **Status transitions** — use `domus task advance <id>` for normal forward progression. Use `domus task cancel`, `domus task defer`, `domus task reopen` for escape hatches. `domus task status` is a Doctor power tool only.
 - **Body content** (description, acceptance criteria, implementation notes) — edit the markdown file directly with Write/Edit tools. The CLI has no flags for body content.
-
-## Committing domus store changes
-
-When staging `.domus/` changes for a commit, always stage the **index files** (`tasks.jsonl`, `ideas.jsonl`) alongside any `.md` files in the same directory. The CLI keeps both in sync on disk, but if only the `.md` files are staged, the committed jsonl will be stale and downstream commands will see a diverged index.
-
-Rule of thumb: if you `git add .domus/tasks/*.md`, also `git add .domus/tasks/tasks.jsonl`. Same for ideas.
 
 ## Task status lifecycle
 
@@ -85,22 +79,15 @@ When the user says "dispatch", "run the worker on X", "dispatch this task", or s
 
 Only dispatch tasks that are `ready` status. If the task is not ready, advance it first or ask the user.
 
-After dispatch, the Foreman manages the review cycle. Do not merge worker output without user approval — see `.domus/reference/staff/roles/foreman.md` for the full protocol.
+After dispatch, the Foreman manages the review cycle (dispatch, supervision, advancement). Do not merge worker output without user approval — when the human approves, Housekeeper handles the landing step. See `.domus/reference/staff/roles/foreman.md` for the dispatch protocol and the `housekeeper` skill for merge/close-out.
 
 ## Updating the base branch config
 
 Run `domus config set-branch [<branch>]` when the user explicitly mentions the domus branch config — e.g. "set the domus branch", "update the domus branch config", "change the domus base branch". If no branch is given, the current git branch is detected automatically. Do not trigger on generic git branch mentions.
 
-## Staff — always-present roles
-
-@staff/staff.md
-@staff/role-activation-rules.md
-@staff/roles/butler.md
-@staff/roles/foreman.md
-
 ## Further reading (load when needed)
 
 - `docs/cli-reference.md` — read when using the domus CLI directly (command syntax, flags)
 - `decisions/000-vision.md` — read when scoping new features or when the right direction feels unclear
-- `decisions/003-personas-vs-skills.md` — read when working with the Domus staff and roles (Butler, Worker, etc.)
+- `decisions/003-personas-vs-skills.md` — read when working with the Domus staff and roles (Butler, Oracle, Worker, etc.)
 - `decisions/004-domus-store-and-worker-logging.md` — read when working with autonomous dispatch, worktrees, or execution logs
