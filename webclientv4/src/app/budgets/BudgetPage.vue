@@ -1,17 +1,29 @@
 <template>
   <EcPageLayout page-name="budget" variant="fixed">
-    <template #toolbar-left>
-      <Button
-        v-if="isMobile"
-        v-tooltip="'Back to budget list'"
-        icon="pi pi-arrow-left"
-        outlined
-        size="small"
-        data-testid="back-btn"
-        @click="router.push('/budgets')"
+    <!-- Mobile toolbar -->
+    <template v-if="isMobile" #toolbar>
+      <BudgetPageToolbarMobile
+        :transactions-href="`#/transactions?budget_id=${route.params.id}`"
+        @back="router.push('/budgets')"
       />
+      <template v-if="!store.isEditMode">
+        <Button label="Edit" data-testid="edit-btn" size="small" @click="store.enterEditMode()" />
+      </template>
+      <template v-else>
+        <Button label="Save" data-testid="save-btn" size="small" @click="onSave" />
+        <Button
+          label="Cancel"
+          severity="secondary"
+          data-testid="cancel-btn"
+          size="small"
+          @click="onCancel"
+        />
+      </template>
+    </template>
+
+    <!-- Desktop toolbar -->
+    <template v-if="!isMobile" #toolbar-left>
       <Button
-        v-else
         label="Back to Budget List"
         icon="pi pi-arrow-left"
         outlined
@@ -19,26 +31,14 @@
         data-testid="back-btn"
         @click="router.push('/budgets')"
       />
-      <Button
-        v-if="isMobile"
-        v-tooltip="'View transactions for this budget'"
-        icon="pi pi-list"
-        text
-        severity="secondary"
-        size="small"
-        as="a"
-        :href="`#/transactions?budget_id=${route.params.id}`"
-        data-testid="view-transactions-btn"
-      />
       <a
-        v-else
         :href="`#/transactions?budget_id=${route.params.id}`"
         class="view-transactions-link"
         data-testid="view-transactions-btn"
         >View Transactions</a
       >
     </template>
-    <template #toolbar-right>
+    <template v-if="!isMobile" #toolbar-right>
       <Button
         v-if="!store.isEditMode"
         label="Edit"
@@ -59,7 +59,8 @@
     </template>
 
     <!-- Budget Summary Strip -->
-    <BudgetSummaryStrip />
+    <BudgetSummaryStripMobile v-if="isMobile" />
+    <BudgetSummaryStrip v-else />
 
     <!-- Scrollable content area -->
     <div class="content-area">
@@ -67,7 +68,8 @@
         <BudgetIncomeList />
       </div>
       <div class="content-card" data-testid="allocations-section">
-        <BudgetAllocationList />
+        <BudgetAllocationListMobile v-if="isMobile" />
+        <BudgetAllocationList v-else />
       </div>
     </div>
   </EcPageLayout>
@@ -85,7 +87,10 @@ import { useSettingsStore } from '../settings/settingsStore';
 import { useResponsive } from '../shared/composables/useResponsive';
 import BudgetIncomeList from './BudgetIncomeList.vue';
 import BudgetAllocationList from './BudgetAllocationList.vue';
+import BudgetAllocationListMobile from './BudgetAllocationListMobile.vue';
 import BudgetSummaryStrip from './BudgetSummaryStrip.vue';
+import BudgetSummaryStripMobile from './BudgetSummaryStripMobile.vue';
+import BudgetPageToolbarMobile from './BudgetPageToolbarMobile.vue';
 
 const { isMobile } = useResponsive();
 const route = useRoute();

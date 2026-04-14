@@ -41,6 +41,34 @@ describe('EcTextField', () => {
     });
   });
 
+  describe('inline mode', () => {
+    it('hides the label in read-only mode when inline=true', () => {
+      const wrapper = createWrapper({ inline: true });
+
+      expect(wrapper.text()).not.toContain(label);
+      expect(wrapper.text()).toContain(value);
+    });
+
+    it('hides the label in edit mode when inline=true', () => {
+      const wrapper = createWrapper({ editMode: true, inline: true });
+
+      expect(wrapper.text()).not.toContain(label);
+      expect(wrapper.find('input').exists()).toBe(true);
+    });
+
+    it('adds inline CSS class when inline=true', () => {
+      const wrapper = createWrapper({ inline: true });
+
+      expect(wrapper.find('.ec-text-field').classes()).toContain('ec-text-field--inline');
+    });
+
+    it('does not add inline CSS class by default', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('.ec-text-field').classes()).not.toContain('ec-text-field--inline');
+    });
+  });
+
   describe('edit mode', () => {
     it('displays an input field with the value', () => {
       const wrapper = createWrapper({ editMode: true });

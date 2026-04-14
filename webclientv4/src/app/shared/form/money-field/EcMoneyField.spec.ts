@@ -93,6 +93,27 @@ describe('EcMoneyField', () => {
 
       expect(valueEl.classes()).toContain('muted');
     });
+
+    it('applies item emphasis class by default', () => {
+      const wrapper = createWrapper({ modelValue: 1000 });
+      const valueEl = wrapper.find('.money-display');
+
+      expect(valueEl.classes()).toContain('emphasis-item');
+    });
+
+    it('forwards emphasis prop to EcMoneyDisplay', () => {
+      const wrapper = createWrapper({ modelValue: 1000, emphasis: 'total' });
+      const valueEl = wrapper.find('.money-display');
+
+      expect(valueEl.classes()).toContain('emphasis-total');
+    });
+
+    it('emphasis prop has no effect in edit mode (input is rendered, not EcMoneyDisplay)', () => {
+      const wrapper = createWrapper({ editMode: true, modelValue: 1000, emphasis: 'total' });
+
+      expect(wrapper.find('input').exists()).toBe(true);
+      expect(wrapper.find('.money-display').exists()).toBe(false);
+    });
   });
 
   describe('edit mode', () => {

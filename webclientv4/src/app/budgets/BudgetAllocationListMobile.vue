@@ -1,9 +1,17 @@
+<!--
+  Noted exception: this mobile component uses a <table> layout rather than the
+  card/list pattern described in webclientv4/CLAUDE.md. Allocations are dense
+  and benefit from column alignment even on narrow screens. The expand-on-tap
+  detail row handles secondary fields.
+  TODO: revisit whether a card layout actually serves this screen better once we
+  have real mobile usage feedback — if so, migrate to match SinkFundAllocationListMobile.
+-->
 <template>
-  <div class="allocation-list">
-    <table class="ec-budget-table allocations-table">
+  <div class="allocation-list-mobile">
+    <table class="ec-budget-table allocations-table-mobile">
       <thead>
         <tr class="allocation-toolbar-row">
-          <th :colspan="store.isEditMode ? 8 : 7" class="allocation-toolbar-cell">
+          <th :colspan="store.isEditMode ? 4 : 3" class="allocation-toolbar-cell">
             <div class="allocation-toolbar">
               <Button
                 v-tooltip="'Toggle between showing all allocations and variable-only mode'"
@@ -29,11 +37,7 @@
         <tr>
           <th class="name-col">Name</th>
           <th class="amount-col">Amount</th>
-          <th class="spent-col">Spent</th>
           <th class="remaining-col">Remaining</th>
-          <th class="class-col">Class</th>
-          <th class="fixed-col">Fixed?</th>
-          <th class="comment-col">Comment</th>
           <th v-if="store.isEditMode" class="action-col"></th>
         </tr>
       </thead>
@@ -55,20 +59,10 @@
             </td>
             <td class="ec-budget-table__amount-cell">
               <EcMoneyDisplay
-                :model-value="categoryTotals(category).spent"
-                emphasis="subtotal"
-                highlight-mode="none"
-              />
-            </td>
-            <td class="ec-budget-table__amount-cell">
-              <EcMoneyDisplay
                 :model-value="categoryTotals(category).remaining"
                 emphasis="subtotal"
               />
             </td>
-            <td></td>
-            <td></td>
-            <td></td>
             <td v-if="store.isEditMode"></td>
           </tr>
 
@@ -87,17 +81,29 @@
               "
             >
               <td>
-                <input
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.name"
-                  type="text"
-                  class="p-inputtext ec-budget-table__cell-input"
-                  data-testid="allocation-name-input"
-                />
-                <span v-else>
-                  {{ allocation.name }}
+                <span :class="{ 'mobile-name-cell': !isSummaryRow(allocation) }">
                   <i
-                    v-if="allocation.is_fixed_amount && !isSummaryRow(allocation)"
+                    v-if="!isSummaryRow(allocation)"
+                    class="pi mobile-chevron"
+                    :class="
+                      isRowExpanded(allocation.id ?? 0) ? 'pi-chevron-down' : 'pi-chevron-right'
+                    "
+                    @click.stop="toggleRowExpanded(allocation.id ?? 0)"
+                  ></i>
+                  <EcTextField
+                    :model-value="allocation.name ?? ''"
+                    label=""
+                    inline
+                    :edit-mode="isEditable(allocation)"
+                    data-testid="allocation-name-input"
+                    @update:model-value="allocation.name = $event"
+                  />
+                  <i
+                    v-if="
+                      !isSummaryRow(allocation) &&
+                      !isEditable(allocation) &&
+                      allocation.is_fixed_amount
+                    "
                     v-tooltip="'Fixed allocation'"
                     class="pi pi-lock ec-budget-table__fixed-icon"
                   ></i>
@@ -105,33 +111,14 @@
               </td>
               <td class="ec-budget-table__amount-cell">
                 <EcMoneyField
-                  v-if="isEditable(allocation)"
                   v-model="allocation.amount"
                   label=""
-                  :edit-mode="true"
-                />
-                <EcMoneyDisplay
-                  v-else
-                  :model-value="allocation.amount ?? 0"
+                  inline
+                  :edit-mode="isEditable(allocation)"
                   :emphasis="emphasisFor(allocation)"
                   :dash-if-zero="dashIfZero"
                   highlight-mode="none"
                 />
-              </td>
-              <td class="ec-budget-table__amount-cell">
-                <span class="spent-cell">
-                  <EcShowTransactionsButton
-                    v-if="!isSummaryRow(allocation)"
-                    data-testid="show-transactions-btn"
-                    @click="showTransactions(allocation)"
-                  />
-                  <EcMoneyDisplay
-                    :model-value="allocation.spent ?? 0"
-                    :emphasis="emphasisFor(allocation)"
-                    :dash-if-zero="dashIfZero"
-                    highlight-mode="none"
-                  />
-                </span>
               </td>
               <td class="ec-budget-table__amount-cell">
                 <EcMoneyDisplay
@@ -139,42 +126,6 @@
                   :emphasis="emphasisFor(allocation)"
                   :dash-if-zero="dashIfZero"
                 />
-              </td>
-              <td>
-                <select
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.allocation_class"
-                  class="cell-select"
-                  data-testid="allocation-class-select"
-                >
-                  <option v-for="cls in allocationClasses" :key="cls.id" :value="cls.id">
-                    {{ cls.name }}
-                  </option>
-                </select>
-                <span v-else-if="!isSummaryRow(allocation)" class="class-display">{{
-                  titleCase(allocation.allocation_class)
-                }}</span>
-              </td>
-              <td class="ec-budget-table__center-cell">
-                <input
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.is_fixed_amount"
-                  type="checkbox"
-                  data-testid="allocation-fixed-checkbox"
-                />
-                <span v-else-if="!isSummaryRow(allocation)">{{
-                  allocation.is_fixed_amount ? 'Yes' : 'No'
-                }}</span>
-              </td>
-              <td>
-                <input
-                  v-if="isEditable(allocation)"
-                  v-model="allocation.comment"
-                  type="text"
-                  class="p-inputtext ec-budget-table__cell-input"
-                  data-testid="allocation-comment-input"
-                />
-                <span v-else-if="!isSummaryRow(allocation)">{{ allocation.comment }}</span>
               </td>
               <td v-if="store.isEditMode" class="ec-budget-table__center-cell">
                 <EcDeleteButton
@@ -186,6 +137,26 @@
                 />
               </td>
             </tr>
+
+            <!-- Mobile detail row (expand on tap) -->
+            <tr
+              v-if="!isSummaryRow(allocation) && isRowExpanded(allocation.id ?? 0)"
+              class="mobile-detail-row"
+            >
+              <td :colspan="store.isEditMode ? 4 : 3">
+                <span class="mobile-detail-item">
+                  Spent:
+                  <EcMoneyDisplay :model-value="allocation.spent ?? 0" highlight-mode="none" />
+                  <EcShowTransactionsButton
+                    data-testid="show-transactions-btn"
+                    @click.stop="showTransactions(allocation)"
+                  />
+                </span>
+                <span class="mobile-detail-item">
+                  {{ category.name }}
+                </span>
+              </td>
+            </tr>
           </template>
 
           <!-- Add allocation button -->
@@ -194,7 +165,7 @@
             class="ec-budget-table__add-row"
             :data-testid="`add-allocation-row-${category.id}`"
           >
-            <td :colspan="8">
+            <td :colspan="4">
               <button
                 class="ec-budget-table__add-link"
                 :data-testid="`add-allocation-btn-${category.id}`"
@@ -222,18 +193,8 @@
             />
           </th>
           <th class="ec-budget-table__amount-cell">
-            <EcMoneyDisplay
-              :model-value="fixedTotals.spent"
-              emphasis="total"
-              highlight-mode="none"
-            />
-          </th>
-          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay :model-value="fixedTotals.remaining" emphasis="total" />
           </th>
-          <th></th>
-          <th></th>
-          <th></th>
           <th v-if="store.isEditMode"></th>
         </tr>
         <tr class="total-row" data-testid="total-row">
@@ -246,18 +207,8 @@
             />
           </th>
           <th class="ec-budget-table__amount-cell">
-            <EcMoneyDisplay
-              :model-value="grandTotals.spent"
-              emphasis="total"
-              highlight-mode="none"
-            />
-          </th>
-          <th class="ec-budget-table__amount-cell">
             <EcMoneyDisplay :model-value="grandTotals.remaining" emphasis="total" />
           </th>
-          <th></th>
-          <th></th>
-          <th></th>
           <th v-if="store.isEditMode"></th>
         </tr>
       </tfoot>
@@ -277,11 +228,10 @@ import { computed, ref } from 'vue';
 import Button from 'primevue/button';
 import { useBudgetStore } from './budgetStore';
 import { useAllocationGrouping } from './useAllocationGrouping';
-import { titleCase } from '../shared/util/titleCase';
-import { allocationClasses } from '../shared/constants/allocationClasses';
 import { Emphasis } from '../shared/constants/emphasis';
 import EcMoneyField from '../shared/form/money-field/EcMoneyField.vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import EcDeleteButton from '../shared/EcDeleteButton.vue';
 import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
@@ -291,6 +241,20 @@ import type { AllocationCategoryData } from '../allocation-categories/allocation
 import type { Emphasis as EmphasisType } from '../shared/constants/emphasis';
 
 const store = useBudgetStore();
+
+const expandedRows = ref(new Set<number>());
+
+function toggleRowExpanded(allocationId: number) {
+  if (expandedRows.value.has(allocationId)) {
+    expandedRows.value.delete(allocationId);
+  } else {
+    expandedRows.value.add(allocationId);
+  }
+}
+
+function isRowExpanded(allocationId: number): boolean {
+  return expandedRows.value.has(allocationId);
+}
 
 const allocations = computed(() => store.budget?.allocations ?? []);
 const categories = computed(() => store.allocationCategories);
@@ -312,7 +276,6 @@ const {
 
 const dashIfZero = ref(false);
 
-// Row helpers — drive all template conditionals
 function isSummaryRow(allocation: AllocationData): boolean {
   return allocation.is_fixed_amount === true && !isFixedDetailVisible.value;
 }
@@ -369,7 +332,7 @@ function addAllocation(category: AllocationCategoryData) {
 /* Shared budget table base — imported unscoped (Vue limitation) */
 @import '../shared/styles/budget-table.css';
 
-.allocation-list {
+.allocation-list-mobile {
   min-height: 0;
 }
 
@@ -386,7 +349,7 @@ function addAllocation(category: AllocationCategoryData) {
 }
 
 /* Column header row sits below toolbar */
-.allocations-table thead tr:nth-child(2) th {
+.allocations-table-mobile thead tr:nth-child(2) th {
   top: 2.25rem !important;
 }
 
@@ -397,79 +360,75 @@ function addAllocation(category: AllocationCategoryData) {
 }
 
 /* ── Base table ── */
-.allocations-table {
-  --thead-height: 4.75rem;
+.allocations-table-mobile {
+  --thead-height: 2.1rem;
 }
 
-.allocations-table th,
-.allocations-table td {
-  white-space: nowrap;
+.allocations-table-mobile th,
+.allocations-table-mobile td {
+  white-space: normal;
+  padding: 0.4rem 0.5rem;
+}
+
+.allocations-table-mobile .name-col {
+  width: auto;
+}
+
+.allocations-table-mobile td:last-child,
+.allocations-table-mobile th:last-child {
+  padding-right: 0.75rem;
+}
+
+/* ── Mobile name cell with chevron ── */
+.mobile-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mobile-chevron {
+  font-size: 0.7rem;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0.2rem;
+}
+
+/* ── Mobile detail row ── */
+.mobile-detail-row td {
+  padding: 0.25rem 0.5rem 0.4rem 1.5rem;
+  background-color: var(--p-surface-50);
+  border-bottom: 1px solid var(--p-surface-200);
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+}
+
+.mobile-detail-item {
+  margin-right: 1rem;
 }
 
 /* ── Amount column header alignment ── */
-.allocations-table thead th.amount-col,
-.allocations-table thead th.spent-col,
-.allocations-table thead th.remaining-col {
+.allocations-table-mobile thead th.amount-col,
+.allocations-table-mobile thead th.remaining-col {
   text-align: right;
 }
 
 /* ── Column widths ── */
 .name-col {
-  width: 30%;
+  width: 50%;
 }
 .amount-col {
-  width: 13%;
-}
-.spent-col {
-  width: 13%;
+  width: 25%;
 }
 .remaining-col {
-  width: 13%;
-}
-.class-col {
-  width: 10%;
-}
-.fixed-col {
-  width: 8%;
+  width: 25%;
 }
 .action-col {
   width: 5%;
 }
 
-/* ── Spent cell with eye icon (visible on hover only) ── */
-.spent-cell {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.25rem;
-}
-
-.spent-cell :deep(.p-button) {
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.spent-cell:hover :deep(.p-button) {
-  opacity: 1;
-}
-
-/* ── Class select (edit mode) ── */
-.cell-select {
-  width: 100%;
-  font-size: 0.85rem;
-  padding: 0.2rem 0.3rem;
-  border: 1px solid var(--p-surface-300);
-  border-radius: 4px;
-  background-color: var(--p-surface-0);
-}
-
-/* ── Class display ── */
-.class-display {
-  font-size: 0.85rem;
-}
-
 /* ── Row animation for variable-only toggle ── */
-.allocations-table tbody tr {
+.allocations-table-mobile tbody tr {
   transition:
     opacity 0.2s ease,
     background-color 0.2s ease;

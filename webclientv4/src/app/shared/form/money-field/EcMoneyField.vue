@@ -31,6 +31,7 @@
       <EcMoneyDisplay
         :model-value="model"
         :highlight-mode="highlightMode ?? HighlightMode.None"
+        :emphasis="emphasis"
         :dash-if-zero="dashIfZero"
       />
     </template>
@@ -43,18 +44,22 @@ import { dollarsToCents } from '../../util/dollarsToCents';
 import { centsToDollars } from '../../util/centsToDollars';
 import EcMoneyDisplay from './EcMoneyDisplay.vue';
 import { HighlightMode } from '../../constants/highlightMode';
+import { Emphasis } from '../../constants/emphasis';
 import type { HighlightMode as HighlightModeType } from '../../constants/highlightMode';
+import type { Emphasis as EmphasisType } from '../../constants/emphasis';
 
 const {
   label = '',
   editMode,
   highlightMode,
+  emphasis = Emphasis.Item,
   inline,
   dashIfZero = false,
 } = defineProps<{
   label?: string;
   editMode: boolean;
   highlightMode?: HighlightModeType;
+  emphasis?: EmphasisType;
   inline?: boolean;
   dashIfZero?: boolean;
 }>();
