@@ -1,17 +1,18 @@
 <template>
-  <div class="ec-text-field">
+  <div :class="['ec-text-field', { 'ec-text-field--inline': inline }]">
     <template v-if="editMode">
-      <label :for="inputId">{{ label }}</label>
+      <label v-if="!inline" :for="inputId">{{ label }}</label>
       <InputText
         :id="inputId"
+        v-bind="$attrs"
         :model-value="modelValue"
         :type="type"
         @update:model-value="$emit('update:modelValue', $event ?? '')"
       />
     </template>
     <template v-else>
-      <span class="label">{{ label }}</span>
-      <span class="value">{{ modelValue }}</span>
+      <span v-if="!inline" class="label">{{ label }}</span>
+      <span v-bind="$attrs" class="value">{{ modelValue }}</span>
     </template>
   </div>
 </template>
@@ -20,15 +21,20 @@
 import { useId } from 'vue';
 import InputText from 'primevue/inputtext';
 
+defineOptions({ inheritAttrs: false });
+
 withDefaults(
   defineProps<{
     modelValue: string;
     label: string;
     editMode: boolean;
     type?: string;
+    /** When true: hides the label and renders as a single-line inline widget. */
+    inline?: boolean;
   }>(),
   {
     type: 'text',
+    inline: false,
   },
 );
 
@@ -43,6 +49,11 @@ const inputId = useId();
 .ec-text-field {
   display: flex;
   flex-direction: column;
+}
+
+.ec-text-field--inline {
+  flex-direction: row;
+  align-items: center;
 }
 
 .label {

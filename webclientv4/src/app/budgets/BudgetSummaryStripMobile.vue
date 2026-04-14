@@ -1,36 +1,38 @@
 <template>
-  <!-- Desktop: horizontal strip -->
-  <div v-if="budgetStore.budget" class="summary-strip" data-testid="budget-summary-strip">
-    <div class="strip-item">
-      <span class="strip-label">Income</span>
-      <EcMoneyDisplay class="strip-value" :model-value="totalIncome" highlight-mode="none" />
+  <div
+    v-if="budgetStore.budget"
+    class="summary-strip summary-strip--mobile"
+    data-testid="budget-summary-strip"
+  >
+    <div class="strip-grid">
+      <div class="strip-item">
+        <span class="strip-label">Income</span>
+        <EcMoneyDisplay class="strip-value" :model-value="totalIncome" highlight-mode="none" />
+      </div>
+      <div class="strip-item">
+        <span class="strip-label">Allocated</span>
+        <EcMoneyDisplay class="strip-value" :model-value="totalAllocations" highlight-mode="none" />
+      </div>
+      <div class="strip-item">
+        <span class="strip-label">Unallocated</span>
+        <EcMoneyDisplay
+          class="strip-value"
+          :model-value="discretionaryTotal"
+          highlight-mode="balance"
+          data-testid="unallocated-amount"
+        />
+      </div>
+      <div class="strip-item">
+        <span class="strip-label">{{ discretionaryLabel }}</span>
+        <EcMoneyDisplay
+          class="strip-value"
+          :model-value="perPersonAmount"
+          highlight-mode="balance"
+          data-testid="discretionary-amount"
+        />
+      </div>
     </div>
-    <div class="strip-divider"></div>
-    <div class="strip-item">
-      <span class="strip-label">Allocated</span>
-      <EcMoneyDisplay class="strip-value" :model-value="totalAllocations" highlight-mode="none" />
-    </div>
-    <div class="strip-divider"></div>
-    <div class="strip-item">
-      <span class="strip-label">Unallocated</span>
-      <EcMoneyDisplay
-        class="strip-value"
-        :model-value="discretionaryTotal"
-        highlight-mode="balance"
-        data-testid="unallocated-amount"
-      />
-    </div>
-    <div class="strip-divider"></div>
-    <div class="strip-item">
-      <span class="strip-label">{{ discretionaryLabel }}</span>
-      <EcMoneyDisplay
-        class="strip-value discretionary-value"
-        :model-value="perPersonAmount"
-        highlight-mode="balance"
-        data-testid="discretionary-amount"
-      />
-    </div>
-    <div class="strip-item needs-wants-savings">
+    <div class="nws-row">
       <span v-tooltip="'Needs'" class="nws-pill nws-need">N {{ needsPercentage }}%</span>
       <span v-tooltip="'Wants'" class="nws-pill nws-want">W {{ wantsPercentage }}%</span>
       <span v-tooltip="'Savings'" class="nws-pill nws-savings">S {{ savingsPercentage }}%</span>
@@ -56,16 +58,22 @@ const {
 </script>
 
 <style scoped>
-.summary-strip {
+.summary-strip--mobile {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
   background-color: var(--p-surface-50);
   border: 1px solid var(--p-surface-300);
   border-radius: 6px;
   margin-bottom: 0.5rem;
   flex-shrink: 0;
+}
+
+.strip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1rem;
 }
 
 .strip-item {
@@ -89,23 +97,15 @@ const {
   color: var(--p-text-color);
 }
 
-.strip-divider {
-  width: 1px;
-  height: 1.2rem;
-  background-color: var(--p-surface-300);
-}
-
-.discretionary-value {
-  font-size: 1.05rem;
-  font-weight: 700;
+.nws-row {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: center;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--p-surface-200);
 }
 
 /* Needs/Wants/Savings pills */
-.needs-wants-savings {
-  margin-left: auto;
-  gap: 0.35rem;
-}
-
 .nws-pill {
   font-size: 0.7rem;
   font-weight: 600;
