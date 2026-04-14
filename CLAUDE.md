@@ -48,21 +48,13 @@ Machine-specific development info (test user credentials, etc.) lives in `.claud
 3. Commit: `git add . && git commit -m "build of static assets"`
 
 ## Deployment
-Prerequisite: user must have run `heroku login` in their terminal session.
 
-**Heroku app mapping:**
+Invoke the **deploy skill** for production deploys. The skill owns the procedure — login check, test gate, "What's New" updates, build, push, migrations. Don't run the steps manually.
+
+**Heroku app mapping** (reference for sanity-checking when poking around the CLI directly):
 - **Production**: `everycent` (eu region) — git remote `heroku`
 - **Staging**: `everycent-staging` (eu region) — git remote `staging`
 - `everycent-euro` is a **separate app**, not the production app for this repo
-
-1. Build Vue assets: `cd webclientv4 && npm run build` (outputs to /public)
-2. If Angular rebuild needed: `cd webclientv3 && npm run build` (outputs to /public/v3). Build Angular **before** Vue.
-3. Commit the built assets: `git add public/ && git commit -m "production build"`
-3. Push to all three remotes:
-   - `git push origin master` — GitHub (code backup)
-   - `git push heroku master` — Heroku production deploy
-   - `git push staging master:main` — Heroku staging (temporary; pushes master to staging's main branch)
-4. Run migrations on production: `heroku run rails db:migrate` (idempotent — safe to run every deploy)
 
 ## Testing (Vue App - webclientv4)
 - Use test-driven development (TDD). Write tests before implementation.
@@ -111,43 +103,24 @@ See `webclientv4/CLAUDE.md` for Vue 3 setup constraints and conventions.
 Reference implementations: store → `transactionStore.ts`, API → `bankAccountApi.ts`, component → `TransactionsPage.vue`.
 For detailed coding rules, see `webclientv4/docs/vue-coding-rules.md`.
 
-## Merge Strategy
-- **Single-commit feature branch → ready-for-master**: fast-forward (default `git merge`)
-- **Multi-commit feature branch → ready-for-master**: `--no-ff` (keeps commits grouped in history)
-- **ready-for-master → master**: `--ff-only` (ready-for-master is just a staging technicality, no merge commits needed)
-- **Before committing**: run `git branch --show-current` and verify you're on the expected feature branch (not master). Commits have landed on wrong branches before.
-- **When master moves ahead**: rebase the feature branch onto master (`git rebase master`) rather than merging. Keeps history linear. Only use `--no-ff` merges for multi-commit branches into ready-for-master.
-- **Never stash** on the main worktree when merging. Commit first, or use ready-for-master. Stash creates hidden state and the ready-for-master pattern makes it unnecessary.
+## Merging
+
+Invoke the **housekeeper skill** for any merge, land, or close-out operation, and for syncing `ready-for-master` back to master. Housekeeper owns the protocol — ready-for-master staging, single-commit ff vs multi-commit `--no-ff`, pre-merge rebase, worktree handling, conflict resolution. Don't DIY a merge even if the steps feel routine — the skill exists to enforce safety rails (never switch the main worktree branch, never stash on the main worktree, never merge directly to master).
+
+Two commit rules that apply outside merging too, so they live here:
+- **Never stash** on the main worktree. Commit first. Stash creates hidden state and is never the right tool when housekeeper's flow is available.
+- **Before committing** anywhere: run `git branch --show-current` and verify you're on the expected branch. Commits have landed on wrong branches before.
 
 ## Housekeeping Commits
 - **Direct to master** for `.domus/`, `CLAUDE.md`, and `vocabulary/` changes — no feature branch needed. These are docs/housekeeping, not code.
 - **Vocabulary changes get their own commits** (separate from feature work) so the evolving vocabulary is reviewable in git log.
 - **When staging `.domus/` changes**, always include the index files (`tasks.jsonl`, `ideas.jsonl`) alongside any `.md` files — staging only the `.md` files causes index drift.
 
-## Ready-for-Prod Pattern
-
-`ready-for-master` is a mutex workaround: use it as the merge target when `master` is checked out in another worktree.
-
-- **Invariant:** `ready-for-master` must always be a fast-forward from master. If `git merge ready-for-master --ff-only` fails, treat as an error — don't resolve silently.
-- **Sync immediately before merging:** run `git merge master --ff-only` on `ready-for-master` right before merging in a feature branch. If master moves between that sync and the merge, re-sync. Don't sync early and trust it stays current.
-
-## Landing Worktree Branches
-
-Full sequence for landing a completed worktree branch:
-
-1. Sync `ready-for-master` to master: `git checkout ready-for-master && git merge master --ff-only`
-2. Identify the correct branch to merge — check `cat .git/worktrees/<name>/HEAD`. The scaffold `worktree-agent-*` branch stays frozen; commits land on the task branch. Merge the task branch.
-3. Merge feature into `ready-for-master` (single-commit: ff; multi-commit: `--no-ff`)
-4. **Stop here.** Show the diff summary and wait for explicit user approval before merging to master.
-5. Update task status: `domus task advance` (repeat until done). Commit `.domus/tasks/*.md` + `tasks.jsonl` as a chore commit on `ready-for-master`.
-6. Clean up: `git worktree remove <path>` then `git branch -d <branch>`. Always merge before removing — worktree cleanup can silently delete branches with unmerged commits (issue #38287).
-7. Later (at deploy time): `git merge ready-for-master --ff-only` on master.
-
-### Worktrees
+## Worktrees
 
 - **Default to a separate worktree** for non-trivial work. The main worktree is the user's active workspace (dev server, open files). Only operate on the main worktree when explicitly told to.
 - **Default: branch new worktrees from master**, not from current work. Specify otherwise if the new branch explicitly depends on in-progress work.
-- **Ask before switching the main worktree's branch** (checkout, merge, rebase). The user runs the dev server there — switching branches disrupts their running session. Treat it like interrupting a running test suite.
+- **Ask before switching the main worktree's branch** (checkout, merge, rebase) outside of merging. The user runs the dev server there — switching branches disrupts their running session. (For merging operations, housekeeper handles this — never switches the main worktree at all.)
 
 ## Worker Dispatch Protocol
 
