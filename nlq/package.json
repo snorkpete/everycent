@@ -1,0 +1,22 @@
+{
+  "name": "everycent-nlq",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Natural Language Querying for Everycent — MCP server exposing analysis tools over the Rails backend",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/stdio.js",
+    "dev": "tsx src/stdio.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}
