@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerPingTool } from "./tools/ping.js";
+import { registerAnalyzeOverspendingTool } from "./tools/analyzeOverspending.js";
 
 export function createServer(): McpServer {
   const server = new McpServer({
@@ -8,6 +9,7 @@ export function createServer(): McpServer {
   });
 
   registerPingTool(server);
+  registerAnalyzeOverspendingTool(server);
 
   return server;
 }
