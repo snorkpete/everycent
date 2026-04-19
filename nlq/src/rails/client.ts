@@ -55,6 +55,17 @@ export class RailsClient {
         headers: this.authHeaders(),
       });
 
+      if (response.status === 401) {
+        const hint =
+          this.credentials.env === "prod"
+            ? "npm run sign-in -- --env prod"
+            : "npm run sign-in";
+        throw new Error(
+          `Rails rejected credentials (401). They may have expired — ` +
+            `re-run '${hint}' to refresh and try again.`,
+        );
+      }
+
       if (!response.ok) {
         const body = await response.text();
         throw new Error(
