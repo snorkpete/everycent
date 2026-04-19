@@ -1,4 +1,5 @@
 import type { Config } from "../config.js";
+import type { DeviseCredentials } from "../auth/credentials.js";
 
 // Node's fetch wraps low-level connection errors as `new Error("fetch failed")`
 // with the real info on `.cause`. For connection refused, cause is an
@@ -20,7 +21,18 @@ function describeCause(cause: unknown): string {
 }
 
 export class RailsClient {
-  constructor(private readonly config: Config) {}
+  constructor(
+    private readonly config: Config,
+    private readonly credentials: DeviseCredentials,
+  ) {}
+
+  private authHeaders(): Record<string, string> {
+    return {
+      "access-token": this.credentials.accessToken,
+      client: this.credentials.client,
+      uid: this.credentials.uid,
+    };
+  }
 
   async get<T>(
     path: string,
@@ -38,7 +50,10 @@ export class RailsClient {
     );
 
     try {
-      const response = await fetch(url, { signal: controller.signal });
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: this.authHeaders(),
+      });
 
       if (!response.ok) {
         const body = await response.text();
