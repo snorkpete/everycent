@@ -1,7 +1,7 @@
 # Task: Investigate LoginPage Google sign-in spec failures in worktrees
 
 **ID:** investigate-loginpage-google-sign-in-spec-failures-in-worktrees
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-14
