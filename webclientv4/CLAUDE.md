@@ -19,6 +19,7 @@ Call `router.replace({ query: { ... } })` in `emitFetch()` when selection change
 - **Always use npm scripts** — use `npm run dev`, `npm run build`, `npm run test`, never invoke tools directly (`npx vite`, `npx vitest`, etc.). If an npm script fails, fix the underlying problem (install deps, fix PATH) rather than bypassing the script.
 - **TypeScript** — type-check with `npm run type-check` (runs `vue-tsc -b --noEmit`, the `-b` flag is essential). If type-check reports stale errors, clear the build cache: `rm node_modules/.tmp/tsconfig.app.tsbuildinfo`.
 - **Worktree node_modules** — the project uses npm. Run `npm install` inside each worktree — do not symlink from another worktree (symlinked `node_modules` break Vite asset resolution via `@fs`, e.g. primeicons fonts fail). Do not run `bun install` in this project; bun auto-migrates `package-lock.json` to its own `bun.lock`, creating lockfile drift. (A "should we migrate to bun?" discussion is in `project_next-up.md`.)
+- **Worktree `.env.local`** — `.env.local` is gitignored and absent in fresh worktrees. Tests don't need it (`VITE_GOOGLE_CLIENT_ID` is stubbed where required), but `npm run dev` does — Google sign-in silently no-ops without the client ID. Copy it in from the main checkout before running the dev server in a worktree.
 
 ## Mobile Development Pattern
 

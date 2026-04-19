@@ -209,6 +209,18 @@ describe('LoginPage', () => {
   });
 
   describe('Google sign-in', () => {
+    beforeEach(() => {
+      // LoginPage early-returns from onMounted when VITE_GOOGLE_CLIENT_ID is
+      // falsy, so tests that assert on initialize/callback wiring must stub
+      // the env var. Keeps the spec independent of .env.local, which is
+      // gitignored and absent in fresh worktrees.
+      vi.stubEnv('VITE_GOOGLE_CLIENT_ID', 'test-client-id');
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
     it('does not call google.accounts.id when window.google is not available', async () => {
       const initializeSpy = vi.fn();
       const renderButtonSpy = vi.fn();

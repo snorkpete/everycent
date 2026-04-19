@@ -106,7 +106,6 @@ For reference — what the main session will do during review (not the worker's 
 - `BudgetAllocationList.vue` is 582 lines with 25 `isMobile` refs. Expect the bulk of the work here. Resist the urge to refactor unrelated things while in the file — pure isMobile extraction only.
 - `BudgetsPage.vue` (list) contains budget-summary data rendering that may share logic with the details page — watch for accidental duplication when extracting. Prefer a single mobile child component reused across pages over copy-paste.
 - Pre-existing spec flakiness (`BudgetAllocationList`/`BudgetIncomeList` ordering in the full suite, per project notes) may surface. Not this task's problem to solve — re-run if flaky, do not modify those tests beyond what's required to move mobile assertions out.
-- `LoginPage` Google sign-in specs fail in worktrees (known environmental issue). Ignore those; do not attempt to fix.
 
 ### Review loop
 
