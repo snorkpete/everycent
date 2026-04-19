@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/stdio.js",
     "dev": "tsx src/stdio.ts",
+    "sign-in": "tsx src/scripts/sign-in.ts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
