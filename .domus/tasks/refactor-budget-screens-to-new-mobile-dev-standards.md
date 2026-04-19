@@ -1,7 +1,7 @@
 # Task: Refactor budget screens to new mobile dev standards
 
 **ID:** refactor-budget-screens-to-new-mobile-dev-standards
-**Status:** in-progress
+**Status:** done
 **Branch:** task/refactor-budget-screens-to-new-mobile-dev-standards
 **Autonomous:** true
 **Priority:** high
