@@ -33,7 +33,11 @@ module Auth
     private
 
     def verify_google_token(credential)
-      Google::Auth::IDTokens.verify_oidc(credential, aud: ENV.fetch('GOOGLE_CLIENT_ID'))
+      allowed_auds = [
+        ENV.fetch('GOOGLE_CLIENT_ID'),
+        ENV['GOOGLE_MCP_CLIENT_ID'],
+      ].compact
+      Google::Auth::IDTokens.verify_oidc(credential, aud: allowed_auds)
     rescue Google::Auth::IDTokens::VerificationError
       nil
     end

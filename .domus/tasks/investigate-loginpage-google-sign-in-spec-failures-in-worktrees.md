@@ -14,17 +14,7 @@
 
 ## What This Task Is
 
-Three specs in `webclientv4/src/auth/LoginPage.spec.ts` fail consistently when the test suite runs inside a `.claude/worktrees/*` worktree, but pass cleanly on the main worktree on master. They have been blocking pre-commit hooks in every dispatched worker, forcing `--no-verify` to land commits — unsustainable.
-
-Affected tests:
-
-- `LoginPage > Google sign-in > initializes and renders the Google button when window.google is available`
-- `LoginPage > Google sign-in > navigates to / after successful Google credential callback`
-- `LoginPage > Google sign-in > does not navigate when Google credential callback fails`
-
-Failure mode: the Google SDK `initialize` spy is never called, so the captured callback stays `null`, so follow-up assertions throw (`capturedCallback is not a function`, `expected null not to be null`).
-
-The root cause is undiagnosed. It is not caused by any code change — the same branch passes all three on master and fails all three in a worktree checkout of the same commit.
+The 3 LoginPage Google sign-in specs in webclientv4 fail consistently when tests run in a git worktree (not the main checkout), blocking pre-commit hooks for worker agents. Currently documented as a known environmental issue in other task specs (e.g. refactor-budget-screens-to-new-mobile-dev-standards line 109) and worked around by telling workers to ignore the failures. This task is to investigate the root cause and fix it so worktree workers can commit cleanly.
 
 ---
 

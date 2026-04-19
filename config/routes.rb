@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  namespace :mcp do
+    get 'overspending_analysis', to: 'overspending_analysis#show'
+  end
+
   resources :transactions, except: [:new, :edit] do
     collection do
       put 'update_all'

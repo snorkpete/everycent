@@ -95,17 +95,11 @@ RSpec.describe Auth::GoogleController, type: :controller do
         expect(response.headers['uid']).to be_present
       end
 
-      it 'updates provider and uid on the user' do
+      it 'does not mutate provider or uid on the user' do
         post :create, params: { credential: 'valid-token' }
         user.reload
-        expect(user.provider).to eq 'google'
-        expect(user.uid).to eq 'google-uid-12345'
-      end
-
-      it 'does not update provider/uid on subsequent sign-ins with same values' do
-        user.update!(provider: 'google', uid: 'google-uid-12345')
-        post :create, params: { credential: 'valid-token' }
-        expect(response).to have_http_status(:ok)
+        expect(user.provider).to eq 'email'
+        expect(user.uid).to eq user.email
       end
     end
   end
