@@ -4,9 +4,11 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import TransactionList from './TransactionList.vue';
+import EcListField from '../shared/form/list-field/EcListField.vue';
 import { useTransactionStore } from './transactionStore';
 import type { TransactionData, AllocationData, SinkFundAllocationData } from './transaction.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
+import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
 
 // Selectors
 const ADD_BTN = '[data-testid="add-btn"]';
@@ -361,4 +363,61 @@ describe('TransactionList', () => {
     });
   });
 
+  describe('unpaid transaction display', () => {
+    it('applies unpaid class to rows where status is "unpaid"', () => {
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'unpaid',
+          deleted: false,
+        },
+      ];
+      const wrapper = createWrapper();
+
+      const rows = wrapper.findAll(TRANSACTION_ROW);
+      expect(rows[0].classes()).toContain('transaction-row--unpaid');
+    });
+
+    it('does not apply unpaid class to paid transactions', () => {
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Salary',
+          withdrawal_amount: 0,
+          deposit_amount: 300000,
+          status: 'paid',
+          deleted: false,
+        },
+      ];
+      const wrapper = createWrapper();
+
+      const rows = wrapper.findAll(TRANSACTION_ROW);
+      expect(rows[0].classes()).not.toContain('transaction-row--unpaid');
+    });
+  });
+
+  describe('allocation dropdown blank option', () => {
+    it('includes a blank first option in allocationItems for regular accounts', async () => {
+      store.isEditMode = true;
+      store.selectedBankAccount = checkingAccount;
+      store.allocations = sampleAllocations;
+      store.transactions = [
+        { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'unpaid' },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const listFields = wrapper.findAllComponents(EcListField);
+      const regularField = listFields.find((f) => {
+        const items = f.props('items') as ListItem[];
+        return items.some((i) => i.id === 0 && i.name === '');
+      });
+      expect(regularField).toBeDefined();
+      const items = regularField!.props('items') as ListItem[];
+      expect(items[0]).toEqual(expect.objectContaining({ id: 0, name: '' }));
+    });
+  });
 });

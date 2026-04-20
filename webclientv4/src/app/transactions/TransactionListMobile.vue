@@ -2,9 +2,7 @@
   <div class="mobile-transaction-list">
     <div v-if="store.transactions.length === 0" class="empty-state" data-testid="empty-state">
       {{
-        store.isEditMode
-          ? 'No transactions yet. Tap + to add one.'
-          : 'No transactions to display.'
+        store.isEditMode ? 'No transactions yet. Tap + to add one.' : 'No transactions to display.'
       }}
     </div>
 
@@ -16,6 +14,7 @@
         :class="{
           'ec-deleted': transaction.deleted,
           'transaction-card--newly-imported': transaction.newlyImported,
+          'transaction-card--unpaid': transaction.status !== 'paid',
         }"
         data-testid="transaction-card"
         @click="onCardClick(transaction, index)"
@@ -24,9 +23,7 @@
           <i
             v-if="!store.isEditMode"
             class="pi card-chevron"
-            :class="
-              isExpanded(keyFor(transaction, index)) ? 'pi-chevron-down' : 'pi-chevron-right'
-            "
+            :class="isExpanded(keyFor(transaction, index)) ? 'pi-chevron-down' : 'pi-chevron-right'"
           ></i>
           <span class="card-date">
             <template v-if="store.isEditMode">
@@ -245,11 +242,12 @@ function allocationName(transaction: TransactionData): string {
   return alloc?.name ?? '\u2014';
 }
 
-const allocationItems = computed((): ListItem[] =>
-  store.allocations
+const allocationItems = computed((): ListItem[] => [
+  { id: 0, name: '' },
+  ...store.allocations
     .filter((a) => a.id != null && a.name != null)
     .map((a) => ({ ...a, id: a.id!, name: a.name! })),
-);
+]);
 
 const sinkFundAllocationItems = computed((): ListItem[] =>
   store.sinkFundAllocations
@@ -423,6 +421,11 @@ const sinkFundAllocationItems = computed((): ListItem[] =>
   gap: 0.5rem;
   align-items: center;
   margin-top: 0.5rem;
+}
+
+.transaction-card--unpaid .card-date,
+.transaction-card--unpaid .card-description {
+  color: var(--p-red-600);
 }
 
 /* ---- Footer ---- */
