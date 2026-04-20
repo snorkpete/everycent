@@ -12,6 +12,11 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: 'Unpaid transactions stand out in red',
+    body: "On the Transactions screen, any transaction that isn't marked Paid now shows in red — date, description, allocation, and amount — so unreconciled rows are easy to spot at a glance.",
+    date: '2026-04-20',
+  },
+  {
     title: 'Reports with charts',
     body: 'The Reports section now has three screens — Net Worth, Category Spending, and Needs vs Wants — each with an interactive chart and a year filter so you can focus on a specific period.',
     date: '2026-04-12',
@@ -36,19 +41,10 @@ export const HIGHLIGHTS: Highlight[] = [
     body: "Open a sink fund on mobile and you'll see a card-based list instead of a crammed table. Tap a card to peek at the target, outstanding, and comment; hit Edit to rename, retarget, or deactivate obligations the same way you would on desktop.",
     date: '2026-04-05',
   },
-  {
-    title: 'Use Everycent comfortably on your phone',
-    body: 'The Transactions list and the Budget view have been reworked for small screens, so you can add a transaction or check the budget without needing your laptop.',
-    date: '2026-04-04',
-  },
-  {
-    title: 'Zero balances now show as a dash',
-    body: 'Accounts sitting at $0 appear as a dash instead of "$0.00" on the Account Balances page, so real balances stand out and the page reads cleaner. If you\'d rather see the zeros (to confirm a closed account, say), flip the toggle at the top of the page.',
-    date: '2026-04-04',
-  },
 ];
 
 export const NOTEWORTHY: string[] = [
+  'Tabbing to the allocation dropdown on a new transaction now defaults to a blank option, so you can keep tabbing without accidentally picking the first allocation.',
   'Click an account, category, or institution name to view its details — no need to hit Edit first.',
   'The Bank Accounts list (under Setup) now shows the bank name and category (Asset, Liability, Current) next to each account.',
   'On Account Balances, assets and their loans are now grouped together, so you can see the equity of each loan-backed asset at a glance.',
