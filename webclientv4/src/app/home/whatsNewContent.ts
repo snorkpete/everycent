@@ -17,6 +17,11 @@ export const HIGHLIGHTS: Highlight[] = [
     date: '2026-04-20',
   },
   {
+    title: 'Tabbing past the allocation no longer picks the wrong one',
+    body: 'When adding a new transaction and tabbing through the fields, the allocation dropdown used to jump to the first alphabetical option. It now defaults to a blank selection, so you can tab past it cleanly.',
+    date: '2026-04-20',
+  },
+  {
     title: 'Reports with charts',
     body: 'The Reports section now has three screens — Net Worth, Category Spending, and Needs vs Wants — each with an interactive chart and a year filter so you can focus on a specific period.',
     date: '2026-04-12',
@@ -44,7 +49,6 @@ export const HIGHLIGHTS: Highlight[] = [
 ];
 
 export const NOTEWORTHY: string[] = [
-  'Tabbing to the allocation dropdown on a new transaction now defaults to a blank option, so you can keep tabbing without accidentally picking the first allocation.',
   'Click an account, category, or institution name to view its details — no need to hit Edit first.',
   'The Bank Accounts list (under Setup) now shows the bank name and category (Asset, Liability, Current) next to each account.',
   'On Account Balances, assets and their loans are now grouped together, so you can see the equity of each loan-backed asset at a glance.',
