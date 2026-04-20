@@ -8,6 +8,7 @@ import EcListField from '../shared/form/list-field/EcListField.vue';
 import { useTransactionStore } from './transactionStore';
 import type { TransactionData, AllocationData, SinkFundAllocationData } from './transaction.types';
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
+import type { ListItem } from '../shared/form/list-field/ec-list-field.types';
 
 const TRANSACTION_CARD = '[data-testid="transaction-card"]';
 const ADD_BTN = '[data-testid="add-btn"]';
@@ -247,11 +248,12 @@ describe('TransactionListMobile', () => {
       const listField = editDetail.findComponent(EcListField);
       expect(listField.exists()).toBe(true);
       expect(listField.props('modelValue')).toBe(1);
-      expect(listField.props('items')).toEqual(
-        sampleAllocations
+      expect(listField.props('items')).toEqual([
+        { id: 0, name: '' },
+        ...sampleAllocations
           .filter((a) => a.id != null && a.name != null)
           .map((a) => ({ ...a, id: a.id, name: a.name })),
-      );
+      ]);
     });
 
     it('calls store.onAllocationChange when regular allocation is changed', async () => {
@@ -411,6 +413,64 @@ describe('TransactionListMobile', () => {
 
       const cards = wrapper.findAll(TRANSACTION_CARD);
       expect(cards[0].classes()).toContain('ec-deleted');
+    });
+  });
+
+  describe('unpaid transaction display', () => {
+    it('applies unpaid class to cards where status is "unpaid"', () => {
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Groceries',
+          withdrawal_amount: 5000,
+          deposit_amount: 0,
+          status: 'unpaid',
+          deleted: false,
+        },
+      ];
+      const wrapper = createWrapper();
+
+      const cards = wrapper.findAll(TRANSACTION_CARD);
+      expect(cards[0].classes()).toContain('transaction-card--unpaid');
+    });
+
+    it('does not apply unpaid class to paid transactions', () => {
+      store.transactions = [
+        {
+          id: 1,
+          description: 'Salary',
+          withdrawal_amount: 0,
+          deposit_amount: 300000,
+          status: 'paid',
+          deleted: false,
+        },
+      ];
+      const wrapper = createWrapper();
+
+      const cards = wrapper.findAll(TRANSACTION_CARD);
+      expect(cards[0].classes()).not.toContain('transaction-card--unpaid');
+    });
+  });
+
+  describe('allocation dropdown blank option', () => {
+    it('includes a blank first option in allocationItems for regular accounts', async () => {
+      store.isEditMode = true;
+      store.selectedBankAccount = checkingAccount;
+      store.allocations = sampleAllocations;
+      store.transactions = [
+        { id: 1, description: 'Test', withdrawal_amount: 0, deposit_amount: 0, status: 'unpaid' },
+      ];
+      const wrapper = createWrapper();
+      await nextTick();
+
+      const listFields = wrapper.findAllComponents(EcListField);
+      const regularField = listFields.find((f) => {
+        const items = f.props('items') as ListItem[];
+        return items.some((i) => i.id === 0 && i.name === '');
+      });
+      expect(regularField).toBeDefined();
+      const items = regularField!.props('items') as ListItem[];
+      expect(items[0]).toEqual(expect.objectContaining({ id: 0, name: '' }));
     });
   });
 });

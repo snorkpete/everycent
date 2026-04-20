@@ -723,7 +723,7 @@ describe('transactionStore', () => {
       expect(store.transactions[0].status).toBe('paid');
     });
 
-    it('sets status to "unpaid" when allocationId is 0', () => {
+    it('sets status to "unpaid" and clears allocation_id when allocationId is 0', () => {
       const store = useTransactionStore();
       const transaction = {
         id: 1,
@@ -731,12 +731,32 @@ describe('transactionStore', () => {
         withdrawal_amount: 0,
         deposit_amount: 0,
         status: 'paid',
+        allocation_id: 5,
       };
       store.transactions = [transaction];
 
       store.onAllocationChange(store.transactions[0], 0);
 
       expect(store.transactions[0].status).toBe('unpaid');
+      expect(store.transactions[0].allocation_id).toBeUndefined();
+    });
+
+    it('sets status to "unpaid" and clears allocation_id when allocationId is null (show-clear path)', () => {
+      const store = useTransactionStore();
+      const transaction = {
+        id: 1,
+        description: 'Test',
+        withdrawal_amount: 0,
+        deposit_amount: 0,
+        status: 'paid',
+        allocation_id: 5,
+      };
+      store.transactions = [transaction];
+
+      store.onAllocationChange(store.transactions[0], null);
+
+      expect(store.transactions[0].status).toBe('unpaid');
+      expect(store.transactions[0].allocation_id).toBeUndefined();
     });
   });
 

@@ -72,7 +72,14 @@ const groups = computed((): ListGroup[] => {
   const groupByField = groupBy;
 
   const grouped: Record<string, ListGroup> = {};
+  const blanks: ListItem[] = [];
   for (const item of items) {
+    // Items without a name are treated as "(blank)" / clear-selection options
+    // and pinned to a group at the top, outside the alphabetical ordering.
+    if (!item.name) {
+      blanks.push(item);
+      continue;
+    }
     const groupId = String(item[groupByIdField]);
     if (!grouped[groupId]) {
       const groupObj = item[groupByField] as { name: string } | undefined;
@@ -84,7 +91,11 @@ const groups = computed((): ListGroup[] => {
     grouped[groupId].items.push(item);
   }
 
-  return Object.values(grouped).sort((a, b) => a.label.localeCompare(b.label));
+  const sorted = Object.values(grouped).sort((a, b) => a.label.localeCompare(b.label));
+  if (blanks.length) {
+    sorted.unshift({ label: '', items: blanks });
+  }
+  return sorted;
 });
 
 const displayOptions = computed(() => (groupBy ? groups.value : items));
@@ -134,6 +145,12 @@ const selectPt = computed(() => {
 .ec-group-option {
   padding-left: 1.5rem !important;
   font-size: 0.8rem;
+}
+
+/* Pinned "blank" group has an empty label; suppress its header row so only
+   the blank option itself shows at the top of the overlay. */
+.ec-group-label:empty {
+  display: none;
 }
 
 .p-select.p-component .ec-select-label {

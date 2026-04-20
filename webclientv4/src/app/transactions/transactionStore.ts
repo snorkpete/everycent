@@ -122,9 +122,14 @@ export const useTransactionStore = defineStore('transactions', () => {
     transaction.deleted = false;
   }
 
-  function onAllocationChange(transaction: TransactionData, allocationId: number) {
-    transaction.allocation_id = allocationId;
-    transaction.status = allocationId > 0 ? 'paid' : 'unpaid';
+  function onAllocationChange(transaction: TransactionData, allocationId: number | null) {
+    if (allocationId != null && allocationId > 0) {
+      transaction.allocation_id = allocationId;
+      transaction.status = 'paid';
+    } else {
+      transaction.allocation_id = undefined;
+      transaction.status = 'unpaid';
+    }
   }
 
   async function autoAllocate() {

@@ -35,6 +35,7 @@
           :class="{
             'ec-deleted': transaction.deleted,
             'transaction-row--newly-imported': transaction.newlyImported,
+            'transaction-row--unpaid': transaction.status !== 'paid',
           }"
         >
           <td class="col-calculator">
@@ -200,11 +201,12 @@ const allocationHeaderName = computed(() => {
   return store.selectedBankAccount?.is_sink_fund ? 'Sink Fund Allocation' : 'Allocation';
 });
 
-const allocationItems = computed((): ListItem[] =>
-  store.allocations
+const allocationItems = computed((): ListItem[] => [
+  { id: 0, name: '' },
+  ...store.allocations
     .filter((a) => a.id != null && a.name != null)
     .map((a) => ({ ...a, id: a.id!, name: a.name! })),
-);
+]);
 
 const sinkFundAllocationItems = computed((): ListItem[] =>
   store.sinkFundAllocations
@@ -347,5 +349,21 @@ function autoAllocationClass(transaction: TransactionData) {
 
 .allocation-cell--contains .auto-indicator {
   color: var(--p-amber-700);
+}
+
+.transaction-row--unpaid .col-date,
+.transaction-row--unpaid .col-description,
+.transaction-row--unpaid .col-allocation,
+.transaction-row--unpaid .col-money {
+  color: var(--p-red-600);
+}
+
+/* PrimeVue's .p-inputtext / .p-select-label / .p-datepicker set color
+   directly on their own elements, and EcMoneyDisplay sets .positive /
+   .negative / .muted similarly — all with equal-or-higher specificity
+   than the td rule above. Force them to the unpaid red within the row. */
+.transaction-row--unpaid
+  :is(.p-inputtext, .p-select-label, .p-datepicker, .positive, .negative, .muted) {
+  color: var(--p-red-600) !important;
 }
 </style>
