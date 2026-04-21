@@ -1,7 +1,7 @@
 # Task: Visually distinguish unpaid transactions in the Vue app
 
 **ID:** visually-distinguish-unpaid-transactions-in-the-vue-app
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-19

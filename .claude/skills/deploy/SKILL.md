@@ -17,6 +17,12 @@ Before doing anything else, output this message:
 
 Wait for confirmation before continuing.
 
+## Heroku App Mapping
+
+- **Production**: `everycent` (eu region) — git remote `heroku`
+- **Staging**: `everycent-staging` (eu region) — git remote `staging`
+- `everycent-euro` is a **separate app**, not the production app for this repo
+
 ## Step 1 — Precondition checks
 
 Run these in the repo root and report results:

@@ -1,7 +1,7 @@
 # Task: Add blank-allocation first option on transactions page to stop tab-through auto-pick
 
 **ID:** add-blank-allocation-first-option-on-transactions-page-to-stop-tab-through-auto-pick
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-19
