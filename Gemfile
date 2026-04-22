@@ -63,14 +63,9 @@ group :development, :test do
   gem 'spring-commands-rspec'
   #gem 'spring-watcher-listen'
 
-  gem 'guard-bundler'
-  gem 'guard-rails'
   gem 'rspec-rails', '~> 7.1'
   gem 'factory_bot_rails'
-  gem 'guard-rspec'
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
-  gem 'ruby_gntp'
-  gem 'terminal-notifier-guard'
 
 end
 
