@@ -1,7 +1,8 @@
 # Task: Add test coverage for mobile transactions toolbar branches
 
 **ID:** add-test-coverage-for-mobile-transactions-toolbar-branches
-**Status:** ready
+**Status:** done
+**Branch:** task/mobile-transactions-test-coverage
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-04
@@ -22,13 +23,13 @@ TransactionsPage.spec.ts: isMobile defaults to false in test env (matchMedia moc
 
 In a new `describe('mobile mode', ...)` block in `TransactionsPage.spec.ts`:
 
-- [ ] Mobile toolbar renders when isMobile is true — TransactionsToolbarMobile present, desktop TransactionSearchForm absent
-- [ ] Mobile list + summary render — TransactionListMobile and TransactionSummaryMobile present, desktop versions absent
-- [ ] `initMobileSearch` defaults: no URL query → picks first account + first budget, calls router.replace + store.fetch
-- [ ] `initMobileSearch` URL params: route.query with budget_id and bank_account_id → those values win over defaults
-- [ ] `onMobileBankAccountChange`: toolbar emits update → state updated, router.replace + store.fetch called with new id
-- [ ] `onMobileBudgetChange`: same shape for budget id
-- [ ] `fetchMobileTransactions` guard: when either selection is null, router.replace and store.fetch are NOT called
+- [x] Mobile toolbar renders when isMobile is true — TransactionsToolbarMobile present, desktop TransactionSearchForm absent
+- [x] Mobile list + summary render — TransactionListMobile and TransactionSummaryMobile present, desktop versions absent
+- [x] `initMobileSearch` defaults: no URL query → picks first account + first budget, calls router.replace + store.fetch
+- [x] `initMobileSearch` URL params: route.query with budget_id and bank_account_id → those values win over defaults
+- [x] `onMobileBankAccountChange`: toolbar emits update → state updated, router.replace + store.fetch called with new id
+- [x] `onMobileBudgetChange`: same shape for budget id
+- [x] `fetchMobileTransactions` guard: when either selection is null, router.replace and store.fetch are NOT called
 
 ### Non-goals
 
