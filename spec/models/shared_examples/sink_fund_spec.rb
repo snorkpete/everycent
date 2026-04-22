@@ -47,6 +47,55 @@ shared_examples_for "SinkFund" do
   end
 
 
+  describe "#transfer_allocation" do
+    before do
+      @sink_fund = create(:bank_account, account_type: 'sink_fund',
+                          closing_balance: 5000_00, closing_date: '2014-12-31')
+      @from_allocation = create(:sink_fund_allocation, name: 'From',
+                                amount: 2000_00, bank_account: @sink_fund)
+      @to_allocation = create(:sink_fund_allocation, name: 'To',
+                              amount: 1000_00, bank_account: @sink_fund)
+    end
+
+    it "creates a withdrawal transaction from the source allocation" do
+      expect {
+        @sink_fund.transfer_allocation(@from_allocation.id, @to_allocation.id, 500_00)
+      }.to change { @sink_fund.transactions.count }.by(2)
+
+      from_txn = @sink_fund.transactions.find_by(
+        sink_fund_allocation_id: @from_allocation.id
+      )
+      expect(from_txn.withdrawal_amount).to eq 500_00
+      expect(from_txn.deposit_amount).to eq 0
+    end
+
+    it "creates a deposit transaction to the target allocation" do
+      @sink_fund.transfer_allocation(@from_allocation.id, @to_allocation.id, 500_00)
+
+      to_txn = @sink_fund.transactions.find_by(
+        sink_fund_allocation_id: @to_allocation.id
+      )
+      expect(to_txn.deposit_amount).to eq 500_00
+      expect(to_txn.withdrawal_amount).to eq 0
+    end
+
+    it "does nothing when both allocation IDs are zero" do
+      expect {
+        @sink_fund.transfer_allocation(0, 0, 500_00)
+      }.not_to change { @sink_fund.transactions.count }
+    end
+
+    it "sets the transaction description to 'Internal Allocation Transfer'" do
+      @sink_fund.transfer_allocation(@from_allocation.id, @to_allocation.id, 500_00)
+      expect(@sink_fund.transactions.last.description).to eq 'Internal Allocation Transfer'
+    end
+
+    it "sets the transaction status to 'paid'" do
+      @sink_fund.transfer_allocation(@from_allocation.id, @to_allocation.id, 500_00)
+      expect(@sink_fund.transactions.last.status).to eq 'paid'
+    end
+  end
+
   describe "#reverse_transactions_from_sink_fund_allocations" do
     before do
       @sink_fund = create(:bank_account, account_type: 'sink_fund',

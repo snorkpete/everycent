@@ -200,6 +200,19 @@ shared_examples_for "Transfers" do
         expect(result[:reason]).to eq "To account doesn't exist"
       end
 
+      it "handles string amount params from HTTP requests" do
+        result = @from_account.transfer to: @to_account.id, amount: '500', description: 'Test',
+                                        date: @today, budget_id: @budget.id
+        expect(result[:success]).to be true
+        expect(@from_account.transactions.last.withdrawal_amount).to eq 500
+      end
+
+      it "rejects string zero amount" do
+        result = @from_account.transfer to: @to_account.id, amount: '0', description: 'Test'
+        expect(result[:success]).to eq false
+        expect(result[:reason]).to eq "Amount must be greater than 0"
+      end
+
       it "returns an error if we don't have an amount" do
         result = @from_account.transfer to: @to_account.id, amount: 0, description: 'Test'
         expect(result[:success]).to eq false

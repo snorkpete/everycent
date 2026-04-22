@@ -156,6 +156,23 @@ RSpec.describe Income, :type => :model do
     end
 
 
+    it "skips non-existent IDs and continues processing remaining items" do
+      @params = { type: 'income', name: 'Lottery Winnings', amounts:[
+          { id: 999_999, amount: 600 },
+          { id: @june_income.id, amount: 800 },
+          { id: @july_income.id, amount: 1000 },
+      ]}
+      Income.mass_update(@params)
+
+      june = Income.find(@june_income.id)
+      july = Income.find(@july_income.id)
+
+      expect(june.name).to eq 'Lottery Winnings'
+      expect(june.amount).to eq 800
+      expect(july.name).to eq 'Lottery Winnings'
+      expect(july.amount).to eq 1000
+    end
+
     it "deletes an income if the id exists and amount is 0" do
       @params = { type: 'income', name: 'Lottery Winnings', amounts:[
           {id: @may_allocation.id, amount: 0, budget_id: 10 },

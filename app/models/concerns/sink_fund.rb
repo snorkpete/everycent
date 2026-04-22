@@ -102,7 +102,7 @@ module SinkFund
 
   def transfer_allocation(existing_allocation_id, new_allocation_id, amount, date=Date.today)
 
-    return if existing_allocation_id == 0 and new_allocation_id == 0
+    return if existing_allocation_id == 0 && new_allocation_id == 0
 
     # remove the amount from the existing allocation
     transaction_from = transaction_for_transfer(existing_allocation_id, date)

@@ -27,6 +27,20 @@ shared_examples_for "ManualBalanceAdjustments" do
       expect(@second_account.current_balance).to eq 80
     end
 
+    it "applies the correct balance to each account regardless of DB return order" do
+      @first_account = create(:bank_account, opening_balance: 40)
+      @second_account = create(:bank_account, opening_balance: 120)
+
+      params = [
+          { bank_account_id: @second_account.id, new_balance: 500 },
+          { bank_account_id: @first_account.id, new_balance: 200 }
+      ]
+
+      BankAccount.manually_adjust_balances(params)
+      expect(@first_account.current_balance).to eq 200
+      expect(@second_account.current_balance).to eq 500
+    end
+
     it "handles an empty list without throwing an error" do
       expect do
         BankAccount.manually_adjust_balances([])

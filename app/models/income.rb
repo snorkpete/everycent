@@ -73,7 +73,7 @@ class Income < ApplicationRecord
       end
 
       income = Income.find_by_id amount_data[:id]
-      return unless income
+      next unless income
 
       if amount_data[:amount] == 0
         income.destroy

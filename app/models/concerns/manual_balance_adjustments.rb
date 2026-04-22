@@ -7,11 +7,11 @@ module ManualBalanceAdjustments
 
   module ClassMethods
     def manually_adjust_balances(adjustments)
-      accounts_to_adjust(adjustments).each_with_index do |account, index|
-        account.manually_adjust_balance(adjustments[index][:new_balance])
+      adjustment_by_id = adjustments.index_by { |a| a[:bank_account_id] }
+      accounts_to_adjust(adjustments).each do |account|
+        account.manually_adjust_balance(adjustment_by_id[account.id][:new_balance])
       end
 
-      # TODO: do we collect errors?
       true
     end
 
