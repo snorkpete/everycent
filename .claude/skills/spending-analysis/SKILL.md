@@ -10,8 +10,8 @@ You are helping the user analyse their Everycent spending data. Load this contex
 
 ## Database context
 
-- DB: `everycent_dev_5` (local PostgreSQL, user `kion`, no password)
-- Connect: `psql -d everycent_dev_4 -c "..."`
+- DB: `everycent_dev_6` (local PostgreSQL, user `kion`, no password)
+- Connect: `psql -d everycent_dev_6 -c "..."`
 - Amounts are stored as **integers in cents** — always divide by `100.0`
 - Exclude manual adjustments: `is_manual_adjustment = false`
 - `withdrawal_amount > 0` for spending; `deposit_amount > 0` for income

@@ -1,7 +1,7 @@
 # Task: Mobile layout: account balances
 
 **ID:** mobile-layout-account-balances
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-04
