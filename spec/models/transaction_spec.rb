@@ -77,6 +77,17 @@ RSpec.describe Transaction, :type => :model do
       expect(transactions.size).to eq 2
     end
 
+    it "rolls back deletions when transaction creation fails" do
+      original_count = Transaction.for_budget_and_bank(@budget.id, @bank_account.id).count
+      expect(original_count).to eq 1
+
+      allow(Transaction).to receive(:create).and_raise(RuntimeError, "simulated failure")
+
+      expect { Transaction.update_with_params(@params) rescue nil }.not_to change {
+        Transaction.for_budget_and_bank(@budget.id, @bank_account.id).count
+      }
+    end
+
     describe "when Against Sink Funds" do
       before do
         @sink_fund = create(:bank_account, account_type: 'sink_fund',

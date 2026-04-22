@@ -111,6 +111,104 @@ describe Budget, :type => :model do
     it "correctly copies the allocations" do
       expect(@new_budget.allocations.second.name).to eq "Debt"
     end
+
+    it "rolls back all records when allocation duplication fails" do
+      allow_any_instance_of(Allocation).to receive(:save).and_raise(RuntimeError, "simulated failure")
+      original_budget_count = Budget.count
+
+      expect { @budget.copy rescue nil }.not_to change { Income.count }
+      expect(Budget.count).to eq original_budget_count
+    end
+  end
+
+  describe "#close" do
+    before do
+      @budget = create(:budget, start_date: '2015-01-01', status: 'open')
+      @account = create(:bank_account, opening_balance: 1000)
+      create(:transaction, bank_account: @account, transaction_date: '2015-01-15',
+             deposit_amount: 500, withdrawal_amount: 0)
+    end
+
+    it "marks the budget as closed" do
+      @budget.close
+      expect(@budget.reload.status).to eq 'closed'
+    end
+
+    it "updates the bank account closing balance" do
+      @budget.close
+      @account.reload
+      expect(@account.closing_balance).to eq 1500
+    end
+
+    it "updates the bank account closing date to the budget end date" do
+      @budget.close
+      @account.reload
+      expect(@account.closing_date).to eq @budget.end_date
+    end
+
+    it "returns the budget" do
+      result = @budget.close
+      expect(result).to eq @budget
+    end
+
+    it "rolls back all changes when the final save fails" do
+      allow(@budget).to receive(:save!).and_raise(RuntimeError, "simulated failure")
+
+      expect { @budget.close rescue nil }.not_to change { @account.reload.closing_balance }
+    end
+  end
+
+  describe ".reopen_last_budget" do
+    before do
+      @first_budget = create(:budget, start_date: '2015-01-01', status: 'closed')
+      @second_budget = create(:budget, start_date: '2015-02-01', status: 'closed')
+      @account = create(:bank_account, opening_balance: 1000)
+      @account.update_columns(closing_balance: 2000, closing_date: @second_budget.end_date)
+      create(:transaction, bank_account: @account, transaction_date: '2015-01-15',
+             deposit_amount: 500, withdrawal_amount: 0)
+    end
+
+    it "reopens the most recently closed budget" do
+      Budget.reopen_last_budget
+      expect(@second_budget.reload.status).to eq 'open'
+    end
+
+    it "does not reopen older closed budgets" do
+      Budget.reopen_last_budget
+      expect(@first_budget.reload.status).to eq 'closed'
+    end
+
+    it "resets the bank account closing balance based on pre-budget transactions" do
+      Budget.reopen_last_budget
+      @account.reload
+      expect(@account.closing_balance).to eq 1500
+    end
+
+    it "resets the bank account closing date to the day before budget start" do
+      Budget.reopen_last_budget
+      @account.reload
+      expect(@account.closing_date).to eq @second_budget.start_date.yesterday
+    end
+
+    it "returns the reopened budget" do
+      result = Budget.reopen_last_budget
+      expect(result.id).to eq @second_budget.id
+    end
+
+    it "rolls back all changes when an error occurs mid-operation" do
+      @second_account = create(:bank_account, opening_balance: 500)
+      @second_account.update_columns(closing_balance: 800, closing_date: @second_budget.end_date)
+
+      call_count = 0
+      allow_any_instance_of(BankAccount).to receive(:save!).and_wrap_original do |method, *args|
+        call_count += 1
+        raise RuntimeError, "simulated failure" if call_count > 1
+        method.call(*args)
+      end
+
+      expect { Budget.reopen_last_budget rescue nil }.not_to change { @account.reload.closing_balance }
+      expect(@second_budget.reload.status).to eq 'closed'
+    end
   end
 
   describe ".current" do

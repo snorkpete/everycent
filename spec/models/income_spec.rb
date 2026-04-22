@@ -185,5 +185,24 @@ RSpec.describe Income, :type => :model do
       expect(Income.find_by_id @may_allocation.id).to be_nil
     end
 
+    it "rolls back all changes when an update fails mid-batch" do
+      call_count = 0
+      allow_any_instance_of(Income).to receive(:update).and_wrap_original do |method, *args|
+        call_count += 1
+        raise RuntimeError, "simulated failure" if call_count >= 3
+        method.call(*args)
+      end
+
+      @params = { type: 'income', name: 'Lottery Winnings', amounts:[
+          { id: @may_allocation.id, amount: 600 },
+          { id: @june_income.id, amount: 800 },
+          { id: @july_income.id, amount: 1000 },
+      ]}
+
+      expect { Income.mass_update(@params) rescue nil }.not_to change {
+        Income.find(@may_allocation.id).amount
+      }
+    end
+
   end
 end
