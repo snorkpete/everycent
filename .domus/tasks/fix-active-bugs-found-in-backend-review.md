@@ -1,7 +1,7 @@
 # Task: Fix active bugs found in backend review
 
 **ID:** fix-active-bugs-found-in-backend-review
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-12

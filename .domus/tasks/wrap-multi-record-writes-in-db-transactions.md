@@ -1,7 +1,7 @@
 # Task: Wrap multi-record writes in DB transactions
 
 **ID:** wrap-multi-record-writes-in-db-transactions
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-12
