@@ -1,7 +1,7 @@
 # Task: Migrate off active_model_serializers
 
 **ID:** migrate-off-active_model_serializers
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10

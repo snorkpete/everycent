@@ -1,8 +1,8 @@
 # Task: Document FutureAllocationData field asymmetry
 
 **ID:** document-futureallocationdata-field-asymmetry
-**Status:** raw
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** low
 **Captured:** 2026-04-10
 **Parent:** none
@@ -14,16 +14,23 @@
 
 ## What This Task Is
 
-[HC §4.6] Note that spent and allocation_class are intentionally omitted vs AllocationData. Documentation only.
+`FutureAllocationData` in `futureBudgets.types.ts` intentionally omits `spent` and `allocation_class` compared to `AllocationData`. Add a short comment noting the asymmetry is intentional so future developers don't "fix" it.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] _Add acceptance criteria_
+- [ ] Comment added to `FutureAllocationData` interface noting intentional omission of `spent` and `allocation_class`
+- [ ] No code changes — documentation only
+- [ ] Pre-commit checks pass
 
 ---
 
 ## Implementation Notes
 
-_Remove if empty._
+### Files to change
+- `webclientv4/src/app/budgets/future-budgets/futureBudgets.types.ts` — add a single-line comment
+
+### Approach
+- Keep comment short — one line, explains WHY not WHAT
+- Single commit

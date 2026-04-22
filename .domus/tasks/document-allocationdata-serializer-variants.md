@@ -1,8 +1,8 @@
 # Task: Document AllocationData serializer variants
 
 **ID:** document-allocationdata-serializer-variants
-**Status:** raw
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** low
 **Captured:** 2026-04-10
 **Parent:** none
@@ -14,16 +14,24 @@
 
 ## What This Task Is
 
-[HC §4.5] Add comment noting which fields come only from SpecialEventAllocationSerializer (budget_name, allocation_category_name). Documentation only.
+`AllocationData` in `transaction.types.ts` contains fields (`budget_name`, `allocation_category_name`) that only come from `SpecialEventAllocationSerializer`, not from the standard `AllocationSerializer`. Add a short inline comment noting this.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] _Add acceptance criteria_
+- [ ] Comment added to `AllocationData` interface in `transaction.types.ts` noting which fields are `SpecialEventAllocationSerializer`-only
+- [ ] No code changes — documentation only
+- [ ] Pre-commit checks pass
 
 ---
 
 ## Implementation Notes
 
-_Remove if empty._
+### Files to change
+- `webclientv4/src/app/transactions/transaction.types.ts` — add a single-line comment above the `budget_name` / `allocation_category_name` fields
+
+### Approach
+- Check `SpecialEventAllocationSerializer` to confirm which fields it adds beyond the standard serializer
+- Keep the comment short — one line max per the project's comment convention
+- Single commit
