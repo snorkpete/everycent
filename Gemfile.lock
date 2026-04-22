@@ -397,7 +397,7 @@ DEPENDENCIES
   bundler
   database_cleaner-active_record (~> 2.1.0)
   devise (~> 4.9.0)
-  devise_token_auth (~> 1.2.2)
+  devise_token_auth (~> 1.2)
   dotenv-rails
   factory_bot_rails
   faker (~> 3.2.0)

@@ -37,7 +37,7 @@ gem 'tzinfo-data'
 # authentication - omniauth is a dependency of devise_token_auth
 gem 'omniauth'
 gem 'devise', '~> 4.9.0'
-gem 'devise_token_auth', '~> 1.2.2'
+gem 'devise_token_auth', '~> 1.2'
 
 # json api building
 gem 'active_model_serializers'
