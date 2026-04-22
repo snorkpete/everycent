@@ -1,7 +1,7 @@
 # Task: Inline validation feedback for sink fund obligations on mobile
 
 **ID:** inline-validation-feedback-for-sink-fund-obligations-on-mobile
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-05

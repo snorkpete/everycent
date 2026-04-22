@@ -1,8 +1,8 @@
 # Task: Loosen devise_token_auth version constraint
 
 **ID:** loosen-devise_token_auth-version-constraint
-**Status:** raw
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** low
 **Captured:** 2026-04-10
 **Parent:** none
@@ -14,16 +14,30 @@
 
 ## What This Task Is
 
-[HC §9.10] ~> 1.2.2 locks out 1.3.x Ruby 3.2 / Rails 7.1 fixes. Auth layer — thorough testing after loosening.
+`devise_token_auth` is pinned to `~> 1.2.2` which locks out 1.3.x releases containing Ruby 3.2 and Rails 7.1 compatibility fixes. Loosen the constraint to allow minor version upgrades.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] _Add acceptance criteria_
+- [ ] `devise_token_auth` constraint changed from `~> 1.2.2` to `~> 1.2` in Gemfile
+- [ ] `Gemfile.lock` updated via `bundle install`
+- [ ] `bundle exec rspec` passes (all auth specs green)
+- [ ] Pre-commit checks pass
 
 ---
 
 ## Implementation Notes
 
-_Remove if empty._
+### Files to change
+- `Gemfile` line 40 — change `'~> 1.2.2'` to `'~> 1.2'`
+
+### Approach
+- One-line change + `bundle install` + full rspec run
+- Auth is critical — if any auth specs fail after the version bump, the constraint should stay as-is and the task should be reported as blocked
+
+### Risks
+- Low. `~> 1.2` still pins to 1.x (won't jump to 2.0). But auth is load-bearing — rspec is the safety net.
+
+### Commit scope
+- Single commit

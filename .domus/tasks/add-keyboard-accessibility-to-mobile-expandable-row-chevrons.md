@@ -1,7 +1,7 @@
 # Task: Add keyboard accessibility to mobile expandable row chevrons
 
 **ID:** add-keyboard-accessibility-to-mobile-expandable-row-chevrons
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-04

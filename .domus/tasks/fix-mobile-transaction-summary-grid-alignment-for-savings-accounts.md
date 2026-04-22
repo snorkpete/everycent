@@ -1,7 +1,7 @@
 # Task: Fix mobile transaction summary grid alignment for savings accounts
 
 **ID:** fix-mobile-transaction-summary-grid-alignment-for-savings-accounts
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-04

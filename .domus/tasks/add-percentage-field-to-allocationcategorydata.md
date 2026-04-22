@@ -1,8 +1,8 @@
 # Task: Add percentage field to AllocationCategoryData
 
 **ID:** add-percentage-field-to-allocationcategorydata
-**Status:** raw
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** low
 **Captured:** 2026-04-10
 **Parent:** none
@@ -14,16 +14,29 @@
 
 ## What This Task Is
 
-[HC §4.3] Backend returns percentage but frontend type only has id and name. Drive-by.
+The backend `AllocationCategorySerializer` returns `id`, `name`, and `percentage`, but the frontend `AllocationCategoryData` interface only declares `id` and `name`. The `percentage` field (integer) is silently untyped.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] _Add acceptance criteria_
+- [ ] `percentage?: number` added to `AllocationCategoryData` interface in `allocationCategory.types.ts`
+- [ ] Pre-commit checks pass (type-check + test suite)
+- [ ] No new type errors introduced
 
 ---
 
 ## Implementation Notes
 
-_Remove if empty._
+### Files to change
+- `webclientv4/src/app/allocation-categories/allocationCategory.types.ts` — add `percentage?: number` to `AllocationCategoryData`
+
+### Approach
+- Add the field as optional (`?`) to match the existing convention
+- The backend schema comment confirms it's an integer column
+
+### Risks
+- None. Additive-only change.
+
+### Commit scope
+- Single commit

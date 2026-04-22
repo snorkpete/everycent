@@ -1,7 +1,7 @@
 # Task: Mobile layout: setup screens
 
 **ID:** mobile-layout-setup-screens
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-04

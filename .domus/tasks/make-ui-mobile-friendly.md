@@ -1,7 +1,7 @@
 # Task: Make UI mobile-friendly
 
 **ID:** make-ui-mobile-friendly
-**Status:** in_progress
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-04

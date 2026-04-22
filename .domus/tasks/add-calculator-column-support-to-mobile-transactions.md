@@ -1,7 +1,7 @@
 # Task: Add calculator column support to mobile transactions
 
 **ID:** add-calculator-column-support-to-mobile-transactions
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-12

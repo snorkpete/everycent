@@ -1,8 +1,8 @@
 # Task: Loosen faker version constraint
 
 **ID:** loosen-faker-version-constraint
-**Status:** raw
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** low
 **Captured:** 2026-04-10
 **Parent:** none
@@ -14,16 +14,29 @@
 
 ## What This Task Is
 
-[HC §9.11] Test-only gem, loosen ~> 3.2.0 to ~> 3.2. Low effort.
+`faker` is pinned to `~> 3.2.0` (patch-only). It's a test-only gem — loosen to `~> 3.2` to allow minor version upgrades.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] _Add acceptance criteria_
+- [x] `faker` constraint changed from `~> 3.2.0` to `~> 3.2` in Gemfile
+- [x] `Gemfile.lock` updated via `bundle install`
+- [x] `bundle exec rspec` passes
+- [x] Pre-commit checks pass
 
 ---
 
 ## Implementation Notes
 
-_Remove if empty._
+### Files to change
+- `Gemfile` line 78 — change `'~> 3.2.0'` to `'~> 3.2'`
+
+### Approach
+- One-line change + `bundle install` + rspec
+
+### Risks
+- None. Test-only gem.
+
+### Commit scope
+- Single commit
