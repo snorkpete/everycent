@@ -1,4 +1,5 @@
-import { useBreakpoints } from '@vueuse/core';
+import { ref, onScopeDispose } from 'vue';
+import type { Ref } from 'vue';
 
 /**
  * Single source of truth for responsive breakpoints.
@@ -17,11 +18,26 @@ const BREAKPOINTS = {
   compact: 992,
 } as const;
 
-export function useResponsive() {
-  const breakpoints = useBreakpoints(BREAKPOINTS);
+function makeMediaQuery(maxWidthPx: number): Ref<boolean> {
+  const query = window.matchMedia(`(max-width: ${maxWidthPx - 1}px)`);
+  const matches = ref(query.matches);
 
+  const handler = (event: MediaQueryListEvent) => {
+    matches.value = event.matches;
+  };
+
+  query.addEventListener('change', handler);
+
+  onScopeDispose(() => {
+    query.removeEventListener('change', handler);
+  });
+
+  return matches;
+}
+
+export function useResponsive() {
   return {
-    isMobile: breakpoints.smaller('mobile'),
-    isCompact: breakpoints.smaller('compact'),
+    isMobile: makeMediaQuery(BREAKPOINTS.mobile),
+    isCompact: makeMediaQuery(BREAKPOINTS.compact),
   };
 }
