@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import type { Pinia } from 'pinia';
@@ -39,9 +40,18 @@ vi.mock('../notifications/useNotifications', () => ({
 
 const mockPush = vi.fn();
 const mockReplace = vi.fn();
+const mockRoute = { params: {} as Record<string, string>, query: {} as Record<string, string> };
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush, replace: mockReplace }),
-  useRoute: () => ({ params: {}, query: {} }),
+  useRoute: () => mockRoute,
+}));
+
+const isMobile = ref(false);
+vi.mock('../shared/composables/useResponsive', () => ({
+  useResponsive: () => ({
+    isMobile,
+    isCompact: ref(false),
+  }),
 }));
 
 // Mock all APIs used by the real stores
@@ -124,6 +134,37 @@ const TransferDialogStub = {
   emits: ['update:visible', 'transferred'],
 };
 
+const ToolbarMobileStub = {
+  name: 'TransactionsToolbarMobile',
+  template: '<div data-testid="transactions-toolbar-mobile" />',
+  props: ['selectedBankAccountId', 'selectedBudgetId', 'dashIfZero'],
+  emits: [
+    'update:selectedBankAccountId',
+    'update:selectedBudgetId',
+    'update:dashIfZero',
+    'refresh',
+    'save',
+    'cancel',
+    'addTransaction',
+    'autoAllocate',
+    'showImportDialog',
+    'showTransferDialog',
+    'navigateToImport',
+  ],
+};
+
+const ListMobileStub = {
+  name: 'TransactionListMobile',
+  template: '<div data-testid="transaction-list-mobile" />',
+  props: ['dashIfZero'],
+};
+
+const SummaryMobileStub = {
+  name: 'TransactionSummaryMobile',
+  template: '<div data-testid="transaction-summary-mobile" />',
+  props: ['transactions', 'bankAccount', 'allocations'],
+};
+
 let pinia: Pinia;
 
 function createWrapper(): VueWrapper {
@@ -136,6 +177,9 @@ function createWrapper(): VueWrapper {
         TransactionSummary: SummaryStub,
         TransactionImportDialog: ImportDialogStub,
         AccountTransferDialog: TransferDialogStub,
+        TransactionsToolbarMobile: ToolbarMobileStub,
+        TransactionListMobile: ListMobileStub,
+        TransactionSummaryMobile: SummaryMobileStub,
       },
     },
   });
@@ -165,6 +209,8 @@ describe('TransactionsPage', () => {
     pinia = createPinia();
     setActivePinia(pinia);
     vi.clearAllMocks();
+    isMobile.value = false;
+    mockRoute.query = {};
   });
 
   describe('on mount', () => {
@@ -668,6 +714,146 @@ describe('TransactionsPage', () => {
       await flushPromises();
 
       expect(transactionApi.getAll).toHaveBeenCalledWith({ budgetId: 1, bankAccountId: 1 });
+    });
+  });
+
+  describe('mobile mode', () => {
+    beforeEach(() => {
+      isMobile.value = true;
+    });
+
+    describe('layout', () => {
+      it('renders TransactionsToolbarMobile and hides desktop TransactionSearchForm', async () => {
+        await setupApis();
+        const wrapper = createWrapper();
+
+        expect(wrapper.findComponent({ name: 'TransactionsToolbarMobile' }).exists()).toBe(true);
+        expect(wrapper.findComponent({ name: 'TransactionSearchForm' }).exists()).toBe(false);
+      });
+
+      it('renders TransactionListMobile and TransactionSummaryMobile, hides desktop versions', async () => {
+        await setupApis();
+        const wrapper = createWrapper();
+
+        expect(wrapper.findComponent({ name: 'TransactionListMobile' }).exists()).toBe(true);
+        expect(wrapper.findComponent({ name: 'TransactionSummaryMobile' }).exists()).toBe(true);
+        expect(wrapper.findComponent({ name: 'TransactionList' }).exists()).toBe(false);
+        expect(wrapper.findComponent({ name: 'TransactionSummary' }).exists()).toBe(false);
+      });
+    });
+
+    describe('initMobileSearch — defaults', () => {
+      it('picks first account and first budget, calls router.replace and store.fetch', async () => {
+        const { transactionApi } = await setupApis();
+        createWrapper();
+        await flushPromises();
+
+        expect(mockReplace).toHaveBeenCalledWith({
+          query: {
+            budget_id: jan2025.id,
+            bank_account_id: checkingAccount.id,
+          },
+        });
+        expect(transactionApi.getAll).toHaveBeenCalledWith({
+          budgetId: jan2025.id,
+          bankAccountId: checkingAccount.id,
+        });
+      });
+    });
+
+    describe('initMobileSearch — URL params', () => {
+      it('uses budget_id and bank_account_id from route.query when present', async () => {
+        const secondAccount = buildBankAccount({ id: 2, name: 'Savings' });
+        const secondBudget = buildBudget({ id: 2, name: 'Feb 2025', status: 'open' });
+
+        const { transactionApi, bankAccountApi, budgetApi } = await setupApis();
+        vi.mocked(bankAccountApi.getOpen).mockResolvedValue([checkingAccount, secondAccount]);
+        vi.mocked(budgetApi.getAll).mockResolvedValue([jan2025, secondBudget]);
+
+        mockRoute.query = { budget_id: '2', bank_account_id: '2' };
+
+        createWrapper();
+        await flushPromises();
+
+        expect(mockReplace).toHaveBeenCalledWith({
+          query: {
+            budget_id: 2,
+            bank_account_id: 2,
+          },
+        });
+        expect(transactionApi.getAll).toHaveBeenCalledWith({
+          budgetId: 2,
+          bankAccountId: 2,
+        });
+      });
+    });
+
+    describe('onMobileBankAccountChange', () => {
+      it('updates state, calls router.replace and store.fetch with the new bank account id', async () => {
+        const secondAccount = buildBankAccount({ id: 2, name: 'Savings' });
+        const { transactionApi, bankAccountApi } = await setupApis();
+        vi.mocked(bankAccountApi.getOpen).mockResolvedValue([checkingAccount, secondAccount]);
+
+        const wrapper = createWrapper();
+        await flushPromises();
+        vi.clearAllMocks();
+
+        const toolbar = wrapper.findComponent({ name: 'TransactionsToolbarMobile' });
+        await toolbar.vm.$emit('update:selectedBankAccountId', secondAccount.id);
+        await flushPromises();
+
+        expect(mockReplace).toHaveBeenCalledWith({
+          query: {
+            budget_id: jan2025.id,
+            bank_account_id: secondAccount.id,
+          },
+        });
+        expect(transactionApi.getAll).toHaveBeenCalledWith({
+          budgetId: jan2025.id,
+          bankAccountId: secondAccount.id,
+        });
+      });
+    });
+
+    describe('onMobileBudgetChange', () => {
+      it('updates state, calls router.replace and store.fetch with the new budget id', async () => {
+        const secondBudget = buildBudget({ id: 2, name: 'Feb 2025', status: 'open' });
+        const { transactionApi, budgetApi } = await setupApis();
+        vi.mocked(budgetApi.getAll).mockResolvedValue([jan2025, secondBudget]);
+
+        const wrapper = createWrapper();
+        await flushPromises();
+        vi.clearAllMocks();
+
+        const toolbar = wrapper.findComponent({ name: 'TransactionsToolbarMobile' });
+        await toolbar.vm.$emit('update:selectedBudgetId', secondBudget.id);
+        await flushPromises();
+
+        expect(mockReplace).toHaveBeenCalledWith({
+          query: {
+            budget_id: secondBudget.id,
+            bank_account_id: checkingAccount.id,
+          },
+        });
+        expect(transactionApi.getAll).toHaveBeenCalledWith({
+          budgetId: secondBudget.id,
+          bankAccountId: checkingAccount.id,
+        });
+      });
+    });
+
+    describe('fetchMobileTransactions guard', () => {
+      it('does not call router.replace or store.fetch when bank account selection is null', async () => {
+        const { transactionApi, bankAccountApi } = await setupApis();
+        // Return empty accounts so initMobileSearch cannot pick a default
+        vi.mocked(bankAccountApi.getOpen).mockResolvedValue([]);
+
+        createWrapper();
+        await flushPromises();
+
+        expect(mockReplace).not.toHaveBeenCalled();
+        expect(transactionApi.getAll).not.toHaveBeenCalled();
+      });
     });
   });
 });
