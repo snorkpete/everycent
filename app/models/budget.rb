@@ -57,17 +57,19 @@ class Budget < ActiveRecord::Base
   end
 
   def copy
-    new_budget = Budget.create(start_date: self.start_date.next_month)
+    ActiveRecord::Base.transaction do
+      new_budget = Budget.create(start_date: self.start_date.next_month)
 
-    incomes.each do |income|
-      new_budget.incomes << income.dup
+      incomes.each do |income|
+        new_budget.incomes << income.dup
+      end
+
+      allocations.each do |allocation|
+        new_budget.allocations << allocation.dup
+      end
+
+      new_budget
     end
-
-    allocations.each do |allocation|
-      new_budget.allocations << allocation.dup
-    end
-
-    new_budget
   end
 
   def self.close(budget_id)
@@ -76,34 +78,34 @@ class Budget < ActiveRecord::Base
   end
 
   def close
-    BankAccount.all.each do |bank_account|
-      bank_account.update_balance(self.id, self.end_date)
-      bank_account.add_brought_forward_transactions(self.start_date, self.end_date)
+    ActiveRecord::Base.transaction do
+      BankAccount.all.each do |bank_account|
+        bank_account.update_balance(self.id, self.end_date)
+        bank_account.add_brought_forward_transactions(self.start_date, self.end_date)
+      end
+      self.status = 'closed'
+      save!
+      self
     end
-    self.status = 'closed'
-    save
-    self
   end
 
   def self.reopen_last_budget
+    ActiveRecord::Base.transaction do
+      budget = Budget.where(status: 'closed').order(start_date: :desc).first
+      budget.status = 'open'
+      budget.save!
 
-    # reopen the last budget
-    budget = Budget.where(status: 'closed').order(start_date: :desc).first
-    budget.status = 'open'
-    budget.save
+      BankAccount.all.each do |bank_account|
+        transactions_before_budget = bank_account.transactions.where('transaction_date < ?', budget.start_date)
+        bank_account.closing_balance = transactions_before_budget.sum('deposit_amount - withdrawal_amount') +
+                                       (bank_account.opening_balance || 0)
+        bank_account.closing_date = budget.start_date.yesterday
+        bank_account.save!
+        bank_account.remove_brought_forward_transactions(budget.start_date, budget.end_date)
+      end
 
-    # reset the bank account balances
-    BankAccount.all.each do |bank_account|
-
-      transactions_before_budget = bank_account.transactions.where('transaction_date < ?', budget.start_date)
-      bank_account.closing_balance = transactions_before_budget.sum('deposit_amount - withdrawal_amount') +
-                                     (bank_account.opening_balance || 0)
-      bank_account.closing_date = budget.start_date.yesterday
-      bank_account.save
-      bank_account.remove_brought_forward_transactions(budget.start_date, budget.end_date)
+      budget
     end
-
-    budget
   end
 
   protected

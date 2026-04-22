@@ -1,6 +1,7 @@
 class Report
 
-  def self.generate_report(sql, fields)
+  def self.generate_report(sql_template, fields, binds = [])
+    sql = ActiveRecord::Base.sanitize_sql_array([sql_template, *binds])
     data = ActiveRecord::Base.connection.select_all(sql)
     {
         success: true,
@@ -17,7 +18,7 @@ class Report
         from transactions t
                  inner join budgets b
                             on t.transaction_date between b.start_date and b.end_date and b.household_id = t.household_id
-        where t.household_id = #{household.id}
+        where t.household_id = ?
         group by to_char(b.end_date, 'yyyy-mm')
         order by to_char(b.end_date, 'yyyy-mm')
     )
@@ -28,7 +29,7 @@ class Report
           sum(net) over (order by period asc rows between unbounded preceding and current row) as net_worth
     from data"
 
-    generate_report(sql, %w(period net_change net_worth))
+    generate_report(sql, %w(period net_change net_worth), [household.id])
   end
 
   def self.category_spending(household)
@@ -47,7 +48,7 @@ class Report
              from allocations a
                       inner join budgets b on a.budget_id = b.id
                       inner join allocation_categories c on c.id = a.allocation_category_id
-             where a.household_id = #{household.id}
+             where a.household_id = ?
          ) as results
     )
 
@@ -62,7 +63,8 @@ class Report
                         { name: 'budgeted', label: 'Budgeted', numeric: true},
                         { name: 'spent', label: 'Spent', numeric: true},
                         { name: 'diff', label: 'Difference', numeric: true}
-                    ])
+                    ],
+                    [household.id])
   end
 
   def self.needs_vs_wants(household)
@@ -85,7 +87,7 @@ class Report
                                  (select id from allocations where budget_id = b.id and allocation_class = 'savings')), 0) /
                  100.0                                                            as actual_savings
           from budgets b
-          where b.household_id = #{household.id}
+          where b.household_id = ?
       )
       select period,
              budgeted_needs,
@@ -118,6 +120,7 @@ class Report
                         { name: 'actual_needs_pct', label: 'Actual Needs %', numeric: false, class: 'actual'},
                         { name: 'actual_wants_pct', label: 'Actual Wants %', numeric: false, class: 'actual'},
                         { name: 'actual_savings_pct', label: 'Actual Savings %', numeric: false, class: 'actual'},
-                    ])
+                    ],
+                    [household.id])
   end
 end

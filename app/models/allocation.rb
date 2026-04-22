@@ -65,41 +65,38 @@ class Allocation < ApplicationRecord
   end
 
   def self.mass_update(params)
-    # @params = { type: 'allocation', name: 'Groceries', amounts:[
-    #     { id: @may_income.id, amount: 600 },
-    #     { id: @june_income.id, amount: 800 },
-    #     { id: @july_income.id, amount: 1000 },
-    # ]}
     return false if params[:name].blank?
 
-    params[:amounts].each do |amount_data|
-      if amount_data[:id] == 0
-        if amount_data[:amount] != 0
-          attrs = {
-            name: params[:name],
-            amount: amount_data[:amount],
-            budget_id: amount_data[:budget_id],
-            allocation_category_id: params[:allocation_category_id]
-          }
-          attrs[:is_fixed_amount] = amount_data[:is_fixed_amount] unless amount_data[:is_fixed_amount].nil?
-          Allocation.create(attrs)
+    ActiveRecord::Base.transaction do
+      params[:amounts].each do |amount_data|
+        if amount_data[:id] == 0
+          if amount_data[:amount] != 0
+            attrs = {
+              name: params[:name],
+              amount: amount_data[:amount],
+              budget_id: amount_data[:budget_id],
+              allocation_category_id: params[:allocation_category_id]
+            }
+            attrs[:is_fixed_amount] = amount_data[:is_fixed_amount] unless amount_data[:is_fixed_amount].nil?
+            Allocation.create(attrs)
+          end
+          next
         end
-        next
+
+        allocation = Allocation.find_by(id: amount_data[:id])
+        next unless allocation
+
+        if amount_data[:amount] == 0
+          allocation.destroy
+        else
+          attrs = { name: params[:name], amount: amount_data[:amount] }
+          attrs[:is_fixed_amount] = amount_data[:is_fixed_amount] unless amount_data[:is_fixed_amount].nil?
+          allocation.update(attrs)
+        end
       end
 
-      allocation = Allocation.find_by(id: amount_data[:id])
-      next unless allocation
-
-      if amount_data[:amount] == 0
-        allocation.destroy
-      else
-        attrs = { name: params[:name], amount: amount_data[:amount] }
-        attrs[:is_fixed_amount] = amount_data[:is_fixed_amount] unless amount_data[:is_fixed_amount].nil?
-        allocation.update(attrs)
-      end
+      true
     end
-
-    true
   end
 
   def spent

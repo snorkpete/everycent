@@ -3,7 +3,7 @@ ruby '3.2.3'
 
 gem 'bundler'
 gem 'rails', '~> 7.1.3'
-gem 'puma'
+gem 'puma', '~> 5.6'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
 gem 'nio4r', '~> 2.7.0'
@@ -37,7 +37,7 @@ gem 'tzinfo-data'
 # authentication - omniauth is a dependency of devise_token_auth
 gem 'omniauth'
 gem 'devise', '~> 4.9.0'
-gem 'devise_token_auth', '~> 1.2.2'
+gem 'devise_token_auth', '~> 1.2'
 
 # json api building
 gem 'active_model_serializers'
@@ -63,19 +63,14 @@ group :development, :test do
   gem 'spring-commands-rspec'
   #gem 'spring-watcher-listen'
 
-  gem 'guard-bundler'
-  gem 'guard-rails'
   gem 'rspec-rails', '~> 7.1'
   gem 'factory_bot_rails'
-  gem 'guard-rspec'
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
-  gem 'ruby_gntp'
-  gem 'terminal-notifier-guard'
 
 end
 
 group :test do
-  gem 'faker', '~> 3.2.0'
+  gem 'faker', '~> 3.2'
   #gem 'capybara'
   gem 'database_cleaner-active_record', '~> 2.1.0'
   gem 'launchy'

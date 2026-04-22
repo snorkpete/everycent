@@ -1,78 +1,122 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref, nextTick } from 'vue';
-
-const mockSmaller = vi.fn();
-vi.mock('@vueuse/core', () => ({
-  useBreakpoints: () => ({
-    smaller: mockSmaller,
-  }),
-}));
-
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { effectScope } from 'vue';
 import { useResponsive } from './useResponsive';
 
+type ChangeHandler = (event: MediaQueryListEvent) => void;
+
+interface FakeMediaQueryList {
+  matches: boolean;
+  addEventListener: ReturnType<typeof vi.fn>;
+  removeEventListener: ReturnType<typeof vi.fn>;
+  simulate: (matches: boolean) => void;
+}
+
+function makeFakeMediaQueryList(initialMatches: boolean): FakeMediaQueryList {
+  const handlers: ChangeHandler[] = [];
+
+  const mql: FakeMediaQueryList = {
+    matches: initialMatches,
+    addEventListener: vi.fn((_event: string, handler: ChangeHandler) => {
+      handlers.push(handler);
+    }),
+    removeEventListener: vi.fn((_event: string, handler: ChangeHandler) => {
+      const index = handlers.indexOf(handler);
+      if (index !== -1) handlers.splice(index, 1);
+    }),
+    simulate(newMatches: boolean) {
+      mql.matches = newMatches;
+      const event = { matches: newMatches } as MediaQueryListEvent;
+      handlers.forEach((h) => h(event));
+    },
+  };
+
+  return mql;
+}
+
 describe('useResponsive', () => {
-  const mobileRef = ref(false);
-  const compactRef = ref(false);
+  let mobileMql: FakeMediaQueryList;
+  let compactMql: FakeMediaQueryList;
 
   beforeEach(() => {
-    mobileRef.value = false;
-    compactRef.value = false;
-    mockSmaller.mockReset();
-    mockSmaller.mockImplementation((key: string) => {
-      if (key === 'mobile') return mobileRef;
-      if (key === 'compact') return compactRef;
-      return ref(false);
+    mobileMql = makeFakeMediaQueryList(false);
+    compactMql = makeFakeMediaQueryList(false);
+
+    vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+      if (query === '(max-width: 575px)') return mobileMql as unknown as MediaQueryList;
+      if (query === '(max-width: 991px)') return compactMql as unknown as MediaQueryList;
+      return makeFakeMediaQueryList(false) as unknown as MediaQueryList;
     });
   });
 
-  function setup() {
-    return useResponsive();
-  }
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it('returns isMobile as false on desktop', () => {
-    const { isMobile } = setup();
+    const { isMobile } = useResponsive();
 
     expect(isMobile.value).toBe(false);
   });
 
   it('returns isCompact as false on desktop', () => {
-    const { isCompact } = setup();
+    const { isCompact } = useResponsive();
 
     expect(isCompact.value).toBe(false);
   });
 
   it('returns isMobile as true when viewport is below mobile breakpoint', () => {
-    mobileRef.value = true;
-    const { isMobile } = setup();
+    mobileMql = makeFakeMediaQueryList(true);
+    vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+      if (query === '(max-width: 575px)') return mobileMql as unknown as MediaQueryList;
+      if (query === '(max-width: 991px)') return compactMql as unknown as MediaQueryList;
+      return makeFakeMediaQueryList(false) as unknown as MediaQueryList;
+    });
+
+    const { isMobile } = useResponsive();
 
     expect(isMobile.value).toBe(true);
   });
 
   it('returns isCompact as true when viewport is below compact breakpoint', () => {
-    compactRef.value = true;
-    const { isCompact } = setup();
+    compactMql = makeFakeMediaQueryList(true);
+    vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+      if (query === '(max-width: 575px)') return mobileMql as unknown as MediaQueryList;
+      if (query === '(max-width: 991px)') return compactMql as unknown as MediaQueryList;
+      return makeFakeMediaQueryList(false) as unknown as MediaQueryList;
+    });
+
+    const { isCompact } = useResponsive();
 
     expect(isCompact.value).toBe(true);
   });
 
-  it('is reactive to viewport changes', async () => {
-    const { isMobile, isCompact } = setup();
+  it('is reactive to viewport changes', () => {
+    const { isMobile, isCompact } = useResponsive();
 
     expect(isMobile.value).toBe(false);
     expect(isCompact.value).toBe(false);
 
-    mobileRef.value = true;
-    compactRef.value = true;
-    await nextTick();
+    mobileMql.simulate(true);
+    compactMql.simulate(true);
 
     expect(isMobile.value).toBe(true);
     expect(isCompact.value).toBe(true);
   });
 
-  it('calls useBreakpoints.smaller with correct breakpoint keys', () => {
-    setup();
+  it('queries matchMedia with correct max-width values for breakpoints', () => {
+    useResponsive();
 
-    expect(mockSmaller).toHaveBeenCalledWith('mobile');
-    expect(mockSmaller).toHaveBeenCalledWith('compact');
+    expect(window.matchMedia).toHaveBeenCalledWith('(max-width: 575px)');
+    expect(window.matchMedia).toHaveBeenCalledWith('(max-width: 991px)');
+  });
+
+  it('removes event listeners when the scope is disposed', () => {
+    const scope = effectScope();
+    scope.run(() => useResponsive());
+
+    scope.stop();
+
+    expect(mobileMql.removeEventListener).toHaveBeenCalled();
+    expect(compactMql.removeEventListener).toHaveBeenCalled();
   });
 });

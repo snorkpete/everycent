@@ -16,6 +16,8 @@ RSpec.describe Auth::GoogleController, type: :controller do
 
   before do
     @request.env['devise.mapping'] = Devise.mappings[:user]
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch).with('GOOGLE_CLIENT_ID').and_return('test-google-client-id')
   end
 
   describe 'POST #create' do

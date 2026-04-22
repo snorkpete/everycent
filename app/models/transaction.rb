@@ -72,32 +72,21 @@ class Transaction < ApplicationRecord
   end
 
   def self.update_with_params(params)
+    ActiveRecord::Base.transaction do
+      sink_fund = BankAccount.sink_funds.where(id: params[:bank_account_id]).includes(:sink_fund_allocations).first
 
-    sink_fund = BankAccount.sink_funds.where(id: params[:bank_account_id]).includes(:sink_fund_allocations).first
+      Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id]).delete_all
 
-    # remove the existing transactions in the period
-    #previous_transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
-    #sink_fund.reverse_transactions_from_sink_fund_allocations(previous_transactions) if sink_fund
-    #previous_transactions.delete_all
-    Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id]).delete_all
+      if params[:transactions]
+        params[:transactions].each do |transaction_params|
+          transaction_params[:bank_account_id] = params[:bank_account_id]
 
-    # re-add the transactions that are being sent
-    if params[:transactions]
-      params[:transactions].each do |transaction_params|
-        transaction_params[:bank_account_id] = params[:bank_account_id]
-
-        Transaction.create(transaction_params.except(:id))
+          Transaction.create(transaction_params.except(:id))
+        end
       end
+
+      Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
     end
-
-    #new_transactions = Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
-    #sink_fund.apply_transactions_to_sink_fund_allocations(new_transactions) if sink_fund
-
-    ##send back the fixed list of transactions
-    #new_transactions
-
-    ##send back the fixed list of transactions
-    Transaction.for_budget_and_bank(params[:budget_id], params[:bank_account_id])
   end
 
   def paid

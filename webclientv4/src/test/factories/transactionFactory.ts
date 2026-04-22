@@ -9,6 +9,7 @@ export function buildTransaction(overrides?: Partial<TransactionData>): Transact
     withdrawal_amount: 5000,
     deposit_amount: 0,
     status: 'paid',
+    paid: true,
     deleted: false,
     ...overrides,
   };
