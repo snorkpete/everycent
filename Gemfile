@@ -75,7 +75,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'faker', '~> 3.2.0'
+  gem 'faker', '~> 3.2'
   #gem 'capybara'
   gem 'database_cleaner-active_record', '~> 2.1.0'
   gem 'launchy'

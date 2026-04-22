@@ -400,7 +400,7 @@ DEPENDENCIES
   devise_token_auth (~> 1.2)
   dotenv-rails
   factory_bot_rails
-  faker (~> 3.2.0)
+  faker (~> 3.2)
   googleauth
   guard-bundler
   guard-rails
