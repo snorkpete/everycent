@@ -3,7 +3,7 @@ ruby '3.2.3'
 
 gem 'bundler'
 gem 'rails', '~> 7.1.3'
-gem 'puma'
+gem 'puma', '~> 5.6'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
 gem 'nio4r', '~> 2.7.0'
