@@ -1,11 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import type { Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import AccountBalancesPage from './AccountBalancesPage.vue';
+import AccountBalancesToolbarMobile from './AccountBalancesToolbarMobile.vue';
+import AccountCategoryTableMobile from './AccountCategoryTableMobile.vue';
+import AccountBalanceSummaryStripMobile from './AccountBalanceSummaryStripMobile.vue';
 import { buildAccountBalance } from '../../test/factories/accountBalanceFactory';
+
+const isMobile = ref(false);
+vi.mock('../shared/composables/useResponsive', () => ({
+  useResponsive: () => ({
+    isMobile,
+    isCompact: ref(false),
+  }),
+}));
 
 // Selectors
 const INCLUDE_CLOSED_TOGGLE = '[data-testid="include-closed-toggle"]';
@@ -84,6 +96,7 @@ describe('AccountBalancesPage', () => {
     pinia = createPinia();
     setActivePinia(pinia);
     vi.clearAllMocks();
+    isMobile.value = false;
   });
 
   async function setupApi(accounts = [currentAccount]) {
@@ -357,6 +370,94 @@ describe('AccountBalancesPage', () => {
       await flushPromises();
 
       expect(dialog.props('visible')).toBe(false);
+    });
+  });
+
+  describe('responsive layout', () => {
+    it('renders desktop toolbar when isMobile is false', async () => {
+      isMobile.value = false;
+      await setupApi();
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(AccountBalancesToolbarMobile).exists()).toBe(false);
+      expect(wrapper.find(ADJUST_BALANCES_BTN).exists()).toBe(true);
+    });
+
+    it('renders AccountBalancesToolbarMobile when isMobile is true', async () => {
+      isMobile.value = true;
+      await setupApi();
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(AccountBalancesToolbarMobile).exists()).toBe(true);
+    });
+
+    it('renders AccountBalanceSummaryStripMobile when isMobile is true and data is ready', async () => {
+      isMobile.value = true;
+      await setupApi([currentAccount]);
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(AccountBalanceSummaryStripMobile).exists()).toBe(true);
+    });
+
+    it('renders desktop summary strip when isMobile is false and data is ready', async () => {
+      isMobile.value = false;
+      await setupApi([currentAccount]);
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(AccountBalanceSummaryStripMobile).exists()).toBe(false);
+      expect(wrapper.find('[data-testid="account-balance-summary-strip"]').exists()).toBe(true);
+    });
+
+    it('renders AccountCategoryTableMobile for tables when isMobile is true', async () => {
+      isMobile.value = true;
+      await setupApi([currentAccount]);
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(AccountCategoryTableMobile).exists()).toBe(true);
+      expect(wrapper.find(CURRENT_ACCOUNTS_TABLE).exists()).toBe(true);
+    });
+
+    it('does not render AccountCategoryTableMobile when isMobile is false', async () => {
+      isMobile.value = false;
+      await setupApi([currentAccount]);
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      expect(wrapper.findComponent(AccountCategoryTableMobile).exists()).toBe(false);
+    });
+
+    it('opens adjust dialog when mobile toolbar emits adjust', async () => {
+      isMobile.value = true;
+      await setupApi();
+      const wrapper = createWrapper();
+      await flushPromises();
+
+      const mobileToolbar = wrapper.findComponent(AccountBalancesToolbarMobile);
+      await mobileToolbar.vm.$emit('adjust');
+      await flushPromises();
+
+      const dialog = wrapper.findComponent({ name: 'AdjustBalancesDialog' });
+      expect(dialog.props('visible')).toBe(true);
+    });
+
+    it('refetches accounts when mobile toolbar emits toggleClosed', async () => {
+      isMobile.value = true;
+      const api = await setupApi([currentAccount]);
+      const wrapper = createWrapper();
+      await flushPromises();
+      vi.clearAllMocks();
+      vi.mocked(api.getAll).mockResolvedValue([currentAccount]);
+
+      const mobileToolbar = wrapper.findComponent(AccountBalancesToolbarMobile);
+      await mobileToolbar.vm.$emit('toggleClosed');
+      await flushPromises();
+
+      expect(api.getAll).toHaveBeenCalled();
     });
   });
 });

@@ -1,6 +1,16 @@
 <template>
   <EcPageLayout page-name="account-balances" variant="fixed" content-bg>
-    <template #toolbar-left>
+    <!-- ── Mobile toolbar ── -->
+    <template v-if="isMobile" #toolbar>
+      <AccountBalancesToolbarMobile
+        v-model:dash-if-zero="dashIfZero"
+        @adjust="showAdjustDialog = true"
+        @toggle-closed="onToggleChanged"
+      />
+    </template>
+
+    <!-- ── Desktop toolbar ── -->
+    <template v-if="!isMobile" #toolbar-left>
       <Button
         label="Adjust Account Balances"
         data-testid="adjust-balances-btn"
@@ -9,7 +19,7 @@
         @click="showAdjustDialog = true"
       />
     </template>
-    <template #toolbar-right>
+    <template v-if="!isMobile" #toolbar-right>
       <Button
         v-tooltip="'Show zero balances as dashes'"
         :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
@@ -31,52 +41,102 @@
     </template>
 
     <!-- Summary Strip -->
-    <AccountBalanceSummaryStrip v-if="store.ready" />
+    <AccountBalanceSummaryStripMobile v-if="isMobile && store.ready" />
+    <AccountBalanceSummaryStrip v-if="!isMobile && store.ready" />
 
     <!-- Content -->
     <div class="content-area">
       <EcStatusMessage :loading="store.loading" :error="store.error" />
       <template v-if="store.ready">
-        <div v-if="store.currentAccounts.length" class="content-card">
-          <AccountCategoryTable
+        <template v-if="isMobile">
+          <AccountCategoryTableMobile
+            v-if="store.currentAccounts.length"
             heading="Current Accounts"
             :accounts="store.currentAccounts"
             :dash-if-zero="dashIfZero"
+            :expanded="expandedCategory === 'current'"
             data-testid="current-accounts-table"
+            @toggle="toggleCategory('current')"
           />
-        </div>
-        <div v-if="store.cashAssetAccounts.length" class="content-card">
-          <AccountCategoryTable
+          <AccountCategoryTableMobile
+            v-if="store.cashAssetAccounts.length"
             heading="Cash Assets"
             :accounts="store.cashAssetAccounts"
             :dash-if-zero="dashIfZero"
+            :expanded="expandedCategory === 'cash-assets'"
             data-testid="cash-assets-table"
+            @toggle="toggleCategory('cash-assets')"
           />
-        </div>
-        <div v-if="store.physicalAssetAccounts.length" class="content-card">
-          <AccountCategoryTable
+          <AccountCategoryTableMobile
+            v-if="store.physicalAssetAccounts.length"
             heading="Non Cash Assets"
             :accounts="store.physicalAssetAccounts"
             :dash-if-zero="dashIfZero"
+            :expanded="expandedCategory === 'non-cash-assets'"
             data-testid="non-cash-assets-table"
+            @toggle="toggleCategory('non-cash-assets')"
           />
-        </div>
-        <div v-if="store.creditCardAccounts.length" class="content-card">
-          <AccountCategoryTable
+          <AccountCategoryTableMobile
+            v-if="store.creditCardAccounts.length"
             heading="Credit Cards"
             :accounts="store.creditCardAccounts"
             :dash-if-zero="dashIfZero"
+            :expanded="expandedCategory === 'credit-cards'"
             data-testid="credit-cards-table"
+            @toggle="toggleCategory('credit-cards')"
           />
-        </div>
-        <div v-if="store.loanAccounts.length" class="content-card">
-          <AccountCategoryTable
+          <AccountCategoryTableMobile
+            v-if="store.loanAccounts.length"
             heading="Other Loans"
             :accounts="store.loanAccounts"
             :dash-if-zero="dashIfZero"
+            :expanded="expandedCategory === 'loans'"
             data-testid="loans-table"
+            @toggle="toggleCategory('loans')"
           />
-        </div>
+        </template>
+        <template v-else>
+          <div v-if="store.currentAccounts.length" class="content-card">
+            <AccountCategoryTable
+              heading="Current Accounts"
+              :accounts="store.currentAccounts"
+              :dash-if-zero="dashIfZero"
+              data-testid="current-accounts-table"
+            />
+          </div>
+          <div v-if="store.cashAssetAccounts.length" class="content-card">
+            <AccountCategoryTable
+              heading="Cash Assets"
+              :accounts="store.cashAssetAccounts"
+              :dash-if-zero="dashIfZero"
+              data-testid="cash-assets-table"
+            />
+          </div>
+          <div v-if="store.physicalAssetAccounts.length" class="content-card">
+            <AccountCategoryTable
+              heading="Non Cash Assets"
+              :accounts="store.physicalAssetAccounts"
+              :dash-if-zero="dashIfZero"
+              data-testid="non-cash-assets-table"
+            />
+          </div>
+          <div v-if="store.creditCardAccounts.length" class="content-card">
+            <AccountCategoryTable
+              heading="Credit Cards"
+              :accounts="store.creditCardAccounts"
+              :dash-if-zero="dashIfZero"
+              data-testid="credit-cards-table"
+            />
+          </div>
+          <div v-if="store.loanAccounts.length" class="content-card">
+            <AccountCategoryTable
+              heading="Other Loans"
+              :accounts="store.loanAccounts"
+              :dash-if-zero="dashIfZero"
+              data-testid="loans-table"
+            />
+          </div>
+        </template>
       </template>
     </div>
 
@@ -93,15 +153,21 @@ import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useAccountBalanceStore } from './accountBalanceStore';
+import { useResponsive } from '../shared/composables/useResponsive';
 import AccountBalanceSummaryStrip from './AccountBalanceSummaryStrip.vue';
+import AccountBalanceSummaryStripMobile from './AccountBalanceSummaryStripMobile.vue';
 import AccountCategoryTable from './AccountCategoryTable.vue';
+import AccountCategoryTableMobile from './AccountCategoryTableMobile.vue';
+import AccountBalancesToolbarMobile from './AccountBalancesToolbarMobile.vue';
 import AdjustBalancesDialog from './AdjustBalancesDialog.vue';
 
 const headingStore = useHeadingStore();
 const store = useAccountBalanceStore();
+const { isMobile } = useResponsive();
 
 const dashIfZero = ref(true);
 const showAdjustDialog = ref(false);
+const expandedCategory = ref<string | null>(null);
 
 onMounted(() => {
   headingStore.setHeading('Account Balances');
@@ -110,6 +176,10 @@ onMounted(() => {
 
 async function onToggleChanged() {
   await store.fetch();
+}
+
+function toggleCategory(category: string) {
+  expandedCategory.value = expandedCategory.value === category ? null : category;
 }
 </script>
 
@@ -141,5 +211,4 @@ async function onToggleChanged() {
   background-color: var(--p-surface-0);
   margin-bottom: 0.5rem;
 }
-
 </style>
