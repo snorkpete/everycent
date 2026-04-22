@@ -15,28 +15,22 @@
       </div>
     </div>
 
-    <template v-if="isDev">
-      <NlqChatButton @toggle="chatVisible = !chatVisible" />
-      <NlqChatWindow v-model:visible="chatVisible" />
-    </template>
+    <NlqChatApp v-if="isDev" />
   </template>
 
   <router-view v-else />
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useAuthStore } from './auth/authStore';
 import Toast from 'primevue/toast';
 import LoadingIndicator from './app/loading/LoadingIndicator.vue';
 import MenuSidebar from './app/menu/MenuSidebar.vue';
 import AppToolbar from './app/toolbar/AppToolbar.vue';
-import NlqChatButton from './app/chat/NlqChatButton.vue';
-import NlqChatWindow from './app/chat/NlqChatWindow.vue';
+import NlqChatApp from './app/chat/NlqChatApp.vue';
 
 const authStore = useAuthStore();
 const isDev = import.meta.env.DEV;
-const chatVisible = ref(false);
 </script>
 
 <style scoped>
