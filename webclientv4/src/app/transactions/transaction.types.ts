@@ -1,7 +1,9 @@
 import type { BankAccountData } from '../bank-accounts/bankAccount.types';
 import type { AllocationCategoryData } from '../allocation-categories/allocationCategory.types';
 import type { MatchType } from '../budgets/autoAllocate.types';
+import type { SinkFundAllocationData } from '../sink-funds/sinkFund.types';
 export type { BudgetData } from '../budgets/budget.types';
+export type { SinkFundAllocationData } from '../sink-funds/sinkFund.types';
 
 export interface AllocationData {
   id?: number;
@@ -22,22 +24,6 @@ export interface AllocationData {
   allocation_class?: string;
   is_fixed_amount?: boolean;
   deleted?: boolean;
-}
-
-export interface SinkFundAllocationData {
-  id?: number;
-  name?: string;
-  amount?: number;
-  bank_account_id?: number;
-  comment?: string;
-  spent?: number;
-  remaining?: number;
-  status?: string;
-  target?: number;
-  current_balance?: number;
-  difference?: number;
-  deleted?: boolean;
-  unsaved?: boolean;
 }
 
 export interface TransactionData {
