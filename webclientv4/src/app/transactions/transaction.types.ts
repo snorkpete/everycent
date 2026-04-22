@@ -19,6 +19,7 @@ export interface AllocationData {
   allocation_category?: AllocationCategoryData;
   bank_account?: BankAccountData;
   special_event_id?: number;
+  // SpecialEventAllocationSerializer only — not present in AllocationSerializer
   budget_name?: string;
   allocation_category_name?: string;
   allocation_class?: string;

@@ -7,6 +7,7 @@ export interface FutureIncomeData {
   comment?: string;
 }
 
+// Intentionally omits `spent` and `allocation_class` from AllocationData — future budgets don't carry actuals
 export interface FutureAllocationData {
   id: number;
   name: string;
