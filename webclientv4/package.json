@@ -37,6 +37,7 @@
     "@primeuix/themes": "^2.0.3",
     "axios": "^1.13.4",
     "jszip": "^3.10.1",
+    "marked": "^18.0.2",
     "pinia": "^3.0.4",
     "primevue": "^4.5.4",
     "vue": "^3.5.24",

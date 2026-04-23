@@ -1,28 +1,41 @@
 <template>
   <Dialog
     :visible="visible"
-    header="Ask Everycent"
     position="bottomright"
     :modal="false"
     :closable="true"
     :style="{ width: '28rem', height: '32rem' }"
-    :contentStyle="{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }"
+    :content-style="{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }"
     @update:visible="$emit('update:visible', $event)"
     @show="onShow"
   >
+    <template #header>
+      <div class="chat-header">
+        <span class="chat-title">Ask Everycent</span>
+        <Button
+          v-tooltip.bottom="'New chat'"
+          icon="pi pi-plus"
+          text
+          rounded
+          size="small"
+          :disabled="messages.length === 0"
+          @click="$emit('clear')"
+        />
+      </div>
+    </template>
+
     <div ref="messagesContainer" class="chat-messages">
       <p v-if="messages.length === 0" class="empty-state">Ask a question about your finances.</p>
 
       <div
-        v-for="(msg, i) in messages"
+        v-for="(msg, i) in renderedMessages"
         :key="i"
-        class="chat-bubble"
+        class="chat-bubble markdown-body"
         :class="msg.role"
-      >
-        {{ msg.content }}
-      </div>
+        v-html="msg.html"
+      />
 
-      <div v-if="loading" class="chat-bubble assistant loading-indicator">…</div>
+      <div v-if="thinking" class="chat-bubble assistant loading-indicator">Thinking...</div>
     </div>
 
     <div class="chat-input">
@@ -39,21 +52,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
+import { marked } from 'marked';
+import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import type { ChatMessage } from './chat.types';
 
-defineProps<{
+marked.setOptions({ breaks: true });
+
+const props = defineProps<{
   visible: boolean;
   messages: ChatMessage[];
   loading: boolean;
+  thinking: boolean;
 }>();
 
 const emit = defineEmits<{
   'update:visible': [value: boolean];
   submit: [content: string];
+  clear: [];
 }>();
+
+const renderedMessages = computed(() =>
+  props.messages.map((msg) => ({
+    ...msg,
+    html: marked.parse(msg.content) as string,
+  })),
+);
 
 const inputText = ref('');
 const inputRef = ref<{ $el: HTMLInputElement } | null>(null);
@@ -77,18 +103,31 @@ function onSubmit() {
   setTimeout(focusInput, 1000);
 }
 
-watch(
-  () => messagesContainer.value?.scrollHeight,
-  async () => {
-    await nextTick();
+function scrollToBottom() {
+  nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
     }
-  },
-);
+  });
+}
+
+watch(() => props.messages.length, scrollToBottom);
+watch(() => props.messages[props.messages.length - 1]?.content.length, scrollToBottom);
 </script>
 
 <style scoped>
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.chat-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -131,5 +170,39 @@ watch(
 .chat-input {
   padding: 0.5rem;
   border-top: 1px solid var(--p-surface-200);
+}
+
+.markdown-body :deep(p) {
+  margin: 0 0 0.25rem;
+}
+
+.markdown-body :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.markdown-body :deep(ul),
+.markdown-body :deep(ol) {
+  margin: 0.25rem 0;
+  padding-left: 1.25rem;
+}
+
+.markdown-body :deep(code) {
+  background-color: var(--p-surface-200);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+}
+
+.markdown-body :deep(pre) {
+  background-color: var(--p-surface-200);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 0.25rem 0;
+}
+
+.markdown-body :deep(pre code) {
+  background: none;
+  padding: 0;
 }
 </style>

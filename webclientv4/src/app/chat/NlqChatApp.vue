@@ -4,7 +4,9 @@
     v-model:visible="chatVisible"
     :messages="chatStore.messages"
     :loading="chatStore.loading"
+    :thinking="chatStore.thinking"
     @submit="chatStore.sendMessage($event)"
+    @clear="chatStore.clearMessages()"
   />
 </template>
 
