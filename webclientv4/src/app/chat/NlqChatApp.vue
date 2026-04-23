@@ -5,6 +5,7 @@
     :messages="chatStore.messages"
     :loading="chatStore.loading"
     :thinking="chatStore.thinking"
+    :error="chatStore.error"
     @submit="chatStore.sendMessage($event)"
     @clear="chatStore.clearMessages()"
   />

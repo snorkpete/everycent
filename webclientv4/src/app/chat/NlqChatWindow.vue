@@ -36,16 +36,19 @@
       />
 
       <div v-if="thinking" class="chat-bubble assistant loading-indicator">Thinking...</div>
+
+      <div v-if="error" class="chat-bubble error">{{ error }}</div>
     </div>
 
     <div class="chat-input">
-      <InputText
+      <Textarea
         ref="inputRef"
         v-model="inputText"
         placeholder="Type a question..."
         fluid
+        :rows="3"
         :disabled="loading"
-        @keydown.enter="onSubmit"
+        @keydown.enter.exact.prevent="onSubmit"
       />
     </div>
   </Dialog>
@@ -56,7 +59,7 @@ import { ref, computed, watch, nextTick } from 'vue';
 import { marked } from 'marked';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
 import type { ChatMessage } from './chat.types';
 
 marked.setOptions({ breaks: true });
@@ -66,6 +69,7 @@ const props = defineProps<{
   messages: ChatMessage[];
   loading: boolean;
   thinking: boolean;
+  error: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -165,6 +169,14 @@ watch(() => props.messages[props.messages.length - 1]?.content.length, scrollToB
 .loading-indicator {
   font-style: italic;
   color: var(--p-text-muted-color);
+}
+
+.chat-bubble.error {
+  align-self: center;
+  background-color: var(--p-red-50);
+  color: var(--p-red-700);
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .chat-input {
