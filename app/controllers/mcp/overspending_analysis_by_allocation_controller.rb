@@ -1,5 +1,5 @@
 module Mcp
-  class OverspendingAnalysisController < AppController
+  class OverspendingAnalysisByAllocationController < AppController
     def show
       period = params.require(:period)
 
@@ -8,26 +8,31 @@ module Mcp
         return
       end
 
+      category = params[:category].presence
+
       render json: {
         period: period,
+        category: category,
         amount_unit: "cents (divide by 100 for currency display)",
-        categories: budget_vs_actual_by_category(period)
+        allocations: budget_vs_actual_by_allocation(period, category)
       }
     end
 
     private
 
-    def budget_vs_actual_by_category(period)
-      # Transactions currently link to budgets by transaction_date (date
-      # range), not by allocation.budget_id — see open task
-      # link-transactions-to-budgets-by-foreign-key-instead-of-date-range.
-      # So "budgeted" aggregates allocations whose budget starts in the
-      # period, while "actual" aggregates transactions whose
-      # transaction_date falls in the period. The allocation join on the
-      # actual side is just for category lookup.
+    # Same design as OverspendingAnalysisController#budget_vs_actual_by_category
+    # but groups by allocation name + category name rather than category alone,
+    # giving per-line-item breakdowns. Both CTEs filter out categories marked
+    # exclude_from_overspend_tracking. An optional category param narrows both
+    # CTEs to a single category by name.
+    def budget_vs_actual_by_allocation(period, category)
+      category_filter = category ? "AND ac.name = :category" : ""
+
       sql = <<~SQL
         WITH budgeted AS (
-          SELECT ac.name AS category,
+          SELECT a.name AS allocation,
+                 ac.id AS category_id,
+                 ac.name AS category,
                  SUM(a.amount) AS budgeted_cents
           FROM allocations a
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
@@ -35,10 +40,13 @@ module Mcp
           WHERE to_char(b.start_date, 'YYYY-MM') = :period
             AND b.household_id = :household_id
             AND ac.exclude_from_overspend_tracking = false
-          GROUP BY ac.name
+            #{category_filter}
+          GROUP BY a.name, ac.id, ac.name
         ),
         actual AS (
-          SELECT ac.name AS category,
+          SELECT a.name AS allocation,
+                 ac.id AS category_id,
+                 ac.name AS category,
                  SUM(t.withdrawal_amount) AS actual_cents
           FROM transactions t
           JOIN allocations a ON t.allocation_id = a.id
@@ -48,25 +56,30 @@ module Mcp
             AND t.is_manual_adjustment = false
             AND t.withdrawal_amount > 0
             AND ac.exclude_from_overspend_tracking = false
-          GROUP BY ac.name
+            #{category_filter}
+          GROUP BY a.name, ac.id, ac.name
         )
         SELECT
+          COALESCE(b.allocation, a.allocation) AS allocation,
+          COALESCE(b.category_id, a.category_id) AS category_id,
           COALESCE(b.category, a.category) AS category,
           COALESCE(b.budgeted_cents, 0) AS budgeted_cents,
           COALESCE(a.actual_cents, 0) AS actual_cents,
           COALESCE(b.budgeted_cents, 0) - COALESCE(a.actual_cents, 0) AS amount_remaining_cents
         FROM budgeted b
-        FULL OUTER JOIN actual a ON b.category = a.category
+        FULL OUTER JOIN actual a ON b.allocation = a.allocation AND b.category_id = a.category_id
         ORDER BY amount_remaining_cents ASC
       SQL
 
-      bindings = { period: period, household_id: current_household.id }
+      bindings = { period: period, household_id: current_household.id, category: category }
       result = ActiveRecord::Base.connection.exec_query(
         ActiveRecord::Base.sanitize_sql([sql, bindings])
       )
 
       result.map do |row|
         {
+          allocation: row["allocation"],
+          category_id: row["category_id"].to_i,
           category: row["category"],
           budgeted_cents: row["budgeted_cents"].to_i,
           actual_cents: row["actual_cents"].to_i,
