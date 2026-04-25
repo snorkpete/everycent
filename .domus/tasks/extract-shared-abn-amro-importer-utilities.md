@@ -1,7 +1,7 @@
 # Task: Extract shared ABN AMRO importer utilities
 
 **ID:** extract-shared-abn-amro-importer-utilities
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-10

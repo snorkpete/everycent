@@ -1,7 +1,7 @@
 # Task: Upgrade rack-cors to 2.x
 
 **ID:** upgrade-rack-cors-to-2x
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10

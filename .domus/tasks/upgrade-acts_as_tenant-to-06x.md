@@ -1,7 +1,7 @@
 # Task: Upgrade acts_as_tenant to 0.6.x
 
 **ID:** upgrade-acts_as_tenant-to-06x
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10

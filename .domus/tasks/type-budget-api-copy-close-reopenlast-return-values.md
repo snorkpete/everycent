@@ -1,7 +1,7 @@
 # Task: Type budget API copy close reopenLast return values
 
 **ID:** type-budget-api-copy-close-reopenlast-return-values
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-10

@@ -1,7 +1,7 @@
 # Task: Extract EcToggleButton component
 
 **ID:** extract-ectogglebutton-component
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10

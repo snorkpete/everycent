@@ -1,7 +1,7 @@
 # Task: Upgrade newrelic_rpm to 9.x
 
 **ID:** upgrade-newrelic_rpm-to-9x
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10
