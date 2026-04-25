@@ -36,6 +36,7 @@
       />
 
       <div v-if="thinking" class="chat-bubble assistant loading-indicator">Thinking...</div>
+      <div v-if="toolStatus" class="chat-bubble assistant loading-indicator">{{ toolStatus }}</div>
 
       <div v-if="error" class="chat-bubble error">{{ error }}</div>
     </div>
@@ -69,6 +70,7 @@ const props = defineProps<{
   messages: ChatMessage[];
   loading: boolean;
   thinking: boolean;
+  toolStatus: string | null;
   error: string | null;
 }>();
 

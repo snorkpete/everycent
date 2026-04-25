@@ -8,6 +8,7 @@ export const useChatStore = defineStore('chat', () => {
   const loading = ref(false);
   const thinking = ref(false);
   const error = ref<string | null>(null);
+  const toolStatus = ref<string | null>(null);
 
   async function sendMessage(content: string) {
     messages.value.push({ role: 'user', content });
@@ -27,6 +28,12 @@ export const useChatStore = defineStore('chat', () => {
             thinking.value = false;
             target.content = event.content;
             break;
+          case 'tool_call':
+            toolStatus.value = `Calling ${event.name}...`;
+            break;
+          case 'tool_result':
+            toolStatus.value = null;
+            break;
           case 'error':
             error.value = event.message;
             if (target.content === '') {
@@ -45,13 +52,15 @@ export const useChatStore = defineStore('chat', () => {
     } finally {
       loading.value = false;
       thinking.value = false;
+      toolStatus.value = null;
     }
   }
 
   function clearMessages() {
     messages.value = [];
     error.value = null;
+    toolStatus.value = null;
   }
 
-  return { messages, loading, thinking, error, sendMessage, clearMessages };
+  return { messages, loading, thinking, error, toolStatus, sendMessage, clearMessages };
 });
