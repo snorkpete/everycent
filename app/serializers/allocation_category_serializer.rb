@@ -13,5 +13,5 @@
 class AllocationCategorySerializer < ActiveModel::Serializer
   type 'allocation_category'
 
-  attributes :id, :name, :percentage, :exclude_from_overspend_tracking
+  attributes :id, :name, :percentage, :budget_role
 end

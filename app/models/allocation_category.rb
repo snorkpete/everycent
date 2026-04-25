@@ -11,6 +11,8 @@
 #
 
 class AllocationCategory < ApplicationRecord
+  BUDGET_ROLES = %w[spending annual_spending transfer savings event].freeze
+
   # force this model to always require scoping to a household
   acts_as_tenant :household
   has_many :recurring_allocations
@@ -21,6 +23,7 @@ class AllocationCategory < ApplicationRecord
                         message: 'Allocation Category already exists.',
                         scope: :household_id
                     }
+  validates :budget_role, inclusion: { in: BUDGET_ROLES }
 
   before_save :fix_name
 

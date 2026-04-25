@@ -27,10 +27,10 @@ vi.mock('../notifications/useNotifications', () => ({
 
 const category1 = buildAllocationCategory({ id: 1, name: 'Groceries' });
 const category2 = buildAllocationCategory({ id: 2, name: 'Utilities' });
-const excludedCategory = buildAllocationCategory({
+const transferCategory = buildAllocationCategory({
   id: 3,
-  name: 'Entertainment',
-  exclude_from_overspend_tracking: true,
+  name: 'Sink Fund Transfers',
+  budget_role: 'transfer',
 });
 
 const DialogStub = {
@@ -176,25 +176,33 @@ describe('AllocationCategoriesPage', () => {
     });
   });
 
-  describe('excluded-from-overspend indicator', () => {
+  describe('budget role badge', () => {
     beforeEach(() => {
-      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([category1, excludedCategory]);
+      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([category1, transferCategory]);
     });
 
-    it('shows an excluded badge for categories with exclude_from_overspend_tracking set', async () => {
+    it('shows a role badge for every category', async () => {
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
-      expect(wrapper.find(`[data-testid="excluded-badge-${excludedCategory.id}"]`).exists()).toBe(
-        true,
+      expect(wrapper.find(`[data-testid="role-badge-${category1.id}"]`).exists()).toBe(true);
+      expect(wrapper.find(`[data-testid="role-badge-${transferCategory.id}"]`).exists()).toBe(true);
+    });
+
+    it('displays "spending" for spending categories', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      expect(wrapper.find(`[data-testid="role-badge-${category1.id}"]`).text()).toBe('spending');
+    });
+
+    it('displays the role label for non-spending categories', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      expect(wrapper.find(`[data-testid="role-badge-${transferCategory.id}"]`).text()).toBe(
+        'transfer',
       );
-    });
-
-    it('does not show an excluded badge for categories without the flag', async () => {
-      const wrapper = createWrapper(pinia);
-      await flushPromises();
-
-      expect(wrapper.find(`[data-testid="excluded-badge-${category1.id}"]`).exists()).toBe(false);
     });
   });
 

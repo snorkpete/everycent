@@ -249,7 +249,7 @@ describe('executeTool', () => {
     });
 
     it('returns the response JSON stringified', async () => {
-      const payload = { categories: [{ name: 'Food', exclude_from_overspend_tracking: false }] };
+      const payload = { categories: [{ name: 'Food', budget_role: 'spending' }] };
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
         new Response(JSON.stringify(payload), { status: 200 }),
       );

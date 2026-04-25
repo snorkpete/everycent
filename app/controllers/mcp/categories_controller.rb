@@ -8,7 +8,7 @@ module Mcp
           {
             id: c.id,
             name: c.name,
-            exclude_from_overspend_tracking: c.exclude_from_overspend_tracking
+            budget_role: c.budget_role
           }
         end
 

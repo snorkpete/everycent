@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_24_132119) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_25_184540) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -23,7 +23,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_24_132119) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.bigint "household_id"
-    t.boolean "exclude_from_overspend_tracking", default: false, null: false
+    t.string "budget_role", default: "spending", null: false
     t.index ["household_id"], name: "index_allocation_categories_on_household_id"
   end
 

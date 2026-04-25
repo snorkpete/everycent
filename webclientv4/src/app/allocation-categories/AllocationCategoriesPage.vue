@@ -10,12 +10,9 @@
             @click.prevent="editCategory(category)"
             >{{ category.name }}</a
           >
-          <span
-            v-if="category.exclude_from_overspend_tracking"
-            class="excluded-badge"
-            :data-testid="`excluded-badge-${category.id}`"
-            >excluded</span
-          >
+          <span class="role-badge" :data-testid="`role-badge-${category.id}`">{{
+            roleBadgeLabel(String(category.budget_role ?? 'spending'))
+          }}</span>
         </span>
         <Button
           label="View"
@@ -49,9 +46,18 @@ import { useHeadingStore } from '../toolbar/headingStore';
 import { useAllocationCategoryStore } from './allocationCategoryStore';
 import { useNotifications } from '../notifications/useNotifications';
 import AllocationCategoryEditDialog from './AllocationCategoryEditDialog.vue';
-import type { AllocationCategoryData } from './allocationCategory.types';
+import {
+  BUDGET_ROLE_LABELS,
+  type AllocationCategoryData,
+  type BudgetRole,
+} from './allocationCategory.types';
 
 const store = useAllocationCategoryStore();
+
+function roleBadgeLabel(role: string): string {
+  return (BUDGET_ROLE_LABELS[role as BudgetRole] ?? role).toLowerCase();
+}
+
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
 
@@ -109,7 +115,7 @@ async function onSave(category: AllocationCategoryData) {
   text-decoration: underline;
 }
 
-.excluded-badge {
+.role-badge {
   font-size: 0.7rem;
   color: var(--p-text-muted-color);
   border: 1px solid var(--p-text-muted-color);
