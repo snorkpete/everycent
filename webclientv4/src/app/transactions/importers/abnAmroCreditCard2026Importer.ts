@@ -1,22 +1,5 @@
 import type { TransactionData } from '../transaction.types';
-
-const MONTH_MAP: Record<string, number> = {
-  jan: 0,
-  feb: 1,
-  mar: 2,
-  mrt: 2,
-  apr: 3,
-  may: 4,
-  mei: 4,
-  jun: 5,
-  jul: 6,
-  aug: 7,
-  sep: 8,
-  okt: 9,
-  oct: 9,
-  nov: 10,
-  dec: 11,
-};
+import { MONTH_MAP, parseLocalDate, formatDate } from './importerUtils';
 
 const DATE_PATTERN = /^(\d{1,2})\s+([a-z]{3})\.?\s+(\d{4})$/i;
 const DESCRIPTION_LABEL = /^Transaction description:/i;
@@ -55,18 +38,6 @@ function parseAmount(line: string): number | null {
   const [, sign, whole, decimal] = match;
   const amount = parseInt(whole, 10) * 100 + parseInt(decimal, 10);
   return sign && sign.trim().startsWith('-') ? -amount : amount;
-}
-
-function parseLocalDate(dateStr: string): Date {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
-
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
 }
 
 interface RawTransaction {

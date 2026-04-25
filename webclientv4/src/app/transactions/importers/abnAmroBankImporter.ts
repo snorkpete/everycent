@@ -1,25 +1,11 @@
 import type { TransactionData } from '../transaction.types';
+import { MONTH_MAP, parseLocalDate, formatDate } from './importerUtils';
 
 interface DateParts {
   year: number;
   month: number;
   day: number;
 }
-
-const MONTH_MAP: Record<string, number> = {
-  Jan: 0,
-  Feb: 1,
-  Mar: 2,
-  Apr: 3,
-  May: 4,
-  Jun: 5,
-  Jul: 6,
-  Aug: 7,
-  Sep: 8,
-  Oct: 9,
-  Nov: 10,
-  Dec: 11,
-};
 
 /** Wraps `new Date()` so tests can mock it via `dateProvider.today = ...`. */
 export const dateProvider = {
@@ -44,7 +30,7 @@ function parseFormattedDate(line: string): DateParts | false {
   if (match) {
     return {
       year: dateProvider.today().getFullYear(),
-      month: MONTH_MAP[match[3]],
+      month: MONTH_MAP[match[3].toLowerCase()],
       day: parseInt(match[2], 10),
     };
   }
@@ -54,7 +40,7 @@ function parseFormattedDate(line: string): DateParts | false {
   if (match) {
     return {
       year: dateProvider.today().getFullYear(),
-      month: MONTH_MAP[match[3]],
+      month: MONTH_MAP[match[3].toLowerCase()],
       day: parseInt(match[2], 10),
     };
   }
@@ -64,7 +50,7 @@ function parseFormattedDate(line: string): DateParts | false {
   if (match) {
     return {
       year: parseInt(match[3], 10),
-      month: MONTH_MAP[match[1]],
+      month: MONTH_MAP[match[1].toLowerCase()],
       day: parseInt(match[2], 10),
     };
   }
@@ -131,18 +117,6 @@ function extractAmount(line: string): number {
   const [, sign, amountString] = match;
   const amount = Math.ceil(Number(amountString) * 100);
   return sign === '-' ? -amount : amount;
-}
-
-function parseLocalDate(dateStr: string): Date {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
-
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
 }
 
 export function abnAmroBankImporter(

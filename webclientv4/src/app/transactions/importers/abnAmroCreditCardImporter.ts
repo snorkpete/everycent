@@ -1,19 +1,5 @@
 import type { TransactionData } from '../transaction.types';
-
-const MONTH_MAP: Record<string, number> = {
-  jan: 0,
-  feb: 1,
-  mar: 2,
-  apr: 3,
-  may: 4,
-  jun: 5,
-  jul: 6,
-  aug: 7,
-  sep: 8,
-  oct: 9,
-  nov: 10,
-  dec: 11,
-};
+import { MONTH_MAP, parseLocalDate, formatDate } from './importerUtils';
 
 function convertInputToLines(input: string | null): string[] {
   if (!input) return [];
@@ -33,19 +19,6 @@ function extractDate(line: string): Date | null {
   const [, day, monthAbbr, year] = parts;
   const month = MONTH_MAP[monthAbbr.toLowerCase()];
   return new Date(parseInt(year, 10), month, parseInt(day, 10));
-}
-
-function parseLocalDate(dateStr: string): Date {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
-
-function formatDate(date: Date): string {
-  if (!date) return '';
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
 }
 
 function isAmountLine(line: string): boolean {
