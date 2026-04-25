@@ -7,6 +7,7 @@ export function buildAllocationCategory(
   return {
     id: 1,
     name: 'Living',
+    exclude_from_overspend_tracking: false,
     ...overrides,
   };
 }

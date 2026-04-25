@@ -1,16 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { nextTick } from 'vue';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from 'primevue/config';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
 import AllocationCategoryEditDialog from './AllocationCategoryEditDialog.vue';
-import type { AllocationCategoryData } from './allocationCategory.types';
+import { buildAllocationCategory } from '../../test/factories';
 import { DialogStub } from '../../test/stubs';
 
-const existingCategory: AllocationCategoryData = { id: 1, name: 'Groceries' };
-const newCategory: AllocationCategoryData = {};
+const existingCategory = buildAllocationCategory({ id: 1, name: 'Groceries' });
+const newCategory = buildAllocationCategory({ id: undefined, name: undefined });
 
-function createWrapper(props: Record<string, unknown> = {}) {
+function createWrapper(props: Record<string, unknown> = {}): VueWrapper {
   return mount(AllocationCategoryEditDialog, {
     props: {
       visible: true,
@@ -68,6 +68,34 @@ describe('AllocationCategoryEditDialog', () => {
 
       expect(wrapper.emitted('update:visible')?.[0]).toEqual([false]);
     });
+
+    it('does not show the checkbox in view mode', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('[data-testid="exclude-from-overspend-checkbox"]').exists()).toBe(false);
+    });
+
+    it('shows "Excluded" text in view mode when the flag is set', () => {
+      const excluded = buildAllocationCategory({
+        id: 1,
+        name: 'Groceries',
+        exclude_from_overspend_tracking: true,
+      });
+      const wrapper = createWrapper({ allocationCategory: excluded });
+
+      expect(wrapper.text()).toContain('Excluded');
+    });
+
+    it('does not show "Excluded" text in view mode when the flag is not set', () => {
+      const notExcluded = buildAllocationCategory({
+        id: 1,
+        name: 'Groceries',
+        exclude_from_overspend_tracking: false,
+      });
+      const wrapper = createWrapper({ allocationCategory: notExcluded });
+
+      expect(wrapper.text()).not.toContain('Excluded');
+    });
   });
 
   describe('edit mode (existing category)', () => {
@@ -87,14 +115,24 @@ describe('AllocationCategoryEditDialog', () => {
       expect(labels).not.toContain('Close');
     });
 
-    it('emits save with the form data when "Save" is clicked', async () => {
+    it('shows the exclude-from-overspend checkbox in edit mode', () => {
+      const wrapper = createWrapper({ initialEditMode: true });
+
+      expect(wrapper.find('[data-testid="exclude-from-overspend-checkbox"]').exists()).toBe(true);
+    });
+
+    it('emits save with the form data including exclude_from_overspend_tracking when "Save" is clicked', async () => {
       const wrapper = createWrapper({ initialEditMode: true });
 
       const saveBtn = wrapper.findAll('button').find((b) => b.text() === 'Save')!;
       await saveBtn.trigger('click');
 
       expect(wrapper.emitted('save')?.[0]).toEqual([
-        { id: existingCategory.id, name: existingCategory.name },
+        {
+          id: existingCategory.id,
+          name: existingCategory.name,
+          exclude_from_overspend_tracking: existingCategory.exclude_from_overspend_tracking,
+        },
       ]);
     });
 
@@ -149,7 +187,10 @@ describe('AllocationCategoryEditDialog', () => {
       const wrapper = createWrapper({ initialEditMode: false });
 
       await wrapper.setProps({ visible: false });
-      await wrapper.setProps({ visible: true, allocationCategory: { id: 2, name: 'Utilities' } });
+      await wrapper.setProps({
+        visible: true,
+        allocationCategory: buildAllocationCategory({ id: 2, name: 'Utilities' }),
+      });
 
       expect(wrapper.text()).toContain('Utilities');
     });

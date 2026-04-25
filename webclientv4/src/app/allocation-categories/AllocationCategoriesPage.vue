@@ -2,13 +2,21 @@
   <EcPageLayout page-name="allocation-categories">
     <EcItemList :items="store.allocationCategories" key-field="id">
       <template #item="{ item: category }">
-        <a
-          class="category-name"
-          href="#"
-          :data-testid="`category-link-${category.id}`"
-          @click.prevent="editCategory(category)"
-          >{{ category.name }}</a
-        >
+        <span class="category-name-row">
+          <a
+            class="category-name"
+            href="#"
+            :data-testid="`category-link-${category.id}`"
+            @click.prevent="editCategory(category)"
+            >{{ category.name }}</a
+          >
+          <span
+            v-if="category.exclude_from_overspend_tracking"
+            class="excluded-badge"
+            :data-testid="`excluded-badge-${category.id}`"
+            >excluded</span
+          >
+        </span>
         <Button
           label="View"
           size="small"
@@ -84,6 +92,12 @@ async function onSave(category: AllocationCategoryData) {
 </script>
 
 <style scoped>
+.category-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .category-name {
   font-size: 0.9rem;
   color: var(--p-primary-color);
@@ -93,5 +107,14 @@ async function onSave(category: AllocationCategoryData) {
 
 .category-name:hover {
   text-decoration: underline;
+}
+
+.excluded-badge {
+  font-size: 0.7rem;
+  color: var(--p-text-muted-color);
+  border: 1px solid var(--p-text-muted-color);
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.35rem;
+  line-height: 1.2;
 }
 </style>

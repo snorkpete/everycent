@@ -27,6 +27,11 @@ vi.mock('../notifications/useNotifications', () => ({
 
 const category1 = buildAllocationCategory({ id: 1, name: 'Groceries' });
 const category2 = buildAllocationCategory({ id: 2, name: 'Utilities' });
+const excludedCategory = buildAllocationCategory({
+  id: 3,
+  name: 'Entertainment',
+  exclude_from_overspend_tracking: true,
+});
 
 const DialogStub = {
   name: 'AllocationCategoryEditDialog',
@@ -168,6 +173,28 @@ describe('AllocationCategoriesPage', () => {
       await flushPromises();
 
       expect(allocationCategoryApi.getAll).toHaveBeenCalledTimes(2); // once on mount, once on refresh
+    });
+  });
+
+  describe('excluded-from-overspend indicator', () => {
+    beforeEach(() => {
+      vi.mocked(allocationCategoryApi.getAll).mockResolvedValue([category1, excludedCategory]);
+    });
+
+    it('shows an excluded badge for categories with exclude_from_overspend_tracking set', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      expect(wrapper.find(`[data-testid="excluded-badge-${excludedCategory.id}"]`).exists()).toBe(
+        true,
+      );
+    });
+
+    it('does not show an excluded badge for categories without the flag', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      expect(wrapper.find(`[data-testid="excluded-badge-${category1.id}"]`).exists()).toBe(false);
     });
   });
 

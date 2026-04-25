@@ -43,7 +43,7 @@ class AllocationCategoriesController < ApplicationController
     end
 
     def allocation_category_params
-      params.fetch(:allocation_category, {}).permit(:name, :percentage)
+      params.fetch(:allocation_category, {}).permit(:name, :percentage, :exclude_from_overspend_tracking)
     end
 
     def select_household
