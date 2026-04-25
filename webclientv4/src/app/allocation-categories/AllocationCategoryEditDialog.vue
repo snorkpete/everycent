@@ -33,7 +33,7 @@ import {
   type BudgetRole,
 } from './allocationCategory.types';
 
-const props = defineProps<{
+const { visible, allocationCategory, initialEditMode } = defineProps<{
   visible: boolean;
   allocationCategory: AllocationCategoryData;
   initialEditMode: boolean;
@@ -57,13 +57,13 @@ function toFormData(category: AllocationCategoryData) {
   };
 }
 
-const formData = reactive(toFormData(props.allocationCategory));
+const formData = reactive(toFormData(allocationCategory));
 
 watch(
-  () => props.visible,
+  () => visible,
   (isVisible) => {
     if (isVisible) {
-      Object.assign(formData, toFormData(props.allocationCategory));
+      Object.assign(formData, toFormData(allocationCategory));
     }
   },
 );
@@ -78,7 +78,7 @@ function saveChanges() {
 
 function cancel() {
   if (formData.id) {
-    Object.assign(formData, toFormData(props.allocationCategory));
+    Object.assign(formData, toFormData(allocationCategory));
   } else {
     emit('update:visible', false);
   }

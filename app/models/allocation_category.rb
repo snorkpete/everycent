@@ -23,7 +23,7 @@ class AllocationCategory < ApplicationRecord
                         message: 'Allocation Category already exists.',
                         scope: :household_id
                     }
-  validates :budget_role, inclusion: { in: BUDGET_ROLES }
+  validates :budget_role, inclusion: { in: BUDGET_ROLES, message: 'is not a valid budget role' }
 
   before_save :fix_name
 

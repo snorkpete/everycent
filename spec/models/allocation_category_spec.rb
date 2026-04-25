@@ -33,6 +33,17 @@ describe AllocationCategory do
     expect(category.name).to eq('Food')
   end
 
+  it 'is valid with a recognised budget_role' do
+    category = build(:allocation_category, budget_role: 'transfer')
+    expect(category).to be_valid
+  end
+
+  it 'is invalid with an unrecognised budget_role' do
+    category = build(:allocation_category, budget_role: 'nonsense')
+    expect(category).not_to be_valid
+    expect(category.errors[:budget_role]).to include('is not a valid budget role')
+  end
+
   it 'is unique per household' do
     food_for_first_household = create(:allocation_category, name: 'food')
 
