@@ -134,7 +134,7 @@ describe('budgetListStore', () => {
 
   describe('copyBudget', () => {
     it('calls the API and refreshes the list', async () => {
-      vi.mocked(budgetApi.copy).mockResolvedValue(undefined);
+      vi.mocked(budgetApi.copy).mockResolvedValue(buildBudget());
       vi.mocked(budgetApi.getAll).mockResolvedValue([]);
 
       const store = useBudgetListStore();
@@ -145,7 +145,7 @@ describe('budgetListStore', () => {
     });
 
     it('sets loading during the operation', async () => {
-      let resolveCopy!: (value: undefined) => void;
+      let resolveCopy!: (value: BudgetData) => void;
       vi.mocked(budgetApi.copy).mockReturnValue(
         new Promise((r) => {
           resolveCopy = r;
@@ -158,7 +158,7 @@ describe('budgetListStore', () => {
 
       expect(store.loading).toBe(true);
 
-      resolveCopy(undefined);
+      resolveCopy(buildBudget());
       await promise;
 
       expect(store.loading).toBe(false);
@@ -177,7 +177,7 @@ describe('budgetListStore', () => {
 
   describe('closeBudget', () => {
     it('calls the API and refreshes the list', async () => {
-      vi.mocked(budgetApi.close).mockResolvedValue(undefined);
+      vi.mocked(budgetApi.close).mockResolvedValue(buildBudget());
       vi.mocked(budgetApi.getAll).mockResolvedValue([]);
 
       const store = useBudgetListStore();
@@ -188,7 +188,7 @@ describe('budgetListStore', () => {
     });
 
     it('sets loading during the operation', async () => {
-      let resolveClose!: (value: undefined) => void;
+      let resolveClose!: (value: BudgetData) => void;
       vi.mocked(budgetApi.close).mockReturnValue(
         new Promise((r) => {
           resolveClose = r;
@@ -201,7 +201,7 @@ describe('budgetListStore', () => {
 
       expect(store.loading).toBe(true);
 
-      resolveClose(undefined);
+      resolveClose(buildBudget());
       await promise;
 
       expect(store.loading).toBe(false);
@@ -220,7 +220,7 @@ describe('budgetListStore', () => {
 
   describe('reopenLastBudget', () => {
     it('calls the API and refreshes the list', async () => {
-      vi.mocked(budgetApi.reopenLast).mockResolvedValue(undefined);
+      vi.mocked(budgetApi.reopenLast).mockResolvedValue(buildBudget());
       vi.mocked(budgetApi.getAll).mockResolvedValue([]);
 
       const store = useBudgetListStore();
@@ -231,7 +231,7 @@ describe('budgetListStore', () => {
     });
 
     it('sets loading during the operation', async () => {
-      let resolveReopen!: (value: undefined) => void;
+      let resolveReopen!: (value: BudgetData) => void;
       vi.mocked(budgetApi.reopenLast).mockReturnValue(
         new Promise((r) => {
           resolveReopen = r;
@@ -244,7 +244,7 @@ describe('budgetListStore', () => {
 
       expect(store.loading).toBe(true);
 
-      resolveReopen(undefined);
+      resolveReopen(buildBudget());
       await promise;
 
       expect(store.loading).toBe(false);

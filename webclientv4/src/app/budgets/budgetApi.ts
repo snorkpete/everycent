@@ -19,12 +19,13 @@ export const budgetApi = {
   create: (budget: { start_date: string }) =>
     apiGateway.post<BudgetData>('/budgets', budget).then((r) => r.data),
 
-  copy: (budgetId: number) => apiGateway.put<void>(`/budgets/${budgetId}/copy`).then((r) => r.data),
+  copy: (budgetId: number) =>
+    apiGateway.put<BudgetData>(`/budgets/${budgetId}/copy`).then((r) => r.data),
 
   close: (budgetId: number) =>
-    apiGateway.put<void>(`/budgets/${budgetId}/close`).then((r) => r.data),
+    apiGateway.put<BudgetData>(`/budgets/${budgetId}/close`).then((r) => r.data),
 
-  reopenLast: () => apiGateway.post<void>('/budgets/reopen_last_budget').then((r) => r.data),
+  reopenLast: () => apiGateway.post<BudgetData>('/budgets/reopen_last_budget').then((r) => r.data),
 
   save: (budget: BudgetDetailData) =>
     apiGateway
