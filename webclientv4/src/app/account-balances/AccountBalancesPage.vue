@@ -20,15 +20,11 @@
       />
     </template>
     <template v-if="!isMobile" #toolbar-right>
-      <Button
-        v-tooltip="'Show zero balances as dashes'"
-        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+      <EcToggleButton
+        v-model="dashIfZero"
+        variant="dashIfZero"
+        tooltip="Show zero balances as dashes"
         data-testid="dash-zero-toggle"
-        @click="dashIfZero = !dashIfZero"
       />
       <label class="toggle-label">
         <ToggleSwitch
@@ -151,6 +147,7 @@ import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcStatusMessage from '../shared/layout/EcStatusMessage.vue';
 import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
+import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useAccountBalanceStore } from './accountBalanceStore';
 import { useResponsive } from '../shared/composables/useResponsive';
@@ -184,11 +181,6 @@ function toggleCategory(category: string) {
 </script>
 
 <style scoped>
-:deep(.icon-btn--active.p-button) {
-  background-color: var(--p-primary-50);
-  color: var(--p-primary-color);
-}
-
 .toggle-label {
   display: flex;
   align-items: center;

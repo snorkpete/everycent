@@ -10,15 +10,12 @@
         @click="emit('adjust')"
       />
       <div class="spacer" />
-      <Button
-        v-tooltip="'Show zero balances as dashes'"
-        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+      <EcToggleButton
+        :model-value="dashIfZero"
+        variant="dashIfZero"
+        tooltip="Show zero balances as dashes"
         data-testid="dash-zero-toggle"
-        @click="emit('update:dashIfZero', !dashIfZero)"
+        @update:model-value="emit('update:dashIfZero', $event)"
       />
       <ToggleSwitch
         v-model="store.includeClosed"
@@ -36,10 +33,8 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
-import Tooltip from 'primevue/tooltip';
+import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useAccountBalanceStore } from './accountBalanceStore';
-
-const vTooltip = Tooltip;
 
 const { dashIfZero } = defineProps<{
   dashIfZero: boolean;
@@ -74,10 +69,5 @@ const store = useAccountBalanceStore();
   color: var(--p-text-color);
   white-space: nowrap;
   cursor: pointer;
-}
-
-:deep(.icon-btn--active.p-button) {
-  background-color: var(--p-primary-50);
-  color: var(--p-primary-color);
 }
 </style>

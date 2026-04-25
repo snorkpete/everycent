@@ -11,15 +11,12 @@
       @update:model-value="(value: number) => emit('update:selectedSinkFundId', value)"
     />
     <div class="action-bar">
-      <Button
-        v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
-        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+      <EcToggleButton
+        :model-value="dashIfZero"
+        variant="dashIfZero"
+        tooltip="Toggle between showing zeroes as numbers or dashes"
         data-testid="dash-zero-toggle"
-        @click="emit('update:dashIfZero', !dashIfZero)"
+        @update:model-value="emit('update:dashIfZero', $event)"
       />
       <ToggleSwitch
         v-model="store.showDeactivated"
@@ -66,7 +63,7 @@
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import ToggleSwitch from 'primevue/toggleswitch';
-import Tooltip from 'primevue/tooltip';
+import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useSinkFundStore } from './sinkFundStore';
 
 const { selectedSinkFundId, dashIfZero } = defineProps<{
@@ -82,8 +79,6 @@ const emit = defineEmits<{
   cancel: [];
   addObligation: [];
 }>();
-
-const vTooltip = Tooltip;
 
 const store = useSinkFundStore();
 </script>
@@ -115,10 +110,5 @@ const store = useSinkFundStore();
   color: var(--p-text-color);
   white-space: nowrap;
   cursor: pointer;
-}
-
-:deep(.icon-btn--active.p-button) {
-  background-color: var(--p-primary-50);
-  color: var(--p-primary-color);
 }
 </style>

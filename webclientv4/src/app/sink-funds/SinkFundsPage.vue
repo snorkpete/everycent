@@ -23,15 +23,11 @@
       />
     </template>
     <template v-if="!isMobile" #toolbar-right>
-      <Button
-        v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
-        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+      <EcToggleButton
+        v-model="dashIfZero"
+        variant="dashIfZero"
+        tooltip="Toggle between showing zeroes as numbers or dashes"
         data-testid="dash-zero-toggle"
-        @click="dashIfZero = !dashIfZero"
       />
       <ToggleSwitch
         v-model="store.showDeactivated"
@@ -91,6 +87,7 @@ import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import ToggleSwitch from 'primevue/toggleswitch';
+import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSinkFundStore } from './sinkFundStore';
 import { useNotifications } from '../notifications/useNotifications';
@@ -146,11 +143,6 @@ function onAddObligation() {
 </script>
 
 <style scoped>
-:deep(.icon-btn--active.p-button) {
-  background-color: var(--p-primary-50);
-  color: var(--p-primary-color);
-}
-
 .toggle-label {
   font-size: 0.875rem;
   color: var(--p-text-color);

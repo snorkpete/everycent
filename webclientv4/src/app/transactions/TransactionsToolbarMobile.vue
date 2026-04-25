@@ -33,15 +33,12 @@
         :href="budgetLink"
         data-testid="go-to-budget-link"
       />
-      <Button
-        v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
-        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+      <EcToggleButton
+        :model-value="dashIfZero"
+        variant="dashIfZero"
+        tooltip="Toggle between showing zeroes as numbers or dashes"
         data-testid="dash-zero-toggle"
-        @click="emit('update:dashIfZero', !dashIfZero)"
+        @update:model-value="emit('update:dashIfZero', $event)"
       />
       <Button
         v-tooltip="'Refresh transactions'"
@@ -102,6 +99,7 @@ import Button from 'primevue/button';
 import Menu from 'primevue/menu';
 import Select from 'primevue/select';
 import Tooltip from 'primevue/tooltip';
+import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useTransactionStore } from './transactionStore';
 
 const { selectedBankAccountId, selectedBudgetId, dashIfZero } = defineProps<{
@@ -185,10 +183,5 @@ function toggleImportMenu(event: Event) {
 
 .spacer {
   flex: 1;
-}
-
-:deep(.icon-btn--active.p-button) {
-  background-color: var(--p-primary-50);
-  color: var(--p-primary-color);
 }
 </style>

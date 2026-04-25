@@ -24,39 +24,23 @@
       <TransactionSearchForm @fetch="onFetch" />
     </template>
     <template v-if="!isMobile" #toolbar-right>
-      <Button
-        v-tooltip="'Toggle between showing zeroes as numbers or dashes'"
-        :icon="dashIfZero ? 'pi pi-minus' : 'pi pi-hashtag'"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': dashIfZero }]"
+      <EcToggleButton
+        v-model="dashIfZero"
+        variant="dashIfZero"
+        tooltip="Toggle between showing zeroes as numbers or dashes"
         data-testid="dash-zero-toggle"
-        @click="dashIfZero = !dashIfZero"
       />
-      <Button
-        v-tooltip="
-          'Toggle description wrapping — truncates long descriptions by default; wrap shows the full text'
-        "
-        icon="pi pi-arrows-h"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': wrapDescriptions }]"
+      <EcToggleButton
+        v-model="wrapDescriptions"
+        variant="wrap"
+        tooltip="Toggle description wrapping — truncates long descriptions by default; wrap shows the full text"
         data-testid="wrap-toggle-btn"
-        @click="wrapDescriptions = !wrapDescriptions"
       />
-      <Button
-        v-tooltip="
-          'Toggle calculator column — shows checkboxes to select transactions and sum their amounts'
-        "
-        icon="pi pi-calculator"
-        text
-        severity="secondary"
-        size="small"
-        :class="['icon-btn', { 'icon-btn--active': showCalculatorColumn }]"
+      <EcToggleButton
+        v-model="showCalculatorColumn"
+        variant="calculator"
+        tooltip="Toggle calculator column — shows checkboxes to select transactions and sum their amounts"
         data-testid="calculator-toggle-btn"
-        @click="toggleCalculatorColumn"
       />
       <Button
         v-tooltip="'Refresh transactions'"
@@ -156,6 +140,7 @@ import { useRoute, useRouter } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
 import Button from 'primevue/button';
+import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
 import { useSettingsStore } from '../settings/settingsStore';
@@ -251,12 +236,9 @@ function fetchMobileTransactions() {
   }
 }
 
-function toggleCalculatorColumn() {
-  showCalculatorColumn.value = !showCalculatorColumn.value;
-  if (!showCalculatorColumn.value) {
-    store.clearSelections();
-  }
-}
+watch(showCalculatorColumn, (visible) => {
+  if (!visible) store.clearSelections();
+});
 
 function onFetch(params: { budgetId: number; bankAccountId: number }) {
   store.fetch(params);
@@ -311,16 +293,6 @@ function navigateToImport() {
 </script>
 
 <style scoped>
-/*
- * `:deep()` is required here because `icon-btn--active` is applied via `:class` on a PrimeVue
- * `<Button>` component, whose root element (`<button class="p-button">`) is owned by PrimeVue's
- * renderer. Scoped CSS cannot pierce a child component's DOM without `:deep()`.
- */
-:deep(.icon-btn--active.p-button) {
-  background-color: var(--p-primary-50);
-  color: var(--p-primary-color);
-}
-
 .content-card {
   flex: 1;
   display: flex;
