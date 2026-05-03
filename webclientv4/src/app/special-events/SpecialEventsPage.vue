@@ -11,57 +11,59 @@
       />
     </template>
 
-    <DataTable :value="store.specialEvents" data-testid="events-table">
-      <Column field="name" header="Name">
-        <template #body="{ data }">
-          <a class="event-link" :data-testid="`event-link-${data.id}`" @click="viewEvent(data)">
-            {{ data.name }}
-          </a>
-        </template>
-      </Column>
-      <Column field="start_date" header="Start Date">
-        <template #body="{ data }">
-          {{ formatDate(data.start_date) }}
-        </template>
-      </Column>
-      <Column field="budget_amount" header="Budget" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="data.budget_amount ?? 0" highlight-mode="none" />
-        </template>
-      </Column>
-      <Column field="actual_amount" header="Actual" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="data.actual_amount ?? 0" highlight-mode="none" />
-        </template>
-      </Column>
-      <Column header="Difference" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="calculateDifference(data)" highlight-mode="balance" />
-        </template>
-      </Column>
-      <Column header="Actions" style="width: 120px; text-align: center">
-        <template #body="{ data }">
-          <Button
-            v-tooltip="'Edit special event'"
-            icon="pi pi-pencil"
-            text
-            severity="secondary"
-            size="small"
-            :data-testid="`edit-btn-${data.id}`"
-            @click="editEvent(data)"
-          />
-          <Button
-            v-tooltip="'Delete special event'"
-            icon="pi pi-trash"
-            text
-            severity="danger"
-            size="small"
-            :data-testid="`delete-btn-${data.id}`"
-            @click="confirmDelete(data)"
-          />
-        </template>
-      </Column>
-    </DataTable>
+    <div class="scroll-content">
+      <DataTable :value="store.specialEvents" data-testid="events-table">
+        <Column field="name" header="Name">
+          <template #body="{ data }">
+            <a class="event-link" :data-testid="`event-link-${data.id}`" @click="viewEvent(data)">
+              {{ data.name }}
+            </a>
+          </template>
+        </Column>
+        <Column field="start_date" header="Start Date">
+          <template #body="{ data }">
+            {{ formatDate(data.start_date) }}
+          </template>
+        </Column>
+        <Column field="budget_amount" header="Budget" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="data.budget_amount ?? 0" highlight-mode="none" />
+          </template>
+        </Column>
+        <Column field="actual_amount" header="Actual" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="data.actual_amount ?? 0" highlight-mode="none" />
+          </template>
+        </Column>
+        <Column header="Difference" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="calculateDifference(data)" highlight-mode="balance" />
+          </template>
+        </Column>
+        <Column header="Actions" style="width: 120px; text-align: center">
+          <template #body="{ data }">
+            <Button
+              v-tooltip="'Edit special event'"
+              icon="pi pi-pencil"
+              text
+              severity="secondary"
+              size="small"
+              :data-testid="`edit-btn-${data.id}`"
+              @click="editEvent(data)"
+            />
+            <Button
+              v-tooltip="'Delete special event'"
+              icon="pi pi-trash"
+              text
+              severity="danger"
+              size="small"
+              :data-testid="`delete-btn-${data.id}`"
+              @click="confirmDelete(data)"
+            />
+          </template>
+        </Column>
+      </DataTable>
+    </div>
 
     <SpecialEventForm
       :visible="formVisible"
@@ -166,6 +168,12 @@ function calculateDifference(event: SpecialEventData): number {
 </script>
 
 <style scoped>
+.scroll-content {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
 .event-link {
   color: var(--p-primary-color);
   cursor: pointer;

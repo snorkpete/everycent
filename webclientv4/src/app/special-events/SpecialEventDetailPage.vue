@@ -31,33 +31,40 @@
       />
     </template>
 
-    <div class="header-card" data-testid="event-header">
-      <h2 class="event-name">{{ event?.name }}</h2>
-      <div class="event-summary">
-        <span>Budgeted: <EcMoneyDisplay :model-value="event?.budget_amount ?? 0" highlight-mode="none" /></span>
-        <span>Actual: <EcMoneyDisplay :model-value="event?.actual_amount ?? 0" highlight-mode="none" /></span>
-        <span v-if="event?.start_date">Start: {{ formatDate(event.start_date) }}</span>
+    <div class="scroll-content">
+      <div class="header-card" data-testid="event-header">
+        <h2 class="event-name">{{ event?.name }}</h2>
+        <div class="event-summary">
+          <span
+            >Budgeted:
+            <EcMoneyDisplay :model-value="event?.budget_amount ?? 0" highlight-mode="none"
+          /></span>
+          <span
+            >Actual: <EcMoneyDisplay :model-value="event?.actual_amount ?? 0" highlight-mode="none"
+          /></span>
+          <span v-if="event?.start_date">Start: {{ formatDate(event.start_date) }}</span>
+        </div>
       </div>
-    </div>
 
-    <DataTable :value="allocations" data-testid="allocations-table">
-      <Column field="name" header="Allocation" />
-      <Column field="budget_name" header="Budget" />
-      <Column field="allocation_category_name" header="Category" />
-      <Column field="amount" header="Amount" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="data.amount ?? 0" highlight-mode="none" />
-        </template>
-      </Column>
-      <Column field="spent" header="Spent" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
-        </template>
-        <template #footer>
-          <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" emphasis="total" />
-        </template>
-      </Column>
-    </DataTable>
+      <DataTable :value="allocations" data-testid="allocations-table">
+        <Column field="name" header="Allocation" />
+        <Column field="budget_name" header="Budget" />
+        <Column field="allocation_category_name" header="Category" />
+        <Column field="amount" header="Amount" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="data.amount ?? 0" highlight-mode="none" />
+          </template>
+        </Column>
+        <Column field="spent" header="Spent" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
+          </template>
+          <template #footer>
+            <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" emphasis="total" />
+          </template>
+        </Column>
+      </DataTable>
+    </div>
 
     <SpecialEventForm
       :visible="formVisible"
@@ -135,6 +142,15 @@ async function onSubmit(data: Partial<SpecialEventData>) {
 </script>
 
 <style scoped>
+.scroll-content {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .header-card {
   padding: 1rem 1.5rem;
   border: 1px solid var(--p-surface-300);
@@ -154,5 +170,4 @@ async function onSubmit(data: Partial<SpecialEventData>) {
   color: var(--p-surface-600);
   font-size: 0.9rem;
 }
-
 </style>
