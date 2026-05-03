@@ -405,7 +405,7 @@ describe('BudgetAllocationList', () => {
       const firstRow = wrapper.findAll(ALLOCATION_ROW)[0];
       const options = firstRow.findAll(`${CLASS_SELECT} option`);
       const optionTexts = options.map((o) => o.text().trim());
-      expect(optionTexts).toEqual(['Want', 'Need', 'Savings']);
+      expect(optionTexts).toEqual(['Want', 'Need', 'Savings', 'Bookkeeping']);
     });
 
     it('shows fixed amount as checkbox', async () => {
@@ -521,7 +521,6 @@ describe('BudgetAllocationList', () => {
       const amountCell = footer.findAll('th')[1];
       expect(amountCell.text()).toBe(expectedTotal);
     });
-
   });
 
   describe('edit mode — add allocation', () => {

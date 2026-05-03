@@ -25,6 +25,24 @@ RSpec.describe Allocation, :type => :model do
     ActsAsTenant.current_tenant = @household
   end
 
+  describe 'allocation_class validation' do
+    it 'is valid with a recognised allocation_class' do
+      allocation = build(:allocation, allocation_class: 'bookkeeping')
+      expect(allocation).to be_valid
+    end
+
+    it 'is invalid with an unrecognised allocation_class' do
+      allocation = build(:allocation, allocation_class: 'nonsense')
+      expect(allocation).not_to be_valid
+      expect(allocation.errors[:allocation_class]).to include('is not a valid allocation class')
+    end
+
+    it 'is valid with a nil allocation_class' do
+      allocation = build(:allocation, allocation_class: nil)
+      expect(allocation).to be_valid
+    end
+  end
+
   describe "::update_from_params" do
     before :each do
       @budget = create(:budget)

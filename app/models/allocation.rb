@@ -17,6 +17,8 @@
 #
 
 class Allocation < ApplicationRecord
+  ALLOCATION_CLASSES = %w[need want savings bookkeeping].freeze
+
   include CumulativeAllocation
 
   # force this model to always require scoping to a household
@@ -28,6 +30,8 @@ class Allocation < ApplicationRecord
   belongs_to :special_event, optional: true
 
   has_many :transactions
+
+  validates :allocation_class, inclusion: { in: ALLOCATION_CLASSES, message: 'is not a valid allocation class' }, allow_nil: true
 
   before_save :fix_name
   before_save :clear_bank_account_if_not_standing_order
