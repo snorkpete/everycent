@@ -21,6 +21,7 @@ export const Icon = {
   INSTITUTIONS: 'pi pi-building',
   BANK_ACCOUNTS: 'pi pi-credit-card',
   SETTINGS: 'pi pi-cog',
+  CHAT_SETTINGS: 'pi pi-comments',
 
   OLD_VERSION: 'pi pi-external-link',
   LOGOUT: 'pi pi-sign-out',

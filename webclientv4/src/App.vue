@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <NlqChatApp v-if="isDev" />
+    <NlqChatApp v-if="chatSettingsStore.chatEnabled" />
   </template>
 
   <router-view v-else />
@@ -28,9 +28,10 @@ import LoadingIndicator from './app/loading/LoadingIndicator.vue';
 import MenuSidebar from './app/menu/MenuSidebar.vue';
 import AppToolbar from './app/toolbar/AppToolbar.vue';
 import NlqChatApp from './app/chat/NlqChatApp.vue';
+import { useChatSettingsStore } from './app/chat-settings/chatSettingsStore';
 
 const authStore = useAuthStore();
-const isDev = import.meta.env.DEV;
+const chatSettingsStore = useChatSettingsStore();
 </script>
 
 <style scoped>

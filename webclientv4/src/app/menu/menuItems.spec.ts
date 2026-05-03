@@ -80,8 +80,9 @@ describe('menuItems', () => {
 
     expect(setup).toBeDefined();
     expect(setup!.icon).toBe(Icon.SETUP);
-    expect(setup!.items).toHaveLength(4);
+    expect(setup!.items).toHaveLength(5);
     expect(setup!.items![0].label).toBe('Allocation Categories');
+    expect(setup!.items!.find((item) => item.label === 'Chat Settings')).toBeDefined();
   });
 
   it('Setup section has a key for expandedKeys tracking', () => {

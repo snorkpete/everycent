@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_25_184540) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_25_211444) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -89,6 +89,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_25_184540) do
     t.bigint "household_id"
     t.index ["household_id"], name: "index_budgets_on_household_id"
     t.index ["start_date"], name: "index_budgets_on_start_date"
+  end
+
+  create_table "chat_settings", force: :cascade do |t|
+    t.bigint "household_id", null: false
+    t.boolean "chat_enabled", default: false, null: false
+    t.string "ollama_url"
+    t.string "ollama_model"
+    t.integer "max_tool_iterations", default: 5, null: false
+    t.jsonb "extras", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["household_id"], name: "index_chat_settings_on_household_id"
   end
 
   create_table "households", force: :cascade do |t|
@@ -255,6 +267,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_25_184540) do
   add_foreign_key "bank_accounts", "bank_accounts", column: "asset_bank_account_id"
   add_foreign_key "bank_accounts", "households", on_update: :cascade
   add_foreign_key "budgets", "households", on_update: :cascade
+  add_foreign_key "chat_settings", "households", on_update: :cascade
   add_foreign_key "incomes", "households", on_update: :cascade
   add_foreign_key "institutions", "households", on_update: :cascade
   add_foreign_key "settings", "households", on_update: :cascade

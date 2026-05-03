@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { streamChat } from './chatAgent';
+import type { ChatConfig } from './chatAgent';
 import * as toolExecutor from './toolExecutor';
+
+const TEST_CONFIG: ChatConfig = {
+  ollamaUrl: 'http://localhost:11434',
+  model: 'test-model',
+  maxToolIterations: 5,
+};
 
 vi.mock('./toolExecutor', () => ({
   executeTool: vi.fn(),
@@ -58,9 +65,12 @@ function mockFetchError(status: number, statusText: string) {
   vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('', { status, statusText }));
 }
 
-async function collectEvents(messages: Parameters<typeof streamChat>[0]) {
+async function collectEvents(
+  messages: Parameters<typeof streamChat>[0],
+  config: ChatConfig = TEST_CONFIG,
+) {
   const events = [];
-  for await (const event of streamChat(messages)) {
+  for await (const event of streamChat(messages, config)) {
     events.push(event);
   }
   return events;

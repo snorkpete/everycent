@@ -120,6 +120,12 @@ function buildSetupSection(navigate: (path: string) => void): AppMenuItem {
         command: () => navigate('/setup/settings'),
         routePath: '/setup/settings',
       },
+      {
+        label: 'Chat Settings',
+        icon: Icon.CHAT_SETTINGS,
+        command: () => navigate('/setup/chat-settings'),
+        routePath: '/setup/chat-settings',
+      },
     ],
   };
 }

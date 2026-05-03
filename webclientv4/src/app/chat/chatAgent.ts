@@ -3,9 +3,11 @@ import { SYSTEM_PROMPT } from './systemPrompt';
 import { TOOL_DEFINITIONS } from './toolDefinitions';
 import { executeTool } from './toolExecutor';
 
-const OLLAMA_BASE_URL = 'http://192.168.68.59:11434';
-const MODEL = 'qwen3:14b';
-const MAX_TOOL_ITERATIONS = 5;
+export interface ChatConfig {
+  ollamaUrl: string;
+  model: string;
+  maxToolIterations: number;
+}
 
 export type AgentEvent =
   | { type: 'thinking' }
@@ -36,9 +38,10 @@ type StreamResult =
 
 async function* streamOllama(
   ollamaMessages: OllamaMessage[],
+  config: ChatConfig,
 ): AsyncGenerator<AgentEvent, StreamResult> {
   const payload = {
-    model: MODEL,
+    model: config.model,
     messages: ollamaMessages,
     tools: TOOL_DEFINITIONS,
     stream: true,
@@ -46,7 +49,7 @@ async function* streamOllama(
 
   let response: Response;
   try {
-    response = await fetch(`${OLLAMA_BASE_URL}/v1/chat/completions`, {
+    response = await fetch(`${config.ollamaUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -167,7 +170,10 @@ async function* streamOllama(
   return { kind: 'text', content: rawContent };
 }
 
-export async function* streamChat(messages: ChatMessage[]): AsyncGenerator<AgentEvent> {
+export async function* streamChat(
+  messages: ChatMessage[],
+  config: ChatConfig,
+): AsyncGenerator<AgentEvent> {
   const ollamaMessages: OllamaMessage[] = [
     { role: 'system', content: SYSTEM_PROMPT },
     ...messages
@@ -177,8 +183,8 @@ export async function* streamChat(messages: ChatMessage[]): AsyncGenerator<Agent
 
   yield { type: 'thinking' };
 
-  for (let iteration = 0; iteration < MAX_TOOL_ITERATIONS; iteration++) {
-    const result: StreamResult = yield* streamOllama(ollamaMessages);
+  for (let iteration = 0; iteration < config.maxToolIterations; iteration++) {
+    const result: StreamResult = yield* streamOllama(ollamaMessages, config);
 
     if (result.kind === 'error') {
       return;

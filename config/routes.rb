@@ -42,6 +42,7 @@ Rails.application.routes.draw do
   end
 
   resources :settings, only: [:index, :create]
+  resources :chat_settings, only: [:index, :create]
 
   resources :allocations, only: [:index]
 

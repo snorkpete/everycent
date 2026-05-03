@@ -20,7 +20,8 @@ class Household < ApplicationRecord
   has_many :payees
   has_many :recurring_allocations
   has_many :recurring_incomes
-  has_many :settings
+  has_one :chat_setting
+  has_one :setting
   has_many :sink_fund_allocations
   has_many :transactions
 

@@ -8,7 +8,9 @@ import {
   handle401,
 } from './interceptors';
 
-const BASE_URL = import.meta.env.PROD ? '' : 'http://localhost:3000';
+const BASE_URL = import.meta.env.PROD
+  ? ''
+  : (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000');
 
 const apiGateway = axios.create({
   baseURL: BASE_URL,

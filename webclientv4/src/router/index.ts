@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import LoginPage from '../auth/LoginPage.vue';
 import { useAuthStore } from '../auth/authStore';
 import { useSettingsStore } from '../app/settings/settingsStore';
+import { useChatSettingsStore } from '../app/chat-settings/chatSettingsStore';
 import { budgetApi } from '../app/budgets/budgetApi';
 
 declare module 'vue-router' {
@@ -48,6 +49,12 @@ const router = createRouter({
       name: 'setup-settings',
       component: () => import('../app/settings/SettingsPage.vue'),
       meta: { title: 'Settings' },
+    },
+    {
+      path: '/setup/chat-settings',
+      name: 'setup-chat-settings',
+      component: () => import('../app/chat-settings/ChatSettingsPage.vue'),
+      meta: { title: 'Chat Settings' },
     },
     {
       path: '/budgets/future',
@@ -156,7 +163,8 @@ router.beforeEach(async (to) => {
   }
 
   const settingsStore = useSettingsStore();
-  await settingsStore.fetchAll();
+  const chatSettingsStore = useChatSettingsStore();
+  await Promise.all([settingsStore.fetchAll(), chatSettingsStore.fetch()]);
 });
 
 router.afterEach((to) => {

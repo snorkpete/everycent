@@ -1,11 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useChatStore } from './chatStore';
+import { useChatSettingsStore } from '../chat-settings/chatSettingsStore';
 import * as chatAgent from './chatAgent';
 import type { AgentEvent } from './chatAgent';
 
 vi.mock('./chatAgent', () => ({
   streamChat: vi.fn(),
+}));
+
+vi.mock('../chat-settings/chatSettingsApi', () => ({
+  chatSettingsApi: {
+    get: vi.fn(),
+    save: vi.fn(),
+  },
 }));
 
 async function* makeStream(events: AgentEvent[]): AsyncGenerator<AgentEvent> {
@@ -14,9 +22,21 @@ async function* makeStream(events: AgentEvent[]): AsyncGenerator<AgentEvent> {
   }
 }
 
+function configureChatSettings() {
+  const chatSettingsStore = useChatSettingsStore();
+  chatSettingsStore.settings = {
+    chat_enabled: true,
+    ollama_url: 'http://localhost:11434',
+    ollama_model: 'test-model',
+    max_tool_iterations: 5,
+    extras: {},
+  };
+}
+
 describe('chatStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    configureChatSettings();
     vi.clearAllMocks();
   });
 
