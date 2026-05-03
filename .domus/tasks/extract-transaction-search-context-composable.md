@@ -1,7 +1,7 @@
 # Task: Extract transaction search context composable
 
 **ID:** extract-transaction-search-context-composable
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10

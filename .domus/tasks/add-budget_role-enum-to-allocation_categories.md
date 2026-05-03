@@ -1,7 +1,7 @@
 # Task: Add budget_role enum to allocation_categories
 
 **ID:** add-budget_role-enum-to-allocation_categories
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-25

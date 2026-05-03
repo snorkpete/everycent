@@ -1,7 +1,7 @@
 # Task: Reduce EcFormDialog boilerplate so dialog owns lifecycle
 
 **ID:** reduce-ecformdialog-boilerplate-so-dialog-owns-lifecycle
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10

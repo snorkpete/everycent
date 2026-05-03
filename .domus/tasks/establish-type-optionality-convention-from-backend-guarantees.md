@@ -1,7 +1,7 @@
 # Task: Establish type optionality convention from backend guarantees
 
 **ID:** establish-type-optionality-convention-from-backend-guarantees
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10
