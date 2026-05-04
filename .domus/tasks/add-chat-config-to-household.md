@@ -1,7 +1,7 @@
 # Task: add-chat-config-to-household
 
 **ID:** add-chat-config-to-household
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-25
