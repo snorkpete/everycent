@@ -4,26 +4,29 @@
       <Button
         v-tooltip="'Return to special events list'"
         icon="pi pi-arrow-left"
-        label="Back"
+        :label="isMobile ? undefined : 'Back'"
         severity="secondary"
         data-testid="back-btn"
         @click="goBack"
       />
       <Button
         v-tooltip="'Edit this special event\'s name, budget, and date'"
-        label="Edit Details"
+        :label="isMobile ? undefined : 'Edit Details'"
+        :icon="isMobile ? 'pi pi-pencil' : undefined"
         data-testid="edit-btn"
         @click="editEvent"
       />
       <Button
         v-tooltip="'Add or remove allocations for this special event'"
-        label="Adjust Allocations"
+        :label="isMobile ? undefined : 'Adjust Allocations'"
+        :icon="isMobile ? 'pi pi-sliders-h' : undefined"
         data-testid="adjust-allocations-btn"
         @click="adjustAllocations"
       />
       <Button
         v-tooltip="'Reload this special event\'s data'"
-        label="Refresh"
+        :label="isMobile ? undefined : 'Refresh'"
+        :icon="isMobile ? 'pi pi-refresh' : undefined"
         severity="secondary"
         data-testid="refresh-btn"
         :loading="store.loading"
@@ -31,7 +34,14 @@
       />
     </template>
 
-    <div class="scroll-content">
+    <SpecialEventDetailMobile
+      v-if="isMobile"
+      :event="event"
+      :allocations="allocations"
+      :total-spent="totalSpent"
+    />
+
+    <div v-else class="scroll-content">
       <div class="header-card" data-testid="event-header">
         <h2 class="event-name">{{ event?.name }}</h2>
         <div class="event-summary">
@@ -85,9 +95,11 @@ import Button from 'primevue/button';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
+import { useResponsive } from '../shared/composables/useResponsive';
 import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
+import SpecialEventDetailMobile from './SpecialEventDetailMobile.vue';
 import type { SpecialEventData } from './specialEvent.types';
 
 const route = useRoute();
@@ -95,6 +107,7 @@ const router = useRouter();
 const store = useSpecialEventStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
+const { isMobile } = useResponsive();
 
 const formVisible = ref(false);
 

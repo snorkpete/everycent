@@ -1,9 +1,17 @@
 <template>
   <EcPageLayout page-name="special-events" variant="fixed">
     <template #toolbar>
-      <Button label="Add Special Event" data-testid="add-btn" @click="addEvent" />
       <Button
-        label="Refresh"
+        v-tooltip="'Create a new special event'"
+        :label="isMobile ? undefined : 'Add Special Event'"
+        :icon="isMobile ? 'pi pi-plus' : undefined"
+        data-testid="add-btn"
+        @click="addEvent"
+      />
+      <Button
+        v-tooltip="'Reload the special events list'"
+        :label="isMobile ? undefined : 'Refresh'"
+        :icon="isMobile ? 'pi pi-refresh' : undefined"
         severity="secondary"
         data-testid="refresh-btn"
         :loading="store.loading"
@@ -11,7 +19,15 @@
       />
     </template>
 
-    <div class="scroll-content">
+    <SpecialEventsListMobile
+      v-if="isMobile"
+      :special-events="store.specialEvents"
+      @view="viewEvent"
+      @edit="editEvent"
+      @delete="confirmDelete"
+    />
+
+    <div v-else class="scroll-content">
       <DataTable :value="store.specialEvents" data-testid="events-table">
         <Column field="name" header="Name">
           <template #body="{ data }">
@@ -88,9 +104,11 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
+import { useResponsive } from '../shared/composables/useResponsive';
 import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
+import SpecialEventsListMobile from './SpecialEventsListMobile.vue';
 import type { SpecialEventData } from './specialEvent.types';
 
 const router = useRouter();
@@ -98,6 +116,7 @@ const store = useSpecialEventStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
 const confirm = useConfirm();
+const { isMobile } = useResponsive();
 
 const formVisible = ref(false);
 const selectedEvent = ref<SpecialEventData | null>(null);

@@ -1,5 +1,5 @@
 <template>
-  <div class="allocations-editor">
+  <div class="allocations-editor" :class="{ 'allocations-editor--mobile': isMobile }">
     <div class="toolbar">
       <Button
         v-tooltip="'Save allocation changes for this special event'"
@@ -20,118 +20,162 @@
     <div v-if="store.currentSpecialEvent" class="header-card" data-testid="event-header">
       <h2 class="event-name">{{ store.currentSpecialEvent.name }}</h2>
       <div class="event-summary">
-        <span>Budgeted: <EcMoneyDisplay :model-value="store.currentSpecialEvent.budget_amount ?? 0" highlight-mode="none" /></span>
+        <span
+          >Budgeted:
+          <EcMoneyDisplay
+            :model-value="store.currentSpecialEvent.budget_amount ?? 0"
+            highlight-mode="none"
+        /></span>
         <span>Actual: <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" /></span>
       </div>
     </div>
 
     <div class="panels">
-      <div class="panel current-allocations">
-        <h3>Current Allocations</h3>
-        <DataTable :value="currentAllocations" data-testid="current-allocations-table" size="small">
-          <Column field="name" header="Allocation" />
-          <Column field="budget_name" header="Budget" />
-          <Column field="allocation_category_name" header="Category" />
-          <Column
-            field="amount"
-            header="Amount"
-            header-style="text-align: right"
-            style="text-align: right"
-          >
-            <template #body="{ data }">
-              <EcMoneyDisplay :model-value="data.amount ?? 0" highlight-mode="none" />
-            </template>
-          </Column>
-          <Column
-            field="spent"
-            header="Spent"
-            header-style="text-align: right"
-            style="text-align: right"
-          >
-            <template #body="{ data }">
-              <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
-            </template>
-            <template #footer>
-              <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" emphasis="total" />
-            </template>
-          </Column>
-          <Column header="" style="width: 3rem; text-align: center">
-            <template #body="{ data }">
-              <Button
-                v-tooltip="'Remove this allocation from the special event'"
-                icon="pi pi-times"
-                severity="danger"
-                text
-                rounded
-                :data-testid="`remove-btn-${data.id}`"
-                @click="removeAllocation(data)"
-              />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
+      <template v-if="isMobile">
+        <SpecialEventCurrentAllocationsMobile
+          :allocations="currentAllocations"
+          :total-spent="totalSpent"
+          @remove="removeAllocation"
+        />
+        <SpecialEventAvailableAllocationsMobile
+          :budgets="budgets"
+          :allocation-categories="allocationCategories"
+          :selected-budget-id="selectedBudgetId"
+          :selected-category-id="selectedCategoryId"
+          :grouped-allocations="groupedAllocations"
+          :is-assigned="isAllocationAssigned"
+          @update:selected-budget-id="
+            selectedBudgetId = $event;
+            onBudgetChange();
+          "
+          @update:selected-category-id="
+            selectedCategoryId = $event;
+            onCategoryChange();
+          "
+          @add="addAllocation"
+        />
+      </template>
 
-      <div class="panel assign-allocations">
-        <h3>Assign Allocations</h3>
-        <div class="filter-row">
-          <Select
-            v-model="selectedBudgetId"
-            :options="budgets"
-            option-label="name"
-            option-value="id"
-            placeholder="Select Budget"
-            data-testid="budget-select"
-            @update:model-value="onBudgetChange"
-          />
-          <Select
-            v-model="selectedCategoryId"
-            :options="allocationCategories"
-            option-label="name"
-            option-value="id"
-            placeholder="All Categories"
-            show-clear
-            data-testid="category-select"
-            @update:model-value="onCategoryChange"
-          />
+      <template v-else>
+        <div class="panel current-allocations">
+          <h3>Current Allocations</h3>
+          <DataTable
+            :value="currentAllocations"
+            data-testid="current-allocations-table"
+            size="small"
+          >
+            <Column field="name" header="Allocation" />
+            <Column field="budget_name" header="Budget" />
+            <Column field="allocation_category_name" header="Category" />
+            <Column
+              field="amount"
+              header="Amount"
+              header-style="text-align: right"
+              style="text-align: right"
+            >
+              <template #body="{ data }">
+                <EcMoneyDisplay :model-value="data.amount ?? 0" highlight-mode="none" />
+              </template>
+            </Column>
+            <Column
+              field="spent"
+              header="Spent"
+              header-style="text-align: right"
+              style="text-align: right"
+            >
+              <template #body="{ data }">
+                <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
+              </template>
+              <template #footer>
+                <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" emphasis="total" />
+              </template>
+            </Column>
+            <Column header="" style="width: 3rem; text-align: center">
+              <template #body="{ data }">
+                <Button
+                  v-tooltip="'Remove this allocation from the special event'"
+                  icon="pi pi-times"
+                  severity="danger"
+                  text
+                  rounded
+                  :data-testid="`remove-btn-${data.id}`"
+                  @click="removeAllocation(data)"
+                />
+              </template>
+            </Column>
+          </DataTable>
         </div>
 
-        <DataTable
-          :value="groupedAllocations"
-          data-testid="available-allocations-table"
-          size="small"
-        >
-          <Column header="Name">
-            <template #body="{ data: row }">
-              <span v-if="row._isCategoryHeader" class="category-header">{{ row.name }}</span>
-              <span v-else>{{ row.name }}</span>
-            </template>
-          </Column>
-          <Column header="Budgeted" header-style="text-align: right" style="text-align: right">
-            <template #body="{ data: row }">
-              <EcMoneyDisplay v-if="!row._isCategoryHeader" :model-value="row.amount ?? 0" highlight-mode="none" />
-            </template>
-          </Column>
-          <Column header="Spent" header-style="text-align: right" style="text-align: right">
-            <template #body="{ data: row }">
-              <EcMoneyDisplay v-if="!row._isCategoryHeader" :model-value="row.spent ?? 0" highlight-mode="none" />
-            </template>
-          </Column>
-          <Column header="" style="width: 3rem; text-align: center">
-            <template #body="{ data: row }">
-              <Button
-                v-if="!row._isCategoryHeader"
-                v-tooltip="'Add this allocation to the special event'"
-                icon="pi pi-plus"
-                text
-                rounded
-                :data-testid="`add-btn-${row.id}`"
-                :disabled="isAllocationAssigned(row)"
-                @click="addAllocation(row)"
-              />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
+        <div class="panel assign-allocations">
+          <h3>Assign Allocations</h3>
+          <div class="filter-row">
+            <Select
+              v-model="selectedBudgetId"
+              :options="budgets"
+              option-label="name"
+              option-value="id"
+              placeholder="Select Budget"
+              data-testid="budget-select"
+              @update:model-value="onBudgetChange"
+            />
+            <Select
+              v-model="selectedCategoryId"
+              :options="allocationCategories"
+              option-label="name"
+              option-value="id"
+              placeholder="All Categories"
+              show-clear
+              data-testid="category-select"
+              @update:model-value="onCategoryChange"
+            />
+          </div>
+
+          <DataTable
+            :value="groupedAllocations"
+            data-testid="available-allocations-table"
+            size="small"
+          >
+            <Column header="Name">
+              <template #body="{ data: row }">
+                <span v-if="row._isCategoryHeader" class="category-header">{{ row.name }}</span>
+                <span v-else>{{ row.name }}</span>
+              </template>
+            </Column>
+            <Column header="Budgeted" header-style="text-align: right" style="text-align: right">
+              <template #body="{ data: row }">
+                <EcMoneyDisplay
+                  v-if="!row._isCategoryHeader"
+                  :model-value="row.amount ?? 0"
+                  highlight-mode="none"
+                />
+              </template>
+            </Column>
+            <Column header="Spent" header-style="text-align: right" style="text-align: right">
+              <template #body="{ data: row }">
+                <EcMoneyDisplay
+                  v-if="!row._isCategoryHeader"
+                  :model-value="row.spent ?? 0"
+                  highlight-mode="none"
+                />
+              </template>
+            </Column>
+            <Column header="" style="width: 3rem; text-align: center">
+              <template #body="{ data: row }">
+                <Button
+                  v-if="!row._isCategoryHeader"
+                  v-tooltip="'Add this allocation to the special event'"
+                  icon="pi pi-plus"
+                  text
+                  rounded
+                  :data-testid="`add-btn-${row.id}`"
+                  :disabled="isAllocationAssigned(row)"
+                  @click="addAllocation(row)"
+                />
+              </template>
+            </Column>
+          </DataTable>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -146,7 +190,10 @@ import Select from 'primevue/select';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
+import { useResponsive } from '../shared/composables/useResponsive';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
+import SpecialEventCurrentAllocationsMobile from './SpecialEventCurrentAllocationsMobile.vue';
+import SpecialEventAvailableAllocationsMobile from './SpecialEventAvailableAllocationsMobile.vue';
 import { budgetApi } from '../budgets/budgetApi';
 import { allocationCategoryApi } from '../allocation-categories/allocationCategoryApi';
 import type { SpecialEventAllocationData } from './specialEvent.types';
@@ -159,6 +206,7 @@ const router = useRouter();
 const store = useSpecialEventStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
+const { isMobile } = useResponsive();
 
 const budgets = ref<BudgetData[]>([]);
 const allocationCategories = ref<AllocationCategoryData[]>([]);
@@ -395,4 +443,16 @@ onMounted(async () => {
   font-weight: bold;
 }
 
+.allocations-editor--mobile {
+  padding: 0.5rem 0.75rem 0;
+}
+
+.allocations-editor--mobile .header-card {
+  padding: 0.75rem;
+}
+
+.allocations-editor--mobile .event-name {
+  font-size: 1.1rem;
+  margin: 0 0 0.25rem;
+}
 </style>
