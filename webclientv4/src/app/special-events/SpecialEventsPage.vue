@@ -1,9 +1,17 @@
 <template>
   <EcPageLayout page-name="special-events" variant="fixed">
     <template #toolbar>
-      <Button label="Add Special Event" data-testid="add-btn" @click="addEvent" />
       <Button
-        label="Refresh"
+        v-tooltip="'Create a new special event'"
+        :label="isMobile ? undefined : 'Add Special Event'"
+        :icon="isMobile ? 'pi pi-plus' : undefined"
+        data-testid="add-btn"
+        @click="addEvent"
+      />
+      <Button
+        v-tooltip="'Reload the special events list'"
+        :label="isMobile ? undefined : 'Refresh'"
+        :icon="isMobile ? 'pi pi-refresh' : undefined"
         severity="secondary"
         data-testid="refresh-btn"
         :loading="store.loading"
@@ -11,57 +19,67 @@
       />
     </template>
 
-    <DataTable :value="store.specialEvents" data-testid="events-table">
-      <Column field="name" header="Name">
-        <template #body="{ data }">
-          <a class="event-link" :data-testid="`event-link-${data.id}`" @click="viewEvent(data)">
-            {{ data.name }}
-          </a>
-        </template>
-      </Column>
-      <Column field="start_date" header="Start Date">
-        <template #body="{ data }">
-          {{ formatDate(data.start_date) }}
-        </template>
-      </Column>
-      <Column field="budget_amount" header="Budget" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="data.budget_amount ?? 0" highlight-mode="none" />
-        </template>
-      </Column>
-      <Column field="actual_amount" header="Actual" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="data.actual_amount ?? 0" highlight-mode="none" />
-        </template>
-      </Column>
-      <Column header="Difference" style="text-align: right">
-        <template #body="{ data }">
-          <EcMoneyDisplay :model-value="calculateDifference(data)" highlight-mode="balance" />
-        </template>
-      </Column>
-      <Column header="Actions" style="width: 120px; text-align: center">
-        <template #body="{ data }">
-          <Button
-            v-tooltip="'Edit special event'"
-            icon="pi pi-pencil"
-            text
-            severity="secondary"
-            size="small"
-            :data-testid="`edit-btn-${data.id}`"
-            @click="editEvent(data)"
-          />
-          <Button
-            v-tooltip="'Delete special event'"
-            icon="pi pi-trash"
-            text
-            severity="danger"
-            size="small"
-            :data-testid="`delete-btn-${data.id}`"
-            @click="confirmDelete(data)"
-          />
-        </template>
-      </Column>
-    </DataTable>
+    <SpecialEventsListMobile
+      v-if="isMobile"
+      :special-events="store.specialEvents"
+      @view="viewEvent"
+      @edit="editEvent"
+      @delete="confirmDelete"
+    />
+
+    <div v-else class="scroll-content">
+      <DataTable :value="store.specialEvents" data-testid="events-table">
+        <Column field="name" header="Name">
+          <template #body="{ data }">
+            <a class="event-link" :data-testid="`event-link-${data.id}`" @click="viewEvent(data)">
+              {{ data.name }}
+            </a>
+          </template>
+        </Column>
+        <Column field="start_date" header="Start Date">
+          <template #body="{ data }">
+            {{ formatDate(data.start_date) }}
+          </template>
+        </Column>
+        <Column field="budget_amount" header="Budget" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="data.budget_amount ?? 0" highlight-mode="none" />
+          </template>
+        </Column>
+        <Column field="actual_amount" header="Actual" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="data.actual_amount ?? 0" highlight-mode="none" />
+          </template>
+        </Column>
+        <Column header="Difference" style="text-align: right">
+          <template #body="{ data }">
+            <EcMoneyDisplay :model-value="calculateDifference(data)" highlight-mode="balance" />
+          </template>
+        </Column>
+        <Column header="Actions" style="width: 120px; text-align: center">
+          <template #body="{ data }">
+            <Button
+              v-tooltip="'Edit special event'"
+              icon="pi pi-pencil"
+              text
+              severity="secondary"
+              size="small"
+              :data-testid="`edit-btn-${data.id}`"
+              @click="editEvent(data)"
+            />
+            <Button
+              v-tooltip="'Delete special event'"
+              icon="pi pi-trash"
+              text
+              severity="danger"
+              size="small"
+              :data-testid="`delete-btn-${data.id}`"
+              @click="confirmDelete(data)"
+            />
+          </template>
+        </Column>
+      </DataTable>
+    </div>
 
     <SpecialEventForm
       :visible="formVisible"
@@ -86,9 +104,11 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useSpecialEventStore } from './specialEventStore';
 import { useNotifications } from '../notifications/useNotifications';
+import { useResponsive } from '../shared/composables/useResponsive';
 import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
+import SpecialEventsListMobile from './SpecialEventsListMobile.vue';
 import type { SpecialEventData } from './specialEvent.types';
 
 const router = useRouter();
@@ -96,6 +116,7 @@ const store = useSpecialEventStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
 const confirm = useConfirm();
+const { isMobile } = useResponsive();
 
 const formVisible = ref(false);
 const selectedEvent = ref<SpecialEventData | null>(null);
@@ -166,6 +187,12 @@ function calculateDifference(event: SpecialEventData): number {
 </script>
 
 <style scoped>
+.scroll-content {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
 .event-link {
   color: var(--p-primary-color);
   cursor: pointer;
