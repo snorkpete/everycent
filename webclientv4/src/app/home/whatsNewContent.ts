@@ -12,6 +12,11 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: 'Special Events works on your phone',
+    body: 'The Special Events list, detail, and allocation editor all now display properly on mobile — card layouts instead of cramped tables, and buttons that actually fit on screen.',
+    date: '2026-05-05',
+  },
+  {
     title: 'Unpaid transactions stand out in red',
     body: "On the Transactions screen, any transaction that isn't marked Paid now shows in red — date, description, allocation, and amount — so unreconciled rows are easy to spot at a glance.",
     date: '2026-04-20',
@@ -36,19 +41,10 @@ export const HIGHLIGHTS: Highlight[] = [
     body: "The 'Sign in with Google' button on the login page is now the preferred way to log in — your existing account is matched by email, so nothing else changes. Email and password still work as a fallback if you need them.",
     date: '2026-04-11',
   },
-  {
-    title: 'Assign allocations on mobile',
-    body: 'Editing a transaction on your phone now shows an allocation dropdown right in the edit row, so you can fix a miscategorised purchase without switching to your laptop.',
-    date: '2026-04-06',
-  },
-  {
-    title: 'Sink Funds now works on your phone',
-    body: "Open a sink fund on mobile and you'll see a card-based list instead of a crammed table. Tap a card to peek at the target, outstanding, and comment; hit Edit to rename, retarget, or deactivate obligations the same way you would on desktop.",
-    date: '2026-04-05',
-  },
 ];
 
 export const NOTEWORTHY: string[] = [
+  'Account Balances is now mobile-friendly — values no longer get cut off on small screens.',
   'Click an account, category, or institution name to view its details — no need to hit Edit first.',
   'The Bank Accounts list (under Setup) now shows the bank name and category (Asset, Liability, Current) next to each account.',
   'On Account Balances, assets and their loans are now grouped together, so you can see the equity of each loan-backed asset at a glance.',
