@@ -36,10 +36,43 @@ RSpec.describe Allocation, :type => :model do
       expect(allocation).not_to be_valid
       expect(allocation.errors[:allocation_class]).to include('is not a valid allocation class')
     end
+  end
 
-    it 'is valid with a nil allocation_class' do
-      allocation = build(:allocation, allocation_class: nil)
-      expect(allocation).to be_valid
+  describe 'default_allocation_class_from_category' do
+    it 'defaults to want for a spending category' do
+      category = create(:allocation_category, budget_role: 'spending')
+      allocation = create(:allocation, allocation_category: category, allocation_class: nil)
+      expect(allocation.allocation_class).to eq('want')
+    end
+
+    it 'defaults to want for an annual_spending category' do
+      category = create(:allocation_category, budget_role: 'annual_spending')
+      allocation = create(:allocation, allocation_category: category, allocation_class: nil)
+      expect(allocation.allocation_class).to eq('want')
+    end
+
+    it 'defaults to want for an event category' do
+      category = create(:allocation_category, budget_role: 'event')
+      allocation = create(:allocation, allocation_category: category, allocation_class: nil)
+      expect(allocation.allocation_class).to eq('want')
+    end
+
+    it 'defaults to savings for a savings category' do
+      category = create(:allocation_category, budget_role: 'savings')
+      allocation = create(:allocation, allocation_category: category, allocation_class: nil)
+      expect(allocation.allocation_class).to eq('savings')
+    end
+
+    it 'defaults to bookkeeping for a transfer category' do
+      category = create(:allocation_category, budget_role: 'transfer')
+      allocation = create(:allocation, allocation_category: category, allocation_class: nil)
+      expect(allocation.allocation_class).to eq('bookkeeping')
+    end
+
+    it 'does not override an explicitly set allocation_class' do
+      category = create(:allocation_category, budget_role: 'savings')
+      allocation = create(:allocation, allocation_category: category, allocation_class: 'need')
+      expect(allocation.allocation_class).to eq('need')
     end
   end
 

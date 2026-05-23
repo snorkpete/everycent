@@ -31,8 +31,9 @@ class Allocation < ApplicationRecord
 
   has_many :transactions
 
-  validates :allocation_class, inclusion: { in: ALLOCATION_CLASSES, message: 'is not a valid allocation class' }, allow_nil: true
+  validates :allocation_class, inclusion: { in: ALLOCATION_CLASSES, message: 'is not a valid allocation class' }
 
+  before_validation :default_allocation_class_from_category
   before_save :fix_name
   before_save :clear_bank_account_if_not_standing_order
 
@@ -126,5 +127,18 @@ class Allocation < ApplicationRecord
 
   def clear_bank_account_if_not_standing_order
     self.bank_account_id = nil unless is_standing_order?
+  end
+
+  BUDGET_ROLE_TO_ALLOCATION_CLASS = {
+    'savings' => 'savings',
+    'transfer' => 'bookkeeping',
+  }.freeze
+
+  def default_allocation_class_from_category
+    return if allocation_class.present?
+
+    self.allocation_class = BUDGET_ROLE_TO_ALLOCATION_CLASS.fetch(
+      allocation_category&.budget_role, 'want'
+    )
   end
 end
