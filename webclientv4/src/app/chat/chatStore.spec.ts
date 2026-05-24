@@ -28,6 +28,7 @@ function configureChatSettings() {
     chat_enabled: true,
     ollama_url: 'http://localhost:11434',
     ollama_model: 'test-model',
+    llm_model_id: null,
     max_tool_iterations: 5,
     extras: {},
   };

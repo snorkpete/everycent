@@ -1,12 +1,15 @@
 class ChatSetting < ApplicationRecord
   acts_as_tenant :household
 
+  belongs_to :llm_model, optional: true
+
   def self.as_hash
     record = get_setting_record
     {
       chat_enabled: record.chat_enabled,
       ollama_url: record.ollama_url,
       ollama_model: record.ollama_model,
+      llm_model_id: record.llm_model_id,
       max_tool_iterations: record.max_tool_iterations,
       extras: record.extras,
     }
@@ -18,6 +21,7 @@ class ChatSetting < ApplicationRecord
     record = get_setting_record
     attrs = params.slice(*UPDATABLE_KEYS).to_h.compact
     attrs[:extras] = parse_extras(params[:extras]) if params.key?(:extras)
+    attrs[:llm_model_id] = params[:llm_model_id] if params.key?(:llm_model_id)
     record.update(attrs)
     record
   end

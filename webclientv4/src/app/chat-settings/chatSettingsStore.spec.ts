@@ -15,6 +15,7 @@ const LOADED_SETTINGS: ChatSettingsData = {
   chat_enabled: true,
   ollama_url: 'http://192.168.68.59:11434',
   ollama_model: 'qwen3:14b',
+  llm_model_id: null,
   max_tool_iterations: 10,
   extras: { temperature: 0.7 },
 };
@@ -37,6 +38,7 @@ describe('chatSettingsStore', () => {
         chat_enabled: false,
         ollama_url: null,
         ollama_model: null,
+        llm_model_id: null,
         max_tool_iterations: 5,
         extras: {},
       });

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_24_095349) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_24_120000) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -39,7 +39,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_095349) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "comment"
     t.bigint "household_id"
-    t.string "allocation_class", default: "want"
+    t.string "allocation_class", default: "want", null: false
     t.boolean "is_fixed_amount", default: false
     t.boolean "is_cumulative", default: false
     t.bigint "special_event_id"
@@ -100,7 +100,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_095349) do
     t.jsonb "extras", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "llm_model_id"
     t.index ["household_id"], name: "index_chat_settings_on_household_id"
+    t.index ["llm_model_id"], name: "index_chat_settings_on_llm_model_id"
   end
 
   create_table "households", force: :cascade do |t|
@@ -319,6 +321,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_095349) do
   add_foreign_key "bank_accounts", "households", on_update: :cascade
   add_foreign_key "budgets", "households", on_update: :cascade
   add_foreign_key "chat_settings", "households", on_update: :cascade
+  add_foreign_key "chat_settings", "llm_models"
   add_foreign_key "incomes", "households", on_update: :cascade
   add_foreign_key "institutions", "households", on_update: :cascade
   add_foreign_key "llm_models", "households", on_update: :cascade

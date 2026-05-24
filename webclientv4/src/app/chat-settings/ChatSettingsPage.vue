@@ -19,9 +19,17 @@
           data-testid="ollama-url"
         />
 
+        <EcListField
+          v-model="formData.llm_model_id"
+          label="Model"
+          :edit-mode="editMode"
+          :items="modelItems"
+          data-testid="llm-model"
+        />
+
         <EcTextField
           v-model="formData.ollama_model"
-          label="Ollama Model"
+          label="Ollama Model (legacy — used as fallback if no Model is selected)"
           :edit-mode="editMode"
           data-testid="ollama-model"
         />
@@ -59,20 +67,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
 import ToggleSwitch from 'primevue/toggleswitch';
 import Textarea from 'primevue/textarea';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcTextField from '../shared/form/text-field/EcTextField.vue';
+import EcListField from '../shared/form/list-field/EcListField.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useChatSettingsStore } from './chatSettingsStore';
+import { useLlmModelStore } from '../llm-models/llmModelStore';
 import { useNotifications } from '../notifications/useNotifications';
 import type { ChatSettingsData } from './chatSettings.types';
 
 const store = useChatSettingsStore();
+const llmModelStore = useLlmModelStore();
 const headingStore = useHeadingStore();
 const notifications = useNotifications();
+
+const modelItems = computed(() =>
+  llmModelStore.models.map((m) => ({
+    id: m.id as number,
+    name: m.display_name || `${m.provider}/${m.name}`,
+  })),
+);
 
 const editMode = ref(false);
 
@@ -80,6 +98,7 @@ interface ChatSettingsFormData {
   chat_enabled: boolean;
   ollama_url: string;
   ollama_model: string;
+  llm_model_id: number | null;
   max_tool_iterations: string;
   extras: string;
 }
@@ -89,6 +108,7 @@ function toFormData(s: ChatSettingsData): ChatSettingsFormData {
     chat_enabled: s.chat_enabled,
     ollama_url: s.ollama_url ?? '',
     ollama_model: s.ollama_model ?? '',
+    llm_model_id: s.llm_model_id,
     max_tool_iterations: String(s.max_tool_iterations),
     extras: Object.keys(s.extras).length > 0 ? JSON.stringify(s.extras, null, 2) : '',
   };
@@ -108,6 +128,7 @@ function toApiData(f: ChatSettingsFormData): ChatSettingsData {
     chat_enabled: f.chat_enabled,
     ollama_url: f.ollama_url || null,
     ollama_model: f.ollama_model || null,
+    llm_model_id: f.llm_model_id,
     max_tool_iterations: Number(f.max_tool_iterations) || 5,
     extras,
   };
@@ -117,6 +138,7 @@ const formData = reactive<ChatSettingsFormData>(toFormData(store.settings));
 
 onMounted(() => {
   headingStore.setHeading('Chat Settings');
+  llmModelStore.fetchAll();
   store
     .fetch()
     .then(() => {

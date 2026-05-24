@@ -38,6 +38,7 @@ describe ChatSettingsController do
         )
         expect(json['ollama_url']).to be_nil
         expect(json['ollama_model']).to be_nil
+        expect(json['llm_model_id']).to be_nil
       end
     end
   end
@@ -96,6 +97,25 @@ describe ChatSettingsController do
 
         json = JSON.parse(response.body)
         expect(json['extras']).to eq({})
+      end
+
+      it 'persists and returns llm_model_id' do
+        llm_model = create(:llm_model)
+
+        post :create, params: { llm_model_id: llm_model.id }
+
+        json = JSON.parse(response.body)
+        expect(json['llm_model_id']).to eq(llm_model.id)
+      end
+
+      it 'clears llm_model_id when set to nil' do
+        llm_model = create(:llm_model)
+        ChatSetting.update_settings(llm_model_id: llm_model.id)
+
+        post :create, params: { llm_model_id: nil }
+
+        json = JSON.parse(response.body)
+        expect(json['llm_model_id']).to be_nil
       end
     end
   end

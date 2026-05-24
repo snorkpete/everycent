@@ -18,6 +18,6 @@ class ChatSettingsController < ApplicationController
   private
 
   def chat_setting_params
-    params.permit(:chat_enabled, :ollama_url, :ollama_model, :max_tool_iterations, :extras)
+    params.permit(:chat_enabled, :ollama_url, :ollama_model, :llm_model_id, :max_tool_iterations, :extras)
   end
 end

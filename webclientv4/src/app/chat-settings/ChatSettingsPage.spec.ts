@@ -5,13 +5,21 @@ import PrimeVue from 'primevue/config';
 import ChatSettingsPage from './ChatSettingsPage.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useChatSettingsStore } from './chatSettingsStore';
+import { useLlmModelStore } from '../llm-models/llmModelStore';
 import { chatSettingsApi } from './chatSettingsApi';
+import { llmModelApi } from '../llm-models/llmModelApi';
 import { buildChatSettings } from '../../test/factories';
 
 vi.mock('./chatSettingsApi', () => ({
   chatSettingsApi: {
     get: vi.fn(),
     save: vi.fn(),
+  },
+}));
+
+vi.mock('../llm-models/llmModelApi', () => ({
+  llmModelApi: {
+    getAll: vi.fn(),
   },
 }));
 
@@ -33,6 +41,17 @@ const configuredSettings = buildChatSettings({
   extras: { temperature: 0.7 },
 });
 
+const registeredModels = [
+  {
+    id: 1,
+    provider: 'anthropic',
+    name: 'claude-sonnet-4-6',
+    display_name: 'Claude Sonnet',
+    active: true,
+  },
+  { id: 2, provider: 'ollama', name: 'qwen3:14b', display_name: '', active: true },
+];
+
 function createWrapper(pinia: Pinia): VueWrapper {
   return mount(ChatSettingsPage, {
     global: {
@@ -51,6 +70,7 @@ describe('ChatSettingsPage', () => {
     vi.clearAllMocks();
     vi.mocked(chatSettingsApi.get).mockResolvedValue(configuredSettings);
     vi.mocked(chatSettingsApi.save).mockResolvedValue(configuredSettings);
+    vi.mocked(llmModelApi.getAll).mockResolvedValue(registeredModels);
   });
 
   describe('on mount', () => {
@@ -194,6 +214,79 @@ describe('ChatSettingsPage', () => {
       await wrapper.find('[data-testid="cancel-btn"]').trigger('click');
 
       expect(wrapper.find('[data-testid="edit-btn"]').exists()).toBe(true);
+    });
+  });
+
+  describe('model field', () => {
+    it('fetches models from the LLM model store on mount', async () => {
+      createWrapper(pinia);
+      await flushPromises();
+
+      expect(llmModelApi.getAll).toHaveBeenCalled();
+    });
+
+    it('renders the model field', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      expect(wrapper.find('[data-testid="llm-model"]').exists()).toBe(true);
+    });
+
+    it('populates modelItems from the LLM model store', async () => {
+      createWrapper(pinia);
+      await flushPromises();
+
+      const store = useLlmModelStore();
+      expect(store.models).toHaveLength(2);
+    });
+
+    it('uses display_name when available', async () => {
+      createWrapper(pinia);
+      await flushPromises();
+
+      const store = useLlmModelStore();
+      // Claude Sonnet has a display_name; the item name should reflect it
+      expect(store.models[0].display_name).toBe('Claude Sonnet');
+    });
+
+    it('falls back to provider/name when display_name is absent', async () => {
+      createWrapper(pinia);
+      await flushPromises();
+
+      const store = useLlmModelStore();
+      // qwen3:14b has an empty display_name
+      expect(store.models[1].display_name).toBe('');
+      expect(store.models[1].name).toBe('qwen3:14b');
+    });
+
+    it('includes llm_model_id in the payload sent to save', async () => {
+      const settingsWithModel = buildChatSettings({ llm_model_id: 1 });
+      vi.mocked(chatSettingsApi.get).mockResolvedValue(settingsWithModel);
+      vi.mocked(chatSettingsApi.save).mockResolvedValue(settingsWithModel);
+
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      await wrapper.find('[data-testid="edit-btn"]').trigger('click');
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
+      await flushPromises();
+
+      expect(chatSettingsApi.save).toHaveBeenCalledWith(
+        expect.objectContaining({ llm_model_id: 1 }),
+      );
+    });
+
+    it('sends llm_model_id as null when no model is selected', async () => {
+      const wrapper = createWrapper(pinia);
+      await flushPromises();
+
+      await wrapper.find('[data-testid="edit-btn"]').trigger('click');
+      await wrapper.find('[data-testid="save-btn"]').trigger('click');
+      await flushPromises();
+
+      expect(chatSettingsApi.save).toHaveBeenCalledWith(
+        expect.objectContaining({ llm_model_id: null }),
+      );
     });
   });
 });
