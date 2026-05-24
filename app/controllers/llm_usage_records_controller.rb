@@ -17,9 +17,7 @@ class LlmUsageRecordsController < ApplicationController
     return if performed?
 
     total_count = scope.count
-    records = scope.order(created_at: :desc)
-                   .limit(per_page)
-                   .offset((page - 1) * per_page)
+    records = scope.recent_first.limit(per_page).offset((page - 1) * per_page)
 
     render json: {
       records: records.map { |r| LlmUsageRecordSerializer.new(r, root: false) },
@@ -30,28 +28,7 @@ class LlmUsageRecordsController < ApplicationController
   def summary
     scope = filtered_scope
     return if performed?
-
-    totals = scope.pick(
-      Arel.sql('COUNT(*), SUM(total_tokens), SUM(total_cost)')
-    )
-
-    by_provider = scope
-      .group(:provider)
-      .pluck(:provider, Arel.sql('SUM(total_tokens), SUM(total_cost)'))
-      .map { |provider, tokens, cost| { provider: provider, total_tokens: tokens.to_i, total_cost: cost.to_d } }
-
-    by_category = scope
-      .group(:usage_category)
-      .pluck(:usage_category, Arel.sql('SUM(total_tokens), SUM(total_cost)'))
-      .map { |category, tokens, cost| { usage_category: category, total_tokens: tokens.to_i, total_cost: cost.to_d } }
-
-    render json: {
-      total_records: totals[0].to_i,
-      total_tokens: totals[1].to_i,
-      total_cost: totals[2].to_d,
-      by_provider: by_provider,
-      by_category: by_category
-    }
+    render json: LlmUsageRecord.summary_for(scope)
   end
 
   private
@@ -69,23 +46,24 @@ class LlmUsageRecordsController < ApplicationController
     scope = LlmUsageRecord.all
 
     if params[:start_date].present?
-      begin
-        scope = scope.where('created_at >= ?', Date.parse(params[:start_date]).beginning_of_day)
-      rescue ArgumentError
-        render json: { error: 'start_date must be a valid ISO date (YYYY-MM-DD)' }, status: :bad_request
-        return nil
-      end
+      start_date = parse_date(params[:start_date], :start_date)
+      return if performed?
+      scope = scope.on_or_after(start_date)
     end
 
     if params[:end_date].present?
-      begin
-        scope = scope.where('created_at <= ?', Date.parse(params[:end_date]).end_of_day)
-      rescue ArgumentError
-        render json: { error: 'end_date must be a valid ISO date (YYYY-MM-DD)' }, status: :bad_request
-        return nil
-      end
+      end_date = parse_date(params[:end_date], :end_date)
+      return if performed?
+      scope = scope.on_or_before(end_date)
     end
 
     scope
+  end
+
+  def parse_date(value, key)
+    Date.parse(value)
+  rescue ArgumentError
+    render json: { error: "#{key} must be a valid ISO date (YYYY-MM-DD)" }, status: :bad_request
+    nil
   end
 end

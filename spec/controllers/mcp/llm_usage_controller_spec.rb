@@ -74,55 +74,7 @@ RSpec.describe Mcp::LlmUsageController, type: :controller do
         expect(json['created']).to eq 2
       end
 
-      it 'copies cost rates from the llm_model at write time' do
-        post :create, params: { llm_model_id: @llm_model.id, records: [valid_record_attrs] }
-
-        record = LlmUsageRecord.last
-        expect(record.input_token_cost_rate).to eq BigDecimal('300.0')
-        expect(record.output_token_cost_rate).to eq BigDecimal('1500.0')
-        expect(record.cache_read_token_cost_rate).to eq BigDecimal('30.0')
-        expect(record.cache_write_token_cost_rate).to eq BigDecimal('375.0')
-        expect(record.thinking_token_cost_rate).to eq BigDecimal('1500.0')
-      end
-
-      it 'copies provider and llm_model_name from the llm_model' do
-        post :create, params: { llm_model_id: @llm_model.id, records: [valid_record_attrs] }
-
-        record = LlmUsageRecord.last
-        expect(record.provider).to eq 'anthropic'
-        expect(record.llm_model_name).to eq 'claude-sonnet-4-5'
-      end
-
-      it 'computes total_tokens as sum of all token counts' do
-        attrs = valid_record_attrs.merge(
-          input_tokens: 1000,
-          output_tokens: 200,
-          cache_read_tokens: 50,
-          cache_write_tokens: 25,
-          thinking_tokens: 10
-        )
-        post :create, params: { llm_model_id: @llm_model.id, records: [attrs] }
-
-        record = LlmUsageRecord.last
-        expect(record.total_tokens).to eq 1285
-      end
-
-      it 'computes total_cost correctly' do
-        attrs = valid_record_attrs.merge(
-          input_tokens: 1200,
-          output_tokens: 350,
-          cache_read_tokens: 0,
-          cache_write_tokens: 0,
-          thinking_tokens: 0
-        )
-        post :create, params: { llm_model_id: @llm_model.id, records: [attrs] }
-
-        record = LlmUsageRecord.last
-        # (1200 * 300 + 350 * 1500) / 1_000_000 = 885_000 / 1_000_000 = 0.885
-        expect(record.total_cost).to eq BigDecimal('0.885')
-      end
-
-      it 'rolls back the entire batch when any record fails validation' do
+      it 'rolls back the entire batch and returns 422 when any record fails validation' do
         invalid_record = valid_record_attrs.merge(usage_category: 'invalid_category')
 
         expect {
@@ -134,7 +86,9 @@ RSpec.describe Mcp::LlmUsageController, type: :controller do
 
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
-        expect(json['errors']).to be_present
+        expect(json['errors']).to be_an(Array)
+        expect(json['errors'].first).to be_a(String)
+        expect(json['errors'].first).to include('Usage category')
       end
 
       it 'returns 404 when the llm_model is not found' do

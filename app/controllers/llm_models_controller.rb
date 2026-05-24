@@ -11,7 +11,7 @@ class LlmModelsController < ApplicationController
   respond_to :json
 
   def index
-    @llm_models = LlmModel.all.order(:provider, :name)
+    @llm_models = LlmModel.sorted
     respond_with(@llm_models, LlmModelSerializer)
   end
 

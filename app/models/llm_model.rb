@@ -5,6 +5,8 @@ class LlmModel < ApplicationRecord
   #   total_cost_cents = (tokens * cost_per_mtok_cents) / 1_000_000
   acts_as_tenant :household
 
+  scope :sorted, -> { order(:provider, :name) }
+
   validates :provider, presence: true
   validates :name, presence: true
   validates :name, uniqueness: { scope: [:household_id, :provider] }

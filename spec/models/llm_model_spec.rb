@@ -71,4 +71,19 @@ RSpec.describe LlmModel, type: :model do
     ActsAsTenant.current_tenant = @household
     expect(LlmModel.count).to eq 1
   end
+
+  describe '.sorted' do
+    it 'returns records ordered by provider, then name' do
+      create(:llm_model, provider: 'openai', name: 'gpt-4o')
+      create(:llm_model, provider: 'anthropic', name: 'claude-sonnet-4-5')
+      create(:llm_model, provider: 'anthropic', name: 'claude-haiku-4-5')
+
+      sorted = LlmModel.sorted
+      expect(sorted.map { |m| [m.provider, m.name] }).to eq([
+        ['anthropic', 'claude-haiku-4-5'],
+        ['anthropic', 'claude-sonnet-4-5'],
+        ['openai', 'gpt-4o']
+      ])
+    end
+  end
 end
