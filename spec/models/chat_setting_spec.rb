@@ -54,4 +54,22 @@ RSpec.describe ChatSetting, type: :model do
       expect(record.llm_model_id).to be_nil
     end
   end
+
+  describe 'whitespace handling' do
+    it 'strips leading and trailing whitespace from ollama_url on save' do
+      setting = ChatSetting.create!(ollama_url: '  http://example.com:11434  ')
+      expect(setting.ollama_url).to eq('http://example.com:11434')
+    end
+
+    it 'strips leading and trailing whitespace from ollama_model on save' do
+      setting = ChatSetting.create!(ollama_model: " qwen3:14b\n")
+      expect(setting.ollama_model).to eq('qwen3:14b')
+    end
+
+    it 'leaves nil string fields alone' do
+      setting = ChatSetting.create!(ollama_url: nil, ollama_model: nil)
+      expect(setting.ollama_url).to be_nil
+      expect(setting.ollama_model).to be_nil
+    end
+  end
 end

@@ -3,6 +3,8 @@ class ChatSetting < ApplicationRecord
 
   belongs_to :llm_model, optional: true
 
+  before_save :strip_string_fields
+
   def self.as_hash
     record = get_setting_record
     {
@@ -38,5 +40,12 @@ class ChatSetting < ApplicationRecord
     end
   rescue JSON::ParserError
     {}
+  end
+
+  private
+
+  def strip_string_fields
+    self.ollama_url = ollama_url.strip if ollama_url.is_a?(String)
+    self.ollama_model = ollama_model.strip if ollama_model.is_a?(String)
   end
 end
