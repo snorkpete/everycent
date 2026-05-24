@@ -1,7 +1,8 @@
 # Task: Backfill and enforce allocation_class (need/want/savings)
 
 **ID:** backfill-and-enforce-allocation_class-needwantsavings
-**Status:** raw
+**Status:** in-progress
+**Branch:** backfill
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-25
