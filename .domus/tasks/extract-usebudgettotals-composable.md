@@ -1,7 +1,7 @@
 # Task: Extract useBudgetTotals composable
 
 **ID:** extract-usebudgettotals-composable
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-10
