@@ -105,6 +105,38 @@ describe('router', () => {
     expect(router.currentRoute.value.name).toBe('setup-settings');
   });
 
+  it('routes /chat/settings to chat-settings when authenticated', async () => {
+    authenticateUser();
+
+    await router.push('/chat/settings');
+
+    expect(router.currentRoute.value.name).toBe('chat-settings');
+  });
+
+  it('redirects /setup/chat-settings to /chat/settings', async () => {
+    authenticateUser();
+
+    await router.push('/setup/chat-settings');
+
+    expect(router.currentRoute.value.path).toBe('/chat/settings');
+  });
+
+  it('routes /chat/models to chat-models when authenticated', async () => {
+    authenticateUser();
+
+    await router.push('/chat/models');
+
+    expect(router.currentRoute.value.name).toBe('chat-models');
+  });
+
+  it('routes /chat/usage to chat-usage when authenticated', async () => {
+    authenticateUser();
+
+    await router.push('/chat/usage');
+
+    expect(router.currentRoute.value.name).toBe('chat-usage');
+  });
+
   it('fetches settings on every authenticated navigation', async () => {
     authenticateUser();
 
@@ -139,6 +171,9 @@ describe('router', () => {
       ['/setup/allocation-categories', 'Allocation Categories - EveryCent'],
       ['/setup/institutions', 'Institutions - EveryCent'],
       ['/setup/settings', 'Settings - EveryCent'],
+      ['/chat/settings', 'Chat Settings - EveryCent'],
+      ['/chat/models', 'Model Registry - EveryCent'],
+      ['/chat/usage', 'Usage Log - EveryCent'],
       ['/budgets/future', 'Future Budgets - EveryCent'],
       ['/budgets', 'Budgets - EveryCent'],
       ['/budgets/123', 'Budget - EveryCent'],

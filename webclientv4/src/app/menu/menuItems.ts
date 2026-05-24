@@ -90,6 +90,34 @@ function buildReportsSection(navigate: (path: string) => void): AppMenuItem {
   };
 }
 
+function buildChatSection(navigate: (path: string) => void): AppMenuItem {
+  return {
+    label: 'Chat',
+    key: 'chat',
+    icon: Icon.CHAT,
+    items: [
+      {
+        label: 'Chat Settings',
+        icon: Icon.CHAT_SETTINGS,
+        command: () => navigate('/chat/settings'),
+        routePath: '/chat/settings',
+      },
+      {
+        label: 'Model Registry',
+        icon: Icon.MODEL_REGISTRY,
+        command: () => navigate('/chat/models'),
+        routePath: '/chat/models',
+      },
+      {
+        label: 'Usage Log',
+        icon: Icon.USAGE_LOG,
+        command: () => navigate('/chat/usage'),
+        routePath: '/chat/usage',
+      },
+    ],
+  };
+}
+
 function buildSetupSection(navigate: (path: string) => void): AppMenuItem {
   return {
     label: 'Setup',
@@ -120,12 +148,6 @@ function buildSetupSection(navigate: (path: string) => void): AppMenuItem {
         command: () => navigate('/setup/settings'),
         routePath: '/setup/settings',
       },
-      {
-        label: 'Chat Settings',
-        icon: Icon.CHAT_SETTINGS,
-        command: () => navigate('/setup/chat-settings'),
-        routePath: '/setup/chat-settings',
-      },
     ],
   };
 }
@@ -138,6 +160,7 @@ export function buildMenuItems(
     ...buildMainItems(navigate),
     { separator: true },
     buildReportsSection(navigate),
+    buildChatSection(navigate),
     buildSetupSection(navigate),
     { separator: true },
     { label: 'Old Version', icon: Icon.OLD_VERSION, url: '/v3/#/' },

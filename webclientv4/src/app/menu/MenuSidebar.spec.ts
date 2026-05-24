@@ -117,6 +117,11 @@ describe('MenuSidebar', () => {
       return headers.find((h) => h.text().includes('Setup'));
     }
 
+    function chatHeader() {
+      const headers = wrapper.findAll('.p-panelmenu-header');
+      return headers.find((h) => h.text().includes('Chat'));
+    }
+
     it('auto-expands the Setup section when mounted on a setup route', () => {
       mockRoute.path = '/setup/institutions';
       createWrapper();
@@ -141,6 +146,31 @@ describe('MenuSidebar', () => {
       await nextTick();
 
       expect(setupHeader()!.attributes('aria-expanded')).toBe('true');
+    });
+
+    it('auto-expands the Chat section when mounted on a chat route', () => {
+      mockRoute.path = '/chat/models';
+      createWrapper();
+
+      expect(chatHeader()!.attributes('aria-expanded')).toBe('true');
+    });
+
+    it('does not auto-expand Chat when mounted on a non-chat route', () => {
+      mockRoute.path = '/';
+      createWrapper();
+
+      expect(chatHeader()!.attributes('aria-expanded')).toBeUndefined();
+    });
+
+    it('expands the Chat section when navigating to a chat route', async () => {
+      mockRoute.path = '/';
+      createWrapper();
+      expect(chatHeader()!.attributes('aria-expanded')).toBeUndefined();
+
+      mockRoute.path = '/chat/settings';
+      await nextTick();
+
+      expect(chatHeader()!.attributes('aria-expanded')).toBe('true');
     });
   });
 

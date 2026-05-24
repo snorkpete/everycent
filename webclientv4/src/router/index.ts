@@ -52,9 +52,25 @@ const router = createRouter({
     },
     {
       path: '/setup/chat-settings',
-      name: 'setup-chat-settings',
+      redirect: '/chat/settings',
+    },
+    {
+      path: '/chat/settings',
+      name: 'chat-settings',
       component: () => import('../app/chat-settings/ChatSettingsPage.vue'),
       meta: { title: 'Chat Settings' },
+    },
+    {
+      path: '/chat/models',
+      name: 'chat-models',
+      component: () => import('../app/llm-models/LlmModelsPage.vue'),
+      meta: { title: 'Model Registry' },
+    },
+    {
+      path: '/chat/usage',
+      name: 'chat-usage',
+      component: () => import('../app/llm-usage/LlmUsageLogPage.vue'),
+      meta: { title: 'Usage Log' },
     },
     {
       path: '/budgets/future',

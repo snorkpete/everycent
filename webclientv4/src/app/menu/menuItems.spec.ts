@@ -74,15 +74,57 @@ describe('menuItems', () => {
     expect(reports!.key).toBe('reports');
   });
 
+  it('includes expandable Chat section with sub-items', () => {
+    const items = buildMenuItems(vi.fn(), vi.fn());
+    const chat = items.find((item) => item.label === 'Chat');
+
+    expect(chat).toBeDefined();
+    expect(chat!.icon).toBe(Icon.CHAT);
+    expect(chat!.items).toHaveLength(3);
+    expect(chat!.items![0].label).toBe('Chat Settings');
+    expect(chat!.items![1].label).toBe('Model Registry');
+    expect(chat!.items![2].label).toBe('Usage Log');
+  });
+
+  it('Chat section has a key for expandedKeys tracking', () => {
+    const items = buildMenuItems(vi.fn(), vi.fn());
+    const chat = items.find((item) => item.label === 'Chat');
+
+    expect(chat!.key).toBe('chat');
+  });
+
+  it('Chat sub-items use command-based Vue navigation with routePath', () => {
+    const navigate = vi.fn();
+    const items = buildMenuItems(vi.fn(), navigate);
+    const chat = items.find((item) => item.label === 'Chat');
+    const modelRegistry = chat!.items!.find((item) => item.label === 'Model Registry');
+
+    expect(modelRegistry!.routePath).toBe('/chat/models');
+    expect(modelRegistry!.url).toBeUndefined();
+    modelRegistry!.command!({ originalEvent: new Event('click'), item: modelRegistry! });
+    expect(navigate).toHaveBeenCalledWith('/chat/models');
+  });
+
+  it('Chat Settings navigates to /chat/settings', () => {
+    const navigate = vi.fn();
+    const items = buildMenuItems(vi.fn(), navigate);
+    const chat = items.find((item) => item.label === 'Chat');
+    const chatSettings = chat!.items!.find((item) => item.label === 'Chat Settings');
+
+    expect(chatSettings!.routePath).toBe('/chat/settings');
+    chatSettings!.command!({ originalEvent: new Event('click'), item: chatSettings! });
+    expect(navigate).toHaveBeenCalledWith('/chat/settings');
+  });
+
   it('includes expandable Setup section with sub-items', () => {
     const items = buildMenuItems(vi.fn(), vi.fn());
     const setup = items.find((item) => item.label === 'Setup');
 
     expect(setup).toBeDefined();
     expect(setup!.icon).toBe(Icon.SETUP);
-    expect(setup!.items).toHaveLength(5);
+    expect(setup!.items).toHaveLength(4);
     expect(setup!.items![0].label).toBe('Allocation Categories');
-    expect(setup!.items!.find((item) => item.label === 'Chat Settings')).toBeDefined();
+    expect(setup!.items!.find((item) => item.label === 'Chat Settings')).toBeUndefined();
   });
 
   it('Setup section has a key for expandedKeys tracking', () => {
