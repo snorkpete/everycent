@@ -4,6 +4,7 @@ FactoryBot.define do
     provider { 'anthropic' }
     name { 'claude-sonnet-4-5' }
     display_name { 'Claude Sonnet 4.5' }
+    url { 'http://localhost:11434' }
     input_token_cost { 300.0000 }
     output_token_cost { 1500.0000 }
     cache_read_token_cost { 30.0000 }

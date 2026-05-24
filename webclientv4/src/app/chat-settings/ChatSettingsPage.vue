@@ -12,26 +12,12 @@
           </template>
         </div>
 
-        <EcTextField
-          v-model="formData.ollama_url"
-          label="Ollama URL"
-          :edit-mode="editMode"
-          data-testid="ollama-url"
-        />
-
         <EcListField
           v-model="formData.llm_model_id"
           label="Model"
           :edit-mode="editMode"
           :items="modelItems"
           data-testid="llm-model"
-        />
-
-        <EcTextField
-          v-model="formData.ollama_model"
-          label="Ollama Model (legacy — used as fallback if no Model is selected)"
-          :edit-mode="editMode"
-          data-testid="ollama-model"
         />
 
         <EcTextField
@@ -96,8 +82,6 @@ const editMode = ref(false);
 
 interface ChatSettingsFormData {
   chat_enabled: boolean;
-  ollama_url: string;
-  ollama_model: string;
   llm_model_id: number | null;
   max_tool_iterations: string;
   extras: string;
@@ -106,8 +90,6 @@ interface ChatSettingsFormData {
 function toFormData(s: ChatSettingsData): ChatSettingsFormData {
   return {
     chat_enabled: s.chat_enabled,
-    ollama_url: s.ollama_url ?? '',
-    ollama_model: s.ollama_model ?? '',
     llm_model_id: s.llm_model_id,
     max_tool_iterations: String(s.max_tool_iterations),
     extras: Object.keys(s.extras).length > 0 ? JSON.stringify(s.extras, null, 2) : '',
@@ -126,8 +108,6 @@ function toApiData(f: ChatSettingsFormData): ChatSettingsData {
 
   return {
     chat_enabled: f.chat_enabled,
-    ollama_url: f.ollama_url || null,
-    ollama_model: f.ollama_model || null,
     llm_model_id: f.llm_model_id,
     max_tool_iterations: Number(f.max_tool_iterations) || 5,
     extras,

@@ -34,6 +34,34 @@ RSpec.describe ChatSetting, type: :model do
       hash = ChatSetting.as_hash
       expect(hash).to include(llm_model_id: model.id)
     end
+
+    it 'includes llm_model as nil when no model is linked' do
+      hash = ChatSetting.as_hash
+      expect(hash[:llm_model]).to be_nil
+    end
+
+    it 'embeds the linked llm_model inline when a model is set' do
+      model = create(:llm_model, provider: 'anthropic', name: 'claude-sonnet-4-5',
+                                  url: 'https://api.anthropic.com', display_name: 'Claude Sonnet 4.5',
+                                  active: true)
+      ChatSetting.update_settings(llm_model_id: model.id)
+
+      hash = ChatSetting.as_hash
+      expect(hash[:llm_model]).to include(
+        id: model.id,
+        provider: 'anthropic',
+        name: 'claude-sonnet-4-5',
+        url: 'https://api.anthropic.com',
+        display_name: 'Claude Sonnet 4.5',
+        active: true,
+      )
+    end
+
+    it 'does not include ollama_url or ollama_model keys' do
+      hash = ChatSetting.as_hash
+      expect(hash).not_to have_key(:ollama_url)
+      expect(hash).not_to have_key(:ollama_model)
+    end
   end
 
   describe '.update_settings' do
@@ -52,24 +80,6 @@ RSpec.describe ChatSetting, type: :model do
 
       record = ChatSetting.first
       expect(record.llm_model_id).to be_nil
-    end
-  end
-
-  describe 'whitespace handling' do
-    it 'strips leading and trailing whitespace from ollama_url on save' do
-      setting = ChatSetting.create!(ollama_url: '  http://example.com:11434  ')
-      expect(setting.ollama_url).to eq('http://example.com:11434')
-    end
-
-    it 'strips leading and trailing whitespace from ollama_model on save' do
-      setting = ChatSetting.create!(ollama_model: " qwen3:14b\n")
-      expect(setting.ollama_model).to eq('qwen3:14b')
-    end
-
-    it 'leaves nil string fields alone' do
-      setting = ChatSetting.create!(ollama_url: nil, ollama_model: nil)
-      expect(setting.ollama_url).to be_nil
-      expect(setting.ollama_model).to be_nil
     end
   end
 end

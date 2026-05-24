@@ -43,7 +43,7 @@ class LlmModelsController < ApplicationController
 
   def llm_model_params
     params.fetch(:llm_model, {}).permit(
-      :provider, :name, :display_name,
+      :provider, :name, :display_name, :url,
       :input_token_cost, :output_token_cost,
       :cache_read_token_cost, :cache_write_token_cost,
       :thinking_token_cost, :active

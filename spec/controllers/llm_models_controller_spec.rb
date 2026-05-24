@@ -86,6 +86,7 @@ RSpec.describe LlmModelsController, type: :controller do
           provider: 'anthropic',
           name: 'claude-haiku-4-5',
           display_name: 'Claude Haiku 4.5',
+          url: 'https://api.anthropic.com',
           input_token_cost: 100.0000,
           output_token_cost: 500.0000,
           cache_read_token_cost: 10.0000,

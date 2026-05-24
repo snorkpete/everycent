@@ -13,11 +13,16 @@ vi.mock('./chatSettingsApi', () => ({
 
 const LOADED_SETTINGS: ChatSettingsData = {
   chat_enabled: true,
-  ollama_url: 'http://192.168.68.59:11434',
-  ollama_model: 'qwen3:14b',
-  llm_model_id: null,
+  llm_model_id: 1,
   max_tool_iterations: 10,
   extras: { temperature: 0.7 },
+  llm_model: {
+    id: 1,
+    provider: 'ollama',
+    name: 'qwen3:14b',
+    url: 'http://192.168.68.59:11434',
+    active: true,
+  },
 };
 
 describe('chatSettingsStore', () => {
@@ -36,11 +41,10 @@ describe('chatSettingsStore', () => {
       const store = useChatSettingsStore();
       expect(store.settings).toEqual({
         chat_enabled: false,
-        ollama_url: null,
-        ollama_model: null,
         llm_model_id: null,
         max_tool_iterations: 5,
         extras: {},
+        llm_model: null,
       });
     });
 

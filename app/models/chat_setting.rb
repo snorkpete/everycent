@@ -3,21 +3,18 @@ class ChatSetting < ApplicationRecord
 
   belongs_to :llm_model, optional: true
 
-  before_save :strip_string_fields
-
   def self.as_hash
     record = get_setting_record
     {
       chat_enabled: record.chat_enabled,
-      ollama_url: record.ollama_url,
-      ollama_model: record.ollama_model,
       llm_model_id: record.llm_model_id,
       max_tool_iterations: record.max_tool_iterations,
       extras: record.extras,
+      llm_model: record.llm_model && llm_model_hash(record.llm_model),
     }
   end
 
-  UPDATABLE_KEYS = %i[chat_enabled ollama_url ollama_model max_tool_iterations].freeze
+  UPDATABLE_KEYS = %i[chat_enabled max_tool_iterations].freeze
 
   def self.update_settings(params)
     record = get_setting_record
@@ -42,10 +39,19 @@ class ChatSetting < ApplicationRecord
     {}
   end
 
-  private
-
-  def strip_string_fields
-    self.ollama_url = ollama_url.strip if ollama_url.is_a?(String)
-    self.ollama_model = ollama_model.strip if ollama_model.is_a?(String)
+  private_class_method def self.llm_model_hash(model)
+    {
+      id: model.id,
+      provider: model.provider,
+      name: model.name,
+      display_name: model.display_name,
+      url: model.url,
+      input_token_cost: model.input_token_cost,
+      output_token_cost: model.output_token_cost,
+      cache_read_token_cost: model.cache_read_token_cost,
+      cache_write_token_cost: model.cache_write_token_cost,
+      thinking_token_cost: model.thinking_token_cost,
+      active: model.active,
+    }
   end
 end

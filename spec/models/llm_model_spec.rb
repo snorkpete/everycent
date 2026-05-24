@@ -23,6 +23,18 @@ RSpec.describe LlmModel, type: :model do
     expect(model.errors[:name]).to be_present
   end
 
+  it 'is invalid without a url' do
+    model = build(:llm_model, url: nil)
+    expect(model).not_to be_valid
+    expect(model.errors[:url]).to be_present
+  end
+
+  it 'is invalid with a blank url' do
+    model = build(:llm_model, url: '   ')
+    expect(model).not_to be_valid
+    expect(model.errors[:url]).to be_present
+  end
+
   it 'is invalid when name is not unique within the same household and provider' do
     create(:llm_model, provider: 'anthropic', name: 'claude-sonnet-4-5')
     duplicate = build(:llm_model, provider: 'anthropic', name: 'claude-sonnet-4-5')
@@ -47,12 +59,12 @@ RSpec.describe LlmModel, type: :model do
   end
 
   it 'defaults active to true' do
-    model = LlmModel.create!(provider: 'anthropic', name: 'claude-sonnet-4-5')
+    model = LlmModel.create!(provider: 'anthropic', name: 'claude-sonnet-4-5', url: 'https://api.anthropic.com')
     expect(model.reload.active).to eq true
   end
 
   it 'defaults cost columns to 0' do
-    model = LlmModel.create!(provider: 'anthropic', name: 'claude-sonnet-4-5')
+    model = LlmModel.create!(provider: 'anthropic', name: 'claude-sonnet-4-5', url: 'https://api.anthropic.com')
     model.reload
     expect(model.input_token_cost).to eq 0
     expect(model.output_token_cost).to eq 0
@@ -84,6 +96,21 @@ RSpec.describe LlmModel, type: :model do
         ['anthropic', 'claude-sonnet-4-5'],
         ['openai', 'gpt-4o']
       ])
+    end
+  end
+
+  describe 'whitespace handling' do
+    it 'strips leading and trailing whitespace from url on save' do
+      model = LlmModel.create!(provider: 'anthropic', name: 'claude-sonnet-4-5', url: '  http://localhost:11434  ')
+      expect(model.url).to eq('http://localhost:11434')
+    end
+
+    it 'leaves non-string url alone' do
+      model = build(:llm_model)
+      model.url = nil
+      # nil url should leave the nil in place (validation will fail, but strip won't raise)
+      model.valid?
+      expect(model.url).to be_nil
     end
   end
 end

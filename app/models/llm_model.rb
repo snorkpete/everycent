@@ -7,7 +7,16 @@ class LlmModel < ApplicationRecord
 
   scope :sorted, -> { order(:provider, :name) }
 
+  before_save :strip_url
+
   validates :provider, presence: true
   validates :name, presence: true
   validates :name, uniqueness: { scope: [:household_id, :provider] }
+  validates :url, presence: true
+
+  private
+
+  def strip_url
+    self.url = url.strip if url.is_a?(String)
+  end
 end

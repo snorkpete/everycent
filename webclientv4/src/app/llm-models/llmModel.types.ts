@@ -3,6 +3,7 @@ export interface LlmModelData {
   provider?: string;
   name?: string;
   display_name?: string;
+  url?: string;
   input_token_cost?: number;
   output_token_cost?: number;
   cache_read_token_cost?: number;

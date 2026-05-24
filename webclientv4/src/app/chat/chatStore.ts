@@ -22,9 +22,10 @@ export const useChatStore = defineStore('chat', () => {
 
   function getChatConfig(): ChatConfig {
     const chatSettings = useChatSettingsStore();
+    const model = chatSettings.settings.llm_model;
     return {
-      ollamaUrl: chatSettings.settings.ollama_url ?? '',
-      model: chatSettings.settings.ollama_model ?? '',
+      ollamaUrl: model?.url ?? '',
+      model: model?.name ?? '',
       maxToolIterations: chatSettings.settings.max_tool_iterations,
     };
   }
@@ -52,7 +53,7 @@ export const useChatStore = defineStore('chat', () => {
   async function sendMessage(content: string) {
     const config = getChatConfig();
     if (!config.ollamaUrl || !config.model) {
-      error.value = 'Chat is not configured. Set Ollama URL and model in Chat Settings.';
+      error.value = 'Chat is not configured. Select a model in Chat Settings.';
       return;
     }
 

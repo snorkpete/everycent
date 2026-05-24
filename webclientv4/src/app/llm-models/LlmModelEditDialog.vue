@@ -23,6 +23,12 @@
         data-testid="name-field"
       />
       <EcTextField
+        v-model="formData.url"
+        label="URL"
+        :edit-mode="editMode"
+        data-testid="url-field"
+      />
+      <EcTextField
         v-model="formData.display_name"
         label="Display Name"
         :edit-mode="editMode"
@@ -87,6 +93,7 @@ import type { LlmModelData } from './llmModel.types';
 interface LlmModelFormData {
   provider: string;
   name: string;
+  url: string;
   display_name: string;
   input_token_cost: string;
   output_token_cost: string;
@@ -119,6 +126,7 @@ function toFormData(source: LlmModelData): LlmModelFormData {
   return {
     provider: source.provider ?? '',
     name: source.name ?? '',
+    url: source.url ?? '',
     display_name: source.display_name ?? '',
     input_token_cost: source.input_token_cost != null ? String(source.input_token_cost) : '',
     output_token_cost: source.output_token_cost != null ? String(source.output_token_cost) : '',
@@ -136,6 +144,7 @@ function toApiData(form: LlmModelFormData): LlmModelData {
   return {
     provider: form.provider,
     name: form.name,
+    url: form.url,
     display_name: form.display_name,
     input_token_cost: form.input_token_cost !== '' ? Number(form.input_token_cost) : 0,
     output_token_cost: form.output_token_cost !== '' ? Number(form.output_token_cost) : 0,

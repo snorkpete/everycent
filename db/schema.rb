@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_24_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_24_134615) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -94,8 +94,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_120000) do
   create_table "chat_settings", force: :cascade do |t|
     t.bigint "household_id", null: false
     t.boolean "chat_enabled", default: false, null: false
-    t.string "ollama_url"
-    t.string "ollama_model"
     t.integer "max_tool_iterations", default: 5, null: false
     t.jsonb "extras", default: {}, null: false
     t.datetime "created_at", null: false
@@ -146,6 +144,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_120000) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "url", null: false
     t.index ["household_id", "provider", "name"], name: "index_llm_models_on_household_id_and_provider_and_name", unique: true
     t.index ["household_id"], name: "index_llm_models_on_household_id"
   end

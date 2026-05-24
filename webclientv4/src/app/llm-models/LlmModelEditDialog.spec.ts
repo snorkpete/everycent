@@ -11,6 +11,7 @@ const existingModel: LlmModelData = {
   id: 1,
   provider: 'anthropic',
   name: 'claude-sonnet-4-6',
+  url: 'https://api.anthropic.com',
   display_name: 'Claude Sonnet',
   input_token_cost: 300,
   output_token_cost: 1500,
@@ -100,6 +101,7 @@ describe('LlmModelEditDialog', () => {
       expect(saved.id).toBe(existingModel.id);
       expect(saved.provider).toBe(existingModel.provider);
       expect(saved.name).toBe(existingModel.name);
+      expect(saved.url).toBe(existingModel.url);
       expect(saved.input_token_cost).toBe(300);
       expect(typeof saved.input_token_cost).toBe('number');
       expect(saved.output_token_cost).toBe(1500);
@@ -137,13 +139,13 @@ describe('LlmModelEditDialog', () => {
     it('emits save with numbers converted from strings', async () => {
       const wrapper = createWrapper({ model: newModel, initialEditMode: true });
 
-      // Fields order: name (index 0), display_name (1), input_token_cost (2), ...
+      // Fields order: name (index 0), url (1), display_name (2), input_token_cost (3), ...
       const textFields = wrapper.findAllComponents(EcTextField);
       const nameField = textFields[0];
       await nameField.vm.$emit('update:modelValue', 'gpt-4o');
       await nextTick();
 
-      const inputCostField = textFields[2];
+      const inputCostField = textFields[3];
       await inputCostField.vm.$emit('update:modelValue', '250');
       await nextTick();
 
@@ -186,8 +188,8 @@ describe('LlmModelEditDialog', () => {
       const wrapper = createWrapper({ model: existingModel, initialEditMode: true });
 
       const textFields = wrapper.findAllComponents(EcTextField);
-      // display_name is the second EcTextField (after name)
-      const displayNameField = textFields[1];
+      // display_name is the third EcTextField (after name and url)
+      const displayNameField = textFields[2];
       await displayNameField.vm.$emit('update:modelValue', '');
       await nextTick();
 

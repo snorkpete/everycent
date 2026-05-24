@@ -36,9 +36,25 @@ describe ChatSettingsController do
           'max_tool_iterations' => 5,
           'extras' => {},
         )
-        expect(json['ollama_url']).to be_nil
-        expect(json['ollama_model']).to be_nil
         expect(json['llm_model_id']).to be_nil
+        expect(json['llm_model']).to be_nil
+        expect(json).not_to have_key('ollama_url')
+        expect(json).not_to have_key('ollama_model')
+      end
+
+      it 'embeds the linked llm_model when one is set' do
+        llm_model = create(:llm_model, url: 'https://api.anthropic.com')
+        ChatSetting.update_settings(llm_model_id: llm_model.id)
+
+        get :index
+
+        json = JSON.parse(response.body)
+        expect(json['llm_model']).to include(
+          'id' => llm_model.id,
+          'url' => 'https://api.anthropic.com',
+          'provider' => llm_model.provider,
+          'name' => llm_model.name,
+        )
       end
     end
   end
@@ -58,25 +74,33 @@ describe ChatSettingsController do
       end
 
       it 'returns a successful response' do
-        post :create, params: { chat_enabled: true, ollama_url: 'http://localhost:11434' }
+        post :create, params: { chat_enabled: true }
         expect(response).to be_successful
       end
 
       it 'persists and returns updated chat settings' do
         post :create, params: {
           chat_enabled: true,
-          ollama_url: 'http://192.168.68.59:11434',
-          ollama_model: 'qwen3:14b',
           max_tool_iterations: 10,
         }
 
         json = JSON.parse(response.body)
         expect(json).to include(
           'chat_enabled' => true,
-          'ollama_url' => 'http://192.168.68.59:11434',
-          'ollama_model' => 'qwen3:14b',
           'max_tool_iterations' => 10,
         )
+      end
+
+      it 'ignores ollama_url and ollama_model if submitted' do
+        post :create, params: {
+          chat_enabled: true,
+          ollama_url: 'http://192.168.68.59:11434',
+          ollama_model: 'qwen3:14b',
+        }
+
+        json = JSON.parse(response.body)
+        expect(json).not_to have_key('ollama_url')
+        expect(json).not_to have_key('ollama_model')
       end
 
       it 'parses extras from a JSON string' do

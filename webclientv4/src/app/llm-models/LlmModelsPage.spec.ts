@@ -57,6 +57,7 @@ const activeModel = {
   provider: 'anthropic',
   name: 'claude-sonnet-4-6',
   display_name: 'Claude Sonnet',
+  url: 'https://api.anthropic.com',
   active: true,
 };
 
@@ -65,6 +66,7 @@ const inactiveModel = {
   provider: 'openai',
   name: 'gpt-4o',
   display_name: '',
+  url: 'https://api.openai.com',
   active: false,
 };
 

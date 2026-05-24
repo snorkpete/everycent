@@ -5,11 +5,10 @@ import type { ChatSettingsData } from './chatSettings.types';
 
 const DEFAULT_SETTINGS: ChatSettingsData = {
   chat_enabled: false,
-  ollama_url: null,
-  ollama_model: null,
   llm_model_id: null,
   max_tool_iterations: 5,
   extras: {},
+  llm_model: null,
 };
 
 export const useChatSettingsStore = defineStore('chatSettings', () => {

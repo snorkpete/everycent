@@ -5,6 +5,9 @@
         <span class="model-label" :data-testid="`model-label-${model.id}`">
           {{ modelDisplayLabel(model as LlmModelData) }}
         </span>
+        <span class="model-url" :data-testid="`model-url-${model.id}`">
+          {{ (model as LlmModelData).url }}
+        </span>
         <span
           class="model-status"
           :class="model.active ? 'model-status--active' : 'model-status--inactive'"
@@ -135,6 +138,12 @@ async function deleteModel(model: LlmModelData) {
 .model-label {
   font-size: 0.9rem;
   flex: 1;
+}
+
+.model-url {
+  font-size: 0.75rem;
+  color: var(--p-text-muted-color);
+  margin-right: 0.5rem;
 }
 
 .model-status {

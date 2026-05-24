@@ -51,11 +51,14 @@ function configureChatSettings(llmModelId: number | null = null) {
   const chatSettingsStore = useChatSettingsStore();
   chatSettingsStore.settings = {
     chat_enabled: true,
-    ollama_url: 'http://localhost:11434',
-    ollama_model: 'test-model',
     llm_model_id: llmModelId,
     max_tool_iterations: 5,
     extras: {},
+    llm_model: {
+      id: llmModelId ?? undefined,
+      url: 'http://localhost:11434',
+      name: 'test-model',
+    },
   };
 }
 

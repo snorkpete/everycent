@@ -35,10 +35,16 @@ vi.mock('../notifications/useNotifications', () => ({
 
 const configuredSettings = buildChatSettings({
   chat_enabled: true,
-  ollama_url: 'http://192.168.68.59:11434',
-  ollama_model: 'qwen3:14b',
+  llm_model_id: 2,
   max_tool_iterations: 10,
   extras: { temperature: 0.7 },
+  llm_model: {
+    id: 2,
+    provider: 'ollama',
+    name: 'qwen3:14b',
+    url: 'http://192.168.68.59:11434',
+    active: true,
+  },
 });
 
 const registeredModels = [
@@ -122,20 +128,6 @@ describe('ChatSettingsPage', () => {
       const toggle = wrapper.find('[data-testid="chat-enabled"]');
       expect(toggle.exists()).toBe(false);
       expect(wrapper.text()).toContain('Yes');
-    });
-
-    it('displays the Ollama URL', async () => {
-      const wrapper = createWrapper(pinia);
-      await flushPromises();
-
-      expect(wrapper.text()).toContain('http://192.168.68.59:11434');
-    });
-
-    it('displays the model name', async () => {
-      const wrapper = createWrapper(pinia);
-      await flushPromises();
-
-      expect(wrapper.text()).toContain('qwen3:14b');
     });
 
     it('displays the max tool iterations', async () => {
@@ -277,6 +269,10 @@ describe('ChatSettingsPage', () => {
     });
 
     it('sends llm_model_id as null when no model is selected', async () => {
+      const noModelSettings = buildChatSettings({ chat_enabled: false, llm_model_id: null });
+      vi.mocked(chatSettingsApi.get).mockResolvedValue(noModelSettings);
+      vi.mocked(chatSettingsApi.save).mockResolvedValue(noModelSettings);
+
       const wrapper = createWrapper(pinia);
       await flushPromises();
 
