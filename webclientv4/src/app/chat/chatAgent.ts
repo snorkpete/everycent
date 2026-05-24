@@ -1,4 +1,4 @@
-import type { ChatMessage } from './chat.types';
+import type { ChatMessage, NormalizedUsage, ToolCallDetail, UsageEvent } from './chat.types';
 import { SYSTEM_PROMPT } from './systemPrompt';
 import { TOOL_DEFINITIONS } from './toolDefinitions';
 import { executeTool } from './toolExecutor';
@@ -14,6 +14,7 @@ export type AgentEvent =
   | { type: 'token'; content: string }
   | { type: 'tool_call'; name: string; args: Record<string, unknown> }
   | { type: 'tool_result'; name: string; result: string }
+  | UsageEvent
   | { type: 'done' }
   | { type: 'error'; message: string };
 
@@ -31,10 +32,36 @@ type OllamaMessage =
   | { role: 'assistant'; content: string | null; tool_calls?: OllamaToolCall[] }
   | { role: 'tool'; tool_call_id: string; content: string };
 
+type OllamaUsage = {
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  total_tokens?: number;
+};
+
 type StreamResult =
-  | { kind: 'text'; content: string }
-  | { kind: 'tool_calls'; calls: OllamaToolCall[] }
+  | { kind: 'text'; content: string; usage: NormalizedUsage }
+  | { kind: 'tool_calls'; calls: OllamaToolCall[]; usage: NormalizedUsage }
   | { kind: 'error'; message: string };
+
+function buildUsage(
+  ollamaUsage: OllamaUsage | null,
+  startTime: number,
+  toolCallsDetail: ToolCallDetail[],
+  incomplete: boolean,
+): NormalizedUsage {
+  return {
+    input_tokens: ollamaUsage?.prompt_tokens ?? 0,
+    output_tokens: ollamaUsage?.completion_tokens ?? 0,
+    cache_read_tokens: 0,
+    cache_write_tokens: 0,
+    thinking_tokens: 0,
+    total_tokens: ollamaUsage?.total_tokens ?? 0,
+    request_duration_ms: Date.now() - startTime,
+    tool_call_count: toolCallsDetail.length,
+    tool_calls_detail: toolCallsDetail,
+    incomplete,
+  };
+}
 
 async function* streamOllama(
   ollamaMessages: OllamaMessage[],
@@ -45,7 +72,10 @@ async function* streamOllama(
     messages: ollamaMessages,
     tools: TOOL_DEFINITIONS,
     stream: true,
+    stream_options: { include_usage: true },
   };
+
+  const startTime = Date.now();
 
   let response: Response;
   try {
@@ -70,6 +100,8 @@ async function* streamOllama(
     return { kind: 'error', message: 'Ollama response has no body' };
   }
 
+  let capturedOllamaUsage: OllamaUsage | null = null;
+
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
@@ -88,14 +120,39 @@ async function* streamOllama(
     const lines = buffer.split('\n');
     buffer = lines.pop()!;
 
+    // Use a flag instead of break so that remaining lines in the same read batch
+    // (e.g. the usage chunk arriving alongside the tool_calls finish chunk) are still
+    // scanned for usage data before we discard them.
+    let stopProcessingDeltas = false;
+
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
       const data = trimmed.slice(6);
-      if (data === '[DONE]') break;
+      if (data === '[DONE]') {
+        stopProcessingDeltas = true;
+        continue;
+      }
 
-      const parsed = JSON.parse(data);
+      const parsed = JSON.parse(data) as {
+        choices?: Array<{
+          delta?: { content?: string | null; tool_calls?: unknown[] };
+          finish_reason?: string | null;
+        }>;
+        usage?: OllamaUsage;
+      };
+
+      // Always capture usage data regardless of whether we've stopped processing deltas.
+      // Ollama sends the usage chunk after the finish chunk; they may arrive in the same
+      // TCP read batch if the transport coalesces them.
+      if (parsed.usage && (!parsed.choices || parsed.choices.length === 0)) {
+        capturedOllamaUsage = parsed.usage;
+        continue;
+      }
+
+      if (stopProcessingDeltas) continue;
+
       const choice = parsed.choices?.[0];
       if (!choice) continue;
 
@@ -149,13 +206,14 @@ async function* streamOllama(
       }
 
       if (finishReason === 'tool_calls') {
-        break;
+        stopProcessingDeltas = true;
       }
     }
   }
 
   // If we accumulated tool calls, return them
   const toolCallEntries = Object.values(pendingToolCalls);
+  const incomplete = capturedOllamaUsage === null;
   if (toolCallEntries.length > 0) {
     return {
       kind: 'tool_calls',
@@ -164,10 +222,15 @@ async function* streamOllama(
         type: 'function' as const,
         function: { name: tc.name, arguments: tc.arguments },
       })),
+      usage: buildUsage(capturedOllamaUsage, startTime, [], incomplete),
     };
   }
 
-  return { kind: 'text', content: rawContent };
+  return {
+    kind: 'text',
+    content: rawContent,
+    usage: buildUsage(capturedOllamaUsage, startTime, [], incomplete),
+  };
 }
 
 export async function* streamChat(
@@ -191,6 +254,7 @@ export async function* streamChat(
     }
 
     if (result.kind === 'text') {
+      yield { type: 'usage', usage: result.usage };
       yield { type: 'done' };
       return;
     }
@@ -203,6 +267,8 @@ export async function* streamChat(
     };
     ollamaMessages.push(assistantMessage);
 
+    const toolCallsDetail: ToolCallDetail[] = [];
+
     for (const call of result.calls) {
       let args: Record<string, unknown>;
       try {
@@ -213,12 +279,14 @@ export async function* streamChat(
 
       yield { type: 'tool_call', name: call.function.name, args };
 
+      const toolStart = Date.now();
       let toolResult: string;
       try {
         toolResult = await executeTool(call.function.name, args);
       } catch (e: unknown) {
         toolResult = e instanceof Error ? e.message : 'Tool execution failed';
       }
+      toolCallsDetail.push({ name: call.function.name, duration_ms: Date.now() - toolStart });
 
       yield { type: 'tool_result', name: call.function.name, result: toolResult };
 
@@ -228,6 +296,16 @@ export async function* streamChat(
         content: toolResult,
       });
     }
+
+    // Emit usage for this LLM call (with the tool calls that followed it)
+    yield {
+      type: 'usage',
+      usage: {
+        ...result.usage,
+        tool_call_count: toolCallsDetail.length,
+        tool_calls_detail: toolCallsDetail,
+      },
+    };
   }
 
   yield { type: 'error', message: 'Tool call loop exceeded maximum iterations' };

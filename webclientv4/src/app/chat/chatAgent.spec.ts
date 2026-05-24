@@ -55,6 +55,30 @@ function toolCallChunk(
   });
 }
 
+function usageChunk(promptTokens: number, completionTokens: number, totalTokens: number) {
+  return sseData({
+    choices: [],
+    usage: {
+      prompt_tokens: promptTokens,
+      completion_tokens: completionTokens,
+      total_tokens: totalTokens,
+    },
+  });
+}
+
+// makeStream sends each line as a separate enqueue (one chunk per line).
+// makeCoalescedStream sends ALL lines as a single enqueue, simulating TCP coalescing.
+function makeCoalescedStream(lines: string[]): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  return new ReadableStream({
+    start(controller) {
+      const combined = lines.map((line) => line + '\n').join('');
+      controller.enqueue(encoder.encode(combined));
+      controller.close();
+    },
+  });
+}
+
 function mockFetchOk(lines: string[]) {
   vi.spyOn(globalThis, 'fetch').mockResolvedValue(
     new Response(makeStream([...lines, 'data: [DONE]']), { status: 200 }),
@@ -379,6 +403,156 @@ describe('streamChat', () => {
       const toolMsg = secondCallBody.messages.find((m: { role: string }) => m.role === 'tool');
       expect(toolMsg).toBeDefined();
       expect(toolMsg.content).toBe('{"categories":[]}');
+    });
+  });
+
+  describe('usage events', () => {
+    it('includes stream_options.include_usage in the Ollama request payload', async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(
+          new Response(makeStream([tokenChunk('Hi'), 'data: [DONE]']), { status: 200 }),
+        );
+
+      await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
+      expect(body.stream_options).toEqual({ include_usage: true });
+    });
+
+    it('emits a usage event with token counts from the final chunk on a text response', async () => {
+      mockFetchOk([tokenChunk('Hello'), usageChunk(10, 5, 15)]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const usageEvent = events.find((e) => e.type === 'usage') as
+        | {
+            type: 'usage';
+            usage: { input_tokens: number; output_tokens: number; total_tokens: number };
+          }
+        | undefined;
+      expect(usageEvent).toBeDefined();
+      expect(usageEvent?.usage.input_tokens).toBe(10);
+      expect(usageEvent?.usage.output_tokens).toBe(5);
+      expect(usageEvent?.usage.total_tokens).toBe(15);
+    });
+
+    it('emits usage event before done on a text response', async () => {
+      mockFetchOk([tokenChunk('Hello'), usageChunk(10, 5, 15)]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const usageIndex = events.findIndex((e) => e.type === 'usage');
+      const doneIndex = events.findIndex((e) => e.type === 'done');
+      expect(usageIndex).toBeGreaterThanOrEqual(0);
+      expect(doneIndex).toBeGreaterThan(usageIndex);
+    });
+
+    it('captures request_duration_ms in the usage event', async () => {
+      mockFetchOk([tokenChunk('Hello'), usageChunk(10, 5, 15)]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const usageEvent = events.find((e) => e.type === 'usage') as
+        | { type: 'usage'; usage: { request_duration_ms: number } }
+        | undefined;
+      expect(usageEvent?.usage.request_duration_ms).toBeGreaterThanOrEqual(0);
+    });
+
+    it('emits incomplete: false when usage chunk is present', async () => {
+      mockFetchOk([tokenChunk('Hello'), usageChunk(10, 5, 15)]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const usageEvent = events.find((e) => e.type === 'usage') as
+        | { type: 'usage'; usage: { incomplete: boolean } }
+        | undefined;
+      expect(usageEvent?.usage.incomplete).toBe(false);
+    });
+
+    it('emits incomplete: true when no usage chunk arrives', async () => {
+      // Stream ends without a usage chunk
+      mockFetchOk([tokenChunk('Hello')]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const usageEvent = events.find((e) => e.type === 'usage') as
+        | { type: 'usage'; usage: { incomplete: boolean; input_tokens: number } }
+        | undefined;
+      expect(usageEvent?.usage.incomplete).toBe(true);
+      expect(usageEvent?.usage.input_tokens).toBe(0);
+    });
+
+    it('emits a usage event after a tool-call iteration with tool_call_count and tool_calls_detail', async () => {
+      vi.mocked(toolExecutor.executeTool).mockResolvedValue('{}');
+      vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(
+          new Response(
+            makeStream([
+              toolCallChunk(
+                0,
+                'call-1',
+                'analyze_overspending',
+                '{"period":"2026-03"}',
+                'tool_calls',
+              ),
+              usageChunk(20, 3, 23),
+              'data: [DONE]',
+            ]),
+            { status: 200 },
+          ),
+        )
+        .mockResolvedValueOnce(
+          new Response(makeStream([tokenChunk('Done'), usageChunk(30, 10, 40), 'data: [DONE]']), {
+            status: 200,
+          }),
+        );
+
+      const events = await collectEvents([{ role: 'user', content: 'overspending?' }]);
+
+      const usageEvents = events.filter((e) => e.type === 'usage') as Array<{
+        type: 'usage';
+        usage: {
+          tool_call_count: number;
+          tool_calls_detail: Array<{ name: string; duration_ms: number }>;
+          input_tokens: number;
+        };
+      }>;
+
+      // First usage event: the tool-call LLM call
+      expect(usageEvents[0].usage.tool_call_count).toBe(1);
+      expect(usageEvents[0].usage.tool_calls_detail[0].name).toBe('analyze_overspending');
+      expect(usageEvents[0].usage.tool_calls_detail[0].duration_ms).toBeGreaterThanOrEqual(0);
+      expect(usageEvents[0].usage.input_tokens).toBe(20);
+
+      // Second usage event: the follow-up text LLM call
+      expect(usageEvents[1].usage.tool_call_count).toBe(0);
+      expect(usageEvents[1].usage.input_tokens).toBe(30);
+    });
+
+    it('captures usage when tool-calls chunk and usage chunk are coalesced in one TCP read batch', async () => {
+      vi.mocked(toolExecutor.executeTool).mockResolvedValue('{}');
+      // Both the tool-calls finish chunk and the usage chunk arrive in a single enqueue
+      // (simulating TCP coalescing). Without the stopProcessingDeltas flag fix, the usage
+      // chunk would be skipped and incomplete: true emitted.
+      const coalescedLines = [
+        toolCallChunk(0, 'call-1', 'analyze_overspending', '{"period":"2026-03"}', 'tool_calls'),
+        usageChunk(20, 3, 23),
+        'data: [DONE]',
+      ];
+      vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(new Response(makeCoalescedStream(coalescedLines), { status: 200 }))
+        .mockResolvedValueOnce(
+          new Response(makeStream([tokenChunk('Done'), 'data: [DONE]']), { status: 200 }),
+        );
+
+      const events = await collectEvents([{ role: 'user', content: 'overspending?' }]);
+
+      const firstUsageEvent = events.find((e) => e.type === 'usage') as
+        | { type: 'usage'; usage: { incomplete: boolean; input_tokens: number } }
+        | undefined;
+      expect(firstUsageEvent?.usage.incomplete).toBe(false);
+      expect(firstUsageEvent?.usage.input_tokens).toBe(20);
     });
   });
 
