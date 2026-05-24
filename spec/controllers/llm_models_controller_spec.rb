@@ -86,11 +86,11 @@ RSpec.describe LlmModelsController, type: :controller do
           provider: 'anthropic',
           name: 'claude-haiku-4-5',
           display_name: 'Claude Haiku 4.5',
-          input_token_cost: 1.0000,
-          output_token_cost: 5.0000,
-          cache_read_token_cost: 0.1000,
-          cache_write_token_cost: 1.2500,
-          thinking_token_cost: 5.0000,
+          input_token_cost: 100.0000,
+          output_token_cost: 500.0000,
+          cache_read_token_cost: 10.0000,
+          cache_write_token_cost: 125.0000,
+          thinking_token_cost: 500.0000,
           active: true,
         }
       }
