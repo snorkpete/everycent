@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_24_073432) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_24_095349) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -146,6 +146,40 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_073432) do
     t.datetime "updated_at", null: false
     t.index ["household_id", "provider", "name"], name: "index_llm_models_on_household_id_and_provider_and_name", unique: true
     t.index ["household_id"], name: "index_llm_models_on_household_id"
+  end
+
+  create_table "llm_usage_records", force: :cascade do |t|
+    t.bigint "household_id", null: false
+    t.bigint "llm_model_id", null: false
+    t.string "usage_category", null: false
+    t.uuid "conversation_id", null: false
+    t.uuid "conversation_turn_id", null: false
+    t.integer "input_tokens", default: 0, null: false
+    t.integer "output_tokens", default: 0, null: false
+    t.integer "cache_read_tokens", default: 0, null: false
+    t.integer "cache_write_tokens", default: 0, null: false
+    t.integer "thinking_tokens", default: 0, null: false
+    t.integer "total_tokens", default: 0, null: false
+    t.decimal "input_token_cost_rate", precision: 10, scale: 4, default: "0.0", null: false
+    t.decimal "output_token_cost_rate", precision: 10, scale: 4, default: "0.0", null: false
+    t.decimal "cache_read_token_cost_rate", precision: 10, scale: 4, default: "0.0", null: false
+    t.decimal "cache_write_token_cost_rate", precision: 10, scale: 4, default: "0.0", null: false
+    t.decimal "thinking_token_cost_rate", precision: 10, scale: 4, default: "0.0", null: false
+    t.decimal "total_cost", precision: 12, scale: 4, default: "0.0", null: false
+    t.string "provider", null: false
+    t.string "llm_model_name", null: false
+    t.integer "request_duration_ms", default: 0, null: false
+    t.boolean "incomplete", default: false, null: false
+    t.integer "tool_call_count", default: 0, null: false
+    t.jsonb "tool_calls_detail", default: [], null: false
+    t.jsonb "extras", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id"], name: "index_llm_usage_records_on_conversation_id"
+    t.index ["conversation_turn_id"], name: "index_llm_usage_records_on_conversation_turn_id"
+    t.index ["household_id", "created_at"], name: "index_llm_usage_records_on_household_id_and_created_at"
+    t.index ["household_id"], name: "index_llm_usage_records_on_household_id"
+    t.index ["llm_model_id"], name: "index_llm_usage_records_on_llm_model_id"
   end
 
   create_table "payees", id: :serial, force: :cascade do |t|
@@ -288,6 +322,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_073432) do
   add_foreign_key "incomes", "households", on_update: :cascade
   add_foreign_key "institutions", "households", on_update: :cascade
   add_foreign_key "llm_models", "households", on_update: :cascade
+  add_foreign_key "llm_usage_records", "households", on_update: :cascade
+  add_foreign_key "llm_usage_records", "llm_models"
   add_foreign_key "settings", "households", on_update: :cascade
   add_foreign_key "sink_fund_allocations", "households", on_update: :cascade
   add_foreign_key "special_events", "households"

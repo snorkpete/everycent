@@ -4,6 +4,13 @@ Rails.application.routes.draw do
     get 'overspending_analysis', to: 'overspending_analysis#show'
     get 'overspending_analysis_by_allocation', to: 'overspending_analysis_by_allocation#show'
     get 'categories', to: 'categories#index'
+    post 'llm_usage', to: 'llm_usage#create'
+  end
+
+  resources :llm_usage_records, only: [:index] do
+    collection do
+      get :summary
+    end
   end
 
   resources :transactions, except: [:new, :edit] do
