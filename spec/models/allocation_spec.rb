@@ -100,6 +100,22 @@ RSpec.describe Allocation, :type => :model do
       expect(canonical('Quarterly Bill (Jan, Apr, Jul, Oct)')).to eq('Quarterly Bill')
     end
 
+    it 'strips an ampersand-separated multi-month suffix' do
+      expect(canonical('Bill (Feb & Mar)')).to eq('Bill')
+    end
+
+    it 'strips a month-with-year suffix' do
+      expect(canonical('Bill (Feb 2024)')).to eq('Bill')
+    end
+
+    it 'strips a multi-month suffix with trailing year' do
+      expect(canonical('Bill (Feb, Mar 2024)')).to eq('Bill')
+    end
+
+    it 'leaves a year-only suffix untouched' do
+      expect(canonical('Bill (2024)')).to eq('Bill (2024)')
+    end
+
     it 'is case-insensitive on month codes' do
       expect(canonical('Bill (feb)')).to eq('Bill')
       expect(canonical('Bill (FEB)')).to eq('Bill')
