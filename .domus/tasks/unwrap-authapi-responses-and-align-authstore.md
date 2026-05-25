@@ -1,7 +1,7 @@
 # Task: Unwrap authApi responses and align authStore
 
 **ID:** unwrap-authapi-responses-and-align-authstore
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10

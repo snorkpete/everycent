@@ -1,7 +1,7 @@
 # Task: Route SpecialEventAllocationsEditor API calls through a store
 
 **ID:** route-specialeventallocationseditor-api-calls-through-a-store
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-10
