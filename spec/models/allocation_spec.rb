@@ -76,6 +76,60 @@ RSpec.describe Allocation, :type => :model do
     end
   end
 
+  describe '.canonical_name_sql' do
+    # Runs the regex through Postgres so this validates the actual SQL
+    # behaviour, not just Ruby-side string manipulation.
+    def canonical(raw_name)
+      ActiveRecord::Base.connection.select_value(
+        ActiveRecord::Base.sanitize_sql([
+          "SELECT #{Allocation.canonical_name_sql(':n')}",
+          { n: raw_name }
+        ])
+      )
+    end
+
+    it 'strips a single month suffix' do
+      expect(canonical('Car Insurance (Feb)')).to eq('Car Insurance')
+    end
+
+    it 'strips a two-month + suffix' do
+      expect(canonical('Travel Insurance (Oct+Mar)')).to eq('Travel Insurance')
+    end
+
+    it 'strips a comma-separated multi-month suffix' do
+      expect(canonical('Quarterly Bill (Jan, Apr, Jul, Oct)')).to eq('Quarterly Bill')
+    end
+
+    it 'is case-insensitive on month codes' do
+      expect(canonical('Bill (feb)')).to eq('Bill')
+      expect(canonical('Bill (FEB)')).to eq('Bill')
+    end
+
+    it 'collapses whitespace around the suffix' do
+      expect(canonical('Bill   (Feb)   ')).to eq('Bill')
+    end
+
+    it 'leaves (SF) untouched' do
+      expect(canonical('Clothing - Family (SF)')).to eq('Clothing - Family (SF)')
+    end
+
+    it 'leaves non-month parenthetical markers untouched' do
+      expect(canonical('Some Bill (Foo)')).to eq('Some Bill (Foo)')
+    end
+
+    it 'leaves names without any parens untouched' do
+      expect(canonical('Groceries')).to eq('Groceries')
+    end
+
+    it 'only strips a trailing suffix, not one in the middle' do
+      expect(canonical('Some (Feb) middle bill')).to eq('Some (Feb) middle bill')
+    end
+
+    it 'leaves a partial-match suffix untouched' do
+      expect(canonical('Bill (Feb, Foo)')).to eq('Bill (Feb, Foo)')
+    end
+  end
+
   describe "::update_from_params" do
     before :each do
       @budget = create(:budget)

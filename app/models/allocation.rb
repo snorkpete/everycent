@@ -69,6 +69,20 @@ class Allocation < ApplicationRecord
     allocation
   end
 
+  MONTH_CODES = %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec].freeze
+  MONTH_SUFFIX_PATTERN =
+    "\\s*\\((#{MONTH_CODES.join('|')})" \
+    "(\\s*[+,]\\s*(#{MONTH_CODES.join('|')}))*\\)\\s*$".freeze
+
+  # SQL fragment that strips trailing month-code suffixes — e.g. "(Feb)",
+  # "(Oct+Mar)", "(Jan, Apr, Jul)" — from an allocation name column so
+  # annual-billing variants group together. Other parenthetical markers like
+  # "(SF)" are left untouched. Caller passes the qualified column name;
+  # must not be user input.
+  def self.canonical_name_sql(column)
+    "REGEXP_REPLACE(#{column}, '#{MONTH_SUFFIX_PATTERN}', '', 'i')"
+  end
+
   def self.mass_update(params)
     return false if params[:name].blank?
 

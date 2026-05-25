@@ -24,13 +24,16 @@ module Mcp
     # but groups by allocation name + category name rather than category alone,
     # giving per-line-item breakdowns. Both CTEs filter to spending categories
     # only. An optional category param narrows both CTEs to a single category
-    # by name.
+    # by name. Allocation names are canonicalised — month-suffix variants like
+    # "Car Insurance (Feb)" and "Car Insurance (Jul)" collapse into a single
+    # row.
     def budget_vs_actual_by_allocation(period, category)
       category_filter = category ? "AND ac.name = :category" : ""
+      canonical_allocation = Allocation.canonical_name_sql('a.name')
 
       sql = <<~SQL
         WITH budgeted AS (
-          SELECT a.name AS allocation,
+          SELECT #{canonical_allocation} AS allocation,
                  ac.id AS category_id,
                  ac.name AS category,
                  SUM(a.amount) AS budgeted_cents
@@ -41,10 +44,10 @@ module Mcp
             AND b.household_id = :household_id
             AND ac.budget_role = 'spending'
             #{category_filter}
-          GROUP BY a.name, ac.id, ac.name
+          GROUP BY #{canonical_allocation}, ac.id, ac.name
         ),
         actual AS (
-          SELECT a.name AS allocation,
+          SELECT #{canonical_allocation} AS allocation,
                  ac.id AS category_id,
                  ac.name AS category,
                  SUM(t.withdrawal_amount) AS actual_cents
@@ -59,7 +62,7 @@ module Mcp
             AND (t.brought_forward_status IS NULL
                  OR t.brought_forward_status NOT IN ('added', 'adjustment'))
             #{category_filter}
-          GROUP BY a.name, ac.id, ac.name
+          GROUP BY #{canonical_allocation}, ac.id, ac.name
         )
         SELECT
           COALESCE(b.allocation, a.allocation) AS allocation,
