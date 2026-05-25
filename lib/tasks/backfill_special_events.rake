@@ -92,7 +92,7 @@ namespace :db do
             allocation_ids: [121, 128, 280, 314, 9600661, 9600663],
           },
           {
-            name:           "Kitchen Renovation - 2022",
+            name:           "Kitchen Renovation - 2022 (incomplete)",
             start_date:     Date.new(2022, 6, 1),
             allocation_ids: [3534, 3537, 3549],
           },
