@@ -1,7 +1,8 @@
 # Task: Add canonical_name_sql class method to Allocation for month-suffix stripping
 
 **ID:** add-canonical_name_sql-class-method-to-allocation-for-month-suffix-stripping
-**Status:** raw
+**Status:** done
+**Branch:** chat-prompt-and-overspend-filters
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-05-24
