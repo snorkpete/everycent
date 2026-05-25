@@ -36,35 +36,33 @@ describe('authStore', () => {
     });
 
     it('sets error on failed login', async () => {
-      const axiosError = {
-        isAxiosError: true,
+      const serverError = {
         response: { data: { errors: ['Invalid credentials'] } },
       };
-      vi.mocked(apiGateway.post).mockRejectedValue(axiosError);
+      vi.mocked(apiGateway.post).mockRejectedValue(serverError);
 
       const store = useAuthStore();
 
-      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(axiosError);
+      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(serverError);
 
       expect(store.loggedIn).toBe(false);
       expect(store.error).toBe('Invalid credentials');
     });
 
-    it('falls back to "Login failed" when axios error has no error messages', async () => {
-      const axiosError = {
-        isAxiosError: true,
+    it('falls back to "Login failed" when error has no server error messages', async () => {
+      const serverError = {
         response: { data: {} },
       };
-      vi.mocked(apiGateway.post).mockRejectedValue(axiosError);
+      vi.mocked(apiGateway.post).mockRejectedValue(serverError);
 
       const store = useAuthStore();
 
-      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(axiosError);
+      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(serverError);
 
       expect(store.error).toBe('Login failed');
     });
 
-    it('sets generic error for non-axios failures', async () => {
+    it('sets generic error for failures without a response payload', async () => {
       vi.mocked(apiGateway.post).mockRejectedValue(new Error('Network error'));
 
       const store = useAuthStore();
@@ -90,35 +88,33 @@ describe('authStore', () => {
     });
 
     it('sets error on failed Google sign-in', async () => {
-      const axiosError = {
-        isAxiosError: true,
+      const serverError = {
         response: { data: { errors: ['No account found for this Google identity'] } },
       };
-      vi.mocked(apiGateway.post).mockRejectedValue(axiosError);
+      vi.mocked(apiGateway.post).mockRejectedValue(serverError);
 
       const store = useAuthStore();
 
-      await expect(store.logInWithGoogle('bad-token')).rejects.toEqual(axiosError);
+      await expect(store.logInWithGoogle('bad-token')).rejects.toEqual(serverError);
 
       expect(store.loggedIn).toBe(false);
       expect(store.error).toBe('No account found for this Google identity');
     });
 
-    it('falls back to "Google sign-in failed" when axios error has no error messages', async () => {
-      const axiosError = {
-        isAxiosError: true,
+    it('falls back to "Google sign-in failed" when error has no server error messages', async () => {
+      const serverError = {
         response: { data: {} },
       };
-      vi.mocked(apiGateway.post).mockRejectedValue(axiosError);
+      vi.mocked(apiGateway.post).mockRejectedValue(serverError);
 
       const store = useAuthStore();
 
-      await expect(store.logInWithGoogle('bad-token')).rejects.toEqual(axiosError);
+      await expect(store.logInWithGoogle('bad-token')).rejects.toEqual(serverError);
 
       expect(store.error).toBe('Google sign-in failed');
     });
 
-    it('sets generic error for non-axios failures', async () => {
+    it('sets generic error for failures without a response payload', async () => {
       vi.mocked(apiGateway.post).mockRejectedValue(new Error('Network error'));
 
       const store = useAuthStore();

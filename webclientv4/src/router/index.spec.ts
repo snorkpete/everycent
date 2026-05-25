@@ -35,9 +35,7 @@ vi.mock('../app/allocation-categories/allocationCategoryApi', () => ({
 
 function authenticateUser() {
   localStorage.setItem('access-token', 'valid-token');
-  vi.mocked(authApi.validateToken).mockResolvedValue({
-    data: { success: true },
-  } as Awaited<ReturnType<typeof authApi.validateToken>>);
+  vi.mocked(authApi.validateToken).mockResolvedValue({ success: true });
 }
 
 describe('router', () => {

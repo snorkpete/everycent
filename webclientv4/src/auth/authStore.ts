@@ -1,8 +1,12 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import axios from 'axios';
 import { authApi } from './authApi';
 import { clearTokens, hasToken } from './authTokens';
+
+function extractAuthError(e: unknown, fallback: string): string {
+  const errors = (e as { response?: { data?: { errors?: string[] } } })?.response?.data?.errors;
+  return errors?.[0] ?? fallback;
+}
 
 export const useAuthStore = defineStore('auth', () => {
   const loggedIn = ref(false);
@@ -15,11 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
       loggedIn.value = true;
     } catch (e: unknown) {
       loggedIn.value = false;
-      if (axios.isAxiosError(e)) {
-        error.value = e.response?.data?.errors?.[0] ?? 'Login failed';
-      } else {
-        error.value = 'Login failed';
-      }
+      error.value = extractAuthError(e, 'Login failed');
       throw e;
     }
   }
@@ -31,11 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
       loggedIn.value = true;
     } catch (e: unknown) {
       loggedIn.value = false;
-      if (axios.isAxiosError(e)) {
-        error.value = e.response?.data?.errors?.[0] ?? 'Google sign-in failed';
-      } else {
-        error.value = 'Google sign-in failed';
-      }
+      error.value = extractAuthError(e, 'Google sign-in failed');
       throw e;
     }
   }
@@ -55,7 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const response = await authApi.validateToken();
-      loggedIn.value = response.data.success === true;
+      loggedIn.value = response.success === true;
       return loggedIn.value;
     } catch {
       loggedIn.value = false;

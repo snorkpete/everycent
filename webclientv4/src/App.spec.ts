@@ -14,7 +14,6 @@ vi.mock('vue-router', () => ({
 vi.mock('./auth/authApi', () => ({
   authApi: {
     signIn: vi.fn(),
-    validateToken: vi.fn(),
     signOut: vi.fn(),
   },
 }));
