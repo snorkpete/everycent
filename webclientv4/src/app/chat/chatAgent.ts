@@ -10,7 +10,7 @@ export interface ChatConfig {
 }
 
 export type AgentEvent =
-  | { type: 'thinking' }
+  | { type: 'thinking'; content: string }
   | { type: 'token'; content: string }
   | { type: 'tool_call'; name: string; args: Record<string, unknown> }
   | { type: 'tool_result'; name: string; result: string }
@@ -36,6 +36,7 @@ type OllamaUsage = {
   prompt_tokens?: number;
   completion_tokens?: number;
   total_tokens?: number;
+  thinking_tokens?: number;
 };
 
 type StreamResult =
@@ -54,7 +55,7 @@ function buildUsage(
     output_tokens: ollamaUsage?.completion_tokens ?? 0,
     cache_read_tokens: 0,
     cache_write_tokens: 0,
-    thinking_tokens: 0,
+    thinking_tokens: ollamaUsage?.thinking_tokens ?? 0,
     total_tokens: ollamaUsage?.total_tokens ?? 0,
     request_duration_ms: Date.now() - startTime,
     tool_call_count: toolCallsDetail.length,
@@ -73,6 +74,7 @@ async function* streamOllama(
     tools: TOOL_DEFINITIONS,
     stream: true,
     stream_options: { include_usage: true },
+    think: true,
   };
 
   const startTime = Date.now();
@@ -106,6 +108,7 @@ async function* streamOllama(
   const decoder = new TextDecoder();
   let buffer = '';
   let rawContent = '';
+  let accumulatedThinking = '';
   let insideThink = false;
   let thinkEnded = false;
 
@@ -137,7 +140,7 @@ async function* streamOllama(
 
       const parsed = JSON.parse(data) as {
         choices?: Array<{
-          delta?: { content?: string | null; tool_calls?: unknown[] };
+          delta?: { content?: string | null; thinking?: string | null; tool_calls?: unknown[] };
           finish_reason?: string | null;
         }>;
         usage?: OllamaUsage;
@@ -182,11 +185,21 @@ async function* streamOllama(
         }
       }
 
+      // Accumulate Ollama native thinking field (when think: true is set, reasoning models
+      // emit thinking content here rather than embedding it in the content field).
+      const nativeThinking: string | null | undefined = delta?.thinking;
+      if (nativeThinking) {
+        accumulatedThinking += nativeThinking;
+        yield { type: 'thinking', content: accumulatedThinking };
+      }
+
       // Accumulate text content
       const token: string | null | undefined = delta?.content;
       if (token) {
         rawContent += token;
 
+        // Strip <think>...</think> tags embedded in the content field.
+        // Some Ollama versions/models embed thinking inside content even with think: true.
         if (!thinkEnded && rawContent.includes('<think>')) {
           insideThink = true;
         }
@@ -195,6 +208,17 @@ async function* streamOllama(
           if (rawContent.includes('</think>')) {
             insideThink = false;
             thinkEnded = true;
+
+            // Extract the thinking portion from inside the tags and merge into accumulatedThinking
+            const thinkMatch = rawContent.match(/<think>([\s\S]*?)<\/think>/);
+            if (thinkMatch) {
+              const inlineThinking = thinkMatch[1].trim();
+              if (inlineThinking && !accumulatedThinking) {
+                accumulatedThinking = inlineThinking;
+                yield { type: 'thinking', content: accumulatedThinking };
+              }
+            }
+
             const afterThink = rawContent.split('</think>').pop()!.trim();
             if (afterThink) {
               yield { type: 'token', content: afterThink };
@@ -244,7 +268,7 @@ export async function* streamChat(
       .map(({ role, content }) => ({ role, content }) as OllamaMessage),
   ];
 
-  yield { type: 'thinking' };
+  yield { type: 'thinking', content: '' };
 
   for (let iteration = 0; iteration < config.maxToolIterations; iteration++) {
     const result: StreamResult = yield* streamOllama(ollamaMessages, config);

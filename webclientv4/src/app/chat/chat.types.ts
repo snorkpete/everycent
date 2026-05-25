@@ -1,6 +1,7 @@
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  thinking?: string;
 }
 
 export interface ToolCallDetail {
