@@ -34,7 +34,7 @@ module Mcp
           JOIN budgets b ON a.budget_id = b.id
           WHERE to_char(b.start_date, 'YYYY-MM') = :period
             AND b.household_id = :household_id
-            AND ac.budget_role IN ('spending', 'annual_spending')
+            AND ac.budget_role = 'spending'
           GROUP BY ac.name
         ),
         actual AS (
@@ -47,7 +47,9 @@ module Mcp
             AND t.household_id = :household_id
             AND t.is_manual_adjustment = false
             AND t.withdrawal_amount > 0
-            AND ac.budget_role IN ('spending', 'annual_spending')
+            AND ac.budget_role = 'spending'
+            AND (t.brought_forward_status IS NULL
+                 OR t.brought_forward_status NOT IN ('added', 'adjustment'))
           GROUP BY ac.name
         )
         SELECT
