@@ -12,6 +12,11 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: "See the AI's reasoning in chat",
+    body: 'When you ask Everycent a question, you can now expand a small box above each answer to peek at how the AI worked out its response — handy if you want to double-check why it gave a particular number.',
+    date: '2026-05-25',
+  },
+  {
     title: 'Ask Everycent your budget questions',
     body: "A new 'Chat' section in the menu lets you ask plain-English questions about your budget — like \"where did I overspend in March?\" — and get answers backed by your data. Currently uses a local AI model on Kion's gaming PC; ask before trying it out.",
     date: '2026-05-24',
