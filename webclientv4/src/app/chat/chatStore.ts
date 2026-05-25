@@ -65,7 +65,7 @@ export const useChatStore = defineStore('chat', () => {
     pendingUsageRecords = [];
 
     messages.value.push({ role: 'user', content });
-    messages.value.push({ role: 'assistant', content: '' });
+    messages.value.push({ role: 'assistant', content: '', turnId: currentTurnId.value });
     const target = messages.value[messages.value.length - 1];
 
     loading.value = true;
@@ -75,7 +75,16 @@ export const useChatStore = defineStore('chat', () => {
       for await (const event of streamChat(messages.value, config)) {
         switch (event.type) {
           case 'thinking':
-            thinking.value = true;
+            // thinking.value is the "waiting for first output" spinner.
+            // The initial empty thinking event activates the spinner.
+            // Once content-bearing thinking events arrive, the per-message disclosure
+            // takes over and the spinner is no longer needed.
+            if (!event.content) {
+              thinking.value = true;
+            } else {
+              thinking.value = false;
+              target.thinking = event.content;
+            }
             break;
           case 'token':
             thinking.value = false;

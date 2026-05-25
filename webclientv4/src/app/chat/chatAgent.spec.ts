@@ -55,14 +55,27 @@ function toolCallChunk(
   });
 }
 
-function usageChunk(promptTokens: number, completionTokens: number, totalTokens: number) {
+function usageChunk(
+  promptTokens: number,
+  completionTokens: number,
+  totalTokens: number,
+  thinkingTokens = 0,
+) {
   return sseData({
     choices: [],
     usage: {
       prompt_tokens: promptTokens,
       completion_tokens: completionTokens,
       total_tokens: totalTokens,
+      thinking_tokens: thinkingTokens,
     },
+  });
+}
+
+function thinkingChunk(reasoning: string) {
+  // Ollama's OpenAI-compat endpoint emits thinking under `delta.reasoning`.
+  return sseData({
+    choices: [{ delta: { reasoning }, finish_reason: null }],
   });
 }
 
@@ -130,12 +143,12 @@ describe('streamChat', () => {
   });
 
   describe('text response', () => {
-    it('yields thinking before streaming begins', async () => {
+    it('yields thinking event with empty content before streaming begins', async () => {
       mockFetchOk([tokenChunk('Hello')]);
 
       const events = await collectEvents([{ role: 'user', content: 'hello' }]);
 
-      expect(events[0]).toEqual({ type: 'thinking' });
+      expect(events[0]).toEqual({ type: 'thinking', content: '' });
     });
 
     it('yields token events for plain text content', async () => {
@@ -553,6 +566,94 @@ describe('streamChat', () => {
         | undefined;
       expect(firstUsageEvent?.usage.incomplete).toBe(false);
       expect(firstUsageEvent?.usage.input_tokens).toBe(20);
+    });
+  });
+
+  describe('think: true in request payload', () => {
+    it('includes think: true in the Ollama request payload', async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(
+          new Response(makeStream([tokenChunk('Hi'), 'data: [DONE]']), { status: 200 }),
+        );
+
+      await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
+      expect(body.think).toBe(true);
+    });
+  });
+
+  describe('thinking token streaming', () => {
+    it('yields thinking events with accumulating content from the native thinking field', async () => {
+      // Each thinkingChunk carries an incremental delta — the agent accumulates them.
+      mockFetchOk([
+        thinkingChunk('Step one.'),
+        thinkingChunk(' Step two.'),
+        tokenChunk('The answer is 42'),
+      ]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const thinkingEvents = events.filter((e) => e.type === 'thinking') as Array<{
+        type: 'thinking';
+        content: string;
+      }>;
+      // First is the initial empty thinking event from streamChat
+      expect(thinkingEvents[0].content).toBe('');
+      // Subsequent events carry accumulating content from the delta.thinking field
+      expect(thinkingEvents.some((e) => e.content === 'Step one.')).toBe(true);
+      expect(thinkingEvents.some((e) => e.content === 'Step one. Step two.')).toBe(true);
+    });
+
+    it('yields no extra thinking events for non-reasoning models (no thinking field in deltas)', async () => {
+      mockFetchOk([tokenChunk('Plain answer')]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const thinkingEvents = events.filter((e) => e.type === 'thinking') as Array<{
+        type: 'thinking';
+        content: string;
+      }>;
+      // Only the initial empty event — no content-bearing thinking events
+      expect(thinkingEvents).toHaveLength(1);
+      expect(thinkingEvents[0].content).toBe('');
+    });
+
+    it('yields token events after thinking concludes', async () => {
+      mockFetchOk([thinkingChunk('Reasoning...'), tokenChunk('Final answer')]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const tokenEvents = events.filter((e) => e.type === 'token') as Array<{
+        type: 'token';
+        content: string;
+      }>;
+      expect(tokenEvents.some((e) => e.content.includes('Final answer'))).toBe(true);
+    });
+  });
+
+  describe('thinking_tokens in usage', () => {
+    it('populates thinking_tokens in usage event from Ollama usage chunk', async () => {
+      mockFetchOk([tokenChunk('Hello'), usageChunk(10, 5, 15, 42)]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const usageEvent = events.find((e) => e.type === 'usage') as
+        | { type: 'usage'; usage: { thinking_tokens: number } }
+        | undefined;
+      expect(usageEvent?.usage.thinking_tokens).toBe(42);
+    });
+
+    it('defaults thinking_tokens to 0 when not provided by Ollama', async () => {
+      mockFetchOk([tokenChunk('Hello'), usageChunk(10, 5, 15)]);
+
+      const events = await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const usageEvent = events.find((e) => e.type === 'usage') as
+        | { type: 'usage'; usage: { thinking_tokens: number } }
+        | undefined;
+      expect(usageEvent?.usage.thinking_tokens).toBe(0);
     });
   });
 

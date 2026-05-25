@@ -78,7 +78,8 @@ describe('chatStore', () => {
       await store.sendMessage('hello');
 
       expect(store.messages[0]).toEqual({ role: 'user', content: 'hello' });
-      expect(store.messages[1]).toEqual({ role: 'assistant', content: '' });
+      expect(store.messages[1]).toMatchObject({ role: 'assistant', content: '' });
+      expect(store.messages[1].turnId).toBeTypeOf('string');
     });
 
     it('sets loading to true during the stream and false after', async () => {
@@ -101,7 +102,7 @@ describe('chatStore', () => {
       let thinkingDuringStream = false;
       vi.mocked(chatAgent.streamChat).mockReturnValue(
         (async function* () {
-          yield { type: 'thinking' } as AgentEvent;
+          yield { type: 'thinking', content: '' } as AgentEvent;
           thinkingDuringStream = useChatStore().thinking;
           yield { type: 'done' } as AgentEvent;
         })(),
@@ -127,13 +128,68 @@ describe('chatStore', () => {
 
     it('sets thinking to false on token event', async () => {
       vi.mocked(chatAgent.streamChat).mockReturnValue(
-        makeStream([{ type: 'thinking' }, { type: 'token', content: 'Hi' }, { type: 'done' }]),
+        makeStream([
+          { type: 'thinking', content: '' },
+          { type: 'token', content: 'Hi' },
+          { type: 'done' },
+        ]),
       );
 
       const store = useChatStore();
       await store.sendMessage('hello');
 
       expect(store.thinking).toBe(false);
+    });
+
+    it('accumulates thinking content onto the assistant message', async () => {
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'thinking', content: 'Reasoning...' },
+          { type: 'thinking', content: 'Reasoning... more.' },
+          { type: 'token', content: 'Answer' },
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      expect(store.messages[1].thinking).toBe('Reasoning... more.');
+    });
+
+    it('leaves thinking undefined on the assistant message when no thinking events with content arrive', async () => {
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'thinking', content: '' },
+          { type: 'token', content: 'Hi' },
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      expect(store.messages[1].thinking).toBeUndefined();
+    });
+
+    it('does not set thinking spinner true on content-bearing thinking events', async () => {
+      // Content-bearing thinking events mean thinking is actively streaming in the
+      // per-message disclosure — the global spinner should not appear.
+      let thinkingDuringContentThinking = true; // assume true, should stay false
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        (async function* () {
+          yield { type: 'thinking', content: '' } as AgentEvent;
+          yield { type: 'thinking', content: 'Reasoning...' } as AgentEvent;
+          thinkingDuringContentThinking = useChatStore().thinking;
+          yield { type: 'token', content: 'Answer' } as AgentEvent;
+          yield { type: 'done' } as AgentEvent;
+        })(),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      expect(thinkingDuringContentThinking).toBe(false);
     });
 
     it('sets toolStatus when a tool_call event arrives', async () => {

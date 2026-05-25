@@ -27,13 +27,25 @@
     <div ref="messagesContainer" class="chat-messages">
       <p v-if="messages.length === 0" class="empty-state">Ask a question about your finances.</p>
 
-      <div
-        v-for="(msg, i) in renderedMessages"
-        :key="i"
-        class="chat-bubble markdown-body"
-        :class="msg.role"
-        v-html="msg.html"
-      />
+      <div v-for="(msg, i) in renderedMessages" :key="i" class="message-wrapper" :class="msg.role">
+        <div
+          v-if="msg.role === 'assistant' && msg.thinking && msg.turnId"
+          class="thinking-disclosure"
+          :class="{ expanded: isThinkingExpanded(msg.turnId, msg) }"
+        >
+          <button class="thinking-toggle" @click="toggleThinking(msg.turnId)">
+            <span class="thinking-label">Thinking</span>
+            <i
+              class="thinking-chevron pi"
+              :class="isThinkingExpanded(msg.turnId, msg) ? 'pi-chevron-up' : 'pi-chevron-down'"
+            />
+          </button>
+          <div v-show="isThinkingExpanded(msg.turnId, msg)" class="thinking-content">
+            {{ msg.thinking }}
+          </div>
+        </div>
+        <div class="chat-bubble markdown-body" :class="msg.role" v-html="msg.html" />
+      </div>
 
       <div v-if="thinking" class="chat-bubble assistant loading-indicator">Thinking...</div>
       <div v-if="toolStatus" class="chat-bubble assistant loading-indicator">{{ toolStatus }}</div>
@@ -87,6 +99,36 @@ const renderedMessages = computed(() =>
   })),
 );
 
+// Keyed by message turnId so entries stay tied to the right message
+// even if the messages array is mutated (e.g. error path pop()).
+// true = user forced open, false = user forced closed. Absent = auto.
+const manualExpand = ref<Map<string, boolean>>(new Map());
+
+function isThinkingExpanded(turnId: string, msg: { thinking?: string; content: string }): boolean {
+  const manual = manualExpand.value.get(turnId);
+  if (manual !== undefined) return manual;
+  // Auto-expand while streaming thinking (no content yet); auto-collapse once content arrives.
+  return !!msg.thinking && msg.content === '';
+}
+
+function toggleThinking(turnId: string) {
+  const msg = props.messages.find((m) => m.turnId === turnId);
+  if (msg === undefined) return;
+  const current = manualExpand.value.get(turnId);
+  const currentExpanded = current !== undefined ? current : !!msg.thinking && msg.content === '';
+  manualExpand.value = new Map(manualExpand.value).set(turnId, !currentExpanded);
+}
+
+watch(
+  () => props.messages.length,
+  (newLen, oldLen) => {
+    if (newLen < oldLen) {
+      manualExpand.value = new Map();
+    }
+    scrollToBottom();
+  },
+);
+
 const inputText = ref('');
 const inputRef = ref<{ $el: HTMLInputElement } | null>(null);
 const messagesContainer = ref<HTMLElement | null>(null);
@@ -117,8 +159,8 @@ function scrollToBottom() {
   });
 }
 
-watch(() => props.messages.length, scrollToBottom);
 watch(() => props.messages[props.messages.length - 1]?.content.length, scrollToBottom);
+watch(() => props.messages[props.messages.length - 1]?.thinking?.length, scrollToBottom);
 </script>
 
 <style scoped>
@@ -147,6 +189,67 @@ watch(() => props.messages[props.messages.length - 1]?.content.length, scrollToB
   color: var(--p-text-muted-color);
   text-align: center;
   margin-top: 2rem;
+}
+
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.message-wrapper.user {
+  align-items: flex-end;
+}
+
+.message-wrapper.assistant {
+  align-items: flex-start;
+}
+
+.thinking-disclosure {
+  max-width: 85%;
+  width: 100%;
+  border: 1px solid var(--p-surface-300);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  font-size: 0.8rem;
+}
+
+.thinking-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.3rem 0.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+  text-align: left;
+}
+
+.thinking-toggle:hover {
+  background-color: var(--p-surface-100);
+}
+
+.thinking-label {
+  font-style: italic;
+}
+
+.thinking-chevron {
+  font-size: 0.65rem;
+}
+
+.thinking-content {
+  padding: 0.4rem 0.6rem;
+  color: var(--p-text-muted-color);
+  font-style: italic;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border-top: 1px solid var(--p-surface-300);
+  max-height: 8rem;
+  overflow-y: auto;
 }
 
 .chat-bubble {
