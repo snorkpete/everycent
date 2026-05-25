@@ -78,7 +78,8 @@ describe('chatStore', () => {
       await store.sendMessage('hello');
 
       expect(store.messages[0]).toEqual({ role: 'user', content: 'hello' });
-      expect(store.messages[1]).toEqual({ role: 'assistant', content: '' });
+      expect(store.messages[1]).toMatchObject({ role: 'assistant', content: '' });
+      expect(store.messages[1].turnId).toBeTypeOf('string');
     });
 
     it('sets loading to true during the stream and false after', async () => {

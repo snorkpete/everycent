@@ -140,7 +140,7 @@ async function* streamOllama(
 
       const parsed = JSON.parse(data) as {
         choices?: Array<{
-          delta?: { content?: string | null; thinking?: string | null; tool_calls?: unknown[] };
+          delta?: { content?: string | null; reasoning?: string | null; tool_calls?: unknown[] };
           finish_reason?: string | null;
         }>;
         usage?: OllamaUsage;
@@ -185,9 +185,9 @@ async function* streamOllama(
         }
       }
 
-      // Accumulate Ollama native thinking field (when think: true is set, reasoning models
-      // emit thinking content here rather than embedding it in the content field).
-      const nativeThinking: string | null | undefined = delta?.thinking;
+      // Ollama's OpenAI-compat endpoint emits native thinking under `delta.reasoning`
+      // (NOT `delta.thinking`) when think:true is set on a reasoning-capable model.
+      const nativeThinking: string | null | undefined = delta?.reasoning;
       if (nativeThinking) {
         accumulatedThinking += nativeThinking;
         yield { type: 'thinking', content: accumulatedThinking };

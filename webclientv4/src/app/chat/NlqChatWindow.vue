@@ -29,15 +29,20 @@
 
       <div v-for="(msg, i) in renderedMessages" :key="i" class="message-wrapper" :class="msg.role">
         <div
-          v-if="msg.role === 'assistant' && msg.thinking"
+          v-if="msg.role === 'assistant' && msg.thinking && msg.turnId"
           class="thinking-disclosure"
-          :class="{ expanded: isThinkingExpanded(i, msg) }"
+          :class="{ expanded: isThinkingExpanded(msg.turnId, msg) }"
         >
-          <button class="thinking-toggle" @click="toggleThinking(i)">
+          <button class="thinking-toggle" @click="toggleThinking(msg.turnId)">
             <span class="thinking-label">Thinking</span>
-            <span class="thinking-chevron">{{ isThinkingExpanded(i, msg) ? '▲' : '▼' }}</span>
+            <i
+              class="thinking-chevron pi"
+              :class="isThinkingExpanded(msg.turnId, msg) ? 'pi-chevron-up' : 'pi-chevron-down'"
+            />
           </button>
-          <div v-show="isThinkingExpanded(i, msg)" class="thinking-content">{{ msg.thinking }}</div>
+          <div v-show="isThinkingExpanded(msg.turnId, msg)" class="thinking-content">
+            {{ msg.thinking }}
+          </div>
         </div>
         <div class="chat-bubble markdown-body" :class="msg.role" v-html="msg.html" />
       </div>
@@ -94,30 +99,26 @@ const renderedMessages = computed(() =>
   })),
 );
 
-// Track which message indices the user has manually toggled.
-// true = user forced open, false = user forced closed.
-// If not in this map, auto-expand logic applies.
-const manualExpand = ref<Map<number, boolean>>(new Map());
+// Keyed by message turnId so entries stay tied to the right message
+// even if the messages array is mutated (e.g. error path pop()).
+// true = user forced open, false = user forced closed. Absent = auto.
+const manualExpand = ref<Map<string, boolean>>(new Map());
 
-function isThinkingExpanded(index: number, msg: { thinking?: string; content: string }): boolean {
-  if (manualExpand.value.has(index)) {
-    return manualExpand.value.get(index)!;
-  }
-  // Auto-expand while streaming thinking (no content yet)
-  // Auto-collapse once content starts arriving
+function isThinkingExpanded(turnId: string, msg: { thinking?: string; content: string }): boolean {
+  const manual = manualExpand.value.get(turnId);
+  if (manual !== undefined) return manual;
+  // Auto-expand while streaming thinking (no content yet); auto-collapse once content arrives.
   return !!msg.thinking && msg.content === '';
 }
 
-function toggleThinking(index: number) {
-  const current = manualExpand.value.get(index);
-  // If no manual state, derive the current auto state from the message, then flip
-  const msg = renderedMessages.value[index];
+function toggleThinking(turnId: string) {
+  const msg = props.messages.find((m) => m.turnId === turnId);
   if (msg === undefined) return;
+  const current = manualExpand.value.get(turnId);
   const currentExpanded = current !== undefined ? current : !!msg.thinking && msg.content === '';
-  manualExpand.value = new Map(manualExpand.value).set(index, !currentExpanded);
+  manualExpand.value = new Map(manualExpand.value).set(turnId, !currentExpanded);
 }
 
-// Clear manual expand state when messages are cleared (new chat)
 watch(
   () => props.messages.length,
   (newLen, oldLen) => {

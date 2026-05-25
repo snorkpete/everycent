@@ -65,7 +65,7 @@ export const useChatStore = defineStore('chat', () => {
     pendingUsageRecords = [];
 
     messages.value.push({ role: 'user', content });
-    messages.value.push({ role: 'assistant', content: '' });
+    messages.value.push({ role: 'assistant', content: '', turnId: currentTurnId.value });
     const target = messages.value[messages.value.length - 1];
 
     loading.value = true;

@@ -72,9 +72,10 @@ function usageChunk(
   });
 }
 
-function thinkingChunk(thinking: string) {
+function thinkingChunk(reasoning: string) {
+  // Ollama's OpenAI-compat endpoint emits thinking under `delta.reasoning`.
   return sseData({
-    choices: [{ delta: { thinking }, finish_reason: null }],
+    choices: [{ delta: { reasoning }, finish_reason: null }],
   });
 }
 
