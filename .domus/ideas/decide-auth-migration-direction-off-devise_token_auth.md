@@ -1,6 +1,17 @@
 # Idea: Decide auth migration direction off devise_token_auth
 
+**Status:** scoped
 **Date:** 2026-06-05
+
+---
+
+## DECISION (2026-06-06): Go Google-only
+
+Chosen **Option 2 — go Google-only.** Drop `devise` and `devise_token_auth`; replace with an owned opaque bearer-token scheme (not JWT). **Sequencing: auth-first** — Ruby 3.4 bump → auth migration → Rails upgrade. Rationale: since devise is being deleted anyway, the git-ref bridge + devise-5 migration (Option B / Rails-first) is throwaway work; deleting the blocker first makes the Rails upgrade clean. The security-sensitive auth change lands on the stable, currently-running Rails 7.1 (one thing changing at a time), and owned token auth is framework-agnostic so it carries through the upgrade.
+
+Scoped into task **`migrate-to-google-only-auth-with-owned-opaque-tokens`** (full build/removal/frontend detail lives there).
+
+Open question carried into that task: whether a non-Google break-glass fallback (locked out of Google / admin recovery) is needed before deleting all password machinery.
 
 ---
 
