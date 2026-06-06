@@ -1,7 +1,7 @@
 # Task: Add placeholder filtering + model-level tests to overspending NLQ tools, update tool-inventory note
 
 **ID:** add-placeholder-filtering-model-level-tests-to-overspending-nlq-tools-update-tool-inventory-note
-**Status:** in-progress
+**Status:** done
 **Branch:** mcp-nlq-query-object-refactor
 **Autonomous:** false
 **Priority:** normal
@@ -40,7 +40,7 @@ Depends on last session's `chat-prompt-and-overspend-filters` work (budget_role=
 - [x] Both overspending tool descriptions rewritten to document sort order, `amount_remaining_cents < 0` filter, and exclusions
 - [x] Model-level specs for the placeholder threshold (PG boundaries: 10 excluded, 11 kept, 0 excluded, NULL excluded)
 - [x] Controller request specs covering budget_role scope, brought-forward exclusion, placeholder exclusion, canonical-name collapse
-- [ ] second-brain NLQ tool-inventory note updated (Build Approach section + schema-reference sweep) — done at session-recap, tracked here
+- [x] second-brain NLQ tool-inventory note updated (Build Approach section + schema-reference sweep) — content queued in second-brain inbox (`everycent-nlq-tool-inventory-build-approach-update.md`) at session-recap 2026-06-06; vault processing merges it into the note
 
 ---
 
