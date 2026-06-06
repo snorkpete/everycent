@@ -19,6 +19,10 @@
 class Allocation < ApplicationRecord
   ALLOCATION_CLASSES = %w[need want savings bookkeeping].freeze
 
+  # Allocations budgeted at or below this threshold are 0.01-style placeholders —
+  # the expense exists but is funded from sink funds, not this month's income.
+  PLACEHOLDER_MAX_CENTS = 10
+
   include CumulativeAllocation
 
   # force this model to always require scoping to a household
@@ -82,6 +86,13 @@ class Allocation < ApplicationRecord
   # passes the qualified column name; must not be user input.
   def self.canonical_name_sql(column)
     "REGEXP_REPLACE(#{column}, '#{MONTH_SUFFIX_PATTERN}', '', 'i')"
+  end
+
+  # Allocations budgeted at or below PLACEHOLDER_MAX_CENTS are 0.01-style
+  # placeholders — the expense exists but is funded from sink funds, not
+  # this month's income. Spending against them is by design, not overspend.
+  def self.non_placeholder_amount_sql(column)
+    "#{column} > #{PLACEHOLDER_MAX_CENTS}"
   end
 
   def self.mass_update(params)

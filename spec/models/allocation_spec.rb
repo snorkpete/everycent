@@ -146,6 +146,38 @@ RSpec.describe Allocation, :type => :model do
     end
   end
 
+  describe '.non_placeholder_amount_sql' do
+    # Runs the fragment through Postgres so this validates the actual SQL
+    # behaviour, not just Ruby-side string manipulation.
+    def non_placeholder?(amount_sql_literal)
+      result = ActiveRecord::Base.connection.select_value(
+        "SELECT #{Allocation.non_placeholder_amount_sql(amount_sql_literal)}"
+      )
+      # Postgres returns 't'/'f'; NULL returns nil
+      case result
+      when 't', true  then true
+      when 'f', false then false
+      else nil
+      end
+    end
+
+    it 'excludes an amount at the boundary (10 cents)' do
+      expect(non_placeholder?('10')).to be false
+    end
+
+    it 'keeps an amount just above the boundary (11 cents)' do
+      expect(non_placeholder?('11')).to be true
+    end
+
+    it 'excludes zero' do
+      expect(non_placeholder?('0')).to be false
+    end
+
+    it 'returns nil for NULL' do
+      expect(non_placeholder?('NULL::integer')).to be_nil
+    end
+  end
+
   describe "::update_from_params" do
     before :each do
       @budget = create(:budget)

@@ -19,8 +19,9 @@ module Mcp
     def results
       raise "Call valid? before results" unless valid?
 
-      category_filter    = category ? "AND ac.name = :category" : ""
+      category_filter      = category ? "AND ac.name = :category" : ""
       canonical_allocation = Allocation.canonical_name_sql('a.name')
+      non_placeholder      = Allocation.non_placeholder_amount_sql('a.amount')
 
       sql = <<~SQL
         WITH budgeted AS (
@@ -34,6 +35,7 @@ module Mcp
           WHERE to_char(b.start_date, 'YYYY-MM') = :period
             AND b.household_id = :household_id
             AND ac.budget_role = 'spending'
+            AND #{non_placeholder}
             #{category_filter}
           GROUP BY #{canonical_allocation}, ac.id, ac.name
         ),
@@ -52,6 +54,7 @@ module Mcp
             AND ac.budget_role = 'spending'
             AND (t.brought_forward_status IS NULL
                  OR t.brought_forward_status NOT IN ('added', 'adjustment'))
+            AND #{non_placeholder}
             #{category_filter}
           GROUP BY #{canonical_allocation}, ac.id, ac.name
         )

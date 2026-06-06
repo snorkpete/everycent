@@ -17,6 +17,8 @@ module Mcp
     def results
       raise "Call valid? before results" unless valid?
 
+      non_placeholder = Allocation.non_placeholder_amount_sql('a.amount')
+
       sql = <<~SQL
         WITH budgeted AS (
           SELECT ac.name AS category,
@@ -27,6 +29,7 @@ module Mcp
           WHERE to_char(b.start_date, 'YYYY-MM') = :period
             AND b.household_id = :household_id
             AND ac.budget_role = 'spending'
+            AND #{non_placeholder}
           GROUP BY ac.name
         ),
         actual AS (
@@ -42,6 +45,7 @@ module Mcp
             AND ac.budget_role = 'spending'
             AND (t.brought_forward_status IS NULL
                  OR t.brought_forward_status NOT IN ('added', 'adjustment'))
+            AND #{non_placeholder}
           GROUP BY ac.name
         )
         SELECT

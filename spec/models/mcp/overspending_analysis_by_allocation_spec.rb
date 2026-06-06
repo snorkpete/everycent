@@ -89,6 +89,27 @@ RSpec.describe Mcp::OverspendingAnalysisByAllocation, type: :model do
       expect(category_names).to include('Transport', 'Food')
     end
 
+    it 'excludes placeholder allocations (amount <= 10 cents) even with real spending against them' do
+      placeholder_allocation = create(
+        :allocation,
+        name:                'Sink Fund Item (Feb)',
+        budget:              @budget,
+        allocation_category: @category,
+        amount:              1
+      )
+      create(
+        :transaction,
+        allocation:        placeholder_allocation,
+        transaction_date:  '2024-02-15',
+        withdrawal_amount: 5_000,
+        deposit_amount:    0
+      )
+
+      rows = build_query(period: period).results
+      allocation_names = rows.map { |r| r[:allocation] }
+      expect(allocation_names).not_to include('Sink Fund Item')
+    end
+
     it 'raises when called on an invalid object' do
       expect { build_query(period: 'bad').results }.to raise_error(RuntimeError, /Call valid\?/)
     end
