@@ -95,10 +95,6 @@ module Mcp
             bm.budgeted_cents,
             COALESCE(am.actual_cents, 0) AS actual_cents,
             ROUND(
-              (COALESCE(am.actual_cents, 0) - bm.budgeted_cents)::numeric / bm.budgeted_cents * 100,
-              1
-            ) AS signed_pct,
-            ROUND(
               ABS((COALESCE(am.actual_cents, 0) - bm.budgeted_cents)::numeric / bm.budgeted_cents * 100),
               1
             ) AS abs_pct

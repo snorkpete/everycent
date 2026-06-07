@@ -234,6 +234,35 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
       end
     end
 
+    context 'pct_months_within_10 — boundary: exactly 10% off' do
+      before do
+        # Exactly 10% over — the SQL uses <= 10 so this must count as "within 10%"
+        setup_month(month: '2024-01', budgeted: 100_000, actual: 110_000)
+      end
+
+      it 'counts a month with exactly 10% deviation as within_10 (boundary is inclusive)' do
+        row = build_query.results.first
+        expect(row[:pct_months_within_10]).to be_within(0.1).of(100.0)
+      end
+    end
+
+    context 'direction when actual equals budgeted (exact match)' do
+      before do
+        # No deviation: actual == budgeted — locks the direction contract
+        setup_month(month: '2024-01', budgeted: 50_000, actual: 50_000)
+      end
+
+      it 'returns direction "over" when net deviation is zero (>= 0 condition)' do
+        row = build_query.results.first
+        expect(row[:direction]).to eq('over')
+      end
+
+      it 'returns net_deviation_cents of 0' do
+        row = build_query.results.first
+        expect(row[:net_deviation_cents]).to eq(0)
+      end
+    end
+
     # ─── €10 noise floor ─────────────────────────────────────────────────────
 
     context '€10 noise floor' do
@@ -277,6 +306,17 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
         rows = build_query(variable_only: false).results
         labels = rows.map { |r| r[:group_label] }
         expect(labels).to include('Groceries', 'Fixed Bill')
+      end
+
+      it 'excludes the fixed allocation actual spend from total_actual_cents (actual_months CTE filtered)' do
+        # When variable_only: true, only Groceries (70_000 actual) must be counted;
+        # Fixed Bill's 60_000 actual must not appear even as an addend.
+        rows = build_query(variable_only: true).results
+        groceries_row = rows.find { |r| r[:group_label] == 'Groceries' }
+        expect(groceries_row[:total_actual_cents]).to eq(70_000)
+        # Confirm combined total does NOT include Fixed Bill's 60_000
+        total = rows.sum { |r| r[:total_actual_cents] }
+        expect(total).to eq(70_000)
       end
     end
 
