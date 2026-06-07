@@ -67,14 +67,11 @@ rails runner "puts Transaction.maximum(:transaction_date)"
 
 Report the date back to the user as a data freshness signal. A recent date confirms the pull captured up-to-date production data.
 
-## Step 6 — Update the spending-analysis skill
-
-Edit `.claude/skills/spending-analysis/SKILL.md` and update the DB name on line 8 (the `DB:` line) to match the new DB name.
-
 ## Done
 
 Summarise:
 - New DB name
 - Migration status (all up / N down)
 - Last transaction date
-- Reminder that `spending-analysis` skill has been updated
+
+The `spending-analysis` skill reads the dev DB name from `config/database.yml` automatically, so no skill edit is needed after a pull.
