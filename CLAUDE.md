@@ -61,6 +61,7 @@ Invoke the **housekeeper skill** for any merge, land, or close-out operation. Do
 - **Default to a separate worktree** for non-trivial work. The main worktree is the user's active workspace (dev server, open files). Only operate on the main worktree when explicitly told to.
 - **Default: branch new worktrees from master**, not from current work. Specify otherwise if the new branch explicitly depends on in-progress work.
 - **Ask before switching the main worktree's branch** (checkout, merge, rebase) outside of merging. The user runs the dev server there — switching branches disrupts their running session.
+- **The `healthcheck` branch/worktree (`/Users/kion/code/everycent-healthcheck`) is the standing home for behaviour-preserving internal-improvement work** — work that improves the system's internals without changing how it behaves for users. This covers regular code audits and the fixes they surface, system/dependency updates with no logic change, and behaviour-preserving internal swaps (e.g. Ruby/Rails upgrades, or swapping the auth implementation while auth behaves identically for users). Put this category of work here rather than spinning a fresh worktree; reserve new worktrees for behaviour-changing feature work.
 
 ## Worker Dispatch
 When dispatching workers, read `~/.claude/docs/worker-dispatch-protocol.md` first.
