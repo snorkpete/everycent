@@ -1,7 +1,7 @@
 # Task: Format money in MCP tool responses instead of returning raw cents
 
 **ID:** format-money-in-mcp-tool-responses-instead-of-returning-raw-cents
-**Status:** ready
+**Status:** done
 **Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-06-07
