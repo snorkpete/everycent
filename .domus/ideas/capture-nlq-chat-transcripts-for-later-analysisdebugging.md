@@ -7,30 +7,41 @@
 
 ## The Idea
 
-The EveryCent NLQ chat currently persists NOTHING — conversations render live in the session and are lost. This idea explores persisting chat transcripts so the agent's behaviour can be debugged after the fact, the way Kion manually copy-pasted his claude.ai history to see where the model drifted on a query.
+The EveryCent NLQ chat currently persists NOTHING about the conversation itself — turns render live in the session and are lost. This idea is to persist a record of how the model *reasoned*, so its behaviour can be reviewed retrospectively and used to tune the system prompt and/or tool definitions.
 
-Three separable pieces (nothing decided — still spitballing):
+The origin: Kion noticed, while actively chatting, that the model took wrong turns that would make sense to correct — but that kind of analysis only works in the moment. There's no way to go back and inspect a past conversation's reasoning, because nothing is saved. Capturing it makes the analysis retrospective instead of opportunistic.
 
-1. **Transcript persistence** — store NLQ conversations (turns, tool calls, tool results, token counts, thinking tokens) in the DB. Foundational; built from scratch since nothing is saved today.
-2. **Auto-attach transcript to a chat-originated bug report** — when the bug-reporting tool fires mid-conversation, snapshot the current thread onto the bug report. Clean integration seam with the bug-reporting task (`add-bug-reporting-to-the-nlq-chat`). The transcript is the agent-debugging analog of attaching a bad transaction file.
-3. **Analysis tooling over transcripts** — querying/reviewing past conversations to find drift/failure patterns. Fuzziest and least urgent; do not design yet.
+**This is purely a model-tuning concern — it is NOT bug-reporting evidence.** (An earlier draft framed an "auto-attach transcript to a bug report" seam; that conflated two separate things and has been removed. See `add-bug-reporting-to-the-nlq-chat` — related only in that both touch the chat, not in purpose.)
+
+### What to capture (Kion's spec)
+
+Keyed by the existing `conversation_id` (already generated when a new chat starts):
+
+- **User prompts** — the raw input.
+- **Thinking output** — *the most valuable signal.* This is where wrong turns show up.
+- **Tool calls** — name + **params especially** (NOT results — see below).
+- **Final output** — less important than thinking, but still valuable.
+
+**Deliberately NOT captured: tool results.** For tuning *how the model decides*, what matters is the reasoning and the call it chose with what params; the result is a deterministic backend echo and isn't what you tune. (Narrow caveat: results would only help in the cents-as-dollars class of bug — the model misreading a *correct* result. Could be added later if that shows up; storage is trivial.)
+
+**Distinct from existing tool-call logging.** There's already some tool-call logging for expense/cost tracking. This is a different purpose (reasoning analysis for prompt/tool tuning) and likely a different store.
 
 ---
 
 ## Why This Is Worth Doing
 
-When the LLM picks the wrong tool, hallucinates a number, or misreads a query, the full turn record (user message -> tool calls -> tool results -> model output, with thinking tokens) is what lets you diagnose it. Today that record is thrown away, so debugging the agent means reproducing from memory. For a bug filed about a chat answer ("this spending total is wrong"), the exact transcript is the single most useful artifact — and capturing it automatically beats asking the user to reconstruct it.
+When the model picks the wrong tool or misreads a query, the thinking + the tool call it chose are what reveal *why*. Today that's thrown away, so prompt/tool-definition tuning relies on catching mistakes live. Persisting the record turns tuning into something you can do deliberately against real history — find the recurring wrong turns, fix the prompt or the tool definition, verify against past cases.
 
 ---
 
 ## Open Questions / Things to Explore
 
-- **What to capture:** just visible user/assistant messages, or full tool I/O (tool calls + results)? For agent-debugging the tool I/O is the part that actually matters — and the part most likely missing if we only log visible messages.
-- **Data model:** one row per turn vs one row per conversation with serialized turns; how tool calls/results are structured.
-- **Retention & PII:** transcripts contain financial data. How long to keep them, purge policy, whether retention mirrors the bug-attachment purge-on-fix rule.
-- **Relationship to bug reporting:** shared infrastructure vs independent feature. Does transcript persistence ship as a prerequisite of bug reporting, or stand alone?
-- **Scope of always-on vs on-demand:** persist every conversation, or only when a bug is filed / explicitly flagged? Always-on enables analysis (#3) but costs storage and widens PII surface.
+- **Always-on by definition.** For retrospective tuning to work it has to capture every conversation — on-demand defeats the purpose. So the real questions are retention and PII, not whether to always capture.
+- **Retention & PII:** prompts and thinking will contain financial data. How long to keep, and what the purge policy is. (Unlike bug attachments, there's no natural "fixed" terminal state to hang a purge on — likely time-based.)
+- **Data model:** one row per turn vs one row per conversation with serialized turns; how thinking and tool-call params are structured for later querying.
+- **Relationship to existing tool-call/cost logging:** extend that store or stand up a separate one? Confirm what it already captures before duplicating.
+- **How to actually review it:** raw DB rows, an export, or a small viewer. Lowest priority — don't design until there's data to look at.
 
 ---
 
-Related: task `add-bug-reporting-to-the-nlq-chat` (auto-attach seam, piece #2).
+Related (chat-adjacent only, NOT a dependency): task `add-bug-reporting-to-the-nlq-chat`.

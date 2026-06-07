@@ -16,6 +16,14 @@
 
 Add bug-reporting capability to the already-live EveryCent NLQ chat by registering new tool(s) on the existing agent (no router, no second prompt), plus Rails backend (bug_reports + bug_report_attachments) and a small CRUD UI for status changes.
 
+### Why (product intent — drives the design)
+
+The reporter is a **non-technical user** (Kion's wife). Bug reporting isn't natural to her, and a plain form fails her because a form assumes the reporter already knows what's relevant. The chat is chosen precisely so it can act as a **conversational intake interviewer**: it actively pulls the relevant details out of her *while the bug is fresh*.
+
+Today the process is a two-step back-and-forth: "hey, I found a bug" → Kion either makes time to come look at what she's doing, or interrogates her over WhatsApp to reconstruct it. The chat replaces that: even if Kion still needs to ask a few follow-ups when he later picks up the bug, the core (possibly-relevant) info is already captured in the report, giving him a troubleshooting foundation to start from.
+
+This is the whole point of the feature — the intake quality matters more than the CRUD mechanics. The bug tool's prompting must behave like an interviewer (what screen, what did you expect vs. what happened, when, reproducible?), not a dumb form-filler.
+
 ### Context
 
 The EveryCent NLQ chat is already implemented and live: a single chat agent with ~12 MCP tools under `/api/mcp/`, thinking-token display, Ollama dev server. This task ADDS bug-reporting capability to that existing chat — it is not a greenfield agent.
@@ -65,7 +73,7 @@ Raw `bytea`, deliberately NOT Active Storage/S3 — avoiding an external blob st
 - [ ] Bug reports are NOT filtered by reporter — both household members see all bugs.
 - [ ] New MCP tool(s) registered on the existing single chat agent (no router, no second prompt) for: create bug report, read/search bug reports.
 - [ ] Agent does read-before-create to dedupe against existing open bugs (prompts the user to add detail to an existing report instead of duplicating).
-- [ ] System prompt updated as needed to cover bug-reporting behaviour.
+- [ ] System prompt / tool prompting makes the agent conduct an interview-style intake for a non-technical reporter — actively eliciting what screen, expected vs. actual, when it happened, and whether it reproduces — rather than passively recording whatever the user volunteers. (This is the core value of the feature.)
 - [ ] Small CRUD UI in webclientv4/ for changing bug-report status (status changes are UI-only, not agent-driven).
 - [ ] Server-side validation is authoritative; JSON keys snake_case.
 - [ ] TDD with 100% coverage on new code (backend rspec + Vue tests).
