@@ -99,7 +99,7 @@ RSpec.describe Mcp::BudgetAccuracyController, type: :controller do
     it 'returns the correct amount_unit string' do
       get :show, params: { start_month: start_month, end_month: end_month }
       json = JSON.parse(response.body)
-      expect(json['amount_unit']).to eq('cents (divide by 100 for currency display)')
+      expect(json['amount_unit']).to eq('*_cents = exact integer cents; *_display = ready-to-show currency string')
     end
 
     it 'returns a results array' do
@@ -145,7 +145,10 @@ RSpec.describe Mcp::BudgetAccuracyController, type: :controller do
       row = json['results'].first
       expect(row.keys).to match_array(
         %w[group_label group_by months_counted median_abs_pct_off avg_abs_pct_off
-           pct_months_within_10 direction total_budgeted_cents total_actual_cents net_deviation_cents]
+           pct_months_within_10 direction
+           total_budgeted_cents total_budgeted_display
+           total_actual_cents total_actual_display
+           net_deviation_cents net_deviation_display]
       )
     end
   end

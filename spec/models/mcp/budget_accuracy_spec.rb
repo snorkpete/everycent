@@ -136,7 +136,10 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
         row = build_query.results.first
         expect(row.keys).to match_array(
           %i[group_label group_by months_counted median_abs_pct_off avg_abs_pct_off
-             pct_months_within_10 direction total_budgeted_cents total_actual_cents net_deviation_cents]
+             pct_months_within_10 direction
+             total_budgeted_cents total_budgeted_display
+             total_actual_cents total_actual_display
+             net_deviation_cents net_deviation_display]
         )
       end
 
@@ -163,16 +166,25 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
       it 'returns total_budgeted_cents' do
         row = build_query.results.first
         expect(row[:total_budgeted_cents]).to eq(50_000)
+        expect(row[:total_budgeted_display]).to eq('€500.00')
       end
 
       it 'returns total_actual_cents' do
         row = build_query.results.first
         expect(row[:total_actual_cents]).to eq(60_000)
+        expect(row[:total_actual_display]).to eq('€600.00')
       end
 
       it 'returns net_deviation_cents = 10_000' do
         row = build_query.results.first
         expect(row[:net_deviation_cents]).to eq(10_000)
+        expect(row[:net_deviation_display]).to eq('€100.00')
+      end
+
+      describe 'money display companions' do
+        let(:rows) { build_query.results }
+
+        include_examples "money fields have display companions"
       end
     end
 

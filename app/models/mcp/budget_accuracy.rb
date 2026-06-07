@@ -134,17 +134,23 @@ module Mcp
       )
 
       result.map do |row|
+        total_budgeted  = row["total_budgeted_cents"].to_i
+        total_actual    = row["total_actual_cents"].to_i
+        net_deviation   = row["net_deviation_cents"].to_i
         {
-          group_label:             row["grp_label"],
-          group_by:                group_by,
-          months_counted:          row["months_counted"].to_i,
-          median_abs_pct_off:      row["median_abs_pct_off"].to_f,
-          avg_abs_pct_off:         row["avg_abs_pct_off"].to_f,
-          pct_months_within_10:    row["pct_months_within_10"].to_f,
-          direction:               row["direction"],
-          total_budgeted_cents:    row["total_budgeted_cents"].to_i,
-          total_actual_cents:      row["total_actual_cents"].to_i,
-          net_deviation_cents:     row["net_deviation_cents"].to_i
+          group_label:               row["grp_label"],
+          group_by:                  group_by,
+          months_counted:            row["months_counted"].to_i,
+          median_abs_pct_off:        row["median_abs_pct_off"].to_f,
+          avg_abs_pct_off:           row["avg_abs_pct_off"].to_f,
+          pct_months_within_10:      row["pct_months_within_10"].to_f,
+          direction:                 row["direction"],
+          total_budgeted_cents:      total_budgeted,
+          total_budgeted_display:    Mcp::Money.display(total_budgeted),
+          total_actual_cents:        total_actual,
+          total_actual_display:      Mcp::Money.display(total_actual),
+          net_deviation_cents:       net_deviation,
+          net_deviation_display:     Mcp::Money.display(net_deviation)
         }
       end
     end

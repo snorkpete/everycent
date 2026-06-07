@@ -32,18 +32,18 @@ Fix: do the currency conversion in **code, at the Ruby response-shaping boundary
 
 ## Acceptance Criteria
 
-- [ ] New helper `app/models/mcp/money.rb` with `Mcp::Money.display(cents)` returning a formatted string: `123456 → "€1,234.56"`, `-5000 → "-€50.00"`, `nil → "€0.00"`. Thousands separator + 2 decimals, € prefix. Format integer-based (no float division — see notes).
-- [ ] Every money-returning query object adds a `*_display` companion **explicitly** for each `*_cents` field it emits (Approach C — no auto-injection helper):
+- [x] New helper `app/models/mcp/money.rb` with `Mcp::Money.display(cents)` returning a formatted string: `123456 → "€1,234.56"`, `-5000 → "-€50.00"`, `nil → "€0.00"`. Thousands separator + 2 decimals, € prefix. Format integer-based (no float division — see notes).
+- [x] Every money-returning query object adds a `*_display` companion **explicitly** for each `*_cents` field it emits (Approach C — no auto-injection helper):
   - `Mcp::OverspendingAnalysis`
   - `Mcp::OverspendingAnalysisByAllocation`
   - `Mcp::BudgetAccuracy` (its money/cents fields — e.g. budgeted/actual totals over the range)
   - (`Mcp::CategoryList` / `ping` have no money fields — untouched.)
-- [ ] Shared RSpec example `spec/support/mcp_money_display.rb` — `"money fields have display companions"` — asserts that for every `*_cents` key in a tool's result rows there is a matching `*_display` key whose value equals `Mcp::Money.display(<cents>)`. Each money-returning query object's spec opts in via `include_examples`.
-- [ ] The `amount_unit: "cents (divide by 100 for currency display)"` controller note is replaced with one describing the two field kinds (e.g. `"*_cents = exact integer cents; *_display = ready-to-show currency string"`).
-- [ ] Each money-returning tool's description in `webclientv4/src/app/chat/toolDefinitions.ts` instructs the model to present monetary figures using the `*_display` fields (and that `*_cents` is for comparison/reasoning only).
-- [ ] `Mcp::Money` unit spec covering: positive, negative, zero, nil, sub-€1 (e.g. `7 → "€0.07"`), thousands boundary (e.g. `100000 → "€1,000.00"`), large value.
-- [ ] Existing query-object + controller specs extended to assert the new `*_display` fields are present and correct (in addition to the shared example).
-- [ ] Gates green: `bundle exec rspec`; in `webclientv4/`: `npm run type-check`, `npm run test`. No error suppression.
+- [x] Shared RSpec example `spec/support/mcp_money_display.rb` — `"money fields have display companions"` — asserts that for every `*_cents` key in a tool's result rows there is a matching `*_display` key whose value equals `Mcp::Money.display(<cents>)`. Each money-returning query object's spec opts in via `include_examples`.
+- [x] The `amount_unit: "cents (divide by 100 for currency display)"` controller note is replaced with one describing the two field kinds (e.g. `"*_cents = exact integer cents; *_display = ready-to-show currency string"`).
+- [x] Each money-returning tool's description in `webclientv4/src/app/chat/toolDefinitions.ts` instructs the model to present monetary figures using the `*_display` fields (and that `*_cents` is for comparison/reasoning only).
+- [x] `Mcp::Money` unit spec covering: positive, negative, zero, nil, sub-€1 (e.g. `7 → "€0.07"`), thousands boundary (e.g. `100000 → "€1,000.00"`), large value.
+- [x] Existing query-object + controller specs extended to assert the new `*_display` fields are present and correct (in addition to the shared example).
+- [x] Gates green: `bundle exec rspec`; in `webclientv4/`: `npm run type-check`, `npm run test`. No error suppression.
 
 ### Out of scope
 

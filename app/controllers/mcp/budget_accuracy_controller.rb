@@ -20,7 +20,7 @@ module Mcp
         group_by:      query.group_by,
         sort_by:       query.sort_by,
         variable_only: query.variable_only,
-        amount_unit:   "cents (divide by 100 for currency display)",
+        amount_unit:   "*_cents = exact integer cents; *_display = ready-to-show currency string",
         results:       query.results
       }
     end

@@ -61,12 +61,22 @@ RSpec.describe Mcp::OverspendingAnalysis, type: :model do
 
     it 'returns a row per spending category with the expected keys' do
       row = build_query(period: period).results.first
-      expect(row.keys).to match_array(%i[category budgeted_cents actual_cents amount_remaining_cents])
+      expect(row.keys).to match_array(
+        %i[category budgeted_cents budgeted_display actual_cents actual_display
+           amount_remaining_cents amount_remaining_display]
+      )
     end
 
     it 'returns budgeted_cents from allocation amounts' do
       row = build_query(period: period).results.find { |r| r[:category] == 'Groceries' }
       expect(row[:budgeted_cents]).to eq(50_000)
+      expect(row[:budgeted_display]).to eq('€500.00')
+    end
+
+    describe 'money display companions' do
+      let(:rows) { build_query(period: period).results }
+
+      include_examples "money fields have display companions"
     end
 
     it 'returns actual_cents from matching transactions' do
@@ -79,6 +89,20 @@ RSpec.describe Mcp::OverspendingAnalysis, type: :model do
       )
       row = build_query(period: period).results.find { |r| r[:category] == 'Groceries' }
       expect(row[:actual_cents]).to eq(12_000)
+      expect(row[:actual_display]).to eq('€120.00')
+    end
+
+    it 'renders a negative amount_remaining_display when the category is overspent' do
+      create(
+        :transaction,
+        allocation:       @allocation,
+        transaction_date: '2024-01-15',
+        withdrawal_amount: 60_000,
+        deposit_amount:    0
+      )
+      row = build_query(period: period).results.find { |r| r[:category] == 'Groceries' }
+      expect(row[:amount_remaining_cents]).to eq(-10_000)
+      expect(row[:amount_remaining_display]).to eq('-€100.00')
     end
 
     it 'excludes transactions with brought_forward_status of added' do

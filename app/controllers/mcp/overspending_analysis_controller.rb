@@ -10,7 +10,7 @@ module Mcp
 
       render json: {
         period:      query.period,
-        amount_unit: "cents (divide by 100 for currency display)",
+        amount_unit: "*_cents = exact integer cents; *_display = ready-to-show currency string",
         categories:  query.results
       }
     end

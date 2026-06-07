@@ -47,7 +47,10 @@ RSpec.describe Mcp::OverspendingAnalysisByAllocation, type: :model do
     it 'returns rows with the expected keys' do
       row = build_query(period: period).results.first
       expect(row.keys).to match_array(
-        %i[allocation category_id category budgeted_cents actual_cents amount_remaining_cents]
+        %i[allocation category_id category
+           budgeted_cents budgeted_display
+           actual_cents actual_display
+           amount_remaining_cents amount_remaining_display]
       )
     end
 
@@ -59,6 +62,13 @@ RSpec.describe Mcp::OverspendingAnalysisByAllocation, type: :model do
     it 'returns budgeted_cents from the allocation amount' do
       row = build_query(period: period).results.first
       expect(row[:budgeted_cents]).to eq(30_000)
+      expect(row[:budgeted_display]).to eq('€300.00')
+    end
+
+    describe 'money display companions' do
+      let(:rows) { build_query(period: period).results }
+
+      include_examples "money fields have display companions"
     end
 
     it 'returns actual_cents from matching transactions' do

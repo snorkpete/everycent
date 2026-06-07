@@ -63,7 +63,7 @@ RSpec.describe Mcp::OverspendingAnalysisByAllocationController, type: :controlle
     it 'returns the correct amount_unit string' do
       get :show, params: { period: period }
       json = JSON.parse(response.body)
-      expect(json['amount_unit']).to eq('cents (divide by 100 for currency display)')
+      expect(json['amount_unit']).to eq('*_cents = exact integer cents; *_display = ready-to-show currency string')
     end
 
     it 'returns an allocations array' do
@@ -77,7 +77,10 @@ RSpec.describe Mcp::OverspendingAnalysisByAllocationController, type: :controlle
       json = JSON.parse(response.body)
       row = json['allocations'].first
       expect(row.keys).to match_array(
-        %w[allocation category_id category budgeted_cents actual_cents amount_remaining_cents]
+        %w[allocation category_id category
+           budgeted_cents budgeted_display
+           actual_cents actual_display
+           amount_remaining_cents amount_remaining_display]
       )
     end
 

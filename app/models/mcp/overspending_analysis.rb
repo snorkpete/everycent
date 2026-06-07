@@ -59,11 +59,17 @@ module Mcp
       )
 
       result.map do |row|
+        budgeted  = row["budgeted_cents"].to_i
+        actual    = row["actual_cents"].to_i
+        remaining = row["amount_remaining_cents"].to_i
         {
-          category:               row["category"],
-          budgeted_cents:         row["budgeted_cents"].to_i,
-          actual_cents:           row["actual_cents"].to_i,
-          amount_remaining_cents: row["amount_remaining_cents"].to_i
+          category:                row["category"],
+          budgeted_cents:          budgeted,
+          budgeted_display:        Mcp::Money.display(budgeted),
+          actual_cents:            actual,
+          actual_display:          Mcp::Money.display(actual),
+          amount_remaining_cents:  remaining,
+          amount_remaining_display: Mcp::Money.display(remaining)
         }
       end
     end
