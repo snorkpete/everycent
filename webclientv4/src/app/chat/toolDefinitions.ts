@@ -52,4 +52,41 @@ export const TOOL_DEFINITIONS = [
       },
     },
   },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'budget_accuracy',
+      description:
+        'Measure how accurately each allocation (or category) was budgeted across a range of months. Answers "What are we bad at predicting?" Rows are sorted worst-predicted first (highest median absolute %-off). Response shape per row: group_label, group_by ("allocation"|"category"), months_counted, median_abs_pct_off, avg_abs_pct_off, pct_months_within_10 (% of months where actual was within 10% of budget), direction ("over"|"under" — derived from the net signed deviation, not the median), total_budgeted_cents, total_actual_cents, net_deviation_cents. All monetary values are cents (divide by 100 for display). Exclusions: spending-role allocations only (budget_role = spending); brought-forward credit card entries excluded; placeholder allocations (budgeted <= 10 cents) excluded; groups where any individual month has budgeted <= 1000 cents (€10 noise floor) are excluded from that month\'s stats. Month-suffix variants (e.g. "Car Insurance (Feb)") are merged when group_by = allocation. Use sort_by = overspend_amount to rank by largest net overspend, or underspend_amount for largest net underspend.',
+      parameters: {
+        type: 'object',
+        properties: {
+          start_month: {
+            type: 'string',
+            description: 'Start of the month range in YYYY-MM format, e.g. 2024-01',
+          },
+          end_month: {
+            type: 'string',
+            description: 'End of the month range (inclusive) in YYYY-MM format, e.g. 2024-12',
+          },
+          group_by: {
+            type: 'string',
+            description:
+              'Group results by "allocation" (individual budget line items, default) or "category" (allocation category).',
+          },
+          sort_by: {
+            type: 'string',
+            description:
+              'Sort order: "pct_off" (highest median absolute %-off first, default), "overspend_amount" (largest net overspend first), or "underspend_amount" (largest net underspend first).',
+          },
+          variable_only: {
+            type: 'boolean',
+            description:
+              'When true, restrict to variable allocations (is_fixed_amount = false). Useful for focusing on discretionary spending where prediction accuracy matters most.',
+          },
+        },
+        required: ['start_month', 'end_month'],
+      },
+    },
+  },
 ];

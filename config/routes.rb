@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   namespace :mcp do
     get 'overspending_analysis', to: 'overspending_analysis#show'
     get 'overspending_analysis_by_allocation', to: 'overspending_analysis_by_allocation#show'
+    get 'budget_accuracy', to: 'budget_accuracy#show'
     get 'categories', to: 'categories#index'
     post 'llm_usage', to: 'llm_usage#create'
   end

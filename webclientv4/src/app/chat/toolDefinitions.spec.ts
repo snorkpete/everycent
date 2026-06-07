@@ -78,4 +78,61 @@ describe('TOOL_DEFINITIONS', () => {
       expect(tool?.function.parameters.properties).toEqual({});
     });
   });
+
+  describe('budget_accuracy', () => {
+    const tool = TOOL_DEFINITIONS.find((t) => t.function.name === 'budget_accuracy');
+
+    it('is present in the list', () => {
+      expect(tool).toBeDefined();
+    });
+
+    it('has type "function"', () => {
+      expect(tool?.type).toBe('function');
+    });
+
+    it('requires start_month', () => {
+      expect(tool?.function.parameters.required).toContain('start_month');
+    });
+
+    it('requires end_month', () => {
+      expect(tool?.function.parameters.required).toContain('end_month');
+    });
+
+    it('start_month parameter is a string type', () => {
+      const prop = tool?.function.parameters.properties['start_month'];
+      expect(prop?.type).toBe('string');
+    });
+
+    it('end_month parameter is a string type', () => {
+      const prop = tool?.function.parameters.properties['end_month'];
+      expect(prop?.type).toBe('string');
+    });
+
+    it('has an optional group_by parameter of string type', () => {
+      const prop = tool?.function.parameters.properties['group_by'];
+      expect(prop?.type).toBe('string');
+    });
+
+    it('does not require group_by', () => {
+      expect(tool?.function.parameters.required).not.toContain('group_by');
+    });
+
+    it('has an optional sort_by parameter of string type', () => {
+      const prop = tool?.function.parameters.properties['sort_by'];
+      expect(prop?.type).toBe('string');
+    });
+
+    it('does not require sort_by', () => {
+      expect(tool?.function.parameters.required).not.toContain('sort_by');
+    });
+
+    it('has an optional variable_only parameter of boolean type', () => {
+      const prop = tool?.function.parameters.properties['variable_only'];
+      expect(prop?.type).toBe('boolean');
+    });
+
+    it('does not require variable_only', () => {
+      expect(tool?.function.parameters.required).not.toContain('variable_only');
+    });
+  });
 });

@@ -90,5 +90,47 @@ export async function executeTool(name: string, args: Record<string, unknown>): 
     return JSON.stringify(data);
   }
 
+  if (name === 'budget_accuracy') {
+    const startMonth = typeof args['start_month'] === 'string' ? args['start_month'] : null;
+    if (!startMonth) {
+      throw new Error('budget_accuracy: missing required parameter "start_month"');
+    }
+    const endMonth = typeof args['end_month'] === 'string' ? args['end_month'] : null;
+    if (!endMonth) {
+      throw new Error('budget_accuracy: missing required parameter "end_month"');
+    }
+    const tokens = getTokens();
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    for (const [key, value] of Object.entries(tokens)) {
+      if (value !== null && value !== undefined) {
+        headers[key] = value;
+      }
+    }
+
+    let url = `${BASE_URL}/mcp/budget_accuracy?start_month=${encodeURIComponent(startMonth)}&end_month=${encodeURIComponent(endMonth)}`;
+    if (typeof args['group_by'] === 'string') {
+      url += `&group_by=${encodeURIComponent(args['group_by'])}`;
+    }
+    if (typeof args['sort_by'] === 'string') {
+      url += `&sort_by=${encodeURIComponent(args['sort_by'])}`;
+    }
+    if (typeof args['variable_only'] === 'boolean') {
+      url += `&variable_only=${args['variable_only']}`;
+    }
+
+    const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      throw new Error(`budget_accuracy failed: ${response.status} ${response.statusText}`);
+    }
+
+    const data: unknown = await response.json();
+    return JSON.stringify(data);
+  }
+
   throw new Error(`Unknown tool: ${name}`);
 }
