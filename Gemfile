@@ -6,7 +6,6 @@ gem 'rails', '~> 7.1.3'
 gem 'puma', '~> 5.6'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
-gem 'nio4r', '~> 2.7.0'
 
 # Ruby 3.4 promoted `observer` from a default gem to a bundled gem, so it must be
 # declared explicitly. Required by factory_bot 6.2.0 (factory_bot/evaluation.rb)
@@ -17,9 +16,6 @@ gem 'observer'
 # Add responders gem since it's no longer included in Rails 7
 gem 'responders'
 gem 'rails-controller-testing'
-
-# fix for deprecated/removed mimemagic 3.2
-gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
 
 group :development do
   gem 'annotate'
@@ -40,8 +36,7 @@ gem 'pg', '~> 1.5.0'
 # fix for time
 gem 'tzinfo-data'
 
-# authentication - omniauth is a dependency of devise_token_auth
-gem 'omniauth'
+# authentication
 gem 'devise', '~> 4.9.0'
 gem 'devise_token_auth', '~> 1.2'
 
@@ -57,7 +52,6 @@ gem 'googleauth'
 
 #for heroku
 group :production do
-  gem 'rails_12factor'
   gem 'newrelic_rpm'
 end
 
@@ -79,7 +73,6 @@ group :test do
   gem 'faker', '~> 3.2'
   #gem 'capybara'
   gem 'database_cleaner-active_record', '~> 2.1.0'
-  gem 'launchy'
   #gem 'selenium-webdriver'
 end
 
