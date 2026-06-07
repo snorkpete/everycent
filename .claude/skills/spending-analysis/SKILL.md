@@ -10,12 +10,15 @@ You are helping the user analyse their Everycent spending data. Load this contex
 
 ## Database context
 
-- DB: `everycent_dev_7` (local PostgreSQL, user `kion`, no password)
-- Connect: `psql -d everycent_dev_7 -c "..."`
+- **Resolve the dev DB name from `config/database.yml`** — never hardcode it (it changes on every prod pull):
+  ```bash
+  awk '/^development:/{f=1} f && /database:/{print $2; exit}' config/database.yml
+  ```
+  Use that value as the DB in all `psql -d <dev_db> -c "..."` commands. Local PostgreSQL, user `kion`, no password.
 - Amounts are stored as **integers in cents** — always divide by `100.0`
 - Exclude manual adjustments: `is_manual_adjustment = false`
 - `withdrawal_amount > 0` for spending; `deposit_amount > 0` for income
-- Note: dev DB has test noise. User will provide a fresh production DB for real analysis — update the DB name when that happens.
+- The dev DB has test noise; a fresh prod pull (`/pg-pull`) refreshes it and updates `database.yml` — this skill follows automatically, no edit needed.
 
 ## Key schema
 
