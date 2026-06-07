@@ -21,7 +21,8 @@ module Mcp
 
       category_filter      = category ? "AND ac.name = :category" : ""
       canonical_allocation = Allocation.canonical_name_sql('a.name')
-      non_placeholder      = Allocation.non_placeholder_amount_sql('a.amount')
+      budgeted_conds       = Mcp::SpendingScope.budgeted_conditions
+      actual_conds         = Mcp::SpendingScope.actual_conditions
 
       sql = <<~SQL
         WITH budgeted AS (
@@ -34,8 +35,7 @@ module Mcp
           JOIN budgets b ON a.budget_id = b.id
           WHERE to_char(b.start_date, 'YYYY-MM') = :period
             AND b.household_id = :household_id
-            AND ac.budget_role = 'spending'
-            AND #{non_placeholder}
+            AND #{budgeted_conds}
             #{category_filter}
           GROUP BY #{canonical_allocation}, ac.id, ac.name
         ),
@@ -49,12 +49,7 @@ module Mcp
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
           WHERE to_char(t.transaction_date, 'YYYY-MM') = :period
             AND t.household_id = :household_id
-            AND t.is_manual_adjustment = false
-            AND t.withdrawal_amount > 0
-            AND ac.budget_role = 'spending'
-            AND (t.brought_forward_status IS NULL
-                 OR t.brought_forward_status NOT IN ('added', 'adjustment'))
-            AND #{non_placeholder}
+            AND #{actual_conds}
             #{category_filter}
           GROUP BY #{canonical_allocation}, ac.id, ac.name
         )
