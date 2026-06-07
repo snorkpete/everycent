@@ -46,3 +46,7 @@ webclientv3/.idea/
 
 # ignore the production builds for now - will have to figure out solution long term
 public/v2
+
+# payee backfill scratch — sensitive bank exports, never commit
+/.backfill-scratch/
+*.zip
