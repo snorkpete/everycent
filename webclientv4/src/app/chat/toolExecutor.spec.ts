@@ -1,121 +1,53 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { executeTool } from './toolExecutor';
-import * as authTokens from '../../auth/authTokens';
+import apiGateway from '../../api/api-gateway';
+import { buildApiGatewayMock } from '../../test/buildApiGatewayMock';
 
-vi.mock('../../auth/authTokens', () => ({
-  getTokens: vi.fn(),
+// Mock at the system boundary (apiGateway), not the internal mcpToolApi module —
+// this lets the real mcpToolApi run, so these specs verify the full path from
+// tool name → HTTP URL/params. See docs/vue-coding-rules.md.
+vi.mock('../../api/api-gateway', () => ({
+  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn(), patch: vi.fn() },
 }));
 
-const mockTokens = {
-  'access-token': 'token-abc',
-  client: 'client-xyz',
-  expiry: '9999999999',
-  'token-type': 'Bearer',
-  uid: 'user@example.com',
-};
+// Minimal axios-error shape — isAxiosError() only checks `isAxiosError === true`.
+function axiosError(response?: { data?: unknown; status?: number; statusText?: string }) {
+  return Object.assign(new Error('Request failed'), { isAxiosError: true, response });
+}
+
+const mockApiGateway = buildApiGatewayMock();
 
 describe('executeTool', () => {
   beforeEach(() => {
-    vi.mocked(authTokens.getTokens).mockReturnValue(mockTokens);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
+    mockApiGateway.reset();
   });
 
   describe('analyze_overspending', () => {
-    it('fetches the overspending analysis endpoint with the given period', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ categories: [] }), { status: 200 }));
+    it('gets the overspending endpoint with the period param', async () => {
+      mockApiGateway.get('/mcp/overspending_analysis', { categories: [] });
 
       await executeTool('analyze_overspending', { period: '2026-03' });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'http://localhost:3000/mcp/overspending_analysis?period=2026-03',
-        expect.objectContaining({
-          headers: expect.objectContaining({ 'access-token': 'token-abc' }),
-        }),
-      );
-    });
-
-    it('attaches all auth headers from getTokens', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-
-      await executeTool('analyze_overspending', { period: '2026-03' });
-
-      const calledHeaders = (fetchSpy.mock.calls[0][1] as RequestInit).headers as Record<
-        string,
-        string
-      >;
-      expect(calledHeaders['access-token']).toBe('token-abc');
-      expect(calledHeaders['client']).toBe('client-xyz');
-      expect(calledHeaders['expiry']).toBe('9999999999');
-      expect(calledHeaders['token-type']).toBe('Bearer');
-      expect(calledHeaders['uid']).toBe('user@example.com');
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/overspending_analysis', {
+        params: { period: '2026-03' },
+      });
     });
 
     it('returns the response JSON stringified', async () => {
       const payload = { categories: [{ name: 'Food', overspend: 5000 }] };
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify(payload), { status: 200 }),
-      );
+      mockApiGateway.get('/mcp/overspending_analysis', payload);
 
       const result = await executeTool('analyze_overspending', { period: '2026-03' });
 
       expect(result).toBe(JSON.stringify(payload));
     });
 
-    it('URL-encodes the period parameter', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-
-      await executeTool('analyze_overspending', { period: '2026-03' });
-
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).toContain('period=2026-03');
-    });
-
-    it('throws a descriptive error when the request fails', async () => {
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response('Internal Server Error', { status: 500, statusText: 'Internal Server Error' }),
-      );
-
-      await expect(executeTool('analyze_overspending', { period: '2026-03' })).rejects.toThrow(
-        'analyze_overspending failed: 500',
-      );
-    });
-
-    it('skips null auth header values', async () => {
-      vi.mocked(authTokens.getTokens).mockReturnValue({
-        'access-token': 'token-abc',
-        client: null,
-        expiry: null,
-        'token-type': 'Bearer',
-        uid: 'user@example.com',
-      });
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-
-      await executeTool('analyze_overspending', { period: '2026-03' });
-
-      const calledHeaders = (fetchSpy.mock.calls[0][1] as RequestInit).headers as Record<
-        string,
-        string
-      >;
-      expect('client' in calledHeaders).toBe(false);
-      expect('expiry' in calledHeaders).toBe(false);
-      expect(calledHeaders['access-token']).toBe('token-abc');
-    });
-
-    it('throws when period parameter is missing', async () => {
+    it('throws when period parameter is missing, before any request', async () => {
       await expect(executeTool('analyze_overspending', {})).rejects.toThrow(
-        'missing required parameter "period"',
+        'analyze_overspending: missing required parameter "period"',
       );
+      expect(apiGateway.get).not.toHaveBeenCalled();
     });
 
     it('throws when period parameter is not a string', async () => {
@@ -126,82 +58,46 @@ describe('executeTool', () => {
   });
 
   describe('analyze_overspending_by_allocation', () => {
-    it('fetches the allocation endpoint with the given period', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ allocations: [] }), { status: 200 }));
+    it('gets the allocation endpoint with the period and no category when absent', async () => {
+      mockApiGateway.get('/mcp/overspending_analysis_by_allocation', { allocations: [] });
 
       await executeTool('analyze_overspending_by_allocation', { period: '2026-03' });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'http://localhost:3000/mcp/overspending_analysis_by_allocation?period=2026-03',
-        expect.objectContaining({
-          headers: expect.objectContaining({ 'access-token': 'token-abc' }),
-        }),
-      );
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/overspending_analysis_by_allocation', {
+        params: { period: '2026-03' },
+      });
     });
 
-    it('appends the category query param when provided', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ allocations: [] }), { status: 200 }));
+    it('forwards the category param when provided as a string', async () => {
+      mockApiGateway.get('/mcp/overspending_analysis_by_allocation', { allocations: [] });
 
       await executeTool('analyze_overspending_by_allocation', {
         period: '2026-03',
         category: 'Food Purchases/Dining Out',
       });
 
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).toContain('category=Food%20Purchases%2FDining%20Out');
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/overspending_analysis_by_allocation', {
+        params: { period: '2026-03', category: 'Food Purchases/Dining Out' },
+      });
     });
 
-    it('omits the category param when not provided', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ allocations: [] }), { status: 200 }));
+    it('ignores a non-string category', async () => {
+      mockApiGateway.get('/mcp/overspending_analysis_by_allocation', { allocations: [] });
 
-      await executeTool('analyze_overspending_by_allocation', { period: '2026-03' });
+      await executeTool('analyze_overspending_by_allocation', { period: '2026-03', category: 42 });
 
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).not.toContain('category');
-    });
-
-    it('attaches all auth headers from getTokens', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-
-      await executeTool('analyze_overspending_by_allocation', { period: '2026-03' });
-
-      const calledHeaders = (fetchSpy.mock.calls[0][1] as RequestInit).headers as Record<
-        string,
-        string
-      >;
-      expect(calledHeaders['access-token']).toBe('token-abc');
-      expect(calledHeaders['client']).toBe('client-xyz');
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/overspending_analysis_by_allocation', {
+        params: { period: '2026-03' },
+      });
     });
 
     it('returns the response JSON stringified', async () => {
       const payload = { allocations: [{ allocation: 'Groceries', overspend: 2500 }] };
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify(payload), { status: 200 }),
-      );
+      mockApiGateway.get('/mcp/overspending_analysis_by_allocation', payload);
 
-      const result = await executeTool('analyze_overspending_by_allocation', {
-        period: '2026-03',
-      });
+      const result = await executeTool('analyze_overspending_by_allocation', { period: '2026-03' });
 
       expect(result).toBe(JSON.stringify(payload));
-    });
-
-    it('throws a descriptive error when the request fails', async () => {
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response('Internal Server Error', { status: 500, statusText: 'Internal Server Error' }),
-      );
-
-      await expect(
-        executeTool('analyze_overspending_by_allocation', { period: '2026-03' }),
-      ).rejects.toThrow('analyze_overspending_by_allocation failed: 500');
     });
 
     it('throws when period parameter is missing', async () => {
@@ -209,161 +105,78 @@ describe('executeTool', () => {
         'missing required parameter "period"',
       );
     });
-
-    it('throws when period parameter is not a string', async () => {
-      await expect(
-        executeTool('analyze_overspending_by_allocation', { period: 123 }),
-      ).rejects.toThrow('missing required parameter "period"');
-    });
   });
 
   describe('list_categories', () => {
-    it('fetches the categories endpoint', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ categories: [] }), { status: 200 }));
+    it('gets the categories endpoint', async () => {
+      mockApiGateway.get('/mcp/categories', { categories: [] });
 
       await executeTool('list_categories', {});
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'http://localhost:3000/mcp/categories',
-        expect.objectContaining({
-          headers: expect.objectContaining({ 'access-token': 'token-abc' }),
-        }),
-      );
-    });
-
-    it('attaches all auth headers from getTokens', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-
-      await executeTool('list_categories', {});
-
-      const calledHeaders = (fetchSpy.mock.calls[0][1] as RequestInit).headers as Record<
-        string,
-        string
-      >;
-      expect(calledHeaders['access-token']).toBe('token-abc');
-      expect(calledHeaders['client']).toBe('client-xyz');
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/categories');
     });
 
     it('returns the response JSON stringified', async () => {
       const payload = { categories: [{ name: 'Food', budget_role: 'spending' }] };
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify(payload), { status: 200 }),
-      );
+      mockApiGateway.get('/mcp/categories', payload);
 
       const result = await executeTool('list_categories', {});
 
       expect(result).toBe(JSON.stringify(payload));
     });
-
-    it('throws a descriptive error when the request fails', async () => {
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response('Internal Server Error', { status: 500, statusText: 'Internal Server Error' }),
-      );
-
-      await expect(executeTool('list_categories', {})).rejects.toThrow(
-        'list_categories failed: 500',
-      );
-    });
   });
 
   describe('budget_accuracy', () => {
-    it('fetches the budget_accuracy endpoint with start_month and end_month', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ results: [] }), { status: 200 }));
+    it('gets the endpoint with required params only when optionals absent', async () => {
+      mockApiGateway.get('/mcp/budget_accuracy', { results: [] });
 
       await executeTool('budget_accuracy', { start_month: '2024-01', end_month: '2024-12' });
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        'http://localhost:3000/mcp/budget_accuracy?start_month=2024-01&end_month=2024-12',
-        expect.objectContaining({
-          headers: expect.objectContaining({ 'access-token': 'token-abc' }),
-        }),
-      );
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/budget_accuracy', {
+        params: { start_month: '2024-01', end_month: '2024-12' },
+      });
     });
 
-    it('appends group_by when provided', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ results: [] }), { status: 200 }));
+    it('forwards group_by, sort_by and variable_only when provided', async () => {
+      mockApiGateway.get('/mcp/budget_accuracy', { results: [] });
 
       await executeTool('budget_accuracy', {
         start_month: '2024-01',
         end_month: '2024-12',
         group_by: 'category',
-      });
-
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).toContain('group_by=category');
-    });
-
-    it('appends sort_by when provided', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ results: [] }), { status: 200 }));
-
-      await executeTool('budget_accuracy', {
-        start_month: '2024-01',
-        end_month: '2024-12',
         sort_by: 'overspend_amount',
-      });
-
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).toContain('sort_by=overspend_amount');
-    });
-
-    it('appends variable_only when provided as boolean', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ results: [] }), { status: 200 }));
-
-      await executeTool('budget_accuracy', {
-        start_month: '2024-01',
-        end_month: '2024-12',
         variable_only: true,
       });
 
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).toContain('variable_only=true');
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/budget_accuracy', {
+        params: {
+          start_month: '2024-01',
+          end_month: '2024-12',
+          group_by: 'category',
+          sort_by: 'overspend_amount',
+          variable_only: true,
+        },
+      });
     });
 
-    it('omits optional params when not provided', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({ results: [] }), { status: 200 }));
+    it('ignores optional params of the wrong type', async () => {
+      mockApiGateway.get('/mcp/budget_accuracy', { results: [] });
 
-      await executeTool('budget_accuracy', { start_month: '2024-01', end_month: '2024-12' });
+      await executeTool('budget_accuracy', {
+        start_month: '2024-01',
+        end_month: '2024-12',
+        group_by: 7,
+        variable_only: 'yes',
+      });
 
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).not.toContain('group_by');
-      expect(url).not.toContain('sort_by');
-      expect(url).not.toContain('variable_only');
-    });
-
-    it('attaches all auth headers from getTokens', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-
-      await executeTool('budget_accuracy', { start_month: '2024-01', end_month: '2024-12' });
-
-      const calledHeaders = (fetchSpy.mock.calls[0][1] as RequestInit).headers as Record<
-        string,
-        string
-      >;
-      expect(calledHeaders['access-token']).toBe('token-abc');
-      expect(calledHeaders['client']).toBe('client-xyz');
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/budget_accuracy', {
+        params: { start_month: '2024-01', end_month: '2024-12' },
+      });
     });
 
     it('returns the response JSON stringified', async () => {
       const payload = { results: [{ group_label: 'Groceries', median_abs_pct_off: 15.2 }] };
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify(payload), { status: 200 }),
-      );
+      mockApiGateway.get('/mcp/budget_accuracy', payload);
 
       const result = await executeTool('budget_accuracy', {
         start_month: '2024-01',
@@ -373,44 +186,79 @@ describe('executeTool', () => {
       expect(result).toBe(JSON.stringify(payload));
     });
 
-    it('throws a descriptive error when the request fails', async () => {
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response('Internal Server Error', { status: 500, statusText: 'Internal Server Error' }),
-      );
-
-      await expect(
-        executeTool('budget_accuracy', { start_month: '2024-01', end_month: '2024-12' }),
-      ).rejects.toThrow('budget_accuracy failed: 500');
-    });
-
-    it('throws when start_month parameter is missing', async () => {
+    it('throws when start_month is missing', async () => {
       await expect(executeTool('budget_accuracy', { end_month: '2024-12' })).rejects.toThrow(
         'missing required parameter "start_month"',
       );
     });
 
-    it('throws when end_month parameter is missing', async () => {
+    it('throws when end_month is missing', async () => {
       await expect(executeTool('budget_accuracy', { start_month: '2024-01' })).rejects.toThrow(
         'missing required parameter "end_month"',
       );
     });
+  });
 
-    it('throws when start_month parameter is not a string', async () => {
+  describe('error surfacing', () => {
+    it('surfaces the error field from a 4xx JSON body so the LLM can self-correct', async () => {
+      mockApiGateway.rejectGet(
+        '/mcp/budget_accuracy',
+        axiosError({ data: { error: 'end_month must not be before start_month' }, status: 400 }),
+      );
+
       await expect(
-        executeTool('budget_accuracy', { start_month: 2024, end_month: '2024-12' }),
-      ).rejects.toThrow('missing required parameter "start_month"');
+        executeTool('budget_accuracy', { start_month: '2024-06', end_month: '2024-01' }),
+      ).rejects.toThrow('budget_accuracy failed: end_month must not be before start_month');
     });
 
-    it('URL-encodes start_month and end_month', async () => {
-      const fetchSpy = vi
-        .spyOn(globalThis, 'fetch')
-        .mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
+    it('falls back to status/statusText when the JSON body has no string error field', async () => {
+      mockApiGateway.rejectGet(
+        '/mcp/overspending_analysis',
+        axiosError({ data: { message: 'nope' }, status: 422, statusText: 'Unprocessable Entity' }),
+      );
 
-      await executeTool('budget_accuracy', { start_month: '2024-01', end_month: '2024-12' });
+      await expect(executeTool('analyze_overspending', { period: '2026-03' })).rejects.toThrow(
+        'analyze_overspending failed: 422 Unprocessable Entity',
+      );
+    });
 
-      const url = fetchSpy.mock.calls[0][0] as string;
-      expect(url).toContain('start_month=2024-01');
-      expect(url).toContain('end_month=2024-12');
+    it('falls back to status/statusText for a non-JSON error body', async () => {
+      mockApiGateway.rejectGet(
+        '/mcp/overspending_analysis',
+        axiosError({
+          data: 'Internal Server Error',
+          status: 500,
+          statusText: 'Internal Server Error',
+        }),
+      );
+
+      await expect(executeTool('analyze_overspending', { period: '2026-03' })).rejects.toThrow(
+        'analyze_overspending failed: 500 Internal Server Error',
+      );
+    });
+
+    it('falls back to the error message for an axios error with no response', async () => {
+      mockApiGateway.rejectGet('/mcp/categories', axiosError());
+
+      await expect(executeTool('list_categories', {})).rejects.toThrow(
+        'list_categories failed: Request failed',
+      );
+    });
+
+    it('wraps a non-axios Error with its message', async () => {
+      mockApiGateway.rejectGet('/mcp/categories', new Error('boom'));
+
+      await expect(executeTool('list_categories', {})).rejects.toThrow(
+        'list_categories failed: boom',
+      );
+    });
+
+    it('stringifies a non-Error rejection value', async () => {
+      vi.mocked(apiGateway.get).mockImplementationOnce(() => Promise.reject('weird'));
+
+      await expect(executeTool('list_categories', {})).rejects.toThrow(
+        'list_categories failed: weird',
+      );
     });
   });
 

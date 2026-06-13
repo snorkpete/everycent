@@ -1,135 +1,84 @@
-import { getTokens } from '../../auth/authTokens';
+import { isAxiosError } from 'axios';
+import { mcpToolApi, type BudgetAccuracyParams } from './mcpToolApi';
 
-const BASE_URL = import.meta.env.PROD ? '' : 'http://localhost:3000';
+// Pulls the LLM-recoverable message out of a failed tool request. The MCP query
+// objects deliberately return `{ error: "<message>" }` bodies (e.g. reversed
+// month ranges) so the model can self-correct — surface that message rather than
+// a generic status line. Falls back to status/statusText, then the raw error.
+function toolError(name: string, error: unknown): Error {
+  if (isAxiosError(error)) {
+    const data: unknown = error.response?.data;
+    if (
+      data !== null &&
+      typeof data === 'object' &&
+      'error' in data &&
+      typeof data.error === 'string'
+    ) {
+      return new Error(`${name} failed: ${data.error}`);
+    }
+    if (error.response) {
+      return new Error(`${name} failed: ${error.response.status} ${error.response.statusText}`);
+    }
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  return new Error(`${name} failed: ${message}`);
+}
+
+function requireString({
+  args,
+  key,
+  tool,
+}: {
+  args: Record<string, unknown>;
+  key: string;
+  tool: string;
+}): string {
+  const value = args[key];
+  if (typeof value !== 'string') {
+    throw new Error(`${tool}: missing required parameter "${key}"`);
+  }
+  return value;
+}
+
+async function call(name: string, fn: () => Promise<unknown>): Promise<string> {
+  try {
+    return JSON.stringify(await fn());
+  } catch (error) {
+    throw toolError(name, error);
+  }
+}
 
 export async function executeTool(name: string, args: Record<string, unknown>): Promise<string> {
   if (name === 'analyze_overspending') {
-    const period = typeof args['period'] === 'string' ? args['period'] : null;
-    if (!period) {
-      throw new Error('analyze_overspending: missing required parameter "period"');
-    }
-    const tokens = getTokens();
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    for (const [key, value] of Object.entries(tokens)) {
-      if (value !== null && value !== undefined) {
-        headers[key] = value;
-      }
-    }
-
-    const response = await fetch(
-      `${BASE_URL}/mcp/overspending_analysis?period=${encodeURIComponent(period)}`,
-      { headers },
-    );
-
-    if (!response.ok) {
-      throw new Error(`analyze_overspending failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data: unknown = await response.json();
-    return JSON.stringify(data);
+    const period = requireString({ args, key: 'period', tool: name });
+    return call(name, () => mcpToolApi.analyzeOverspending(period));
   }
 
   if (name === 'analyze_overspending_by_allocation') {
-    const period = typeof args['period'] === 'string' ? args['period'] : null;
-    if (!period) {
-      throw new Error('analyze_overspending_by_allocation: missing required parameter "period"');
-    }
-    const tokens = getTokens();
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    for (const [key, value] of Object.entries(tokens)) {
-      if (value !== null && value !== undefined) {
-        headers[key] = value;
-      }
-    }
-
-    let url = `${BASE_URL}/mcp/overspending_analysis_by_allocation?period=${encodeURIComponent(period)}`;
-    if (typeof args['category'] === 'string') {
-      url += `&category=${encodeURIComponent(args['category'])}`;
-    }
-
-    const response = await fetch(url, { headers });
-
-    if (!response.ok) {
-      throw new Error(
-        `analyze_overspending_by_allocation failed: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    const data: unknown = await response.json();
-    return JSON.stringify(data);
+    const period = requireString({ args, key: 'period', tool: name });
+    const category = typeof args['category'] === 'string' ? args['category'] : undefined;
+    return call(name, () => mcpToolApi.analyzeOverspendingByAllocation(period, category));
   }
 
   if (name === 'list_categories') {
-    const tokens = getTokens();
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    for (const [key, value] of Object.entries(tokens)) {
-      if (value !== null && value !== undefined) {
-        headers[key] = value;
-      }
-    }
-
-    const response = await fetch(`${BASE_URL}/mcp/categories`, { headers });
-
-    if (!response.ok) {
-      throw new Error(`list_categories failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data: unknown = await response.json();
-    return JSON.stringify(data);
+    return call(name, () => mcpToolApi.listCategories());
   }
 
   if (name === 'budget_accuracy') {
-    const startMonth = typeof args['start_month'] === 'string' ? args['start_month'] : null;
-    if (!startMonth) {
-      throw new Error('budget_accuracy: missing required parameter "start_month"');
-    }
-    const endMonth = typeof args['end_month'] === 'string' ? args['end_month'] : null;
-    if (!endMonth) {
-      throw new Error('budget_accuracy: missing required parameter "end_month"');
-    }
-    const tokens = getTokens();
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+    const params: BudgetAccuracyParams = {
+      start_month: requireString({ args, key: 'start_month', tool: name }),
+      end_month: requireString({ args, key: 'end_month', tool: name }),
     };
-
-    for (const [key, value] of Object.entries(tokens)) {
-      if (value !== null && value !== undefined) {
-        headers[key] = value;
-      }
-    }
-
-    let url = `${BASE_URL}/mcp/budget_accuracy?start_month=${encodeURIComponent(startMonth)}&end_month=${encodeURIComponent(endMonth)}`;
     if (typeof args['group_by'] === 'string') {
-      url += `&group_by=${encodeURIComponent(args['group_by'])}`;
+      params.group_by = args['group_by'];
     }
     if (typeof args['sort_by'] === 'string') {
-      url += `&sort_by=${encodeURIComponent(args['sort_by'])}`;
+      params.sort_by = args['sort_by'];
     }
     if (typeof args['variable_only'] === 'boolean') {
-      url += `&variable_only=${args['variable_only']}`;
+      params.variable_only = args['variable_only'];
     }
-
-    const response = await fetch(url, { headers });
-
-    if (!response.ok) {
-      throw new Error(`budget_accuracy failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data: unknown = await response.json();
-    return JSON.stringify(data);
+    return call(name, () => mcpToolApi.budgetAccuracy(params));
   }
 
   throw new Error(`Unknown tool: ${name}`);
