@@ -1,7 +1,7 @@
 # Task: Harden MCP toolExecutor: surface 400 error bodies to the LLM + dedup auth headers
 
 **ID:** harden-mcp-toolexecutor-surface-400-error-bodies-to-the-llm-dedup-auth-headers
-**Status:** ready
+**Status:** cancelled
 **Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-06-07
