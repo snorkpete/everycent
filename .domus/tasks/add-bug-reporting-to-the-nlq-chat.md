@@ -30,9 +30,37 @@ The EveryCent NLQ chat is already implemented and live: a single chat agent with
 
 ### Approach
 
-- Add a new bug-reporting tool (or small tool set) to the existing single chat agent. No router, no second system prompt — the LLM decides via tool selection whether a message is a financial query or a bug action.
-- The system prompt may need updating to cover bug-reporting behaviour.
-- Add corresponding Rails backend support.
+- The chat gets TWO modes — `nlq` (existing financial Q&A) and `bug-report` — selected by an explicit **UI button**, not an LLM router/classifier. The user declares intent by clicking; there is no message-classification step and therefore no misroute failure mode. Type: `type ChatMode = 'nlq' | 'bug-report'` (a union type, not necessarily an enum; extends cleanly to a 3rd mode later).
+- Each mode swaps exactly two things: the **system prompt** and the **available tool set**. Toolsets are disjoint — bug mode does NOT load the NLQ tools, and vice versa (a real context-budget win on the local model; it grows as the NLQ toolset builds out toward its ~12-tool target — only 4 are wired today).
+- Add corresponding Rails backend support for the bug-report tools.
+
+### Chat Mode Architecture (confirmed 2026-06-08, after codebase investigation)
+
+**Key fact — prompt + tools are FRONTEND-owned and sent straight to Ollama; they never touch Rails.** So mode-switching is a pure frontend concern. The Rails MCP layer is a stateless query executor with no prompt/tool registry.
+
+Current wiring (anchors for the implementer):
+- `webclientv4/src/app/chat/systemPrompt.ts` — system prompt, currently a hardcoded module const. → refactor to `getSystemPrompt(mode)`.
+- `webclientv4/src/app/chat/toolDefinitions.ts` — tool array, currently hardcoded (4 tools: `analyze_overspending`, `analyze_overspending_by_allocation`, `list_categories`, `budget_accuracy`). → refactor to `getToolsForMode(mode)`.
+- `webclientv4/src/app/chat/chatAgent.ts:265` injects the system prompt; `:74` injects the tools into the Ollama payload. Thread `mode` through `ChatConfig`.
+- `webclientv4/src/app/chat/toolExecutor.ts:5` — hardcoded switch (one branch per tool name → Rails MCP endpoint). Bug tools add new branches here.
+- `webclientv4/src/app/chat/chatStore.ts:12` — `defineStore('chat', ...)`; `:18` generates `conversationId` via `crypto.randomUUID()`; `:147` `clearMessages()` resets it.
+- `webclientv4/src/app/chat/NlqChatWindow.vue` (reusable PrimeVue Dialog) + `NlqChatApp.vue` (wrapper), mounted globally at `App.vue:18`.
+
+**Store decision — Option B: key the store by mode.** Make the store a factory: `defineStore(\`chat-${mode}\`, setupFn)`. `chat-nlq` and `chat-bug-report` are then independent stores (separate `messages`, `conversationId`, `loading`). Render ONE at a time. Rationale:
+- Pinia stores are singletons *by ID*, not one-per-page — parameterizing the ID gives genuine independent instances. This is cheap and localized (thread `mode` through `useChatStore()` callsites), NOT a big refactor.
+- Non-destructive: switching modes does not nuke the other mode's in-progress conversation (Option A — a single store with a `mode` ref + `clearMessages` on switch — would have).
+- Keeps visual stacking (two windows at once) nearly free LATER without retrofit — but we are NOT building stacking now (YAGNI; not needed for two users).
+
+**Banned (over-engineering guardrails):**
+- No LLM router/classifier — the button is the disambiguation.
+- No mid-conversation mode coexistence / visual stacking built now (the store-keyed-by-mode design just doesn't *prevent* it later).
+- No mode registry / plugin framework / `ChatModeStrategy` abstraction. Two modes, hardcoded. Refactor to a registry only if/when a 3rd mode actually lands.
+- No sharing tools across modes "just in case." Disjoint. (Possible exception: a shared *prompt fragment* describing EveryCent to the model, if one exists — copy-paste it for now, extract later only if it proves duplicated.)
+
+### Effort
+
+- Mode parameterization (prompt fn + tools fn + `mode` on `ChatConfig` + store-keyed-by-mode): ~0.5 day, frontend only.
+- The bug feature itself (backend tables/endpoints/tools + intake prompt + CRUD UI) is the real work — see Slices below.
 
 ### Data Model
 
@@ -71,7 +99,9 @@ Raw `bytea`, deliberately NOT Active Storage/S3 — avoiding an external blob st
 
 - [ ] `bug_reports` model: status enum (open / in_progress / fixed), `reporter_id` captured from the devise_token_auth identity at create time, description/text fields, scoped by Household via `acts_as_tenant`.
 - [ ] Bug reports are NOT filtered by reporter — both household members see all bugs.
-- [ ] New MCP tool(s) registered on the existing single chat agent (no router, no second prompt) for: create bug report, read/search bug reports.
+- [ ] Chat supports a `bug-report` mode alongside `nlq`, selected by an explicit UI button (no LLM router/classifier). `getSystemPrompt(mode)` and `getToolsForMode(mode)` select the prompt + disjoint toolset; `mode` threaded through `ChatConfig`.
+- [ ] Store keyed by mode (Option B): `defineStore(\`chat-${mode}\`, ...)` so `nlq` and `bug-report` have independent state; one rendered at a time. No multi-instance stacking built.
+- [ ] Bug-mode tools (create bug report, read/search bug reports) registered for that mode only, wired through `toolExecutor` to new Rails MCP endpoints.
 - [ ] Agent does read-before-create to dedupe against existing open bugs (prompts the user to add detail to an existing report instead of duplicating).
 - [ ] System prompt / tool prompting makes the agent conduct an interview-style intake for a non-technical reporter — actively eliciting what screen, expected vs. actual, when it happened, and whether it reproduces — rather than passively recording whatever the user volunteers. (This is the core value of the feature.)
 - [ ] Small CRUD UI in webclientv4/ for changing bug-report status (status changes are UI-only, not agent-driven).
