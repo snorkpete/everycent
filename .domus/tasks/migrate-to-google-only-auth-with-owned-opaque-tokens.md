@@ -1,7 +1,7 @@
 # Task: Migrate to Google-only auth with owned opaque tokens
 
 **ID:** migrate-to-google-only-auth-with-owned-opaque-tokens
-**Status:** ready
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-06

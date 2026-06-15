@@ -44,4 +44,6 @@ When the model picks the wrong tool or misreads a query, the thinking + the tool
 
 ---
 
-Related (chat-adjacent only, NOT a dependency): task `add-bug-reporting-to-the-nlq-chat`.
+Related: task `add-bug-reporting-to-the-nlq-chat`.
+
+**Strong-benefit precursor to bug reporting (not a hard dependency).** Tuning the bug-report intake prompt needs a corpus of real bug-intake conversations to review retrospectively — the same retrospective-tuning argument this idea makes for NLQ, applied to bug-report mode. So prefer building chat persistence *first*. It remains tuning-only: the captured transcript is NOT bug-reporting evidence and is not auto-attached to bug reports (confirmed 2026-06-14 — debugging-evidence framing was considered and rejected; capture stays purely for prompt/tool tuning). The bug-reporting design as written does not depend on this.

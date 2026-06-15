@@ -123,3 +123,4 @@ Raw `bytea`, deliberately NOT Active Storage/S3 — avoiding an external blob st
 
 - One open design question remains (attachment capture mechanism), deferred to Slice 2 — this is why the task sits at `proposed` rather than fully `ready`.
 - Slice 1 must be fully usable end-to-end before Slice 2 begins.
+- **Recommended precursor (not a hard dependency): chat persistence** — see idea `capture-nlq-chat-transcripts-for-later-analysis/debugging`. Tuning the intake prompt (the core value of this feature) needs a corpus of real bug-intake conversations to review retrospectively, which requires persistence in place first. The design here does not depend on it, but building persistence before this task is the preferred sequencing. Persistence is tuning-only — transcripts are NOT bug-report evidence.

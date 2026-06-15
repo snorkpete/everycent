@@ -1,7 +1,7 @@
 # Task: Remove password-based auth after Google OAuth migration
 
 **ID:** remove-password-based-auth-after-google-oauth-migration
-**Status:** deferred
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-09
