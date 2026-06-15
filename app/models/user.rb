@@ -33,6 +33,11 @@
 class User < ApplicationRecord
   before_validation :generate_uid
 
+  # email is the sole join key for Google sign-in (Auth::GoogleController looks
+  # up User.find_by(email:) with no tenant scope), so it must be globally unique
+  # and present. devise used to enforce this; it no longer does.
+  validates :email, presence: true, uniqueness: { case_sensitive: false }
+
   belongs_to :household
   has_many :sessions, dependent: :destroy
 
