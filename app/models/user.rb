@@ -31,13 +31,10 @@
 #
 
 class User < ApplicationRecord
-  include DeviseTokenAuth::Concerns::User
-
-  # do not require email confirmation for new users
-  before_create :skip_confirmation!
   before_validation :generate_uid
 
   belongs_to :household
+  has_many :sessions, dependent: :destroy
 
   has_many :bank_accounts, through: :household
   has_many :allocation_categories, through: :household

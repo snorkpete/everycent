@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_24_134615) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_15_000001) do
   create_schema "heroku_ext"
 
   # These are extensions that must be enabled in order to support this database
@@ -217,6 +217,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_134615) do
     t.index ["bank_account_id"], name: "index_recurring_incomes_on_bank_account_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.string "user_agent"
+    t.string "ip_address"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "last_active_at"
+    t.index ["token_digest"], name: "index_sessions_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "settings", id: :serial, force: :cascade do |t|
     t.integer "primary_budget_account_id"
     t.string "bank_charges_allocation_name"
@@ -326,6 +339,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_24_134615) do
   add_foreign_key "llm_models", "households", on_update: :cascade
   add_foreign_key "llm_usage_records", "households", on_update: :cascade
   add_foreign_key "llm_usage_records", "llm_models"
+  add_foreign_key "sessions", "users"
   add_foreign_key "settings", "households", on_update: :cascade
   add_foreign_key "sink_fund_allocations", "households", on_update: :cascade
   add_foreign_key "special_events", "households"

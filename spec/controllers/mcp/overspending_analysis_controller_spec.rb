@@ -99,8 +99,8 @@ RSpec.describe Mcp::OverspendingAnalysisController, type: :controller do
 
   describe 'GET #show — authentication' do
     it 'returns 401 when not logged in' do
-      # Reset auth headers to simulate an unauthenticated request
-      request.headers.merge!('access-token' => '', 'client' => '', 'uid' => '')
+      # Clear auth header to simulate an unauthenticated request
+      request.headers['Authorization'] = nil
       get :show, params: { period: '2024-01' }
       expect(response).to have_http_status(:unauthorized)
     end

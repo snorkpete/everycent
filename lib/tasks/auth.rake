@@ -1,45 +1,32 @@
 namespace :auth do
-  desc 'Clear all auth tokens from every user. Safe to run in any environment.'
+  desc 'Clear all sessions. Safe to run in any environment.'
   task clear_tokens: :environment do
-    count = User.update_all(tokens: nil)
-    puts "Cleared auth tokens for #{count} user(s)."
+    count = Session.delete_all
+    puts "Cleared #{count} session(s)."
   end
 
-  desc 'Seed dev/test users with known passwords. Aborts if run in production.'
+  desc 'Seed dev/test users (Google-only). Aborts if run in production.'
   task :seed_dev_users, [:claude_household_name] => :environment do |_t, args|
     abort 'This task cannot be run in production.' if Rails.env.production?
 
     claude_household_name = args[:claude_household_name]
     if claude_household_name.blank?
-      abort 'Usage: rake auth:seed_dev_users["<your-household-name>"] — the claude dev user gets scoped to this household so agents can inspect real dev data.'
+      abort 'Usage: rake auth:seed_dev_users["<your-household-name>"]'
     end
 
-    # Cypress tests run against a fresh, dedicated household so they never
-    # touch real dev data. Create it if missing.
     cypress_household = ActsAsTenant.without_tenant do
       Household.find_or_create_by!(name: 'Cypress Test Household')
     end
     ActsAsTenant.with_tenant(cypress_household) do
       user = User.find_by(email: 'cypress@test.com')
       if user.nil?
-        User.create!(
-          email: 'cypress@test.com',
-          password: 'CypressTest123!',
-          password_confirmation: 'CypressTest123!',
-          household: cypress_household
-        )
+        User.create!(email: 'cypress@test.com', household: cypress_household, provider: 'google', uid: 'cypress@test.com')
         puts "Created user: cypress@test.com in household: #{cypress_household.name}"
       else
-        user.password = 'CypressTest123!'
-        user.password_confirmation = 'CypressTest123!'
-        user.save!
-        puts "Updated password for: cypress@test.com"
+        puts "Updated user: cypress@test.com"
       end
     end
 
-    # Claude's test user is scoped to the developer's own household so agents
-    # can poke around real dev data when debugging. The caller must pass the
-    # household name explicitly — we never silently pick a default.
     claude_household = ActsAsTenant.without_tenant do
       Household.find_by(name: claude_household_name)
     end
@@ -48,18 +35,10 @@ namespace :auth do
     ActsAsTenant.with_tenant(claude_household) do
       user = User.find_by(email: 'claude@everycent.dev')
       if user.nil?
-        User.create!(
-          email: 'claude@everycent.dev',
-          password: 'Claude123!',
-          password_confirmation: 'Claude123!',
-          household: claude_household
-        )
+        User.create!(email: 'claude@everycent.dev', household: claude_household, provider: 'google', uid: 'claude@everycent.dev')
         puts "Created user: claude@everycent.dev in household: #{claude_household.name}"
       else
-        user.password = 'Claude123!'
-        user.password_confirmation = 'Claude123!'
-        user.save!
-        puts "Updated password for: claude@everycent.dev"
+        puts "Updated user: claude@everycent.dev"
       end
     end
   end

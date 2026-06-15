@@ -15,7 +15,6 @@ RSpec.describe Auth::GoogleController, type: :controller do
   end
 
   before do
-    @request.env['devise.mapping'] = Devise.mappings[:user]
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with('GOOGLE_CLIENT_ID').and_return('test-google-client-id')
   end
@@ -90,18 +89,16 @@ RSpec.describe Auth::GoogleController, type: :controller do
         expect(body['success']).to be true
       end
 
-      it 'sets auth token headers in the response' do
+      it 'returns a token in the body' do
         post :create, params: { credential: 'valid-token' }
-        expect(response.headers['access-token']).to be_present
-        expect(response.headers['client']).to be_present
-        expect(response.headers['uid']).to be_present
+        body = JSON.parse(response.body)
+        expect(body['data']['token']).to be_present
       end
 
-      it 'does not mutate provider or uid on the user' do
-        post :create, params: { credential: 'valid-token' }
-        user.reload
-        expect(user.provider).to eq 'email'
-        expect(user.uid).to eq user.email
+      it 'creates a Session row for the user' do
+        user # ensure user exists
+        expect { post :create, params: { credential: 'valid-token' } }
+          .to change(Session, :count).by(1)
       end
     end
   end

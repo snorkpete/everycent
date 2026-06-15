@@ -62,7 +62,7 @@ RSpec.describe Mcp::CategoriesController, type: :controller do
 
   describe 'GET #index — authentication' do
     it 'returns 401 when not logged in' do
-      request.headers.merge!('access-token' => '', 'client' => '', 'uid' => '')
+      request.headers['Authorization'] = nil
       get :index
       expect(response).to have_http_status(:unauthorized)
     end

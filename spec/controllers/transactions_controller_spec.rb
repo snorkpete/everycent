@@ -233,14 +233,8 @@ RSpec.describe TransactionsController, :type => :controller do
     end
 
     it 'requires authentication' do
-      # Clear auth headers to simulate unauthenticated request
-      request.headers.merge!({
-        'access-token' => '',
-        'token-type' => '',
-        'client' => '',
-        'uid' => ''
-      })
-      sign_out @user
+      # Clear auth header to simulate unauthenticated request
+      request.headers['Authorization'] = nil
 
       post :import_preview, params: {
         budget_id: budget.id,
@@ -479,13 +473,8 @@ RSpec.describe TransactionsController, :type => :controller do
     end
 
     it 'requires authentication' do
-      request.headers.merge!({
-        'access-token' => '',
-        'token-type' => '',
-        'client' => '',
-        'uid' => ''
-      })
-      sign_out @user
+      # Clear auth header to simulate unauthenticated request
+      request.headers['Authorization'] = nil
 
       post :import_save, params: {
         budget_id: budget.id,

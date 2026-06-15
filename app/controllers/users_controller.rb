@@ -1,9 +1,9 @@
 class UsersController < ApplicationController
   # this class is about managing the list of users
   # It does NOT handle authentication
-  # Authentication is managed by Devise
+  # Identity is determined through google sign in, and then,
+  # Authentication within the app is managed via Bearer token (Session model)
   # Currently, this logic is not being used
-  before_action :authenticate_user!
 
   # Find the current household to use for household scoping
   # This 3 lines should be present in every controller (except the User controller)
