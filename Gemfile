@@ -2,8 +2,12 @@ source 'https://rubygems.org'
 ruby '3.4.9'
 
 gem 'bundler'
-gem 'rails', '~> 7.1.3'
+gem 'rails', '~> 7.2.0'
 gem 'puma', '~> 5.6'
+# Stay on Rack 2 through the Rails 8.1 upgrade. Rails 7.2/8.x allow rack >= 2.2.4;
+# forced Rack 3 only lands in Rails 8.2. Puma 5.6 is incompatible with Rack 3, and
+# Rack 3 forces rack-cors 3.0 + middleware breaking changes — deferred to the 8.2 task.
+gem 'rack', '~> 2.2'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
 
@@ -68,7 +72,7 @@ end
 group :test do
   gem 'faker', '~> 3.2'
   #gem 'capybara'
-  gem 'database_cleaner-active_record', '~> 2.1.0'
+  gem 'database_cleaner-active_record', '~> 2.2'
   #gem 'selenium-webdriver'
 end
 
