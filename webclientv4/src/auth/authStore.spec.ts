@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAuthStore } from './authStore';
 import apiGateway from '../api/api-gateway';
-import { AUTH_HEADER_KEYS } from './auth.types';
 
 // Mock at the gateway layer, not authApi — this keeps the real authApi in the
 // path so the store is tested against the same code it runs in production.
@@ -18,76 +17,26 @@ describe('authStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     localStorage.clear();
-    vi.restoreAllMocks();
-  });
-
-  describe('logIn', () => {
-    it('sets loggedIn to true on successful login', async () => {
-      const email = 'user@test.com';
-      const password = 'password';
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
-
-      const store = useAuthStore();
-      await store.logIn(email, password);
-
-      expect(store.loggedIn).toBe(true);
-      expect(store.error).toBeNull();
-      expect(apiGateway.post).toHaveBeenCalledWith('/auth/sign_in', { email, password });
-    });
-
-    it('sets error on failed login', async () => {
-      const serverError = {
-        response: { data: { errors: ['Invalid credentials'] } },
-      };
-      vi.mocked(apiGateway.post).mockRejectedValue(serverError);
-
-      const store = useAuthStore();
-
-      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(serverError);
-
-      expect(store.loggedIn).toBe(false);
-      expect(store.error).toBe('Invalid credentials');
-    });
-
-    it('falls back to "Login failed" when error has no server error messages', async () => {
-      const serverError = {
-        response: { data: {} },
-      };
-      vi.mocked(apiGateway.post).mockRejectedValue(serverError);
-
-      const store = useAuthStore();
-
-      await expect(store.logIn('user@test.com', 'wrong')).rejects.toEqual(serverError);
-
-      expect(store.error).toBe('Login failed');
-    });
-
-    it('sets generic error for failures without a response payload', async () => {
-      vi.mocked(apiGateway.post).mockRejectedValue(new Error('Network error'));
-
-      const store = useAuthStore();
-
-      await expect(store.logIn('user@test.com', 'pass')).rejects.toThrow('Network error');
-
-      expect(store.loggedIn).toBe(false);
-      expect(store.error).toBe('Login failed');
-    });
+    vi.clearAllMocks();
   });
 
   describe('logInWithGoogle', () => {
-    it('sets loggedIn to true on successful Google sign-in', async () => {
+    it('saves body token, sets loggedIn to true on successful sign-in', async () => {
       const credential = 'google-credential-token';
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
+      vi.mocked(apiGateway.post).mockResolvedValue({
+        data: { success: true, data: { email: 'user@test.com', token: 'tok-google' } },
+      });
 
       const store = useAuthStore();
       await store.logInWithGoogle(credential);
 
       expect(store.loggedIn).toBe(true);
       expect(store.error).toBeNull();
+      expect(localStorage.getItem('auth-token')).toBe('tok-google');
       expect(apiGateway.post).toHaveBeenCalledWith('/auth/google', { credential });
     });
 
-    it('sets error on failed Google sign-in', async () => {
+    it('sets error and does not save token on failed sign-in', async () => {
       const serverError = {
         response: { data: { errors: ['No account found for this Google identity'] } },
       };
@@ -99,12 +48,11 @@ describe('authStore', () => {
 
       expect(store.loggedIn).toBe(false);
       expect(store.error).toBe('No account found for this Google identity');
+      expect(localStorage.getItem('auth-token')).toBeNull();
     });
 
     it('falls back to "Google sign-in failed" when error has no server error messages', async () => {
-      const serverError = {
-        response: { data: {} },
-      };
+      const serverError = { response: { data: {} } };
       vi.mocked(apiGateway.post).mockRejectedValue(serverError);
 
       const store = useAuthStore();
@@ -127,30 +75,63 @@ describe('authStore', () => {
   });
 
   describe('logOut', () => {
-    it('clears loggedIn and removes auth keys from localStorage', async () => {
-      for (const key of AUTH_HEADER_KEYS) {
-        localStorage.setItem(key, 'some-value');
-      }
-
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
+    it('calls signOut, clears token, and sets loggedIn to false', async () => {
+      localStorage.setItem('auth-token', 'tok-abc');
+      vi.mocked(apiGateway.post).mockResolvedValue({
+        data: { success: true, data: { email: 'user@test.com', token: 'tok-abc' } },
+      });
+      vi.mocked(apiGateway.delete).mockResolvedValue({ status: 204 });
 
       const store = useAuthStore();
-      await store.logIn('user@test.com', 'password');
-      store.logOut();
+      await store.logInWithGoogle('credential');
+      await store.logOut();
 
       expect(store.loggedIn).toBe(false);
-      for (const key of AUTH_HEADER_KEYS) {
-        expect(localStorage.getItem(key)).toBeNull();
-      }
+      expect(localStorage.getItem('auth-token')).toBeNull();
+      expect(apiGateway.delete).toHaveBeenCalledWith('/auth/sign_out');
+    });
+
+    it('clears token and sets loggedIn to false even when signOut rejects', async () => {
+      vi.mocked(apiGateway.post).mockResolvedValue({
+        data: { success: true, data: { email: 'user@test.com', token: 'tok-abc' } },
+      });
+      vi.mocked(apiGateway.delete).mockRejectedValue(new Error('Network error'));
+
+      const store = useAuthStore();
+      await store.logInWithGoogle('credential');
+
+      await store.logOut();
+
+      expect(store.loggedIn).toBe(false);
+      expect(localStorage.getItem('auth-token')).toBeNull();
+    });
+  });
+
+  describe('invalidateSession', () => {
+    it('clears the token and sets loggedIn to false without calling the server', async () => {
+      vi.mocked(apiGateway.post).mockResolvedValue({
+        data: { success: true, data: { email: 'user@test.com', token: 'tok-abc' } },
+      });
+
+      const store = useAuthStore();
+      await store.logInWithGoogle('credential');
+
+      store.invalidateSession();
+
+      expect(store.loggedIn).toBe(false);
+      expect(localStorage.getItem('auth-token')).toBeNull();
+      expect(apiGateway.delete).not.toHaveBeenCalled();
     });
   });
 
   describe('checkSession', () => {
     it('returns true immediately if already logged in', async () => {
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
+      vi.mocked(apiGateway.post).mockResolvedValue({
+        data: { success: true, data: { email: 'user@test.com', token: 'tok-abc' } },
+      });
 
       const store = useAuthStore();
-      await store.logIn('user@test.com', 'password');
+      await store.logInWithGoogle('credential');
 
       const result = await store.checkSession();
 
@@ -169,7 +150,7 @@ describe('authStore', () => {
     });
 
     it('validates token and sets loggedIn on success', async () => {
-      localStorage.setItem('access-token', 'valid-token');
+      localStorage.setItem('auth-token', 'valid-token');
       vi.mocked(apiGateway.get).mockResolvedValue({
         data: { success: true },
       });
@@ -179,11 +160,11 @@ describe('authStore', () => {
 
       expect(result).toBe(true);
       expect(store.loggedIn).toBe(true);
-      expect(apiGateway.get).toHaveBeenCalledWith('/auth/validate_token');
+      expect(apiGateway.get).toHaveBeenCalledWith('/auth/validate');
     });
 
-    it('sets loggedIn to false when validation returns success !== true', async () => {
-      localStorage.setItem('access-token', 'some-token');
+    it('clears the stale token when validation returns success !== true', async () => {
+      localStorage.setItem('auth-token', 'some-token');
       vi.mocked(apiGateway.get).mockResolvedValue({
         data: { success: false },
       });
@@ -193,10 +174,11 @@ describe('authStore', () => {
 
       expect(result).toBe(false);
       expect(store.loggedIn).toBe(false);
+      expect(localStorage.getItem('auth-token')).toBeNull();
     });
 
-    it('returns false when token validation fails', async () => {
-      localStorage.setItem('access-token', 'expired-token');
+    it('clears the stale token when validation fails', async () => {
+      localStorage.setItem('auth-token', 'expired-token');
       vi.mocked(apiGateway.get).mockRejectedValue(new Error('Unauthorized'));
 
       const store = useAuthStore();
@@ -204,6 +186,7 @@ describe('authStore', () => {
 
       expect(result).toBe(false);
       expect(store.loggedIn).toBe(false);
+      expect(localStorage.getItem('auth-token')).toBeNull();
     });
   });
 });

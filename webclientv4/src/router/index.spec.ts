@@ -8,7 +8,6 @@ import { allocationCategoryApi } from '../app/allocation-categories/allocationCa
 
 vi.mock('../auth/authApi', () => ({
   authApi: {
-    signIn: vi.fn(),
     validateToken: vi.fn(),
     signOut: vi.fn(),
   },
@@ -34,8 +33,11 @@ vi.mock('../app/allocation-categories/allocationCategoryApi', () => ({
 }));
 
 function authenticateUser() {
-  localStorage.setItem('access-token', 'valid-token');
-  vi.mocked(authApi.validateToken).mockResolvedValue({ success: true });
+  localStorage.setItem('auth-token', 'valid-token');
+  vi.mocked(authApi.validateToken).mockResolvedValue({
+    success: true,
+    data: { email: 'user@test.com' },
+  });
 }
 
 describe('router', () => {
