@@ -262,6 +262,167 @@ describe('executeTool', () => {
     });
   });
 
+  describe('out_of_budget_analysis', () => {
+    it('gets the endpoint with required params only when group_by absent', async () => {
+      mockApiGateway.get('/mcp/out_of_budget_analysis', { results: [] });
+
+      await executeTool('out_of_budget_analysis', {
+        start_month: '2024-01',
+        end_month: '2024-12',
+      });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/out_of_budget_analysis', {
+        params: { start_month: '2024-01', end_month: '2024-12' },
+      });
+    });
+
+    it('forwards group_by when provided as a string', async () => {
+      mockApiGateway.get('/mcp/out_of_budget_analysis', { results: [] });
+
+      await executeTool('out_of_budget_analysis', {
+        start_month: '2024-01',
+        end_month: '2024-12',
+        group_by: 'allocation_name',
+      });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/out_of_budget_analysis', {
+        params: { start_month: '2024-01', end_month: '2024-12', group_by: 'allocation_name' },
+      });
+    });
+
+    it('ignores a non-string group_by', async () => {
+      mockApiGateway.get('/mcp/out_of_budget_analysis', { results: [] });
+
+      await executeTool('out_of_budget_analysis', {
+        start_month: '2024-01',
+        end_month: '2024-12',
+        group_by: 42,
+      });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/out_of_budget_analysis', {
+        params: { start_month: '2024-01', end_month: '2024-12' },
+      });
+    });
+
+    it('returns the response JSON stringified', async () => {
+      const payload = { results: [{ month: '2024-01', total_cents: 5000 }] };
+      mockApiGateway.get('/mcp/out_of_budget_analysis', payload);
+
+      const result = await executeTool('out_of_budget_analysis', {
+        start_month: '2024-01',
+        end_month: '2024-12',
+      });
+
+      expect(result).toBe(JSON.stringify(payload));
+    });
+
+    it('throws when start_month is missing', async () => {
+      await expect(executeTool('out_of_budget_analysis', { end_month: '2024-12' })).rejects.toThrow(
+        'missing required parameter "start_month"',
+      );
+    });
+
+    it('throws when end_month is missing', async () => {
+      await expect(
+        executeTool('out_of_budget_analysis', { start_month: '2024-01' }),
+      ).rejects.toThrow('missing required parameter "end_month"');
+    });
+  });
+
+  describe('placeholder_allocation_analysis', () => {
+    it('gets the endpoint with required params', async () => {
+      mockApiGateway.get('/mcp/placeholder_allocation_analysis', { results: {} });
+
+      await executeTool('placeholder_allocation_analysis', {
+        start_month: '2024-01',
+        end_month: '2024-12',
+      });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/placeholder_allocation_analysis', {
+        params: { start_month: '2024-01', end_month: '2024-12' },
+      });
+    });
+
+    it('returns the response JSON stringified', async () => {
+      const payload = { results: { monthly_summary: [], top_placeholders: [] } };
+      mockApiGateway.get('/mcp/placeholder_allocation_analysis', payload);
+
+      const result = await executeTool('placeholder_allocation_analysis', {
+        start_month: '2024-01',
+        end_month: '2024-12',
+      });
+
+      expect(result).toBe(JSON.stringify(payload));
+    });
+
+    it('throws when start_month is missing', async () => {
+      await expect(
+        executeTool('placeholder_allocation_analysis', { end_month: '2024-12' }),
+      ).rejects.toThrow('missing required parameter "start_month"');
+    });
+
+    it('throws when end_month is missing', async () => {
+      await expect(
+        executeTool('placeholder_allocation_analysis', { start_month: '2024-01' }),
+      ).rejects.toThrow('missing required parameter "end_month"');
+    });
+  });
+
+  describe('sink_fund_status', () => {
+    it('gets the endpoint with no params when none provided', async () => {
+      mockApiGateway.get('/mcp/sink_fund_status', { results: [] });
+
+      await executeTool('sink_fund_status', {});
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/sink_fund_status', { params: {} });
+    });
+
+    it('forwards account when provided as a string', async () => {
+      mockApiGateway.get('/mcp/sink_fund_status', { results: [] });
+
+      await executeTool('sink_fund_status', { account: 'Sink Fund Account' });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/sink_fund_status', {
+        params: { account: 'Sink Fund Account' },
+      });
+    });
+
+    it('forwards include_closed when provided as a boolean', async () => {
+      mockApiGateway.get('/mcp/sink_fund_status', { results: [] });
+
+      await executeTool('sink_fund_status', { include_closed: true });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/sink_fund_status', {
+        params: { include_closed: true },
+      });
+    });
+
+    it('ignores a non-string account', async () => {
+      mockApiGateway.get('/mcp/sink_fund_status', { results: [] });
+
+      await executeTool('sink_fund_status', { account: 42 });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/sink_fund_status', { params: {} });
+    });
+
+    it('ignores a non-boolean include_closed', async () => {
+      mockApiGateway.get('/mcp/sink_fund_status', { results: [] });
+
+      await executeTool('sink_fund_status', { include_closed: 'yes' });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/sink_fund_status', { params: {} });
+    });
+
+    it('returns the response JSON stringified', async () => {
+      const payload = { results: [{ name: 'Car Fund', remaining_cents: 5000 }] };
+      mockApiGateway.get('/mcp/sink_fund_status', payload);
+
+      const result = await executeTool('sink_fund_status', {});
+
+      expect(result).toBe(JSON.stringify(payload));
+    });
+  });
+
   describe('unknown tool', () => {
     it('throws a descriptive error for an unrecognised tool name', async () => {
       await expect(executeTool('do_something_weird', {})).rejects.toThrow(

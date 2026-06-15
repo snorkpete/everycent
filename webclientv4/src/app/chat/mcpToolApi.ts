@@ -12,6 +12,22 @@ export interface BudgetAccuracyParams {
   variable_only?: boolean;
 }
 
+export interface OutOfBudgetAnalysisParams {
+  start_month: string;
+  end_month: string;
+  group_by?: string;
+}
+
+export interface PlaceholderAllocationAnalysisParams {
+  start_month: string;
+  end_month: string;
+}
+
+export interface SinkFundStatusParams {
+  account?: string;
+  include_closed?: boolean;
+}
+
 export const mcpToolApi = {
   analyzeOverspending: (period: string): Promise<unknown> =>
     apiGateway
@@ -30,4 +46,13 @@ export const mcpToolApi = {
 
   budgetAccuracy: (params: BudgetAccuracyParams): Promise<unknown> =>
     apiGateway.get<unknown>('/mcp/budget_accuracy', { params }).then((r) => r.data),
+
+  outOfBudgetAnalysis: (params: OutOfBudgetAnalysisParams): Promise<unknown> =>
+    apiGateway.get<unknown>('/mcp/out_of_budget_analysis', { params }).then((r) => r.data),
+
+  placeholderAllocationAnalysis: (params: PlaceholderAllocationAnalysisParams): Promise<unknown> =>
+    apiGateway.get<unknown>('/mcp/placeholder_allocation_analysis', { params }).then((r) => r.data),
+
+  sinkFundStatus: (params: SinkFundStatusParams): Promise<unknown> =>
+    apiGateway.get<unknown>('/mcp/sink_fund_status', { params }).then((r) => r.data),
 };

@@ -119,4 +119,100 @@ describe('mcpToolApi', () => {
       expect(result).toEqual(payload);
     });
   });
+
+  describe('outOfBudgetAnalysis', () => {
+    it('gets /mcp/out_of_budget_analysis with required params', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: {} });
+
+      await mcpToolApi.outOfBudgetAnalysis({ start_month: '2024-01', end_month: '2024-12' });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/out_of_budget_analysis', {
+        params: { start_month: '2024-01', end_month: '2024-12' },
+      });
+    });
+
+    it('forwards group_by when provided', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: {} });
+
+      await mcpToolApi.outOfBudgetAnalysis({
+        start_month: '2024-01',
+        end_month: '2024-12',
+        group_by: 'allocation_name',
+      });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/out_of_budget_analysis', {
+        params: { start_month: '2024-01', end_month: '2024-12', group_by: 'allocation_name' },
+      });
+    });
+
+    it('returns the response data', async () => {
+      const payload = { results: [{ month: '2024-01', total_cents: 50000 }] };
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: payload });
+
+      const result = await mcpToolApi.outOfBudgetAnalysis({
+        start_month: '2024-01',
+        end_month: '2024-12',
+      });
+
+      expect(result).toEqual(payload);
+    });
+  });
+
+  describe('placeholderAllocationAnalysis', () => {
+    it('gets /mcp/placeholder_allocation_analysis with required params', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: {} });
+
+      await mcpToolApi.placeholderAllocationAnalysis({
+        start_month: '2024-01',
+        end_month: '2024-12',
+      });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/placeholder_allocation_analysis', {
+        params: { start_month: '2024-01', end_month: '2024-12' },
+      });
+    });
+
+    it('returns the response data', async () => {
+      const payload = {
+        results: { monthly_summary: [], top_placeholders: [] },
+      };
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: payload });
+
+      const result = await mcpToolApi.placeholderAllocationAnalysis({
+        start_month: '2024-01',
+        end_month: '2024-12',
+      });
+
+      expect(result).toEqual(payload);
+    });
+  });
+
+  describe('sinkFundStatus', () => {
+    it('gets /mcp/sink_fund_status with no params when none provided', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: {} });
+
+      await mcpToolApi.sinkFundStatus({});
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/sink_fund_status', { params: {} });
+    });
+
+    it('forwards account and include_closed when provided', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: {} });
+
+      await mcpToolApi.sinkFundStatus({ account: 'Sink Fund Account', include_closed: true });
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/sink_fund_status', {
+        params: { account: 'Sink Fund Account', include_closed: true },
+      });
+    });
+
+    it('returns the response data', async () => {
+      const payload = { results: [{ name: 'Car Fund', remaining_cents: 5000 }] };
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: payload });
+
+      const result = await mcpToolApi.sinkFundStatus({});
+
+      expect(result).toEqual(payload);
+    });
+  });
 });

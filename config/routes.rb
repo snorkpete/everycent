@@ -6,6 +6,9 @@ Rails.application.routes.draw do
     get 'budget_accuracy', to: 'budget_accuracy#show'
     get 'categories', to: 'categories#index'
     post 'llm_usage', to: 'llm_usage#create'
+    get 'out_of_budget_analysis', to: 'out_of_budget_analysis#show'
+    get 'placeholder_allocation_analysis', to: 'placeholder_allocation_analysis#show'
+    get 'sink_fund_status', to: 'sink_fund_status#show'
   end
 
   resources :llm_usage_records, only: [:index] do

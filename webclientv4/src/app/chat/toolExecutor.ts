@@ -1,5 +1,11 @@
 import { isAxiosError } from 'axios';
-import { mcpToolApi, type BudgetAccuracyParams } from './mcpToolApi';
+import {
+  mcpToolApi,
+  type BudgetAccuracyParams,
+  type OutOfBudgetAnalysisParams,
+  type PlaceholderAllocationAnalysisParams,
+  type SinkFundStatusParams,
+} from './mcpToolApi';
 
 // Pulls the LLM-recoverable message out of a failed tool request. The MCP query
 // objects deliberately return `{ error: "<message>" }` bodies (e.g. reversed
@@ -79,6 +85,36 @@ export async function executeTool(name: string, args: Record<string, unknown>): 
       params.variable_only = args['variable_only'];
     }
     return call(name, () => mcpToolApi.budgetAccuracy(params));
+  }
+
+  if (name === 'out_of_budget_analysis') {
+    const params: OutOfBudgetAnalysisParams = {
+      start_month: requireString({ args, key: 'start_month', tool: name }),
+      end_month: requireString({ args, key: 'end_month', tool: name }),
+    };
+    if (typeof args['group_by'] === 'string') {
+      params.group_by = args['group_by'];
+    }
+    return call(name, () => mcpToolApi.outOfBudgetAnalysis(params));
+  }
+
+  if (name === 'placeholder_allocation_analysis') {
+    const params: PlaceholderAllocationAnalysisParams = {
+      start_month: requireString({ args, key: 'start_month', tool: name }),
+      end_month: requireString({ args, key: 'end_month', tool: name }),
+    };
+    return call(name, () => mcpToolApi.placeholderAllocationAnalysis(params));
+  }
+
+  if (name === 'sink_fund_status') {
+    const params: SinkFundStatusParams = {};
+    if (typeof args['account'] === 'string') {
+      params.account = args['account'];
+    }
+    if (typeof args['include_closed'] === 'boolean') {
+      params.include_closed = args['include_closed'];
+    }
+    return call(name, () => mcpToolApi.sinkFundStatus(params));
   }
 
   throw new Error(`Unknown tool: ${name}`);

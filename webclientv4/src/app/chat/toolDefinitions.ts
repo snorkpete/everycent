@@ -89,4 +89,76 @@ export const TOOL_DEFINITIONS = [
       },
     },
   },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'out_of_budget_analysis',
+      description:
+        'Analyze how much the household relies on the Out-of-Budget / Sink Fund Transfers escape valve — the shock-absorber category that absorbs spending outside the normal budget. Also includes the "Over Budget Supplement" category (same mechanism, different label). Use this when the user asks about OOB spending, escape-valve reliance, or which months are worst for out-of-budget use. Response shape depends on group_by: "month" → one row per budget period in chronological order (fields: month, total_cents, total_display); "allocation_name" → recurring OOB items ranked by total spend DESC (fields: allocation_name, total_cents, total_display); "calendar_month" → seasonality — which calendar months of the year are worst on average, ranked by avg_monthly_cents DESC (fields: calendar_month, month_name, year_count, total_cents, total_display, avg_monthly_cents, avg_monthly_display). Monetary fields come in pairs: *_cents (exact integer, use for comparison/reasoning) and *_display (pre-formatted currency string — always present this to the user verbatim instead of doing arithmetic on the cents value). Exclusions: brought-forward credit card entries excluded.',
+      parameters: {
+        type: 'object',
+        properties: {
+          start_month: {
+            type: 'string',
+            description: 'Start of the month range in YYYY-MM format, e.g. 2024-01',
+          },
+          end_month: {
+            type: 'string',
+            description: 'End of the month range (inclusive) in YYYY-MM format, e.g. 2024-12',
+          },
+          group_by: {
+            type: 'string',
+            description:
+              'How to group results: "month" (chronological per budget period, default), "allocation_name" (recurring OOB items ranked by total), or "calendar_month" (seasonality — which months of the year are worst on average).',
+          },
+        },
+        required: ['start_month', 'end_month'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'placeholder_allocation_analysis',
+      description:
+        "Analyze structural reliance on saved money — how much spending flows through 0.01 placeholder allocations (budgeted at 1–10 cents), which represent expenses funded from sink funds rather than the current month's income. This is the allocation-level complement to out_of_budget_analysis (which is the category-level view of the same mechanism). Placeholders are the SUBJECT of this tool — they are not excluded. Response shape: { monthly_summary: [...], top_placeholders: [...] }. monthly_summary rows (one per budget month, chronological): month, total_allocation_count, placeholder_count, placeholder_pct (% of allocations that are placeholders), spend_cents, spend_display (total spending through placeholders). top_placeholders rows (ranked by total spend DESC): allocation_name, category_name, months_appeared, total_spend_cents, total_spend_display. Monetary fields come in pairs: *_cents (exact integer, use for comparison/reasoning) and *_display (pre-formatted currency string — always present this to the user verbatim instead of doing arithmetic on the cents value). Exclusions: brought-forward credit card entries excluded from spend totals.",
+      parameters: {
+        type: 'object',
+        properties: {
+          start_month: {
+            type: 'string',
+            description: 'Start of the month range in YYYY-MM format, e.g. 2024-01',
+          },
+          end_month: {
+            type: 'string',
+            description: 'End of the month range (inclusive) in YYYY-MM format, e.g. 2024-12',
+          },
+        },
+        required: ['start_month', 'end_month'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'sink_fund_status',
+      description:
+        'Report the current state of sink fund reserve allocations across all tiers (e.g. Sink Fund Account for near-term reserves, Long Term Sink Fund for months-out reserves, Emergency Fund Savings for break-glass reserves). Use this when the user asks about reserves, what they\'re saving for, how healthy savings are, or what\'s running low. Response: one row per sink fund allocation sorted by account name ASC, then allocation name ASC. Fields per row: name (allocation name), account (tier / bank account name), status ("open" or "closed"), target_cents, target_display (the savings target), funded_cents, funded_display (total money deposited in), spent_cents, spent_display (total withdrawn), remaining_cents, remaining_display (funded - spent = net current balance), is_overdrawn (boolean — true when remaining_cents < 0, meaning withdrawals exceed deposits). Negative remaining_cents signals an overdrawn allocation — always flag these explicitly to the user. Monetary fields come in pairs: *_cents (exact integer) and *_display (pre-formatted currency string — always present this to the user verbatim).',
+      parameters: {
+        type: 'object',
+        properties: {
+          account: {
+            type: 'string',
+            description:
+              'Filter to a specific sink fund tier by exact account name (e.g. "Sink Fund Account", "Long Term Sink Fund", "Emergency Fund Savings"). Omit to return all tiers.',
+          },
+          include_closed: {
+            type: 'boolean',
+            description:
+              'When true, include closed (completed or archived) allocations. Default: false (open allocations only).',
+          },
+        },
+      },
+    },
+  },
 ];
