@@ -36,10 +36,6 @@ gem 'pg', '~> 1.5.0'
 # fix for time
 gem 'tzinfo-data'
 
-# authentication
-gem 'devise', '~> 4.9.0'
-gem 'devise_token_auth', '~> 1.2'
-
 # json api building
 gem 'active_model_serializers'
 
