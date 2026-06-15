@@ -6,46 +6,6 @@
       <div ref="googleButtonRef" class="google-button" data-testid="google-button-container" />
 
       <EcStatusMessage :error="authStore.error" />
-
-      <button
-        type="button"
-        class="toggle-link"
-        data-testid="password-toggle"
-        @click="showPasswordForm = !showPasswordForm"
-      >
-        {{ showPasswordForm ? 'Hide password login' : 'Use password instead (not recommended)' }}
-      </button>
-
-      <form v-if="showPasswordForm" data-testid="login-form" @submit.prevent="login">
-        <div class="field">
-          <label for="email">Email</label>
-          <InputText
-            id="email"
-            v-model="email"
-            type="text"
-            class="w-full"
-            data-testid="email-input"
-          />
-        </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <Password
-            id="password"
-            v-model="password"
-            :feedback="false"
-            toggle-mask
-            class="w-full"
-            data-testid="password-input"
-          />
-        </div>
-        <Button
-          type="submit"
-          label="Log In"
-          :loading="loading"
-          class="w-full"
-          data-testid="login-button"
-        />
-      </form>
     </div>
   </div>
 </template>
@@ -53,21 +13,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import InputText from 'primevue/inputtext';
-import Password from 'primevue/password';
-import Button from 'primevue/button';
 import { useAuthStore } from './authStore';
 import EcStatusMessage from '../app/shared/layout/EcStatusMessage.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
 
-const email = ref('');
-const password = ref('');
-const loading = ref(false);
 const googleButtonRef = ref<HTMLElement | null>(null);
-
-const showPasswordForm = ref<boolean>(import.meta.env.DEV);
 
 async function handleGoogleCredential(response: google.accounts.id.CredentialResponse) {
   try {
@@ -111,18 +63,6 @@ onMounted(() => {
     });
   }
 });
-
-async function login() {
-  loading.value = true;
-  try {
-    await authStore.logIn(email.value, password.value);
-    router.push('/');
-  } catch {
-    // error is already set in the store
-  } finally {
-    loading.value = false;
-  }
-}
 </script>
 
 <style scoped>
@@ -145,31 +85,5 @@ async function login() {
   display: flex;
   justify-content: center;
   margin-bottom: 1.5rem;
-}
-
-.field {
-  margin-bottom: 1rem;
-}
-
-.field label {
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.toggle-link {
-  display: block;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-bottom: 1rem;
-  color: var(--p-text-muted-color);
-  font-size: 0.875rem;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.w-full {
-  width: 100%;
 }
 </style>

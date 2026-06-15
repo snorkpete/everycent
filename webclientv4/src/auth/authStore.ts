@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { authApi } from './authApi';
-import { clearTokens, hasToken } from './authTokens';
+import { clearToken, hasToken, saveToken } from './authTokens';
 
 function extractAuthError(e: unknown, fallback: string): string {
   const errors = (e as { response?: { data?: { errors?: string[] } } })?.response?.data?.errors;
@@ -12,22 +12,11 @@ export const useAuthStore = defineStore('auth', () => {
   const loggedIn = ref(false);
   const error = ref<string | null>(null);
 
-  async function logIn(email: string, password: string) {
-    error.value = null;
-    try {
-      await authApi.signIn(email, password);
-      loggedIn.value = true;
-    } catch (e: unknown) {
-      loggedIn.value = false;
-      error.value = extractAuthError(e, 'Login failed');
-      throw e;
-    }
-  }
-
   async function logInWithGoogle(credential: string) {
     error.value = null;
     try {
-      await authApi.googleSignIn(credential);
+      const response = await authApi.googleSignIn(credential);
+      saveToken(response.data.token);
       loggedIn.value = true;
     } catch (e: unknown) {
       loggedIn.value = false;
@@ -36,28 +25,43 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function logOut() {
-    clearTokens();
+  // Called by handle401 when the server rejects a session mid-flight.
+  // Clears local auth state without calling the server (the server already
+  // told us the session is gone). handle401 then redirects to /login.
+  function invalidateSession() {
+    clearToken();
+    loggedIn.value = false;
+  }
+
+  async function logOut() {
+    try {
+      await authApi.signOut();
+    } catch {
+      // best-effort: logout always proceeds even if the server call fails
+    }
+    clearToken();
     loggedIn.value = false;
   }
 
   async function checkSession(): Promise<boolean> {
     if (loggedIn.value) return true;
-
-    if (!hasToken()) {
-      loggedIn.value = false;
-      return false;
-    }
+    if (!hasToken()) return false;
 
     try {
       const response = await authApi.validateToken();
-      loggedIn.value = response.success === true;
-      return loggedIn.value;
+      if (response.success === true) {
+        loggedIn.value = true;
+        return true;
+      }
     } catch {
-      loggedIn.value = false;
-      return false;
+      // fall through to invalidate below
     }
+
+    // Token present but the server rejected it (or the request failed) —
+    // clear the stale token so we don't re-validate it on every load.
+    invalidateSession();
+    return false;
   }
 
-  return { loggedIn, error, logIn, logInWithGoogle, logOut, checkSession };
+  return { loggedIn, error, logInWithGoogle, logOut, checkSession, invalidateSession };
 });

@@ -1,5 +1,4 @@
 class LlmUsageRecordsController < ApplicationController
-  before_action :authenticate_user!
   before_action :require_household!
 
   set_current_tenant_through_filter

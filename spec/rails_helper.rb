@@ -27,8 +27,8 @@ ActiveRecord::Migration.maintain_test_schema!
 
 module AuthHelper
   def auth_request(user)
-    sign_in user
-    request.headers.merge!(user.create_new_auth_token)
+    _, token = Session.start!(user: user)
+    request.headers['Authorization'] = "Bearer #{token}"
   end
 end
 
@@ -65,13 +65,7 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   # authentication helper methods
-  config.include Devise::Test::ControllerHelpers, type: :controller
   config.include AuthHelper
-
-  # Rails 7.1 compatibility
-  config.before(:each, type: :controller) do
-    @request.env['devise.mapping'] = Devise.mappings[:user]
-  end
 
   # Handle ActionController::Parameters in tests
   config.before(:each) do

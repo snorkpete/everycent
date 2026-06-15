@@ -31,13 +31,15 @@
 #
 
 class User < ApplicationRecord
-  include DeviseTokenAuth::Concerns::User
-
-  # do not require email confirmation for new users
-  before_create :skip_confirmation!
   before_validation :generate_uid
 
+  # email is the sole join key for Google sign-in (Auth::GoogleController looks
+  # up User.find_by(email:) with no tenant scope), so it must be globally unique
+  # and present. devise used to enforce this; it no longer does.
+  validates :email, presence: true, uniqueness: { case_sensitive: false }
+
   belongs_to :household
+  has_many :sessions, dependent: :destroy
 
   has_many :bank_accounts, through: :household
   has_many :allocation_categories, through: :household

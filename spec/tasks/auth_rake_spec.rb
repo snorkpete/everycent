@@ -14,25 +14,17 @@ RSpec.describe 'auth rake tasks' do
   end
 
   describe 'auth:clear_tokens' do
-    it 'clears tokens for all users' do
+    it 'clears all sessions' do
       household = ActsAsTenant.without_tenant { Household.create!(name: 'Test') }
       user = ActsAsTenant.with_tenant(household) do
-        User.create!(
-          email: 'tok@example.com',
-          password: 'password123',
-          password_confirmation: 'password123',
-          household: household
-        )
+        User.create!(email: 'tok@example.com', household: household, provider: 'google', uid: 'tok@example.com')
       end
-      # Give the user a live token via the normal flow
-      ActsAsTenant.with_tenant(household) { user.create_new_auth_token }
-
-      expect(user.reload.tokens).not_to be_nil
+      Session.start!(user: user)
 
       expect { Rake::Task['auth:clear_tokens'].invoke }
-        .to output(/Cleared auth tokens for 1 user/).to_stdout
+        .to output(/Cleared 1 session/).to_stdout
 
-      expect(user.reload.tokens).to be_blank
+      expect(Session.count).to eq(0)
     end
   end
 
@@ -49,44 +41,31 @@ RSpec.describe 'auth rake tasks' do
         ActsAsTenant.without_tenant do
           cypress = User.find_by(email: 'cypress@test.com')
           expect(cypress).to be_present
+          expect(cypress.provider).to eq 'google'
+          expect(cypress.uid).to eq 'cypress@test.com'
           expect(cypress.household.name).to eq('Cypress Test Household')
 
           claude = User.find_by(email: 'claude@everycent.dev')
           expect(claude).to be_present
+          expect(claude.provider).to eq 'google'
+          expect(claude.uid).to eq 'claude@everycent.dev'
           expect(claude.household).to eq(claude_household)
         end
       end
 
-      it 'updates password for existing dev users in their respective households (idempotent)' do
+      it 'handles existing users without error (idempotent)' do
         cypress_household = ActsAsTenant.without_tenant { Household.create!(name: 'Cypress Test Household') }
         claude_household = ActsAsTenant.without_tenant { Household.create!(name: 'Kion Dev Household') }
 
         ActsAsTenant.with_tenant(cypress_household) do
-          User.create!(
-            email: 'cypress@test.com',
-            password: 'old_password',
-            password_confirmation: 'old_password',
-            household: cypress_household
-          )
+          User.create!(email: 'cypress@test.com', household: cypress_household, provider: 'google', uid: 'cypress@test.com')
         end
         ActsAsTenant.with_tenant(claude_household) do
-          User.create!(
-            email: 'claude@everycent.dev',
-            password: 'old_password',
-            password_confirmation: 'old_password',
-            household: claude_household
-          )
+          User.create!(email: 'claude@everycent.dev', household: claude_household, provider: 'google', uid: 'claude@everycent.dev')
         end
 
         expect { Rake::Task['auth:seed_dev_users'].invoke('Kion Dev Household') }
-          .to output(/Updated password for: cypress@test\.com.*Updated password for: claude@everycent\.dev/m).to_stdout
-
-        ActsAsTenant.with_tenant(cypress_household) do
-          expect(User.find_by(email: 'cypress@test.com').valid_password?('CypressTest123!')).to be true
-        end
-        ActsAsTenant.with_tenant(claude_household) do
-          expect(User.find_by(email: 'claude@everycent.dev').valid_password?('Claude123!')).to be true
-        end
+          .to output(/Updated user: cypress@test\.com.*Updated user: claude@everycent\.dev/m).to_stdout
       end
 
       it 'aborts when claude_household_name is blank' do
@@ -133,12 +112,7 @@ RSpec.describe 'auth rake tasks' do
     it 'aborts when a user with the same email already exists in that household' do
       household = ActsAsTenant.without_tenant { Household.create!(name: 'Target Household') }
       ActsAsTenant.with_tenant(household) do
-        User.create!(
-          email: 'existing@example.com',
-          password: 'password123',
-          password_confirmation: 'password123',
-          household: household
-        )
+        User.create!(email: 'existing@example.com', household: household, provider: 'google', uid: 'existing@example.com')
       end
 
       expect { Rake::Task['auth:add_user'].invoke('existing@example.com', 'Target Household') }

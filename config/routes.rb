@@ -84,15 +84,14 @@ Rails.application.routes.draw do
       put 'allocations'
     end
   end
-  # Must be declared before `mount_devise_token_auth_for` below.
-  # devise_token_auth mounts a catch-all `/auth/:provider` route for its
-  # omniauth redirect flow, which would otherwise match this request first
-  # and redirect the POST into `/omniauth/google` — a route we don't
-  # define, because our Google sign-in uses an in-page ID token (JWT) that
-  # we verify directly in `Auth::GoogleController#create`, not the
-  # full OAuth 2.0 redirect dance.
   post '/auth/google', to: 'auth/google#create'
-  mount_devise_token_auth_for 'User', at: '/auth'
+  delete '/auth/sign_out', to: 'auth/sessions#destroy'
+  get '/auth/validate', to: 'auth/sessions#show'
+
+  if ENV['EVERYCENT_DEV_LOGIN'] == 'true' && !Rails.env.production?
+    post '/auth/dev_login', to: 'auth/dev_login#create'
+  end
+
   resources :users, except: [:new, :edit]
 
 end

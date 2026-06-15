@@ -1,103 +1,66 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { getTokens, saveTokens, clearTokens, hasToken } from './authTokens';
+import { getToken, saveToken, clearToken, hasToken, AUTH_TOKEN_KEY } from './authTokens';
 
 describe('authTokens', () => {
   beforeEach(() => {
     localStorage.clear();
   });
 
-  describe('getTokens', () => {
-    it('returns tokens present in localStorage', () => {
-      localStorage.setItem('access-token', 'tok');
-      localStorage.setItem('client', 'cli');
-      localStorage.setItem('uid', 'user@test.com');
+  describe('getToken', () => {
+    it('returns the token when present in localStorage', () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, 'tok-abc');
 
-      const tokens = getTokens();
-
-      expect(tokens['access-token']).toBe('tok');
-      expect(tokens.client).toBe('cli');
-      expect(tokens.uid).toBe('user@test.com');
+      expect(getToken()).toBe('tok-abc');
     });
 
-    it('omits keys not present in localStorage', () => {
-      localStorage.setItem('access-token', 'tok');
-
-      const tokens = getTokens();
-
-      expect(tokens['access-token']).toBe('tok');
-      expect(tokens.client).toBeUndefined();
-      expect(tokens.expiry).toBeUndefined();
-    });
-
-    it('returns empty object when localStorage has no auth tokens', () => {
-      expect(getTokens()).toEqual({});
+    it('returns null when the token is absent', () => {
+      expect(getToken()).toBeNull();
     });
   });
 
-  describe('saveTokens', () => {
-    it('saves auth header values to localStorage', () => {
-      saveTokens({
-        'access-token': 'new-tok',
-        client: 'new-cli',
-        uid: 'new@test.com',
-        expiry: '12345',
-        'token-type': 'Bearer',
-      });
+  describe('saveToken', () => {
+    it('saves the token to localStorage', () => {
+      saveToken('new-token');
 
-      expect(localStorage.getItem('access-token')).toBe('new-tok');
-      expect(localStorage.getItem('client')).toBe('new-cli');
-      expect(localStorage.getItem('uid')).toBe('new@test.com');
-      expect(localStorage.getItem('expiry')).toBe('12345');
-      expect(localStorage.getItem('token-type')).toBe('Bearer');
+      expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBe('new-token');
     });
 
-    it('skips undefined values', () => {
-      saveTokens({ 'access-token': 'tok', client: undefined });
+    it('overwrites an existing token', () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, 'old-token');
+      saveToken('new-token');
 
-      expect(localStorage.getItem('access-token')).toBe('tok');
-      expect(localStorage.getItem('client')).toBeNull();
-    });
-
-    it('ignores non-auth keys in the input', () => {
-      saveTokens({ 'access-token': 'tok', 'x-custom': 'ignored' });
-
-      expect(localStorage.getItem('access-token')).toBe('tok');
-      expect(localStorage.getItem('x-custom')).toBeNull();
+      expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBe('new-token');
     });
   });
 
-  describe('clearTokens', () => {
-    it('removes all auth keys from localStorage', () => {
-      localStorage.setItem('access-token', 'tok');
-      localStorage.setItem('client', 'cli');
-      localStorage.setItem('uid', 'user@test.com');
+  describe('clearToken', () => {
+    it('removes the auth token from localStorage', () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, 'tok-abc');
 
-      clearTokens();
+      clearToken();
 
-      expect(localStorage.getItem('access-token')).toBeNull();
-      expect(localStorage.getItem('client')).toBeNull();
-      expect(localStorage.getItem('uid')).toBeNull();
+      expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
     });
 
-    it('does not remove non-auth keys', () => {
-      localStorage.setItem('access-token', 'tok');
+    it('does not remove unrelated localStorage keys', () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, 'tok-abc');
       localStorage.setItem('theme', 'dark');
 
-      clearTokens();
+      clearToken();
 
-      expect(localStorage.getItem('access-token')).toBeNull();
+      expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
       expect(localStorage.getItem('theme')).toBe('dark');
     });
   });
 
   describe('hasToken', () => {
-    it('returns true when access-token exists', () => {
-      localStorage.setItem('access-token', 'tok');
+    it('returns true when the token exists', () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, 'tok-abc');
 
       expect(hasToken()).toBe(true);
     });
 
-    it('returns false when access-token is absent', () => {
+    it('returns false when the token is absent', () => {
       expect(hasToken()).toBe(false);
     });
   });

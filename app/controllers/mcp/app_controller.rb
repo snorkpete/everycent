@@ -1,9 +1,8 @@
 module Mcp
   # Base controller for all MCP tool endpoints. Requires a signed-in user
-  # (via devise_token_auth headers) and scopes all downstream queries to
-  # that user's household.
+  # (via Bearer token in Authorization header) and scopes all downstream
+  # queries to that user's household.
   class AppController < ApplicationController
-    before_action :authenticate_user!
     before_action :require_household!
 
     set_current_tenant_through_filter

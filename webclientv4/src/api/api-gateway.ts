@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {
   attachAuthHeaders,
-  saveAuthHeaders,
   startLoading,
   finishLoadingOnSuccess,
   finishLoadingOnError,
@@ -21,8 +20,6 @@ const apiGateway = axios.create({
 
 apiGateway.interceptors.request.use(attachAuthHeaders);
 apiGateway.interceptors.request.use(startLoading);
-
-apiGateway.interceptors.response.use(saveAuthHeaders);
 
 // Finishes loading indicator, then delegates to handle401.
 // Both functions reject, so the caller always receives the original error.

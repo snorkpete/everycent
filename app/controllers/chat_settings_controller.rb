@@ -1,6 +1,4 @@
 class ChatSettingsController < ApplicationController
-  before_action :authenticate_user!
-
   set_current_tenant_through_filter
   before_action do
     set_current_tenant current_household

@@ -1,6 +1,7 @@
 module Auth
   class GoogleController < ApplicationController
     skip_before_action :verify_authenticity_token
+    skip_before_action :authenticate_user!
 
     def create
       credential = params[:credential]
@@ -24,10 +25,8 @@ module Auth
         return
       end
 
-      auth_headers = user.create_new_auth_token
-      response.headers.merge!(auth_headers)
-
-      render json: { success: true, data: { email: user.email } }, status: :ok
+      user_session, token = Session.start!(user: user, user_agent: request.user_agent, ip_address: request.remote_ip)
+      render json: { success: true, data: { email: user.email, token: token } }
     end
 
     private

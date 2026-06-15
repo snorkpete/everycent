@@ -22,24 +22,6 @@ vi.mock('../api/api-gateway', () => ({
   },
 }));
 
-const primevueStubs = {
-  InputText: {
-    template:
-      '<input :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ['modelValue'],
-  },
-  Password: {
-    template:
-      '<input type="password" :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ['modelValue', 'feedback', 'toggleMask'],
-  },
-  Button: {
-    template:
-      '<button type="submit" :data-testid="$attrs[\'data-testid\']" :data-loading="loading">{{ label }}</button>',
-    props: ['label', 'loading', 'severity', 'size'],
-  },
-};
-
 describe('LoginPage', () => {
   let pinia: Pinia;
 
@@ -55,7 +37,6 @@ describe('LoginPage', () => {
     return mount(LoginPage, {
       global: {
         plugins: [pinia],
-        stubs: primevueStubs,
       },
     });
   }
@@ -68,19 +49,6 @@ describe('LoginPage', () => {
   it('renders the Google button container', () => {
     const wrapper = createWrapper();
     expect(wrapper.find('[data-testid="google-button-container"]').exists()).toBe(true);
-  });
-
-  it('renders the password form in dev mode', () => {
-    const wrapper = createWrapper();
-    expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="email-input"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="password-input"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="login-button"]').text()).toBe('Log In');
-  });
-
-  it('always renders the password toggle link', () => {
-    const wrapper = createWrapper();
-    expect(wrapper.find('[data-testid="password-toggle"]').exists()).toBe(true);
   });
 
   it('does not show error when store has no error', () => {
@@ -97,115 +65,6 @@ describe('LoginPage', () => {
     const errorEl = wrapper.find('[data-testid="status-message"]');
     expect(errorEl.exists()).toBe(true);
     expect(errorEl.text()).toBe('Invalid credentials');
-  });
-
-  describe('password toggle', () => {
-    beforeEach(() => {
-      vi.stubEnv('DEV', false);
-    });
-
-    afterEach(() => {
-      vi.unstubAllEnvs();
-    });
-
-    it('hides the password form by default in a prod-like environment', () => {
-      const wrapper = createWrapper();
-      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(false);
-    });
-
-    it('reveals the password form when the toggle is clicked', async () => {
-      const wrapper = createWrapper();
-      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(false);
-      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
-      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(true);
-    });
-
-    it('hides the password form again when the toggle is clicked a second time', async () => {
-      const wrapper = createWrapper();
-      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
-      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(true);
-      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
-      expect(wrapper.find('[data-testid="login-form"]').exists()).toBe(false);
-    });
-
-    it('shows the correct toggle label when form is hidden', () => {
-      const wrapper = createWrapper();
-      expect(wrapper.find('[data-testid="password-toggle"]').text()).toBe(
-        'Use password instead (not recommended)',
-      );
-    });
-
-    it('shows the correct toggle label when form is visible', async () => {
-      const wrapper = createWrapper();
-      await wrapper.find('[data-testid="password-toggle"]').trigger('click');
-      expect(wrapper.find('[data-testid="password-toggle"]').text()).toBe('Hide password login');
-    });
-  });
-
-  describe('password form sign-in', () => {
-    it('calls authStore.logIn and navigates to / on success', async () => {
-      const email = 'user@test.com';
-      const password = 'password123';
-      const apiGateway = (await import('../api/api-gateway')).default;
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
-
-      const wrapper = createWrapper();
-      await wrapper.find('[data-testid="email-input"]').setValue(email);
-      await wrapper.find('[data-testid="password-input"]').setValue(password);
-      await wrapper.find('[data-testid="login-form"]').trigger('submit');
-      await flushPromises();
-
-      expect(apiGateway.post).toHaveBeenCalledWith('/auth/sign_in', { email, password });
-      expect(mockPush).toHaveBeenCalledWith('/');
-    });
-
-    it('does not navigate on failed login', async () => {
-      const email = 'user@test.com';
-      const password = 'wrong';
-      const apiGateway = (await import('../api/api-gateway')).default;
-      vi.mocked(apiGateway.post).mockRejectedValue({
-        isAxiosError: true,
-        response: { data: { errors: ['Bad credentials'] } },
-      });
-
-      const wrapper = createWrapper();
-      await wrapper.find('[data-testid="email-input"]').setValue(email);
-      await wrapper.find('[data-testid="password-input"]').setValue(password);
-      await wrapper.find('[data-testid="login-form"]').trigger('submit');
-      await flushPromises();
-
-      expect(mockPush).not.toHaveBeenCalled();
-    });
-
-    it('shows loading state during login and clears it after', async () => {
-      const apiGateway = (await import('../api/api-gateway')).default;
-      let resolveSignIn!: (value: { data: Record<string, unknown> }) => void;
-      vi.mocked(apiGateway.post).mockImplementation(
-        () => new Promise((resolve) => (resolveSignIn = resolve)),
-      );
-
-      const wrapper = createWrapper();
-      await wrapper.find('[data-testid="login-form"]').trigger('submit');
-      await flushPromises();
-
-      expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('true');
-
-      resolveSignIn({ data: {} });
-      await flushPromises();
-
-      expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
-    });
-
-    it('clears loading state on failed login', async () => {
-      const apiGateway = (await import('../api/api-gateway')).default;
-      vi.mocked(apiGateway.post).mockRejectedValue(new Error('fail'));
-
-      const wrapper = createWrapper();
-      await wrapper.find('[data-testid="login-form"]').trigger('submit');
-      await flushPromises();
-
-      expect(wrapper.find('[data-testid="login-button"]').attributes('data-loading')).toBe('false');
-    });
   });
 
   describe('Google sign-in', () => {
@@ -263,7 +122,9 @@ describe('LoginPage', () => {
 
     it('navigates to / after successful Google credential callback', async () => {
       const apiGateway = (await import('../api/api-gateway')).default;
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
+      vi.mocked(apiGateway.post).mockResolvedValue({
+        data: { success: true, data: { email: 'user@test.com', token: 'tok-google' } },
+      });
 
       let capturedCallback: ((response: google.accounts.id.CredentialResponse) => void) | null =
         null;

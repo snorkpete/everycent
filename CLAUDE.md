@@ -62,6 +62,10 @@ Invoke the **housekeeper skill** for any merge, land, or close-out operation. Do
 - **Default: branch new worktrees from master**, not from current work. Specify otherwise if the new branch explicitly depends on in-progress work.
 - **Ask before switching the main worktree's branch** (checkout, merge, rebase) outside of merging. The user runs the dev server there — switching branches disrupts their running session.
 - **The `healthcheck` branch/worktree (`/Users/kion/code/everycent-healthcheck`) is the standing home for behaviour-preserving internal-improvement work** — work that improves the system's internals without changing how it behaves for users. This covers regular code audits and the fixes they surface, system/dependency updates with no logic change, and behaviour-preserving internal swaps (e.g. Ruby/Rails upgrades, or swapping the auth implementation while auth behaves identically for users). Put this category of work here rather than spinning a fresh worktree; reserve new worktrees for behaviour-changing feature work.
+- **Running the app from a non-master worktree needs the gitignored env files copied from the main checkout** (`/Users/kion/code/everycent`). Two files, neither tracked so neither comes with a fresh worktree:
+  - Rails root `.env` — holds `GOOGLE_CLIENT_ID` / `GOOGLE_MCP_CLIENT_ID`. Without it, `Auth::GoogleController#create` raises `KeyError` on `ENV.fetch('GOOGLE_CLIENT_ID')`.
+  - `webclientv4/.env.local` — holds `VITE_GOOGLE_CLIENT_ID`. Without it, the Google sign-in button silently doesn't render (`LoginPage.vue` early-returns).
+  - `dotenv` (Rails) and Vite both read env only at boot — **restart both servers after copying**. Use distinct ports (e.g. Rails `3001`, Vite `4201` via `VITE_API_BASE_URL=http://localhost:3001`) so you don't collide with the main worktree's running servers.
 
 ## Worker Dispatch
 When dispatching workers, read `~/.claude/docs/worker-dispatch-protocol.md` first.
