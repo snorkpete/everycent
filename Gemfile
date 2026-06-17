@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 ruby '3.4.9'
 
 gem 'bundler'
-gem 'rails', '~> 7.2.0'
-gem 'puma', '~> 5.6'
+gem 'rails', '~> 8.0.0'
+gem 'puma', '~> 8.0'
 # Stay on Rack 2 through the Rails 8.1 upgrade. Rails 7.2/8.x allow rack >= 2.2.4;
 # forced Rack 3 only lands in Rails 8.2. Puma 5.6 is incompatible with Rack 3, and
 # Rack 3 forces rack-cors 3.0 + middleware breaking changes — deferred to the 8.2 task.
@@ -22,7 +22,7 @@ gem 'responders'
 gem 'rails-controller-testing'
 
 group :development do
-  gem 'annotate'
+  gem 'annotaterb'
   gem 'lol_dba'
   # Remove meta_request as it's not compatible with Rails 7.1
   # gem 'meta_request', github: 'dejan/rails_panel', branch: 'master', glob: 'meta_request/meta_request.gemspec'
@@ -63,7 +63,7 @@ group :development, :test do
   gem 'spring-commands-rspec'
   #gem 'spring-watcher-listen'
 
-  gem 'rspec-rails', '~> 7.1'
+  gem 'rspec-rails', '~> 8.0'
   gem 'factory_bot_rails'
   gem 'wdm', '>= 0.1.0' if Gem.win_platform?
 

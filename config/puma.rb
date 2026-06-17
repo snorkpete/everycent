@@ -8,6 +8,11 @@ max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
 min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
 threads min_threads_count, max_threads_count
 
+# Heroku's Router 2.0 manages keep-alive connections itself; Puma 6.5+ defaults
+# to keep-alives on, which conflicts. Disable so Puma doesn't hold connections
+# the router already pools. https://devcenter.heroku.com/articles/http-routing
+enable_keep_alives false
+
 # Specifies the `worker_timeout` threshold that Puma will use to wait before
 # terminating a worker in development environments.
 #
