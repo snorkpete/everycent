@@ -94,7 +94,7 @@ export const TOOL_DEFINITIONS = [
     function: {
       name: 'out_of_budget_analysis',
       description:
-        'Analyze how much the household relies on the Out-of-Budget / Sink Fund Transfers escape valve — the shock-absorber category that absorbs spending outside the normal budget. Also includes the "Over Budget Supplement" category (same mechanism, different label). Use this when the user asks about OOB spending, escape-valve reliance, or which months are worst for out-of-budget use. Response shape depends on group_by: "month" → one row per budget period in chronological order (fields: month, total_cents, total_display); "allocation_name" → recurring OOB items ranked by total spend DESC (fields: allocation_name, total_cents, total_display); "calendar_month" → seasonality — which calendar months of the year are worst on average, ranked by avg_monthly_cents DESC (fields: calendar_month, month_name, year_count, total_cents, total_display, avg_monthly_cents, avg_monthly_display). Monetary fields come in pairs: *_cents (exact integer, use for comparison/reasoning) and *_display (pre-formatted currency string — always present this to the user verbatim instead of doing arithmetic on the cents value). Exclusions: brought-forward credit card entries excluded.',
+        'Analyze how much the household relies on the Out-of-Budget / Sink Fund Transfers escape valve — the shock-absorber category that absorbs spending outside the normal budget. Also includes the "Over Budget Supplement" category (same mechanism, different label). Use this when the user asks about OOB spending, escape-valve reliance, or which months are worst for out-of-budget use. Response shape depends on group_by: "month" → one row per budget period in chronological order (fields: month, total_cents, total_display); "allocation_name" → recurring OOB items ranked by total spend DESC (fields: allocation_name, total_cents, total_display); "calendar_month" → seasonality — which calendar months of the year are worst on average, ranked by avg_monthly_cents DESC (fields: calendar_month, month_name, year_count, total_cents, total_display, avg_monthly_cents, avg_monthly_display). Monetary fields come in pairs: *_cents (exact integer, use for comparison/reasoning) and *_display (pre-formatted currency string — always present this to the user verbatim instead of doing arithmetic on the cents value). Exclusions: brought-forward credit card entries excluded; manual adjustments excluded; deposit-only transactions excluded (only withdrawal transactions counted).',
       parameters: {
         type: 'object',
         properties: {
@@ -150,7 +150,7 @@ export const TOOL_DEFINITIONS = [
           account: {
             type: 'string',
             description:
-              'Filter to a specific sink fund tier by exact account name (e.g. "Sink Fund Account", "Long Term Sink Fund", "Emergency Fund Savings"). Omit to return all tiers.',
+              'Filter to a specific sink fund tier by exact account name. Omit to return all tiers (recommended first call — the account names in the results tell you what values are valid for filtering).',
           },
           include_closed: {
             type: 'boolean',

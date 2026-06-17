@@ -55,9 +55,14 @@ module Mcp
       @group_by    = group_by
     end
 
-    # Returns result rows. Raises if called on an invalid object.
+    # Returns result rows. Raises if called on an invalid object or OOB categories not found.
     def results
       raise "Call valid? before results" unless valid?
+
+      if AllocationCategory.where(name: OOB_CATEGORY_NAMES).empty?
+        raise "No out-of-budget categories found (looked for: #{OOB_CATEGORY_NAMES.join(', ')}). " \
+              "The OOB category names may have changed."
+      end
 
       case group_by
       when 'month'       then results_by_month
@@ -117,7 +122,9 @@ module Mcp
     # Seasonality: which calendar months (1–12) are worst on average.
     # Two-step: first aggregate per (calendar_month, budget_month), then average
     # across years — this gives a true per-calendar-month average regardless of how
-    # many budget periods fall in a given year.
+    # many budget periods fall in a given year. Caveat: this holds for the standard
+    # monthly budget cadence; if a calendar month ever spans >1 budget period, those
+    # sub-periods are averaged together first before contributing to the year average.
     def results_by_calendar_month
       sql = <<~SQL
         WITH monthly_budget_spend AS (
@@ -165,14 +172,14 @@ module Mcp
 
     # SQL fragment: transaction conditions for OOB category scope.
     # Excludes brought-forward and manual adjustments.
+    # Category names are passed as a bound array via :oob_category_names (added in execute_and_map).
     def oob_transaction_conditions(txn_alias: 't', allocation_alias: 'a', category_alias: 'ac')
-      names_list = OOB_CATEGORY_NAMES.map { |n| ActiveRecord::Base.connection.quote(n) }.join(', ')
       <<~SQL.strip
         #{txn_alias}.is_manual_adjustment = false
         AND #{txn_alias}.withdrawal_amount > 0
         AND (#{txn_alias}.brought_forward_status IS NULL
              OR #{txn_alias}.brought_forward_status NOT IN ('added', 'adjustment'))
-        AND #{category_alias}.name IN (#{names_list})
+        AND #{category_alias}.name = ANY(:oob_category_names)
       SQL
     end
 
@@ -182,14 +189,23 @@ module Mcp
 
     def execute_and_map(sql, &block)
       bindings = {
-        start_month:  start_month,
-        end_month:    end_month,
-        household_id: ActsAsTenant.current_tenant.id
+        start_month:       start_month,
+        end_month:         end_month,
+        household_id:      ActsAsTenant.current_tenant.id,
+        oob_category_names: oob_category_names_literal
       }
       result = ActiveRecord::Base.connection.exec_query(
         ActiveRecord::Base.sanitize_sql([sql, bindings])
       )
       result.map(&block)
+    end
+
+    # Returns a Postgres array literal for OOB_CATEGORY_NAMES, e.g. '{"a","b"}'.
+    # Safe to build without quote() because OOB_CATEGORY_NAMES is a hardcoded constant
+    # (not user input). Each element is quoted and curly-brace-wrapped for Postgres syntax.
+    def oob_category_names_literal
+      quoted = OOB_CATEGORY_NAMES.map { |n| "\"#{n.gsub('"', '\\"')}\"" }.join(',')
+      "{#{quoted}}"
     end
 
     def end_month_not_before_start_month

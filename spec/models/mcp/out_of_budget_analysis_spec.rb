@@ -129,6 +129,14 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
       expect { build_query(start_month: 'bad').results }.to raise_error(RuntimeError, /Call valid\?/)
     end
 
+    it 'raises with a descriptive error when no OOB categories exist for the current tenant' do
+      # Destroy all allocation categories so the guard fires
+      AllocationCategory.delete_all
+      expect { build_query.results }.to raise_error(
+        RuntimeError, /No out-of-budget categories found/
+      )
+    end
+
     # ─── group_by: month ──────────────────────────────────────────────────────
 
     context 'group_by: month' do
@@ -348,10 +356,28 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
 
     # ─── Tenant scoping ───────────────────────────────────────────────────────
 
-    it 'scopes to the current tenant — a different household sees no data' do
+    it 'scopes to the current tenant — a different household with no OOB data raises the guard' do
       setup_oob_month(month: '2024-01', actual: 10_000)
 
       other_household = create(:household)
+      ActsAsTenant.current_tenant = other_household
+      # other_household has no OOB categories at all → guard raises rather than returning empty
+      expect { build_query(group_by: 'month').results }.to raise_error(
+        RuntimeError, /No out-of-budget categories found/
+      )
+    ensure
+      ActsAsTenant.current_tenant = @household
+    end
+
+    it 'scopes to the current tenant — a different household with OOB categories but no transactions returns empty' do
+      setup_oob_month(month: '2024-01', actual: 10_000)
+
+      other_household = create(:household)
+      ActsAsTenant.with_tenant(other_household) do
+        # Create the OOB category for the other tenant so the guard passes
+        create(:allocation_category, budget_role: 'spending', name: 'Out-of-Budget/ Sink Fund Transfers')
+      end
+
       ActsAsTenant.current_tenant = other_household
       expect(build_query(group_by: 'month').results).to be_empty
     ensure

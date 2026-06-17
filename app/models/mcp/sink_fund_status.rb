@@ -15,13 +15,12 @@ module Mcp
   #   target_cents:       allocation amount (the target to reach)
   #   funded_cents:       total deposits into this allocation
   #   spent_cents:        total withdrawals out of this allocation
-  #   remaining_cents:    target - (funded - spent) — positive = underfunded, negative = overdrawn
+  #   remaining_cents:    funded - spent — net current balance; negative = overdrawn
   #   is_overdrawn:       true when remaining_cents < 0
   #
-  # Note: remaining_cents = target - current_balance, where
-  # current_balance = total_deposits - total_withdrawals (net flow into the allocation).
-  # A negative remaining means more has been withdrawn than the target allows — flagged
-  # as overdrawn.
+  # Note: remaining_cents = funded - spent (net current balance in the allocation).
+  # A negative remaining means more has been withdrawn than deposited — flagged as overdrawn.
+  # This is NOT target - balance; the target is reported separately for reference.
   class SinkFundStatus
     include ActiveModel::Validations
 
@@ -55,7 +54,7 @@ module Mcp
         JOIN bank_accounts ba ON sfa.bank_account_id = ba.id
         LEFT JOIN transactions t ON t.sink_fund_allocation_id = sfa.id
         WHERE sfa.household_id = :household_id
-          AND ba.account_type = 'sink_fund'
+          AND ba.account_type = 'sink_fund'   -- bank_accounts.account_type plain string column; no Ruby constant/enum defined
           #{status_condition}
           #{account_condition}
         GROUP BY sfa.id, sfa.name, ba.name, sfa.status, sfa.amount

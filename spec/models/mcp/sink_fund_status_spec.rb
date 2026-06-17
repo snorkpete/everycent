@@ -77,8 +77,11 @@ RSpec.describe Mcp::SinkFundStatus, type: :model do
 
   describe '#results' do
     it 'raises when called on an invalid object' do
-      q = Mcp::SinkFundStatus.new
-      allow(q).to receive(:valid?).and_return(false)
+      # Construct a genuinely invalid instance by passing a non-string account value;
+      # the account_is_string_or_nil validator rejects it.
+      q = Mcp::SinkFundStatus.new(account: 123)
+      q.valid?
+      expect(q.errors).not_to be_empty
       expect { q.results }.to raise_error(RuntimeError, /Call valid\?/)
     end
 

@@ -56,8 +56,6 @@ module Mcp
     # Returns per-month stats: how many placeholder allocations exist, what fraction
     # of total allocations they represent, and how much spending flows through them.
     def monthly_summary_results
-      placeholder_condition = "a.amount <= #{Allocation::PLACEHOLDER_MAX_CENTS}"
-
       sql = <<~SQL
         WITH all_allocations AS (
           SELECT
@@ -122,8 +120,6 @@ module Mcp
 
     # Returns placeholder allocations ranked by total spend across the date range.
     def top_placeholder_results
-      placeholder_condition = "a.amount <= #{Allocation::PLACEHOLDER_MAX_CENTS}"
-
       sql = <<~SQL
         SELECT
           #{Allocation.canonical_name_sql('a.name')}  AS allocation_name,
@@ -179,6 +175,12 @@ module Mcp
           "end_month (#{end_month}) must not be before start_month (#{start_month})"
         )
       end
+    end
+
+    # SQL condition selecting placeholder allocations only.
+    # Threshold is single-sourced via Allocation::PLACEHOLDER_MAX_CENTS.
+    def placeholder_condition
+      "a.amount <= #{Allocation::PLACEHOLDER_MAX_CENTS}"
     end
   end
 end

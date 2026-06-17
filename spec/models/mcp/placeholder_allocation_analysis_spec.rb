@@ -252,6 +252,29 @@ RSpec.describe Mcp::PlaceholderAllocationAnalysis, type: :model do
       end
     end
 
+    # ─── Cross-tenant isolation ───────────────────────────────────────────────
+
+    it 'does not inflate total_allocation_count with another household\'s allocations in the same month' do
+      # Set up allocations for household A (current tenant)
+      setup_month(month: '2024-01', budgeted: 50_000, allocation_name: 'Rent')
+      setup_month(month: '2024-01', budgeted: 1,      allocation_name: 'Sink Fund Item')
+
+      # Set up allocations for household B in the same month
+      other_household = create(:household)
+      ActsAsTenant.with_tenant(other_household) do
+        other_category = create(:allocation_category, budget_role: 'spending', name: 'Bills')
+        other_budget = create(:budget, start_date: '2024-01-01')
+        create(:allocation, budget: other_budget, allocation_category: other_category,
+               name: 'Water', amount: 30_000)
+        create(:allocation, budget: other_budget, allocation_category: other_category,
+               name: 'Electric', amount: 25_000)
+      end
+
+      row = build_query(start_month: '2024-01', end_month: '2024-01').results[:monthly_summary].first
+      # Household A has 2 allocations — household B's 2 must not be counted
+      expect(row[:total_allocation_count]).to eq(2)
+    end
+
     # ─── Tenant scoping ───────────────────────────────────────────────────────
 
     it 'scopes to the current tenant — a different household sees no data' do
