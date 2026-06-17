@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby '3.4.9'
 
 gem 'bundler'
-gem 'rails', '~> 8.0.0'
+gem 'rails', '~> 8.1.0'
 gem 'puma', '~> 8.0'
 # Stay on Rack 2 through the Rails 8.1 upgrade. Rails 7.2/8.x allow rack >= 2.2.4;
 # forced Rack 3 only lands in Rails 8.2. Puma 5.6 is incompatible with Rack 3, and
