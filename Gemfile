@@ -11,12 +11,6 @@ gem 'rack', '~> 2.2'
 # gem 'bootsnap', require: false
 gem 'bootsnap', '>= 1.8.1', require: false
 
-# Ruby 3.4 promoted `observer` from a default gem to a bundled gem, so it must be
-# declared explicitly. Required by factory_bot 6.2.0 (factory_bot/evaluation.rb)
-# and drb/observer. Likely removable once factory_bot is bumped (>= 6.4.4) during
-# the Rails upgrade — re-check then.
-gem 'observer'
-
 # Add responders gem since it's no longer included in Rails 7
 gem 'responders'
 gem 'rails-controller-testing'
@@ -35,7 +29,7 @@ end
 # Previously locked to pg 0.21 because current versions of pg gem had segfault issues
 # Trying to use latest released pg gem
 # gem 'pg', '~> 0.21'
-gem 'pg', '~> 1.5.0'
+gem 'pg', '~> 1.6'
 
 # fix for time
 gem 'tzinfo-data'
