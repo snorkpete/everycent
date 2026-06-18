@@ -1,7 +1,7 @@
 # Task: Upgrade to Rails 8.1 + Ruby 3.4
 
 **ID:** upgrade-to-rails-81-ruby-34
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-05
