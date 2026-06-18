@@ -124,3 +124,26 @@ Raw `bytea`, deliberately NOT Active Storage/S3 — avoiding an external blob st
 - One open design question remains (attachment capture mechanism), deferred to Slice 2 — this is why the task sits at `proposed` rather than fully `ready`.
 - Slice 1 must be fully usable end-to-end before Slice 2 begins.
 - **Recommended precursor (not a hard dependency): chat persistence** — see idea `capture-nlq-chat-transcripts-for-later-analysis/debugging`. Tuning the intake prompt (the core value of this feature) needs a corpus of real bug-intake conversations to review retrospectively, which requires persistence in place first. The design here does not depend on it, but building persistence before this task is the preferred sequencing. Persistence is tuning-only — transcripts are NOT bug-report evidence.
+
+## ⚠️ Resume after Rails 8.1 landed on master (2026-06-18)
+
+Master is now on **Rails 8.1 / Ruby 3.4** (merged 2026-06-18). The 8.1 schema dumper
+**sorts `schema.rb` columns alphabetically** and bumped the header to `[8.1]`, so this
+branch's `[7.1]` `schema.rb` will conflict with master across nearly every line on merge.
+Don't hand-merge it. Resume like this:
+
+1. On this branch (still Rails 7.1), `rails db:rollback` the `create_bug_reports`
+   migration → this branch's `schema.rb` reverts to the pre-upgrade `[7.1]`-without-
+   `bug_reports` = the merge base.
+2. Commit that `schema.rb` revert (keep the migration file).
+3. Sync master → git cleanly takes master's `[8.1]` schema (no conflict, branch == base).
+4. `bundle install` (now on Rails 8.1 via master).
+5. `rails db:migrate` → re-adds `bug_reports` on the 8.1 schema; `schema.rb` regenerates
+   alphabetical `[8.1]` with the table. Final merge diff = just the `bug_reports` table.
+
+Shortcut equivalent: skip the rollback; on sync `git checkout --theirs db/schema.rb`,
+then `rails db:migrate`. `schema.rb` is generated — never resolve it by hand.
+
+**Caveat:** regenerate `schema.rb` from a clean/round-tripped DB, NOT the shared
+`everycent_dev*`/`everycent_test` DBs — those are cross-contaminated (this branch's
+`bug_reports` table already leaked into them via the shared DBs).
