@@ -1,7 +1,7 @@
 # Task: Build NLQ analysis tools: out_of_budget_analysis, placeholder_allocation_analysis, sink_fund_status
 
 **ID:** build-nlq-analysis-tools-out_of_budget_analysis-placeholder_allocation_analysis-sink_fund_status
-**Status:** ready-for-human-review
+**Status:** done
 **Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-06-15
