@@ -9,8 +9,8 @@ RSpec.describe Mcp::OutOfBudgetAnalysisController, type: :controller do
     @user = create(:user, household: @household)
     auth_request(@user)
 
-    # Ensure OOB categories exist so results guard doesn't raise
-    create(:allocation_category, budget_role: 'spending', name: 'Out-of-Budget/ Sink Fund Transfers')
+    # Ensure a transfer-role (OOB) category exists so the results guard doesn't raise
+    create(:allocation_category, budget_role: 'transfer', name: 'Out-of-Budget/ Sink Fund Transfers')
   end
 
   describe 'GET #show — validation errors' do

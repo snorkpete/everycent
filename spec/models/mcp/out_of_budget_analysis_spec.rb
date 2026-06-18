@@ -6,19 +6,19 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
     ActsAsTenant.current_tenant = @household
     @bank_account = create(:bank_account)
 
-    # OOB category — matches OOB_CATEGORY_NAMES[0]
+    # OOB category — identified by budget_role = 'transfer'
     @oob_category = create(
       :allocation_category,
-      budget_role: 'spending',
+      budget_role: 'transfer',
       name: 'Out-of-Budget/ Sink Fund Transfers'
     )
-    # Supplement category — matches OOB_CATEGORY_NAMES[1]
+    # Supplement category — also a transfer-role escape valve
     @supplement_category = create(
       :allocation_category,
-      budget_role: 'spending',
+      budget_role: 'transfer',
       name: 'Over Budget Supplement'
     )
-    # Regular spending category — must NOT appear in OOB results
+    # Regular spending category — must NOT appear in OOB results (not transfer-role)
     @regular_category = create(
       :allocation_category,
       budget_role: 'spending',
@@ -129,11 +129,11 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
       expect { build_query(start_month: 'bad').results }.to raise_error(RuntimeError, /Call valid\?/)
     end
 
-    it 'raises with a descriptive error when no OOB categories exist for the current tenant' do
+    it 'raises with a descriptive error when no transfer-role categories exist for the current tenant' do
       # Destroy all allocation categories so the guard fires
       AllocationCategory.delete_all
       expect { build_query.results }.to raise_error(
-        RuntimeError, /No out-of-budget categories found/
+        RuntimeError, /No categories with budget_role = 'transfer' found/
       )
     end
 
@@ -361,9 +361,9 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
 
       other_household = create(:household)
       ActsAsTenant.current_tenant = other_household
-      # other_household has no OOB categories at all → guard raises rather than returning empty
+      # other_household has no transfer-role categories at all → guard raises rather than returning empty
       expect { build_query(group_by: 'month').results }.to raise_error(
-        RuntimeError, /No out-of-budget categories found/
+        RuntimeError, /No categories with budget_role = 'transfer' found/
       )
     ensure
       ActsAsTenant.current_tenant = @household
@@ -374,8 +374,8 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
 
       other_household = create(:household)
       ActsAsTenant.with_tenant(other_household) do
-        # Create the OOB category for the other tenant so the guard passes
-        create(:allocation_category, budget_role: 'spending', name: 'Out-of-Budget/ Sink Fund Transfers')
+        # Create a transfer-role category for the other tenant so the guard passes
+        create(:allocation_category, budget_role: 'transfer', name: 'Out-of-Budget/ Sink Fund Transfers')
       end
 
       ActsAsTenant.current_tenant = other_household

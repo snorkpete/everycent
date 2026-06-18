@@ -1,31 +1,28 @@
 module Mcp
   # Query object for the out_of_budget_analysis endpoint.
   #
-  # Analyses spending in the Out-of-Budget / Sink Fund Transfers category and the
-  # Over Budget Supplement category — the "escape valve" / shock-absorber categories
-  # that absorb spending outside the normal budget.
+  # Analyses spending in the "out-of-budget" / shock-absorber categories — the
+  # escape valve that absorbs spending outside the normal budget (e.g. the
+  # Out-of-Budget / Sink Fund Transfers and Over Budget Supplement categories).
   #
-  # Note on category identification: both OOB categories have budget_role = 'spending'
-  # in this household's data. They are identified by name because budget_role alone
-  # does not distinguish them from regular spending categories. The category names
-  # are 'Out-of-Budget/ Sink Fund Transfers' and 'Over Budget Supplement'.
+  # Category identification: these categories are classified with
+  # budget_role = 'transfer' on AllocationCategory. The tool scopes by that role
+  # rather than by category name, so it automatically tracks whatever the
+  # household classifies as a transfer / escape-valve category.
   #
   # Bookkeeping gates:
   # - Excludes brought-forward transactions (brought_forward_status IN ('added','adjustment'))
   # - Excludes manual adjustments
-  # - Scopes to the OOB category names (not placeholder exclusion — this tool's
-  #   subject IS the category, placeholder filtering is irrelevant)
+  # - Scopes to budget_role = 'transfer' (not placeholder exclusion — this tool's
+  #   subject IS the transfer category, placeholder filtering is irrelevant)
   class OutOfBudgetAnalysis
     include ActiveModel::Validations
 
     VALID_GROUP_BY = %w[month allocation_name calendar_month].freeze
 
-    # These are the two category names that represent the OOB / shock-absorber
-    # mechanism. Verified against prod schema — both have budget_role = 'spending'.
-    OOB_CATEGORY_NAMES = [
-      'Out-of-Budget/ Sink Fund Transfers',
-      'Over Budget Supplement'
-    ].freeze
+    # Categories representing the out-of-budget / shock-absorber mechanism are
+    # classified with this budget_role (see the budget_role enum on AllocationCategory).
+    OOB_BUDGET_ROLE = 'transfer'.freeze
 
     attr_reader :start_month, :end_month, :group_by
 
@@ -55,13 +52,14 @@ module Mcp
       @group_by    = group_by
     end
 
-    # Returns result rows. Raises if called on an invalid object or OOB categories not found.
+    # Returns result rows. Raises if called on an invalid object or if no
+    # transfer-role (out-of-budget) categories exist for the tenant.
     def results
       raise "Call valid? before results" unless valid?
 
-      if AllocationCategory.where(name: OOB_CATEGORY_NAMES).empty?
-        raise "No out-of-budget categories found (looked for: #{OOB_CATEGORY_NAMES.join(', ')}). " \
-              "The OOB category names may have changed."
+      if AllocationCategory.where(budget_role: OOB_BUDGET_ROLE).empty?
+        raise "No categories with budget_role = '#{OOB_BUDGET_ROLE}' found. Out-of-budget " \
+              "analysis requires the escape-valve categories to be classified as transfer."
       end
 
       case group_by
@@ -171,15 +169,15 @@ module Mcp
     end
 
     # SQL fragment: transaction conditions for OOB category scope.
-    # Excludes brought-forward and manual adjustments.
-    # Category names are passed as a bound array via :oob_category_names (added in execute_and_map).
+    # Excludes brought-forward and manual adjustments; scopes to budget_role = 'transfer'.
+    # The role is passed as a bound param :oob_budget_role (added in execute_and_map).
     def oob_transaction_conditions(txn_alias: 't', allocation_alias: 'a', category_alias: 'ac')
       <<~SQL.strip
         #{txn_alias}.is_manual_adjustment = false
         AND #{txn_alias}.withdrawal_amount > 0
         AND (#{txn_alias}.brought_forward_status IS NULL
              OR #{txn_alias}.brought_forward_status NOT IN ('added', 'adjustment'))
-        AND #{category_alias}.name = ANY(:oob_category_names)
+        AND #{category_alias}.budget_role = :oob_budget_role
       SQL
     end
 
@@ -189,23 +187,15 @@ module Mcp
 
     def execute_and_map(sql, &block)
       bindings = {
-        start_month:       start_month,
-        end_month:         end_month,
-        household_id:      ActsAsTenant.current_tenant.id,
-        oob_category_names: oob_category_names_literal
+        start_month:     start_month,
+        end_month:       end_month,
+        household_id:    ActsAsTenant.current_tenant.id,
+        oob_budget_role: OOB_BUDGET_ROLE
       }
       result = ActiveRecord::Base.connection.exec_query(
         ActiveRecord::Base.sanitize_sql([sql, bindings])
       )
       result.map(&block)
-    end
-
-    # Returns a Postgres array literal for OOB_CATEGORY_NAMES, e.g. '{"a","b"}'.
-    # Safe to build without quote() because OOB_CATEGORY_NAMES is a hardcoded constant
-    # (not user input). Each element is quoted and curly-brace-wrapped for Postgres syntax.
-    def oob_category_names_literal
-      quoted = OOB_CATEGORY_NAMES.map { |n| "\"#{n.gsub('"', '\\"')}\"" }.join(',')
-      "{#{quoted}}"
     end
 
     def end_month_not_before_start_month
