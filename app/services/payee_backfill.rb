@@ -1,14 +1,14 @@
 # Backfills `transactions.payee_name` for one household.
 #
-# Only considers rows where `payee_name IS NULL` (idempotent). Whether a row
-# is an internal transfer / bookkeeping movement is determined entirely by
-# PayeeTransferDetector — this class does not re-implement that logic.
+# Only considers rows where `payee_name IS NULL` (idempotent). The decision of
+# whether a row is an internal transfer / bookkeeping movement and what payee
+# name to assign is delegated entirely to PayeeNameResolver — this class does
+# not re-implement that logic.
 #
-# Per candidate row:
-#   - PayeeTransferDetector.transfer? → leave NULL, count :cleared
-#   - otherwise pass to PayeeNameExtractor:
-#       - non-nil result → write payee_name (unless dry_run), count :named
-#       - nil result     → leave NULL, count :no_extractor
+# Per candidate row (via PayeeNameResolver):
+#   - :cleared      → leave NULL, count :cleared
+#   - :named        → write payee_name (unless dry_run), count :named
+#   - :no_extractor → leave NULL, count :no_extractor
 #
 # Usage:
 #   result = PayeeBackfill.new(household_id: 96).call          # dry run (default)
@@ -30,28 +30,13 @@ class PayeeBackfill
     ActsAsTenant.with_tenant(household) do
       candidates.in_batches do |batch|
         batch.each do |txn|
-          if PayeeTransferDetector.transfer?(txn)
-            counts[:cleared] += 1
-            next
-          end
+          outcome, name = PayeeNameResolver.call(txn)
+          counts[outcome] += 1
 
-          # `bank_account` may be nil for a small number of historical rows with
-          # a dangling bank_account_id. `&.import_format` returns nil, which
-          # PayeeNameExtractor treats as an unregistered format → nil → :no_extractor.
-          name = PayeeNameExtractor.extract(
-            description:   txn.description,
-            import_format: txn.bank_account&.import_format
-          )
-
-          if name
-            # update_columns intentionally bypasses callbacks/validations and
-            # leaves updated_at untouched — this is a one-off embedding backfill,
-            # not a meaningful change to the row.
-            txn.update_columns(payee_name: name) unless @dry_run
-            counts[:named] += 1
-          else
-            counts[:no_extractor] += 1
-          end
+          # update_columns intentionally bypasses callbacks/validations and
+          # leaves updated_at untouched — this is a one-off embedding backfill,
+          # not a meaningful change to the row.
+          txn.update_columns(payee_name: name) if outcome == :named && !@dry_run
         end
       end
     end

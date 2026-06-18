@@ -562,5 +562,44 @@ RSpec.describe ImportSaveService do
         expect(txn.sink_fund_allocation_id).to be_nil
       end
     end
+
+    context 'payee_name extraction on import' do
+      let(:abn_account) do
+        ba = create(:bank_account,
+          household: household,
+          account_no: "NL11ABNA0123456789",
+          opening_balance: 10000,
+          import_format: 'abn-amro-bank'
+        )
+        ba.update_columns(closing_balance: 10000, closing_date: Date.new(2026, 2, 28))
+        ba
+      end
+
+      it 'sets payee_name for an extractable merchant description on import' do
+        params = [{
+          bank_account_id: abn_account.id,
+          iban: "NL11ABNA0123456789",
+          transactions: [txn_params(bank_ref: "PAYEE-001", description: "ALBERT HEIJN 2242,PAS363")]
+        }]
+
+        build_service(params).call
+        txn = Transaction.find_by(bank_ref: "PAYEE-001")
+        expect(txn.payee_name).to eq('ALBERT HEIJN')
+      end
+
+      it 'leaves payee_name nil for a transfer description on import' do
+        # "INT CARD SERVICES" matches CC_PAYMENT_INTL in PayeeTransferDetector
+        # (/\bINT(?:ERNATIONAL)? CARD SERVI/i) → resolver returns :cleared
+        params = [{
+          bank_account_id: abn_account.id,
+          iban: "NL11ABNA0123456789",
+          transactions: [txn_params(bank_ref: "PAYEE-002", description: "INT CARD SERVICES")]
+        }]
+
+        build_service(params).call
+        txn = Transaction.find_by(bank_ref: "PAYEE-002")
+        expect(txn.payee_name).to be_nil
+      end
+    end
   end
 end

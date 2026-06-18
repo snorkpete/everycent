@@ -32,6 +32,7 @@ class Transaction < ApplicationRecord
 
   before_save :check_status
   before_create :assign_bank_ref
+  before_create :assign_payee_name
 
   def self.preloaded
     includes({ allocation: :allocation_category }, { bank_account: :institution } )
@@ -109,6 +110,17 @@ class Transaction < ApplicationRecord
     self.bank_ref = "MAN-#{SecureRandom.hex(8)}"
   end
 
+  # Populate payee_name from the description at creation time (import + manual),
+  # unless one was explicitly provided. Mirrors the historical PayeeBackfill via
+  # the shared PayeeNameResolver. Update paths are untouched (before_create only).
+  def assign_payee_name
+    return if payee_name.present?
+
+    # outcome is ignored here — :cleared and :no_extractor both mean "leave nil"
+    _outcome, name = PayeeNameResolver.call(self)
+    self.payee_name = name
+  end
+
   def to_brought_forward_version(brought_forward_date)
     new_transaction = dup
     new_transaction.description = "#{description} (B/F)"
@@ -116,6 +128,8 @@ class Transaction < ApplicationRecord
     new_transaction.status = 'unpaid'
     new_transaction.brought_forward_status = 'added'
     new_transaction.bank_ref = nil
+    # don't copy payee name - let PayeeTransferDetector determine the value
+    new_transaction.payee_name = nil
     new_transaction
   end
 

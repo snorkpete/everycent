@@ -19,7 +19,12 @@ RSpec.describe PayeeBackfill do
   end
 
   def make_txn(overrides = {})
-    create(:transaction, { household: household, bank_account: bank_account }.merge(overrides))
+    txn = create(:transaction, { household: household, bank_account: bank_account }.merge(overrides))
+    # Simulate historical (pre-callback) rows that have payee_name NULL.
+    # Only null it out when the test didn't explicitly supply a payee_name
+    # (the idempotency test passes payee_name: 'EXISTING VALUE' and must keep it).
+    txn.update_columns(payee_name: nil) unless overrides.key?(:payee_name)
+    txn
   end
 
   # ------------------------------------------------------------------

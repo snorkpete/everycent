@@ -205,6 +205,52 @@ RSpec.describe Transaction, :type => :model do
     end
   end
 
+  describe 'payee_name assignment on create' do
+    let(:abn_account) { create(:bank_account, import_format: 'abn-amro-bank') }
+
+    it 'sets payee_name to the cleaned merchant name for a registered format and clean description' do
+      txn = create(:transaction, bank_account: abn_account, description: 'ALBERT HEIJN 2242,PAS363')
+      expect(txn.payee_name).to eq('ALBERT HEIJN')
+    end
+
+    it 'leaves payee_name nil for a transfer description on a registered format' do
+      txn = create(:transaction, bank_account: abn_account, description: 'KJ STEPHEN')
+      expect(txn.payee_name).to be_nil
+    end
+
+    it 'leaves payee_name nil for a blank/unregistered import_format (default factory bank_account)' do
+      # Default bank_account factory has import_format: "" — extractor returns nil
+      txn = create(:transaction, description: 'ALBERT HEIJN 2242,PAS363')
+      expect(txn.payee_name).to be_nil
+    end
+
+    it 'preserves an explicitly provided payee_name without overwriting it' do
+      txn = create(:transaction, bank_account: abn_account, description: 'ALBERT HEIJN 2242,PAS363',
+                   payee_name: 'EXPLICIT')
+      expect(txn.payee_name).to eq('EXPLICIT')
+    end
+
+    it 'does not change payee_name on update (before_create only)' do
+      txn = create(:transaction, bank_account: abn_account, description: 'ALBERT HEIJN 2242,PAS363')
+      original_payee = txn.payee_name
+      txn.update_columns(payee_name: nil)
+      txn.update!(description: 'DIFFERENT DESC')
+      expect(txn.reload.payee_name).to be_nil
+    end
+
+    it 'clears payee_name on a brought-forward copy of a named transaction' do
+      # dup copies payee_name; to_brought_forward_version nils it so the callback
+      # re-resolves and PayeeTransferDetector clears the B/F row (no double-count).
+      original = create(:transaction, bank_account: abn_account, description: 'ALBERT HEIJN 2242,PAS363')
+      expect(original.payee_name).to eq('ALBERT HEIJN')
+
+      bf = original.to_brought_forward_version(Date.new(2026, 4, 1))
+      bf.save!
+      expect(bf.reload.payee_name).to be_nil
+      expect(bf.brought_forward_status).to eq('added')
+    end
+  end
+
   describe "#to_brought_forward_version" do
     before do
       @original_transaction = build(:transaction,
