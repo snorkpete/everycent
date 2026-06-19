@@ -21,21 +21,6 @@ export const HIGHLIGHTS: Highlight[] = [
     body: "A new 'Chat' section in the menu lets you ask plain-English questions about your budget — like \"where did I overspend in March?\" — and get answers backed by your data. Currently uses a local AI model on Kion's gaming PC; ask before trying it out.",
     date: '2026-05-24',
   },
-  {
-    title: 'Special Events works on your phone',
-    body: 'The Special Events list, detail, and allocation editor all now display properly on mobile — card layouts instead of cramped tables, and buttons that actually fit on screen.',
-    date: '2026-05-05',
-  },
-  {
-    title: 'Unpaid transactions stand out in red',
-    body: "On the Transactions screen, any transaction that isn't marked Paid now shows in red — date, description, allocation, and amount — so unreconciled rows are easy to spot at a glance.",
-    date: '2026-04-20',
-  },
-  {
-    title: 'Tabbing past the allocation no longer picks the wrong one',
-    body: 'When adding a new transaction and tabbing through the fields, the allocation dropdown used to jump to the first alphabetical option. It now defaults to a blank selection, so you can tab past it cleanly.',
-    date: '2026-04-20',
-  },
 ];
 
 export const NOTEWORTHY: string[] = [
