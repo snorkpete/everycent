@@ -3,6 +3,9 @@
 ## Overview
 Personal finance app for zero-based budgeting. Rails 7.1 API + Vue 3 frontend (webclientv4/), Angular 14 safety net (webclientv3/, frozen). PostgreSQL, devise_token_auth, acts_as_tenant by Household, deployed on Heroku.
 
+## ⚠️ Public Repo — No PII in Tracked Files
+This repository is **public**. Never write real personal or financial data into any tracked file — real names, home address, emails, financial figures/balances, account or fund labels, real merchant/biller names, or other household identifiers. **`.domus/` (tasks, ideas, docs, `tasks.jsonl`) is tracked and public — treat everything there as world-readable.** Use fictional/generic placeholders in code, comments, specs, and docs; keep real values outside the repo (`~/code/…`) or in gitignored / DB-backed config. When illustrating by example, invent data — don't paste the household's actual data. (A 2026-06 audit found real PII had leaked into payee code + `.domus/`; cleanup is tracked at `~/code/everycent-payee-pii-cleanup.md`.)
+
 ## Backend Conventions
 - All models use `acts_as_tenant :household` for data scoping
 - JSON keys use snake_case matching Ruby names. Use model names for nested collections (e.g. `bank_accounts`, not `accounts`)

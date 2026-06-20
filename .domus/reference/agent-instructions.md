@@ -1,5 +1,9 @@
 # Domus — Workflow Instructions
 
+## ⚠️ Public repo — scrub PII at capture
+
+`.domus/` is tracked in a **public** repository — every task, idea, doc, and `tasks.jsonl` entry is world-readable. **Never capture real PII**: real names, home address, emails, financial figures/balances, account or fund labels, real merchant/biller names, or household identifiers. Describe by symbol/category instead (e.g. "the surname regex in `payee_transfer_detector.rb`"), not the real values. Keep real values outside the repo (`~/code/…`). Applies to titles, summaries, detail bodies, and the index.
+
 ## Before creating a task
 
 Always check the existing task list before creating a new task. Run `domus task list` or scan `.domus/tasks/` to avoid duplicates — including cancelled tasks, which may be worth reopening rather than recreating.
