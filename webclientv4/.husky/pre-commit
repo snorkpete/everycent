@@ -24,16 +24,24 @@ if [ ! -e "$worktree_root/webclientv4/node_modules" ]; then
   ln -sfn "$main_root/webclientv4/node_modules" "$worktree_root/webclientv4/node_modules"
 fi
 
-# --- Vue: lint-staged (ESLint + Prettier on staged .ts/.vue files) ---
-cd "$worktree_root/webclientv4" || { echo "pre-commit: can't cd to webclientv4"; exit 1; }
-lint-staged
-node tools/check-api-ownership.mjs || { echo "pre-commit: api ownership check failed"; exit 1; }
+# --- Vue gates: only when webclientv4/ files are staged ---
+# Docs-only or backend-only commits skip the Vue lint/type-check/test suite.
+staged_vue=$(git diff --cached --name-only --diff-filter=ACM | grep '^webclientv4/' || true)
+if [ -n "$staged_vue" ]; then
+  cd "$worktree_root/webclientv4" || { echo "pre-commit: can't cd to webclientv4"; exit 1; }
 
-# --- Vue: type-check (full project) ---
-npm run type-check || { echo "pre-commit: type-check failed"; exit 1; }
+  # lint-staged (ESLint + Prettier on staged .ts/.vue files)
+  lint-staged
+  node tools/check-api-ownership.mjs || { echo "pre-commit: api ownership check failed"; exit 1; }
 
-# --- Vue: full test suite (vitest + ESLint rule tests) ---
-npm run test || { echo "pre-commit: vue tests failed"; exit 1; }
+  # type-check (full project)
+  npm run type-check || { echo "pre-commit: type-check failed"; exit 1; }
+
+  # full test suite (vitest + ESLint rule tests)
+  npm run test || { echo "pre-commit: vue tests failed"; exit 1; }
+else
+  echo "pre-commit: no webclientv4/ changes staged — skipping Vue lint/type-check/tests"
+fi
 
 # --- Rails: run rspec for changed Ruby files ---
 cd "$worktree_root" || { echo "pre-commit: can't cd to repo root"; exit 1; }
