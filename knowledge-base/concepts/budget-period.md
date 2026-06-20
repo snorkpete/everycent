@@ -11,6 +11,14 @@ timestamp: 2026-06-20T00:00:00Z
 
 # Budget Period
 
-> **Stub — definition only.** Full treatment pending.
+> **Stub — restored from prior vocabulary notes; pending review against current code.**
 
-The budget period is the month-long window a [budget](/tables/budgets.md) covers; most time-scoped logic is relative to it. See [budget membership](/concepts/budget-membership.md).
+## Context
+
+Budget periods are always calendar months. The [budget](/tables/budgets.md) auto-names itself from the date range. Nearly all system operations are bounded by the current budget period — viewing transactions, calculating balances, determining what gets brought forward. See [budget membership](/concepts/budget-membership.md).
+
+## Contract
+
+- Always one calendar month.
+- Defined by budget's start_date and end_date.
+- Transactions, balance calculations, and close operations are all scoped to a budget period.

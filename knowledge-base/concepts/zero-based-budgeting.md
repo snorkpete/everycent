@@ -11,6 +11,16 @@ timestamp: 2026-06-20T00:00:00Z
 
 # Zero-Based Budgeting
 
-> **Stub — definition only.** Full treatment pending.
+> **Stub — restored from prior vocabulary notes; pending review against current code.**
 
-Zero-based budgeting is the core philosophy: every cent gets a job. In practice the unallocated remainder is deliberate [discretionary money](/concepts/discretionary-money.md) split between partners.
+## Context
+
+**Theory vs practice.** Conceptually, every cent is allocated. In practice, the system intentionally doesn't allocate everything — the unallocated remainder is [discretionary money](/concepts/discretionary-money.md), split equally between husband and wife with no questions asked. There's no official tracking of this discretionary spending, though you could figure it out with effort. The system doesn't provide that effort.
+
+This is zero-based in spirit with a deliberate gap. The gap is a feature, not a bug — it gives breathing room and avoids micromanaging personal spending.
+
+## Contract
+
+- Total income minus total allocation = discretionary (untracked).
+- Allocations exist only within their budget period.
+- The system does not enforce that all income is allocated.

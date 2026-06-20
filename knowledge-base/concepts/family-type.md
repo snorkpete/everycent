@@ -11,6 +11,14 @@ timestamp: 2026-06-20T00:00:00Z
 
 # Family Type
 
-> **Stub — definition only.** Full treatment pending.
+> **Stub — restored from prior vocabulary notes; pending review against current code.**
 
-Family type is a [settings](/tables/settings.md) value (couple or single) that shapes the [discretionary-money](/concepts/discretionary-money.md) split and person-name display.
+## Context
+
+For couples, the unallocated budget remainder is split equally between the two people for no-questions-asked [discretionary](/concepts/discretionary-money.md) spending. Person names (husband/wife or single_person) are stored in [settings](/tables/settings.md).
+
+## Contract
+
+- Values: `couple`, `single`.
+- Stored in settings.
+- Affects discretionary spending split and display of person names.

@@ -11,6 +11,20 @@ timestamp: 2026-06-20T00:00:00Z
 
 # Reports
 
-> **Stub — definition only.** Full treatment pending.
+> **Stub — restored from prior vocabulary notes; pending review against current code.**
 
-Reports are backward-looking analyses — net worth over time, [category](/tables/allocation_categories.md) spending (budget vs actual), and needs vs wants. All retrospective; see also [budget-role analysis sections](/concepts/budget-role-analysis-sections.md).
+## Context
+
+All reports are retrospective — they analyze what happened to inform future decisions. Key reports:
+
+- **Net worth** — cumulative money gained/lost over time. Shows the trend.
+- **Category spending** — budget vs actual by [allocation category](/tables/allocation_categories.md) and period. Answers "am I spending what I planned?"
+- **Needs vs wants** — income allocation breakdown by [allocation class](/concepts/allocation-class.md). Answers "is my spending in alignment?"
+
+See also [budget-role analysis sections](/concepts/budget-role-analysis-sections.md).
+
+## Contract
+
+- Net worth: period, net_change, cumulative net_worth.
+- Category spending: period, category_name, budgeted, spent, difference.
+- Needs vs wants: budgeted and actual for each class (need/want/savings), with percentages.

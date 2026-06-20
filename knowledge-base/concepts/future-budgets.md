@@ -11,6 +11,20 @@ timestamp: 2026-06-20T00:00:00Z
 
 # Future Budgets
 
-> **Stub — definition only.** Full treatment pending.
+> **Stub — restored from prior vocabulary notes; pending review against current code.**
 
-Future budgets is a spreadsheet-like screen for editing [allocations](/tables/allocations.md) across all open budgets by name, where roughly 95% of budget editing happens. It enforces name consistency and is the home of the 0 = delete / 0.01 = keep-alive [placeholder allocations](/concepts/placeholder-allocations.md) behavior.
+## Context
+
+**Origin.** Built after observing how the user's wife used a spreadsheet to plan [allocations](/tables/allocations.md) across multiple months. The spreadsheet layout (allocations as rows, budgets as columns) turned out to be the natural way to think about budgets over time.
+
+**Enforces allocation name consistency.** Because you edit by allocation name across budgets (not budget by budget), names naturally stay consistent. This is what makes name-based allocation identity work in practice.
+
+**The 0 / 0.01 problem lives here.** Setting an allocation to 0 signals deletion. 0.01 is the keep-alive hack for seasonal allocations that need to survive across months ([placeholder allocations](/concepts/placeholder-allocations.md)). This is a UX workaround masking a missing "inactive but present" state.
+
+## Contract
+
+- Operates on all open budgets.
+- Edits allocations by name across budgets.
+- 0 = delete the allocation from that budget.
+- 0.01 = keep the allocation alive without meaningful budget impact.
+- Changes propagate through the copy chain (since [copy budget](/concepts/copy-budget.md) duplicates allocations by name).

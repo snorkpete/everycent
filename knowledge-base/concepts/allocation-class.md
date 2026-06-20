@@ -11,6 +11,17 @@ timestamp: 2026-06-20T00:00:00Z
 
 # Allocation Class
 
-> **Stub — definition only.** Full treatment pending.
+> **Stub — restored from prior vocabulary notes; pending review against current code.**
 
-Allocation class is a higher classification of an [allocation](/tables/allocations.md) — need, want, or savings — meant for evaluating spending alignment but underdeveloped. Stored in `allocation_class`, it is a [refactor candidate](/tracking/refactor-candidates.md) (R1).
+## Context
+
+The foundational concept behind the needs-vs-wants report. A common alignment target is roughly 50% needs / 30% wants / 20% savings, but the real point is having the data to evaluate alignment at all.
+
+**Underdeveloped.** This area hasn't been fleshed out enough in the system. There's an intention to put more emphasis on alignment tracking, but currently it's primarily a reporting classification with no enforcement or guidance features. Stored in `allocation_class`, it is a [refactor candidate](/tracking/refactor-candidates.md) (R1).
+
+## Contract
+
+- Values: `need`, `want`, `savings`.
+- Set on [allocations](/tables/allocations.md) (via `allocation_class` field, defaults to `want`).
+- Used by the needs-vs-wants report to calculate budgeted and actual percentages per class.
+- No enforcement — purely informational/analytical.

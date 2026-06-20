@@ -11,6 +11,16 @@ timestamp: 2026-06-20T00:00:00Z
 
 # Copy Budget
 
-> **Stub — definition only.** Full treatment pending.
+> **Stub — restored from prior vocabulary notes; pending review against current code.**
 
-Copy budget duplicates the incomes and allocations of an existing [budget](/tables/budgets.md) into a new one a month ahead, making it the main way budgets come into being. It stands in for the never-completed [recurring allocations](/concepts/recurring-allocation.md).
+## Context
+
+**Replaced recurring allocations.** The original design intended [recurring allocations](/concepts/recurring-allocation.md)/incomes as templates for new budgets. But every month was nearly identical to the last, so copy budget emerged from practical need and became the standard workflow. The recurring allocations feature was never truly implemented — it's dead code.
+
+Copy is the reason the 0.01 keep-alive hack exists — seasonal allocations need to survive in the copied budget even when they're not active that month.
+
+## Contract
+
+- Creates a new budget with start_date one month ahead of the source.
+- Copies all incomes and allocations from the source budget.
+- The new budget is created in `open` status.
