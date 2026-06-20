@@ -18,7 +18,7 @@ The **tenant root** of EveryCent and the **isolation boundary** the entire app
 is scoped by. Structurally thin (just `name` + timestamps), but semantically
 central: it is the unit of multi-tenancy.
 
-In practice there is **one household with two users**. Multi-tenancy was added
+In practice the app is multi-tenant, scoped per household. Multi-tenancy was added
 later (the app was originally single-tenant), which explains why some older
 tables are not household-scoped — see [Trinidad banking
 model](/legacy/trinidad-banking-model.md).

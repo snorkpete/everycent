@@ -35,7 +35,7 @@ cross-budget grouping — hence a separate table.
 | Column | Meaning |
 |---|---|
 | `id` | Primary key. |
-| `name` | Event label ("Italy 2025"). Required. |
+| `name` | Event label ("Summer Trip 2025"). Required. |
 | `budget_amount` | Planned total. **Frontend-maintained cache — see below.** Default 0, ≥ 0. |
 | `actual_amount` | Actual total. **Frontend-maintained cache — see below.** Default 0, ≥ 0. |
 | `start_date` | **Ordering only** — events are listed by occurrence (descending), typically the first day of the vacation. No timespan semantics; nothing keys off it. (Omitted from the model's stale annotation but present in the schema.) |
@@ -62,10 +62,12 @@ goes stale. **To answer "what did this event cost," derive from the
 allocations; treat the stored totals as a possibly-stale display cache.** See
 [bugs](/tracking/bugs.md) (B8).
 
-> Provenance: this was the first feature built purely via AI (Cursor, Nov 2025,
-> lighter review than hand-built code) — which is consistent with the
-> frontend-trusting, server-light pattern here. Useful archaeology when reasoning
-> about code from that era.
+> Provenance: the special-events implementation came entirely out of an early
+> AI-assisted experiment (Cursor, Nov 2025) — a first run at AI-first "vibe coding"
+> that optimized for speed of exploration over review rigor, with limited tool
+> access at the time. A hand-built version would have been designed differently;
+> the frontend-trusting, server-light pattern here is an artifact of that
+> experiment. Useful archaeology when reasoning about this code.
 
 ## Consumption & settings
 
@@ -75,5 +77,5 @@ its budget, category, and actual transactions."
 
 The special-events UI filters allocations by budget + category (nothing shows
 until a budget is picked). `settings.default_allocation_category_id_for_special_events`
-sets which category is **pre-selected** in that filter — a UI convenience (this
-household keeps a dedicated `event`-role category). See [settings](/tables/settings.md).
+sets which category is **pre-selected** in that filter — a UI convenience (a
+household can keep a dedicated `event`-role category). See [settings](/tables/settings.md).

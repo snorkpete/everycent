@@ -12,8 +12,8 @@ EveryCent is a personal **zero-based budgeting** application (Rails + Postgres,
 Vue 3 frontend, an NLQ/MCP reporting layer over the Rails API). It is zero-based
 in *concept*; see
 [discretionary money & the budget gap](/concepts/discretionary-money.md) for how
-the implementation deliberately leaves a discretionary remainder. One household,
-two users in practice. This bundle is the durable, agent-facing knowledge base
+the implementation deliberately leaves a discretionary remainder. It is
+multi-tenant, scoped by household. This bundle is the durable, agent-facing knowledge base
 that explains how the system actually works, beyond what the raw schema reveals.
 
 ## Scope of this version
@@ -67,9 +67,10 @@ system facts generalize, household facts do not.
   `> 10` placeholder filter, `budget_role` semantics, and
   `allocation_id` = budget membership.
 - **Household-specific knowledge** — data conventions of this particular
-  household that shape behavior but are not part of the product. E.g. the two
-  `transfer` categories (sink-fund injection and overspend top-up), the permanent
-  miscellaneous allocation, and the ~200 discretionary gap.
+  household that shape behavior but are not part of the product. E.g.
+  household-specific `transfer` categories (such as sink-fund injection and
+  overspend top-up), a permanent miscellaneous allocation, and a deliberate
+  discretionary gap.
 
 ## Design philosophy
 

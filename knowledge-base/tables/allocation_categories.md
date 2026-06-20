@@ -84,8 +84,8 @@ explicit **convenience bonus**, not the purpose of `budget_role`.
 
 ## Household-specific categories
 
-Beyond the system mechanics above, this household maintains specific categories
-that shape analysis. These are **household data conventions, not part of
+Beyond the system mechanics above, a household typically maintains specific
+categories that shape analysis. These are **household data conventions, not part of
 EveryCent itself** — see the knowledge-tiers note in [about](/about.md).
 
 - **Sink-fund injection** (`transfer` role) — funds spending that was pre-saved

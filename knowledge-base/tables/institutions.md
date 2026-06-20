@@ -5,7 +5,7 @@ term: institution
 definition: "Bank or financial entity that issues bank accounts. A simple reference/lookup entity."
 lexicon: true
 description: >-
-  Household-scoped lookup of financial institutions (Scotia, ABN AMRO).
+  Household-scoped lookup of financial institutions (e.g. a retail bank).
   Informational; bank accounts optionally reference one. Nothing keys off it
   functionally.
 resource: everycent:table:institutions
@@ -15,7 +15,7 @@ timestamp: 2026-06-17T00:00:00Z
 
 # institutions
 
-A household-scoped lookup of financial institutions (Scotia, ABN AMRO). Purely
+A household-scoped lookup of financial institutions (e.g. a retail bank). Purely
 **informational** — it records which institution a [bank
 account](/tables/bank_accounts.md) is from. No functional behavior keys off it.
 

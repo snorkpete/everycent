@@ -15,7 +15,7 @@ timestamp: 2026-06-20T00:00:00Z
 
 ## Context
 
-**Origin.** Built after observing how the user's wife used a spreadsheet to plan [allocations](/tables/allocations.md) across multiple months. The spreadsheet layout (allocations as rows, budgets as columns) turned out to be the natural way to think about budgets over time.
+**Origin.** Built after observing spreadsheet-based planning of [allocations](/tables/allocations.md) across multiple months. The spreadsheet layout (allocations as rows, budgets as columns) turned out to be the natural way to think about budgets over time.
 
 **Enforces allocation name consistency.** Because you edit by allocation name across budgets (not budget by budget), names naturally stay consistent. This is what makes name-based allocation identity work in practice.
 

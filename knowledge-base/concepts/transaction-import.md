@@ -38,6 +38,6 @@ import styles, both selected per account by
 ## Why provenance matters
 
 Copy-pasted rows have ambiguous IDs (paste mistakes, duplicate risk); CAMT rows
-carry definitive server-side IDs. The household has **largely moved to CAMT where
-supported** (ABN AMRO accounts) for reliability; the anticipated mixing of the two
+carry definitive server-side IDs. Some accounts have **largely moved to CAMT where
+supported** for reliability; the anticipated mixing of the two
 didn't materialize, but manual import remains necessary where CAMT isn't offered.

@@ -2,7 +2,7 @@
 type: concept
 title: Zero-Based Budgeting
 term: zero-based-budgeting
-definition: "Core philosophy: every cent gets a job. In practice the unallocated remainder is deliberate discretionary money split between partners — see discretionary money & the budget gap."
+definition: "Core philosophy: every cent gets a job. In practice the unallocated remainder is deliberate discretionary money split among household members — see discretionary money & the budget gap."
 lexicon: true
 doc_status: stub
 tags: [domain, stub]
@@ -15,7 +15,7 @@ timestamp: 2026-06-20T00:00:00Z
 
 ## Context
 
-**Theory vs practice.** Conceptually, every cent is allocated. In practice, the system intentionally doesn't allocate everything — the unallocated remainder is [discretionary money](/concepts/discretionary-money.md), split equally between husband and wife with no questions asked. There's no official tracking of this discretionary spending, though you could figure it out with effort. The system doesn't provide that effort.
+**Theory vs practice.** Conceptually, every cent is allocated. In practice, the system intentionally doesn't allocate everything — the unallocated remainder is [discretionary money](/concepts/discretionary-money.md), split equally among household members with no questions asked. There's no official tracking of this discretionary spending, though you could figure it out with effort. The system doesn't provide that effort.
 
 This is zero-based in spirit with a deliberate gap. The gap is a feature, not a bug — it gives breathing room and avoids micromanaging personal spending.
 

@@ -3,7 +3,7 @@ type: concept
 title: Discretionary money & the budget gap
 description: >-
   Discretionary/personal money is intentionally NOT modeled as an allocation. It
-  is the remainder of income minus allocations, split between the two users, and
+  is the remainder of income minus allocations, split among household members, and
   visible only as actual transfer transactions. The budget target is a deliberate
   non-zero gap, not zero.
 tags: [domain, budgeting, discretionary, zero-based, reporting]
@@ -36,8 +36,8 @@ the budget/joint account into each user's individual spending account.
 ## The target is a non-zero gap, not zero
 
 Because discretionary money is the remainder, **budgeting does not aim for zero
-unallocated.** It aims for a deliberate **positive gap** — e.g. ~200, so that
-each of the two users gets ~100 in personal money.
+unallocated.** It aims for a deliberate **positive gap**, so that household
+members are each left some unbudgeted personal money.
 
 **Therefore:** `income − allocations > 0` is **not** an unbudgeted shortfall to
 fix. It **is** the discretionary pool, by design. Any "you have unallocated money"

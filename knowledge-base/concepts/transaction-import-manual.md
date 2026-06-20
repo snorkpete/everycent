@@ -17,7 +17,7 @@ original and still-needed path.
   frontend parses it into [transactions](/tables/transactions.md) according to the
   account's [`import_format`](/tables/bank_accounts.md). There is no backend
   importer for this path.
-- **Origin.** The first supported format mirrored Scotia Bank's web interface
+- **Origin.** The first supported format mirrored a retail bank's web interface
   (which is also why the transaction screen exposes separate withdrawal/deposit
   fields — see [transactions](/tables/transactions.md)).
 - **ID ambiguity.** Copy-pasted rows lack definitive bank IDs, so there is real

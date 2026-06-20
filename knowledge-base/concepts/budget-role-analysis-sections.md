@@ -41,13 +41,13 @@ cost?" (the `event` section) vs. "total real spend this year" (include
 transfers that *fund* things, never the spending itself. The actual spend always
 flows through **normal allocations** in the monthly budget.
 
-Worked example (this household): when the month runs over, the money moved **into**
-the joint account to cover it goes through an overspend-top-up `transfer`
-category; the things actually bought are still ordinary allocations (there's even
-a permanent **miscellaneous** allocation for the random monthly stuff). So
-"funding" and "spending" never mix in the data. See
-[allocation_categories](/tables/allocation_categories.md) for the household-specific
-`transfer` categories.
+Worked example: when a period runs over, the top-up funding that covers it flows
+through an overspend-top-up `transfer` category, while the things actually bought
+stay in ordinary allocations (a budget might even keep a permanent
+**miscellaneous** allocation for random monthly spend). So "funding" and
+"spending" never mix in the data. See
+[allocation_categories](/tables/allocation_categories.md) for the `transfer`-role
+categories.
 
 ## Relationship to other filters
 

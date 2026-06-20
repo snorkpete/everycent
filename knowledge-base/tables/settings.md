@@ -47,6 +47,6 @@ It omits `bank_charges_allocation_name` entirely (reinforcing D10).
 
 `family_type` + the name fields are the **labels and toggle** behind the
 discretionary 50/50 split: `family_type` decides *whether* to split (couple →
-between the two named people; single → no split), and the names label each
+between the two people; single → no split), and the names label each
 person's personal-money transfer. All **household-specific / display tier**, not
 accounting logic. See [discretionary money & the budget gap](/concepts/discretionary-money.md).

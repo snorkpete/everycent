@@ -59,7 +59,7 @@ backing asset (see `asset_bank_account_id`).
 | `payment_due_day` | CC payment due day-of-month (1–31). CC only. |
 | `import_format` | Selects the (mostly frontend) import parser. Durably live — see [transaction import](/concepts/transaction-import.md). Default `""`. |
 | `account_no` | Account number; **load-bearing for import** (matching imported rows to the account). See [transaction import](/concepts/transaction-import.md). |
-| `institution_id` | → `institutions`. Informational lookup ("from Scotia / ABN AMRO"). `optional`. Rarely used functionally. |
+| `institution_id` | → `institutions`. Informational lookup (e.g. "from a retail bank"). `optional`. Rarely used functionally. |
 | `asset_bank_account_id` | Self-FK. On a **liability** account, points at the backing **asset** account; the asset side sees them as `has_many :loans`. **Validated: settable only when `account_category = liability`.** |
 | `household_id` | Tenant scope. |
 | `account_type_description` | **DEAD (D9).** |

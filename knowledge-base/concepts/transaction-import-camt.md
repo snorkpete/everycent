@@ -15,7 +15,7 @@ A sub-concept of [transaction import](/concepts/transaction-import.md). The
 structured, reliable path.
 
 - **Structured format.** CAMT is the ISO 20022 bank-statement format (European
-  banking; fits the ABN AMRO / NL setup).
+  banking; fits a typical European-bank setup).
 - **Backend component.** Unlike manual import (frontend-only), CAMT has a
   **backend importer** — this is the *only* import path with backend logic,
   because the structured data allows server-side checks.
@@ -25,6 +25,6 @@ structured, reliable path.
 - **Selected via `import_format`**, like manual parsers; it "piggybacks" on the
   same per-account selection. Sets
   [`transactions.camt_imported = true`](/tables/transactions.md).
-- **Adoption.** The household has largely switched to CAMT-only for ABN AMRO
-  accounts for data reliability; accounts without CAMT support (e.g. the credit
+- **Adoption.** Some accounts have largely switched to CAMT-only for data
+  reliability; accounts without CAMT support (e.g. the credit
   card) still use [manual import](/concepts/transaction-import-manual.md).

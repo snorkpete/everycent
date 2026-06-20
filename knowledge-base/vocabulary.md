@@ -58,7 +58,7 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **transfer** — Paired transactions moving money between accounts, or between allocations and sink-fund allocations. One withdrawal + one deposit. · [concepts/transfer.md](concepts/transfer.md)
 
-**zero-based-budgeting** — Core philosophy: every cent gets a job. In practice the unallocated remainder is deliberate discretionary money split between partners — see discretionary money & the budget gap. · [concepts/zero-based-budgeting.md](concepts/zero-based-budgeting.md)
+**zero-based-budgeting** — Core philosophy: every cent gets a job. In practice the unallocated remainder is deliberate discretionary money split among household members — see discretionary money & the budget gap. · [concepts/zero-based-budgeting.md](concepts/zero-based-budgeting.md)
 
 
 ## NLQ chat
