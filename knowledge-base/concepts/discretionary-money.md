@@ -51,7 +51,7 @@ or "budget doesn't balance" logic must account for this, or it will be wrong.
 | The split math / per-user transfer amounts | **No** | Budget-screen UI only |
 | The target gap amount | **No** | A couple's decision; may vary per budget, rarely does |
 | The discretionary remainder as a plan figure | **No** | Derived, never persisted |
-| The actual movement of personal money | Yes | As transfer [transactions](/tables/incomes.md) with **no `allocation_id`** |
+| The actual movement of personal money | Yes | As transfer [transactions](/tables/transactions.md) with **no `allocation_id`** |
 
 ## Why discretionary money stays out of reporting: allocation_id = budget membership
 

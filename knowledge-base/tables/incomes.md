@@ -14,8 +14,9 @@ timestamp: 2026-06-17T00:00:00Z
 The **money-in side** of a budget period. Each row is one expected income line
 for one [budget](/tables/budgets.md). Where [allocations](/tables/allocations.md)
 assign money *out*, incomes declare the money *coming in* that those allocations
-budget against. Total income for a budget is the pool allocations must fully
-consume (zero-based).
+budget against. Total income is the pool allocations draw from — but allocations
+do **not** fully consume it. The remainder is discretionary money; see
+[discretionary money & the budget gap](/concepts/discretionary-money.md).
 
 ## Schema
 
@@ -33,7 +34,7 @@ consume (zero-based).
 ## Plan-only: no linkage to actuals
 
 **Income is a planning declaration only.** `incomes.amount` is the *planned*
-figure. Actual income arrives as a [transaction](/tables/budgets.md) with a
+figure. Actual income arrives as a [transaction](/tables/transactions.md) with a
 `deposit_amount`. **There is no row-to-row matching** between an income line and
 the deposit(s) that fulfill it — there is no `income_id` on transactions. Any
 plan-vs-actual comparison is done at the **aggregate** level.

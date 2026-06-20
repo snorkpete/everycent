@@ -33,6 +33,9 @@ modeling gap. See [dead schema](/tracking/dead-schema.md) for the register.
   `clear_bank_account_if_not_standing_order` callback that now always nulls it
 - `allocation_categories.percentage` (D5) — the percentage-tracking attempt;
   technically stopped being used in the Trinidad era
+- `settings.bank_charges_allocation_name` (D10) — Trinidad-era
+  auto-categorization of bank-charge transactions by description; dead (possibly
+  never fully built)
 - The abandoned tables `recurring_allocations`, `recurring_incomes`, `payees`
   (these predate multi-tenancy and have no `household_id`; empty in prod, no live
   code)

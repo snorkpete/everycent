@@ -13,11 +13,14 @@ timestamp: 2026-06-17T00:00:00Z
 # allocations
 
 The **core money-out unit**. One row is one budgeted outflow line in a
-[budget](/tables/budgets.md) — the zero-based unit of "this much money is
-assigned to this purpose." Counterpart to [incomes](/tables/incomes.md), but
-richer: it carries classification, behavior flags, and the link to actuals.
+[budget](/tables/budgets.md) — money deliberately assigned to a specific purpose.
+Note that **not** all income is allocated: the unallocated remainder is
+discretionary money, never modeled as an allocation — see
+[discretionary money & the budget gap](/concepts/discretionary-money.md).
+Counterpart to [incomes](/tables/incomes.md), but richer: it carries
+classification, behavior flags, and the link to actuals.
 
-This is where **plan meets actual**: [transactions](/tables/budgets.md) point at
+This is where **plan meets actual**: [transactions](/tables/transactions.md) point at
 an allocation via `transactions.allocation_id`. The budgeted `amount` is compared
 against the sum of categorized transactions.
 

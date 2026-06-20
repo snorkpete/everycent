@@ -26,5 +26,19 @@ them, do not populate them.
 | D3 | `allocations.bank_account_id` | Column | Trinidad vestige. The `clear_bank_account_if_not_standing_order` callback now always nulls it. |
 | D4 | `allocations.allocation_type` | Column | Dead. Referenced nowhere in the `Allocation` model. Purpose no longer known. |
 | D5 | `allocation_categories.percentage` | Column | Dead percentage-tracking attempt; stopped being used in the Trinidad era. Related to the unmodeled 50/30/20 target — see [allocations](/tables/allocations.md). |
+| D6 | `transactions.payee_id` | Column | Points at the abandoned normalized `payees` table. See [transactions](/tables/transactions.md). |
+| D7 | `bank_accounts.user_id` | Column | Model TODO marks it "not used anymore." See [bank_accounts](/tables/bank_accounts.md). |
+| D8 | `bank_accounts.allow_default_allocations`, `bank_accounts.default_sub_account_amount` | Columns | Trinidad / sub-account vestiges. See [bank_accounts](/tables/bank_accounts.md). |
+| D9 | `bank_accounts.account_type_description` | Column | Dead. See [bank_accounts](/tables/bank_accounts.md). |
+| D10 | `settings.bank_charges_allocation_name` | Column | Trinidad-era auto-categorization of bank-charge transactions by description; dead (possibly never fully built). See [settings](/tables/settings.md), [Trinidad banking model](/legacy/trinidad-banking-model.md). |
 
 See [allocations](/tables/allocations.md) for context on D2–D5.
+
+## Quarantined (held for possible salvage)
+
+Distinct from plain dead schema: this is **not** an auto-recommend-to-drop item —
+it is held for possible salvage before any deletion.
+
+| ID | Item | Kind | Notes |
+|---|---|---|---|
+| D-Trinidad | `transactions.payee_code` | Column | Trinidad artifact, held for possible salvage before deletion. Do **not** auto-recommend dropping. See [transactions](/tables/transactions.md). |

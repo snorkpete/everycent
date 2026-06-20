@@ -14,8 +14,11 @@ timestamp: 2026-06-17T00:00:00Z
 The **period container** at the heart of the zero-based engine. Each row is one
 budgeting cycle — in practice **one month**. It is the envelope that
 [incomes](/tables/incomes.md) and [allocations](/tables/allocations.md) attach
-to. "Fully assigned" (the zero-based constraint: planned income fully consumed by
-allocations) is measured *within* one budget.
+to. EveryCent is zero-based in *concept*, but allocations do **not** fully
+consume income in *implementation*: the unallocated remainder is deliberate
+discretionary money. See
+[discretionary money & the budget gap](/concepts/discretionary-money.md). This is
+all measured *within* one budget.
 
 ## Schema
 

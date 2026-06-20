@@ -13,12 +13,29 @@ okf_version: "0.1"
 * [budgets](tables/budgets.md) - the monthly period container
 * [incomes](tables/incomes.md) - plan-only inflow lines
 * [allocations](tables/allocations.md) - the core money-out unit
+* [allocation_categories](tables/allocation_categories.md) - grouping buckets; budget_role drives NLQ analysis sectioning
+* [bank_accounts](tables/bank_accounts.md) - where money lives; site of close, brought-forward, adjustment, transfers
+* [transactions](tables/transactions.md) - actual money movement synced from real bank data
+* [sink_fund_allocations](tables/sink_fund_allocations.md) - money-storing envelopes inside a sink-fund account
+* [special_events](tables/special_events.md) - a non-recurring spending occasion grouping allocations across budgets
+* [institutions](tables/institutions.md) - household-scoped lookup of financial institutions
+* [settings](tables/settings.md) - per-household singleton config row
 
 # Domain concepts
 
-* [Budget close & balance checkpointing](concepts/budget-close-checkpointing.md) - how closing stores balance checkpoints
+* [Budget close & balance checkpointing](concepts/budget-close-checkpointing.md) - closing rolls each account's closing_balance forward
 * [Placeholder allocations](concepts/placeholder-allocations.md) - sink-fund-funded expenses budgeted at ~0
 * [Allocation naming conventions](concepts/allocation-naming-conventions.md) - structured meaning in allocation names
+* [Discretionary money & the budget gap](concepts/discretionary-money.md) - why the budget target is a deliberate non-zero gap
+* [Budget-role analysis sections](concepts/budget-role-analysis-sections.md) - how budget_role partitions spend for the NLQ layer
+* [Budget membership](concepts/budget-membership.md) - allocation_id presence marks a transaction as part of the budget
+* [Credit card accounts](concepts/credit-card.md) - the statement cycle and brought-forward unlocked by credit_card accounts
+* [Brought-forward](concepts/brought-forward.md) - unpaid credit-card charges carried into the next budget on close
+* [Sink fund accounts](concepts/sink-fund.md) - money-storing envelopes unlocked by sink_fund accounts
+* [Manual balance adjustment](concepts/manual-balance-adjustment.md) - a self-deleting transaction that forces the balance to match the bank
+* [Transaction import](concepts/transaction-import.md) - how real bank transactions get into EveryCent
+* [Transaction import (manual)](concepts/transaction-import-manual.md) - frontend-only copy-paste import per import_format
+* [Transaction import (CAMT)](concepts/transaction-import-camt.md) - the ISO 20022 path, the one importer with a backend component
 
 # Legacy
 
@@ -34,9 +51,6 @@ okf_version: "0.1"
 
 # Not yet documented (pending)
 
-Tables present in the schema but not yet covered: `bank_accounts`,
-`institutions`, `transactions`, `payees`, `sink_fund_allocations`,
-`special_events`, `recurring_allocations`, `recurring_incomes`, `settings`,
-`users`, `sessions`, `chat_settings`, `llm_models`, `llm_usage_records`,
-`allocation_categories`. Next priority: `allocation_categories` (referenced
-heavily by [allocations](tables/allocations.md)).
+Tables present in the schema but not yet covered: `payees` (dead), `users`,
+`sessions`, `chat_settings`, `llm_models`, `llm_usage_records`,
+`recurring_allocations` (dead), `recurring_incomes` (dead).

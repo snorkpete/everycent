@@ -9,7 +9,10 @@ timestamp: 2026-06-17T00:00:00Z
 # About this bundle
 
 EveryCent is a personal **zero-based budgeting** application (Rails + Postgres,
-Vue 3 frontend, an NLQ/MCP reporting layer over the Rails API). One household,
+Vue 3 frontend, an NLQ/MCP reporting layer over the Rails API). It is zero-based
+in *concept*; see
+[discretionary money & the budget gap](/concepts/discretionary-money.md) for how
+the implementation deliberately leaves a discretionary remainder. One household,
 two users in practice. This bundle is the durable, agent-facing knowledge base
 that explains how the system actually works, beyond what the raw schema reveals.
 
@@ -46,3 +49,16 @@ Their absence means "not yet written," not "doesn't exist."
 - **`type` values** are lowercase-hyphenated by local convention
   (`table`, `concept`, `tracking-register`); OKF tolerates any type string.
 - **Tracking IDs** (B/D/I/R/Q + number) are stable references used across concepts.
+
+### Knowledge tiers
+
+Facts in this bundle live in one of two tiers, and an agent should know which —
+system facts generalize, household facts do not.
+
+- **EveryCent-system knowledge** — true for any instance of the app. E.g. the
+  `> 10` placeholder filter, `budget_role` semantics, and
+  `allocation_id` = budget membership.
+- **Household-specific knowledge** — data conventions of this particular
+  household that shape behavior but are not part of the product. E.g. the two
+  `transfer` categories (sink-fund injection and overspend top-up), the permanent
+  miscellaneous allocation, and the ~200 discretionary gap.

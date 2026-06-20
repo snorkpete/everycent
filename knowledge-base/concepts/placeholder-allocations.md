@@ -15,11 +15,22 @@ A **placeholder allocation** is an [allocation](/tables/allocations.md) budgeted
 at **≤ 10 cents** (`PLACEHOLDER_MAX_CENTS = 10`, in
 [minor units](/concepts/money-units.md) — i.e. 0.01-style amounts).
 
-## What it represents
+## Where the 0.01 amount actually comes from
 
-The expense **exists and will be spent**, but it is **funded from a sink fund**,
-not from this month's income. The tiny budgeted amount is a marker so the line
-shows up in the budget without claiming a real slice of this month's inflow.
+The tiny amount is a **UI workaround from the mass-edit allocations feature**,
+not a designed sentinel. Mass-edit matches allocations across budgets by name,
+with one amount field per budget; in that form **amount 0 means "remove this
+allocation from this budget."** Entering **0.01** keeps a near-zero allocation
+alive without triggering that delete.
+
+`PLACEHOLDER_MAX_CENTS = 10` / the `> 10` filter is therefore the **model
+tolerating that UI artifact** — so workaround amounts don't count as real spend
+or real budget. It *coincides* with sink-fund-funded lines (which legitimately
+want ~0 in the monthly budget) but the 0.01 itself is incidental, not semantic.
+
+This may disappear if the "amount 0 = delete" behavior is replaced by an
+explicit per-budget delete — see
+[refactor candidates](/tracking/refactor-candidates.md) (R2).
 
 ## Why an agent must handle it specially
 

@@ -17,13 +17,15 @@ holds money set aside for irregular/future expenses.
 
 ## Envelopes, not goals
 
-A sink-fund account owns many `sink_fund_allocations` (table not yet documented in
-full). In practice these are **envelopes that store money** — not targets building
-toward a goal. A `target` field exists but is **effectively unused by design**: a
-validation that would check allocations against a target is **disabled** in code
-and is a [refactor candidate](/tracking/refactor-candidates.md) (R4) to remove.
-
-`sink_fund_allocation_balance` = Σ of the allocations' amounts.
+A sink-fund account owns many [`sink_fund_allocations`](/tables/sink_fund_allocations.md).
+In practice these are **envelopes that store money** — not targets building toward
+a goal. There is **no `target` column**: `target`/`target=` are methods aliasing
+the `amount` column. The envelope's real balance is
+**`current_balance` = Σ(deposit − withdrawal)** over its transactions — **not**
+`amount`, which is near-vestigial (display-only plus one UI shortfall readout
+slated for removal). The dead target-design methods and a disabled target
+validation are a [refactor candidate](/tracking/refactor-candidates.md) (R4) to
+remove.
 
 ## Relationship to spending
 
