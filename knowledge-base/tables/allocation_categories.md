@@ -1,6 +1,9 @@
 ---
 type: table
 title: allocation_categories
+term: allocation-category
+definition: "Label that groups allocations. Unique per household, shared across all budgets."
+lexicon: true
 description: >-
   Household-scoped grouping buckets for allocations (food, household, transport,
   …). Carries two orthogonal axes: budget_role (newer, drives NLQ analysis

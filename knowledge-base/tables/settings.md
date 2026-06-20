@@ -1,6 +1,9 @@
 ---
 type: table
 title: settings
+term: settings
+definition: "Household-level config singleton: primary budget account, family type, person names, default categories."
+lexicon: true
 description: >-
   A per-household singleton config row, accessed as a class-level key-value store.
   Holds the primary budget account, household composition (names + family_type),

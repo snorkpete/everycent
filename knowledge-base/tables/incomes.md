@@ -1,6 +1,9 @@
 ---
 type: table
 title: incomes
+term: income
+definition: "Money coming into a budget — a named source with an amount, optionally linked to a bank account. A planning declaration only."
+lexicon: true
 description: >-
   Plan-only inflow lines, one set per budget. Declares expected income that
   allocations budget against. Not linked to actual deposit transactions.

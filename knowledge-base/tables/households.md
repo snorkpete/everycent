@@ -1,6 +1,9 @@
 ---
 type: table
 title: households
+term: household
+definition: "Tenancy boundary. Everything belongs to exactly one household; full isolation, no cross-household actions."
+lexicon: true
 description: >-
   The tenant root and isolation boundary. Almost every live table is scoped to a
   household via a direct household_id foreign key.

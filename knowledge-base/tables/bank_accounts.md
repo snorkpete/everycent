@@ -1,6 +1,9 @@
 ---
 type: table
 title: bank_accounts
+term: bank-account
+definition: "Universal value-tracking primitive — any container of monetary value (accounts, investments, assets, credit cards, loans). Single-table subclasses via account_type."
+lexicon: true
 description: >-
   Where money physically lives, and the execution site for budget close,
   brought-forward, manual adjustment, and transfers. Two orthogonal axes:

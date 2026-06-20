@@ -1,6 +1,9 @@
 ---
 type: concept
 title: Sink fund accounts
+term: sink-fund
+definition: "A bank account (type sink_fund) subdivided into named envelopes via sink-fund allocations. Not a separate model — a bank account with the sink-fund concern."
+lexicon: true
 description: >-
   Behavior unlocked when a bank account has account_type sink_fund: money-storing
   envelopes (sink_fund_allocations), a dedicated screen, and internal

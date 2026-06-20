@@ -1,6 +1,9 @@
 ---
 type: concept
 title: Manual balance adjustment
+term: manual-balance-adjustment
+definition: "Singleton corrective transaction reconciling the calculated balance with reality; at most one per bank account, replaced entirely when recalculated."
+lexicon: true
 description: >-
   A reconciliation trick: a single self-updating, self-deleting transaction per
   account that forces EveryCent's balance to match the real bank balance. Current

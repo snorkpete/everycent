@@ -1,6 +1,9 @@
 ---
 type: concept
 title: Transaction import
+term: import
+definition: "Loading transactions into the system via three methods: file import (CAMT, idempotent), manual entry, manual upload (copy-paste). The save is destructive (wipe and replace)."
+lexicon: true
 description: >-
   How real bank transactions get into EveryCent. Mostly frontend parsing selected
   by import_format; the CAMT path is the one importer with a backend component

@@ -1,6 +1,9 @@
 ---
 type: table
 title: sink_fund_allocations
+term: sink-fund-allocation
+definition: "One obligation/envelope within a sink fund. Real balance is current_balance = Σ(deposit − withdrawal); persists across budget periods unlike regular allocations."
+lexicon: true
 description: >-
   Named money-storing envelopes inside a sink-fund bank account. The live balance
   is transaction-derived (current_balance); the amount/target field is near-vestigial

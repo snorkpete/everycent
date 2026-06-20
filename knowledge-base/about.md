@@ -18,11 +18,13 @@ that explains how the system actually works, beyond what the raw schema reveals.
 
 ## Scope of this version
 
-Database layer only, and within that the **budget core** cluster (households →
-budgets → incomes → allocations) plus the cross-cutting concepts those tables
-depend on. Banking/actuals, recurring templates, auth, and the AI/chat tables
-are **not yet documented** — see the pending list in [the index](/index.md).
-Their absence means "not yet written," not "doesn't exist."
+The **database layer** is now broadly covered — most tables (as they behave
+today) plus the cross-cutting concepts they depend on. Still pending: the
+**auth** and **AI/chat** tables (see the pending list in [the index](/index.md)),
+and the non-database layers (controllers, routes, UI) this bundle will grow into.
+Absence means "not yet written," not "doesn't exist." Some files are **stubs**
+(frontmatter `doc_status: stub`) — they carry a definition but await full
+treatment.
 
 ## How to read this bundle
 
@@ -39,6 +41,9 @@ Their absence means "not yet written," not "doesn't exist."
   a field or writing a migration.
 - **Legacy concepts** (`legacy/`) explain deprecated schema that predates the
   current household setup, so empty/unused fields are explained in one place.
+- **Lexicon** (`vocabulary.md`) is an always-loaded, generated index of the
+  domain's words — read it first for the shared language, then follow a link for
+  depth. It is a view over the files below, not a separate source.
 
 ## Bundle conventions
 
@@ -49,6 +54,9 @@ Their absence means "not yet written," not "doesn't exist."
 - **`type` values** are lowercase-hyphenated by local convention
   (`table`, `concept`, `tracking-register`); OKF tolerates any type string.
 - **Tracking IDs** (B/D/I/R/Q + number) are stable references used across concepts.
+- **Lexicon** — a file with `lexicon: true` contributes its `term` + `definition`
+  to the generated [vocabulary.md](/vocabulary.md). That file is a pure view —
+  never hand-edit it; change the source `definition` and run `rake kb:vocabulary`.
 
 ### Knowledge tiers
 
@@ -62,3 +70,21 @@ system facts generalize, household facts do not.
   household that shape behavior but are not part of the product. E.g. the two
   `transfer` categories (sink-fund injection and overspend top-up), the permanent
   miscellaneous allocation, and the ~200 discretionary gap.
+
+## Design philosophy
+
+Features come from observing real usage, not theoretical design. The system
+evolved empirically — most original intuitions about how budgeting "should" work
+turned out wrong, and nearly every feature that stuck came from watching how the
+system was actually used. Copy budget replaced theoretically-designed recurring
+allocations (months were too similar to need templates); future budgets came from
+observed spreadsheet usage; the 0.01 keep-alive and month-suffix names were
+user-invented hacks that stuck because they worked; special events exist to answer
+"how much did that vacation actually cost?"
+
+The working rules an agent should carry:
+
+- Prefer observation over speculation when weighing a new feature.
+- **User workarounds that stick are signals of missing features** — and if a
+  workaround already works well enough, improving it shouldn't degrade the
+  experience.

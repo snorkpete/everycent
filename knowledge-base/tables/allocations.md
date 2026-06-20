@@ -1,6 +1,9 @@
 ---
 type: table
 title: allocations
+term: allocation
+definition: "Budget line item; the core money-out unit of zero-based budgeting. Has amount + category, tracks spent/remaining. Identity across budgets is name-based, not relational."
+lexicon: true
 description: >-
   The core money-out unit of EveryCent. One budgeted outflow line per budget;
   where plan meets actual via transactions.allocation_id. Carries a four-way

@@ -1,6 +1,9 @@
 ---
 type: table
 title: transactions
+term: transaction
+definition: "Individual money movement with a withdrawal or deposit amount; belongs to a bank account, optionally links an allocation OR a sink-fund allocation (mutually exclusive)."
+lexicon: true
 description: >-
   One bank transaction — actual money movement synced from real bank data. Where
   plan (allocations) meets reality. Budget membership is by date range, not a

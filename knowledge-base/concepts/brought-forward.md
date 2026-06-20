@@ -1,6 +1,9 @@
 ---
 type: concept
 title: Brought-forward (credit-card carry-over)
+term: brought-forward
+definition: "Credit-card mechanism: unpaid transactions copied to the next period with a (B/F) suffix plus a balancing transaction; originals marked paid."
+lexicon: true
 description: >-
   At budget close, unpaid credit-card charges are copied into the next budget so
   what's still owed stays visible, with a balancing adjustment. Reopen reverses

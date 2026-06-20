@@ -52,8 +52,8 @@ Invoke the **housekeeper skill** for any merge, land, or close-out operation. Do
 - **Before committing** anywhere: run `git branch --show-current` and verify you're on the expected branch.
 
 ## Housekeeping Commits
-- **Direct to master** for `.domus/`, `CLAUDE.md`, and `vocabulary/` changes — no feature branch needed.
-- **Vocabulary changes get their own commits** (separate from feature work).
+- **Direct to master** for `.domus/`, `CLAUDE.md`, and `knowledge-base/` changes — no feature branch needed.
+- **Knowledge-base changes get their own commits** (separate from feature work).
 - **When staging `.domus/` changes**, always include the index files (`tasks.jsonl`, `ideas.jsonl`) alongside any `.md` files.
 
 ## Worktrees
@@ -77,5 +77,12 @@ See `.domus/reference/agent-instructions.md` for domus workflow rules (task life
 ## Cypress E2E Tests
 See `webclientv4/cypress/CLAUDE.md` for E2E test rules.
 
-## Vocabulary
-Domain vocabulary lives in `vocabulary/`. Read `vocabulary/INSTRUCTIONS.md` and `vocabulary/vocabulary.md` when working on domain concepts.
+## Knowledge Base
+The agent-facing system-of-record lives in `knowledge-base/` — an OKF bundle (table / concept / tracking / legacy files) documenting how Everycent actually works: facts, mechanics, history, rationale. Read `knowledge-base/about.md` for the reading guide and conventions; load specific files on demand.
+
+- **`knowledge-base/vocabulary.md` is the always-loaded lexicon** — a generated index of the domain's words. Read it at session start for the shared language, then follow a link for depth.
+- It is **generated, never hand-edited**: a word's compressed meaning lives in its source file's `definition` frontmatter (alongside `term:` and `lexicon: true`). After changing any `definition`, regenerate with `rake kb:vocabulary` (`rake kb:vocabulary:check` verifies it's current — wired into pre-commit).
+- **When documenting a new concept**, follow the frontmatter contract in `about.md` so it flows into the lexicon, and keep the per-directory `index.md` files current.
+- If a documented contract diverges from code behavior, that's a potential bug — flag it.
+
+(A fuller CLAUDE.md ↔ knowledge-base loading review is still pending — see project notes.)

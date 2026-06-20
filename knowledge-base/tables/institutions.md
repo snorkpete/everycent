@@ -1,6 +1,9 @@
 ---
 type: table
 title: institutions
+term: institution
+definition: "Bank or financial entity that issues bank accounts. A simple reference/lookup entity."
+lexicon: true
 description: >-
   Household-scoped lookup of financial institutions (Scotia, ABN AMRO).
   Informational; bank accounts optionally reference one. Nothing keys off it

@@ -1,6 +1,9 @@
 ---
 type: concept
 title: Credit card accounts
+term: credit-card
+definition: "Bank-account subclass with statement-cycle tracking and paid/unpaid transactions. Transactions default to unpaid; unpaid at budget close are brought forward."
+lexicon: true
 description: >-
   Behavior unlocked when a bank account has account_type credit_card: the
   statement cycle (statement_day / payment_due_day) and brought-forward on budget

@@ -1,6 +1,9 @@
 ---
 type: table
 title: budgets
+term: budget
+definition: "Monthly planning container with start/end dates and open/closed status; holds incomes and allocations. The current budget is the earliest open one. The core unit of time."
+lexicon: true
 description: >-
   The monthly period container at the heart of the zero-based engine. Incomes
   and allocations attach to a budget; transactions link only indirectly.

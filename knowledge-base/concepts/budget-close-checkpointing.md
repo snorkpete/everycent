@@ -1,6 +1,9 @@
 ---
 type: concept
 title: Budget close & balance checkpointing
+term: close-budget
+definition: "End-of-period process: rolls each account's closing_balance forward, brings forward unpaid credit-card transactions, sets status closed. Began as a performance optimization."
+lexicon: true
 description: >-
   Closing a budget is both an accounting step and a performance mechanism: it
   rolls each bank account's single closing_balance forward so open budgets only

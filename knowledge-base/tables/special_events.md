@@ -1,6 +1,9 @@
 ---
 type: table
 title: special_events
+term: special-event
+definition: "Named event with budgeted and actual amounts; primarily a retrospective cost-analysis tool. (The amounts are a frontend-maintained cache — see bugs B8.)"
+lexicon: true
 description: >-
   A discrete non-recurring spending occasion (vacation, birthday, Christmas) that
   groups allocations across multiple budgets. Stored budget_amount/actual_amount

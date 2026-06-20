@@ -1,6 +1,9 @@
 ---
 type: concept
 title: Money units
+term: money-representation
+definition: "All monetary amounts are stored as integers in cents. No floats anywhere in the money path."
+lexicon: true
 description: >-
   All monetary values in EveryCent are stored as integer minor units (cents),
   not decimal currency. Every monetary field links back to this concept.
