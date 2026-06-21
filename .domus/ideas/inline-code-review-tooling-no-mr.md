@@ -1,7 +1,7 @@
 # Idea: Inline code review tooling (no MR)
 
 **Captured:** 2026-03-15
-**Status:** raw
+**Status:** deferred
 
 ---
 

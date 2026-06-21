@@ -1,7 +1,7 @@
 # Idea: Filter/exclude certain allocation categories from NLQ tools
 
 **Captured:** 2026-06-06
-**Status:** raw
+**Status:** deferred
 
 ---
 

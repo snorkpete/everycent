@@ -1,5 +1,6 @@
 # Idea: Dependency-Ordered Task Display in Domus Overview
 
+**Status:** abandoned
 **Date:** 2026-03-28
 
 ---

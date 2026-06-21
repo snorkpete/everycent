@@ -1,6 +1,6 @@
 # Idea: Decide auth migration direction off devise_token_auth
 
-**Status:** scoped
+**Status:** implemented
 **Date:** 2026-06-05
 
 ---

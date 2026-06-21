@@ -1,7 +1,7 @@
 # Idea: Auto-Categorisation on Import
 
 **Captured:** unknown
-**Status:** raw
+**Status:** implemented
 
 ---
 

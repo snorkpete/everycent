@@ -1,7 +1,7 @@
 # Idea: Clean up domus task list display and status sync
 
 **Captured:** 2026-04-03
-**Status:** raw
+**Status:** abandoned
 
 ---
 

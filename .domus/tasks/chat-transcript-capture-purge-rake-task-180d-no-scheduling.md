@@ -1,7 +1,7 @@
 # Task: Chat-transcript capture — purge rake task (180d, no scheduling)
 
 **ID:** chat-transcript-capture-purge-rake-task-180d-no-scheduling
-**Status:** ready
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-19

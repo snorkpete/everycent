@@ -1,7 +1,7 @@
 # Idea: Extract buildSettingsStore and similar store factories for test setup
 
 **Captured:** 2026-04-02
-**Status:** raw
+**Status:** abandoned
 
 ---
 

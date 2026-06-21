@@ -2,7 +2,7 @@
 
 **Captured:** 2026-03-26
 **Last refined:** 2026-04-06
-**Status:** raw
+**Status:** scoped
 
 ---
 
@@ -19,6 +19,19 @@
 A natural-language analysis layer over 12 years of everycent budgeting data (two countries, two life stages). User types a question in a Vue chat interface → LLM receives it via MCP → LLM calls analyze-shaped tools → LLM returns the answer.
 
 This is the umbrella project. It subsumes the earlier `everycent-mcp-server` idea, which turned out to be an architectural component rather than a separate initiative.
+
+---
+
+## ⚠️ Status / As-Built (2026-06-21) — read before trusting the Architecture section below
+
+**SCOPED. Phases 1 & 2 are SHIPPED; the as-built architecture DIVERGED from the original plan; phase 3 and the production-hosting direction remain open.**
+
+- **What's built:** ~12 MCP analysis tools (incl. the first tool, `analyze_overspending`); the Vue chat UI; the agent/tool-calling loop. Dogfooding via Claude Code (phase 1) and the in-app chat (phase 2) both work.
+- **⚠️ Architecture pivoted — the "Architecture" and "Phased Plan" sections below are now STALE.** They describe a *TypeScript MCP server as a thin translation layer* + an *agent SDK* driving the loop. **Reality: NLQ is FRONTEND-DRIVEN. Ollama runs in the browser; the agent loop (tool-calling, multi-round iteration) lives in `webclientv4/src/app/chat/chatAgent.ts`; Rails is only stateless `/mcp/*` tool endpoints (query objects). There is NO backend MCP server / orchestrator / ChatController.** This pivot is coupled to the free-local-model decision (run a local Ollama model for free instead of pay-per-use API). Full as-built breakdown: second-brain `inbox/everycent-nlq-chat-architecture-as-built.md`.
+- **Open threads:**
+  - **Phase 3 (pgvector embeddings):** not built. Open question still stands — could SQL + analyze-tools alone answer the full test set, making phase 3 pure learning investment?
+  - **Production architecture direction (reopened):** the in-browser-Ollama design is coupled to the free-local-model choice; whether production should be a TS service vs in-Rails (vs something else) is an explicitly reopened open question.
+- **Live tasks spawned from this umbrella:** `build-budget_vs_actual-nlq-tool-1-or-generalize-the-overspending-tools-to-cover-it`, the `chat-transcript-capture-*` cluster, `add-cancelinterrupt-for-long-running-nlq-chat-requests`, `add-bug-reporting-to-the-nlq-chat`, `filterexclude-certain-allocation-categories-from-nlq-tools`, `harden-mcp-toolexecutor-*`.
 
 ---
 

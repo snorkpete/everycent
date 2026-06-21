@@ -1,7 +1,7 @@
 # Task: Chat-transcript capture — frontend capture, assemble, flush
 
 **ID:** chat-transcript-capture-frontend-capture-assemble-flush
-**Status:** ready
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-19

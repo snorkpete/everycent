@@ -1,7 +1,7 @@
 # Task: Chat-transcript capture — backend table, recorder, controller
 
 **ID:** chat-transcript-capture-backend-table-recorder-controller
-**Status:** ready
+**Status:** done
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-19

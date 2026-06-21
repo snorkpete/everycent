@@ -1,6 +1,13 @@
 # Idea: Hunter — LLM-Powered Bug Reporting & Autonomous Fix Pipeline
 
 **Date:** 2026-03-28
+**Status:** scoped
+
+---
+
+## Status (2026-06-21)
+
+**SCOPED — partially underway, and definitely a to-do.** Slice 1 (the user-facing bug-reporting chat interface — the front end of Hunter) is in flight on the parked `add-bug-reporting-to-the-nlq-chat` branch (worktree `everycent-bug-capture`, "Slice 1, text-only"). It's **blocked on the `chat-transcript-capture-*` task cluster** (another session's work). The broader pipeline (error-log capture, deployed-source access, GitHub issue handoff, autonomous taskmaster→worker→merge fix loop) is still exploratory.
 
 ---
 

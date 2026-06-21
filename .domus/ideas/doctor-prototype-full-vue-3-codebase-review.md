@@ -28,6 +28,18 @@ The key goal is **capturing the process itself** — not just the findings. This
 
 ---
 
+## Status / Progress (2026-06-21)
+
+**KEEP — started but automation didn't get far enough.** The manual review process was run once and produced artifacts, but the goal of automating the Doctor role/workflow is unfinished. More to figure out and do here.
+
+**Artifacts from the manual run live in `.reviews/2025-04-08/`** (git-tracked):
+- Multi-model, multi-dimension review outputs: `haiku-*` and `sonnet-*` across `api-surface`, `consistency`, `dependency-health`, `duplication` dimensions, plus `sonnet-deduped.md` (the merged/deduped findings).
+- This was effectively a model-comparison (haiku vs sonnet) and dimension-decomposition prototype. ADR `.domus/docs/adrs/002-haiku-rejected-for-review-agents.md` captured one outcome (haiku rejected for review agents).
+
+**Still open:** turning this one-off manual run into a repeatable, automated Doctor process — triggers, output format, task-filing, scope-per-run, and how it plugs into the healthcheck loop (see `automate-the-healthcheck-loop-into-a-self-cleaning-system`). The review *capability* now also exists via the `senior-code-reviewer` agent + `/code-review` skill; the gap is the automated, periodic, role-driven orchestration.
+
+---
+
 ## Open Questions / Things to Explore
 
 - What triggers a Doctor review? Scheduled (e.g. weekly), on-demand, or both?

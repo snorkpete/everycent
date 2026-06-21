@@ -1,4 +1,4 @@
-# Idea: Analytics, Logging, and Observability
+# Idea: Backend observability (OpenTelemetry)
 
 **Captured:** 2026-03-11
 **Status:** raw
@@ -7,34 +7,29 @@
 
 ## The Idea
 
-Add per-user interaction logging and analytics infrastructure. This includes:
+Instrument Rails (and optionally Vue) with **OpenTelemetry** for distributed tracing and performance visibility, with no vendor lock-in.
 
-- Logging all user interactions (keyed by username) for product analytics
-- Google Analytics (GA) tracking on the frontend
-- OpenTelemetry instrumentation for distributed tracing and observability
-
-Analytics/logging data should live in a **separate database** from the main app DB to avoid coupling operational data with analytical data and to allow independent scaling.
+Scoped down from the original "analytics, logging & observability" idea. **The product-analytics half (Google Analytics + per-user/username-keyed interaction logging) has been retired** — Everycent is a two-user household app, so behavioural analytics has nothing meaningful to measure and never pays off. Observability (debugging, performance, error visibility) is the part that's genuinely useful today.
 
 ---
 
 ## Why This Is Worth Doing
 
-- Understand how users actually use the product (which features, how often, drop-off points)
-- Foundation for data-driven product decisions
-- OpenTelemetry gives visibility into backend performance without vendor lock-in
-- Prerequisite for Everycent becoming a real product with real usage insights
+- See backend performance and request flow when something is slow or breaks — real debugging value now, not someday.
+- OpenTelemetry is vendor-neutral: instrument once, point at whatever backend (self-hosted or managed) without rewiring.
+- Complements the narrow telemetry that already exists (LLM usage records, chat-transcript capture) with general request/trace visibility.
 
 ---
 
 ## Open Questions / Things to Explore
 
-- **Storage choice for analytics DB** — candidates to evaluate:
-  - ClickHouse (columnar, fast aggregations, self-hostable)
-  - TimescaleDB (Postgres extension, familiar tooling)
-  - A managed service (e.g. Posthog, Mixpanel) vs. self-hosted
-  - BigQuery or similar cloud data warehouse if scale warrants it
-- What exactly to log — page views, feature interactions, API calls, or all of the above
-- Privacy implications — user-keyed logs need a data retention and deletion policy
-- Whether GA and OpenTelemetry cover different enough concerns to warrant both, or if one covers the need
-- How to pipe Rails + Vue telemetry into the same observability backend
-- Whether this runs as a sidecar/separate service or is instrumented inline
+- **Backend to send traces to** — self-hosted (e.g. Jaeger / Grafana Tempo / SigNoz) vs a managed OTLP endpoint (Honeycomb, Grafana Cloud, etc.). Cost vs effort for a personal app.
+- **Scope of instrumentation** — Rails-only first (controllers, DB queries, the `/mcp/*` tool endpoints, import pipeline)? Add Vue/browser tracing later, or skip it?
+- **Sidecar vs inline** — run a collector as a separate process/service, or export directly from the app.
+- **Sampling & retention** — low-traffic app, so probably trace everything; still decide retention to avoid unbounded storage.
+- **Heroku fit** — does the chosen collector/exporter run cleanly on the Heroku deploy model, or does it need an add-on?
+- **Privacy** — traces can capture request params/SQL; ensure no PII (amounts, descriptions, household identifiers) leaks into span attributes, given the public-repo / PII sensitivity.
+
+---
+
+*Split note: the retired GA / product-analytics half was dropped 2026-06-21 during idea review — two-user app, no analytics value.*

@@ -1,7 +1,20 @@
 # Idea: Payee Name Backfill for Historical Transactions
 
 **Captured:** 2026-03-26
-**Status:** raw
+**Status:** implemented
+
+---
+
+## ✅ Implemented — but via a DIFFERENT approach than proposed below (2026-06-21)
+
+The goal (backfill historical `payee_name`) is implemented, but **NOT** with the embeddings/fuzzy-matching design described in this idea.
+
+- **Proposed (below):** embed known payee names + null-payee descriptions, nearest-neighbour match, confidence thresholds, human-in-the-loop review. This was tethered to NLQ phase-3 embeddings — which were never built.
+- **Actual:** **description-based detection.** `PayeeBackfill` service (`app/services/payee_backfill.rb`) + `lib/tasks/payee_backfill.rake`, driven by `PayeeNameExtractor` per-format extractor classes. No embeddings, no vector NN.
+- **Reusable parts retained:** `PayeeNameExtractor` + import-time payee/transfer detection stay; the one-shot backfill rake + service get removed after the prod run via contingent cleanup task `remove-payee-backfill-rake-task-and-payeebackfill-service-after-successful-run`.
+- **Execution note:** confirm the prod hh96 backfill has actually been run and the data accepted (the cleanup task gates on it).
+
+*Everything below is the original (superseded) embeddings proposal, kept for history.*
 
 ---
 

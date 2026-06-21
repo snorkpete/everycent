@@ -1,7 +1,7 @@
 # Idea: Capture NLQ chat transcripts for later analysis/debugging
 
 **Captured:** 2026-06-07
-**Status:** raw
+**Status:** implemented
 
 ---
 

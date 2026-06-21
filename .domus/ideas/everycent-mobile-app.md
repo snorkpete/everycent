@@ -2,7 +2,7 @@
 
 **Captured:** 2026-03-15
 **Last refined:** 2026-04-06
-**Status:** raw
+**Status:** scoped
 
 ---
 
