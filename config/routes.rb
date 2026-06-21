@@ -5,7 +5,7 @@ Rails.application.routes.draw do
     get 'overspending_analysis_by_allocation', to: 'overspending_analysis_by_allocation#show'
     get 'budget_accuracy', to: 'budget_accuracy#show'
     get 'categories', to: 'categories#index'
-    post 'llm_usage', to: 'llm_usage#create'
+    post 'conversation_turns', to: 'conversation_turns#create'
     get 'out_of_budget_analysis', to: 'out_of_budget_analysis#show'
     get 'placeholder_allocation_analysis', to: 'placeholder_allocation_analysis#show'
     get 'sink_fund_status', to: 'sink_fund_status#show'

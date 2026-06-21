@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_15_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_21_185722) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
@@ -101,6 +101,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_000001) do
     t.index ["llm_model_id"], name: "index_chat_settings_on_llm_model_id"
   end
 
+  create_table "conversation_turn_steps", force: :cascade do |t|
+    t.uuid "conversation_turn_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "household_id", null: false
+    t.integer "step_index", null: false
+    t.text "thinking"
+    t.jsonb "tool_calls", default: [], null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_turn_id", "step_index"], name: "index_conversation_turn_steps_on_turn_id_and_step_index", unique: true
+    t.index ["conversation_turn_id"], name: "index_conversation_turn_steps_on_conversation_turn_id"
+    t.index ["household_id", "created_at"], name: "index_conversation_turn_steps_on_household_id_and_created_at"
+    t.index ["household_id"], name: "index_conversation_turn_steps_on_household_id"
+  end
+
+  create_table "conversation_turns", force: :cascade do |t|
+    t.uuid "conversation_id", null: false
+    t.uuid "conversation_turn_id", null: false
+    t.datetime "created_at", null: false
+    t.text "final_output"
+    t.bigint "household_id", null: false
+    t.boolean "incomplete", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.text "user_prompt", null: false
+    t.index ["conversation_id"], name: "index_conversation_turns_on_conversation_id"
+    t.index ["conversation_turn_id"], name: "index_conversation_turns_on_conversation_turn_id", unique: true
+    t.index ["household_id", "created_at"], name: "index_conversation_turns_on_household_id_and_created_at"
+    t.index ["household_id"], name: "index_conversation_turns_on_household_id"
+  end
+
   create_table "households", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.string "name"
@@ -166,6 +195,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_000001) do
     t.integer "output_tokens", default: 0, null: false
     t.string "provider", null: false
     t.integer "request_duration_ms", default: 0, null: false
+    t.integer "step_index", default: 0, null: false
     t.decimal "thinking_token_cost_rate", precision: 10, scale: 4, default: "0.0", null: false
     t.integer "thinking_tokens", default: 0, null: false
     t.integer "tool_call_count", default: 0, null: false
@@ -175,6 +205,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_000001) do
     t.datetime "updated_at", null: false
     t.string "usage_category", null: false
     t.index ["conversation_id"], name: "index_llm_usage_records_on_conversation_id"
+    t.index ["conversation_turn_id", "step_index"], name: "index_llm_usage_records_on_turn_id_and_step_index", unique: true
     t.index ["conversation_turn_id"], name: "index_llm_usage_records_on_conversation_turn_id"
     t.index ["household_id", "created_at"], name: "index_llm_usage_records_on_household_id_and_created_at"
     t.index ["household_id"], name: "index_llm_usage_records_on_household_id"
@@ -332,6 +363,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_000001) do
   add_foreign_key "budgets", "households", on_update: :cascade
   add_foreign_key "chat_settings", "households", on_update: :cascade
   add_foreign_key "chat_settings", "llm_models"
+  add_foreign_key "conversation_turn_steps", "households", on_update: :cascade
+  add_foreign_key "conversation_turns", "households", on_update: :cascade
   add_foreign_key "incomes", "households", on_update: :cascade
   add_foreign_key "institutions", "households", on_update: :cascade
   add_foreign_key "llm_models", "households", on_update: :cascade

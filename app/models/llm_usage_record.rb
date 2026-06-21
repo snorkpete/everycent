@@ -62,6 +62,7 @@ class LlmUsageRecord < ApplicationRecord
       usage_category: attrs[:usage_category],
       conversation_id: attrs[:conversation_id],
       conversation_turn_id: attrs[:conversation_turn_id],
+      step_index: attrs[:step_index].to_i,
       input_tokens: input_tokens,
       output_tokens: output_tokens,
       cache_read_tokens: cache_read_tokens,
