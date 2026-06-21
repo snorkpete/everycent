@@ -20,7 +20,7 @@ them, do not populate them.
 
 | ID | Item | Kind | Notes |
 |---|---|---|---|
-| — | `payees`, `recurring_allocations`, `recurring_incomes` | Tables | Abandoned. Predate multi-tenancy (no `household_id`). Empty in prod, no live code. The problem they targeted was solved differently (to be pinned when that solution's table is documented). |
+| — | `payees`, `recurring_allocations`, `recurring_incomes` | Tables | Abandoned v1 ideas, Trinidad-era but separate from the banking model. Predate multi-tenancy (no `household_id`). Empty in prod, no live code. Solved differently: [recurring_allocations](/tables/recurring_allocations.md)/[recurring_incomes](/tables/recurring_incomes.md) → [copy budget](/concepts/copy-budget.md); [payees](/tables/payees.md) → [auto-allocation](/concepts/auto-allocation.md). |
 | D1 | `incomes.bank_account_id` | Column | Trinidad vestige. See [incomes](/tables/incomes.md). |
 | D2 | `allocations.is_standing_order` | Column | Trinidad vestige (standing orders). |
 | D3 | `allocations.bank_account_id` | Column | Trinidad vestige. The `clear_bank_account_if_not_standing_order` callback now always nulls it. |
@@ -41,4 +41,4 @@ it is held for possible salvage before any deletion.
 
 | ID | Item | Kind | Notes |
 |---|---|---|---|
-| D-Trinidad | `transactions.payee_code` | Column | Trinidad artifact, held for possible salvage before deletion. Do **not** auto-recommend dropping. See [transactions](/tables/transactions.md). |
+| D-Trinidad | `transactions.payee_code` | Column | Trinidad artifact with data: ~1,297 rows, **TT household only** (suspected per-transaction bank refs in the wrong column, not payee IDs). Held for salvage pending analysis of old Trinidad data — this blocks dropping the `payees` table. Do **not** auto-recommend dropping. See [transactions](/tables/transactions.md). |

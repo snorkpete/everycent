@@ -38,9 +38,9 @@ table in the schema.
 | `brought_forward_status` | Tags synthetic carry-forward rows. Values: `brought_forward` (copied originals), `added` (the copies), `adjustment` (the balancing entry). See [brought-forward](/concepts/brought-forward.md). |
 | `is_manual_adjustment` | Marks the single balance-reconciliation row. See [manual balance adjustment](/concepts/manual-balance-adjustment.md). Default false. |
 | `camt_imported` | Provenance flag: true if the row came via the CAMT backend importer (definitive IDs) vs. manual/copy-paste. Mostly UI-informational. See [transaction import](/concepts/transaction-import.md). |
-| `payee_id` | **DEAD (D6)** — the abandoned normalized `payees` table. |
-| `payee_code` | **DEAD-but-quarantined (D-Trinidad)** — Trinidad-era artifact; held for possible salvage before deletion. Unused in NL. |
-| `payee_name` | **LIVE, forward-looking.** Populated at create from `description` via `PayeeNameResolver` (unless provided). Intended to feed the NLQ embedding layer (semantic queries over transaction detail incl. payee, with historical reach). |
+| `payee_id` | **DEAD (D6)** — FK at the abandoned normalized [payees](/tables/payees.md) table. |
+| `payee_code` | **DEAD-but-quarantined (D-Trinidad)** — Trinidad artifact with TT-only data; held for salvage pending analysis. Unused in NL. See [payees](/tables/payees.md). |
+| `payee_name` | **LIVE, forward-looking.** The repurposed v1 payee column. Populated at create from `description` via `PayeeNameResolver` (unless provided), to feed the NLQ embedding layer. See [payee-name](/concepts/payee-name.md). |
 | `household_id` | Tenant scope. |
 | `created_at` / `updated_at` | Timestamps. |
 

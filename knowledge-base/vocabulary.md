@@ -14,6 +14,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **auto-allocate** — Suggests which allocation a transaction belongs to by matching its description against the previous budget's transactions. Match types: exact or contains. · [concepts/auto-allocate.md](concepts/auto-allocate.md)
 
+**auto-allocation** — Suggests an allocation for each imported transaction by matching its description against the previous budget's already-allocated transactions, then mapping to the same-named allocation in the current budget. The live answer to 'how do we tag transactions easily?' · [concepts/auto-allocation.md](concepts/auto-allocation.md)
+
 **bank-account** — Universal value-tracking primitive — any container of monetary value (accounts, investments, assets, credit cards, loans). Single-table subclasses via account_type. · [tables/bank_accounts.md](tables/bank_accounts.md)
 
 **brought-forward** — Credit-card mechanism: unpaid transactions copied to the next period with a (B/F) suffix plus a balancing transaction; originals marked paid. · [concepts/brought-forward.md](concepts/brought-forward.md)
@@ -44,6 +46,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **money-representation** — All monetary amounts are stored as integers in cents. No floats anywhere in the money path. · [concepts/money-units.md](concepts/money-units.md)
 
+**payee-name** — A cleaned merchant string derived from a transaction's description at create time, for NLQ embedding quality — not entity resolution and not transaction tagging. Internal transfers/bookkeeping resolve to NULL. Reuses the legacy payee_name column. · [concepts/payee-name.md](concepts/payee-name.md)
+
 **reports** — Backward-looking analysis: net worth over time, category spending (budget vs actual), needs vs wants. All retrospective. · [concepts/reports.md](concepts/reports.md)
 
 **settings** — Household-level config singleton: primary budget account, family type, person names, default categories. · [tables/settings.md](tables/settings.md)
@@ -71,6 +75,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 
 ## Dead / partial
+
+**payee** _(dead)_ — Dead table. The v1 idea for easy transaction tagging — a payee list whose default_allocation_name let a description resolve to an allocation. Never stuck; replaced by description-based auto-allocation. · [tables/payees.md](tables/payees.md)
 
 **recurring-allocation** _(dead)_ — Templates for auto-populating new budgets. Never truly implemented — copy budget replaced the need. Dead code / DB artifacts. · [concepts/recurring-allocation.md](concepts/recurring-allocation.md)
 

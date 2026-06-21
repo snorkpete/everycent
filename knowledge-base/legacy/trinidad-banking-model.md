@@ -36,9 +36,18 @@ modeling gap. See [dead schema](/tracking/dead-schema.md) for the register.
 - `settings.bank_charges_allocation_name` (D10) — Trinidad-era
   auto-categorization of bank-charge transactions by description; dead (possibly
   never fully built)
-- The abandoned tables `recurring_allocations`, `recurring_incomes`, `payees`
-  (these predate multi-tenancy and have no `household_id`; empty in prod, no live
-  code)
+- `transactions.payee_code` (D-Trinidad) — TT-household-only data, held for
+  salvage pending analysis; see [transactions](/tables/transactions.md)
+
+The abandoned tables `recurring_allocations`, `recurring_incomes`, and `payees`
+are also Trinidad-era and equally dead, but they belong to a **separate concern** —
+early attempts at *easy budget creation* and *easy transaction tagging* — not the
+banking model above, and they would have applied to the NL household too. They are
+documented with their own history and live replacements:
+[recurring_allocations](/tables/recurring_allocations.md) /
+[recurring_incomes](/tables/recurring_incomes.md) →
+[copy budget](/concepts/copy-budget.md); [payees](/tables/payees.md) →
+[auto-allocation](/concepts/auto-allocation.md).
 
 ## Why an agent should care
 

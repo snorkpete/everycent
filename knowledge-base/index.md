@@ -21,6 +21,12 @@ okf_version: "0.1"
 * [institutions](tables/institutions.md) - household-scoped lookup of financial institutions
 * [settings](tables/settings.md) - per-household singleton config row
 
+# Dead tables (abandoned v1 ideas)
+
+* [payees](tables/payees.md) - dead; v1 transaction-tagging via default allocations
+* [recurring_allocations](tables/recurring_allocations.md) - dead; v1 budget-creation templates
+* [recurring_incomes](tables/recurring_incomes.md) - dead; income half of the same templates
+
 # Domain concepts
 
 * [Budget close & balance checkpointing](concepts/budget-close-checkpointing.md) - closing rolls each account's closing_balance forward
@@ -29,6 +35,8 @@ okf_version: "0.1"
 * [Discretionary money & the budget gap](concepts/discretionary-money.md) - why the budget target is a deliberate non-zero gap
 * [Budget-role analysis sections](concepts/budget-role-analysis-sections.md) - how budget_role partitions spend for the NLQ layer
 * [Budget membership](concepts/budget-membership.md) - allocation_id presence marks a transaction as part of the budget
+* [Auto-allocation](concepts/auto-allocation.md) - suggests an allocation by matching descriptions against the previous budget
+* [Payee name](concepts/payee-name.md) - cleaned merchant string for NLQ embedding; the repurposed payee_name column
 * [Credit card accounts](concepts/credit-card.md) - the statement cycle and brought-forward unlocked by credit_card accounts
 * [Brought-forward](concepts/brought-forward.md) - unpaid credit-card charges carried into the next budget on close
 * [Sink fund accounts](concepts/sink-fund.md) - money-storing envelopes unlocked by sink_fund accounts
@@ -51,6 +59,6 @@ okf_version: "0.1"
 
 # Not yet documented (pending)
 
-Tables present in the schema but not yet covered: `payees` (dead), `users`,
-`sessions`, `chat_settings`, `llm_models`, `llm_usage_records`,
-`recurring_allocations` (dead), `recurring_incomes` (dead).
+Tables present in the schema but not yet covered: the **auth** tables (`users`,
+`sessions`) and the **AI/chat** tables (`chat_settings`, `llm_models`,
+`llm_usage_records`).
