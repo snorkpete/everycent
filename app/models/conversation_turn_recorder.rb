@@ -75,5 +75,6 @@ class ConversationTurnRecorder
     required = %i[llm_model_id conversation_id conversation_turn_id user_prompt steps]
     missing = required.reject { |k| @dto.key?(k) }
     raise InvalidPayloadError, "Missing required fields: #{missing.join(', ')}" if missing.any?
+    raise InvalidPayloadError, "steps must contain at least one step" if Array(@dto[:steps]).empty?
   end
 end

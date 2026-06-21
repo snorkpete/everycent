@@ -72,7 +72,7 @@ RSpec.describe Mcp::ConversationTurnsController, type: :controller do
 
         expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
-        expect(json['created']).to eq 1
+        expect(json['steps_created']).to eq 1
       end
 
       it 'creates a multi-step turn correctly' do
@@ -86,6 +86,12 @@ RSpec.describe Mcp::ConversationTurnsController, type: :controller do
           .and change(LlmUsageRecord, :count).by(2)
 
         expect(response).to have_http_status(:created)
+        expect(JSON.parse(response.body)['steps_created']).to eq 2
+      end
+
+      it 'returns 422 when steps is empty' do
+        post :create, params: valid_turn_params.merge(steps: [])
+        expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it 'returns 404 when the llm_model is not found' do

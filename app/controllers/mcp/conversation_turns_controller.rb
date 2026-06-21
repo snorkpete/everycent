@@ -1,8 +1,9 @@
 module Mcp
   class ConversationTurnsController < AppController
     def create
-      turn = ConversationTurnRecorder.record(turn_params, household: current_household)
-      render json: { created: 1 }, status: :created
+      turn_dto = turn_params
+      ConversationTurnRecorder.record(turn_dto, household: current_household)
+      render json: { steps_created: turn_dto[:steps].size }, status: :created
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'LLM model not found' }, status: :not_found
     rescue ConversationTurnRecorder::InvalidPayloadError => e

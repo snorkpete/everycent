@@ -320,6 +320,13 @@ RSpec.describe ConversationTurnRecorder do
           ConversationTurnRecorder.record(dto, household: household)
         }.to raise_error(ConversationTurnRecorder::InvalidPayloadError)
       end
+
+      it 'raises InvalidPayloadError for empty steps' do
+        dto = base_dto.merge(steps: [])
+        expect {
+          ConversationTurnRecorder.record(dto, household: household)
+        }.to raise_error(ConversationTurnRecorder::InvalidPayloadError)
+      end
     end
   end
 
