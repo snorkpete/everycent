@@ -26,6 +26,12 @@ okf_version: "0.1"
 * [users](tables/users.md) - login identity; belongs to a household (multi-user)
 * [sessions](tables/sessions.md) - live bearer-token store (SHA256 digest, sliding TTL)
 
+# AI / chat
+
+* [chat_settings](tables/chat_settings.md) - per-household NLQ chat config (singleton)
+* [llm_models](tables/llm_models.md) - selectable-model registry + (forward-looking) cost rates
+* [llm_usage_records](tables/llm_usage_records.md) - append-only per-turn LLM usage log
+
 # Dead tables (abandoned v1 ideas)
 
 * [payees](tables/payees.md) - dead; v1 transaction-tagging via default allocations
@@ -43,6 +49,7 @@ okf_version: "0.1"
 * [Auto-allocation](concepts/auto-allocation.md) - suggests an allocation by matching descriptions against the previous budget
 * [Payee name](concepts/payee-name.md) - cleaned merchant string for NLQ embedding; the repurposed payee_name column
 * [Session authentication](concepts/session-auth.md) - Google login + opaque DB bearer tokens; fail-closed per-request auth
+* [NLQ chat](concepts/nlq-chat.md) - frontend-driven chat over finances; Rails only serves /mcp tools + support tables
 * [Credit card accounts](concepts/credit-card.md) - the statement cycle and brought-forward unlocked by credit_card accounts
 * [Brought-forward](concepts/brought-forward.md) - unpaid credit-card charges carried into the next budget on close
 * [Sink fund accounts](concepts/sink-fund.md) - money-storing envelopes unlocked by sink_fund accounts
@@ -65,5 +72,5 @@ okf_version: "0.1"
 
 # Not yet documented (pending)
 
-Tables present in the schema but not yet covered: the **AI/chat** tables
-(`chat_settings`, `llm_models`, `llm_usage_records`).
+**All schema tables are now documented.** The remaining scope is the **non-database
+layers** — controllers, routes, and the Vue UI — which this bundle will grow into.

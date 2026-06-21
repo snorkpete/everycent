@@ -18,10 +18,10 @@ that explains how the system actually works, beyond what the raw schema reveals.
 
 ## Scope of this version
 
-The **database layer** is now broadly covered — most tables (as they behave
-today) plus the cross-cutting concepts they depend on. Still pending: the
-**auth** and **AI/chat** tables (see the pending list in [the index](/index.md)),
-and the non-database layers (controllers, routes, UI) this bundle will grow into.
+The **database layer** is now fully covered — every table (as it behaves today),
+including the auth and AI/chat tables, plus the cross-cutting concepts they depend
+on. Still pending: the non-database layers (controllers, routes, UI) this bundle
+will grow into (see [the index](/index.md)).
 Absence means "not yet written," not "doesn't exist." Some files are **stubs**
 (frontmatter `doc_status: stub`) — they carry a definition but await full
 treatment.

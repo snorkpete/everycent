@@ -26,6 +26,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **budget-period** — The month-long window a budget covers. Most time-scoped logic is relative to this. · [concepts/budget-period.md](concepts/budget-period.md)
 
+**chat-setting** — Per-household singleton config for the NLQ chat: the enable flag, the selected LLM model, and the tool-iteration cap. Singleton by convention, not by DB constraint. · [tables/chat_settings.md](tables/chat_settings.md)
+
 **close-budget** — End-of-period process: rolls each account's closing_balance forward, brings forward unpaid credit-card transactions, sets status closed. Began as a performance optimization. · [concepts/budget-close-checkpointing.md](concepts/budget-close-checkpointing.md)
 
 **copy-budget** — Duplicate incomes and allocations into a new budget one month ahead. The primary mechanism for creating budgets — it replaced the never-built recurring allocations. · [concepts/copy-budget.md](concepts/copy-budget.md)
@@ -44,9 +46,15 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **institution** — Bank or financial entity that issues bank accounts. A simple reference/lookup entity. · [tables/institutions.md](tables/institutions.md)
 
+**llm-model** — Per-household registry of selectable LLM models — provider, name, endpoint URL, and five per-million-token cost rates. The cost rates are forward-looking (currently dummy pricing over a free local model). · [tables/llm_models.md](tables/llm_models.md)
+
+**llm-usage-record** — Append-only log of LLM calls from the NLQ chat — token counts, point-in-time cost-rate snapshots, computed (simulated) cost, and per-turn telemetry. Written by the frontend via POST /mcp/llm_usage. · [tables/llm_usage_records.md](tables/llm_usage_records.md)
+
 **manual-balance-adjustment** — Singleton corrective transaction reconciling the calculated balance with reality; at most one per bank account, replaced entirely when recalculated. · [concepts/manual-balance-adjustment.md](concepts/manual-balance-adjustment.md)
 
 **money-representation** — All monetary amounts are stored as integers in cents. No floats anywhere in the money path. · [concepts/money-units.md](concepts/money-units.md)
+
+**nlq-chat** — A natural-language-query chat over the household's finances. The model and agent loop run in the browser; Rails only exposes stateless /mcp/* tool endpoints plus three support tables (config, model registry, usage log). Shipped but not yet in active use. · [concepts/nlq-chat.md](concepts/nlq-chat.md)
 
 **payee-name** — A cleaned merchant string derived from a transaction's description at create time, for NLQ embedding quality — not entity resolution and not transaction tagging. Internal transfers/bookkeeping resolve to NULL. Reuses the legacy payee_name column. · [concepts/payee-name.md](concepts/payee-name.md)
 
