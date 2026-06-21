@@ -32,6 +32,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **copy-budget** — Duplicate incomes and allocations into a new budget one month ahead. The primary mechanism for creating budgets — it replaced the never-built recurring allocations. · [concepts/copy-budget.md](concepts/copy-budget.md)
 
+**countable-spend** — The canonical filter the MCP analysis tools apply to decide which allocations and transactions count as real discretionary spend — spending-role only, non-placeholder, and (on the actuals side) excluding deposits, manual adjustments, and brought-forward rows. · [concepts/countable-spend.md](concepts/countable-spend.md)
+
 **credit-card** — Bank-account subclass with statement-cycle tracking and paid/unpaid transactions. Transactions default to unpaid; unpaid at budget close are brought forward. · [concepts/credit-card.md](concepts/credit-card.md)
 
 **family-type** — Household setting (couple or single) that shapes the discretionary-money split and person-name display. · [concepts/family-type.md](concepts/family-type.md)
@@ -58,7 +60,7 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **payee-name** — A cleaned merchant string derived from a transaction's description at create time, for NLQ embedding quality — not entity resolution and not transaction tagging. Internal transfers/bookkeeping resolve to NULL. Reuses the legacy payee_name column. · [concepts/payee-name.md](concepts/payee-name.md)
 
-**reports** — Backward-looking analysis: net worth over time, category spending (budget vs actual), needs vs wants. All retrospective. · [concepts/reports.md](concepts/reports.md)
+**reports** — The three retrospective reports on the Reports screen, computed as raw SQL in report.rb. The older reporting layer — it does NOT apply the countable-spend filters the MCP tools do, so figures can diverge. · [concepts/reports.md](concepts/reports.md)
 
 **session** — A live login session: stores only the SHA256 digest of an opaque bearer token, with a 7-day sliding TTL. Created on Google login, validated per request, deleted on logout (revocation). · [tables/sessions.md](tables/sessions.md)
 

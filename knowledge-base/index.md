@@ -46,10 +46,15 @@ okf_version: "0.1"
 * [Discretionary money & the budget gap](concepts/discretionary-money.md) - why the budget target is a deliberate non-zero gap
 * [Budget-role analysis sections](concepts/budget-role-analysis-sections.md) - how budget_role partitions spend for the NLQ layer
 * [Budget membership](concepts/budget-membership.md) - allocation_id presence marks a transaction as part of the budget
+* [Copy budget](concepts/copy-budget.md) - duplicate a budget one month ahead; the primary way budgets are created
+* [Future budgets](concepts/future-budgets.md) - spreadsheet-style editing of allocations by name across open budgets
+* [Recurring allocation](concepts/recurring-allocation.md) - abandoned v1 budget-template idea; replaced by copy budget
 * [Auto-allocation](concepts/auto-allocation.md) - suggests an allocation by matching descriptions against the previous budget
 * [Payee name](concepts/payee-name.md) - cleaned merchant string for NLQ embedding; the repurposed payee_name column
 * [Session authentication](concepts/session-auth.md) - Google login + opaque DB bearer tokens; fail-closed per-request auth
 * [NLQ chat](concepts/nlq-chat.md) - frontend-driven chat over finances; Rails only serves /mcp tools + support tables
+* [Countable spend](concepts/countable-spend.md) - the MCP tools' filter for what counts as real discretionary spend
+* [Reports](concepts/reports.md) - net worth, category spending, needs-vs-wants; the older raw-SQL reporting layer
 * [Credit card accounts](concepts/credit-card.md) - the statement cycle and brought-forward unlocked by credit_card accounts
 * [Brought-forward](concepts/brought-forward.md) - unpaid credit-card charges carried into the next budget on close
 * [Sink fund accounts](concepts/sink-fund.md) - money-storing envelopes unlocked by sink_fund accounts
