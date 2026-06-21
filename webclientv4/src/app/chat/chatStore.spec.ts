@@ -4,7 +4,7 @@ import { useChatStore } from './chatStore';
 import { useChatSettingsStore } from '../chat-settings/chatSettingsStore';
 import * as chatAgent from './chatAgent';
 import type { AgentEvent } from './chatAgent';
-import * as llmUsageApiModule from '../llm-usage/llmUsageApi';
+import * as conversationTurnApiModule from './conversationTurnApi';
 
 vi.mock('./chatAgent', () => ({
   streamChat: vi.fn(),
@@ -17,9 +17,9 @@ vi.mock('../chat-settings/chatSettingsApi', () => ({
   },
 }));
 
-vi.mock('../llm-usage/llmUsageApi', () => ({
-  llmUsageApi: {
-    submitBatch: vi.fn(),
+vi.mock('./conversationTurnApi', () => ({
+  conversationTurnApi: {
+    submitTurn: vi.fn(),
   },
 }));
 
@@ -29,16 +29,18 @@ async function* makeStream(events: AgentEvent[]): AsyncGenerator<AgentEvent> {
   }
 }
 
-function makeUsageEvent(): Extract<AgentEvent, { type: 'usage' }> {
+function makeUsageEvent(
+  overrides: Partial<{ input_tokens: number; output_tokens: number; total_tokens: number }> = {},
+): Extract<AgentEvent, { type: 'usage' }> {
   return {
     type: 'usage',
     usage: {
-      input_tokens: 10,
-      output_tokens: 20,
+      input_tokens: overrides.input_tokens ?? 10,
+      output_tokens: overrides.output_tokens ?? 20,
       cache_read_tokens: 0,
       cache_write_tokens: 0,
       thinking_tokens: 0,
-      total_tokens: 30,
+      total_tokens: overrides.total_tokens ?? 30,
       request_duration_ms: 100,
       tool_call_count: 0,
       tool_calls_detail: [],
@@ -67,7 +69,9 @@ describe('chatStore', () => {
     setActivePinia(createPinia());
     configureChatSettings();
     vi.clearAllMocks();
-    vi.mocked(llmUsageApiModule.llmUsageApi.submitBatch).mockResolvedValue({ created: 1 });
+    vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mockResolvedValue({
+      steps_created: 1,
+    });
   });
 
   describe('sendMessage', () => {
@@ -389,8 +393,228 @@ describe('chatStore', () => {
     });
   });
 
-  describe('usage tracking', () => {
-    it('calls submitBatch with accumulated usage records when llm_model_id is set', async () => {
+  describe('turn capture — params and results', () => {
+    it('captures tool-call params (does not discard event.args)', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'tool_call', name: 'analyze_overspending', args: { period: '2026-03' } },
+          { type: 'tool_result', name: 'analyze_overspending', result: '{"categories":[]}' },
+          makeUsageEvent(),
+          { type: 'token', content: 'Done' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps[0].tool_calls[0].params).toEqual({ period: '2026-03' });
+    });
+
+    it('captures tool-call results', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'tool_call', name: 'analyze_overspending', args: {} },
+          { type: 'tool_result', name: 'analyze_overspending', result: '{"categories":[]}' },
+          makeUsageEvent(),
+          { type: 'token', content: 'Done' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps[0].tool_calls[0].result).toBe('{"categories":[]}');
+    });
+
+    it('captures the tool-call name', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'tool_call', name: 'analyze_overspending', args: {} },
+          { type: 'tool_result', name: 'analyze_overspending', result: '{}' },
+          makeUsageEvent(),
+          { type: 'token', content: 'Done' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps[0].tool_calls[0].name).toBe('analyze_overspending');
+    });
+
+    it('correctly pairs results when two different tools are called in the same step', async () => {
+      // Verifies that tool_result matching is by name, not array position.
+      // Step sequence: tool_call A → tool_result A → tool_call B → tool_result B → usage
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'tool_call', name: 'analyze_overspending', args: { period: '2026-03' } },
+          { type: 'tool_result', name: 'analyze_overspending', result: 'result-A' },
+          {
+            type: 'tool_call',
+            name: 'sink_fund_status',
+            args: { allocation_category_id: 5 },
+          },
+          { type: 'tool_result', name: 'sink_fund_status', result: 'result-B' },
+          makeUsageEvent(),
+          { type: 'token', content: 'Done' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      const step0 = turn.steps[0];
+      expect(step0.tool_calls).toHaveLength(2);
+      expect(step0.tool_calls[0].name).toBe('analyze_overspending');
+      expect(step0.tool_calls[0].result).toBe('result-A');
+      expect(step0.tool_calls[1].name).toBe('sink_fund_status');
+      expect(step0.tool_calls[1].result).toBe('result-B');
+    });
+  });
+
+  describe('turn capture — per-step thinking accumulation', () => {
+    it('captures thinking for a single-step turn', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'thinking', content: 'I am reasoning' },
+          { type: 'token', content: 'Answer' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps[0].thinking).toBe('I am reasoning');
+    });
+
+    it('accumulates thinking per step — each step retains its own reasoning', async () => {
+      // Two-step turn: step 0 has tool calls + thinking, step 1 has different thinking
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          // Step 0: tool call with thinking
+          { type: 'thinking', content: 'Step 0 reasoning' },
+          { type: 'tool_call', name: 'analyze_overspending', args: { period: '2026-03' } },
+          { type: 'tool_result', name: 'analyze_overspending', result: '{}' },
+          makeUsageEvent({ input_tokens: 10 }),
+          // Step 1: final text with different thinking
+          { type: 'thinking', content: 'Step 1 reasoning' },
+          { type: 'token', content: 'Final answer' },
+          makeUsageEvent({ input_tokens: 20 }),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps).toHaveLength(2);
+      // Each step has its own thinking — not overwritten by the next step's
+      expect(turn.steps[0].thinking).toBe('Step 0 reasoning');
+      expect(turn.steps[1].thinking).toBe('Step 1 reasoning');
+    });
+
+    it('empty thinking string when no thinking events precede a step', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          // No thinking event before this step
+          { type: 'token', content: 'Quick answer' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps[0].thinking).toBe('');
+    });
+  });
+
+  describe('turn capture — turn-level fields', () => {
+    it('captures the user_prompt at turn level', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([{ type: 'token', content: 'Hello' }, makeUsageEvent(), { type: 'done' }]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('What is my budget?');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.user_prompt).toBe('What is my budget?');
+    });
+
+    it('captures final_output as the last token content', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'token', content: 'Hello' },
+          { type: 'token', content: 'Hello world' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.final_output).toBe('Hello world');
+    });
+
+    it('sends final_output as null when no token events arrive (tool-only turn)', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'tool_call', name: 'analyze_overspending', args: {} },
+          { type: 'tool_result', name: 'analyze_overspending', result: '{}' },
+          makeUsageEvent(),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.final_output).toBeNull();
+    });
+
+    it('includes conversation_id and conversation_turn_id in the turn', async () => {
       configureChatSettings(42);
       vi.mocked(chatAgent.streamChat).mockReturnValue(
         makeStream([makeUsageEvent(), { type: 'done' }]),
@@ -399,48 +623,39 @@ describe('chatStore', () => {
       const store = useChatStore();
       await store.sendMessage('hello');
 
-      expect(llmUsageApiModule.llmUsageApi.submitBatch).toHaveBeenCalledOnce();
-      const batch = vi.mocked(llmUsageApiModule.llmUsageApi.submitBatch).mock.calls[0][0];
-      expect(batch.llm_model_id).toBe(42);
-      expect(batch.records).toHaveLength(1);
-      const record = batch.records[0];
-      expect(record.llm_model_id).toBe(42);
-      expect(record.usage_category).toBe('chat');
-      expect(record.conversation_id).toBe(store.conversationId);
-      expect(record.conversation_turn_id).toMatch(
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.conversation_id).toBe(store.conversationId);
+      expect(turn.conversation_turn_id).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
       );
-      expect(record.input_tokens).toBe(10);
-      expect(record.output_tokens).toBe(20);
-      expect(record.total_tokens).toBe(30);
-      expect(record.incomplete).toBe(false);
-      expect(record.extras).toEqual({});
     });
+  });
 
-    it('accumulates multiple usage events from a multi-iteration turn', async () => {
+  describe('turn flush — DTO assembly and POST', () => {
+    it('POSTs exactly once per turn to conversationTurnApi', async () => {
       configureChatSettings(42);
       vi.mocked(chatAgent.streamChat).mockReturnValue(
-        makeStream([makeUsageEvent(), makeUsageEvent(), { type: 'done' }]),
+        makeStream([makeUsageEvent(), { type: 'done' }]),
       );
 
       const store = useChatStore();
       await store.sendMessage('hello');
 
-      const batch = vi.mocked(llmUsageApiModule.llmUsageApi.submitBatch).mock.calls[0][0];
-      expect(batch.records).toHaveLength(2);
+      expect(conversationTurnApiModule.conversationTurnApi.submitTurn).toHaveBeenCalledOnce();
     });
 
-    it('does NOT call submitBatch when there are no usage records', async () => {
+    it('does NOT call submitTurn when there are no steps (no usage events)', async () => {
       configureChatSettings(42);
       vi.mocked(chatAgent.streamChat).mockReturnValue(makeStream([{ type: 'done' }]));
 
       const store = useChatStore();
       await store.sendMessage('hello');
 
-      expect(llmUsageApiModule.llmUsageApi.submitBatch).not.toHaveBeenCalled();
+      expect(conversationTurnApiModule.conversationTurnApi.submitTurn).not.toHaveBeenCalled();
     });
 
-    it('does NOT call submitBatch when llm_model_id is null', async () => {
+    it('does NOT call submitTurn when llm_model_id is null', async () => {
       configureChatSettings(null);
       vi.mocked(chatAgent.streamChat).mockReturnValue(
         makeStream([makeUsageEvent(), { type: 'done' }]),
@@ -449,10 +664,10 @@ describe('chatStore', () => {
       const store = useChatStore();
       await store.sendMessage('hello');
 
-      expect(llmUsageApiModule.llmUsageApi.submitBatch).not.toHaveBeenCalled();
+      expect(conversationTurnApiModule.conversationTurnApi.submitTurn).not.toHaveBeenCalled();
     });
 
-    it('logs a warning when llm_model_id is null and usage records were captured', async () => {
+    it('logs a warning when llm_model_id is null and steps were captured', async () => {
       configureChatSettings(null);
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       vi.mocked(chatAgent.streamChat).mockReturnValue(
@@ -466,9 +681,69 @@ describe('chatStore', () => {
       warnSpy.mockRestore();
     });
 
-    it('catches submitBatch failures and does not bubble them to UI', async () => {
+    it('assembles steps in order (first usage event = step 0, second = step 1)', async () => {
       configureChatSettings(42);
-      vi.mocked(llmUsageApiModule.llmUsageApi.submitBatch).mockRejectedValue(
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([
+          { type: 'tool_call', name: 'analyze_overspending', args: { period: '2026-03' } },
+          { type: 'tool_result', name: 'analyze_overspending', result: 'result-A' },
+          makeUsageEvent({ input_tokens: 10 }),
+          { type: 'token', content: 'Final' },
+          makeUsageEvent({ input_tokens: 20 }),
+          { type: 'done' },
+        ]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps).toHaveLength(2);
+      // Step 0 has the tool call
+      expect(turn.steps[0].tool_calls[0].name).toBe('analyze_overspending');
+      expect(turn.steps[0].usage.input_tokens).toBe(10);
+      // Step 1 has no tool calls (it's the final text step)
+      expect(turn.steps[1].tool_calls).toHaveLength(0);
+      expect(turn.steps[1].usage.input_tokens).toBe(20);
+    });
+
+    it('snapshots llm_model_id at turn start — settings change mid-stream is ignored', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        (async function* () {
+          yield makeUsageEvent() as AgentEvent;
+          // Settings update during the stream — should NOT affect the turn.
+          configureChatSettings(99);
+          yield { type: 'done' } as AgentEvent;
+        })(),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.llm_model_id).toBe(42);
+    });
+
+    it('still submits the turn when it ends with an error event', async () => {
+      configureChatSettings(42);
+      vi.mocked(chatAgent.streamChat).mockReturnValue(
+        makeStream([makeUsageEvent(), { type: 'error', message: 'something broke' } as AgentEvent]),
+      );
+
+      const store = useChatStore();
+      await store.sendMessage('hello');
+
+      // Cost was incurred — we still want it recorded even though the turn errored.
+      expect(conversationTurnApiModule.conversationTurnApi.submitTurn).toHaveBeenCalledOnce();
+      expect(store.error).toBe('something broke');
+    });
+
+    it('catches submitTurn failures and does not bubble them to UI', async () => {
+      configureChatSettings(42);
+      vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mockRejectedValue(
         new Error('Network error'),
       );
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -483,11 +758,14 @@ describe('chatStore', () => {
       expect(store.error).toBeNull();
       // But it should be logged — wait a tick for the rejected promise to settle
       await Promise.resolve();
-      expect(errorSpy).toHaveBeenCalledWith('Failed to submit usage records', expect.any(Error));
+      expect(errorSpy).toHaveBeenCalledWith(
+        'Failed to submit conversation turn',
+        expect.any(Error),
+      );
       errorSpy.mockRestore();
     });
 
-    it('resets the usage buffer at the start of each sendMessage call', async () => {
+    it('resets the step buffer at the start of each sendMessage call', async () => {
       configureChatSettings(42);
       vi.mocked(chatAgent.streamChat)
         .mockReturnValueOnce(makeStream([makeUsageEvent(), { type: 'done' }]))
@@ -497,25 +775,8 @@ describe('chatStore', () => {
       await store.sendMessage('first');
       await store.sendMessage('second');
 
-      // Second call: no usage event, so submitBatch should only be called once (from the first)
-      expect(llmUsageApiModule.llmUsageApi.submitBatch).toHaveBeenCalledOnce();
-    });
-
-    it('includes correct conversation_id from the store across turns', async () => {
-      configureChatSettings(42);
-      vi.mocked(chatAgent.streamChat).mockImplementation(() =>
-        makeStream([makeUsageEvent(), { type: 'done' }]),
-      );
-
-      const store = useChatStore();
-      const expectedConversationId = store.conversationId;
-      await store.sendMessage('first');
-      await store.sendMessage('second');
-
-      const calls = vi.mocked(llmUsageApiModule.llmUsageApi.submitBatch).mock.calls;
-      expect(calls).toHaveLength(2);
-      expect(calls[0][0].records[0].conversation_id).toBe(expectedConversationId);
-      expect(calls[1][0].records[0].conversation_id).toBe(expectedConversationId);
+      // Second call: no usage event, so submitTurn should only be called once (from the first)
+      expect(conversationTurnApiModule.conversationTurnApi.submitTurn).toHaveBeenCalledOnce();
     });
 
     it('uses different conversation_turn_id for each sendMessage call', async () => {
@@ -528,47 +789,39 @@ describe('chatStore', () => {
       await store.sendMessage('first');
       await store.sendMessage('second');
 
-      const calls = vi.mocked(llmUsageApiModule.llmUsageApi.submitBatch).mock.calls;
-      const turnId1 = calls[0][0].records[0].conversation_turn_id;
-      const turnId2 = calls[1][0].records[0].conversation_turn_id;
-      expect(turnId1).not.toBe(turnId2);
+      const calls = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock.calls;
+      expect(calls[0][0].conversation_turn_id).not.toBe(calls[1][0].conversation_turn_id);
     });
 
-    it('snapshots llm_model_id at turn start — settings change mid-stream is ignored', async () => {
+    it('sends usage_category as chat for all steps', async () => {
       configureChatSettings(42);
-      // Generator changes settings mid-stream between the usage event and 'done'.
       vi.mocked(chatAgent.streamChat).mockReturnValue(
-        (async function* () {
-          yield makeUsageEvent() as AgentEvent;
-          // Settings update during the stream — should NOT affect the batch.
-          configureChatSettings(99);
-          yield { type: 'done' } as AgentEvent;
-        })(),
+        makeStream([makeUsageEvent(), makeUsageEvent(), { type: 'done' }]),
       );
 
       const store = useChatStore();
       await store.sendMessage('hello');
 
-      const calls = vi.mocked(llmUsageApiModule.llmUsageApi.submitBatch).mock.calls;
-      expect(calls).toHaveLength(1);
-      // Both the batch top-level llm_model_id and each record's llm_model_id
-      // come from the captured value at turn start (42), not the new value (99).
-      expect(calls[0][0].llm_model_id).toBe(42);
-      expect(calls[0][0].records[0].llm_model_id).toBe(42);
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      for (const step of turn.steps) {
+        expect(step.usage.usage_category).toBe('chat');
+      }
     });
 
-    it('still submits accumulated usage records when the turn ends with an error event', async () => {
+    it('maps usage token fields correctly from the usage event', async () => {
       configureChatSettings(42);
       vi.mocked(chatAgent.streamChat).mockReturnValue(
-        makeStream([makeUsageEvent(), { type: 'error', message: 'something broke' } as AgentEvent]),
+        makeStream([makeUsageEvent({ input_tokens: 50, output_tokens: 75 }), { type: 'done' }]),
       );
 
       const store = useChatStore();
       await store.sendMessage('hello');
 
-      // Cost was incurred — we still want it recorded even though the turn errored.
-      expect(llmUsageApiModule.llmUsageApi.submitBatch).toHaveBeenCalledOnce();
-      expect(store.error).toBe('something broke');
+      const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
+        .calls[0][0];
+      expect(turn.steps[0].usage.input_tokens).toBe(50);
+      expect(turn.steps[0].usage.output_tokens).toBe(75);
     });
   });
 });

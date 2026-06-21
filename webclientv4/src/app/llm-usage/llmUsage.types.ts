@@ -31,14 +31,6 @@ export interface LlmUsageRecordData {
   created_at?: string;
 }
 
-export interface LlmUsageBatch {
-  llm_model_id: number;
-  records: Omit<
-    LlmUsageRecordData,
-    'id' | 'total_cost' | 'provider' | 'llm_model_name' | 'created_at'
-  >[];
-}
-
 export interface LlmUsageSummary {
   total_records: number;
   total_tokens: number;

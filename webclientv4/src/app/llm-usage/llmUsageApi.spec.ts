@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { llmUsageApi } from './llmUsageApi';
 import apiGateway from '../../api/api-gateway';
-import type { LlmUsageBatch, LlmUsageSummary, UsagePageResponse } from './llmUsage.types';
+import type { LlmUsageSummary, UsagePageResponse } from './llmUsage.types';
 
 vi.mock('../../api/api-gateway', () => ({
   default: {
@@ -15,50 +15,6 @@ vi.mock('../../api/api-gateway', () => ({
 describe('llmUsageApi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe('submitBatch', () => {
-    it('posts to /mcp/llm_usage with the batch payload', async () => {
-      const batch: LlmUsageBatch = {
-        llm_model_id: 1,
-        records: [
-          {
-            llm_model_id: 1,
-            usage_category: 'chat',
-            conversation_id: 'conv-abc',
-            conversation_turn_id: 'turn-1',
-            input_tokens: 100,
-            output_tokens: 50,
-            cache_read_tokens: 0,
-            cache_write_tokens: 0,
-            thinking_tokens: 0,
-            total_tokens: 150,
-            request_duration_ms: 1200,
-            incomplete: false,
-            tool_call_count: 0,
-            tool_calls_detail: [],
-            extras: {},
-          },
-        ],
-      };
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: { created: 1 } });
-
-      await llmUsageApi.submitBatch(batch);
-
-      expect(apiGateway.post).toHaveBeenCalledWith('/mcp/llm_usage', batch);
-    });
-
-    it('returns the response data', async () => {
-      const batch: LlmUsageBatch = {
-        llm_model_id: 2,
-        records: [],
-      };
-      vi.mocked(apiGateway.post).mockResolvedValue({ data: { created: 0 } });
-
-      const result = await llmUsageApi.submitBatch(batch);
-
-      expect(result).toEqual({ created: 0 });
-    });
   });
 
   describe('getAll', () => {

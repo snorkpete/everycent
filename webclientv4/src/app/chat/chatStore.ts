@@ -1,13 +1,21 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import type { ChatMessage } from './chat.types';
+import type {
+  ChatMessage,
+  ConversationTurnDto,
+  ConversationTurnStep,
+  StepToolCall,
+} from './chat.types';
 import { streamChat } from './chatAgent';
 import type { ChatConfig } from './chatAgent';
 import { useChatSettingsStore } from '../chat-settings/chatSettingsStore';
-import { llmUsageApi } from '../llm-usage/llmUsageApi';
-import type { LlmUsageBatch } from '../llm-usage/llmUsage.types';
+import { conversationTurnApi } from './conversationTurnApi';
 
-type UsageRecord = LlmUsageBatch['records'][number];
+/** Mutable state accumulated within a single step (one LLM call). */
+interface PendingStep {
+  thinking: string;
+  toolCalls: StepToolCall[];
+}
 
 export const useChatStore = defineStore('chat', () => {
   const messages = ref<ChatMessage[]>([]);
@@ -18,7 +26,11 @@ export const useChatStore = defineStore('chat', () => {
   const conversationId = ref<string>(crypto.randomUUID());
   const currentTurnId = ref<string>('');
 
-  let pendingUsageRecords: UsageRecord[] = [];
+  // Per-turn accumulation
+  let pendingSteps: ConversationTurnStep[] = [];
+  let currentStep: PendingStep = { thinking: '', toolCalls: [] };
+  let pendingUserPrompt: string = '';
+  let pendingFinalOutput: string | null = null;
 
   function getChatConfig(): ChatConfig {
     const chatSettings = useChatSettingsStore();
@@ -30,23 +42,27 @@ export const useChatStore = defineStore('chat', () => {
     };
   }
 
-  function submitUsageBatch(turnLlmModelId: number | null) {
-    if (pendingUsageRecords.length === 0) {
+  function submitTurn(turnLlmModelId: number | null) {
+    if (pendingSteps.length === 0) {
       return;
     }
 
     if (turnLlmModelId === null) {
-      console.warn('Usage records captured but llm_model_id is null — skipping batch submit');
+      console.warn('Conversation turn captured but llm_model_id is null — skipping turn submit');
       return;
     }
 
-    const batch: LlmUsageBatch = {
+    const turn: ConversationTurnDto = {
       llm_model_id: turnLlmModelId,
-      records: pendingUsageRecords,
+      conversation_id: conversationId.value,
+      conversation_turn_id: currentTurnId.value,
+      user_prompt: pendingUserPrompt,
+      final_output: pendingFinalOutput,
+      steps: pendingSteps,
     };
 
-    llmUsageApi.submitBatch(batch).catch((e: unknown) => {
-      console.error('Failed to submit usage records', e);
+    conversationTurnApi.submitTurn(turn).catch((e: unknown) => {
+      console.error('Failed to submit conversation turn', e);
     });
   }
 
@@ -62,7 +78,12 @@ export const useChatStore = defineStore('chat', () => {
     const turnLlmModelId = useChatSettingsStore().settings.llm_model_id;
 
     currentTurnId.value = crypto.randomUUID();
-    pendingUsageRecords = [];
+
+    // Reset per-turn accumulation
+    pendingSteps = [];
+    currentStep = { thinking: '', toolCalls: [] };
+    pendingUserPrompt = content;
+    pendingFinalOutput = null;
 
     messages.value.push({ role: 'user', content });
     messages.value.push({ role: 'assistant', content: '', turnId: currentTurnId.value });
@@ -84,37 +105,61 @@ export const useChatStore = defineStore('chat', () => {
             } else {
               thinking.value = false;
               target.thinking = event.content;
+              // Accumulate into the current step (each step gets its own thinking)
+              currentStep.thinking = event.content;
             }
             break;
           case 'token':
             thinking.value = false;
             target.content = event.content;
+            // Token events carry the full accumulated content (snapshot, not delta).
+            // The last snapshot is the final answer text.
+            pendingFinalOutput = event.content;
             break;
           case 'tool_call':
             toolStatus.value = `Calling ${event.name}...`;
+            // Capture args — will be matched with result on tool_result
+            currentStep.toolCalls.push({
+              name: event.name,
+              params: event.args,
+              result: '',
+            });
             break;
-          case 'tool_result':
+          case 'tool_result': {
             toolStatus.value = null;
+            // Match on name, using findLast so the same tool can appear twice in one step.
+            // The agent processes tool calls sequentially today, so the last unresolved
+            // call with this name is always the right target.
+            const pending = [...currentStep.toolCalls]
+              .reverse()
+              .find((tc) => tc.name === event.name && tc.result === '');
+            if (pending) {
+              pending.result = event.result;
+            }
             break;
+          }
           case 'usage': {
-            const record: UsageRecord = {
-              llm_model_id: turnLlmModelId ?? 0,
-              usage_category: 'chat',
-              conversation_id: conversationId.value,
-              conversation_turn_id: currentTurnId.value,
-              input_tokens: event.usage.input_tokens,
-              output_tokens: event.usage.output_tokens,
-              cache_read_tokens: event.usage.cache_read_tokens,
-              cache_write_tokens: event.usage.cache_write_tokens,
-              thinking_tokens: event.usage.thinking_tokens,
-              total_tokens: event.usage.total_tokens,
-              request_duration_ms: event.usage.request_duration_ms,
-              incomplete: event.usage.incomplete,
-              tool_call_count: event.usage.tool_call_count,
-              tool_calls_detail: event.usage.tool_calls_detail,
-              extras: {},
+            // A usage event closes a step — seal the current step and start fresh
+            const completedStep: ConversationTurnStep = {
+              thinking: currentStep.thinking,
+              tool_calls: currentStep.toolCalls,
+              usage: {
+                usage_category: 'chat',
+                input_tokens: event.usage.input_tokens,
+                output_tokens: event.usage.output_tokens,
+                cache_read_tokens: event.usage.cache_read_tokens,
+                cache_write_tokens: event.usage.cache_write_tokens,
+                thinking_tokens: event.usage.thinking_tokens,
+                request_duration_ms: event.usage.request_duration_ms,
+                incomplete: event.usage.incomplete,
+                tool_call_count: event.usage.tool_call_count,
+                tool_calls_detail: event.usage.tool_calls_detail,
+                extras: {},
+              },
             };
-            pendingUsageRecords.push(record);
+            pendingSteps.push(completedStep);
+            // Reset for the next step (if any — multi-step turns have multiple usage events)
+            currentStep = { thinking: '', toolCalls: [] };
             break;
           }
           case 'error':
@@ -136,7 +181,7 @@ export const useChatStore = defineStore('chat', () => {
       loading.value = false;
       thinking.value = false;
       toolStatus.value = null;
-      submitUsageBatch(turnLlmModelId);
+      submitTurn(turnLlmModelId);
     }
   }
 

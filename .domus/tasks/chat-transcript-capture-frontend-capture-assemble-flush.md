@@ -26,14 +26,14 @@ Frontend half of NLQ conversation-transcript capture. Today the agent loop **dis
 
 ## Acceptance Criteria
 
-- [ ] `chatStore.ts` no longer discards tool-call `event.args` — `params` are captured per step.
-- [ ] Tool-call **results** are captured per step (available client-side after the tool runs in `chatAgent.ts`).
-- [ ] Intermediate `thinking` is **accumulated per step**, not overwritten — every step's reasoning is retained, not just the last generation's.
-- [ ] `user_prompt` and `final_output` are captured at the turn level.
-- [ ] A turn flush assembles the full turn-DTO (above) and POSTs it to `POST /mcp/conversation_turns`, in step order, once per turn.
-- [ ] The old `/mcp/llm_usage` caller (`llmUsageApi` / `submitUsageBatch` path) is removed/repointed — nothing calls the deleted endpoint.
-- [ ] Unit tests cover: params captured, results captured, per-step thinking accumulation, turn-DTO assembly + ordering, single POST per turn. (TDD, 100% coverage on new code per webclientv4 rules.)
-- [ ] `npm run type-check` and `npm run test` pass; `senior-code-reviewer` run on the Vue changes.
+- [x] `chatStore.ts` no longer discards tool-call `event.args` — `params` are captured per step.
+- [x] Tool-call **results** are captured per step (available client-side after the tool runs in `chatAgent.ts`).
+- [x] Intermediate `thinking` is **accumulated per step**, not overwritten — every step's reasoning is retained, not just the last generation's.
+- [x] `user_prompt` and `final_output` are captured at the turn level.
+- [x] A turn flush assembles the full turn-DTO (above) and POSTs it to `POST /mcp/conversation_turns`, in step order, once per turn.
+- [x] The old `/mcp/llm_usage` caller (`llmUsageApi` / `submitUsageBatch` path) is removed/repointed — nothing calls the deleted endpoint.
+- [x] Unit tests cover: params captured, results captured, per-step thinking accumulation, turn-DTO assembly + ordering, single POST per turn. (TDD, 100% coverage on new code per webclientv4 rules.)
+- [x] `npm run type-check` and `npm run test` pass; `senior-code-reviewer` run on the Vue changes.
 
 ---
 
