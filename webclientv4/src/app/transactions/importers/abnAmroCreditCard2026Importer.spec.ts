@@ -5,70 +5,70 @@ describe('abnAmroCreditCard2026Importer', () => {
   const startDate = '2026-02-28';
   const endDate = '2026-03-27';
 
-  // Real-world sample copied directly from the ABN AMRO credit card page
+  // Synthetic sample modeled on the ABN AMRO credit-card statement format
   const fullSample = `2026
 
 Current Period
 28 februari to 27 maart 2026
 24 mrt 2026
-Transaction description:AUDIBLE NEWARK USA
+Transaction description:ACMEAUDIO NEWARK USA
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 € 0,00
-Transaction description:SHEIN.COM DUBLIN IRL
+Transaction description:SHOPCO.COM DUBLIN IRL
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 61,02
 RESERVED
 
 22 mrt 2026
-Transaction description:DROPBOX*Z4PRP1WGRY1L D02FD79 IRL
+Transaction description:CLOUDCO*Z4PRP1WGRY1L D02FD79 IRL
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 106,22
-Transaction description:PAYPAL *PATREONIREL M 35314369001 IRL
+Transaction description:PAYPAL *MEMBERSVCIREL M 35314369001 IRL
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 5,45
 20 mrt 2026
-Transaction description:GOOGLE*GOOGLE PLAY APP DUBLIN IRL
+Transaction description:APPCO*APPCO PLAY APP DUBLIN IRL
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 2,99
 18 mrt 2026
-Transaction description:CLAUDE.AI SUBSCRIPTION SAN FRANCISCO USA
+Transaction description:AICO.AI SUBSCRIPTION SAN FRANCISCO USA
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 95,02
-Transaction description:STENA LINE B.V. HOEK VAN HOLL NLD
+Transaction description:FERRYCO LINE B.V. HOEK VAN HOLL NLD
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 646,50
 17 mrt 2026
-Transaction description:ELEVENLABS.IO NEW YORK USA
+Transaction description:VOICECO.IO NEW YORK USA
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 5,40
 15 mrt 2026
-Transaction description:WWW.F1.COM LONDON GBR
+Transaction description:WWW.SPORTCO.COM LONDON GBR
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 11,90
-Transaction description:AMZNPRIMENL*BO6OK1L75 LUXEMBOURG LUX
+Transaction description:SHOPRIMENL*BO6OK1L75 LUXEMBOURG LUX
 RECURRING
 
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 49,90
-Transaction description:GOOGLE*GOOGLE PLAY APP DUBLIN IRL
+Transaction description:APPCO*APPCO PLAY APP DUBLIN IRL
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 9,99
@@ -77,84 +77,84 @@ Transaction description:IDEAL BETALING, DANK U
 Transaction amount:
 + € 887,33
 12 mrt 2026
-Transaction description:HP INSTANT INK NL AMSTELVEEN NLD
+Transaction description:PRINTCO INK NL AMSTELVEEN NLD
 RECURRING
 
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 5,49
-Transaction description:ASSOCIATION OF CHARTER GLASGOW GBR
+Transaction description:MEMBER ASSOCIATION GLASGOW GBR
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 385,52
 11 mrt 2026
-Transaction description:DING 220172540 DUBLIN IRL
+Transaction description:TOPUP 220172540 DUBLIN IRL
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 5,46
-Transaction description:DING 220172501 DUBLIN IRL
+Transaction description:TOPUP 220172501 DUBLIN IRL
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 5,46
 7 mrt 2026
-Transaction description:CLAUDE.AI SUBSCRIPTION SAN FRANCISCO USA
+Transaction description:AICO.AI SUBSCRIPTION SAN FRANCISCO USA
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 21,78
 5 mrt 2026
-Transaction description:LEONARDO HOTEL ALMERE ALMERE NLD
+Transaction description:GRAND HOTEL ALMERE ALMERE NLD
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 30,00
-Transaction description:LEONARDO HOTEL ALMERE ALMERE NLD
+Transaction description:GRAND HOTEL ALMERE ALMERE NLD
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 99,10
 4 mrt 2026
-Transaction description:HEROKU* FEB-110431881 SAN FRANCISCO USA
+Transaction description:HOSTCO* FEB-110431881 SAN FRANCISCO USA
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 12,38
-Transaction description:GOOGLE*GOOGLE ONE DUBLIN IRL
+Transaction description:APPCO*APPCO ONE DUBLIN IRL
 RECURRING
 
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 29,99
 3 mrt 2026
-Transaction description:MICROSOFT*MICROSOFT 36 MSBILL.INFO IRL
+Transaction description:SOFTCO*SOFTCO 36 BILLCO.INFO IRL
 RECURRING
 
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 129,00
 2 mrt 2026
-Transaction description:GUARDIAN LIFE OF THE C WESTMOORINGS TTO
+Transaction description:INSURECO WESTMOORINGS TTO
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 51,70
-Transaction description:GUARDIAN LIFE OF THE C WESTMOORINGS TTO
+Transaction description:INSURECO WESTMOORINGS TTO
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 35,83
 28 feb 2026
-Transaction description:OCULUS *U6JFBED572 DUBLIN IRL
+Transaction description:VRCO *U6JFBED572 DUBLIN IRL
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 8,99
-Transaction description:NETFLIX.COM LOS GATOS USA
+Transaction description:STREAMCO.COM LOS GATOS USA
 RECURRING
 
 Cardholder:K.J. STEPHEN
 Transaction amount:
 - € 17,31
-Transaction description:GOOGLE*YOUTUBEPREMIUM LONDON GBR
+Transaction description:APPCO*VIDEOPREMIUM LONDON GBR
 RECURRING
 
 Cardholder:K.J. STEPHEN
@@ -172,7 +172,7 @@ Transaction amount:
       const result = abnAmroCreditCard2026Importer(fullSample, startDate, endDate);
       const first = result[0];
       expect(first.transaction_date).toBe('2026-03-24');
-      expect(first.description).toBe('AUDIBLE NEWARK USA');
+      expect(first.description).toBe('ACMEAUDIO NEWARK USA');
       expect(first.withdrawal_amount).toBe(0);
       expect(first.deposit_amount).toBe(0);
       expect(first.status).toBe('unpaid');
@@ -180,12 +180,12 @@ Transaction amount:
 
     it('parses a negative amount correctly', () => {
       const result = abnAmroCreditCard2026Importer(fullSample, startDate, endDate);
-      // SHEIN.COM is the second transaction
-      const shein = result[1];
-      expect(shein.transaction_date).toBe('2026-03-24');
-      expect(shein.description).toBe('SHEIN.COM DUBLIN IRL');
-      expect(shein.withdrawal_amount).toBe(6102);
-      expect(shein.deposit_amount).toBe(0);
+      // SHOPCO.COM is the second transaction
+      const shopco = result[1];
+      expect(shopco.transaction_date).toBe('2026-03-24');
+      expect(shopco.description).toBe('SHOPCO.COM DUBLIN IRL');
+      expect(shopco.withdrawal_amount).toBe(6102);
+      expect(shopco.deposit_amount).toBe(0);
     });
 
     it('parses iDEAL positive amount correctly', () => {
@@ -200,10 +200,10 @@ Transaction amount:
 
     it('ignores RECURRING and RESERVED tags', () => {
       const result = abnAmroCreditCard2026Importer(fullSample, startDate, endDate);
-      // DROPBOX has RECURRING tag — should still parse correctly
-      const dropbox = result.find((t) => t.description!.includes('DROPBOX'));
-      expect(dropbox).toBeDefined();
-      expect(dropbox!.withdrawal_amount).toBe(10622);
+      // CLOUDCO has RECURRING tag — should still parse correctly
+      const cloudco = result.find((t) => t.description!.includes('CLOUDCO'));
+      expect(cloudco).toBeDefined();
+      expect(cloudco!.withdrawal_amount).toBe(10622);
     });
 
     it('ignores header junk (year, Current Period, date range)', () => {
@@ -218,16 +218,16 @@ Transaction amount:
 
     it('handles transactions with RECURRING between description and cardholder', () => {
       const result = abnAmroCreditCard2026Importer(fullSample, startDate, endDate);
-      const f1 = result.find((t) => t.description!.includes('WWW.F1.COM'));
-      expect(f1).toBeDefined();
-      expect(f1!.transaction_date).toBe('2026-03-15');
-      expect(f1!.withdrawal_amount).toBe(1190);
+      const sportco = result.find((t) => t.description!.includes('WWW.SPORTCO.COM'));
+      expect(sportco).toBeDefined();
+      expect(sportco!.transaction_date).toBe('2026-03-15');
+      expect(sportco!.withdrawal_amount).toBe(1190);
     });
 
-    it('parses last complete transaction (GOOGLE*YOUTUBEPREMIUM)', () => {
+    it('parses last complete transaction (APPCO*VIDEOPREMIUM)', () => {
       const result = abnAmroCreditCard2026Importer(fullSample, startDate, endDate);
       const last = result[result.length - 1];
-      expect(last.description).toBe('GOOGLE*YOUTUBEPREMIUM LONDON GBR');
+      expect(last.description).toBe('APPCO*VIDEOPREMIUM LONDON GBR');
       expect(last.transaction_date).toBe('2026-02-28');
       expect(last.withdrawal_amount).toBe(2599);
     });
@@ -305,7 +305,7 @@ Transaction amount:
   describe('noise handling', () => {
     it('skips RECURRING tags between fields', () => {
       const input = `10 mrt 2026
-Transaction description:NETFLIX.COM LOS GATOS USA
+Transaction description:STREAMCO.COM LOS GATOS USA
 RECURRING
 
 Cardholder:K.J. STEPHEN
@@ -313,13 +313,13 @@ Transaction amount:
 - € 17,31`;
       const result = abnAmroCreditCard2026Importer(input, startDate, endDate);
       expect(result.length).toBe(1);
-      expect(result[0].description).toBe('NETFLIX.COM LOS GATOS USA');
+      expect(result[0].description).toBe('STREAMCO.COM LOS GATOS USA');
       expect(result[0].withdrawal_amount).toBe(1731);
     });
 
     it('skips RESERVED tag after amount', () => {
       const input = `24 mrt 2026
-Transaction description:SHEIN.COM DUBLIN IRL
+Transaction description:SHOPCO.COM DUBLIN IRL
 Cardholder:P.A. STEPHEN | Extra Card
 Transaction amount:
 - € 61,02
@@ -361,7 +361,7 @@ Cardholder:K.J. STEPHEN`;
   describe('amount parsing', () => {
     it('handles zero amounts', () => {
       const input = `24 mrt 2026
-Transaction description:AUDIBLE NEWARK USA
+Transaction description:ACMEAUDIO NEWARK USA
 Transaction amount:
 € 0,00`;
       const result = abnAmroCreditCard2026Importer(input, startDate, endDate);
