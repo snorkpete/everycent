@@ -12,6 +12,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **allocation-class** — Higher classification of an allocation: need, want, or savings. A mechanism for evaluating spending alignment; underdeveloped. Stored in allocation_class (a refactor candidate, R1). · [concepts/allocation-class.md](concepts/allocation-class.md)
 
+**authentication** — Google-only login that mints an opaque DB-backed bearer token (only its SHA256 digest stored, 7-day sliding TTL). Fail-closed: every request needs a valid token unless the endpoint explicitly opts out. · [concepts/session-auth.md](concepts/session-auth.md)
+
 **auto-allocate** — Suggests which allocation a transaction belongs to by matching its description against the previous budget's transactions. Match types: exact or contains. · [concepts/auto-allocate.md](concepts/auto-allocate.md)
 
 **auto-allocation** — Suggests an allocation for each imported transaction by matching its description against the previous budget's already-allocated transactions, then mapping to the same-named allocation in the current budget. The live answer to 'how do we tag transactions easily?' · [concepts/auto-allocation.md](concepts/auto-allocation.md)
@@ -50,6 +52,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **reports** — Backward-looking analysis: net worth over time, category spending (budget vs actual), needs vs wants. All retrospective. · [concepts/reports.md](concepts/reports.md)
 
+**session** — A live login session: stores only the SHA256 digest of an opaque bearer token, with a 7-day sliding TTL. Created on Google login, validated per request, deleted on logout (revocation). · [tables/sessions.md](tables/sessions.md)
+
 **settings** — Household-level config singleton: primary budget account, family type, person names, default categories. · [tables/settings.md](tables/settings.md)
 
 **sink-fund** — A bank account (type sink_fund) subdivided into named envelopes via sink-fund allocations. Not a separate model — a bank account with the sink-fund concern. · [concepts/sink-fund.md](concepts/sink-fund.md)
@@ -61,6 +65,8 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 **transaction** — Individual money movement with a withdrawal or deposit amount; belongs to a bank account, optionally links an allocation OR a sink-fund allocation (mutually exclusive). · [tables/transactions.md](tables/transactions.md)
 
 **transfer** — Paired transactions moving money between accounts, or between allocations and sink-fund allocations. One withdrawal + one deposit. · [concepts/transfer.md](concepts/transfer.md)
+
+**user** — A person who logs in. Belongs to one household; a household can have several (this one has two). Email is the sole Google-login join key. Most columns are dead devise residue. · [tables/users.md](tables/users.md)
 
 **zero-based-budgeting** — Core philosophy: every cent gets a job. In practice the unallocated remainder is deliberate discretionary money split among household members — see discretionary money & the budget gap. · [concepts/zero-based-budgeting.md](concepts/zero-based-budgeting.md)
 

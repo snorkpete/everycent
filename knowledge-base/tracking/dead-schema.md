@@ -31,6 +31,9 @@ them, do not populate them.
 | D8 | `bank_accounts.allow_default_allocations`, `bank_accounts.default_sub_account_amount` | Columns | Trinidad / sub-account vestiges. See [bank_accounts](/tables/bank_accounts.md). |
 | D9 | `bank_accounts.account_type_description` | Column | Dead. See [bank_accounts](/tables/bank_accounts.md). |
 | D10 | `settings.bank_charges_allocation_name` | Column | Trinidad-era auto-categorization of bank-charge transactions by description; dead (possibly never fully built). See [settings](/tables/settings.md), [Trinidad banking model](/legacy/trinidad-banking-model.md). |
+| D11 | `users` devise/devise_token_auth residue: `encrypted_password`, `reset_password_token`, `reset_password_sent_at`, `remember_created_at`, `sign_in_count`, `current_sign_in_at`, `last_sign_in_at`, `current_sign_in_ip`, `last_sign_in_ip`, `confirmation_token`, `confirmed_at`, `confirmation_sent_at`, `unconfirmed_email`, `tokens`, `image`, `nickname` | Columns | Left in place by the **additive** 2026 auth rebuild (Google-only [session auth](/concepts/session-auth.md)). Destructive drop gated on prod soak — task `drop-legacy-devise-auth-columns-post-prod-soak`. See [users](/tables/users.md). |
+| D12 | `users.admin` | Column | Devise-era flag. No live code reads it. |
+| D13 | `users.provider`, `users.uid` (+ `uid_and_provider` and `reset_password_token` unique indexes) | Columns/indexes | Vestigial devise_token_auth identity keys, still auto-populated by `generate_uid` (`provider='email'`, `uid=email`) but redundant with the email uniqueness validation. The indexes are effectively dead. |
 
 See [allocations](/tables/allocations.md) for context on D2–D5.
 
