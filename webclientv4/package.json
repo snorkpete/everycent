@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
-    "axios": "^1.13.4",
+    "axios": "^1.18.1",
     "jszip": "^3.10.1",
     "marked": "^18.0.2",
     "pinia": "^3.0.4",
