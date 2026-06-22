@@ -9,6 +9,8 @@
 
 Today healthcheck is a me-in-the-loop process (audits + fixes, dependency updates, behaviour-preserving refactors). Explore automating the whole loop so the system self-cleans and surfaces only problems/decisions to Kion. This is background orchestration operating ON the repo — closer to a Claude Code / domus-harness / scheduled-agent shape than to the in-app NLQ chat agent. Distinct from chat-agent work and does not bear on the NLQ agent hosting decision. Direction unknown — exploratory.
 
+**This loop is a *consumer* of [[verifier-gated-autopilot-harness-for-autonomous-dev-loops]]** (2026-06-22) — the self-cleaning audit→triage→fix→re-audit→converge cycle runs ON that harness rather than being built standalone. The harness supplies the execution substrate (external verifier, anti-cheat gate, checkpoint/rollback, the trust dial); this idea is the healthcheck-specific *application* of it. The hardest open question below (autonomous vs surface-for-decision, and how the loop knows it's "converged") is the harness's central tension — see its open questions, especially: **triage may be irreducibly human**, and a loop that generates + does + judges its own work has no external oracle for "no tasks left."
+
 **Includes the periodic-refactoring angle** (folded in from the now-abandoned `periodic-refactoring-process-and-refactor-skill` idea, 2026-06-21): one concrete recurring pass the loop should run is a **structured refactoring pass** — inventory shared patterns → identify extraction candidates → propose changes → apply + test. Per the "do it manually first, then extract" rule, run that pass by hand a few times before crystallizing it into a reusable `/refactor` skill that the automated loop can invoke.
 
 ---
