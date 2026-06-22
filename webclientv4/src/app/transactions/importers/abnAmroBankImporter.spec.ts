@@ -142,6 +142,16 @@ Amount:- 10.00
       expect(result.length).toBe(1);
       expect(result[0].transaction_date).toBe('2025-04-25');
     });
+
+    it('old format long-form (space-surrounded bullet) still parses correctly', () => {
+      const input = `
+Fri, 25 Apr • Some payment
+Amount:- 10.00
+`;
+      const result = abnAmroBankImporter(input, startDate, endDate);
+      expect(result.length).toBe(1);
+      expect(result[0].transaction_date).toBe('2025-04-25');
+    });
   });
 
   describe('amount parsing', () => {
@@ -198,6 +208,58 @@ Account: Some Bank, Description: something,
 `;
       const result = abnAmroBankImporter(input, startDate, endDate);
       expect(result.length).toBe(1);
+    });
+  });
+
+  describe('new paste format (bullet-joined date line)', () => {
+    const newFormatStartDate = '2026-06-01';
+    const newFormatEndDate = '2026-06-30';
+
+    beforeEach(() => {
+      dateProvider.today = () => new Date(2026, 5, 22);
+    });
+
+    it('parses new-format short-form date line (no space before bullet)', () => {
+      const input = `
+June 2026
+Account: Joint Sink Fund, Description: Overboeking ,
+JF
+Joint Sink Fund
+Mo 22 Jun•Overboeking
+Amount:- 10,880.00
+`;
+      const result = abnAmroBankImporter(input, newFormatStartDate, newFormatEndDate);
+      expect(result.length).toBe(1);
+      expect(result[0].transaction_date).toBe('2026-06-22');
+      expect(result[0].withdrawal_amount).toBe(1088000);
+      expect(result[0].deposit_amount).toBe(0);
+      expect(result[0].description).toBe('Joint Sink Fund');
+    });
+
+    it('parses a second new-format row with different date and description', () => {
+      const input = `
+June 2026
+JC
+Joint Checking
+We 17 Jun•Betaalpas
+Amount:- 30.00
+`;
+      const result = abnAmroBankImporter(input, newFormatStartDate, newFormatEndDate);
+      expect(result.length).toBe(1);
+      expect(result[0].transaction_date).toBe('2026-06-17');
+      expect(result[0].description).toBe('Joint Checking');
+    });
+
+    it('strips bullets from a description line that itself contains a bullet', () => {
+      const input = `
+June 2026
+PAYEE•NAME
+Mo 22 Jun•Overboeking
+Amount:- 50.00
+`;
+      const result = abnAmroBankImporter(input, newFormatStartDate, newFormatEndDate);
+      expect(result.length).toBe(1);
+      expect(result[0].description).toBe('PAYEE NAME');
     });
   });
 });

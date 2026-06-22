@@ -25,8 +25,8 @@ function isBlank(line: string): boolean {
 }
 
 function parseFormattedDate(line: string): DateParts | false {
-  // Long form: "Fri, 8 Mar • …"
-  let match = line.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{1,2}) ([A-Za-z]{3}) /);
+  // Long form: "Fri, 8 Mar • …" or "Fri, 8 Mar•…"
+  let match = line.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{1,2}) ([A-Za-z]{3})(?=[ •]|$)/);
   if (match) {
     return {
       year: dateProvider.today().getFullYear(),
@@ -35,8 +35,8 @@ function parseFormattedDate(line: string): DateParts | false {
     };
   }
 
-  // Short form: "Fr 25 Apr • …"
-  match = line.match(/^(Mo|Tu|We|Th|Fr|Sa|Su) (\d{1,2}) ([A-Za-z]{3}) /);
+  // Short form: "Fr 25 Apr • …" or "Fr 25 Apr•…"
+  match = line.match(/^(Mo|Tu|We|Th|Fr|Sa|Su) (\d{1,2}) ([A-Za-z]{3})(?=[ •]|$)/);
   if (match) {
     return {
       year: dateProvider.today().getFullYear(),
@@ -79,6 +79,11 @@ function extractDate(line: string): Date | undefined {
   if (!parts) return undefined;
   // hour=10 avoids midnight timezone off-by-one
   return new Date(parts.year, parts.month, parts.day, 10);
+}
+
+/** Strip bullet separators (•) from a line and collapse internal whitespace. */
+function cleanDescription(line: string): string {
+  return line.replace(/•/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function isSkippableText(line: string): boolean {
@@ -173,7 +178,7 @@ export function abnAmroBankImporter(
     }
 
     if (isDescription(line)) {
-      currentDescription = line;
+      currentDescription = cleanDescription(line);
     }
   }
 
