@@ -282,9 +282,6 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
-    spring (2.1.1)
-    spring-commands-rspec (1.0.4)
-      spring (>= 0.9.1)
     stringio (3.2.0)
     thor (1.5.0)
     timeout (0.6.1)
@@ -316,7 +313,6 @@ DEPENDENCIES
   acts_as_tenant
   annotaterb
   bootsnap (>= 1.8.1)
-  bundler
   database_cleaner-active_record (~> 2.2)
   dotenv-rails
   factory_bot_rails
@@ -332,8 +328,6 @@ DEPENDENCIES
   rails-controller-testing
   responders
   rspec-rails (~> 8.0)
-  spring
-  spring-commands-rspec
   tzinfo-data
   web-console
 

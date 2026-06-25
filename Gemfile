@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 ruby '3.4.9'
 
-gem 'bundler'
 gem 'rails', '~> 8.1.0'
 gem 'puma', '~> 8.0'
 # Stay on Rack 2 through the Rails 8.1 upgrade. Rails 7.2/8.x allow rack >= 2.2.4;
@@ -52,10 +51,6 @@ end
 group :development, :test do
   # Load .env for local development
   gem 'dotenv-rails'
-
-  gem 'spring'
-  gem 'spring-commands-rspec'
-  #gem 'spring-watcher-listen'
 
   gem 'rspec-rails', '~> 8.0'
   gem 'factory_bot_rails'
