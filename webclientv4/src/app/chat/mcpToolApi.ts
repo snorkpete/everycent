@@ -28,6 +28,11 @@ export interface SinkFundStatusParams {
   include_closed?: boolean;
 }
 
+export interface CreateBugReportParams {
+  title: string;
+  description: string;
+}
+
 export const mcpToolApi = {
   analyzeOverspending: (period: string): Promise<unknown> =>
     apiGateway
@@ -55,4 +60,10 @@ export const mcpToolApi = {
 
   sinkFundStatus: (params: SinkFundStatusParams): Promise<unknown> =>
     apiGateway.get<unknown>('/mcp/sink_fund_status', { params }).then((r) => r.data),
+
+  searchBugReports: (): Promise<unknown> =>
+    apiGateway.get<unknown>('/mcp/bug_reports').then((r) => r.data),
+
+  createBugReport: (params: CreateBugReportParams): Promise<unknown> =>
+    apiGateway.post<unknown>('/mcp/bug_reports', { bug_report: params }).then((r) => r.data),
 };

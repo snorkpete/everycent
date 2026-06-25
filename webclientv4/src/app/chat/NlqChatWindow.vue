@@ -11,21 +11,43 @@
   >
     <template #header>
       <div class="chat-header">
-        <span class="chat-title">Ask Everycent</span>
-        <Button
-          v-tooltip.bottom="'New chat'"
-          icon="pi pi-plus"
-          text
-          rounded
-          size="small"
-          :disabled="messages.length === 0"
-          @click="$emit('clear')"
-        />
+        <span class="chat-title">{{
+          mode === 'bug-report' ? 'Report a bug' : 'Ask Everycent'
+        }}</span>
+        <div class="chat-header-actions">
+          <Button
+            v-tooltip.bottom="
+              mode === 'bug-report' ? 'Switch to Ask mode' : 'Switch to bug report mode'
+            "
+            :icon="mode === 'bug-report' ? 'pi pi-comments' : 'pi pi-exclamation-circle'"
+            text
+            rounded
+            size="small"
+            data-testid="mode-switch-button"
+            @click="$emit('switch-mode', mode === 'bug-report' ? 'nlq' : 'bug-report')"
+          />
+          <Button
+            v-tooltip.bottom="'New chat'"
+            icon="pi pi-plus"
+            text
+            rounded
+            size="small"
+            data-testid="new-chat-button"
+            :disabled="chatStore.messages.length === 0"
+            @click="chatStore.clearMessages()"
+          />
+        </div>
       </div>
     </template>
 
     <div ref="messagesContainer" class="chat-messages">
-      <p v-if="messages.length === 0" class="empty-state">Ask a question about your finances.</p>
+      <p v-if="chatStore.messages.length === 0" class="empty-state">
+        {{
+          mode === 'bug-report'
+            ? 'Describe the problem you ran into.'
+            : 'Ask a question about your finances.'
+        }}
+      </p>
 
       <div v-for="(msg, i) in renderedMessages" :key="i" class="message-wrapper" :class="msg.role">
         <div
@@ -47,20 +69,24 @@
         <div class="chat-bubble markdown-body" :class="msg.role" v-html="msg.html" />
       </div>
 
-      <div v-if="thinking" class="chat-bubble assistant loading-indicator">Thinking...</div>
-      <div v-if="toolStatus" class="chat-bubble assistant loading-indicator">{{ toolStatus }}</div>
+      <div v-if="chatStore.thinking" class="chat-bubble assistant loading-indicator">
+        Thinking...
+      </div>
+      <div v-if="chatStore.toolStatus" class="chat-bubble assistant loading-indicator">
+        {{ chatStore.toolStatus }}
+      </div>
 
-      <div v-if="error" class="chat-bubble error">{{ error }}</div>
+      <div v-if="chatStore.error" class="chat-bubble error">{{ chatStore.error }}</div>
     </div>
 
     <div class="chat-input">
       <Textarea
         ref="inputRef"
         v-model="inputText"
-        placeholder="Type a question..."
+        :placeholder="mode === 'bug-report' ? 'Describe the problem...' : 'Type a question...'"
         fluid
         :rows="3"
-        :disabled="loading"
+        :disabled="chatStore.loading"
         @keydown.enter.exact.prevent="onSubmit"
       />
     </div>
@@ -73,27 +99,27 @@ import { marked } from 'marked';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
-import type { ChatMessage } from './chat.types';
+import type { ChatMode } from './chat.types';
+import { useChatStore } from './chatStore';
 
 marked.setOptions({ breaks: true });
 
-const props = defineProps<{
+const { visible, mode } = defineProps<{
   visible: boolean;
-  messages: ChatMessage[];
-  loading: boolean;
-  thinking: boolean;
-  toolStatus: string | null;
-  error: string | null;
+  mode: ChatMode;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   'update:visible': [value: boolean];
-  submit: [content: string];
-  clear: [];
+  'switch-mode': [mode: ChatMode];
 }>();
+
+// Each mode has its own store instance; the :key on this component guarantees
+// this is called once per mount (the parent remounts on mode switch via :key="mode").
+const chatStore = useChatStore(mode);
 
 const renderedMessages = computed(() =>
-  props.messages.map((msg) => ({
+  chatStore.messages.map((msg) => ({
     ...msg,
     html: marked.parse(msg.content) as string,
   })),
@@ -112,7 +138,7 @@ function isThinkingExpanded(turnId: string, msg: { thinking?: string; content: s
 }
 
 function toggleThinking(turnId: string) {
-  const msg = props.messages.find((m) => m.turnId === turnId);
+  const msg = chatStore.messages.find((m) => m.turnId === turnId);
   if (msg === undefined) return;
   const current = manualExpand.value.get(turnId);
   const currentExpanded = current !== undefined ? current : !!msg.thinking && msg.content === '';
@@ -120,7 +146,7 @@ function toggleThinking(turnId: string) {
 }
 
 watch(
-  () => props.messages.length,
+  () => chatStore.messages.length,
   (newLen, oldLen) => {
     if (newLen < oldLen) {
       manualExpand.value = new Map();
@@ -138,7 +164,7 @@ function focusInput() {
 }
 
 // Dialog's onAfterEnter steals focus to its close button after the transition.
-// setTimeout(0) queues our focus call after that.
+// 1000ms gives the animation time to finish before we reclaim focus.
 function onShow() {
   setTimeout(focusInput, 1000);
 }
@@ -146,7 +172,7 @@ function onShow() {
 function onSubmit() {
   const trimmed = inputText.value.trim();
   if (!trimmed) return;
-  emit('submit', trimmed);
+  chatStore.sendMessage(trimmed);
   inputText.value = '';
   setTimeout(focusInput, 1000);
 }
@@ -159,8 +185,8 @@ function scrollToBottom() {
   });
 }
 
-watch(() => props.messages[props.messages.length - 1]?.content.length, scrollToBottom);
-watch(() => props.messages[props.messages.length - 1]?.thinking?.length, scrollToBottom);
+watch(() => chatStore.messages[chatStore.messages.length - 1]?.content.length, scrollToBottom);
+watch(() => chatStore.messages[chatStore.messages.length - 1]?.thinking?.length, scrollToBottom);
 </script>
 
 <style scoped>
@@ -174,6 +200,13 @@ watch(() => props.messages[props.messages.length - 1]?.thinking?.length, scrollT
 .chat-title {
   font-weight: 600;
   font-size: 1.1rem;
+  flex: 1;
+}
+
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .chat-messages {

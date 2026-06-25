@@ -1,12 +1,19 @@
-import type { ChatMessage, NormalizedUsage, ToolCallDetail, UsageEvent } from './chat.types';
-import { SYSTEM_PROMPT } from './systemPrompt';
-import { TOOL_DEFINITIONS } from './toolDefinitions';
+import type {
+  ChatMessage,
+  ChatMode,
+  NormalizedUsage,
+  ToolCallDetail,
+  UsageEvent,
+} from './chat.types';
+import { getSystemPrompt } from './systemPrompt';
+import { getToolsForMode } from './toolDefinitions';
 import { executeTool } from './toolExecutor';
 
 export interface ChatConfig {
   ollamaUrl: string;
   model: string;
   maxToolIterations: number;
+  mode: ChatMode;
 }
 
 export type AgentEvent =
@@ -71,7 +78,7 @@ async function* streamOllama(
   const payload = {
     model: config.model,
     messages: ollamaMessages,
-    tools: TOOL_DEFINITIONS,
+    tools: getToolsForMode(config.mode),
     stream: true,
     stream_options: { include_usage: true },
     think: true,
@@ -262,7 +269,7 @@ export async function* streamChat(
   config: ChatConfig,
 ): AsyncGenerator<AgentEvent> {
   const ollamaMessages: OllamaMessage[] = [
-    { role: 'system', content: SYSTEM_PROMPT },
+    { role: 'system', content: getSystemPrompt(config.mode) },
     ...messages
       .filter((m) => m.content !== '')
       .map(({ role, content }) => ({ role, content }) as OllamaMessage),

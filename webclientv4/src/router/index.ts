@@ -142,6 +142,12 @@ const router = createRouter({
       meta: { title: 'Special Event Allocations' },
     },
     {
+      path: '/bug-reports',
+      name: 'bug-reports',
+      component: () => import('../app/bug-reports/BugReportsPage.vue'),
+      meta: { title: 'Bug Reports' },
+    },
+    {
       path: '/reports',
       name: 'reports',
       component: () => import('../app/reports/ReportsPage.vue'),

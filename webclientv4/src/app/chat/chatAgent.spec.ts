@@ -7,6 +7,7 @@ const TEST_CONFIG: ChatConfig = {
   ollamaUrl: 'http://localhost:11434',
   model: 'test-model',
   maxToolIterations: 5,
+  mode: 'nlq',
 };
 
 vi.mock('./toolExecutor', () => ({
@@ -213,7 +214,7 @@ describe('streamChat', () => {
       expect(nonSystemMessages.every((m: { content: string }) => m.content !== '')).toBe(true);
     });
 
-    it('includes TOOL_DEFINITIONS in the request payload', async () => {
+    it('sends tools in the request payload', async () => {
       const fetchSpy = vi
         .spyOn(globalThis, 'fetch')
         .mockResolvedValue(
@@ -225,6 +226,43 @@ describe('streamChat', () => {
       const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
       expect(body.tools).toBeDefined();
       expect(body.tools.length).toBeGreaterThan(0);
+    });
+
+    it('sends bug-report tools (not NLQ tools) when mode is bug-report', async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(
+          new Response(makeStream([tokenChunk('Hi'), 'data: [DONE]']), { status: 200 }),
+        );
+
+      const bugReportConfig: ChatConfig = { ...TEST_CONFIG, mode: 'bug-report' };
+      await collectEvents([{ role: 'user', content: 'hello' }], bugReportConfig);
+
+      const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
+      const toolNames: string[] = body.tools.map(
+        (t: { function: { name: string } }) => t.function.name,
+      );
+      expect(toolNames).toContain('search_bug_reports');
+      expect(toolNames).toContain('create_bug_report');
+      expect(toolNames).not.toContain('analyze_overspending');
+    });
+
+    it('sends NLQ tools (not bug-report tools) when mode is nlq', async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(
+          new Response(makeStream([tokenChunk('Hi'), 'data: [DONE]']), { status: 200 }),
+        );
+
+      await collectEvents([{ role: 'user', content: 'hello' }]);
+
+      const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
+      const toolNames: string[] = body.tools.map(
+        (t: { function: { name: string } }) => t.function.name,
+      );
+      expect(toolNames).toContain('analyze_overspending');
+      expect(toolNames).not.toContain('search_bug_reports');
+      expect(toolNames).not.toContain('create_bug_report');
     });
   });
 

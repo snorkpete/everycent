@@ -78,7 +78,7 @@ describe('chatStore', () => {
     it('appends the user message and an empty assistant placeholder', async () => {
       vi.mocked(chatAgent.streamChat).mockReturnValue(makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.messages[0]).toEqual({ role: 'user', content: 'hello' });
@@ -90,12 +90,12 @@ describe('chatStore', () => {
       let loadingDuringStream = false;
       vi.mocked(chatAgent.streamChat).mockReturnValue(
         (async function* () {
-          loadingDuringStream = useChatStore().loading;
+          loadingDuringStream = useChatStore('nlq').loading;
           yield { type: 'done' } as AgentEvent;
         })(),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(loadingDuringStream).toBe(true);
@@ -107,12 +107,12 @@ describe('chatStore', () => {
       vi.mocked(chatAgent.streamChat).mockReturnValue(
         (async function* () {
           yield { type: 'thinking', content: '' } as AgentEvent;
-          thinkingDuringStream = useChatStore().thinking;
+          thinkingDuringStream = useChatStore('nlq').thinking;
           yield { type: 'done' } as AgentEvent;
         })(),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(thinkingDuringStream).toBe(true);
@@ -124,7 +124,7 @@ describe('chatStore', () => {
         makeStream([{ type: 'token', content: 'Hello world' }, { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.messages[1].content).toBe('Hello world');
@@ -139,7 +139,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.thinking).toBe(false);
@@ -155,7 +155,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.messages[1].thinking).toBe('Reasoning... more.');
@@ -170,7 +170,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.messages[1].thinking).toBeUndefined();
@@ -184,13 +184,13 @@ describe('chatStore', () => {
         (async function* () {
           yield { type: 'thinking', content: '' } as AgentEvent;
           yield { type: 'thinking', content: 'Reasoning...' } as AgentEvent;
-          thinkingDuringContentThinking = useChatStore().thinking;
+          thinkingDuringContentThinking = useChatStore('nlq').thinking;
           yield { type: 'token', content: 'Answer' } as AgentEvent;
           yield { type: 'done' } as AgentEvent;
         })(),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(thinkingDuringContentThinking).toBe(false);
@@ -205,13 +205,13 @@ describe('chatStore', () => {
             name: 'analyze_overspending',
             args: { period: '2026-03' },
           } as AgentEvent;
-          statusDuringToolCall = useChatStore().toolStatus ?? '';
+          statusDuringToolCall = useChatStore('nlq').toolStatus ?? '';
           yield { type: 'tool_result', name: 'analyze_overspending', result: '{}' } as AgentEvent;
           yield { type: 'done' } as AgentEvent;
         })(),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('overspending?');
 
       expect(statusDuringToolCall).toBe('Calling analyze_overspending...');
@@ -226,7 +226,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('overspending?');
 
       expect(store.toolStatus).toBeNull();
@@ -240,7 +240,7 @@ describe('chatStore', () => {
         })(),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.toolStatus).toBeNull();
@@ -251,7 +251,7 @@ describe('chatStore', () => {
         makeStream([{ type: 'error', message: 'Connection failed' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.error).toBe('Connection failed');
@@ -266,7 +266,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.messages.length).toBe(2);
@@ -280,7 +280,7 @@ describe('chatStore', () => {
         })(),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(store.error).toBe('Boom');
@@ -292,7 +292,7 @@ describe('chatStore', () => {
         .mockReturnValueOnce(makeStream([{ type: 'error', message: 'fail' }]))
         .mockReturnValueOnce(makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('first');
       await store.sendMessage('second');
 
@@ -304,7 +304,7 @@ describe('chatStore', () => {
     it('empties the messages array', async () => {
       vi.mocked(chatAgent.streamChat).mockReturnValue(makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
       store.clearMessages();
 
@@ -316,7 +316,7 @@ describe('chatStore', () => {
         makeStream([{ type: 'error', message: 'fail' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
       store.clearMessages();
 
@@ -326,14 +326,14 @@ describe('chatStore', () => {
 
   describe('toolStatus', () => {
     it('starts as null', () => {
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       expect(store.toolStatus).toBeNull();
     });
   });
 
   describe('conversation tracking', () => {
     it('generates a conversationId when the store is created', () => {
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       expect(store.conversationId).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
       );
@@ -342,7 +342,7 @@ describe('chatStore', () => {
     it('regenerates conversationId when clearMessages is called', async () => {
       vi.mocked(chatAgent.streamChat).mockReturnValue(makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       const original = store.conversationId;
       await store.sendMessage('hello');
       store.clearMessages();
@@ -356,11 +356,9 @@ describe('chatStore', () => {
     it('keeps conversationId stable across multiple sendMessage calls in the same session', async () => {
       // Fresh generator per call — mockReturnValue with a single generator would
       // exhaust on the first call and skip the streaming path on the second.
-      vi.mocked(chatAgent.streamChat).mockImplementation(
-        () => makeStream([{ type: 'done' }]) as unknown as ReturnType<typeof chatAgent.streamChat>,
-      );
+      vi.mocked(chatAgent.streamChat).mockImplementation(() => makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       const original = store.conversationId;
       await store.sendMessage('first');
       await store.sendMessage('second');
@@ -371,7 +369,7 @@ describe('chatStore', () => {
     it('generates a fresh conversationTurnId for each sendMessage call', async () => {
       vi.mocked(chatAgent.streamChat).mockReturnValue(makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       const capturedTurnIds: string[] = [];
 
       vi.mocked(chatAgent.streamChat).mockImplementation(async function* () {
@@ -407,7 +405,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -428,7 +426,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -449,7 +447,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -478,7 +476,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -504,7 +502,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -530,7 +528,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -552,7 +550,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -568,7 +566,7 @@ describe('chatStore', () => {
         makeStream([{ type: 'token', content: 'Hello' }, makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('What is my budget?');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -587,7 +585,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -606,7 +604,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -620,7 +618,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -639,7 +637,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(conversationTurnApiModule.conversationTurnApi.submitTurn).toHaveBeenCalledOnce();
@@ -649,7 +647,7 @@ describe('chatStore', () => {
       configureChatSettings(42);
       vi.mocked(chatAgent.streamChat).mockReturnValue(makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(conversationTurnApiModule.conversationTurnApi.submitTurn).not.toHaveBeenCalled();
@@ -661,7 +659,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(conversationTurnApiModule.conversationTurnApi.submitTurn).not.toHaveBeenCalled();
@@ -674,7 +672,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('llm_model_id is null'));
@@ -694,7 +692,7 @@ describe('chatStore', () => {
         ]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -719,7 +717,7 @@ describe('chatStore', () => {
         })(),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -733,7 +731,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), { type: 'error', message: 'something broke' } as AgentEvent]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       // Cost was incurred — we still want it recorded even though the turn errored.
@@ -751,7 +749,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       // Error should not surface to the store
@@ -771,7 +769,7 @@ describe('chatStore', () => {
         .mockReturnValueOnce(makeStream([makeUsageEvent(), { type: 'done' }]))
         .mockReturnValueOnce(makeStream([{ type: 'done' }]));
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('first');
       await store.sendMessage('second');
 
@@ -785,7 +783,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('first');
       await store.sendMessage('second');
 
@@ -799,7 +797,7 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent(), makeUsageEvent(), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
@@ -815,13 +813,34 @@ describe('chatStore', () => {
         makeStream([makeUsageEvent({ input_tokens: 50, output_tokens: 75 }), { type: 'done' }]),
       );
 
-      const store = useChatStore();
+      const store = useChatStore('nlq');
       await store.sendMessage('hello');
 
       const turn = vi.mocked(conversationTurnApiModule.conversationTurnApi.submitTurn).mock
         .calls[0][0];
       expect(turn.steps[0].usage.input_tokens).toBe(50);
       expect(turn.steps[0].usage.output_tokens).toBe(75);
+    });
+  });
+
+  describe('mode isolation', () => {
+    it('nlq and bug-report stores are independent — messages in one do not appear in the other', async () => {
+      vi.mocked(chatAgent.streamChat).mockImplementation(() => makeStream([{ type: 'done' }]));
+
+      const nlqStore = useChatStore('nlq');
+      await nlqStore.sendMessage('financial question');
+
+      const bugStore = useChatStore('bug-report');
+
+      expect(nlqStore.messages.length).toBe(2); // user + assistant placeholder
+      expect(bugStore.messages.length).toBe(0);
+    });
+
+    it('nlq and bug-report stores have independent conversationIds', () => {
+      const nlqStore = useChatStore('nlq');
+      const bugStore = useChatStore('bug-report');
+
+      expect(nlqStore.conversationId).not.toBe(bugStore.conversationId);
     });
   });
 });

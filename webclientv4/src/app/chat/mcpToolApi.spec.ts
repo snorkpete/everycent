@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mcpToolApi } from './mcpToolApi';
 import apiGateway from '../../api/api-gateway';
+import type { CreateBugReportParams } from './mcpToolApi';
 
 vi.mock('../../api/api-gateway', () => ({
   default: {
     get: vi.fn(),
+    post: vi.fn(),
   },
 }));
 
@@ -211,6 +213,53 @@ describe('mcpToolApi', () => {
       vi.mocked(apiGateway.get).mockResolvedValue({ data: payload });
 
       const result = await mcpToolApi.sinkFundStatus({});
+
+      expect(result).toEqual(payload);
+    });
+  });
+
+  describe('searchBugReports', () => {
+    it('gets /mcp/bug_reports', async () => {
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: {} });
+
+      await mcpToolApi.searchBugReports();
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/bug_reports');
+    });
+
+    it('returns the response data', async () => {
+      const payload = { bug_reports: [{ id: 1, title: 'Something broke' }] };
+      vi.mocked(apiGateway.get).mockResolvedValue({ data: payload });
+
+      const result = await mcpToolApi.searchBugReports();
+
+      expect(result).toEqual(payload);
+    });
+  });
+
+  describe('createBugReport', () => {
+    it('posts to /mcp/bug_reports with nested bug_report body', async () => {
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: {} });
+      const params: CreateBugReportParams = {
+        title: 'Budget total looks wrong on the Budgets screen',
+        description: 'The total shown is higher than expected after closing the month.',
+      };
+
+      await mcpToolApi.createBugReport(params);
+
+      expect(apiGateway.post).toHaveBeenCalledWith('/mcp/bug_reports', {
+        bug_report: params,
+      });
+    });
+
+    it('returns the response data', async () => {
+      const payload = { id: 42, title: 'Budget total looks wrong on the Budgets screen' };
+      vi.mocked(apiGateway.post).mockResolvedValue({ data: payload });
+
+      const result = await mcpToolApi.createBugReport({
+        title: 'Budget total looks wrong on the Budgets screen',
+        description: 'The total shown is higher than expected.',
+      });
 
       expect(result).toEqual(payload);
     });

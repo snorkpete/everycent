@@ -89,6 +89,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_185722) do
     t.index ["start_date"], name: "index_budgets_on_start_date"
   end
 
+  create_table "bug_reports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.bigint "household_id", null: false
+    t.bigint "reporter_id", null: false
+    t.string "status", default: "open", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["household_id", "created_at"], name: "index_bug_reports_on_household_id_and_created_at"
+    t.index ["household_id"], name: "index_bug_reports_on_household_id"
+    t.index ["reporter_id"], name: "index_bug_reports_on_reporter_id"
+  end
+
   create_table "chat_settings", force: :cascade do |t|
     t.boolean "chat_enabled", default: false, null: false
     t.datetime "created_at", null: false
@@ -361,6 +374,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_185722) do
   add_foreign_key "bank_accounts", "bank_accounts", column: "asset_bank_account_id"
   add_foreign_key "bank_accounts", "households", on_update: :cascade
   add_foreign_key "budgets", "households", on_update: :cascade
+  add_foreign_key "bug_reports", "households", on_update: :cascade
+  add_foreign_key "bug_reports", "users", column: "reporter_id"
   add_foreign_key "chat_settings", "households", on_update: :cascade
   add_foreign_key "chat_settings", "llm_models"
   add_foreign_key "conversation_turn_steps", "households", on_update: :cascade

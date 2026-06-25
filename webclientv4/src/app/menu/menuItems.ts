@@ -59,6 +59,12 @@ function buildMainItems(navigate: (path: string) => void): AppMenuItem[] {
       command: () => navigate('/special-events'),
       routePath: '/special-events',
     },
+    {
+      label: 'Bug Reports',
+      icon: Icon.BUG_REPORTS,
+      command: () => navigate('/bug-reports'),
+      routePath: '/bug-reports',
+    },
   ];
 }
 

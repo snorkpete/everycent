@@ -423,6 +423,73 @@ describe('executeTool', () => {
     });
   });
 
+  describe('search_bug_reports', () => {
+    it('gets /mcp/bug_reports', async () => {
+      mockApiGateway.get('/mcp/bug_reports', { bug_reports: [] });
+
+      await executeTool('search_bug_reports', {});
+
+      expect(apiGateway.get).toHaveBeenCalledWith('/mcp/bug_reports');
+    });
+
+    it('returns the response JSON stringified', async () => {
+      const payload = { bug_reports: [{ id: 1, title: 'Something broke' }] };
+      mockApiGateway.get('/mcp/bug_reports', payload);
+
+      const result = await executeTool('search_bug_reports', {});
+
+      expect(result).toBe(JSON.stringify(payload));
+    });
+  });
+
+  describe('create_bug_report', () => {
+    it('posts to /mcp/bug_reports with the title and description', async () => {
+      mockApiGateway.post('/mcp/bug_reports', { id: 1, title: 'Budget total wrong' });
+
+      await executeTool('create_bug_report', {
+        title: 'Budget total wrong',
+        description: 'Total shown is incorrect.',
+      });
+
+      expect(apiGateway.post).toHaveBeenCalledWith('/mcp/bug_reports', {
+        bug_report: {
+          title: 'Budget total wrong',
+          description: 'Total shown is incorrect.',
+        },
+      });
+    });
+
+    it('returns the response JSON stringified', async () => {
+      const payload = { id: 7, title: 'Budget total wrong', status: 'open' };
+      mockApiGateway.post('/mcp/bug_reports', payload);
+
+      const result = await executeTool('create_bug_report', {
+        title: 'Budget total wrong',
+        description: 'Total shown is incorrect.',
+      });
+
+      expect(result).toBe(JSON.stringify(payload));
+    });
+
+    it('throws when title is missing', async () => {
+      await expect(executeTool('create_bug_report', { description: 'something' })).rejects.toThrow(
+        'create_bug_report: missing required parameter "title"',
+      );
+    });
+
+    it('throws when description is missing', async () => {
+      await expect(executeTool('create_bug_report', { title: 'Bug title' })).rejects.toThrow(
+        'create_bug_report: missing required parameter "description"',
+      );
+    });
+
+    it('throws when title is not a string', async () => {
+      await expect(
+        executeTool('create_bug_report', { title: 42, description: 'some text' }),
+      ).rejects.toThrow('missing required parameter "title"');
+    });
+  });
+
   describe('unknown tool', () => {
     it('throws a descriptive error for an unrecognised tool name', async () => {
       await expect(executeTool('do_something_weird', {})).rejects.toThrow(

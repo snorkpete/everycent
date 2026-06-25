@@ -1,3 +1,5 @@
+export type ChatMode = 'nlq' | 'bug-report';
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;

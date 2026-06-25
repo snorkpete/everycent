@@ -9,7 +9,11 @@ Rails.application.routes.draw do
     get 'out_of_budget_analysis', to: 'out_of_budget_analysis#show'
     get 'placeholder_allocation_analysis', to: 'placeholder_allocation_analysis#show'
     get 'sink_fund_status', to: 'sink_fund_status#show'
+    get 'bug_reports', to: 'bug_reports#index'
+    post 'bug_reports', to: 'bug_reports#create'
   end
+
+  resources :bug_reports, only: [:index, :update]
 
   resources :llm_usage_records, only: [:index] do
     collection do

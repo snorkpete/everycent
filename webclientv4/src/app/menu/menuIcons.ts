@@ -27,6 +27,8 @@ export const Icon = {
   MODEL_REGISTRY: 'pi pi-box',
   USAGE_LOG: 'pi pi-chart-bar',
 
+  BUG_REPORTS: 'pi pi-flag',
+
   OLD_VERSION: 'pi pi-external-link',
   LOGOUT: 'pi pi-sign-out',
 };

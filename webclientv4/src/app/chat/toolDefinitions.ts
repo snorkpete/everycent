@@ -1,6 +1,21 @@
-export const TOOL_DEFINITIONS = [
+import type { ChatMode } from './chat.types';
+
+export interface ToolDefinition {
+  type: 'function';
+  function: {
+    name: string;
+    description: string;
+    parameters: {
+      type: string;
+      properties: Record<string, { type: string; description?: string }>;
+      required?: string[];
+    };
+  };
+}
+
+const NLQ_TOOL_DEFINITIONS: ToolDefinition[] = [
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'analyze_overspending',
       description:
@@ -18,7 +33,7 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'analyze_overspending_by_allocation',
       description:
@@ -41,7 +56,7 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'list_categories',
       description:
@@ -53,7 +68,7 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'budget_accuracy',
       description:
@@ -90,7 +105,7 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'out_of_budget_analysis',
       description:
@@ -117,7 +132,7 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'placeholder_allocation_analysis',
       description:
@@ -139,7 +154,7 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'sink_fund_status',
       description:
@@ -162,3 +177,51 @@ export const TOOL_DEFINITIONS = [
     },
   },
 ];
+
+const BUG_REPORT_TOOL_DEFINITIONS: ToolDefinition[] = [
+  {
+    type: 'function',
+    function: {
+      name: 'search_bug_reports',
+      description:
+        'Returns currently-open bug reports for the household so the assistant can check for duplicates before creating a new one.',
+      parameters: {
+        type: 'object',
+        properties: {},
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'create_bug_report',
+      description: 'Creates a new bug report from the interview.',
+      parameters: {
+        type: 'object',
+        properties: {
+          title: {
+            type: 'string',
+            description:
+              'A short one-line summary of what and where, e.g. "Budget total looks wrong on the Budgets screen"',
+          },
+          description: {
+            type: 'string',
+            description:
+              'A clear plain-prose writeup pulling together everything learned (where, what happened, expected vs actual, when, reproduction notes), written for the developer who will read it later.',
+          },
+        },
+        required: ['title', 'description'],
+      },
+    },
+  },
+];
+
+export function getToolsForMode(mode: ChatMode): ToolDefinition[] {
+  if (mode === 'bug-report') {
+    return BUG_REPORT_TOOL_DEFINITIONS;
+  }
+  return NLQ_TOOL_DEFINITIONS;
+}
+
+// Keep backward-compatible export for existing specs
+export const TOOL_DEFINITIONS = NLQ_TOOL_DEFINITIONS;

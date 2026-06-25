@@ -5,6 +5,7 @@ import {
   type OutOfBudgetAnalysisParams,
   type PlaceholderAllocationAnalysisParams,
   type SinkFundStatusParams,
+  type CreateBugReportParams,
 } from './mcpToolApi';
 
 // Pulls the LLM-recoverable message out of a failed tool request. The MCP query
@@ -115,6 +116,18 @@ export async function executeTool(name: string, args: Record<string, unknown>): 
       params.include_closed = args['include_closed'];
     }
     return call(name, () => mcpToolApi.sinkFundStatus(params));
+  }
+
+  if (name === 'search_bug_reports') {
+    return call(name, () => mcpToolApi.searchBugReports());
+  }
+
+  if (name === 'create_bug_report') {
+    const params: CreateBugReportParams = {
+      title: requireString({ args, key: 'title', tool: name }),
+      description: requireString({ args, key: 'description', tool: name }),
+    };
+    return call(name, () => mcpToolApi.createBugReport(params));
   }
 
   throw new Error(`Unknown tool: ${name}`);

@@ -14,6 +14,10 @@ describe('formatDate', () => {
     expect(formatDate('')).toBe('');
   });
 
+  it('formats the date portion of an ISO timestamp', () => {
+    expect(formatDate('2024-12-25T14:30:00.000Z')).toBe('25-12-2024');
+  });
+
   it('returns an empty string for an invalid date string', () => {
     expect(formatDate('not-a-date')).toBe('');
   });

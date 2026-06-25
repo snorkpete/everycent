@@ -1,23 +1,19 @@
 <template>
   <NlqChatButton @toggle="chatVisible = !chatVisible" />
   <NlqChatWindow
+    :key="mode"
     v-model:visible="chatVisible"
-    :messages="chatStore.messages"
-    :loading="chatStore.loading"
-    :thinking="chatStore.thinking"
-    :tool-status="chatStore.toolStatus"
-    :error="chatStore.error"
-    @submit="chatStore.sendMessage($event)"
-    @clear="chatStore.clearMessages()"
+    :mode="mode"
+    @switch-mode="mode = $event"
   />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import type { ChatMode } from './chat.types';
 import NlqChatButton from './NlqChatButton.vue';
 import NlqChatWindow from './NlqChatWindow.vue';
-import { useChatStore } from './chatStore';
 
-const chatStore = useChatStore();
 const chatVisible = ref(false);
+const mode = ref<ChatMode>('nlq');
 </script>
