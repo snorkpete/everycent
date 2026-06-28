@@ -1,7 +1,7 @@
 # Task: Rails 8.1 post-upgrade gem cleanup
 
 **ID:** rails-81-post-upgrade-gem-cleanup
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-06-18

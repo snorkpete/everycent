@@ -1,8 +1,8 @@
 # Task: Add bug reporting to the NLQ chat
 
 **ID:** add-bug-reporting-to-the-nlq-chat
-**Status:** proposed
-**Autonomous:** false
+**Status:** done
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-06-06
 **Parent:** none
@@ -88,7 +88,7 @@ Raw `bytea`, deliberately NOT Active Storage/S3 — avoiding an external blob st
 
 ### Conventions
 
-- Backend: Rails 7.1 API, acts_as_tenant by Household, devise_token_auth. JSON keys snake_case. Server-side validation authoritative.
+- Backend: Rails 8.1 API (master is on Rails 8.1 / Ruby 3.4 since 2026-06-18), acts_as_tenant by Household, devise_token_auth. JSON keys snake_case. Server-side validation authoritative.
 - Frontend: Vue 3 in webclientv4/. Follow reference implementations: store → transactionStore.ts, API → bankAccountApi.ts, component → TransactionsPage.vue. TDD, 100% coverage on new code.
 
 ---
@@ -121,29 +121,71 @@ Raw `bytea`, deliberately NOT Active Storage/S3 — avoiding an external blob st
 
 ## Implementation Notes
 
-- One open design question remains (attachment capture mechanism), deferred to Slice 2 — this is why the task sits at `proposed` rather than fully `ready`.
+- **Slice 1 is `ready` for dispatch** (re-implementation onto current master — see Landing Strategy below). Slice 2 (attachments) still carries one open design question (attachment capture mechanism) and is explicitly out of this dispatch's scope.
 - Slice 1 must be fully usable end-to-end before Slice 2 begins.
 - **Recommended precursor (not a hard dependency): chat persistence** — see idea `capture-nlq-chat-transcripts-for-later-analysis/debugging`. Tuning the intake prompt (the core value of this feature) needs a corpus of real bug-intake conversations to review retrospectively, which requires persistence in place first. The design here does not depend on it, but building persistence before this task is the preferred sequencing. Persistence is tuning-only — transcripts are NOT bug-report evidence.
 
-## ⚠️ Resume after Rails 8.1 landed on master (2026-06-18)
+## 🛠️ Landing strategy — RE-IMPLEMENT Slice 1 onto refactored master (decided 2026-06-25)
 
-Master is now on **Rails 8.1 / Ruby 3.4** (merged 2026-06-18). The 8.1 schema dumper
-**sorts `schema.rb` columns alphabetically** and bumped the header to `[8.1]`, so this
-branch's `[7.1]` `schema.rb` will conflict with master across nearly every line on merge.
-Don't hand-merge it. Resume like this:
+**This task's dispatch scope is Slice 1 ONLY.** Slice 1 was fully implemented and tested
+on branch `add-bug-reporting-to-the-nlq-chat`, but it is NOT being git-merged. Master moved
+~461 files since the branch base (merge-base `c2ce53ee5f4c12ac9cbcda7be0837a0e90d5f755`),
+including the **apiGateway / mcpToolApi refactor** that restructured the very chat files
+Slice 1 modified. A rebase/merge would force reconciling two independent ~half-file rewrites
+of `chatStore.ts` et al → **frankenmerge risk** (old mode-switching patterns stitched beside
+new apiGateway patterns; compiles but not native to the new architecture). Decision:
+**re-implement the integration layer fresh on current master, using the original branch as
+the reference spec.**
 
-1. On this branch (still Rails 7.1), `rails db:rollback` the `create_bug_reports`
-   migration → this branch's `schema.rb` reverts to the pre-upgrade `[7.1]`-without-
-   `bug_reports` = the merge base.
-2. Commit that `schema.rb` revert (keep the migration file).
-3. Sync master → git cleanly takes master's `[8.1]` schema (no conflict, branch == base).
-4. `bundle install` (now on Rails 8.1 via master).
-5. `rails db:migrate` → re-adds `bug_reports` on the 8.1 schema; `schema.rb` regenerates
-   alphabetical `[8.1]` with the table. Final merge diff = just the `bug_reports` table.
+### Operation
 
-Shortcut equivalent: skip the rollback; on sync `git checkout --theirs db/schema.rb`,
-then `rails db:migrate`. `schema.rb` is generated — never resolve it by hand.
+- **Branch from LOCAL master** (not origin — local master runs ahead), in an isolated worktree.
+- **Reference artifact = the original implementation.** Generate it with:
+  `git diff c2ce53ee5f4c12ac9cbcda7be0837a0e90d5f755..add-bug-reporting-to-the-nlq-chat`
+  Use that diff + the Slice 1 acceptance criteria above as the spec. The branch's file
+  anchors/line-numbers are **pre-refactor** — refresh them against current master before relying on them.
 
-**Caveat:** regenerate `schema.rb` from a clean/round-tripped DB, NOT the shared
-`everycent_dev*`/`everycent_test` DBs — those are cross-contaminated (this branch's
-`bug_reports` table already leaked into them via the shared DBs).
+### Bucket A — clean-apply (28 files; master never touched them → take the branch's version verbatim)
+
+Backend: `app/models/bug_report.rb`, `app/controllers/bug_reports_controller.rb`,
+`app/controllers/mcp/bug_reports_controller.rb`, `db/migrate/20260615203415_create_bug_reports.rb`,
+`spec/models/bug_report_spec.rb`, `spec/controllers/bug_reports_controller_spec.rb`,
+`spec/controllers/mcp/bug_reports_controller_spec.rb`, `spec/factories/bug_reports.rb`.
+Frontend bug-reports module: `webclientv4/src/app/bug-reports/*` (bugReport.types.ts,
+bugReportApi.ts+spec, BugReportsPage.vue+spec, bugReportStore.ts+spec).
+Chat files master did NOT touch: `chat/chatAgent.ts+spec`, `chat/systemPrompt.ts+spec`,
+`chat/NlqChatApp.vue+spec`, `chat/NlqChatWindow.vue+spec`. Plus `menu/menuIcons.ts`,
+`menu/menuItems.ts`, `router/index.ts`, `test/factories/bugReportFactory.ts`, `test/factories/index.ts`.
+
+⚠️ "Clean-apply" ≠ "no thought": several of these import symbols from Bucket B files
+(e.g. `chatAgent.ts`/`systemPrompt.ts` call `getToolsForMode(mode)` / `getSystemPrompt(mode)`).
+Validate the integration via type-check + tests — don't assume the file applies in isolation.
+
+### Bucket B — re-implement on the current apiGateway/mcpToolApi architecture (the collision zone)
+
+`config/routes.rb` (small: re-add `bug_reports` routes), `chat/chat.types.ts` (add bug-mode types),
+`chat/chatStore.ts`+spec (**KEY**: the mode-keyed store `defineStore(\`chat-${mode}\`)` design
+reconciled with master's apiGateway refactor), `chat/mcpToolApi.ts`+spec,
+`chat/toolDefinitions.ts`+spec (bug tools via `getToolsForMode(mode)` — master also added tools here),
+`chat/toolExecutor.ts`+spec (add bug-tool branches). **Re-write these so the result is NATIVE to
+the new architecture — not a textual 3-way merge.**
+
+### schema.rb — regenerate, never hand-edit
+
+After applying Bucket A's migration: `bundle install`, `rails db:migrate`, `rails db:schema:dump`.
+**Verify the `schema.rb` diff vs master is EXACTLY the `bug_reports` table + version bump — nothing else.**
+If stray tables/columns appear, the local DB is contaminated (known: `bug_reports` already leaked into
+shared `everycent_dev*`/`everycent_test`) → round-trip through a throwaway DB. Never resolve schema.rb by hand.
+
+### Verification & commit
+
+- All green: `npm run type-check`, `npm run test` (webclientv4/), `bundle exec rspec`. TDD / 100%
+  coverage on new code per CLAUDE.md. The branch's comprehensive specs come along and re-validate the re-implementation.
+- **Single squashed feature commit** for Slice 1 (the original branch's two same-message commits collapse into one).
+- Worker commits to its task branch; does **NOT** push or merge. Senior review + human close-out, then deploy.
+- **Worktree env:** copy the gitignored env files from `/Users/kion/code/everycent` (Rails root `.env`,
+  `webclientv4/.env.local`) into the worktree before `rails db:migrate` / running the app (per CLAUDE.md Worktrees).
+
+### Out of scope
+
+Slice 2 (attachments) — still carries the open attachment-capture design question; remains future work in this file.
