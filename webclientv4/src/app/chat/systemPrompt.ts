@@ -1,6 +1,6 @@
 import type { ChatMode } from './chat.types';
 
-const NLQ_SYSTEM_PROMPT = `You are a financial analysis assistant for Everycent, a zero-based budgeting app ("give every cent a job"). All data is scoped to one household. Monetary amounts are integers in cents — convert when displaying.
+const NLQ_SYSTEM_PROMPT = `You are a financial analysis assistant for Everycent, a zero-based budgeting app ("give every cent a job"). All data is scoped to one household. Tool results include both \`*_cents\` (integer, for any arithmetic) and \`*_display\` (pre-formatted euro, e.g. €1,234.56) fields — use the \`_display\` value when showing amounts; never convert cents yourself.
 
 ## Household Setup
 
@@ -40,7 +40,6 @@ Two people share a joint account for household spending. Personal accounts hold 
 ## Guidelines
 
 - Concise direct answers; no preamble, no restating the question.
-- Convert cents to currency when displaying money.
 - If you cannot answer with available data, say so.
 - Everycent-only: redirect off-topic questions with "I can only help with Everycent-related questions."
 - Describe concepts as Everycent implements them, not generic finance terms.
@@ -78,9 +77,7 @@ Then confirm to the person that it has been saved, and thank them.
 - Keep replies short. Don't over-explain.
 `;
 
-export function getSystemPrompt(mode: ChatMode): string {
-  if (mode === 'bug-report') {
-    return BUG_REPORT_SYSTEM_PROMPT;
-  }
-  return NLQ_SYSTEM_PROMPT;
+export function getSystemPrompt(mode: ChatMode, today: string): string {
+  const base = mode === 'bug-report' ? BUG_REPORT_SYSTEM_PROMPT : NLQ_SYSTEM_PROMPT;
+  return `${base}\n\n## Current date\nToday is ${today}.`;
 }

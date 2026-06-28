@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { streamChat } from './chatAgent';
+import { streamChat, formatToday } from './chatAgent';
 import type { ChatConfig } from './chatAgent';
 import * as toolExecutor from './toolExecutor';
 
@@ -736,5 +736,11 @@ describe('streamChat', () => {
         }),
       );
     });
+  });
+});
+
+describe('formatToday', () => {
+  it('formats today as "Weekday, D Month YYYY"', () => {
+    expect(formatToday()).toMatch(/^\w+, \d{1,2} \w+ \d{4}$/);
   });
 });

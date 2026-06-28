@@ -51,6 +51,15 @@ type StreamResult =
   | { kind: 'tool_calls'; calls: OllamaToolCall[]; usage: NormalizedUsage }
   | { kind: 'error'; message: string };
 
+export function formatToday(): string {
+  return new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }); // e.g. "Sunday, 28 June 2026"
+}
+
 function buildUsage(
   ollamaUsage: OllamaUsage | null,
   startTime: number,
@@ -269,7 +278,7 @@ export async function* streamChat(
   config: ChatConfig,
 ): AsyncGenerator<AgentEvent> {
   const ollamaMessages: OllamaMessage[] = [
-    { role: 'system', content: getSystemPrompt(config.mode) },
+    { role: 'system', content: getSystemPrompt(config.mode, formatToday()) },
     ...messages
       .filter((m) => m.content !== '')
       .map(({ role, content }) => ({ role, content }) as OllamaMessage),
