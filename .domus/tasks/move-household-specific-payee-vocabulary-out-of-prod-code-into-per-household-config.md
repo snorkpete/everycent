@@ -3,7 +3,7 @@
 **ID:** move-household-specific-payee-vocabulary-out-of-prod-code-into-per-household-config
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-06-21
 **Parent:** none
 **Depends on:** none

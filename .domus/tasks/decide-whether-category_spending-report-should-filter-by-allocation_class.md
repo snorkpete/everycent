@@ -3,7 +3,7 @@
 **ID:** decide-whether-category_spending-report-should-filter-by-allocation_class
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-06-21
 **Parent:** none
 **Depends on:** none

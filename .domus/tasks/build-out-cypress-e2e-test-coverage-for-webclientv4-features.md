@@ -1,7 +1,7 @@
 # Task: Build out Cypress e2e test coverage for webclientv4 features
 
 **ID:** build-out-cypress-e2e-test-coverage-for-webclientv4-features
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-04-14

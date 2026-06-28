@@ -1,7 +1,7 @@
 # Task: Align NLQ MCP server and chat app tool contracts
 
 **ID:** align-nlq-mcp-server-and-chat-app-tool-contracts
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-28

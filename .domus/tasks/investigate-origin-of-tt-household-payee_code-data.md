@@ -1,9 +1,9 @@
 # Task: Investigate origin of TT household payee_code data
 
 **ID:** investigate-origin-of-tt-household-payee_code-data
-**Status:** raw
+**Status:** done
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-06-07
 **Parent:** none
 **Depends on:** none

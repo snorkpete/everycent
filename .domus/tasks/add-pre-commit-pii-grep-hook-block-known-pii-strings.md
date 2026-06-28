@@ -1,7 +1,7 @@
 # Task: Add pre-commit PII grep hook (block known-PII strings)
 
 **ID:** add-pre-commit-pii-grep-hook-block-known-pii-strings
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-21

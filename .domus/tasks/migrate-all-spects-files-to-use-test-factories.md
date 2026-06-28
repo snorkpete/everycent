@@ -1,7 +1,7 @@
 # Task: Migrate all spec.ts files to use test factories
 
 **ID:** migrate-all-spects-files-to-use-test-factories
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-04-05

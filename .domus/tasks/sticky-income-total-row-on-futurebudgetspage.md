@@ -1,9 +1,9 @@
 # Task: Sticky income total row on FutureBudgetsPage
 
 **ID:** sticky-income-total-row-on-futurebudgetspage
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-04-03
 **Parent:** none
 **Depends on:** none

@@ -3,7 +3,7 @@
 **ID:** refine-global-debugging-protocol-wording
 **Status:** raw
 **Autonomous:** false
-**Priority:** low
+**Priority:** high
 **Captured:** 2026-04-11
 **Parent:** none
 **Depends on:** none

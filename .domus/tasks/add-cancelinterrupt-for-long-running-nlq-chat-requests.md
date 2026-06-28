@@ -3,7 +3,7 @@
 **ID:** add-cancelinterrupt-for-long-running-nlq-chat-requests
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-05-23
 **Parent:** none
 **Depends on:** none

@@ -1,9 +1,9 @@
 # Task: Link transactions to budgets by foreign key instead of date range
 
 **ID:** link-transactions-to-budgets-by-foreign-key-instead-of-date-range
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
-**Priority:** normal
+**Priority:** low
 **Captured:** 2026-03-17
 **Parent:** none
 **Depends on:** none

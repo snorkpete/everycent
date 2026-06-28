@@ -3,7 +3,7 @@
 **ID:** extract-eccard-shared-component
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-04-04
 **Parent:** none
 **Depends on:** none

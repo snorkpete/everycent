@@ -3,7 +3,7 @@
 **ID:** fix-order-dependent-load-induced-spec-flakiness-transcripts_rake-router
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-06-26
 **Parent:** none
 **Depends on:** none
@@ -14,17 +14,11 @@
 
 ## What This Task Is
 
-Two pre-existing flaky specs surfaced while landing bug-reporting Slice 1. They are **unrelated to that work** — pre-existing flakiness, just exposed by running the full suite during the landing. Both intermittently block clean commits.
+A pre-existing flaky spec, surfaced (not caused) while landing bug-reporting Slice 1. It intermittently blocks clean commits.
 
-### (1) Backend — `spec/tasks/transcripts_rake_spec.rb` (order-dependent)
-The 4 `transcripts:purge` examples **pass 7/7 in isolation** but **fail under the full suite in defined order**. Classic test pollution — a sibling spec is leaving DB/tenant state behind that the purge examples then trip over.
+> **Scope narrowed 2026-06-28.** The original backend half (`transcripts_rake_spec.rb`) was root-caused to a leaked `ActsAsTenant.current_tenant` and moved to **`centralize-household-tenant-scoping-controller-side-spec-tenant-reset`** (global spec tenant reset). This task is now the frontend router half only.
 
-Repro / investigation leads:
-- Run the file alone → passes (isolation is clean).
-- Run the full suite **in defined order** (not random) → the purge examples fail.
-- Look for a sibling spec that mutates DB or `acts_as_tenant` tenant state without cleaning up; the purge examples likely assume a clean slate.
-
-### (2) Frontend — `webclientv4 src/router/index.spec.ts` (load-induced timeout)
+### Frontend — `webclientv4 src/router/index.spec.ts` (load-induced timeout)
 The `/setup/bank-accounts` and `/setup/allocation-categories` authenticated-navigation tests **pass 32/32 in isolation** but **intermittently time out (~25s)** under full-suite **concurrent load** in the pre-commit hook.
 
 Repro / investigation leads:
@@ -36,9 +30,10 @@ Repro / investigation leads:
 
 ## Acceptance Criteria
 
-- [ ] `transcripts_rake_spec.rb` passes under the full suite in defined order (root-cause the polluting sibling spec; fix the leak rather than reordering around it).
 - [ ] The two router navigation tests pass reliably under full-suite concurrent load in the pre-commit hook (no ~25s timeouts).
-- [ ] Fixes address the root cause (state isolation / async handling), not just retries or increased timeouts.
+- [ ] Fix addresses the root cause (async handling / contention), not just retries or increased timeouts.
+
+(Backend `transcripts_rake` criterion moved to `centralize-household-tenant-scoping-controller-side-spec-tenant-reset`.)
 
 ---
 

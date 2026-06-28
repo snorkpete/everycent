@@ -1,9 +1,9 @@
 # Task: Document payee_name denormalization on Transaction
 
 **ID:** document-payee_name-denormalization-on-transaction
-**Status:** raw
+**Status:** done
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-06-06
 **Parent:** none
 **Depends on:** none

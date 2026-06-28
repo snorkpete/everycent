@@ -3,7 +3,7 @@
 **ID:** drop-unused-payee-table-and-columns
 **Status:** raw
 **Autonomous:** false
-**Priority:** normal
+**Priority:** high
 **Captured:** 2026-06-07
 **Parent:** none
 **Depends on:** none
