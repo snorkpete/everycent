@@ -24,7 +24,7 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **budget** — Monthly planning container with start/end dates and open/closed status; holds incomes and allocations. The current budget is the earliest open one. The core unit of time. · [tables/budgets.md](tables/budgets.md)
 
-**budget-period** — The month-long window a budget covers. Most time-scoped logic is relative to this. · [concepts/budget-period.md](concepts/budget-period.md)
+**budget-period** — The month-long window a budget covers, bounded by its start_date/end_date — one month in length but not necessarily a calendar month. Most time-scoped logic is relative to this. · [concepts/budget-period.md](concepts/budget-period.md)
 
 **chat-setting** — Per-household singleton config for the NLQ chat: the enable flag, the selected LLM model, and the tool-iteration cap. Singleton by convention, not by DB constraint. · [tables/chat_settings.md](tables/chat_settings.md)
 
