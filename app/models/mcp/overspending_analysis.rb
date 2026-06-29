@@ -27,7 +27,7 @@ module Mcp
           FROM allocations a
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
           JOIN budgets b ON a.budget_id = b.id
-          WHERE to_char(b.start_date, 'YYYY-MM') = :period
+          WHERE #{Mcp::BudgetPeriod.end_month_sql} = :period
             AND b.household_id = :household_id
             AND #{budgeted_conds}
           GROUP BY ac.name
@@ -38,7 +38,8 @@ module Mcp
           FROM transactions t
           JOIN allocations a ON t.allocation_id = a.id
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
-          WHERE to_char(t.transaction_date, 'YYYY-MM') = :period
+          JOIN budgets b ON t.budget_id = b.id
+          WHERE #{Mcp::BudgetPeriod.end_month_sql} = :period
             AND t.household_id = :household_id
             AND #{actual_conds}
           GROUP BY ac.name

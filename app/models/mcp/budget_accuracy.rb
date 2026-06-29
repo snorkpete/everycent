@@ -64,29 +64,30 @@ module Mcp
       sql = <<~SQL
         WITH budgeted_months AS (
           SELECT #{group_select} AS grp_label,
-                 to_char(b.start_date, 'YYYY-MM') AS month,
+                 #{Mcp::BudgetPeriod.end_month_sql} AS month,
                  SUM(a.amount) AS budgeted_cents
           FROM allocations a
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
           JOIN budgets b ON a.budget_id = b.id
-          WHERE to_char(b.start_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
+          WHERE #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
             AND b.household_id = :household_id
             AND #{budgeted_conds}
             #{variable_cond}
-          GROUP BY #{group_by_sql}, to_char(b.start_date, 'YYYY-MM')
+          GROUP BY #{group_by_sql}, #{Mcp::BudgetPeriod.end_month_sql}
         ),
         actual_months AS (
           SELECT #{group_select} AS grp_label,
-                 to_char(t.transaction_date, 'YYYY-MM') AS month,
+                 #{Mcp::BudgetPeriod.end_month_sql} AS month,
                  SUM(t.withdrawal_amount) AS actual_cents
           FROM transactions t
           JOIN allocations a ON t.allocation_id = a.id
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
-          WHERE to_char(t.transaction_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
+          JOIN budgets b ON t.budget_id = b.id
+          WHERE #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
             AND t.household_id = :household_id
             AND #{actual_conds}
             #{variable_cond}
-          GROUP BY #{group_by_sql}, to_char(t.transaction_date, 'YYYY-MM')
+          GROUP BY #{group_by_sql}, #{Mcp::BudgetPeriod.end_month_sql}
         ),
         monthly_stats AS (
           SELECT

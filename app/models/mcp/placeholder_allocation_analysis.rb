@@ -59,19 +59,19 @@ module Mcp
       sql = <<~SQL
         WITH all_allocations AS (
           SELECT
-            to_char(b.start_date, 'YYYY-MM') AS month,
-            COUNT(*)                          AS total_allocation_count
+            #{Mcp::BudgetPeriod.end_month_sql} AS month,
+            COUNT(*)                            AS total_allocation_count
           FROM allocations a
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
           JOIN budgets b                ON a.budget_id = b.id
           WHERE b.household_id = :household_id
-            AND to_char(b.start_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
-          GROUP BY to_char(b.start_date, 'YYYY-MM')
+            AND #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
+          GROUP BY #{Mcp::BudgetPeriod.end_month_sql}
         ),
         placeholder_spend AS (
           SELECT
-            to_char(b.start_date, 'YYYY-MM') AS month,
-            COUNT(DISTINCT a.id)              AS placeholder_count,
+            #{Mcp::BudgetPeriod.end_month_sql} AS month,
+            COUNT(DISTINCT a.id)               AS placeholder_count,
             COALESCE(SUM(t.withdrawal_amount), 0) AS spend_cents
           FROM allocations a
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
@@ -83,9 +83,9 @@ module Mcp
             AND (t.brought_forward_status IS NULL
                  OR t.brought_forward_status NOT IN ('added', 'adjustment'))
           WHERE b.household_id = :household_id
-            AND to_char(b.start_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
+            AND #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
             AND #{placeholder_condition}
-          GROUP BY to_char(b.start_date, 'YYYY-MM')
+          GROUP BY #{Mcp::BudgetPeriod.end_month_sql}
         )
         SELECT
           aa.month,
@@ -124,8 +124,8 @@ module Mcp
         SELECT
           #{Allocation.canonical_name_sql('a.name')}  AS allocation_name,
           ac.name                                      AS category_name,
-          COUNT(DISTINCT to_char(b.start_date, 'YYYY-MM')) AS months_appeared,
-          COALESCE(SUM(t.withdrawal_amount), 0)        AS total_spend_cents
+          COUNT(DISTINCT #{Mcp::BudgetPeriod.end_month_sql}) AS months_appeared,
+          COALESCE(SUM(t.withdrawal_amount), 0)              AS total_spend_cents
         FROM allocations a
         JOIN allocation_categories ac ON a.allocation_category_id = ac.id
         JOIN budgets b                ON a.budget_id = b.id
@@ -136,7 +136,7 @@ module Mcp
           AND (t.brought_forward_status IS NULL
                OR t.brought_forward_status NOT IN ('added', 'adjustment'))
         WHERE b.household_id = :household_id
-          AND to_char(b.start_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
+          AND #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
           AND #{placeholder_condition}
         GROUP BY #{Allocation.canonical_name_sql('a.name')}, ac.name
         ORDER BY total_spend_cents DESC

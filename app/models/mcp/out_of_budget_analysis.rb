@@ -75,16 +75,16 @@ module Mcp
     def results_by_month
       sql = <<~SQL
         SELECT
-          to_char(b.start_date, 'YYYY-MM') AS month,
-          SUM(t.withdrawal_amount)         AS total_cents
+          #{Mcp::BudgetPeriod.end_month_sql} AS month,
+          SUM(t.withdrawal_amount)            AS total_cents
         FROM transactions t
         JOIN allocations a           ON t.allocation_id = a.id
         JOIN allocation_categories ac ON a.allocation_category_id = ac.id
         JOIN budgets b                ON a.budget_id = b.id
         WHERE t.household_id = :household_id
           AND #{oob_transaction_conditions}
-          AND to_char(b.start_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
-        GROUP BY to_char(b.start_date, 'YYYY-MM')
+          AND #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
+        GROUP BY #{Mcp::BudgetPeriod.end_month_sql}
         ORDER BY month ASC
       SQL
 
@@ -106,7 +106,7 @@ module Mcp
         JOIN budgets b                ON a.budget_id = b.id
         WHERE t.household_id = :household_id
           AND #{oob_transaction_conditions}
-          AND to_char(b.start_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
+          AND #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
         GROUP BY #{canonical_allocation_name}
         ORDER BY total_cents DESC
       SQL
@@ -127,17 +127,17 @@ module Mcp
       sql = <<~SQL
         WITH monthly_budget_spend AS (
           SELECT
-            EXTRACT(MONTH FROM b.start_date)::integer AS calendar_month,
-            to_char(b.start_date, 'YYYY-MM')          AS budget_month,
-            SUM(t.withdrawal_amount)                   AS period_total_cents
+            EXTRACT(MONTH FROM b.end_date)::integer AS calendar_month,
+            #{Mcp::BudgetPeriod.end_month_sql}      AS budget_month,
+            SUM(t.withdrawal_amount)                AS period_total_cents
           FROM transactions t
           JOIN allocations a            ON t.allocation_id = a.id
           JOIN allocation_categories ac ON a.allocation_category_id = ac.id
           JOIN budgets b                ON a.budget_id = b.id
           WHERE t.household_id = :household_id
             AND #{oob_transaction_conditions}
-            AND to_char(b.start_date, 'YYYY-MM') BETWEEN :start_month AND :end_month
-          GROUP BY EXTRACT(MONTH FROM b.start_date)::integer, to_char(b.start_date, 'YYYY-MM')
+            AND #{Mcp::BudgetPeriod.end_month_sql} BETWEEN :start_month AND :end_month
+          GROUP BY EXTRACT(MONTH FROM b.end_date)::integer, #{Mcp::BudgetPeriod.end_month_sql}
         )
         SELECT
           calendar_month,

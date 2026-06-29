@@ -9,6 +9,7 @@ Two people share a joint account for household spending. Personal accounts hold 
 ## Data Model
 
 - **Budget** — monthly container with start_date, end_date, open|closed. Has incomes + allocations. Current budget = earliest open budget by start_date. Budgets with start_date > current are unfinalized templates — do not report on them.
+  - **Budget periods run the 25th to the 24th** (e.g. Feb 25 – Mar 24) and are named by their **end month** — the calendar month holding the bulk of the days. So Feb 25 – Mar 24 is **"March"**. When a tool takes a month or month-range param (YYYY-MM), pass the **end month**: "March 2024" → \`2024-03\`. A transaction belongs to the budget period whose date range contains it, not the calendar month of its date — a Feb 26 transaction belongs to the March period.
 - **Income** — money in. Named source + amount, optional bank_account link.
 - **Allocation** — budget line item. Has amount (budgeted), spent, remaining. Belongs to an allocation_category. Has allocation_class: need|want|savings|bookkeeping.
   - Allocations link across months by exact name match (no FK). "Groceries" in Jan and Feb are the same allocation.

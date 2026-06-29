@@ -31,10 +31,11 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
     Mcp::OutOfBudgetAnalysis.new(**defaults.merge(overrides))
   end
 
-  # Helper: create a budget + OOB allocation + optional transaction
+  # Helper: create a realistic budget period + OOB allocation + optional transaction.
+  # `month` is the end-month label (e.g. '2024-03' => Feb 25 – Mar 24).
   def setup_oob_month(month:, category: nil, allocation_name: 'Trip Expenses', actual: nil)
     cat = category || @oob_category
-    budget = create(:budget, start_date: "#{month}-01")
+    budget = create_budget_period(month: month)
     allocation = create(
       :allocation,
       name:                allocation_name,
@@ -293,7 +294,9 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
       end
 
       it 'excludes regular spending categories (only OOB categories appear)' do
-        regular_budget = create(:budget, start_date: '2024-01-01')
+        # Use create_budget_period so end_date is populated — budget_role is
+        # the actual guard; a NULL end_date would exclude the row vacuously.
+        regular_budget = create_budget_period(month: '2024-01')
         regular_alloc = create(
           :allocation,
           budget:              regular_budget,
@@ -394,6 +397,25 @@ RSpec.describe Mcp::OutOfBudgetAnalysis, type: :model do
 
       results = build_query(start_month: '2024-01', end_month: '2024-02', group_by: 'month').results
       expect(results.map { |r| r[:month] }).to contain_exactly('2024-01', '2024-02')
+    end
+
+    # Boundary proof: a period whose start_date is in February but end_date
+    # is in March must appear as '2024-03', not '2024-02'.  A transaction on
+    # Feb 26 (the start-month side) confirms the period is present.
+    # This test would FAIL under the old to_char(b.start_date, 'YYYY-MM') logic.
+    it 'labels budget period by end-month, not start-month (Feb 25–Mar 24 is 2024-03)' do
+      result = setup_oob_month(month: '2024-03')
+      create(
+        :transaction,
+        allocation:        result[:allocation],
+        transaction_date:  '2024-02-26', # start-month side of the Feb 25–Mar 24 boundary
+        withdrawal_amount: 8_000,
+        deposit_amount:    0
+      )
+      months = build_query(
+        start_month: '2024-03', end_month: '2024-03', group_by: 'month'
+      ).results.map { |r| r[:month] }
+      expect(months).to eq(['2024-03'])
     end
   end
 end

@@ -41,7 +41,7 @@ RSpec.describe Mcp::OverspendingAnalysis, type: :model do
 
     before do
       @category = create(:allocation_category, budget_role: 'spending', name: 'Groceries')
-      @budget   = create(:budget, start_date: '2024-01-01')
+      @budget   = create_budget_period(month: '2024-01')
       @bank_account = create(:bank_account)
       @allocation = create(
         :allocation,
@@ -175,6 +175,36 @@ RSpec.describe Mcp::OverspendingAnalysis, type: :model do
 
     it 'raises when called on an invalid object' do
       expect { build_query(period: 'bad').results }.to raise_error(RuntimeError, /Call valid\?/)
+    end
+
+    describe 'boundary-crossing transaction (calendar month ≠ budget month)' do
+      # The 2024-03 budget period spans Feb 25 – Mar 24.
+      # A transaction dated 2024-02-26 has calendar month '2024-02' but budget month '2024-03'.
+      # Old code keyed actuals by to_char(t.transaction_date,'YYYY-MM') so it would NOT
+      # count this transaction in the '2024-03' actuals. New code keys by t.budget_id → correct.
+      #
+      # Setup arithmetic:
+      #   budgeted:  50_000 (€500.00)
+      #   actual:    15_000 from the Feb-26 transaction (€150.00)
+      #   remaining: 50_000 - 15_000 = 35_000 (€350.00)
+      it 'counts a transaction dated in the prior calendar month when its budget period ends in the queried month' do
+        budget_march = create_budget_period(month: '2024-03')
+        category     = create(:allocation_category, budget_role: 'spending', name: 'Boundary')
+        allocation   = create(:allocation, budget: budget_march, allocation_category: category, amount: 50_000)
+        # Feb 26 is calendar month '2024-02' but within the Feb 25–Mar 24 budget period
+        create(
+          :transaction,
+          allocation:        allocation,
+          transaction_date:  '2024-02-26',
+          withdrawal_amount: 15_000,
+          deposit_amount:    0
+        )
+        row = Mcp::OverspendingAnalysis.new(period: '2024-03').results
+                .find { |r| r[:category] == 'Boundary' }
+        expect(row).not_to be_nil
+        expect(row[:actual_cents]).to eq(15_000)
+        expect(row[:amount_remaining_cents]).to eq(35_000)
+      end
     end
   end
 end

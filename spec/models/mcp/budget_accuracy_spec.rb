@@ -13,14 +13,17 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
     Mcp::BudgetAccuracy.new(**defaults.merge(overrides))
   end
 
-  # Helper: create a budget + allocation + optional transaction for a given month
+  # Helper: create a budget period + allocation + optional transaction for a given month.
+  # Uses create_budget_period so the budget has a real 25th–24th date range with a
+  # populated end_date, which is required for t.budget_id → budget joins to work.
+  # transaction_date defaults to the 15th of `month`, which always falls within the
+  # budget period (the period ends on the 24th of the same month).
   def setup_month(month:, budgeted:, actual: nil, category: nil, allocation_name: 'Groceries', fixed: false)
-    cat = category || @category
-    date = "#{month}-01"
-    budget = create(:budget, start_date: date)
+    cat    = category || @category
+    budget = create_budget_period(month: month)
     allocation = create(
       :allocation,
-      name:                "#{allocation_name}",
+      name:                allocation_name,
       budget:              budget,
       allocation_category: cat,
       amount:              budgeted,
@@ -29,8 +32,8 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
     if actual
       create(
         :transaction,
-        allocation:       allocation,
-        transaction_date: "#{month}-15",
+        allocation:        allocation,
+        transaction_date:  "#{month}-15",
         withdrawal_amount: actual,
         deposit_amount:    0
       )
@@ -427,7 +430,7 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
 
     context 'excluded data' do
       before do
-        @budget = create(:budget, start_date: '2024-01-01')
+        @budget = create_budget_period(month: '2024-01')
         @allocation = create(
           :allocation,
           name:                'Groceries',
@@ -503,6 +506,43 @@ RSpec.describe Mcp::BudgetAccuracy, type: :model do
     end
 
     # ─── Household scoping ────────────────────────────────────────────────────
+
+    # ─── Boundary-crossing transactions ─────────────────────────────────────────
+
+    context 'boundary-crossing transaction (calendar month ≠ budget month)' do
+      # The 2024-03 budget period spans Feb 25 – Mar 24.
+      # A transaction dated 2024-02-26 has calendar month '2024-02' but budget month '2024-03'.
+      # Old code keyed actuals by to_char(t.transaction_date,'YYYY-MM') — this transaction
+      # would be bucketed into '2024-02' and NOT matched against the '2024-03' budgeted row,
+      # so total_actual_cents would appear as 0 instead of 60_000.
+      # New code keys by t.budget_id → correctly attributed to the March period.
+      #
+      # Setup arithmetic:
+      #   budgeted:      50_000 (€500.00)
+      #   actual:        60_000 from the Feb-26 boundary transaction (€600.00)
+      #   pct_off:       |60_000 - 50_000| / 50_000 * 100 = 20.0%
+      #   direction:     'over'
+      #   net_deviation: 60_000 - 50_000 = 10_000
+      it 'counts a transaction dated in the prior calendar month when its budget period ends in the queried month' do
+        result = setup_month(month: '2024-03', budgeted: 50_000, actual: nil)
+        # Feb 26 is calendar month '2024-02' but within the Feb 25–Mar 24 budget period;
+        # assign_budget_id sets t.budget_id to the 2024-03 period budget automatically.
+        create(
+          :transaction,
+          allocation:        result[:allocation],
+          transaction_date:  '2024-02-26',
+          withdrawal_amount: 60_000,
+          deposit_amount:    0
+        )
+        rows = build_query(start_month: '2024-03', end_month: '2024-03').results
+        row  = rows.first
+        expect(row).not_to be_nil
+        expect(row[:total_actual_cents]).to eq(60_000)
+        expect(row[:median_abs_pct_off]).to be_within(0.2).of(20.0)
+        expect(row[:direction]).to eq('over')
+        expect(row[:net_deviation_cents]).to eq(10_000)
+      end
+    end
 
     it 'scopes to the current tenant — a different household sees no data' do
       setup_month(month: '2024-01', budgeted: 50_000, actual: 60_000)

@@ -13,10 +13,11 @@ RSpec.describe Mcp::PlaceholderAllocationAnalysis, type: :model do
     Mcp::PlaceholderAllocationAnalysis.new(**defaults.merge(overrides))
   end
 
-  # Helper: create a budget + allocation, optionally with a transaction
+  # Helper: create a realistic budget period + allocation, optionally with a transaction.
+  # `month` is the end-month label (e.g. '2024-03' => Feb 25 – Mar 24).
   def setup_month(month:, budgeted:, actual: nil, allocation_name: 'Test Item', category: nil)
     cat = category || @category
-    budget = create(:budget, start_date: "#{month}-01")
+    budget = create_budget_period(month: month)
     allocation = create(
       :allocation,
       name:                allocation_name,
@@ -259,11 +260,13 @@ RSpec.describe Mcp::PlaceholderAllocationAnalysis, type: :model do
       setup_month(month: '2024-01', budgeted: 50_000, allocation_name: 'Rent')
       setup_month(month: '2024-01', budgeted: 1,      allocation_name: 'Sink Fund Item')
 
-      # Set up allocations for household B in the same month
+      # Set up allocations for household B in the same month.
+      # Use create_budget_period so end_date is populated — household_id is
+      # the actual guard; a NULL end_date would exclude them vacuously.
       other_household = create(:household)
       ActsAsTenant.with_tenant(other_household) do
         other_category = create(:allocation_category, budget_role: 'spending', name: 'Bills')
-        other_budget = create(:budget, start_date: '2024-01-01')
+        other_budget = create_budget_period(month: '2024-01')
         create(:allocation, budget: other_budget, allocation_category: other_category,
                name: 'Water', amount: 30_000)
         create(:allocation, budget: other_budget, allocation_category: other_category,
@@ -300,6 +303,25 @@ RSpec.describe Mcp::PlaceholderAllocationAnalysis, type: :model do
         start_month: '2024-01', end_month: '2024-01'
       ).results[:monthly_summary].map { |r| r[:month] }
       expect(months).to eq(['2024-01'])
+    end
+
+    # Boundary proof: a period whose start_date is in February but end_date
+    # is in March must appear as '2024-03', not '2024-02'.  A transaction on
+    # Feb 26 (the start-month side) confirms the period is present.
+    # This test would FAIL under the old to_char(b.start_date, 'YYYY-MM') logic.
+    it 'labels budget period by end-month, not start-month (Feb 25–Mar 24 is 2024-03)' do
+      result = setup_month(month: '2024-03', budgeted: 1)
+      create(
+        :transaction,
+        allocation:        result[:allocation],
+        transaction_date:  '2024-02-26', # start-month side of the Feb 25–Mar 24 boundary
+        withdrawal_amount: 5_000,
+        deposit_amount:    0
+      )
+      months = build_query(
+        start_month: '2024-03', end_month: '2024-03'
+      ).results[:monthly_summary].map { |r| r[:month] }
+      expect(months).to eq(['2024-03'])
     end
   end
 end
