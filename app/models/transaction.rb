@@ -29,8 +29,10 @@ class Transaction < ApplicationRecord
   belongs_to :allocation, optional: true
   belongs_to :bank_account
   belongs_to :sink_fund_allocation, optional: true
+  belongs_to :budget, optional: true
 
   before_save :check_status
+  before_save :assign_budget_id
   before_create :assign_bank_ref
   before_create :assign_payee_name
 
@@ -121,6 +123,24 @@ class Transaction < ApplicationRecord
     self.payee_name = name
   end
 
+  def assign_budget_id
+    return unless will_save_change_to_transaction_date?
+
+    if transaction_date.blank?
+      self.budget_id = nil
+      return
+    end
+
+    # Date-range scoped to the record's own household: require_tenant is false, so
+    # acts_as_tenant won't scope this if no tenant is set, and this is a range query
+    # (a different budget per household), not a globally-unique id lookup.
+    self.budget_id = Budget
+      .where(household_id: household_id)
+      .where('start_date <= :d AND end_date >= :d', d: transaction_date)
+      .order(:start_date)
+      .pick(:id)
+  end
+
   def to_brought_forward_version(brought_forward_date)
     new_transaction = dup
     new_transaction.description = "#{description} (B/F)"
@@ -130,6 +150,8 @@ class Transaction < ApplicationRecord
     new_transaction.bank_ref = nil
     # don't copy payee name - let PayeeTransferDetector determine the value
     new_transaction.payee_name = nil
+    # clear so before_save :assign_budget_id recomputes for the new date
+    new_transaction.budget_id = nil
     new_transaction
   end
 

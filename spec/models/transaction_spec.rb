@@ -251,6 +251,80 @@ RSpec.describe Transaction, :type => :model do
     end
   end
 
+  describe '#assign_budget_id' do
+    let(:bank_account) { create(:bank_account) }
+    let!(:budget) { create(:budget, start_date: '2015-01-01') }
+    # budget end_date is start_date.next_month.yesterday = 2015-01-31
+
+    it 'assigns budget_id to the budget whose date-range contains transaction_date' do
+      txn = create(:transaction, bank_account: bank_account, transaction_date: '2015-01-15')
+      expect(txn.budget_id).to eq budget.id
+    end
+
+    it 'assigns budget_id when transaction_date equals budget start_date (boundary)' do
+      txn = create(:transaction, bank_account: bank_account, transaction_date: '2015-01-01')
+      expect(txn.budget_id).to eq budget.id
+    end
+
+    it 'assigns budget_id when transaction_date equals budget end_date (boundary)' do
+      txn = create(:transaction, bank_account: bank_account, transaction_date: '2015-01-31')
+      expect(txn.budget_id).to eq budget.id
+    end
+
+    it 'leaves budget_id nil when transaction_date is nil' do
+      txn = create(:transaction, bank_account: bank_account, transaction_date: nil)
+      expect(txn.budget_id).to be_nil
+    end
+
+    it 'leaves budget_id nil when transaction_date falls outside all budgets (in a gap)' do
+      txn = create(:transaction, bank_account: bank_account, transaction_date: '2015-03-01')
+      expect(txn.budget_id).to be_nil
+    end
+
+    it 'reassigns budget_id when transaction_date changes to fall in a different budget' do
+      budget2 = create(:budget, start_date: '2015-02-01')
+      # budget2 end_date = 2015-02-28
+
+      txn = create(:transaction, bank_account: bank_account, transaction_date: '2015-01-15')
+      expect(txn.budget_id).to eq budget.id
+
+      txn.update!(transaction_date: '2015-02-10')
+      expect(txn.reload.budget_id).to eq budget2.id
+    end
+
+    it 'does not recompute budget_id when a save does not change transaction_date' do
+      txn = create(:transaction, bank_account: bank_account, transaction_date: '2015-01-15')
+      expect(txn.budget_id).to eq budget.id
+
+      # Forcibly clear it to prove the callback does not run on a non-date save
+      txn.update_columns(budget_id: nil)
+      txn.update!(status: 'paid')
+      expect(txn.reload.budget_id).to be_nil
+    end
+
+    context 'brought-forward transactions' do
+      let(:next_budget) { create(:budget, start_date: '2015-02-01') }
+      # next_budget end_date = 2015-02-28; B/F date = budget.end_date.tomorrow = 2015-02-01
+
+      it 'assigns correct budget_id when brought-forward date falls in an existing next budget' do
+        # Simulates the Budget.close path: the next budget exists before close is called
+        next_budget # ensure it's created
+        original = create(:transaction, bank_account: bank_account, transaction_date: '2015-01-15')
+        bf = original.to_brought_forward_version(Date.new(2015, 2, 1))
+        bf.save!
+        expect(bf.reload.budget_id).to eq next_budget.id
+      end
+
+      it 'leaves budget_id nil when brought-forward date has no matching budget yet' do
+        # Simulates closing before the next budget is created
+        original = create(:transaction, bank_account: bank_account, transaction_date: '2015-01-15')
+        bf = original.to_brought_forward_version(Date.new(2015, 2, 1))
+        bf.save!
+        expect(bf.reload.budget_id).to be_nil
+      end
+    end
+  end
+
   describe "#to_brought_forward_version" do
     before do
       @original_transaction = build(:transaction,

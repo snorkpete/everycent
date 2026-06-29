@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_21_185722) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_29_162043) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
@@ -315,6 +315,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_185722) do
     t.integer "bank_account_id"
     t.string "bank_ref"
     t.string "brought_forward_status"
+    t.integer "budget_id"
     t.boolean "camt_imported", default: false
     t.datetime "created_at", precision: nil, null: false
     t.integer "deposit_amount", default: 0
@@ -332,6 +333,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_185722) do
     t.index ["allocation_id"], name: "index_transactions_on_allocation_id"
     t.index ["bank_account_id", "bank_ref"], name: "index_transactions_on_bank_account_id_and_bank_ref", unique: true
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
+    t.index ["budget_id"], name: "index_transactions_on_budget_id"
     t.index ["household_id"], name: "index_transactions_on_household_id"
     t.index ["transaction_date"], name: "index_transactions_on_transaction_date"
   end
