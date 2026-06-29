@@ -1,7 +1,7 @@
 # Task: Schedule the chat-transcript purge job
 
 **ID:** schedule-the-chat-transcript-purge-job
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-06-19

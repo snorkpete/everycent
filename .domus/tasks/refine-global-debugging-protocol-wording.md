@@ -1,7 +1,7 @@
 # Task: Refine global debugging protocol wording
 
 **ID:** refine-global-debugging-protocol-wording
-**Status:** raw
+**Status:** done
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-04-11

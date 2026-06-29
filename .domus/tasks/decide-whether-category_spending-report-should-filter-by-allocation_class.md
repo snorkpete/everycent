@@ -1,7 +1,7 @@
 # Task: Decide whether category_spending report should filter by allocation_class
 
 **ID:** decide-whether-category_spending-report-should-filter-by-allocation_class
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-06-21

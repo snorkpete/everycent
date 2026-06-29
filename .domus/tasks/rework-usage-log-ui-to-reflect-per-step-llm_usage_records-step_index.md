@@ -3,7 +3,7 @@
 **ID:** rework-usage-log-ui-to-reflect-per-step-llm_usage_records-step_index
 **Status:** raw
 **Autonomous:** false
-**Priority:** low
+**Priority:** normal
 **Captured:** 2026-06-20
 **Parent:** none
 **Depends on:** chat-transcript-capture-backend-table-recorder-controller

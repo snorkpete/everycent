@@ -1,7 +1,7 @@
 # Task: Make chat-transcript retention window configurable from settings UI
 
 **ID:** make-chat-transcript-retention-window-configurable-from-settings-ui
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-06-19

@@ -1,7 +1,7 @@
-# Task: Fix order-dependent + load-induced spec flakiness (transcripts_rake, router)
+# Task: Fix load-induced router spec flakiness (router.spec.ts timeouts under concurrent load)
 
 **ID:** fix-order-dependent-load-induced-spec-flakiness-transcripts_rake-router
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-06-26

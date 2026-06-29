@@ -1,7 +1,7 @@
 # Task: Move household-specific payee vocabulary out of prod code into per-household config
 
 **ID:** move-household-specific-payee-vocabulary-out-of-prod-code-into-per-household-config
-**Status:** raw
+**Status:** deferred
 **Autonomous:** false
 **Priority:** high
 **Captured:** 2026-06-21
