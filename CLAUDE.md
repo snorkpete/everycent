@@ -81,11 +81,17 @@ See `.domus/reference/agent-instructions.md` for domus workflow rules (task life
 See `webclientv4/cypress/CLAUDE.md` for E2E test rules.
 
 ## Knowledge Base
-The agent-facing system-of-record lives in `knowledge-base/` — an OKF bundle (table / concept / tracking / legacy files) documenting how Everycent actually works: facts, mechanics, history, rationale. Read `knowledge-base/about.md` for the reading guide and conventions; load specific files on demand.
+The agent-facing system-of-record lives in `knowledge-base/` — an OKF bundle (table / concept / tracking / legacy files) documenting how Everycent actually works: facts, mechanics, history, rationale. It captures what the code **can't** tell you (the why, non-obvious mechanics, history, invariants) — not a restatement of the code. Read `knowledge-base/about.md` for the reading guide and conventions.
 
-- **`knowledge-base/vocabulary.md` is the always-loaded lexicon** — a generated index of the domain's words. Read it at session start for the shared language, then follow a link for depth.
-- It is **generated, never hand-edited**: a word's compressed meaning lives in its source file's `definition` frontmatter (alongside `term:` and `lexicon: true`). After changing any `definition`, regenerate with `rake kb:vocabulary` (`rake kb:vocabulary:check` verifies it's current — wired into pre-commit).
-- **When documenting a new concept**, follow the frontmatter contract in `about.md` so it flows into the lexicon, and keep the per-directory `index.md` files current.
+**Always-loaded (tier 1) — read both at session start:**
+- **`knowledge-base/vocabulary.md`** — the generated lexicon. Terms with compressed definitions, so we share language. Read it first.
+- **`knowledge-base/index.md`** — the bundle root: lists the *areas* (`tables/`, `concepts/`, `tracking/`, `legacy/`), not individual files. Tells you what the KB holds.
+
+**On-demand (tier 2):** each area's `index.md` is the generated listing of its files (from their `description`). **Load the relevant area's `index.md` before reasoning about, explaining, or modifying anything in that area.**
+
+**Forced lookup before absence/derivation claims.** Before (a) asserting Everycent lacks a feature or behaves a certain way, or (b) deriving domain behavior from code/schema alone, consult the KB first: check `vocabulary.md`, load the relevant area `index.md`, and open the named file. Schema is ground truth for *structure*; the KB is ground truth for *meaning*. Only after that lookup may you state what the system does or doesn't do.
+
+**Generated, never hand-edited.** `vocabulary.md` flows from each file's `definition` (+ `term:` + `lexicon: true`); the per-area `index.md` files flow from each file's `description`. After changing a `definition` run `rake kb:vocabulary`; after changing a `description` (or adding/removing a file) run `rake kb:index`. Both `:check` variants run in pre-commit when `knowledge-base/` files are staged. The root `index.md` is hand-maintained (areas only).
+
+- **When documenting a new concept**, follow the frontmatter contract in `about.md` (`type`, `description`, and `definition` + `lexicon: true` if it names a term), then regenerate.
 - If a documented contract diverges from code behavior, that's a potential bug — flag it.
-
-(A fuller CLAUDE.md ↔ knowledge-base loading review is still pending — see project notes.)

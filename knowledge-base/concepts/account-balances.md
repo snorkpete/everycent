@@ -4,6 +4,11 @@ title: Account Balances
 term: account-balances
 definition: "Dashboard grouping accounts by type (cash / non-cash assets, credit cards, loans) with aggregate calculations including net worth."
 lexicon: true
+description: >-
+  How the account-balances screen groups bank accounts by the
+  account_category (asset/liability) and is_cash dimensions into cash/non-cash
+  assets, credit cards, and loans, and the aggregates it derives — net worth
+  being the sum of current_balance across all accounts.
 doc_status: stub
 tags: [domain, stub]
 timestamp: 2026-06-20T00:00:00Z

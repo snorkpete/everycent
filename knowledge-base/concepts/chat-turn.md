@@ -5,6 +5,11 @@ term: turn
 definition: "One exchange within a conversation: a user message plus its eventual user-facing answer. One-to-many with steps; identified by conversation_turn_id."
 lexicon: true
 lexicon_group: chat
+description: >-
+  Why a turn is one user-message-plus-answer exchange (conversation_turn_id,
+  generated per sendMessage), one-to-many with steps, and the overloaded-term
+  gotcha: we reserve turn for the user exchange where some agent frameworks use
+  "turn" for each inner LLM call.
 tags: [domain, nlq-chat]
 timestamp: 2026-06-20T00:00:00Z
 ---

@@ -5,6 +5,11 @@ term: step
 definition: "One inner LLM call within a turn. A no-tool turn is one step; a tool-calling turn is several. Ordered by step_index. (Some frameworks call this a 'turn'.)"
 lexicon: true
 lexicon_group: chat
+description: >-
+  Why a step is the inner-LLM-call grain within a turn (no-tool turn = 1 step,
+  tool-calling turn = several), how it maps 1:1 to an LlmUsageRecord cost row
+  and to chat_transcript_steps capture, and the deliberate step-vs-turn naming
+  choice against frameworks that call this a "turn".
 tags: [domain, nlq-chat]
 timestamp: 2026-06-20T00:00:00Z
 ---

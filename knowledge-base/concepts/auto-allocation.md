@@ -4,6 +4,13 @@ title: Auto-allocation (suggestion from the previous budget)
 term: auto-allocation
 definition: "Suggests an allocation for each imported transaction by matching its description against the previous budget's already-allocated transactions, then mapping to the same-named allocation in the current budget. The live answer to 'how do we tag transactions easily?'"
 lexicon: true
+description: >-
+  The live transaction-tagging mechanism: AutoAllocationSuggester matches each
+  imported description against the previous budget's allocated transactions
+  (exact then contains, sink funds excluded) and maps the single matched
+  allocation name into the current budget — a suggestion service, not an
+  auto-writer. Covers why it depends on name consistency and the abandoned
+  payees-entity v1 it replaced.
 tags: [domain, import, allocation]
 timestamp: 2026-06-21T00:00:00Z
 ---

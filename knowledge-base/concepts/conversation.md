@@ -5,6 +5,10 @@ term: conversation
 definition: "The full back-and-forth with the NLQ chat LLM until the user clears it. Identified by conversation_id."
 lexicon: true
 lexicon_group: chat
+description: >-
+  Definition-only stub: a conversation is the full NLQ-chat back-and-forth until
+  the user clears it, identified by conversation_id and containing one or more
+  turns.
 doc_status: stub
 tags: [domain, stub]
 timestamp: 2026-06-20T00:00:00Z

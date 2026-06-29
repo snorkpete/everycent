@@ -4,6 +4,11 @@ title: Copy Budget
 term: copy-budget
 definition: "Duplicate incomes and allocations into a new budget one month ahead. The primary mechanism for creating budgets — it replaced the never-built recurring allocations."
 lexicon: true
+description: >-
+  Why copying a budget's incomes and allocations one month ahead became the
+  standard budget-creation workflow — it emerged from months being nearly
+  identical, replacing the never-built recurring allocations, and is the reason
+  the 0.01 keep-alive hack exists.
 doc_status: stub
 tags: [domain, stub]
 timestamp: 2026-06-20T00:00:00Z

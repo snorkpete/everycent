@@ -39,6 +39,19 @@ treatment.
   incomplete features (I), refactor candidates (R), and open questions (Q).
   These are maintenance state, not the live model — consult them before trusting
   a field or writing a migration.
+
+  *Why the bundle tracks its own defects:* EveryCent was built as a functional
+  tool for a two-person household, not a production product. With limited
+  development time, the guiding stance was to enforce each rule at the *cheapest
+  sufficient place* for that context — sometimes in the UI (e.g. a transaction
+  can't link both an allocation and a sink-fund allocation, enforced only in the
+  form), sometimes by convention between two users who both know the rules (e.g.
+  don't edit a closed budget's amounts), sometimes not at all where it doesn't
+  bite at this scale (e.g. an N+1 that's invisible for two users). That's a
+  deliberate trade, not an oversight. These registers catalog those rough edges
+  honestly, and they're being closed deliberately now that the app doubles as a
+  production-practices learning ground and AI-assisted development makes the
+  fixes cheap.
 - **Legacy concepts** (`legacy/`) explain deprecated schema that predates the
   current household setup, so empty/unused fields are explained in one place.
 - **Lexicon** (`vocabulary.md`) is an always-loaded, generated index of the
@@ -50,7 +63,11 @@ treatment.
 - **Money** is integer minor units everywhere — see [money units](/concepts/money-units.md).
 - **Links** are bundle-relative (`/tables/allocations.md`) and keep the `.md` suffix.
 - **Subdirectory index files** are added once a directory holds **3 or more**
-  files (progressive disclosure). Smaller directories are left without one.
+  files (progressive disclosure); smaller directories are left without one. They
+  are **generated** — a frontmatter-less OKF listing built from each file's
+  `description` by `rake kb:index` (`rake kb:index:check` verifies currency).
+  Never hand-edit them; change the source `description` and regenerate. The root
+  `index.md` lists only the *areas*, not individual files — it is hand-maintained.
 - **`type` values** are lowercase-hyphenated by local convention
   (`table`, `concept`, `tracking-register`); OKF tolerates any type string.
 - **Tracking IDs** (B/D/I/R/Q + number) are stable references used across concepts.

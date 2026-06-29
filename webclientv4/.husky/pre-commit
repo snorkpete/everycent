@@ -47,6 +47,17 @@ fi
 cd "$worktree_root" || { echo "pre-commit: can't cd to repo root"; exit 1; }
 
 staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+
+# --- Knowledge base: verify generated vocabulary/index are current ---
+# Only when knowledge-base/ files are staged. Regenerate with
+# `rake kb:vocabulary` / `rake kb:index` if these fail.
+staged_kb=$(echo "$staged_files" | grep '^knowledge-base/' || true)
+if [ -n "$staged_kb" ]; then
+  echo "Verifying knowledge-base generated files are current..."
+  bundle exec rake kb:vocabulary:check || { echo "pre-commit: vocabulary.md is stale — run 'rake kb:vocabulary'"; exit 1; }
+  bundle exec rake kb:index:check || { echo "pre-commit: an area index.md is stale — run 'rake kb:index'"; exit 1; }
+fi
+
 staged_ruby_files=$(echo "$staged_files" | grep '^app/.*\.rb$' || true)
 staged_spec_files=$(echo "$staged_files" | grep '^spec/.*_spec\.rb$' || true)
 

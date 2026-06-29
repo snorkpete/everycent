@@ -4,6 +4,11 @@ title: Recurring Allocation
 term: recurring-allocation
 definition: "Templates for auto-populating new budgets. Never truly implemented — copy budget replaced the need. Dead code / DB artifacts."
 lexicon: true
+description: >-
+  Why recurring allocations (and recurring incomes) — the v1 template-based
+  answer to creating new budgets — are dead code: the data model exists but was
+  never built out, and copy budget replaced the need. DB artifacts pending
+  cleanup.
 status: dead
 doc_status: stub
 tags: [domain, stub]

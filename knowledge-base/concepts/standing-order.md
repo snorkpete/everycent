@@ -4,6 +4,12 @@ title: Standing Order
 term: standing-order
 definition: "Allocation tied to a specific bank account for recurring fixed payments; originally solved cash-flow routing between personal and joint accounts."
 lexicon: true
+description: >-
+  Why the standing-order feature is dead: it once computed how much to leave in
+  personal accounts to cover direct debits before transferring the remainder to
+  a joint account, but a changed household payment structure removed that
+  problem. The is_standing_order flag and its bank_account_id persistence logic
+  still linger in code.
 status: dead
 doc_status: stub
 tags: [domain, stub]

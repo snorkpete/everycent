@@ -4,6 +4,12 @@ title: Session authentication (Google login + opaque bearer tokens)
 term: authentication
 definition: "Google-only login that mints an opaque DB-backed bearer token (only its SHA256 digest stored, 7-day sliding TTL). Fail-closed: every request needs a valid token unless the endpoint explicitly opts out."
 lexicon: true
+description: >-
+  How the 2026-rebuilt auth works and why: Google-only login minting opaque
+  DB-backed bearer tokens (chosen over JWT for a monolith), fail-closed
+  per-request validation via the Authenticatable concern, sliding 7-day TTL, two
+  accepted Google client IDs (web + permanent MCP path), and the additive
+  migration that left legacy devise columns awaiting a soak-gated drop.
 tags: [domain, auth]
 timestamp: 2026-06-21T00:00:00Z
 ---

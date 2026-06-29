@@ -4,6 +4,12 @@ title: Payee name (description cleaning for NLQ)
 term: payee-name
 definition: "A cleaned merchant string derived from a transaction's description at create time, for NLQ embedding quality — not entity resolution and not transaction tagging. Internal transfers/bookkeeping resolve to NULL. Reuses the legacy payee_name column."
 lexicon: true
+description: >-
+  Why transactions.payee_name carries a cleaned merchant string for NLQ
+  embedding quality (not entity resolution, not tagging), how PayeeNameResolver
+  is the single source of truth shared by the before_create callback and the
+  backfill, the brought-forward dup double-count trap, and the household-specific
+  transfer vocabulary that makes it a PII/config concern.
 tags: [domain, nlq, import]
 timestamp: 2026-06-21T00:00:00Z
 ---

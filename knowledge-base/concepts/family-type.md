@@ -4,6 +4,11 @@ title: Family Type
 term: family-type
 definition: "Household setting (couple or single) that shapes the discretionary-money split and person-name display."
 lexicon: true
+description: >-
+  How the couple/single family-type setting (stored in settings) shapes the
+  system: for couples it splits the unallocated remainder equally for
+  no-questions-asked discretionary spending, and it governs which person names
+  are displayed.
 doc_status: stub
 tags: [domain, stub]
 timestamp: 2026-06-20T00:00:00Z

@@ -4,6 +4,12 @@ title: Reports (net worth, category spending, needs-vs-wants)
 term: reports
 definition: "The three retrospective reports on the Reports screen, computed as raw SQL in report.rb. The older reporting layer — it does NOT apply the countable-spend filters the MCP tools do, so figures can diverge."
 lexicon: true
+description: >-
+  How the three retrospective Reports-screen reports compute in raw SQL
+  (report.rb) — net_worth as cumulative flow, category_spending per category,
+  needs-vs-wants as the 50/30/20 split with wants-as-residual — and the warts a
+  senior must know: they bypass countable-spend filters and the needs/wants
+  split chronically drifts.
 tags: [domain, reporting]
 timestamp: 2026-06-21T00:00:00Z
 ---

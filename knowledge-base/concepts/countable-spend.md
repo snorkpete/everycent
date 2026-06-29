@@ -4,6 +4,12 @@ title: Countable spend (the MCP spending filter)
 term: countable-spend
 definition: "The canonical filter the MCP analysis tools apply to decide which allocations and transactions count as real discretionary spend — spending-role only, non-placeholder, and (on the actuals side) excluding deposits, manual adjustments, and brought-forward rows."
 lexicon: true
+description: >-
+  The exact Mcp::SpendingScope filters that decide what counts as real
+  discretionary spend on both the budgeted side (spending-role, non-placeholder)
+  and the actuals side (also excluding manual adjustments, deposits, and
+  brought-forward rows), the tools that deliberately invert/extend them, and the
+  wart that legacy Reports don't apply them — so figures can diverge.
 tags: [domain, nlq, analysis]
 timestamp: 2026-06-21T00:00:00Z
 ---

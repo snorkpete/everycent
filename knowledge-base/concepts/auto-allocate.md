@@ -4,6 +4,10 @@ title: Auto-Allocate
 term: auto-allocate
 definition: "Suggests which allocation a transaction belongs to by matching its description against the previous budget's transactions. Match types: exact or contains."
 lexicon: true
+description: >-
+  How auto-allocate suggests an allocation for a transaction by matching its
+  description against the previous budget's transactions only (exact or
+  contains), and why it leans on allocation names staying stable across budgets.
 doc_status: stub
 tags: [domain, stub]
 timestamp: 2026-06-20T00:00:00Z

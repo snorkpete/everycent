@@ -4,6 +4,11 @@ title: Transfer
 term: transfer
 definition: "Paired transactions moving money between accounts, or between allocations and sink-fund allocations. One withdrawal + one deposit."
 lexicon: true
+description: >-
+  How transfers model non-external money movement as exactly one withdrawal plus
+  one deposit — across accounts or between allocations and sink-fund
+  allocations — and the singleton pattern for sink-fund-allocation transfers
+  (at most one, replaced rather than appended on recalculation).
 doc_status: stub
 tags: [domain, stub]
 timestamp: 2026-06-20T00:00:00Z

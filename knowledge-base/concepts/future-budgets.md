@@ -4,6 +4,11 @@ title: Future Budgets
 term: future-budgets
 definition: "Spreadsheet-like screen for editing allocations across all open budgets by name; where ~95% of budget editing happens. Enforces name consistency; home of the 0 = delete / 0.01 = keep-alive behavior."
 lexicon: true
+description: >-
+  Why this spreadsheet-style screen (allocations as rows, budgets as columns) is
+  where most budget editing happens, how editing by allocation name across all
+  open budgets is what makes name-based allocation identity hold, and where the
+  0 = delete / 0.01 = keep-alive workaround lives.
 doc_status: stub
 tags: [domain, stub]
 timestamp: 2026-06-20T00:00:00Z

@@ -4,6 +4,12 @@ title: NLQ chat (frontend-driven, with backend support tables)
 term: nlq-chat
 definition: "A natural-language-query chat over the household's finances. The model and agent loop run in the browser; Rails only exposes stateless /mcp/* tool endpoints plus three support tables (config, model registry, usage log). Shipped but not yet in active use."
 lexicon: true
+description: >-
+  The defining architecture of the NLQ chat — frontend-driven, with the LLM and
+  agent loop running in the browser (chatAgent.ts) and Rails only exposing
+  stateless /mcp/* tools plus three support tables; there is no backend agent.
+  Also why it ships logging-only with simulated cost, embeddings unbuilt, and an
+  open production-architecture question.
 tags: [domain, ai, chat, nlq]
 timestamp: 2026-06-21T00:00:00Z
 ---

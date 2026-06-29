@@ -4,6 +4,11 @@ title: Weekly Budget
 term: weekly-budget
 definition: "Alternative view splitting a monthly budget into weeks with proportional allocation distribution. Partially implemented; stalled."
 lexicon: true
+description: >-
+  Why weekly budget is a stalled, partially-built feature: intended for mid-month
+  course correction by splitting a month into 5 day-weighted weeks for cumulative
+  allocations, but development paused for months/years with only some backend
+  logic in place.
 status: partial
 doc_status: stub
 tags: [domain, stub]
