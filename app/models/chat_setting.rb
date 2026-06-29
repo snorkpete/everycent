@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: chat_settings
+#
+#  id                  :bigint           not null, primary key
+#  chat_enabled        :boolean          default(FALSE), not null
+#  extras              :jsonb            not null
+#  max_tool_iterations :integer          default(5), not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  household_id        :bigint           not null
+#  llm_model_id        :bigint
+#
+# Indexes
+#
+#  index_chat_settings_on_household_id  (household_id)
+#  index_chat_settings_on_llm_model_id  (llm_model_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (household_id => households.id) ON UPDATE => cascade
+#  fk_rails_...  (llm_model_id => llm_models.id)
+#
 class ChatSetting < ApplicationRecord
   acts_as_tenant :household
 

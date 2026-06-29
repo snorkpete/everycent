@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: sessions
+#
+#  id             :bigint           not null, primary key
+#  expires_at     :datetime         not null
+#  ip_address     :string
+#  last_active_at :datetime
+#  token_digest   :string           not null
+#  user_agent     :string
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  user_id        :bigint           not null
+#
+# Indexes
+#
+#  index_sessions_on_token_digest  (token_digest) UNIQUE
+#  index_sessions_on_user_id       (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (user_id => users.id)
+#
 require 'rails_helper'
 
 RSpec.describe Session, type: :model do

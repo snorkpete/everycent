@@ -2,16 +2,25 @@
 #
 # Table name: settings
 #
-#  id                           :integer          not null, primary key
-#  primary_budget_account_id    :integer
-#  bank_charges_allocation_name :string
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  husband                      :string           default("Husband")
-#  wife                         :string           default("Wife")
-#  family_type                  :string           default("couple")
-#  single_person                :string
-#  household_id                 :bigint(8)
+#  id                                                :integer          not null, primary key
+#  bank_charges_allocation_name                      :string
+#  default_allocation_category_id_for_special_events :integer
+#  family_type                                       :string           default("couple")
+#  husband                                           :string           default("Husband")
+#  single_person                                     :string
+#  wife                                              :string           default("Wife")
+#  created_at                                        :datetime         not null
+#  updated_at                                        :datetime         not null
+#  household_id                                      :bigint
+#  primary_budget_account_id                         :integer
+#
+# Indexes
+#
+#  index_settings_on_household_id  (household_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (household_id => households.id) ON UPDATE => cascade
 #
 
 class Setting < ApplicationRecord

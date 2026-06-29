@@ -3,23 +3,38 @@
 # Table name: transactions
 #
 #  id                      :integer          not null, primary key
-#  description             :string
 #  bank_ref                :string
-#  bank_account_id         :integer
-#  transaction_date        :date
-#  withdrawal_amount       :integer
-#  deposit_amount          :integer
-#  payee_id                :integer
-#  allocation_id           :integer
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
+#  brought_forward_status  :string
+#  camt_imported           :boolean          default(FALSE)
+#  deposit_amount          :integer          default(0)
+#  description             :string
+#  is_manual_adjustment    :boolean          default(FALSE)
 #  payee_code              :string
 #  payee_name              :string
-#  sink_fund_allocation_id :integer
 #  status                  :string
-#  brought_forward_status  :string
-#  household_id            :bigint(8)
-#  is_manual_adjustment    :boolean          default(FALSE)
+#  transaction_date        :date
+#  withdrawal_amount       :integer          default(0)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  allocation_id           :integer
+#  bank_account_id         :integer
+#  budget_id               :integer
+#  household_id            :bigint
+#  payee_id                :integer
+#  sink_fund_allocation_id :integer
+#
+# Indexes
+#
+#  index_transactions_on_allocation_id                 (allocation_id)
+#  index_transactions_on_bank_account_id               (bank_account_id)
+#  index_transactions_on_bank_account_id_and_bank_ref  (bank_account_id,bank_ref) UNIQUE
+#  index_transactions_on_budget_id                     (budget_id)
+#  index_transactions_on_household_id                  (household_id)
+#  index_transactions_on_transaction_date              (transaction_date)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (household_id => households.id) ON UPDATE => cascade
 #
 
 require 'rails_helper'

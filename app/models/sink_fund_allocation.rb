@@ -3,14 +3,23 @@
 # Table name: sink_fund_allocations
 #
 #  id              :integer          not null, primary key
-#  name            :string
-#  bank_account_id :integer
 #  amount          :integer
+#  comment         :string
+#  name            :string
+#  status          :string           default("open")
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  comment         :string
-#  status          :string           default("open")
-#  household_id    :bigint(8)
+#  bank_account_id :integer
+#  household_id    :bigint
+#
+# Indexes
+#
+#  index_sink_fund_allocations_on_bank_account_id  (bank_account_id)
+#  index_sink_fund_allocations_on_household_id     (household_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (household_id => households.id) ON UPDATE => cascade
 #
 
 # TODO: rename sink fund allocation to 'Financial Obligation'

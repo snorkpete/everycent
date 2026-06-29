@@ -2,13 +2,22 @@
 #
 # Table name: special_events
 #
-#  id             :integer          not null, primary key
-#  name           :string
-#  budget_amount  :integer          default(0), not null
-#  actual_amount  :integer          default(0), not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  household_id   :bigint(8)
+#  id            :bigint           not null, primary key
+#  actual_amount :integer          default(0), not null
+#  budget_amount :integer          default(0), not null
+#  name          :string
+#  start_date    :date
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  household_id  :bigint           not null
+#
+# Indexes
+#
+#  index_special_events_on_household_id  (household_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (household_id => households.id)
 #
 
 class SpecialEvent < ApplicationRecord
