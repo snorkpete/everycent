@@ -50,3 +50,6 @@ public/v2
 # payee backfill scratch — sensitive bank exports, never commit
 /.backfill-scratch/
 *.zip
+
+# Playwright MCP artifacts (screenshots, snapshots, console logs) — regenerated, never commit
+/.playwright-mcp/
