@@ -1,7 +1,7 @@
 # Task: Completely remove Spring from the test path
 
 **ID:** completely-remove-spring-from-the-test-path
-**Status:** raw
+**Status:** cancelled
 **Autonomous:** false
 **Priority:** normal
 **Captured:** 2026-06-29
