@@ -14,8 +14,6 @@ Domain words with compressed definitions, loaded at session start. Follow the li
 
 **authentication** — Google-only login that mints an opaque DB-backed bearer token (only its SHA256 digest stored, 7-day sliding TTL). Fail-closed: every request needs a valid token unless the endpoint explicitly opts out. · [concepts/session-auth.md](concepts/session-auth.md)
 
-**auto-allocate** — Suggests which allocation a transaction belongs to by matching its description against the previous budget's transactions. Match types: exact or contains. · [concepts/auto-allocate.md](concepts/auto-allocate.md)
-
 **auto-allocation** — Suggests an allocation for each imported transaction by matching its description against the previous budget's already-allocated transactions, then mapping to the same-named allocation in the current budget. The live answer to 'how do we tag transactions easily?' · [concepts/auto-allocation.md](concepts/auto-allocation.md)
 
 **bank-account** — Universal value-tracking primitive — any container of monetary value (accounts, investments, assets, credit cards, loans). Single-table subclasses via account_type. · [tables/bank_accounts.md](tables/bank_accounts.md)

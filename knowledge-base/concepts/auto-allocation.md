@@ -39,7 +39,9 @@ allocations from the previous budget" button.
 Algorithm:
 
 1. **Find the previous budget** — the latest budget with `start_date` before this
-   one's.
+   one's. Only the *immediately* previous budget is consulted — matching never
+   looks further back. This keeps it simple and relevant: last month's allocation
+   patterns are the best predictor of this month's.
 2. **Load its allocated transactions** — within that budget's date range,
    `allocation_id` present, **excluding sink-fund accounts**.
 3. **Two match passes** over each incoming description:

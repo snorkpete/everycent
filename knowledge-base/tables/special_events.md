@@ -60,7 +60,9 @@ event re-save.
 allocation's amount or transactions change without re-saving the event, the cache
 goes stale. **To answer "what did this event cost," derive from the
 allocations; treat the stored totals as a possibly-stale display cache.** See
-[bugs](/tracking/bugs.md) (B8).
+[bugs](/tracking/bugs.md) (B8); for *why* the totals are fragile — they derive
+entirely from the allocation bridge — see
+[special-event tagging](/concepts/special-event-tagging.md).
 
 > Provenance: the special-events implementation came entirely out of an early
 > AI-assisted experiment (Cursor, Nov 2025) — a first run at AI-first "vibe coding"
