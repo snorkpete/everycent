@@ -1,7 +1,7 @@
 # Task: Upgrade Heroku stack Heroku-24 to Heroku-26
 
 **ID:** upgrade-heroku-stack-heroku-24-to-heroku-26
-**Status:** ready
+**Status:** done
 **Autonomous:** false
 **Priority:** low
 **Captured:** 2026-06-19
