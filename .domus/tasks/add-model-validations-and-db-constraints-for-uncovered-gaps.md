@@ -1,7 +1,7 @@
 # Task: Add model validations and DB constraints for uncovered gaps
 
 **ID:** add-model-validations-and-db-constraints-for-uncovered-gaps
-**Status:** ready
+**Status:** done
 **Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-04-12
@@ -73,17 +73,17 @@ All idempotent (`WHERE` guards), so safe on any DB state.
 
 ## Acceptance Criteria
 
-- [ ] All listed model validations added (mind the `allow_nil` on percentage and the
+- [x] All listed model validations added (mind the `allow_nil` on percentage and the
       already-present SinkFundAllocation name presence)
-- [ ] rspec model specs added for every new validation (TDD; covers the valid + invalid
+- [x] rspec model specs added for every new validation (TDD; covers the valid + invalid
       cases per validator)
-- [ ] Migration backfills the 3 statements above, THEN applies NOT NULL / default /
+- [x] Migration backfills the 3 statements above, THEN applies NOT NULL / default /
       unique index — in that order, single migration
-- [ ] `bundle exec rspec` green
-- [ ] No nil amounts can enter allocations, incomes, or sink_fund_allocations
-- [ ] No invalid account_type/account_category/status strings can be saved on
+- [x] `bundle exec rspec` green
+- [x] No nil amounts can enter allocations, incomes, or sink_fund_allocations
+- [x] No invalid account_type/account_category/status strings can be saved on
       bank_accounts
-- [ ] No `package-lock.json` / unrelated churn
+- [x] No `package-lock.json` / unrelated churn
 
 ---
 
