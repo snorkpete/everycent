@@ -2,7 +2,7 @@
 
 **ID:** prevent-transactions-with-blank-transaction_date
 **Status:** ready
-**Autonomous:** false
+**Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-04-22
 **Parent:** none
