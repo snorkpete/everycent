@@ -39,6 +39,13 @@
           <span class="card-spent">
             <EcMoneyDisplay :model-value="allocation.spent ?? 0" highlight-mode="none" />
           </span>
+          <!-- EcShowTransactionsButton emits click without the event, so @click.stop on it would throw -->
+          <span class="card-eye" @click.stop>
+            <EcShowTransactionsButton
+              data-testid="show-transactions-btn"
+              @click="showTransactions(allocation)"
+            />
+          </span>
         </div>
 
         <div
@@ -72,6 +79,14 @@
     <div v-else class="empty-state" data-testid="empty-state">
       No allocations yet. Tap Adjust Allocations to add some.
     </div>
+
+    <AllocationTransactionsDialog
+      :visible="dialogVisible"
+      :allocation-id="selectedAllocationId"
+      :allocation-name="selectedAllocationName"
+      :fetch-transactions="budgetApi.getTransactionsForAllocation"
+      @update:visible="dialogVisible = $event"
+    />
   </div>
 </template>
 
@@ -79,6 +94,9 @@
 import { ref } from 'vue';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import { formatDate } from '../shared/util/formatDate';
+import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
+import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
+import { budgetApi } from '../budgets/budgetApi';
 import type { SpecialEventData, SpecialEventAllocationData } from './specialEvent.types';
 
 defineProps<{
@@ -88,6 +106,15 @@ defineProps<{
 }>();
 
 const expandedId = ref<number | null>(null);
+const dialogVisible = ref(false);
+const selectedAllocationId = ref(0);
+const selectedAllocationName = ref('');
+
+function showTransactions(allocation: SpecialEventAllocationData) {
+  selectedAllocationId.value = allocation.id ?? 0;
+  selectedAllocationName.value = allocation.name ?? '';
+  dialogVisible.value = true;
+}
 
 function toggleExpanded(id: number | undefined) {
   if (id == null) return;
@@ -170,6 +197,10 @@ function toggleExpanded(id: number | undefined) {
 }
 
 .card-spent {
+  flex-shrink: 0;
+}
+
+.card-eye {
   flex-shrink: 0;
 }
 

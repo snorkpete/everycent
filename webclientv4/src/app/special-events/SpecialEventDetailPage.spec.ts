@@ -5,7 +5,20 @@ import { mount, VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import SpecialEventDetailPage from './SpecialEventDetailPage.vue';
+import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
+import { budgetApi } from '../budgets/budgetApi';
 import type { SpecialEventData } from './specialEvent.types';
+import { buildSpecialEvent, buildSpecialEventAllocation } from '../../test/factories';
+import { getTooltipValue } from '../../test/tooltip-helper';
+import { DialogStub } from '../../test/stubs';
+
+const SHOW_TRANSACTIONS_BTN = '[data-testid="show-transactions-btn"]';
+
+vi.mock('../budgets/budgetApi', () => ({
+  budgetApi: {
+    getTransactionsForAllocation: vi.fn().mockResolvedValue([]),
+  },
+}));
 
 const mockSetHeading = vi.fn();
 vi.mock('../toolbar/headingStore', () => ({
@@ -80,6 +93,7 @@ function createWrapper(): VueWrapper {
       plugins: [PrimeVue, createPinia()],
       stubs: {
         SpecialEventForm: FormStub,
+        Dialog: DialogStub,
       },
     },
   });
@@ -207,6 +221,62 @@ describe('SpecialEventDetailPage', () => {
 
       const table = wrapper.find('[data-testid="allocations-table"]');
       expect(table.exists()).toBe(true);
+    });
+  });
+
+  describe('show transactions eye icon', () => {
+    it('renders an eye button on each allocation row', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.findAll(SHOW_TRANSACTIONS_BTN)).toHaveLength(2);
+    });
+
+    it('has a tooltip on the eye button', () => {
+      const wrapper = createWrapper();
+
+      const button = wrapper.find(SHOW_TRANSACTIONS_BTN);
+      expect(getTooltipValue(button)).toBe('Show transactions for this allocation');
+    });
+
+    it('opens the transactions dialog for the clicked allocation', async () => {
+      const wrapper = createWrapper();
+
+      await wrapper.findAll(SHOW_TRANSACTIONS_BTN)[1].trigger('click');
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      expect(dialog.props('visible')).toBe(true);
+      expect(dialog.props('allocationId')).toBe(11);
+      expect(dialog.props('allocationName')).toBe('Food');
+    });
+
+    it('wires the dialog to the budget allocation transactions endpoint', () => {
+      const wrapper = createWrapper();
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      expect(dialog.props('fetchTransactions')).toBe(budgetApi.getTransactionsForAllocation);
+    });
+
+    it('falls back to empty id and name when the allocation has none', async () => {
+      mockStore.currentSpecialEvent = buildSpecialEvent({
+        allocations: [buildSpecialEventAllocation({ id: undefined, name: undefined })],
+      });
+      const wrapper = createWrapper();
+
+      await wrapper.find(SHOW_TRANSACTIONS_BTN).trigger('click');
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      expect(dialog.props('allocationId')).toBe(0);
+      expect(dialog.props('allocationName')).toBe('');
+    });
+
+    it('closes the dialog when it emits update:visible false', async () => {
+      const wrapper = createWrapper();
+      await wrapper.find(SHOW_TRANSACTIONS_BTN).trigger('click');
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      await dialog.vm.$emit('update:visible', false);
+
+      expect(dialog.props('visible')).toBe(false);
     });
   });
 

@@ -67,13 +67,27 @@
         </Column>
         <Column field="spent" header="Spent" style="text-align: right">
           <template #body="{ data }">
-            <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
+            <span class="spent-cell">
+              <EcShowTransactionsButton
+                data-testid="show-transactions-btn"
+                @click="showTransactions(data)"
+              />
+              <EcMoneyDisplay :model-value="data.spent ?? 0" highlight-mode="none" />
+            </span>
           </template>
           <template #footer>
             <EcMoneyDisplay :model-value="totalSpent" highlight-mode="none" emphasis="total" />
           </template>
         </Column>
       </DataTable>
+
+      <AllocationTransactionsDialog
+        :visible="dialogVisible"
+        :allocation-id="selectedAllocationId"
+        :allocation-name="selectedAllocationName"
+        :fetch-transactions="budgetApi.getTransactionsForAllocation"
+        @update:visible="dialogVisible = $event"
+      />
     </div>
 
     <SpecialEventForm
@@ -100,7 +114,10 @@ import { formatDate } from '../shared/util/formatDate';
 import EcMoneyDisplay from '../shared/form/money-field/EcMoneyDisplay.vue';
 import SpecialEventForm from './SpecialEventForm.vue';
 import SpecialEventDetailMobile from './SpecialEventDetailMobile.vue';
-import type { SpecialEventData } from './specialEvent.types';
+import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
+import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
+import { budgetApi } from '../budgets/budgetApi';
+import type { SpecialEventData, SpecialEventAllocationData } from './specialEvent.types';
 
 const route = useRoute();
 const router = useRouter();
@@ -110,6 +127,9 @@ const notifications = useNotifications();
 const { isMobile } = useResponsive();
 
 const formVisible = ref(false);
+const dialogVisible = ref(false);
+const selectedAllocationId = ref(0);
+const selectedAllocationName = ref('');
 
 const event = computed(() => store.currentSpecialEvent);
 const allocations = computed(() => event.value?.allocations ?? []);
@@ -122,6 +142,12 @@ onMounted(() => {
     store.fetchOne(id);
   }
 });
+
+function showTransactions(allocation: SpecialEventAllocationData) {
+  selectedAllocationId.value = allocation.id ?? 0;
+  selectedAllocationName.value = allocation.name ?? '';
+  dialogVisible.value = true;
+}
 
 function goBack() {
   router.push({ name: 'special-events' });
@@ -182,5 +208,21 @@ async function onSubmit(data: Partial<SpecialEventData>) {
   gap: 1.5rem;
   color: var(--p-surface-600);
   font-size: 0.9rem;
+}
+
+.spent-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.spent-cell :deep(.p-button) {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.spent-cell:hover :deep(.p-button) {
+  opacity: 1;
 }
 </style>
