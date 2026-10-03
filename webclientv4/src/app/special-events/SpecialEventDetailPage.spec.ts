@@ -42,31 +42,31 @@ vi.mock('vue-router', () => ({
   useRoute: () => ({ params: mockRouteParams, query: {} }),
 }));
 
-const eventWithAllocations: SpecialEventData = {
+const eventWithAllocations: SpecialEventData = buildSpecialEvent({
   id: 1,
   name: 'Birthday Party',
   budget_amount: 50000,
   actual_amount: 30000,
   start_date: '2026-06-15',
   allocations: [
-    {
+    buildSpecialEventAllocation({
       id: 10,
       name: 'Decorations',
       budget_name: 'June 2026',
       allocation_category_name: 'Entertainment',
       amount: 20000,
       spent: 15000,
-    },
-    {
+    }),
+    buildSpecialEventAllocation({
       id: 11,
       name: 'Food',
       budget_name: 'June 2026',
       allocation_category_name: 'Groceries',
       amount: 30000,
       spent: 15000,
-    },
+    }),
   ],
-};
+});
 
 const mockStore = reactive({
   currentSpecialEvent: eventWithAllocations as SpecialEventData | null,
