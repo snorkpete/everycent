@@ -1,7 +1,7 @@
 # Task: Restore budget-window enforcement on transaction save (client + server)
 
 **ID:** prevent-transactions-with-blank-transaction_date
-**Status:** ready
+**Status:** ready-for-human-review
 **Autonomous:** true
 **Priority:** normal
 **Captured:** 2026-04-22

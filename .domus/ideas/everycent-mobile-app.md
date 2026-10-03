@@ -2,7 +2,7 @@
 
 **Captured:** 2026-03-15
 **Last refined:** 2026-04-06
-**Status:** scoped
+**Status:** implemented
 
 ---
 
@@ -138,3 +138,23 @@ For everycent, the real problem isn't classic edit conflicts — it's **deduplic
 - How much of the Flutter app's architecture transfers if you later build in React Native or native Kotlin?
 - Should the Flutter app share the same `/api/mobile/` endpoints as a potential RN version, or do they diverge?
 - How does Flutter handle streaming data (for chat) — is it native-feeling or does it fight the framework?
+
+---
+
+## Closure — 2026-08-11
+
+**Marked `implemented`. This idea is discharged from the everycent repo.** Everything above is preserved as the 2026-03-15 → 2026-04-06 record and is *not* current understanding.
+
+**What shipped here:** Phase 1 (mobile web) — closed 2026-04-22. 17 `*Mobile.vue` components across transactions, budgets, sink funds, account balances, and special events. A couple of known bugs remain as follow-ups; the track work is complete.
+
+**What moved:** the native app track now lives in its own repo at `~/code/everycent-mobile`, with its own domus store. Fresh, narrow ideas and tasks start there rather than carrying this idea forward.
+
+**Superseded above — recorded so the frozen record explains itself:**
+- **Monorepo placement** (`mobile_flutter/` + `mobile_android/`) reversed to a separate repo. Neither directory was ever created. Reason: Android build infrastructure would replicate into every everycent worktree, including Rails-only ones.
+- **Flutter-first ordering** dropped in favour of native Kotlin + Jetpack Compose. Its premise — Flutter having better-documented auth patterns — expired when the owned Google-only opaque bearer-token scheme shipped 2026-06-15. The Flutter-vs-native side-by-side comparison is cancelled; its exit criteria were never defined.
+- **Auth0** superseded by that same owned token scheme.
+- The open questions above that reference Flutter are moot.
+
+**Still live, and carried forward:** the offline/sync dedup design (fingerprint on amount + date + rough payee, field-level merge, review screen, no silent auto-merge), the `/api/mobile/` namespace rationale, and the dependency on the `transaction-fingerprinting-for-dedup` task (still `deferred`, still Rails-side, stays in this repo).
+
+Current understanding lives in the second brain at `notes/projects/everycent-mobile/overview.md`.
