@@ -12,6 +12,11 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: 'Special events now add up across budgets',
+    body: 'If a special event runs across more than one budget period (like a trip that spans two months), each allocation now shows once with the amounts added together. Use the Summed / By Budget button at the top to switch back to the per-budget view.',
+    date: '2026-10-03',
+  },
+  {
     title: 'Report a problem right from chat',
     body: 'Chat has a new bug-reporting mode: turn it on, describe what went wrong in plain English, and it gathers the details and saves a report for Kion to look at later.',
     date: '2026-06-29',
@@ -24,9 +29,5 @@ export const HIGHLIGHTS: Highlight[] = [
 ];
 
 export const NOTEWORTHY: string[] = [
-  'Chat now knows today\'s date, so questions like "how are we doing this month?" use the right period.',
-  'Account Balances is now mobile-friendly — values no longer get cut off on small screens.',
-  'Click an account, category, or institution name to view its details — no need to hit Edit first.',
-  'The Bank Accounts list (under Setup) now shows the bank name and category (Asset, Liability, Current) next to each account.',
-  'On Account Balances, assets and their loans are now grouped together, so you can see the equity of each loan-backed asset at a glance.',
+  "On a special event, click the eye icon next to an allocation to see the transactions behind what was spent. In the summed view, each budget's transactions are listed separately with a subtotal.",
 ];
