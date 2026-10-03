@@ -4,7 +4,10 @@ import { setActivePinia, createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import type { VueWrapper } from '@vue/test-utils';
 import AllocationTransactionsDialog from './AllocationTransactionsDialog.vue';
+import AllocationTransactionsSections from './AllocationTransactionsSections.vue';
+import AllocationTransactionsTable from './AllocationTransactionsTable.vue';
 import type { TransactionData } from '../transactions/transaction.types';
+import type { TransactionsDialogAllocation } from './allocationTransactions.types';
 import { DialogStub } from '../../test/stubs';
 
 // Selectors
@@ -14,6 +17,8 @@ const TRANSACTIONS_TABLE = '[data-testid="transactions-table"]';
 const TRANSACTION_ROW = '[data-testid="transaction-row"]';
 const TOTAL_ROW = '[data-testid="total-row"]';
 const ERROR_STATE = '[data-testid="error-state"]';
+const SECTION = '[data-testid="transactions-section"]';
+const SECTION_HEADING = '[data-testid="section-heading"]';
 
 const sampleTransactions: TransactionData[] = [
   {
@@ -43,6 +48,7 @@ function createWrapper(
     visible: boolean;
     allocationId: number;
     allocationName: string;
+    allocations: TransactionsDialogAllocation[];
     fetchTransactions: (id: number) => Promise<TransactionData[]>;
   }> = {},
 ): VueWrapper<InstanceType<typeof AllocationTransactionsDialog>> {
@@ -333,6 +339,254 @@ describe('AllocationTransactionsDialog', () => {
 
       expect(wrapper.find(ERROR_STATE).exists()).toBe(false);
       expect(wrapper.findAll(TRANSACTION_ROW)).toHaveLength(sampleTransactions.length);
+    });
+  });
+
+  describe('multiple allocations', () => {
+    const julyAllocation: TransactionsDialogAllocation = {
+      id: 1,
+      name: 'Food',
+      label: 'Jul 2024',
+    };
+    const augustAllocation: TransactionsDialogAllocation = {
+      id: 2,
+      name: 'Food',
+      label: 'Aug 2024',
+    };
+    const augustTransactions: TransactionData[] = [
+      { id: 10, transaction_date: '2024-08-02', description: 'Bakery', net_amount: -2000 },
+    ];
+
+    function mockByAllocation() {
+      mockFetchTransactions.mockImplementation(async (id: number) =>
+        id === 1 ? sampleTransactions : augustTransactions,
+      );
+    }
+
+    async function openWithTwoAllocations(): Promise<
+      VueWrapper<InstanceType<typeof AllocationTransactionsDialog>>
+    > {
+      const wrapper = createWrapper({
+        visible: false,
+        allocationId: 1,
+        allocationName: 'Food',
+        allocations: [julyAllocation, augustAllocation],
+      });
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+      return wrapper;
+    }
+
+    function deferredFetches() {
+      const resolvers = new Map<number, (value: TransactionData[]) => void>();
+      const rejecters = new Map<number, (reason: Error) => void>();
+      mockFetchTransactions.mockImplementation(
+        (id: number) =>
+          new Promise<TransactionData[]>((resolve, reject) => {
+            resolvers.set(id, resolve);
+            rejecters.set(id, reject);
+          }),
+      );
+      return { resolvers, rejecters };
+    }
+
+    it('fetches every allocation when opened', async () => {
+      mockByAllocation();
+
+      await openWithTwoAllocations();
+
+      expect(mockFetchTransactions).toHaveBeenCalledTimes(2);
+      expect(mockFetchTransactions).toHaveBeenCalledWith(1);
+      expect(mockFetchTransactions).toHaveBeenCalledWith(2);
+    });
+
+    it('fetches in parallel', async () => {
+      const { resolvers } = deferredFetches();
+
+      const wrapper = createWrapper({
+        visible: false,
+        allocations: [julyAllocation, augustAllocation],
+      });
+      await wrapper.setProps({ visible: true });
+
+      expect(mockFetchTransactions).toHaveBeenCalledTimes(2);
+
+      resolvers.forEach((resolve) => resolve([]));
+      await flushPromises();
+    });
+
+    it('keeps the title from allocationName', () => {
+      const wrapper = createWrapper({
+        visible: false,
+        allocationName: 'Food',
+        allocations: [julyAllocation, augustAllocation],
+      });
+
+      expect(wrapper.findComponent(DialogStub).props('header')).toBe('Transactions for Food');
+    });
+
+    it('swaps to the sectioned display, not the single table total', async () => {
+      mockByAllocation();
+
+      const wrapper = await openWithTwoAllocations();
+
+      expect(wrapper.findComponent(AllocationTransactionsSections).exists()).toBe(true);
+      expect(wrapper.findComponent(AllocationTransactionsTable).exists()).toBe(false);
+      expect(wrapper.find(TOTAL_ROW).exists()).toBe(false);
+    });
+
+    it('uses the single table display when allocations is not passed', async () => {
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
+
+      const wrapper = createWrapper({ visible: false });
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+
+      expect(wrapper.findComponent(AllocationTransactionsTable).exists()).toBe(true);
+      expect(wrapper.findComponent(AllocationTransactionsSections).exists()).toBe(false);
+      expect(wrapper.find(SECTION_HEADING).exists()).toBe(false);
+    });
+
+    it('passes one section per allocation, in the given order', async () => {
+      mockByAllocation();
+
+      const wrapper = await openWithTwoAllocations();
+
+      const sections = wrapper.findComponent(AllocationTransactionsSections).props('sections');
+      expect(sections.map((section) => section.allocation.id)).toEqual([1, 2]);
+      expect(sections[1].transactions).toEqual(augustTransactions);
+    });
+
+    it('shows the error state when any fetch fails', async () => {
+      mockFetchTransactions.mockImplementation(async (id: number) => {
+        if (id === 2) throw new Error('Network error');
+        return sampleTransactions;
+      });
+
+      const wrapper = await openWithTwoAllocations();
+
+      expect(wrapper.find(ERROR_STATE).exists()).toBe(true);
+      expect(wrapper.find(SECTION).exists()).toBe(false);
+    });
+
+    it('shows the empty state when no section has transactions', async () => {
+      const wrapper = await openWithTwoAllocations();
+
+      expect(wrapper.find(EMPTY_STATE).exists()).toBe(true);
+      expect(wrapper.find(SECTION).exists()).toBe(false);
+    });
+
+    it('keeps the display chosen at open when allocations changes while open', async () => {
+      mockByAllocation();
+      const wrapper = await openWithTwoAllocations();
+
+      await wrapper.setProps({ allocations: undefined });
+
+      expect(wrapper.findComponent(AllocationTransactionsSections).exists()).toBe(true);
+      expect(wrapper.findComponent(AllocationTransactionsTable).exists()).toBe(false);
+    });
+
+    it('does not fetch when allocations is empty', async () => {
+      const wrapper = createWrapper({ visible: false, allocations: [] });
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+
+      expect(mockFetchTransactions).not.toHaveBeenCalled();
+      expect(wrapper.find(EMPTY_STATE).exists()).toBe(true);
+    });
+
+    it('ignores a slower earlier request when reopened with different allocations', async () => {
+      const { resolvers } = deferredFetches();
+
+      const wrapper = createWrapper({ visible: false, allocations: [julyAllocation] });
+      await wrapper.setProps({ visible: true });
+      await wrapper.setProps({ visible: false });
+      await wrapper.setProps({ allocations: [augustAllocation] });
+      await wrapper.setProps({ visible: true });
+
+      resolvers.get(2)!(augustTransactions);
+      await flushPromises();
+      resolvers.get(1)!(sampleTransactions);
+      await flushPromises();
+
+      expect(wrapper.findAll(TRANSACTION_ROW)).toHaveLength(1);
+      expect(wrapper.find(LOADING_STATE).exists()).toBe(false);
+    });
+
+    it('keeps loading until the latest request settles', async () => {
+      const { resolvers } = deferredFetches();
+
+      const wrapper = createWrapper({ visible: false, allocations: [julyAllocation] });
+      await wrapper.setProps({ visible: true });
+      await wrapper.setProps({ visible: false });
+      await wrapper.setProps({ allocations: [augustAllocation] });
+      await wrapper.setProps({ visible: true });
+
+      resolvers.get(1)!(sampleTransactions);
+      await flushPromises();
+
+      expect(wrapper.find(LOADING_STATE).exists()).toBe(true);
+
+      resolvers.get(2)!([]);
+      await flushPromises();
+    });
+
+    it('ignores a stale failure from an earlier request', async () => {
+      const { resolvers, rejecters } = deferredFetches();
+
+      const wrapper = createWrapper({ visible: false, allocations: [julyAllocation] });
+      await wrapper.setProps({ visible: true });
+      await wrapper.setProps({ visible: false });
+      await wrapper.setProps({ allocations: [augustAllocation] });
+      await wrapper.setProps({ visible: true });
+
+      rejecters.get(1)!(new Error('late failure'));
+      await flushPromises();
+      resolvers.get(2)!(sampleTransactions);
+      await flushPromises();
+
+      expect(wrapper.find(ERROR_STATE).exists()).toBe(false);
+      expect(wrapper.findAll(TRANSACTION_ROW)).toHaveLength(sampleTransactions.length);
+    });
+
+    it('clears previous sections when reopened with no allocations', async () => {
+      mockFetchTransactions.mockResolvedValue(sampleTransactions);
+      const wrapper = createWrapper({ visible: false, allocations: [julyAllocation] });
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+      expect(wrapper.findAll(TRANSACTION_ROW)).toHaveLength(3);
+
+      await wrapper.setProps({ visible: false });
+      await wrapper.setProps({ allocations: [] });
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+
+      expect(wrapper.find(TRANSACTION_ROW).exists()).toBe(false);
+      expect(wrapper.find(EMPTY_STATE).exists()).toBe(true);
+    });
+  });
+
+  describe('single mode reopening', () => {
+    it('ignores a slower earlier request after reopening', async () => {
+      const resolvers: ((value: TransactionData[]) => void)[] = [];
+      mockFetchTransactions.mockImplementation(
+        () =>
+          new Promise<TransactionData[]>((resolve) => {
+            resolvers.push(resolve);
+          }),
+      );
+
+      const wrapper = createWrapper({ visible: false });
+      await wrapper.setProps({ visible: true });
+      await wrapper.setProps({ visible: false });
+      await wrapper.setProps({ visible: true });
+
+      resolvers[1]([]);
+      await flushPromises();
+      resolvers[0](sampleTransactions);
+      await flushPromises();
+
+      expect(wrapper.findAll(TRANSACTION_ROW)).toHaveLength(0);
     });
   });
 });

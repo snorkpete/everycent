@@ -25,15 +25,15 @@
     <ul v-if="allocations.length > 0" class="cards-list">
       <li
         v-for="allocation in allocations"
-        :key="allocation.id"
+        :key="allocation.key"
         class="allocation-card"
         data-testid="allocation-card"
-        @click="toggleExpanded(allocation.id)"
+        @click="toggleExpanded(allocation.key)"
       >
         <div class="card-main">
           <i
             class="pi card-chevron"
-            :class="expandedId === allocation.id ? 'pi-chevron-down' : 'pi-chevron-right'"
+            :class="expandedKey === allocation.key ? 'pi-chevron-down' : 'pi-chevron-right'"
           ></i>
           <span class="card-name" data-testid="card-name">{{ allocation.name }}</span>
           <span class="card-spent">
@@ -49,7 +49,7 @@
         </div>
 
         <div
-          v-if="expandedId === allocation.id"
+          v-if="expandedKey === allocation.key"
           class="card-detail"
           data-testid="card-detail"
           @click.stop
@@ -84,6 +84,7 @@
       :visible="dialogVisible"
       :allocation-id="selectedAllocationId"
       :allocation-name="selectedAllocationName"
+      :allocations="selectedAllocations"
       :fetch-transactions="budgetApi.getTransactionsForAllocation"
       @update:visible="dialogVisible = $event"
     />
@@ -97,28 +98,32 @@ import { formatDate } from '../shared/util/formatDate';
 import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { budgetApi } from '../budgets/budgetApi';
-import type { SpecialEventData, SpecialEventAllocationData } from './specialEvent.types';
+import type { TransactionsDialogAllocation } from '../shared/allocationTransactions.types';
+import type { SpecialEventData, SpecialEventAllocationRow } from './specialEvent.types';
 
 defineProps<{
   event: SpecialEventData | null;
-  allocations: SpecialEventAllocationData[];
+  allocations: SpecialEventAllocationRow[];
   totalSpent: number;
 }>();
 
-const expandedId = ref<number | null>(null);
+const expandedKey = ref<string | null>(null);
 const dialogVisible = ref(false);
 const selectedAllocationId = ref(0);
 const selectedAllocationName = ref('');
+const selectedAllocations = ref<TransactionsDialogAllocation[]>();
 
-function showTransactions(allocation: SpecialEventAllocationData) {
-  selectedAllocationId.value = allocation.id ?? 0;
-  selectedAllocationName.value = allocation.name ?? '';
+function showTransactions(allocation: SpecialEventAllocationRow) {
+  selectedAllocationId.value = allocation.ids[0] ?? 0;
+  selectedAllocationName.value = allocation.name;
+  // Only a merged row needs the multi-allocation dialog; single rows use the original props.
+  selectedAllocations.value =
+    allocation.dialogAllocations.length > 1 ? allocation.dialogAllocations : undefined;
   dialogVisible.value = true;
 }
 
-function toggleExpanded(id: number | undefined) {
-  if (id == null) return;
-  expandedId.value = expandedId.value === id ? null : id;
+function toggleExpanded(key: string) {
+  expandedKey.value = expandedKey.value === key ? null : key;
 }
 </script>
 

@@ -16,7 +16,11 @@ export { buildInstitution } from './institutionFactory';
 export { buildChatSettings } from './chatSettingsFactory';
 export { buildSettings } from './settingsFactory';
 export { buildSinkFundAllocation, buildSinkFund } from './sinkFundFactory';
-export { buildSpecialEvent, buildSpecialEventAllocation } from './specialEventFactory';
+export {
+  buildSpecialEvent,
+  buildSpecialEventAllocation,
+  buildSpecialEventAllocationRow,
+} from './specialEventFactory';
 export { buildTransaction, buildDeposit, buildUnpaidTransaction } from './transactionFactory';
 export { buildLlmUsageRecord, buildLlmUsageSummary } from './llmUsageFactory';
 export { buildBugReport } from './bugReportFactory';

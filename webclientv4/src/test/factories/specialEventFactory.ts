@@ -1,7 +1,24 @@
 import type {
   SpecialEventData,
   SpecialEventAllocationData,
+  SpecialEventAllocationRow,
 } from '../../app/special-events/specialEvent.types';
+
+export function buildSpecialEventAllocationRow(
+  overrides?: Partial<SpecialEventAllocationRow>,
+): SpecialEventAllocationRow {
+  return {
+    key: '1',
+    ids: [1],
+    name: 'Decorations',
+    budget_name: 'Mar 2026',
+    allocation_category_name: 'Entertainment',
+    amount: 20000,
+    spent: 0,
+    dialogAllocations: [{ id: 1, name: 'Decorations', label: 'Mar 2026' }],
+    ...overrides,
+  };
+}
 
 export function buildSpecialEventAllocation(
   overrides?: Partial<SpecialEventAllocationData>,
@@ -14,6 +31,7 @@ export function buildSpecialEventAllocation(
     spent: 0,
     allocation_category_id: 1,
     budget_name: 'Mar 2026',
+    budget_start_date: '2026-02-25',
     allocation_category_name: 'Entertainment',
     ...overrides,
   };

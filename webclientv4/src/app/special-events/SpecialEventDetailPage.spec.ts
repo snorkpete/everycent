@@ -13,6 +13,14 @@ import { getTooltipValue } from '../../test/tooltip-helper';
 import { DialogStub } from '../../test/stubs';
 
 const SHOW_TRANSACTIONS_BTN = '[data-testid="show-transactions-btn"]';
+const SUMMED_TOGGLE = '[data-testid="summed-toggle"]';
+const BUDGET_NAME_CELL = '[data-testid="budget-name-cell"]';
+
+const mockIsMobile = vi.hoisted(() => ({ value: false }));
+vi.mock('../shared/composables/useResponsive', async () => {
+  const { computed } = await import('vue');
+  return { useResponsive: () => ({ isMobile: computed(() => mockIsMobile.value) }) };
+});
 
 vi.mock('../budgets/budgetApi', () => ({
   budgetApi: {
@@ -109,6 +117,7 @@ describe('SpecialEventDetailPage', () => {
     mockStore.fetchOne.mockResolvedValue(undefined);
     mockStore.update.mockResolvedValue(undefined);
     mockRouteParams.id = '1';
+    mockIsMobile.value = false;
   });
 
   describe('on mount', () => {
@@ -247,6 +256,7 @@ describe('SpecialEventDetailPage', () => {
       expect(dialog.props('visible')).toBe(true);
       expect(dialog.props('allocationId')).toBe(11);
       expect(dialog.props('allocationName')).toBe('Food');
+      expect(dialog.props('allocations')).toBeUndefined();
     });
 
     it('wires the dialog to the budget allocation transactions endpoint', () => {
@@ -256,7 +266,7 @@ describe('SpecialEventDetailPage', () => {
       expect(dialog.props('fetchTransactions')).toBe(budgetApi.getTransactionsForAllocation);
     });
 
-    it('falls back to empty id and name when the allocation has none', async () => {
+    it('opens the dialog with an empty id when the allocation has no id', async () => {
       mockStore.currentSpecialEvent = buildSpecialEvent({
         allocations: [buildSpecialEventAllocation({ id: undefined, name: undefined })],
       });
@@ -267,6 +277,7 @@ describe('SpecialEventDetailPage', () => {
       const dialog = wrapper.findComponent(AllocationTransactionsDialog);
       expect(dialog.props('allocationId')).toBe(0);
       expect(dialog.props('allocationName')).toBe('');
+      expect(dialog.props('allocations')).toBeUndefined();
     });
 
     it('closes the dialog when it emits update:visible false', async () => {
@@ -277,6 +288,135 @@ describe('SpecialEventDetailPage', () => {
       await dialog.vm.$emit('update:visible', false);
 
       expect(dialog.props('visible')).toBe(false);
+    });
+  });
+
+  describe('summed mode', () => {
+    const julyFood = buildSpecialEventAllocation({
+      id: 20,
+      name: 'Food',
+      amount: 5000,
+      spent: 4000,
+      budget_name: 'Jul 2024',
+      budget_start_date: '2024-06-25',
+      allocation_category_name: 'Groceries',
+    });
+    const augustFood = buildSpecialEventAllocation({
+      id: 21,
+      name: 'Food',
+      amount: 10000,
+      spent: 8000,
+      budget_name: 'Aug 2024',
+      budget_start_date: '2024-07-25',
+      allocation_category_name: 'Groceries',
+    });
+    const hotel = buildSpecialEventAllocation({
+      id: 22,
+      name: 'Hotel',
+      amount: 30000,
+      spent: 25000,
+      budget_name: 'Aug 2024',
+      budget_start_date: '2024-07-25',
+      allocation_category_name: 'Travel',
+    });
+
+    function useMultiPeriodEvent() {
+      mockStore.currentSpecialEvent = buildSpecialEvent({
+        allocations: [augustFood, hotel, julyFood],
+      });
+    }
+
+    it('merges same-named allocations across budgets by default', () => {
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      expect(wrapper.findAll('tbody tr')).toHaveLength(2);
+      expect(wrapper.find('tbody').text()).toContain('150.00');
+    });
+
+    it('lists the joined budget names oldest first for a merged row', () => {
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      expect(wrapper.findAll(BUDGET_NAME_CELL)[0].text()).toBe('Jul 2024, Aug 2024');
+    });
+
+    it('carries the full budget list in a tooltip on a merged row', () => {
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      const cells = wrapper.findAll(BUDGET_NAME_CELL);
+      expect(getTooltipValue(cells[0])).toBe('Jul 2024, Aug 2024');
+      expect(getTooltipValue(cells[1])).toBeUndefined();
+    });
+
+    it('opens the dialog with every merged allocation, oldest budget first', async () => {
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      await wrapper.findAll(SHOW_TRANSACTIONS_BTN)[0].trigger('click');
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      expect(dialog.props('allocationId')).toBe(20);
+      expect(dialog.props('allocationName')).toBe('Food');
+      expect(dialog.props('allocations')).toEqual([
+        { id: 20, name: 'Food', label: 'Jul 2024' },
+        { id: 21, name: 'Food', label: 'Aug 2024' },
+      ]);
+    });
+
+    it('keeps the spent footer total across merging', () => {
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('tfoot').text()).toContain('370.00');
+    });
+
+    it('defaults the toggle to the summed label with a tooltip', () => {
+      const wrapper = createWrapper();
+
+      const toggle = wrapper.find(SUMMED_TOGGLE);
+      expect(toggle.text()).toContain('Summed');
+      expect(getTooltipValue(toggle)).toBeTruthy();
+    });
+
+    it('lists every allocation per budget after toggling', async () => {
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      await wrapper.find(SUMMED_TOGGLE).trigger('click');
+
+      expect(wrapper.findAll('tbody tr')).toHaveLength(3);
+      expect(wrapper.find(SUMMED_TOGGLE).text()).toContain('By Budget');
+      expect(wrapper.find('tfoot').text()).toContain('370.00');
+    });
+
+    it('toggles back to summed', async () => {
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      await wrapper.find(SUMMED_TOGGLE).trigger('click');
+      await wrapper.find(SUMMED_TOGGLE).trigger('click');
+
+      expect(wrapper.findAll('tbody tr')).toHaveLength(2);
+    });
+
+    it('hides the toggle label on mobile', () => {
+      mockIsMobile.value = true;
+      const wrapper = createWrapper();
+
+      expect(wrapper.find(SUMMED_TOGGLE).text()).toBe('');
+    });
+
+    it('passes the merged rows to the mobile component', () => {
+      mockIsMobile.value = true;
+      useMultiPeriodEvent();
+      const wrapper = createWrapper();
+
+      const mobile = wrapper.findComponent({ name: 'SpecialEventDetailMobile' });
+      const rows = mobile.props('allocations') as { key: string }[];
+      expect(rows.map((row) => row.key)).toEqual(['20-21', '22']);
+      expect(mobile.props('totalSpent')).toBe(37000);
     });
   });
 

@@ -4,10 +4,10 @@ import PrimeVue from 'primevue/config';
 import SpecialEventDetailMobile from './SpecialEventDetailMobile.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { budgetApi } from '../budgets/budgetApi';
-import { buildSpecialEvent, buildSpecialEventAllocation } from '../../test/factories';
+import { buildSpecialEvent, buildSpecialEventAllocationRow } from '../../test/factories';
 import { getTooltipValue } from '../../test/tooltip-helper';
 import { DialogStub } from '../../test/stubs';
-import type { SpecialEventAllocationData } from './specialEvent.types';
+import type { SpecialEventAllocationRow } from './specialEvent.types';
 
 const ALLOCATION_CARD = '[data-testid="allocation-card"]';
 const CARD_DETAIL = '[data-testid="card-detail"]';
@@ -19,22 +19,40 @@ vi.mock('../budgets/budgetApi', () => ({
   },
 }));
 
-const allocation1 = buildSpecialEventAllocation({
-  id: 1,
+const allocation1 = buildSpecialEventAllocationRow({
+  key: '1',
+  ids: [1],
   name: 'Hotel',
   amount: 30000,
   spent: 25000,
   budget_name: 'Aug 2024',
   allocation_category_name: 'Travel',
+  dialogAllocations: [{ id: 1, name: 'Hotel', label: 'Aug 2024' }],
 });
 
-const allocation2 = buildSpecialEventAllocation({
-  id: 2,
+const allocation2 = buildSpecialEventAllocationRow({
+  key: '2',
+  ids: [2],
   name: 'Flights',
   amount: 20000,
   spent: 18000,
   budget_name: 'Jul 2024',
   allocation_category_name: 'Travel',
+  dialogAllocations: [{ id: 2, name: 'Flights', label: 'Jul 2024' }],
+});
+
+const mergedAllocation = buildSpecialEventAllocationRow({
+  key: '3-4',
+  ids: [3, 4],
+  name: 'Food',
+  amount: 15000,
+  spent: 12000,
+  budget_name: 'Jul 2024, Aug 2024',
+  allocation_category_name: 'Groceries',
+  dialogAllocations: [
+    { id: 3, name: 'Food', label: 'Jul 2024' },
+    { id: 4, name: 'Food', label: 'Aug 2024' },
+  ],
 });
 
 const event = buildSpecialEvent({
@@ -43,13 +61,12 @@ const event = buildSpecialEvent({
   budget_amount: 300000,
   actual_amount: 286313,
   start_date: '2024-08-01',
-  allocations: [allocation1, allocation2],
 });
 
 function createWrapper(
   overrides: {
     event?: typeof event | null;
-    allocations?: SpecialEventAllocationData[];
+    allocations?: SpecialEventAllocationRow[];
     totalSpent?: number;
   } = {},
 ): VueWrapper {
@@ -157,6 +174,7 @@ describe('SpecialEventDetailMobile', () => {
       expect(dialog.props('visible')).toBe(true);
       expect(dialog.props('allocationId')).toBe(2);
       expect(dialog.props('allocationName')).toBe('Flights');
+      expect(dialog.props('allocations')).toBeUndefined();
     });
 
     it('wires the dialog to the budget allocation transactions endpoint', () => {
@@ -174,16 +192,28 @@ describe('SpecialEventDetailMobile', () => {
       expect(wrapper.find(CARD_DETAIL).exists()).toBe(false);
     });
 
-    it('falls back to empty id and name when the allocation has none', async () => {
+    it('opens the dialog with every allocation of a merged row', async () => {
+      const wrapper = createWrapper({ allocations: [mergedAllocation], totalSpent: 12000 });
+
+      await wrapper.find(SHOW_TRANSACTIONS_BTN).trigger('click');
+
+      const dialog = wrapper.findComponent(AllocationTransactionsDialog);
+      expect(dialog.props('visible')).toBe(true);
+      expect(dialog.props('allocationId')).toBe(3);
+      expect(dialog.props('allocationName')).toBe('Food');
+      expect(dialog.props('allocations')).toEqual(mergedAllocation.dialogAllocations);
+    });
+
+    it('opens the dialog with an empty id when the row has no ids', async () => {
       const wrapper = createWrapper({
-        allocations: [buildSpecialEventAllocation({ id: undefined, name: undefined })],
+        allocations: [buildSpecialEventAllocationRow({ ids: [], dialogAllocations: [] })],
       });
 
       await wrapper.find(SHOW_TRANSACTIONS_BTN).trigger('click');
 
       const dialog = wrapper.findComponent(AllocationTransactionsDialog);
       expect(dialog.props('allocationId')).toBe(0);
-      expect(dialog.props('allocationName')).toBe('');
+      expect(dialog.props('allocations')).toBeUndefined();
     });
 
     it('closes the dialog when it emits update:visible false', async () => {
@@ -231,6 +261,15 @@ describe('SpecialEventDetailMobile', () => {
 
       const amount = wrapper.find('[data-testid="detail-amount"]');
       expect(amount.text()).toContain('300.00');
+    });
+
+    it('shows the full list of budget names for a merged row', async () => {
+      const wrapper = createWrapper({ allocations: [mergedAllocation], totalSpent: 12000 });
+
+      await wrapper.find(ALLOCATION_CARD).trigger('click');
+
+      const budgetName = wrapper.find('[data-testid="detail-budget-name"]');
+      expect(budgetName.text()).toContain('Jul 2024, Aug 2024');
     });
 
     it('collapses when clicked again', async () => {

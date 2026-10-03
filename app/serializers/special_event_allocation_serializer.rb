@@ -20,13 +20,18 @@ class SpecialEventAllocationSerializer < ActiveModel::Serializer
   type 'allocation'
 
   attributes :id, :name, :amount, :budget_id, :spent,
-             :allocation_category_id, :budget_name, :allocation_category_name
+             :allocation_category_id, :budget_name, :budget_start_date,
+             :allocation_category_name
 
   has_one :allocation_category, serializer: AllocationCategorySerializer
   has_one :budget, serializer: SimpleBudgetSerializer
 
   def budget_name
     object.budget&.name
+  end
+
+  def budget_start_date
+    object.budget&.start_date
   end
 
   def allocation_category_name

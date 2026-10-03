@@ -24,6 +24,16 @@
         @click="adjustAllocations"
       />
       <Button
+        v-tooltip="
+          'Toggle between merging same-named allocations across budgets and listing each budget separately'
+        "
+        :label="isMobile ? undefined : isSummed ? 'Summed' : 'By Budget'"
+        :icon="isSummed ? 'pi pi-link' : 'pi pi-list'"
+        :outlined="isSummed"
+        data-testid="summed-toggle"
+        @click="toggleSummed"
+      />
+      <Button
         v-tooltip="'Reload this special event\'s data'"
         :label="isMobile ? undefined : 'Refresh'"
         :icon="isMobile ? 'pi pi-refresh' : undefined"
@@ -37,7 +47,7 @@
     <SpecialEventDetailMobile
       v-if="isMobile"
       :event="event"
-      :allocations="allocations"
+      :allocations="rows"
       :total-spent="totalSpent"
     />
 
@@ -56,9 +66,18 @@
         </div>
       </div>
 
-      <DataTable :value="allocations" data-testid="allocations-table">
+      <DataTable :value="rows" data-key="key" data-testid="allocations-table">
         <Column field="name" header="Allocation" />
-        <Column field="budget_name" header="Budget" />
+        <Column field="budget_name" header="Budget">
+          <template #body="{ data }">
+            <span
+              v-tooltip="data.ids.length > 1 ? data.budget_name : undefined"
+              class="budget-name-cell"
+              data-testid="budget-name-cell"
+              >{{ data.budget_name }}</span
+            >
+          </template>
+        </Column>
         <Column field="allocation_category_name" header="Category" />
         <Column field="amount" header="Amount" style="text-align: right">
           <template #body="{ data }">
@@ -85,6 +104,7 @@
         :visible="dialogVisible"
         :allocation-id="selectedAllocationId"
         :allocation-name="selectedAllocationName"
+        :allocations="selectedAllocations"
         :fetch-transactions="budgetApi.getTransactionsForAllocation"
         @update:visible="dialogVisible = $event"
       />
@@ -117,7 +137,9 @@ import SpecialEventDetailMobile from './SpecialEventDetailMobile.vue';
 import EcShowTransactionsButton from '../shared/EcShowTransactionsButton.vue';
 import AllocationTransactionsDialog from '../shared/AllocationTransactionsDialog.vue';
 import { budgetApi } from '../budgets/budgetApi';
-import type { SpecialEventData, SpecialEventAllocationData } from './specialEvent.types';
+import { useSpecialEventAllocationRows } from './useSpecialEventAllocationRows';
+import type { TransactionsDialogAllocation } from '../shared/allocationTransactions.types';
+import type { SpecialEventData, SpecialEventAllocationRow } from './specialEvent.types';
 
 const route = useRoute();
 const router = useRouter();
@@ -130,10 +152,11 @@ const formVisible = ref(false);
 const dialogVisible = ref(false);
 const selectedAllocationId = ref(0);
 const selectedAllocationName = ref('');
+const selectedAllocations = ref<TransactionsDialogAllocation[]>();
 
 const event = computed(() => store.currentSpecialEvent);
 const allocations = computed(() => event.value?.allocations ?? []);
-const totalSpent = computed(() => allocations.value.reduce((sum, a) => sum + (a.spent ?? 0), 0));
+const { isSummed, toggleSummed, rows, totalSpent } = useSpecialEventAllocationRows(allocations);
 
 onMounted(() => {
   headingStore.setHeading('Special Event');
@@ -143,9 +166,11 @@ onMounted(() => {
   }
 });
 
-function showTransactions(allocation: SpecialEventAllocationData) {
-  selectedAllocationId.value = allocation.id ?? 0;
-  selectedAllocationName.value = allocation.name ?? '';
+function showTransactions(row: SpecialEventAllocationRow) {
+  selectedAllocationId.value = row.ids[0] ?? 0;
+  selectedAllocationName.value = row.name;
+  // Only a merged row needs the multi-allocation dialog; single rows use the original props.
+  selectedAllocations.value = row.dialogAllocations.length > 1 ? row.dialogAllocations : undefined;
   dialogVisible.value = true;
 }
 
@@ -208,6 +233,15 @@ async function onSubmit(data: Partial<SpecialEventData>) {
   gap: 1.5rem;
   color: var(--p-surface-600);
   font-size: 0.9rem;
+}
+
+.budget-name-cell {
+  display: inline-block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 
 .spent-cell {

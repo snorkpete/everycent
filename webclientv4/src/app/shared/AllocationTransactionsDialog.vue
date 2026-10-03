@@ -15,37 +15,13 @@
       Failed to load transactions.
     </div>
 
-    <div v-else-if="transactions.length === 0" class="empty-state" data-testid="empty-state">
+    <div v-else-if="isEmpty" class="empty-state" data-testid="empty-state">
       No transactions found for this allocation.
     </div>
 
     <div v-else class="transactions-content">
-      <table class="transactions-table" data-testid="transactions-table">
-        <thead>
-          <tr>
-            <th class="date-col">Date</th>
-            <th class="description-col">Description</th>
-            <th class="amount-col">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="transaction in transactions"
-            :key="transaction.id"
-            data-testid="transaction-row"
-          >
-            <td>{{ formatDate(transaction.transaction_date ?? '') }}</td>
-            <td>{{ transaction.description }}</td>
-            <td class="amount-col"><EcMoneyDisplay :model-value="transaction.net_amount ?? 0" highlight-mode="none" /></td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr class="total-row" data-testid="total-row">
-            <td colspan="2">Total</td>
-            <td class="amount-col"><EcMoneyDisplay :model-value="total" highlight-mode="none" emphasis="total" /></td>
-          </tr>
-        </tfoot>
-      </table>
+      <AllocationTransactionsSections v-if="isMultiple" :sections="sections" />
+      <AllocationTransactionsTable v-else :transactions="singleTransactions" />
     </div>
   </Dialog>
 </template>
@@ -53,14 +29,20 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
-import { formatDate } from './util/formatDate';
-import EcMoneyDisplay from './form/money-field/EcMoneyDisplay.vue';
+import AllocationTransactionsTable from './AllocationTransactionsTable.vue';
+import AllocationTransactionsSections from './AllocationTransactionsSections.vue';
+import type {
+  AllocationTransactionSection,
+  TransactionsDialogAllocation,
+} from './allocationTransactions.types';
 import type { TransactionData } from '../transactions/transaction.types';
 
 const props = defineProps<{
   visible: boolean;
   allocationId: number;
   allocationName: string;
+  /** Optional multi-allocation mode: one parallel request and one section per entry. */
+  allocations?: TransactionsDialogAllocation[];
   fetchTransactions: (id: number) => Promise<TransactionData[]>;
 }>();
 
@@ -68,28 +50,61 @@ defineEmits<{
   'update:visible': [value: boolean];
 }>();
 
-const transactions = ref<TransactionData[]>([]);
+const sections = ref<AllocationTransactionSection[]>([]);
 const loading = ref(false);
 const error = ref(false);
+// Decided once per open so the display always matches how the data was loaded.
+const isMultiple = ref(false);
 
 const dialogTitle = computed(() => `Transactions for ${props.allocationName}`);
 
-const total = computed(() => transactions.value.reduce((sum, t) => sum + (t.net_amount ?? 0), 0));
+const isEmpty = computed(() =>
+  sections.value.every((section) => section.transactions.length === 0),
+);
+
+const singleTransactions = computed(() =>
+  sections.value.flatMap((section) => section.transactions),
+);
+
+// Loading seam: one request in single mode, N parallel requests in multi mode,
+// normalised to the same list-of-sections shape.
+async function loadSections(): Promise<AllocationTransactionSection[]> {
+  if (props.allocations) {
+    const requested = props.allocations;
+    const fetched = await Promise.all(
+      requested.map((allocation) => props.fetchTransactions(allocation.id)),
+    );
+    return requested.map((allocation, index) => ({ allocation, transactions: fetched[index] }));
+  }
+  const allocation = { id: props.allocationId, name: props.allocationName };
+  return [{ allocation, transactions: await props.fetchTransactions(allocation.id) }];
+}
+
+function hasTarget(): boolean {
+  return props.allocations ? props.allocations.length > 0 : !!props.allocationId;
+}
+
+let latestRequest = 0;
 
 watch(
   () => props.visible,
   async (isVisible) => {
-    if (isVisible && props.allocationId) {
-      loading.value = true;
-      transactions.value = [];
-      error.value = false;
-      try {
-        transactions.value = await props.fetchTransactions(props.allocationId);
-      } catch {
-        error.value = true;
-      } finally {
-        loading.value = false;
-      }
+    if (!isVisible) return;
+    const requestId = ++latestRequest;
+    isMultiple.value = !!props.allocations;
+    sections.value = [];
+    error.value = false;
+    loading.value = false;
+    if (!hasTarget()) return;
+    loading.value = true;
+    try {
+      const loaded = await loadSections();
+      if (requestId !== latestRequest) return;
+      sections.value = loaded;
+    } catch {
+      if (requestId === latestRequest) error.value = true;
+    } finally {
+      if (requestId === latestRequest) loading.value = false;
     }
   },
 );
@@ -99,60 +114,6 @@ watch(
 .transactions-content {
   max-height: 60vh;
   overflow: auto;
-}
-
-.transactions-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
-
-.transactions-table th,
-.transactions-table td {
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--p-surface-200);
-}
-
-.date-col {
-  width: 25%;
-  white-space: nowrap;
-}
-
-.amount-col {
-  width: 25%;
-  white-space: nowrap;
-  text-align: right;
-}
-
-.description-col {
-  width: 50%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.transactions-table thead th {
-  font-weight: 600;
-  background-color: var(--p-surface-50);
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.transactions-table tfoot td {
-  position: sticky;
-  bottom: 0;
-  background-color: var(--p-surface-0);
-}
-
-.total-row {
-  font-weight: 600;
-  border-top: 2px solid var(--p-surface-400);
-}
-
-.total-row td {
-  border-bottom: none;
 }
 
 .loading-state,
