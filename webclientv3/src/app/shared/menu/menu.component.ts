@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs/operators";
 import { AuthService } from "../../core/auth/auth.service";
+import { LoginRedirect } from "../../core/auth/login-redirect.service";
 import { Icon } from "../ec-icon/icon.type";
 
 export interface MenuItemConfig {
@@ -179,7 +180,11 @@ export class MenuComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private loginRedirect: LoginRedirect
+  ) {}
 
   ngOnInit() {
     this.router.events
@@ -190,7 +195,7 @@ export class MenuComponent implements OnInit {
   logOut(): void {
     this.authService.logOut().then(() => {
       this.menuSelect.emit();
-      this.router.navigate(["/login"]);
+      this.loginRedirect.toLogin();
     });
   }
 }
