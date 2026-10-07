@@ -1,12 +1,12 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import {
   HttpClientTestingModule,
   HttpTestingController,
   TestRequest
 } from "@angular/common/http/testing";
-import { TestBed, waitForAsync } from "@angular/core/testing";
-import { Router } from "@angular/router";
-import { RouterStub } from "../../test/stub-services/router-stub";
+import { TestBed } from "@angular/core/testing";
+import { AUTH_TOKEN_KEY } from "../app/core/auth/auth-token";
+import { LoginRedirect } from "../app/core/auth/login-redirect.service";
 import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
 import { ApiGateway } from "./api-gateway.service";
 
@@ -14,6 +14,7 @@ describe("ApiGateway", () => {
   let apiGateway: ApiGateway;
   let http: HttpClient;
   let httpTestingController: HttpTestingController;
+  let loginRedirect: { toLogin: jasmine.Spy };
 
   // helper to make it easier to test against partial URLs
   function checkRequest(url: string): TestRequest {
@@ -23,12 +24,14 @@ describe("ApiGateway", () => {
   }
 
   beforeEach(() => {
+    localStorage.clear();
+    loginRedirect = { toLogin: jasmine.createSpy("toLogin") };
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         ApiGateway,
         LoadingIndicator,
-        { provide: Router, useValue: RouterStub }
+        { provide: LoginRedirect, useValue: loginRedirect }
       ]
     });
   });
@@ -81,14 +84,8 @@ describe("ApiGateway", () => {
       expect(req.request.url).toContain("hello?name=joe&last=smith");
     });
 
-    it("adds the correct authentication headers", () => {
-      // setup the local storage
-      // Authentication header values should pull from here
-      localStorage.setItem("access-token", "access");
-      localStorage.setItem("client", "client");
-      localStorage.setItem("expiry", "expiry");
-      localStorage.setItem("token-type", "token");
-      localStorage.setItem("uid", "uid");
+    it("adds the bearer token and content type headers", () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, "my-token");
 
       apiGateway.get("hello", { name: "joe", last: "smith" }).subscribe();
 
@@ -97,23 +94,39 @@ describe("ApiGateway", () => {
         "application/json",
         "content type matches"
       );
-      expect(req.request.headers.get("access-token")).toEqual(
-        "access",
-        "access token matches"
+      expect(req.request.headers.get("Authorization")).toEqual(
+        "Bearer my-token",
+        "bearer token matches"
       );
-      expect(req.request.headers.get("client")).toEqual(
-        "client",
-        "client matches"
-      );
-      expect(req.request.headers.get("expiry")).toEqual(
-        "expiry",
-        "expiry matches"
-      );
-      expect(req.request.headers.get("token-type")).toEqual(
-        "token",
-        "token type matches"
-      );
-      expect(req.request.headers.get("uid")).toEqual("uid", "uid matches");
+    });
+
+    it("sends no Authorization header when there is no token", () => {
+      apiGateway.get("hello", { name: "joe", last: "smith" }).subscribe();
+
+      const req = checkRequest("hello");
+      expect(req.request.headers.has("Authorization")).toEqual(false);
+    });
+
+    describe("when the request fails", () => {
+      it("redirects to login on a 401", () => {
+        apiGateway.get("hello").subscribe();
+        checkRequest("hello").flush("", {
+          status: 401,
+          statusText: "Unauthorized"
+        });
+
+        expect(loginRedirect.toLogin).toHaveBeenCalled();
+      });
+
+      it("does not redirect to login on other errors", () => {
+        apiGateway.get("hello").subscribe();
+        checkRequest("hello").flush("", {
+          status: 500,
+          statusText: "Server Error"
+        });
+
+        expect(loginRedirect.toLogin).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -151,14 +164,8 @@ describe("ApiGateway", () => {
       req.flush(mockResponse);
     });
 
-    it("adds the correct authentication headers", () => {
-      // setup the local storage
-      // Authentication header values should pull from here
-      localStorage.setItem("access-token", "access");
-      localStorage.setItem("client", "client");
-      localStorage.setItem("expiry", "expiry");
-      localStorage.setItem("token-type", "token");
-      localStorage.setItem("uid", "uid");
+    it("adds the bearer token and content type headers", () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, "my-token");
 
       apiGateway.post("hello", { name: "joe", last: "smith" }).subscribe();
 
@@ -167,95 +174,18 @@ describe("ApiGateway", () => {
         "application/json",
         "content type matches"
       );
-      expect(req.request.headers.get("access-token")).toEqual(
-        "access",
-        "access token matches"
-      );
-      expect(req.request.headers.get("client")).toEqual(
-        "client",
-        "client matches"
-      );
-      expect(req.request.headers.get("expiry")).toEqual(
-        "expiry",
-        "expiry matches"
-      );
-      expect(req.request.headers.get("token-type")).toEqual(
-        "token",
-        "token type matches"
-      );
-      expect(req.request.headers.get("uid")).toEqual("uid", "uid matches");
-    });
-  });
-
-  describe("postWithoutAuthentication()", () => {
-    it("POSTs to the correct url", () => {
-      let url = "/login";
-      apiGateway.postWithoutAuthentication(url, {}).subscribe();
-      const req = checkRequest(url);
-      expect(req.request.url).toContain(url, "uses correct url");
-      expect(req.request.method).toEqual("POST", "uses correct method");
-    });
-
-    it("adds additional data to the request body", () => {
-      apiGateway
-        .postWithoutAuthentication("test", {
-          mydata: "yes",
-          name: "Jess"
-        })
-        .subscribe();
-
-      const req = checkRequest("test");
-      expect(req.request.body).toEqual({ mydata: "yes", name: "Jess" });
-    });
-
-    it("does NOT add any authentication headers", () => {
-      apiGateway.postWithoutAuthentication("test", {}).subscribe();
-      const req = checkRequest("test");
-      expect(req.request.headers.get("Content-Type")).toEqual(
-        "application/json",
-        "has correct content type"
-      );
-      expect(req.request.headers.get("access-token")).toEqual(
-        null,
-        "no access token"
+      expect(req.request.headers.get("Authorization")).toEqual(
+        "Bearer my-token",
+        "bearer token matches"
       );
     });
 
-    it("sends the authentication response headers as the output on success", waitForAsync(() => {
-      apiGateway.postWithoutAuthentication("test", {}).subscribe(result => {
-        expect(result["access-token"]).toEqual("a");
-        expect(result["client"]).toEqual("c");
-        expect(result["expiry"]).toEqual("e");
-        expect(result["token-type"]).toEqual("t");
-        expect(result["uid"]).toEqual("u");
-      });
+    it("sends no Authorization header when there is no token", () => {
+      apiGateway.post("hello", { name: "joe", last: "smith" }).subscribe();
 
-      let headers = new HttpHeaders({
-        "access-token": "a",
-        client: "c",
-        expiry: "e",
-        "token-type": "t",
-        uid: "u"
-      });
-
-      const req = checkRequest("test");
-      req.flush("", { headers: headers });
-    }));
-
-    it("sends the error message as the response if the request fails", waitForAsync(() => {
-      let errorJSON = { errors: ["Authentication failed"] };
-      apiGateway.postWithoutAuthentication("test", {}).subscribe({
-        error: error => {
-          expect(error).toEqual("Authentication failed");
-        }
-      });
-
-      const req = checkRequest("test");
-      req.flush(errorJSON, {
-        status: 401,
-        statusText: "Authentication Failed"
-      });
-    }));
+      const req = checkRequest("hello");
+      expect(req.request.headers.has("Authorization")).toEqual(false);
+    });
   });
 
   afterEach(() => {

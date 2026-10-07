@@ -2,39 +2,31 @@ import { Injectable } from "@angular/core";
 import {
   ActivatedRouteSnapshot,
   CanActivate,
-  Router,
   RouterStateSnapshot
 } from "@angular/router";
-import { Observable } from "rxjs";
 import { MessageService } from "../../message-display/message.service";
 import { AuthService } from "./auth.service";
+import { LoginRedirect } from "./login-redirect.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private messageService: MessageService,
     private authService: AuthService,
-    private router: Router
+    private loginRedirect: LoginRedirect
   ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean> | Promise<boolean> | boolean {
+  ): Promise<boolean> {
     this.messageService.clear();
 
-    return this.authService
-      .isLoggedIn()
-      .then(isLoggedIn => {
-        if (isLoggedIn) {
-          return isLoggedIn;
-        }
-        throw new Error("not logged in");
-      })
-      .catch(error => {
-        this.messageService.setErrorMessage("Not logged in");
-        this.router.navigate(["/login"]);
-        return error;
-      });
+    return this.authService.isLoggedIn().then(isLoggedIn => {
+      if (!isLoggedIn) {
+        this.loginRedirect.toLogin();
+      }
+      return isLoggedIn;
+    });
   }
 }

@@ -25,21 +25,17 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 
+// Uses the dev-only login endpoint (needs EVERYCENT_DEV_LOGIN=true on the server)
 Cypress.Commands.add('login', () => {
   cy.log("Logging into the app...");
   cy.request({
     method: 'POST',
-    url: 'http://localhost:3000/auth/sign_in',
+    url: 'http://localhost:3000/auth/dev_login',
     body: {
-      email: 'test@gmail.com',
-      password: 'password'
+      email: 'test@gmail.com'
     }
   })
     .then(response => {
-      window.localStorage.setItem("access-token", response.headers["access-token"]);
-      window.localStorage.setItem("client", response.headers["client"]);
-      window.localStorage.setItem("expiry", response.headers["expiry"]);
-      window.localStorage.setItem("token-type", response.headers["token-type"]);
-      window.localStorage.setItem("uid", response.headers["uid"]);
+      window.localStorage.setItem("auth-token", response.body.data.token);
     });
 });
