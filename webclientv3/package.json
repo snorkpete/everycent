@@ -17,7 +17,7 @@
     "@amcharts/amcharts4": "^4.6.0",
     "@angular/animations": "14.3.0",
     "@angular/cdk": "14.2.7",
-    "@angular/common": "14.3.0",
+    "@angular/common": "20.3.27",
     "@angular/compiler": "14.3.0",
     "@angular/core": "14.3.0",
     "@angular/flex-layout": "^12.0.0-beta.34",
