@@ -1,0 +1,11 @@
+{
+  "name": "everycent-mods",
+  "owner": { "name": "everycent" },
+  "plugins": [
+    {
+      "name": "usage-band",
+      "source": "./.claude/mods/usage-band",
+      "description": "Shows context window fill and 5-hour / weekly usage"
+    }
+  ]
+}
