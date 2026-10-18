@@ -134,7 +134,11 @@ export class AbnAmroCreditCardImporterService {
 
   formatDate(date: Date): string {
     if (!date) return "";
-    return date.toISOString().substring(0, 10); // YYYY-MM-DD format
+    // Use local date parts: dates are built at local midnight, so
+    // toISOString() shifts them back a day east of UTC.
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${date.getFullYear()}-${month}-${day}`; // YYYY-MM-DD format
   }
 
   isAmountLine(line: string): boolean {
