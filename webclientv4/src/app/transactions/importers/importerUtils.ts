@@ -3,6 +3,7 @@ export const MONTH_MAP: Record<string, number> = {
   feb: 1,
   mar: 2,
   mrt: 2,
+  maa: 2, // first 3 letters of Dutch "maart"
   apr: 3,
   may: 4,
   mei: 4,
