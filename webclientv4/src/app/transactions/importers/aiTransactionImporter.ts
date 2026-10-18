@@ -1,5 +1,5 @@
 import type { TransactionData } from '../transaction.types';
-import type { LanguageModelSession } from '../../ai/languageModel.types';
+import type { JsonSchema, LanguageModelSession } from '../../ai/languageModel.types';
 import { parseLocalDate, formatDate } from './importerUtils';
 
 // The model only labels transactions (e.g. status "declined"); what happens to them
@@ -13,7 +13,20 @@ Rules:
 - status: "declined" if the transaction is marked declined or rejected, "pending" if marked pending, reserved or not yet processed, otherwise "completed".
 Respond only with JSON matching the schema.`;
 
-export const AI_TRANSACTION_SCHEMA = {
+// What the model returns: deliberately simpler than TransactionData (euros with a
+// sign, a status label); converting to cents and withdrawal/deposit is done in code
+interface ModelTransaction {
+  date: string;
+  description: string;
+  amount: number;
+  status: 'completed' | 'pending' | 'declined';
+}
+
+interface ModelReply {
+  transactions: ModelTransaction[];
+}
+
+export const AI_TRANSACTION_SCHEMA: JsonSchema<ModelReply> = {
   type: 'object',
   properties: {
     transactions: {
@@ -37,13 +50,6 @@ export const AI_TRANSACTION_SCHEMA = {
 const INPUT_SHARE_OF_TOKEN_BUDGET = 0.4;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-
-interface ModelTransaction {
-  date: string;
-  description: string;
-  amount: number;
-  status: string;
-}
 
 export interface AiImportOptions {
   signal?: AbortSignal;
@@ -88,8 +94,8 @@ export async function aiTransactionImporter(
       signal,
     });
 
-    for (const row of extractRows(reply)) {
-      if (!isValidTransaction(row)) {
+    for (const row of reply.transactions) {
+      if (!hasUsableValues(row)) {
         result.invalidCount++;
       } else if (row.status === 'declined' || row.status === 'pending') {
         result.skippedCount++;
@@ -114,8 +120,8 @@ function buildPrompt(text: string, startDate: string, endDate: string): string {
  * wrong side of a split.
  */
 async function splitToFit(text: string, session: LanguageModelSession): Promise<string[]> {
-  const maxTokens = Math.floor(session.tokenBudget * INPUT_SHARE_OF_TOKEN_BUDGET);
-  const tokens = await session.measureTokens(text);
+  const maxTokens = Math.floor(session.promptAndReplyTokenBudget * INPUT_SHARE_OF_TOKEN_BUDGET);
+  const tokens = await session.countTokens(text);
   if (tokens <= maxTokens) return [text];
 
   // Measuring every candidate part would be slow, so convert the budget to characters
@@ -144,23 +150,14 @@ function packBlocks(blocks: string[], maxChars: number, separator = '\n\n'): str
   return parts;
 }
 
-function extractRows(reply: unknown): unknown[] {
-  const rows = (reply as { transactions?: unknown } | null)?.transactions;
-  return Array.isArray(rows) ? rows : [];
-}
-
-// Model output is never trusted: only rows with a real date, a non-zero amount and
-// a description are used; the rest are counted as unreadable
-function isValidTransaction(row: unknown): row is ModelTransaction {
-  const candidate = row as Partial<ModelTransaction> | null;
+// The schema guarantees each row's shape, not its values: only rows with a real
+// date, a non-zero amount and a description are used; the rest count as unreadable
+function hasUsableValues(row: ModelTransaction): boolean {
   return (
-    typeof candidate?.description === 'string' &&
-    candidate.description.trim() !== '' &&
-    typeof candidate.amount === 'number' &&
-    Number.isFinite(candidate.amount) &&
-    candidate.amount !== 0 &&
-    typeof candidate.date === 'string' &&
-    isRealDate(candidate.date)
+    row.description.trim() !== '' &&
+    Number.isFinite(row.amount) &&
+    row.amount !== 0 &&
+    isRealDate(row.date)
   );
 }
 

@@ -1,29 +1,66 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { browserLanguageModel } from './browserLanguageModel';
-import { buildPromptApiMock, fakeTokenCount } from '../../test/buildPromptApiMock';
+import { buildPromptApiMock } from '../../test/buildPromptApiMock';
+import type { JsonSchema } from './languageModel.types';
 
-const SCHEMA = { type: 'object' };
+const SCHEMA: JsonSchema<{ ok: boolean }> = { type: 'object' };
+const { installer } = browserLanguageModel;
 
 describe('browserLanguageModel', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  describe('availability', () => {
+  describe('installer.availability', () => {
     it('is unavailable when the browser has no Prompt API', async () => {
-      expect(await browserLanguageModel.availability()).toBe('unavailable');
+      expect(await installer.availability()).toBe('unavailable');
     });
 
     it("reports the browser's availability", async () => {
       buildPromptApiMock({ availability: 'downloadable' });
-      expect(await browserLanguageModel.availability()).toBe('downloadable');
+      expect(await installer.availability()).toBe('downloadable');
     });
 
     it('is unavailable when the availability check throws', async () => {
       vi.stubGlobal('LanguageModel', {
         availability: () => Promise.reject(new Error('boom')),
       });
-      expect(await browserLanguageModel.availability()).toBe('unavailable');
+      expect(await installer.availability()).toBe('unavailable');
+    });
+  });
+
+  describe('installer.install', () => {
+    it('does nothing when the model is already available', async () => {
+      const mock = buildPromptApiMock({ availability: 'available' });
+      await installer.install();
+      expect(mock.createOptions).toEqual([]);
+    });
+
+    it('downloads the model, reporting progress, then cleans up', async () => {
+      const mock = buildPromptApiMock({
+        availability: 'downloadable',
+        downloadProgress: [0.25, 1],
+      });
+      const onProgress = vi.fn();
+
+      await installer.install({ onProgress });
+
+      expect(onProgress.mock.calls).toEqual([[0.25], [1]]);
+      expect(mock.createOptions[0]).toMatchObject({
+        expectedInputs: [{ type: 'text', languages: ['en'] }],
+      });
+      expect(mock.destroyedSessions).toBe(1);
+    });
+
+    it('does not require a progress callback', async () => {
+      buildPromptApiMock({ availability: 'downloading', downloadProgress: [0.5] });
+      await expect(installer.install()).resolves.toBeUndefined();
+    });
+
+    it('throws when the browser has no Prompt API', async () => {
+      await expect(installer.install()).rejects.toThrow(
+        'This browser does not have a built-in AI model',
+      );
     });
   });
 
@@ -44,37 +81,13 @@ describe('browserLanguageModel', () => {
         expectedOutputs: [{ type: 'text', languages: ['en'] }],
       });
     });
-
-    it('reports download progress', async () => {
-      buildPromptApiMock({ downloadProgress: [0.25, 1] });
-      const onDownloadProgress = vi.fn();
-
-      await browserLanguageModel.createSession({ systemPrompt: 'x', onDownloadProgress });
-
-      expect(onDownloadProgress.mock.calls).toEqual([[0.25], [1]]);
-    });
-
-    it('does not require a download progress callback', async () => {
-      buildPromptApiMock({ downloadProgress: [0.5] });
-      await expect(
-        browserLanguageModel.createSession({ systemPrompt: 'x' }),
-      ).resolves.toBeDefined();
-    });
   });
 
   describe('session', () => {
-    it('reports the token budget left after the system prompt', async () => {
+    it('reports the prompt-and-reply budget left after the system prompt', async () => {
       buildPromptApiMock({ contextWindow: 6000, systemPromptTokens: 250 });
       const session = await browserLanguageModel.createSession({ systemPrompt: 'x' });
-      expect(session.tokenBudget).toBe(5750);
-    });
-
-    it("supports Chrome's older quota names", async () => {
-      buildPromptApiMock({ contextWindow: 4000, systemPromptTokens: 100, legacyNames: true });
-      const session = await browserLanguageModel.createSession({ systemPrompt: 'x' });
-
-      expect(session.tokenBudget).toBe(3900);
-      expect(await session.measureTokens('12345678')).toBe(fakeTokenCount('12345678'));
+      expect(session.promptAndReplyTokenBudget).toBe(5750);
     });
 
     it('assumes a small context window when the browser reports none', async () => {
@@ -82,19 +95,19 @@ describe('browserLanguageModel', () => {
         create: async () => ({ destroy: vi.fn() }),
       });
       const session = await browserLanguageModel.createSession({ systemPrompt: 'x' });
-      expect(session.tokenBudget).toBe(4096);
+      expect(session.promptAndReplyTokenBudget).toBe(4096);
     });
 
-    it('measures tokens with the browser', async () => {
+    it('counts tokens with the browser', async () => {
       buildPromptApiMock();
       const session = await browserLanguageModel.createSession({ systemPrompt: 'x' });
-      expect(await session.measureTokens('a'.repeat(40))).toBe(10);
+      expect(await session.countTokens('a'.repeat(40))).toBe(10);
     });
 
-    it('estimates tokens when the browser cannot measure them', async () => {
+    it('estimates tokens when the browser cannot count them', async () => {
       buildPromptApiMock({ withoutMeasure: true });
       const session = await browserLanguageModel.createSession({ systemPrompt: 'x' });
-      expect(await session.measureTokens('a'.repeat(41))).toBe(11);
+      expect(await session.countTokens('a'.repeat(41))).toBe(11);
     });
 
     it('prompts with the schema as a response constraint and parses the JSON reply', async () => {

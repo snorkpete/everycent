@@ -194,7 +194,9 @@ describe('TransactionAiImportDialog', () => {
 
     it('mentions skipped and unreadable rows', async () => {
       buildPromptApiMock({
-        responses: [reply([row('GOOD'), row('DECLINED', 'declined'), { bad: true }])],
+        responses: [
+          reply([row('GOOD'), row('DECLINED', 'declined'), { ...row('NO AMOUNT'), amount: 0 }]),
+        ],
       });
       const wrapper = createWrapper();
 

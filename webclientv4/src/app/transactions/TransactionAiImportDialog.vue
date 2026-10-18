@@ -15,7 +15,7 @@
     </p>
 
     <Message
-      v-if="availability === 'unavailable'"
+      v-if="!isChecking && !isAvailable"
       severity="warn"
       :closable="false"
       data-testid="ai-import-unavailable"
@@ -24,7 +24,7 @@
       browser.
     </Message>
     <Message
-      v-else-if="availability === 'downloadable'"
+      v-else-if="needsInstall"
       severity="info"
       :closable="false"
       data-testid="ai-import-download-note"
@@ -81,7 +81,7 @@ const emit = defineEmits<{
 
 const store = useTransactionStore();
 const notifications = useNotifications();
-const { availability, isUsable, refresh } = useLanguageModelAvailability();
+const { isChecking, isAvailable, needsInstall, refresh } = useLanguageModelAvailability();
 
 const rawInput = ref('');
 const statusText = ref('');
@@ -90,7 +90,8 @@ const isBusy = ref(false);
 let abortController: AbortController | null = null;
 
 const canImport = computed(
-  () => isUsable.value && !isBusy.value && !!store.selectedBudget && rawInput.value.trim() !== '',
+  () =>
+    isAvailable.value && !isBusy.value && !!store.selectedBudget && rawInput.value.trim() !== '',
 );
 
 // Fresh state each time the dialog opens; stop any running import when it closes
@@ -107,8 +108,8 @@ watch(
 );
 
 /**
- * Starts the model (downloading it on first use), runs the importer and emits the
- * result. One AbortController covers the whole run so closing the dialog cancels it.
+ * Installs the model if needed (a one-time download), starts it, runs the importer
+ * and emits the result. One AbortController covers the whole run so closing the dialog cancels it.
  * Finding nothing keeps the dialog open so the text can be adjusted and retried.
  */
 async function runImport() {
@@ -121,16 +122,18 @@ async function runImport() {
   isBusy.value = true;
 
   try {
+    const provider = getLanguageModelProvider();
     statusText.value = 'Starting the AI model…';
-    session = await getLanguageModelProvider().createSession({
-      systemPrompt: AI_IMPORT_SYSTEM_PROMPT,
+    await provider.installer.install({
       signal,
-      onDownloadProgress: (fraction) => {
+      onProgress: (fraction) => {
         statusText.value = 'Downloading the AI model (one-time)…';
         downloadProgress.value = fraction;
       },
     });
     downloadProgress.value = null;
+
+    session = await provider.createSession({ systemPrompt: AI_IMPORT_SYSTEM_PROMPT, signal });
 
     const result = await aiTransactionImporter(rawInput.value, startDate, endDate, session, {
       signal,

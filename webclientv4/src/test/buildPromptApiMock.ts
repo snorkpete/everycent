@@ -9,8 +9,6 @@ export interface PromptApiMockOptions {
   responses?: string[];
   // Fractions reported to the download monitor during create()
   downloadProgress?: number[];
-  // Use Chrome's older inputQuota/inputUsage/measureInputUsage names
-  legacyNames?: boolean;
   // Omit the token-measuring method entirely
   withoutMeasure?: boolean;
   createError?: Error;
@@ -50,7 +48,6 @@ export function buildPromptApiMock({
   systemPromptTokens = 200,
   responses = ['{"transactions":[]}'],
   downloadProgress = [],
-  legacyNames = false,
   withoutMeasure = false,
   createError,
   promptError,
@@ -83,15 +80,9 @@ export function buildPromptApiMock({
         mock.destroyedSessions++;
       },
     };
-    if (legacyNames) {
-      session.inputQuota = contextWindow;
-      session.inputUsage = systemPromptTokens;
-      if (!withoutMeasure) session.measureInputUsage = measure;
-    } else {
-      session.contextWindow = contextWindow;
-      session.contextUsage = systemPromptTokens;
-      if (!withoutMeasure) session.measureContextUsage = measure;
-    }
+    session.contextWindow = contextWindow;
+    session.contextUsage = systemPromptTokens;
+    if (!withoutMeasure) session.measureContextUsage = measure;
     return session;
   }
 

@@ -136,9 +136,7 @@ describe('aiTransactionImporter', () => {
           { date: '6 Oct', description: 'WRONG FORMAT', amount: -1, status: 'completed' },
           { date: '2026-10-06', description: '  ', amount: -1, status: 'completed' },
           { date: '2026-10-06', description: 'NO AMOUNT', amount: 0, status: 'completed' },
-          { date: '2026-10-06', description: 'TEXT AMOUNT', amount: '-1', status: 'completed' },
-          { date: 20261006, description: 'NUMBER DATE', amount: -1, status: 'completed' },
-          null,
+          { date: '2026-10-06', description: 'NOT A NUMBER', amount: NaN, status: 'completed' },
           { date: '2026-10-06', description: 'GOOD', amount: -1, status: 'completed' },
         ]),
       ],
@@ -147,19 +145,7 @@ describe('aiTransactionImporter', () => {
     const result = await aiTransactionImporter('text', startDate, endDate, session);
 
     expect(result.transactions.map((t) => t.description)).toEqual(['GOOD']);
-    expect(result.invalidCount).toBe(7);
-  });
-
-  it('returns nothing when the reply has no transactions list', async () => {
-    const { session } = await setup({ responses: ['{"something":"else"}'] });
-    const result = await aiTransactionImporter('text', startDate, endDate, session);
-    expect(result.transactions).toEqual([]);
-  });
-
-  it('returns nothing when the reply is null', async () => {
-    const { session } = await setup({ responses: ['null'] });
-    const result = await aiTransactionImporter('text', startDate, endDate, session);
-    expect(result.transactions).toEqual([]);
+    expect(result.invalidCount).toBe(5);
   });
 
   describe('long statements', () => {

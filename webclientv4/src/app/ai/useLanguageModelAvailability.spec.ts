@@ -25,39 +25,46 @@ describe('useLanguageModelAvailability', () => {
     vi.unstubAllGlobals();
   });
 
-  it('is null and not usable while checking', () => {
-    const { availability, isUsable } = setup({ availability: 'available' });
-    expect(availability.value).toBeNull();
-    expect(isUsable.value).toBe(false);
+  it('is checking, and neither available nor needing install, until the check finishes', () => {
+    const { isChecking, isAvailable, needsInstall } = setup({ availability: 'downloadable' });
+    expect(isChecking.value).toBe(true);
+    expect(isAvailable.value).toBe(false);
+    expect(needsInstall.value).toBe(false);
   });
 
-  it('is usable once the model is available', async () => {
-    const { availability, isUsable } = setup({ availability: 'available' });
+  it('is available and needs no install when the model is ready', async () => {
+    const { isChecking, isAvailable, needsInstall } = setup({ availability: 'available' });
     await flushPromises();
-    expect(availability.value).toBe('available');
-    expect(isUsable.value).toBe(true);
+    expect(isChecking.value).toBe(false);
+    expect(isAvailable.value).toBe(true);
+    expect(needsInstall.value).toBe(false);
   });
 
-  it('is usable when the model still needs downloading', async () => {
-    const { isUsable } = setup({ availability: 'downloadable' });
-    await flushPromises();
-    expect(isUsable.value).toBe(true);
-  });
+  it.each(['downloadable', 'downloading'] as const)(
+    'is available but needs install when the model is %s',
+    async (availability) => {
+      const { isAvailable, needsInstall } = setup({ availability });
+      await flushPromises();
+      expect(isAvailable.value).toBe(true);
+      expect(needsInstall.value).toBe(true);
+    },
+  );
 
-  it('is not usable when the browser has no model', async () => {
-    const { availability, isUsable } = setup();
+  it('is not available when the browser has no model', async () => {
+    const { isChecking, isAvailable, needsInstall } = setup();
     await flushPromises();
-    expect(availability.value).toBe('unavailable');
-    expect(isUsable.value).toBe(false);
+    expect(isChecking.value).toBe(false);
+    expect(isAvailable.value).toBe(false);
+    expect(needsInstall.value).toBe(false);
   });
 
   it('picks up changes on refresh', async () => {
-    const { availability, refresh } = setup({ availability: 'downloadable' });
+    const { needsInstall, refresh } = setup({ availability: 'downloadable' });
     await flushPromises();
 
     buildPromptApiMock({ availability: 'available' });
     await refresh();
 
-    expect(availability.value).toBe('available');
+    expect(needsInstall.value).toBe(false);
   });
 });

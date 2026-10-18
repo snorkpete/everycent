@@ -166,7 +166,7 @@ const store = useTransactionStore();
 const headingStore = useHeadingStore();
 const settingsStore = useSettingsStore();
 const notifications = useNotifications();
-const { isUsable: aiImportAvailable } = useLanguageModelAvailability();
+const { isAvailable: aiImportAvailable } = useLanguageModelAvailability();
 
 const dashIfZero = ref(true);
 const wrapDescriptions = ref(false);
