@@ -94,6 +94,32 @@ describe("AuthService", () => {
         expect(spy).toHaveBeenCalledTimes(1);
       });
 
+      it("re-validates when the token changes", async () => {
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          of({ success: true })
+        );
+
+        await authService.isLoggedIn();
+        localStorage.setItem(AUTH_TOKEN_KEY, "new-token");
+        await authService.isLoggedIn();
+
+        expect(spy).toHaveBeenCalledTimes(2);
+      });
+
+      it("re-validates after logging out", async () => {
+        spyOn(apiGateway, "delete").and.returnValue(of({}));
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          of({ success: true })
+        );
+
+        await authService.isLoggedIn();
+        await authService.logOut();
+        localStorage.setItem(AUTH_TOKEN_KEY, "token");
+        await authService.isLoggedIn();
+
+        expect(spy).toHaveBeenCalledTimes(2);
+      });
+
       it("resolves to false and does not cache if success is not true", async () => {
         const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
           of({ success: false })
@@ -102,6 +128,14 @@ describe("AuthService", () => {
         expect(await authService.isLoggedIn()).toEqual(false);
         expect(await authService.isLoggedIn()).toEqual(false);
         expect(spy).toHaveBeenCalledTimes(2);
+      });
+
+      it("keeps the token if success is not true", async () => {
+        spyOn(apiGateway, "getOrThrow").and.returnValue(of({ success: false }));
+
+        await authService.isLoggedIn();
+
+        expect(localStorage.getItem(AUTH_TOKEN_KEY)).toEqual("token");
       });
 
       it("clears the token and resolves to false on a 401", async () => {
@@ -117,7 +151,6 @@ describe("AuthService", () => {
         const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
           throwError({ status: 401 })
         );
-        localStorage.setItem(AUTH_TOKEN_KEY, "token");
 
         await authService.isLoggedIn();
         localStorage.setItem(AUTH_TOKEN_KEY, "new-token");

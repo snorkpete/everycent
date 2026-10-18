@@ -1,12 +1,15 @@
 import { Injectable } from "@angular/core";
 import { ApiGateway } from "../../../api/api-gateway.service";
-import { clearAuthToken, hasAuthToken } from "./auth-token";
+import { clearAuthToken, getAuthToken } from "./auth-token";
 
 // Login is handled by the Vue app (webclientv4); v3 only checks for the
 // shared session token and signs out.
 @Injectable()
 export class AuthService {
-  private validated = false;
+  // The token the server last confirmed. Keyed by value rather than a flag:
+  // the token is shared with the Vue app, which may swap it (re-login) while
+  // this app stays open.
+  private validatedToken: string | null = null;
   private pendingValidation: Promise<boolean> | null = null;
 
   constructor(private apiGateway: ApiGateway) {}
@@ -18,27 +21,29 @@ export class AuthService {
       .catch(() => undefined)
       .then(() => {
         clearAuthToken();
-        this.validated = false;
+        this.validatedToken = null;
+        this.pendingValidation = null;
         return true;
       });
   }
 
   /**
    * A missing token means logged out. Otherwise the token is validated against
-   * the server; a successful result is cached for the service's lifetime so
-   * repeated route guards don't re-validate.
+   * the server; a successful result is cached for as long as the token stays
+   * the same, so repeated route guards don't re-validate.
    */
   isLoggedIn(): Promise<boolean> {
-    if (!hasAuthToken()) {
+    const token = getAuthToken();
+    if (token === null) {
       return Promise.resolve(false);
     }
-    if (this.validated) {
+    if (token === this.validatedToken) {
       return Promise.resolve(true);
     }
 
     // Share one in-flight request between guards firing at the same time.
     if (!this.pendingValidation) {
-      this.pendingValidation = this.validate().then(valid => {
+      this.pendingValidation = this.validate(token).then(valid => {
         this.pendingValidation = null;
         return valid;
       });
@@ -46,14 +51,16 @@ export class AuthService {
     return this.pendingValidation;
   }
 
-  private validate(): Promise<boolean> {
+  private validate(token: string): Promise<boolean> {
     return this.apiGateway
       .getOrThrow("/auth/validate")
       .toPromise()
       .then(result => {
         // success:false does not clear the token either: only a 401 does.
         const valid = result?.success === true;
-        this.validated = valid;
+        if (valid) {
+          this.validatedToken = token;
+        }
         return valid;
       })
       .catch(error => {
