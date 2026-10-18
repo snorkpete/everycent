@@ -118,6 +118,18 @@ describe("ApiGateway", () => {
         expect(loginRedirect.toLogin).toHaveBeenCalled();
       });
 
+      it("clears the stale auth token on a 401", () => {
+        localStorage.setItem(AUTH_TOKEN_KEY, "stale-token");
+
+        apiGateway.get("hello").subscribe();
+        checkRequest("hello").flush("", {
+          status: 401,
+          statusText: "Unauthorized"
+        });
+
+        expect(localStorage.getItem(AUTH_TOKEN_KEY)).toEqual(null);
+      });
+
       it("does not redirect to login on other errors", () => {
         apiGateway.get("hello").subscribe();
         checkRequest("hello").flush("", {
@@ -126,6 +138,124 @@ describe("ApiGateway", () => {
         });
 
         expect(loginRedirect.toLogin).not.toHaveBeenCalled();
+      });
+
+      it("keeps the auth token on other errors", () => {
+        localStorage.setItem(AUTH_TOKEN_KEY, "my-token");
+
+        apiGateway.get("hello").subscribe();
+        checkRequest("hello").flush("", {
+          status: 500,
+          statusText: "Server Error"
+        });
+
+        expect(localStorage.getItem(AUTH_TOKEN_KEY)).toEqual("my-token");
+      });
+    });
+  });
+
+  describe("getOrThrow()", () => {
+    it("makes a 'GET' request to the url", () => {
+      apiGateway.getOrThrow("/auth/validate").subscribe();
+
+      const req = checkRequest("/auth/validate");
+      expect(req.request.method).toEqual("GET");
+    });
+
+    it("emits the response", () => {
+      let result: any;
+      apiGateway.getOrThrow("/auth/validate").subscribe(data => {
+        result = data;
+      });
+
+      checkRequest("/auth/validate").flush({ success: true });
+
+      expect(result).toEqual({ success: true });
+    });
+
+    it("adds the bearer token and content type headers", () => {
+      localStorage.setItem(AUTH_TOKEN_KEY, "my-token");
+
+      apiGateway.getOrThrow("hello").subscribe();
+
+      const req = checkRequest("hello");
+      expect(req.request.headers.get("Content-Type")).toEqual(
+        "application/json"
+      );
+      expect(req.request.headers.get("Authorization")).toEqual(
+        "Bearer my-token"
+      );
+    });
+
+    it("hides the loading indicator after a success", () => {
+      const loadingIndicator = TestBed.inject(LoadingIndicator);
+
+      apiGateway.getOrThrow("hello").subscribe();
+      expect(loadingIndicator.isVisible()).toEqual(true);
+
+      checkRequest("hello").flush({});
+
+      expect(loadingIndicator.isVisible()).toEqual(false);
+    });
+
+    describe("when the request fails", () => {
+      it("propagates the error to the caller", () => {
+        let status: number | undefined;
+        apiGateway.getOrThrow("hello").subscribe({
+          error: error => {
+            status = error.status;
+          }
+        });
+
+        checkRequest("hello").flush("", {
+          status: 500,
+          statusText: "Server Error"
+        });
+
+        expect(status).toEqual(500);
+      });
+
+      it("propagates a 401 without redirecting to login", () => {
+        let status: number | undefined;
+        apiGateway.getOrThrow("hello").subscribe({
+          error: error => {
+            status = error.status;
+          }
+        });
+
+        checkRequest("hello").flush("", {
+          status: 401,
+          statusText: "Unauthorized"
+        });
+
+        expect(status).toEqual(401);
+        expect(loginRedirect.toLogin).not.toHaveBeenCalled();
+      });
+
+      it("does not clear the auth token", () => {
+        localStorage.setItem(AUTH_TOKEN_KEY, "my-token");
+
+        apiGateway.getOrThrow("hello").subscribe({ error: () => undefined });
+        checkRequest("hello").flush("", {
+          status: 401,
+          statusText: "Unauthorized"
+        });
+
+        expect(localStorage.getItem(AUTH_TOKEN_KEY)).toEqual("my-token");
+      });
+
+      it("hides the loading indicator", () => {
+        const loadingIndicator = TestBed.inject(LoadingIndicator);
+
+        apiGateway.getOrThrow("hello").subscribe({ error: () => undefined });
+        expect(loadingIndicator.isVisible()).toEqual(true);
+
+        checkRequest("hello").flush("", {
+          status: 500,
+          statusText: "Server Error"
+        });
+
+        expect(loadingIndicator.isVisible()).toEqual(false);
       });
     });
   });

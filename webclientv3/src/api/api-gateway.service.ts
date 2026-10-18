@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { empty, Observable } from "rxjs";
-import { catchError, tap } from "rxjs/operators";
-import { getAuthToken } from "../app/core/auth/auth-token";
+import { catchError, finalize, tap } from "rxjs/operators";
+import { clearAuthToken, getAuthToken } from "../app/core/auth/auth-token";
 import { LoginRedirect } from "../app/core/auth/login-redirect.service";
 import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
 import { BASE_URL } from "./base-url.service";
@@ -26,11 +26,26 @@ export class ApiGateway {
       catchError(error => {
         this.loadingIndicator.hide();
         if (error.status === 401) {
+          clearAuthToken();
           this.loginRedirect.toLogin();
         }
         return empty();
       })
     );
+  }
+
+  /**
+   * Like get(), but errors propagate to the caller: nothing is swallowed and
+   * there is no login redirect. Use when the caller decides how to react.
+   */
+  getOrThrow(url: string): Observable<any> {
+    const options = { headers: this.getAuthenticationHeaders() };
+    const fullUrl = `${this.BASE_URL}${url}`;
+
+    this.loadingIndicator.show();
+    return this.http
+      .get(fullUrl, options)
+      .pipe(finalize(() => this.loadingIndicator.hide()));
   }
 
   post(url: string, data?: any): Observable<any> {
