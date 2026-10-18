@@ -67,7 +67,7 @@ interface ImportMenuItem {
 
 function findMenuItem(wrapper: VueWrapper, label: string): ImportMenuItem {
   const items = wrapper.findComponent(Menu).props('model') as ImportMenuItem[];
-  const item = items.find((i) => i.label === label);
+  const item = items.find((i) => i.label.startsWith(label));
   if (!item) throw new Error(`No menu item labelled ${label}`);
   return item;
 }
@@ -150,7 +150,9 @@ describe('TransactionsToolbarMobile', () => {
     it('disables Import via AI when the AI model is unavailable', () => {
       const wrapper = createWrapper();
 
-      expect(findMenuItem(wrapper, 'Import via AI').disabled).toBe(true);
+      const item = findMenuItem(wrapper, 'Import via AI');
+      expect(item.disabled).toBe(true);
+      expect(item.label).toBe('Import via AI (needs desktop Chrome or Edge)');
     });
 
     it('opens the AI import dialog from the menu when available', () => {

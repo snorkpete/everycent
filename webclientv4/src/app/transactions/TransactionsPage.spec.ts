@@ -12,7 +12,7 @@ import { buildBudget } from '../../test/factories/budgetFactory';
 import { buildAllocation } from '../../test/factories/allocationFactory';
 import { buildSettings } from '../../test/factories/settingsFactory';
 import { buildPromptApiMock } from '../../test/buildPromptApiMock';
-import { getTooltipValue } from '../../test/tooltip-helper';
+import Menu from 'primevue/menu';
 
 // Selectors
 const EDIT_BTN = '[data-testid="edit-btn"]';
@@ -20,8 +20,6 @@ const SAVE_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
 const REFRESH_BTN = '[data-testid="refresh-btn"]';
 const IMPORT_BTN = '[data-testid="import-btn"]';
-const AI_IMPORT_BTN = '[data-testid="ai-import-btn"]';
-const AI_IMPORT_BTN_WRAPPER = '[data-testid="ai-import-btn-wrapper"]';
 const TRANSFER_BTN = '[data-testid="transfer-btn"]';
 const WRAP_TOGGLE_BTN = '[data-testid="wrap-toggle-btn"]';
 const CALCULATOR_TOGGLE_BTN = '[data-testid="calculator-toggle-btn"]';
@@ -178,6 +176,19 @@ const SummaryMobileStub = {
 };
 
 let pinia: Pinia;
+
+interface ImportMenuItem {
+  label: string;
+  disabled?: boolean;
+  command: () => void;
+}
+
+function findImportMenuItem(wrapper: VueWrapper, label: string): ImportMenuItem {
+  const items = wrapper.findComponent(Menu).props('model') as ImportMenuItem[];
+  const item = items.find((i) => i.label.startsWith(label));
+  if (!item) throw new Error(`No import menu item labelled ${label}`);
+  return item;
+}
 
 function createWrapper(): VueWrapper {
   return mount(TransactionsPage, {
@@ -530,15 +541,49 @@ describe('TransactionsPage', () => {
       expect(importBtn.attributes('disabled')).toBeUndefined();
     });
 
-    it('opens import dialog when Import button is clicked', async () => {
+    it('opens the import menu when Import button is clicked', async () => {
+      await setupApis();
+      const wrapper = createWrapper();
+      const toggle = vi.spyOn(
+        wrapper.findComponent(Menu).vm as unknown as { toggle: () => void },
+        'toggle',
+      );
+
+      await wrapper.find(IMPORT_BTN).trigger('click');
+
+      expect(toggle).toHaveBeenCalled();
+    });
+
+    it('lists Import, Import via AI and Import CAMT in the import menu', async () => {
       await setupApis();
       const wrapper = createWrapper();
 
-      await wrapper.find(IMPORT_BTN).trigger('click');
+      const items = wrapper.findComponent(Menu).props('model') as ImportMenuItem[];
+      expect(items.map((i) => i.label)).toEqual([
+        'Import',
+        'Import via AI (needs desktop Chrome or Edge)',
+        'Import CAMT',
+      ]);
+    });
+
+    it('opens import dialog from the Import menu item', async () => {
+      await setupApis();
+      const wrapper = createWrapper();
+
+      findImportMenuItem(wrapper, 'Import').command();
       await flushPromises();
 
       const dialog = wrapper.findComponent({ name: 'TransactionImportDialog' });
       expect(dialog.props('visible')).toBe(true);
+    });
+
+    it('navigates to the CAMT import page from the Import CAMT menu item', async () => {
+      await setupApis();
+      const wrapper = createWrapper();
+
+      findImportMenuItem(wrapper, 'Import CAMT').command();
+
+      expect(mockPush).toHaveBeenCalled();
     });
 
     it('adds imported transactions to draft when dialog emits "imported"', async () => {
@@ -570,10 +615,9 @@ describe('TransactionsPage', () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        expect(wrapper.find(AI_IMPORT_BTN).attributes('disabled')).toBeDefined();
-        expect(getTooltipValue(wrapper.find(AI_IMPORT_BTN_WRAPPER))).toContain(
-          'desktop Chrome or Edge',
-        );
+        const item = findImportMenuItem(wrapper, 'Import via AI');
+        expect(item.disabled).toBe(true);
+        expect(item.label).toBe('Import via AI (needs desktop Chrome or Edge)');
       });
 
       it('is enabled when the browser has an AI model', async () => {
@@ -582,17 +626,19 @@ describe('TransactionsPage', () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        expect(wrapper.find(AI_IMPORT_BTN).attributes('disabled')).toBeUndefined();
-        expect(getTooltipValue(wrapper.find(AI_IMPORT_BTN_WRAPPER))).toContain('any format');
+        const item = findImportMenuItem(wrapper, 'Import via AI');
+        expect(item.disabled).toBe(false);
+        expect(item.label).toBe('Import via AI');
       });
 
-      it('opens the AI import dialog when clicked', async () => {
+      it('opens the AI import dialog from the menu', async () => {
         buildPromptApiMock();
         await setupApis();
         const wrapper = createWrapper();
         await flushPromises();
 
-        await wrapper.find(AI_IMPORT_BTN).trigger('click');
+        findImportMenuItem(wrapper, 'Import via AI').command();
+        await flushPromises();
 
         const dialog = wrapper.findComponent({ name: 'TransactionAiImportDialog' });
         expect(dialog.props('visible')).toBe(true);
@@ -603,7 +649,8 @@ describe('TransactionsPage', () => {
         await setupApis();
         const wrapper = createWrapper();
         await flushPromises();
-        await wrapper.find(AI_IMPORT_BTN).trigger('click');
+        findImportMenuItem(wrapper, 'Import via AI').command();
+        await flushPromises();
 
         const dialog = wrapper.findComponent({ name: 'TransactionAiImportDialog' });
         await dialog.vm.$emit('update:visible', false);

@@ -56,29 +56,15 @@
       <EcToolbarSeparator />
       <Button
         label="Import"
+        icon="pi pi-chevron-down"
+        icon-pos="right"
         outlined
         size="small"
+        aria-haspopup="true"
         data-testid="import-btn"
-        @click="showImportDialog = true"
+        @click="toggleImportMenu"
       />
-      <!-- Wrapper carries the tooltip, since disabled buttons don't receive hover events -->
-      <span v-tooltip="aiImportTooltip" data-testid="ai-import-btn-wrapper">
-        <Button
-          label="Import via AI"
-          outlined
-          size="small"
-          :disabled="!aiImportAvailable"
-          data-testid="ai-import-btn"
-          @click="showAiImportDialog = true"
-        />
-      </span>
-      <Button
-        label="Import CAMT"
-        outlined
-        size="small"
-        data-testid="import-camt-btn"
-        @click="navigateToImport"
-      />
+      <Menu ref="importMenuRef" :model="importMenuItems" :popup="true" />
       <Button
         label="Transfer"
         outlined
@@ -154,6 +140,7 @@ import { useRoute, useRouter } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
 import Button from 'primevue/button';
+import Menu from 'primevue/menu';
 import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
@@ -181,18 +168,43 @@ const settingsStore = useSettingsStore();
 const notifications = useNotifications();
 const { isUsable: aiImportAvailable } = useLanguageModelAvailability();
 
-const aiImportTooltip = computed(() =>
-  aiImportAvailable.value
-    ? 'Paste transactions in any format and let the AI model in your browser read them'
-    : "Needs the built-in AI model in desktop Chrome or Edge, which isn't available in this browser",
-);
-
 const dashIfZero = ref(true);
 const wrapDescriptions = ref(false);
 const showCalculatorColumn = ref(false);
 const showImportDialog = ref(false);
 const showAiImportDialog = ref(false);
 const showTransferDialog = ref(false);
+
+const importMenuRef = ref();
+const importMenuItems = computed(() => [
+  {
+    label: 'Import',
+    icon: 'pi pi-upload',
+    command: () => {
+      showImportDialog.value = true;
+    },
+  },
+  {
+    // Disabled items can't show tooltips, so the label explains why
+    label: aiImportAvailable.value
+      ? 'Import via AI'
+      : 'Import via AI (needs desktop Chrome or Edge)',
+    icon: 'pi pi-sparkles',
+    disabled: !aiImportAvailable.value,
+    command: () => {
+      showAiImportDialog.value = true;
+    },
+  },
+  {
+    label: 'Import CAMT',
+    icon: 'pi pi-file',
+    command: () => navigateToImport(),
+  },
+]);
+
+function toggleImportMenu(event: Event) {
+  importMenuRef.value.toggle(event);
+}
 
 // Mobile: inline search state (shared with TransactionsToolbarMobile via props/events)
 const searchState = ref({

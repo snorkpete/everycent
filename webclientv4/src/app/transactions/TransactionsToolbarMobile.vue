@@ -148,8 +148,9 @@ const importMenuItems = computed(() => [
     command: () => emit('showImportDialog'),
   },
   {
-    // Phones don't have the browser's built-in AI model, so this is usually disabled here
-    label: 'Import via AI',
+    // Phones don't have the browser's built-in AI model, so this is usually disabled here.
+    // Disabled items can't show tooltips, so the label explains why
+    label: aiImportAvailable ? 'Import via AI' : 'Import via AI (needs desktop Chrome or Edge)',
     icon: 'pi pi-sparkles',
     disabled: !aiImportAvailable,
     command: () => emit('showAiImportDialog'),
