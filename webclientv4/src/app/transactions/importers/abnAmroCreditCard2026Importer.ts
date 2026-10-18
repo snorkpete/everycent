@@ -204,8 +204,9 @@ function extractRawTransactions(lines: string[], header: StatementHeader): RawTr
         transactions.push({ date: currentDate, description, amount });
       }
 
-      // Advance past the amount line we consumed
-      i = j + 1;
+      // Advance past the amount line we consumed. Without an amount, resume at the
+      // line that ended the scan so a following date or transaction isn't skipped
+      i = amount !== null ? j + 1 : j;
       continue;
     }
 

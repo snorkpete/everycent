@@ -356,6 +356,37 @@ Cardholder:K.J. STEPHEN`;
       const result = abnAmroCreditCard2026Importer(input, startDate, endDate);
       expect(result.length).toBe(0);
     });
+
+    it('keeps the next transaction after one with no amount', () => {
+      const input = `24 mrt 2026
+Transaction description:NO AMOUNT
+Transaction description:NEXT PURCHASE
+Transaction amount:
+- € 20,00`;
+      const result = abnAmroCreditCard2026Importer(input, startDate, endDate);
+      expect(result.length).toBe(1);
+      expect(result[0].description).toBe('NEXT PURCHASE');
+    });
+
+    it('keeps the next date after a transaction with no amount', () => {
+      const input = `25 mrt 2026
+Transaction description:NO AMOUNT
+24 mrt 2026
+Transaction description:NEXT PURCHASE
+Transaction amount:
+- € 20,00`;
+      const result = abnAmroCreditCard2026Importer(input, startDate, endDate);
+      expect(result.length).toBe(1);
+      expect(result[0].transaction_date).toBe('2026-03-24');
+    });
+
+    it('skips a transaction whose amount label is the last line', () => {
+      const input = `24 mrt 2026
+Transaction description:CUT OFF
+Transaction amount:`;
+      const result = abnAmroCreditCard2026Importer(input, startDate, endDate);
+      expect(result.length).toBe(0);
+    });
   });
 
   describe('amount parsing', () => {
