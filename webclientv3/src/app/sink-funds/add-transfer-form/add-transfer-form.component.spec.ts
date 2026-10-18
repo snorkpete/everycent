@@ -7,7 +7,6 @@ import { SharedModule } from "../../shared/shared.module";
 import { ApiGateway } from "../../../api/api-gateway.service";
 import { ApiGatewayStub } from "../../../../test/stub-services/api-gateway-stub";
 import { SinkFundService } from "../sink-fund.service";
-import { LoginComponent } from "../../login/login.component";
 import { EcMaterialModule } from "../../shared/ec-material/ec-material.module";
 import { MatDialogRef } from "@angular/material/dialog";
 import { SampleSinkFundData } from "../../../../test/samples/sample-sink-fund-data";
@@ -23,7 +22,7 @@ describe("AddTransferFormComponent", () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [TestConfigModule, SharedModule],
-      declarations: [AddTransferFormComponent, LoginComponent],
+      declarations: [AddTransferFormComponent],
       providers: [
         SinkFundService,
         DeactivateService,

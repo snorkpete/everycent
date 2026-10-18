@@ -1,9 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { empty, Observable, throwError as observableThrowError } from "rxjs";
-import { catchError, map, tap } from "rxjs/operators";
-import { AuthCredentials } from "../app/core/auth/auth-credentials";
+import { empty, Observable } from "rxjs";
+import { catchError, tap } from "rxjs/operators";
+import { getAuthToken } from "../app/core/auth/auth-token";
+import { LoginRedirect } from "../app/core/auth/login-redirect.service";
 import { LoadingIndicator } from "../app/shared/loading-indicator/loading-indicator.service";
 import { BASE_URL } from "./base-url.service";
 
@@ -12,7 +12,7 @@ export class ApiGateway {
   private BASE_URL = BASE_URL;
   constructor(
     private http: HttpClient,
-    private router: Router,
+    private loginRedirect: LoginRedirect,
     private loadingIndicator: LoadingIndicator
   ) {}
 
@@ -24,10 +24,10 @@ export class ApiGateway {
     return this.http.get(fullUrl, options).pipe(
       tap(() => this.loadingIndicator.hide()),
       catchError(error => {
-        // TODO: only catch authentication errors
-        //       when doing this redirect
-        this.router.navigateByUrl("/login");
         this.loadingIndicator.hide();
+        if (error.status === 401) {
+          this.loginRedirect.toLogin();
+        }
         return empty();
       })
     );
@@ -63,41 +63,15 @@ export class ApiGateway {
       .pipe(tap(() => this.loadingIndicator.hide()));
   }
 
-  postWithoutAuthentication(url: string, data: any): Observable<any> {
-    const headers = new HttpHeaders({
-      "Content-Type": "application/json"
-    });
-
-    const fullUrl = `${this.BASE_URL}${url}`;
-
-    this.loadingIndicator.show();
-    return this.http
-      .post(fullUrl, data, { headers: headers, observe: "response" })
-      .pipe(
-        tap(() => this.loadingIndicator.hide()),
-        map(response => {
-          return {
-            "access-token": response.headers.get("access-token"),
-            client: response.headers.get("client"),
-            expiry: response.headers.get("expiry"),
-            "token-type": response.headers.get("token-type"),
-            uid: response.headers.get("uid")
-          };
-        }),
-        catchError(errorRes => {
-          console.log(errorRes);
-          this.loadingIndicator.hide();
-          let errorResponse = errorRes.error;
-          return observableThrowError(errorResponse["errors"][0]);
-        })
-      );
-  }
-
   private getAuthenticationHeaders(): HttpHeaders {
-    let headers = AuthCredentials.fromLocalStorage().toHeaders();
     // ensure that we receive responses as json
-    // Note that headers is immutable - append returns a new HttpHeaders object
-    return headers.append("Content-Type", "application/json");
+    let headers = new HttpHeaders({ "Content-Type": "application/json" });
+    // Note that headers is immutable - set returns a new HttpHeaders object
+    const token = getAuthToken();
+    if (token !== null) {
+      headers = headers.set("Authorization", `Bearer ${token}`);
+    }
+    return headers;
   }
 
   private urlEncode(obj: any = {}): string {
