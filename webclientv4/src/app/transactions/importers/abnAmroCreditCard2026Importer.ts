@@ -1,7 +1,13 @@
 import type { TransactionData } from '../transaction.types';
 import { MONTH_MAP, parseLocalDate, formatDate } from './importerUtils';
 
-const DATE_PATTERN = /^(\d{1,2})\s+([a-z]{3})\.?\s+(\d{4})$/i;
+// Year is optional: the 2026 statements print dates like "9 Oct" with no year
+const DATE_PATTERN = /^(\d{1,2})\s+([a-z]{3})\.?(?:\s+(\d{4}))?$/i;
+// e.g. "28 September to 27 October 2026" or "28 februari to 27 maart 2026"
+const PERIOD_PATTERN =
+  /^\d{1,2}\s+[a-z]+\.?(?:\s+\d{4})?\s+to\s+(\d{1,2})\s+([a-z]+)\.?\s+(\d{4})$/i;
+const YEAR_PATTERN = /^\d{4}$/;
+const DECLINED_PATTERN = /^DECLINED$/i;
 const DESCRIPTION_LABEL = /^Transaction description:/i;
 const AMOUNT_LABEL = /^Transaction amount:/i;
 const NOISE_PATTERNS = [
@@ -9,8 +15,8 @@ const NOISE_PATTERNS = [
   /^RECURRING$/i,
   /^RESERVED$/i,
   /^Current Period$/i,
-  /^\d{4}$/, // standalone year like "2026"
-  /^\d+\s+\w+\s+to\s+\d+/i, // date range like "28 februari to 27 maart 2026"
+  YEAR_PATTERN, // standalone year like "2026"
+  PERIOD_PATTERN, // date range like "28 februari to 27 maart 2026"
 ];
 
 function isNoise(line: string): boolean {
@@ -18,16 +24,75 @@ function isNoise(line: string): boolean {
 }
 
 function isDateLine(line: string): boolean {
-  return DATE_PATTERN.test(line);
+  return parseDateParts(line) !== null;
 }
 
-function parseDate(line: string): Date | null {
+function isDeclinedLine(line: string): boolean {
+  return DECLINED_PATTERN.test(line);
+}
+
+// Maps a (possibly full) month name to a month index using its first 3 letters
+function monthFromName(name: string): number | undefined {
+  return MONTH_MAP[name.slice(0, 3).toLowerCase()];
+}
+
+interface StatementHeader {
+  year: number;
+  periodEnd?: Date;
+}
+
+/**
+ * Works out the year for dates that are printed without one.
+ * Prefers the period line ("28 September to 27 October 2026"); then the
+ * standalone year line; and finally the year of the endDate argument.
+ */
+function findStatementHeader(lines: string[], fallbackYear: number): StatementHeader {
+  for (const line of lines) {
+    const match = line.match(PERIOD_PATTERN);
+    if (!match) continue;
+    const [, day, monthName, year] = match;
+    const month = monthFromName(monthName);
+    if (month === undefined) continue;
+    return {
+      year: parseInt(year, 10),
+      periodEnd: new Date(parseInt(year, 10), month, parseInt(day, 10)),
+    };
+  }
+
+  const yearLine = lines.find((l) => YEAR_PATTERN.test(l));
+  return { year: yearLine ? parseInt(yearLine, 10) : fallbackYear };
+}
+
+// Picks the year that puts the date closest to the period end, so periods
+// spanning New Year (and dates just outside the period) get the right year
+function inferYear(month: number, day: number, header: StatementHeader): number {
+  const { year, periodEnd } = header;
+  if (!periodEnd) return year;
+  const distance = (y: number) => Math.abs(new Date(y, month, day).getTime() - periodEnd.getTime());
+  return [year - 1, year, year + 1].reduce((best, y) => (distance(y) < distance(best) ? y : best));
+}
+
+interface DateParts {
+  day: number;
+  month: number;
+  year?: number;
+}
+
+// Returns null unless the line is a date with a recognised month,
+// so lines like "12 USD" aren't mistaken for dates
+function parseDateParts(line: string): DateParts | null {
   const match = line.match(DATE_PATTERN);
   if (!match) return null;
   const [, day, monthAbbr, year] = match;
-  const month = MONTH_MAP[monthAbbr.toLowerCase()];
+  const month = monthFromName(monthAbbr);
   if (month === undefined) return null;
-  return new Date(parseInt(year, 10), month, parseInt(day, 10));
+  return { day: parseInt(day, 10), month, year: year ? parseInt(year, 10) : undefined };
+}
+
+function parseDate(parts: DateParts, header: StatementHeader): Date {
+  const { day, month } = parts;
+  const year = parts.year ?? inferYear(month, day, header);
+  return new Date(year, month, day);
 }
 
 function parseAmount(line: string): number | null {
@@ -51,7 +116,8 @@ interface RawTransaction {
  *
  * Strategy: split lines into blocks by date, then within each block find
  * transactions by scanning for labeled fields. Ignores noise (RECURRING,
- * RESERVED, headers) and gracefully skips incomplete transactions.
+ * RESERVED, headers), skips DECLINED transactions and gracefully skips
+ * incomplete transactions.
  */
 export function abnAmroCreditCard2026Importer(
   input: string,
@@ -68,7 +134,8 @@ export function abnAmroCreditCard2026Importer(
     .map((l) => l.trim())
     .filter((l) => l !== '');
 
-  const raw = extractRawTransactions(lines);
+  const header = findStatementHeader(lines, end.getFullYear());
+  const raw = extractRawTransactions(lines, header);
 
   return raw.map((t) => {
     const transaction: TransactionData = {
@@ -87,7 +154,7 @@ export function abnAmroCreditCard2026Importer(
   });
 }
 
-function extractRawTransactions(lines: string[]): RawTransaction[] {
+function extractRawTransactions(lines: string[], header: StatementHeader): RawTransaction[] {
   const transactions: RawTransaction[] = [];
   let currentDate: Date | null = null;
   let i = 0;
@@ -102,8 +169,9 @@ function extractRawTransactions(lines: string[]): RawTransaction[] {
     }
 
     // Date line — update current date and continue
-    if (isDateLine(line)) {
-      currentDate = parseDate(line);
+    const dateParts = parseDateParts(line);
+    if (dateParts) {
+      currentDate = parseDate(dateParts, header);
       i++;
       continue;
     }
@@ -129,7 +197,10 @@ function extractRawTransactions(lines: string[]): RawTransaction[] {
         j++;
       }
 
-      if (amount !== null) {
+      // Declined transactions never went through, so skip them
+      const declined = isDeclinedLine(lines[j + 1] ?? '');
+
+      if (amount !== null && !declined) {
         transactions.push({ date: currentDate, description, amount });
       }
 
