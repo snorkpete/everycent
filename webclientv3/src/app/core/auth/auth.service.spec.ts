@@ -49,18 +49,111 @@ describe("AuthService", () => {
   });
 
   describe("isLoggedIn()", () => {
-    it("resolves to false if there is no auth token", waitForAsync(() => {
-      authService.isLoggedIn().then(isLoggedIn => {
-        expect(isLoggedIn).toEqual(false);
-      });
-    }));
+    it("resolves to false without validating if there is no auth token", async () => {
+      const spy = spyOn(apiGateway, "getOrThrow");
 
-    it("resolves to true if there is an auth token", waitForAsync(() => {
-      localStorage.setItem(AUTH_TOKEN_KEY, "token");
+      expect(await authService.isLoggedIn()).toEqual(false);
+      expect(spy).not.toHaveBeenCalled();
+    });
 
-      authService.isLoggedIn().then(isLoggedIn => {
-        expect(isLoggedIn).toEqual(true);
+    describe("with an auth token", () => {
+      beforeEach(() => {
+        localStorage.setItem(AUTH_TOKEN_KEY, "token");
       });
-    }));
+
+      it("validates the token against the server", async () => {
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          of({ success: true, data: { email: "user@example.com" } })
+        );
+
+        expect(await authService.isLoggedIn()).toEqual(true);
+        expect(spy).toHaveBeenCalledWith("/auth/validate");
+      });
+
+      it("caches a successful validation", async () => {
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          of({ success: true })
+        );
+
+        expect(await authService.isLoggedIn()).toEqual(true);
+        expect(await authService.isLoggedIn()).toEqual(true);
+        expect(spy).toHaveBeenCalledTimes(1);
+      });
+
+      it("shares one request between concurrent calls", async () => {
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          of({ success: true })
+        );
+
+        const results = await Promise.all([
+          authService.isLoggedIn(),
+          authService.isLoggedIn()
+        ]);
+
+        expect(results).toEqual([true, true]);
+        expect(spy).toHaveBeenCalledTimes(1);
+      });
+
+      it("resolves to false and does not cache if success is not true", async () => {
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          of({ success: false })
+        );
+
+        expect(await authService.isLoggedIn()).toEqual(false);
+        expect(await authService.isLoggedIn()).toEqual(false);
+        expect(spy).toHaveBeenCalledTimes(2);
+      });
+
+      it("clears the token and resolves to false on a 401", async () => {
+        spyOn(apiGateway, "getOrThrow").and.returnValue(
+          throwError({ status: 401 })
+        );
+
+        expect(await authService.isLoggedIn()).toEqual(false);
+        expect(localStorage.getItem(AUTH_TOKEN_KEY)).toEqual(null);
+      });
+
+      it("does not cache a 401", async () => {
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          throwError({ status: 401 })
+        );
+        localStorage.setItem(AUTH_TOKEN_KEY, "token");
+
+        await authService.isLoggedIn();
+        localStorage.setItem(AUTH_TOKEN_KEY, "new-token");
+        await authService.isLoggedIn();
+
+        expect(spy).toHaveBeenCalledTimes(2);
+      });
+
+      it("keeps the token and resolves to true on a non-401 error", async () => {
+        spyOn(apiGateway, "getOrThrow").and.returnValue(
+          throwError({ status: 500 })
+        );
+
+        expect(await authService.isLoggedIn()).toEqual(true);
+        expect(localStorage.getItem(AUTH_TOKEN_KEY)).toEqual("token");
+      });
+
+      it("keeps the token and resolves to true on a network error", async () => {
+        spyOn(apiGateway, "getOrThrow").and.returnValue(
+          throwError({ status: 0 })
+        );
+
+        expect(await authService.isLoggedIn()).toEqual(true);
+        expect(localStorage.getItem(AUTH_TOKEN_KEY)).toEqual("token");
+      });
+
+      it("does not cache a non-401 error", async () => {
+        const spy = spyOn(apiGateway, "getOrThrow").and.returnValue(
+          throwError({ status: 500 })
+        );
+
+        await authService.isLoggedIn();
+        await authService.isLoggedIn();
+
+        expect(spy).toHaveBeenCalledTimes(2);
+      });
+    });
   });
 });
