@@ -6,10 +6,6 @@ export function getAuthToken(): string | null {
   return localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
-export function hasAuthToken(): boolean {
-  return getAuthToken() !== null;
-}
-
 export function clearAuthToken(): void {
   localStorage.removeItem(AUTH_TOKEN_KEY);
 }
