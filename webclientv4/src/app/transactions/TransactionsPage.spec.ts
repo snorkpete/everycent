@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ref } from 'vue';
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia } from 'pinia';
@@ -11,6 +11,8 @@ import { buildBankAccount } from '../../test/factories/bankAccountFactory';
 import { buildBudget } from '../../test/factories/budgetFactory';
 import { buildAllocation } from '../../test/factories/allocationFactory';
 import { buildSettings } from '../../test/factories/settingsFactory';
+import { buildPromptApiMock } from '../../test/buildPromptApiMock';
+import { getTooltipValue } from '../../test/tooltip-helper';
 
 // Selectors
 const EDIT_BTN = '[data-testid="edit-btn"]';
@@ -18,6 +20,8 @@ const SAVE_BTN = '[data-testid="save-btn"]';
 const CANCEL_BTN = '[data-testid="cancel-btn"]';
 const REFRESH_BTN = '[data-testid="refresh-btn"]';
 const IMPORT_BTN = '[data-testid="import-btn"]';
+const AI_IMPORT_BTN = '[data-testid="ai-import-btn"]';
+const AI_IMPORT_BTN_WRAPPER = '[data-testid="ai-import-btn-wrapper"]';
 const TRANSFER_BTN = '[data-testid="transfer-btn"]';
 const WRAP_TOGGLE_BTN = '[data-testid="wrap-toggle-btn"]';
 const CALCULATOR_TOGGLE_BTN = '[data-testid="calculator-toggle-btn"]';
@@ -127,6 +131,13 @@ const ImportDialogStub = {
   emits: ['update:visible', 'imported'],
 };
 
+const AiImportDialogStub = {
+  name: 'TransactionAiImportDialog',
+  template: '<div data-testid="ai-import-dialog" />',
+  props: ['visible'],
+  emits: ['update:visible', 'imported'],
+};
+
 const TransferDialogStub = {
   name: 'AccountTransferDialog',
   template: '<div data-testid="transfer-dialog" />',
@@ -137,7 +148,7 @@ const TransferDialogStub = {
 const ToolbarMobileStub = {
   name: 'TransactionsToolbarMobile',
   template: '<div data-testid="transactions-toolbar-mobile" />',
-  props: ['selectedBankAccountId', 'selectedBudgetId', 'dashIfZero'],
+  props: ['selectedBankAccountId', 'selectedBudgetId', 'dashIfZero', 'aiImportAvailable'],
   emits: [
     'update:selectedBankAccountId',
     'update:selectedBudgetId',
@@ -148,6 +159,7 @@ const ToolbarMobileStub = {
     'addTransaction',
     'autoAllocate',
     'showImportDialog',
+    'showAiImportDialog',
     'showTransferDialog',
     'navigateToImport',
   ],
@@ -176,6 +188,7 @@ function createWrapper(): VueWrapper {
         TransactionList: ListStub,
         TransactionSummary: SummaryStub,
         TransactionImportDialog: ImportDialogStub,
+        TransactionAiImportDialog: AiImportDialogStub,
         AccountTransferDialog: TransferDialogStub,
         TransactionsToolbarMobile: ToolbarMobileStub,
         TransactionListMobile: ListMobileStub,
@@ -547,6 +560,74 @@ describe('TransactionsPage', () => {
       expect(store.transactions.some((t) => t.description === 'Test Import')).toBe(true);
     });
 
+    describe('Import via AI', () => {
+      afterEach(() => {
+        vi.unstubAllGlobals();
+      });
+
+      it('is disabled with an explanation when the browser has no AI model', async () => {
+        await setupApis();
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        expect(wrapper.find(AI_IMPORT_BTN).attributes('disabled')).toBeDefined();
+        expect(getTooltipValue(wrapper.find(AI_IMPORT_BTN_WRAPPER))).toContain(
+          'desktop Chrome or Edge',
+        );
+      });
+
+      it('is enabled when the browser has an AI model', async () => {
+        buildPromptApiMock({ availability: 'downloadable' });
+        await setupApis();
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        expect(wrapper.find(AI_IMPORT_BTN).attributes('disabled')).toBeUndefined();
+        expect(getTooltipValue(wrapper.find(AI_IMPORT_BTN_WRAPPER))).toContain('any format');
+      });
+
+      it('opens the AI import dialog when clicked', async () => {
+        buildPromptApiMock();
+        await setupApis();
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        await wrapper.find(AI_IMPORT_BTN).trigger('click');
+
+        const dialog = wrapper.findComponent({ name: 'TransactionAiImportDialog' });
+        expect(dialog.props('visible')).toBe(true);
+      });
+
+      it('closes the AI import dialog when it asks to', async () => {
+        buildPromptApiMock();
+        await setupApis();
+        const wrapper = createWrapper();
+        await flushPromises();
+        await wrapper.find(AI_IMPORT_BTN).trigger('click');
+
+        const dialog = wrapper.findComponent({ name: 'TransactionAiImportDialog' });
+        await dialog.vm.$emit('update:visible', false);
+
+        expect(dialog.props('visible')).toBe(false);
+      });
+
+      it('adds AI-imported transactions to the draft', async () => {
+        await setupApis();
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        const dialog = wrapper.findComponent({ name: 'TransactionAiImportDialog' });
+        await dialog.vm.$emit('imported', [
+          { description: 'AI Import', withdrawal_amount: 100, deposit_amount: 0 },
+        ]);
+        await flushPromises();
+
+        const store = useTransactionStore();
+        expect(store.isEditMode).toBe(true);
+        expect(store.transactions.some((t) => t.description === 'AI Import')).toBe(true);
+      });
+    });
+
     it('shows Transfer button', async () => {
       await setupApis();
       const wrapper = createWrapper();
@@ -720,6 +801,33 @@ describe('TransactionsPage', () => {
   describe('mobile mode', () => {
     beforeEach(() => {
       isMobile.value = true;
+    });
+
+    describe('Import via AI', () => {
+      afterEach(() => {
+        vi.unstubAllGlobals();
+      });
+
+      it('tells the mobile toolbar whether AI import is available', async () => {
+        buildPromptApiMock();
+        await setupApis();
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        const toolbar = wrapper.findComponent({ name: 'TransactionsToolbarMobile' });
+        expect(toolbar.props('aiImportAvailable')).toBe(true);
+      });
+
+      it('opens the AI import dialog from the mobile toolbar', async () => {
+        await setupApis();
+        const wrapper = createWrapper();
+
+        const toolbar = wrapper.findComponent({ name: 'TransactionsToolbarMobile' });
+        await toolbar.vm.$emit('showAiImportDialog');
+
+        const dialog = wrapper.findComponent({ name: 'TransactionAiImportDialog' });
+        expect(dialog.props('visible')).toBe(true);
+      });
     });
 
     describe('layout', () => {

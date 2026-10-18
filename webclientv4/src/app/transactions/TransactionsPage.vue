@@ -4,6 +4,7 @@
     <template v-if="isMobile" #toolbar>
       <TransactionsToolbarMobile
         v-model:dash-if-zero="dashIfZero"
+        :ai-import-available="aiImportAvailable"
         :selected-bank-account-id="searchState.selectedBankAccountId"
         :selected-budget-id="searchState.selectedBudgetId"
         @update:selected-bank-account-id="onMobileBankAccountChange"
@@ -14,6 +15,7 @@
         @add-transaction="store.addTransaction()"
         @auto-allocate="onAutoAllocate"
         @show-import-dialog="showImportDialog = true"
+        @show-ai-import-dialog="showAiImportDialog = true"
         @show-transfer-dialog="showTransferDialog = true"
         @navigate-to-import="navigateToImport"
       />
@@ -59,6 +61,17 @@
         data-testid="import-btn"
         @click="showImportDialog = true"
       />
+      <!-- Wrapper carries the tooltip, since disabled buttons don't receive hover events -->
+      <span v-tooltip="aiImportTooltip" data-testid="ai-import-btn-wrapper">
+        <Button
+          label="Import via AI"
+          outlined
+          size="small"
+          :disabled="!aiImportAvailable"
+          data-testid="ai-import-btn"
+          @click="showAiImportDialog = true"
+        />
+      </span>
       <Button
         label="Import CAMT"
         outlined
@@ -105,6 +118,7 @@
 
     <!-- Import Dialog -->
     <TransactionImportDialog v-model:visible="showImportDialog" @imported="onImport" />
+    <TransactionAiImportDialog v-model:visible="showAiImportDialog" @imported="onImport" />
 
     <!-- Transfer Dialog -->
     <AccountTransferDialog v-model:visible="showTransferDialog" @transferred="onTransferred" />
@@ -135,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
@@ -146,6 +160,7 @@ import { useTransactionStore } from './transactionStore';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useNotifications } from '../notifications/useNotifications';
 import { useResponsive } from '../shared/composables/useResponsive';
+import { useLanguageModelAvailability } from '../ai/useLanguageModelAvailability';
 import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
 import TransactionListMobile from './TransactionListMobile.vue';
@@ -153,6 +168,7 @@ import TransactionSummary from './TransactionSummary.vue';
 import TransactionSummaryMobile from './TransactionSummaryMobile.vue';
 import TransactionsToolbarMobile from './TransactionsToolbarMobile.vue';
 import TransactionImportDialog from './TransactionImportDialog.vue';
+import TransactionAiImportDialog from './TransactionAiImportDialog.vue';
 import AccountTransferDialog from './AccountTransferDialog.vue';
 import type { TransactionData } from './transaction.types';
 
@@ -163,11 +179,19 @@ const store = useTransactionStore();
 const headingStore = useHeadingStore();
 const settingsStore = useSettingsStore();
 const notifications = useNotifications();
+const { isUsable: aiImportAvailable } = useLanguageModelAvailability();
+
+const aiImportTooltip = computed(() =>
+  aiImportAvailable.value
+    ? 'Paste transactions in any format and let the AI model in your browser read them'
+    : "Needs the built-in AI model in desktop Chrome or Edge, which isn't available in this browser",
+);
 
 const dashIfZero = ref(true);
 const wrapDescriptions = ref(false);
 const showCalculatorColumn = ref(false);
 const showImportDialog = ref(false);
+const showAiImportDialog = ref(false);
 const showTransferDialog = ref(false);
 
 // Mobile: inline search state (shared with TransactionsToolbarMobile via props/events)

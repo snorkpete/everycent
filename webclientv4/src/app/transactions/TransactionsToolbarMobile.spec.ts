@@ -3,6 +3,7 @@ import { nextTick, ref } from 'vue';
 import { mount, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { setActivePinia, createPinia, type Pinia } from 'pinia';
 import PrimeVue from 'primevue/config';
+import Menu from 'primevue/menu';
 import TransactionsToolbarMobile from './TransactionsToolbarMobile.vue';
 import { useTransactionStore } from './transactionStore';
 import { buildBankAccount } from '../../test/factories/bankAccountFactory';
@@ -58,11 +59,25 @@ const jan2025 = buildBudget({ id: 1, name: 'Jan 2025', status: 'open' });
 let pinia: Pinia;
 let store: ReturnType<typeof useTransactionStore>;
 
+interface ImportMenuItem {
+  label: string;
+  disabled?: boolean;
+  command: () => void;
+}
+
+function findMenuItem(wrapper: VueWrapper, label: string): ImportMenuItem {
+  const items = wrapper.findComponent(Menu).props('model') as ImportMenuItem[];
+  const item = items.find((i) => i.label === label);
+  if (!item) throw new Error(`No menu item labelled ${label}`);
+  return item;
+}
+
 function createWrapper(
   props: {
     selectedBankAccountId?: number | null;
     selectedBudgetId?: number | null;
     dashIfZero?: boolean;
+    aiImportAvailable?: boolean;
   } = {},
 ): VueWrapper {
   return mount(TransactionsToolbarMobile, {
@@ -70,6 +85,7 @@ function createWrapper(
       selectedBankAccountId: props.selectedBankAccountId ?? 1,
       selectedBudgetId: props.selectedBudgetId ?? 1,
       dashIfZero: props.dashIfZero ?? true,
+      aiImportAvailable: props.aiImportAvailable,
     },
     global: {
       plugins: [PrimeVue, pinia],
@@ -129,6 +145,21 @@ describe('TransactionsToolbarMobile', () => {
       const wrapper = createWrapper();
 
       expect(wrapper.find(IMPORT_MENU_BTN).exists()).toBe(true);
+    });
+
+    it('disables Import via AI when the AI model is unavailable', () => {
+      const wrapper = createWrapper();
+
+      expect(findMenuItem(wrapper, 'Import via AI').disabled).toBe(true);
+    });
+
+    it('opens the AI import dialog from the menu when available', () => {
+      const wrapper = createWrapper({ aiImportAvailable: true });
+      const item = findMenuItem(wrapper, 'Import via AI');
+
+      expect(item.disabled).toBe(false);
+      item.command();
+      expect(wrapper.emitted('showAiImportDialog')).toHaveLength(1);
     });
   });
 
