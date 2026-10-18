@@ -102,10 +102,16 @@ import Tooltip from 'primevue/tooltip';
 import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useTransactionStore } from './transactionStore';
 
-const { selectedBankAccountId, selectedBudgetId, dashIfZero } = defineProps<{
+const {
+  selectedBankAccountId,
+  selectedBudgetId,
+  dashIfZero,
+  aiImportAvailable = false,
+} = defineProps<{
   selectedBankAccountId: number | null;
   selectedBudgetId: number | null;
   dashIfZero: boolean;
+  aiImportAvailable?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -118,6 +124,7 @@ const emit = defineEmits<{
   addTransaction: [];
   autoAllocate: [];
   showImportDialog: [];
+  showAiImportDialog: [];
   showTransferDialog: [];
   navigateToImport: [];
 }>();
@@ -139,6 +146,14 @@ const importMenuItems = computed(() => [
     label: 'Import',
     icon: 'pi pi-upload',
     command: () => emit('showImportDialog'),
+  },
+  {
+    // Phones don't have the browser's built-in AI model, so this is usually disabled here.
+    // Disabled items can't show tooltips, so the label explains why
+    label: aiImportAvailable ? 'Import via AI' : 'Import via AI (needs desktop Chrome or Edge)',
+    icon: 'pi pi-sparkles',
+    disabled: !aiImportAvailable,
+    command: () => emit('showAiImportDialog'),
   },
   {
     label: 'Import CAMT',

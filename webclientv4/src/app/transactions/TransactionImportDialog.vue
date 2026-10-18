@@ -36,6 +36,8 @@
 </template>
 
 <script setup lang="ts">
+// TransactionAiImportDialog deliberately duplicates this dialog's paste box and save
+// flow. Before adding a third import dialog, extract the shared parts first.
 import { ref, watch } from 'vue';
 import Select from 'primevue/select';
 import Textarea from 'primevue/textarea';

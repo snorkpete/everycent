@@ -4,6 +4,7 @@
     <template v-if="isMobile" #toolbar>
       <TransactionsToolbarMobile
         v-model:dash-if-zero="dashIfZero"
+        :ai-import-available="aiImportAvailable"
         :selected-bank-account-id="searchState.selectedBankAccountId"
         :selected-budget-id="searchState.selectedBudgetId"
         @update:selected-bank-account-id="onMobileBankAccountChange"
@@ -14,6 +15,7 @@
         @add-transaction="store.addTransaction()"
         @auto-allocate="onAutoAllocate"
         @show-import-dialog="showImportDialog = true"
+        @show-ai-import-dialog="showAiImportDialog = true"
         @show-transfer-dialog="showTransferDialog = true"
         @navigate-to-import="navigateToImport"
       />
@@ -54,18 +56,15 @@
       <EcToolbarSeparator />
       <Button
         label="Import"
+        icon="pi pi-chevron-down"
+        icon-pos="right"
         outlined
         size="small"
+        aria-haspopup="true"
         data-testid="import-btn"
-        @click="showImportDialog = true"
+        @click="toggleImportMenu"
       />
-      <Button
-        label="Import CAMT"
-        outlined
-        size="small"
-        data-testid="import-camt-btn"
-        @click="navigateToImport"
-      />
+      <Menu ref="importMenuRef" :model="importMenuItems" :popup="true" />
       <Button
         label="Transfer"
         outlined
@@ -105,6 +104,7 @@
 
     <!-- Import Dialog -->
     <TransactionImportDialog v-model:visible="showImportDialog" @imported="onImport" />
+    <TransactionAiImportDialog v-model:visible="showAiImportDialog" @imported="onImport" />
 
     <!-- Transfer Dialog -->
     <AccountTransferDialog v-model:visible="showTransferDialog" @transferred="onTransferred" />
@@ -135,17 +135,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import EcPageLayout from '../shared/layout/EcPageLayout.vue';
 import EcToolbarSeparator from '../shared/layout/EcToolbarSeparator.vue';
 import Button from 'primevue/button';
+import Menu from 'primevue/menu';
 import EcToggleButton from '../shared/EcToggleButton.vue';
 import { useHeadingStore } from '../toolbar/headingStore';
 import { useTransactionStore } from './transactionStore';
 import { useSettingsStore } from '../settings/settingsStore';
 import { useNotifications } from '../notifications/useNotifications';
 import { useResponsive } from '../shared/composables/useResponsive';
+import { useLanguageModelAvailability } from '../ai/useLanguageModelAvailability';
 import TransactionSearchForm from './TransactionSearchForm.vue';
 import TransactionList from './TransactionList.vue';
 import TransactionListMobile from './TransactionListMobile.vue';
@@ -153,6 +155,7 @@ import TransactionSummary from './TransactionSummary.vue';
 import TransactionSummaryMobile from './TransactionSummaryMobile.vue';
 import TransactionsToolbarMobile from './TransactionsToolbarMobile.vue';
 import TransactionImportDialog from './TransactionImportDialog.vue';
+import TransactionAiImportDialog from './TransactionAiImportDialog.vue';
 import AccountTransferDialog from './AccountTransferDialog.vue';
 import type { TransactionData } from './transaction.types';
 
@@ -163,12 +166,45 @@ const store = useTransactionStore();
 const headingStore = useHeadingStore();
 const settingsStore = useSettingsStore();
 const notifications = useNotifications();
+const { isAvailable: aiImportAvailable } = useLanguageModelAvailability();
 
 const dashIfZero = ref(true);
 const wrapDescriptions = ref(false);
 const showCalculatorColumn = ref(false);
 const showImportDialog = ref(false);
+const showAiImportDialog = ref(false);
 const showTransferDialog = ref(false);
+
+const importMenuRef = ref();
+const importMenuItems = computed(() => [
+  {
+    label: 'Import',
+    icon: 'pi pi-upload',
+    command: () => {
+      showImportDialog.value = true;
+    },
+  },
+  {
+    // Disabled items can't show tooltips, so the label explains why
+    label: aiImportAvailable.value
+      ? 'Import via AI'
+      : 'Import via AI (needs desktop Chrome or Edge)',
+    icon: 'pi pi-sparkles',
+    disabled: !aiImportAvailable.value,
+    command: () => {
+      showAiImportDialog.value = true;
+    },
+  },
+  {
+    label: 'Import CAMT',
+    icon: 'pi pi-file',
+    command: () => navigateToImport(),
+  },
+]);
+
+function toggleImportMenu(event: Event) {
+  importMenuRef.value.toggle(event);
+}
 
 // Mobile: inline search state (shared with TransactionsToolbarMobile via props/events)
 const searchState = ref({
