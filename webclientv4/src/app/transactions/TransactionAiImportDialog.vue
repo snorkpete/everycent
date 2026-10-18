@@ -106,6 +106,11 @@ watch(
   },
 );
 
+/**
+ * Starts the model (downloading it on first use), runs the importer and emits the
+ * result. One AbortController covers the whole run so closing the dialog cancels it.
+ * Finding nothing keeps the dialog open so the text can be adjusted and retried.
+ */
 async function runImport() {
   const budget = store.selectedBudget;
   if (!budget?.start_date || !budget.end_date) return;

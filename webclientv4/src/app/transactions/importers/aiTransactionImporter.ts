@@ -2,6 +2,8 @@ import type { TransactionData } from '../transaction.types';
 import type { LanguageModelSession } from '../../ai/languageModel.types';
 import { parseLocalDate, formatDate } from './importerUtils';
 
+// The model only labels transactions (e.g. status "declined"); what happens to them
+// is decided in code below, where it can be tested
 export const AI_IMPORT_SYSTEM_PROMPT = `You extract financial transactions from text pasted from a bank or credit card statement. The text can be in any format.
 Rules:
 - Return one entry per transaction. Ignore balances, totals, headers, cardholder names and other non-transaction lines.
@@ -60,6 +62,10 @@ export interface AiImportResult {
 /**
  * Turns freeform statement text into transactions using a language model.
  * Long text is split into parts that fit the model's context window.
+ *
+ * Unlike the per-format importers this is async, takes a session instead of
+ * creating one (the caller owns the model's lifecycle), and reports skipped and
+ * unreadable rows, since a model can partly succeed where a parser can't.
  */
 export async function aiTransactionImporter(
   input: string,
@@ -96,13 +102,16 @@ export async function aiTransactionImporter(
   return result;
 }
 
+// The budget period lets the model choose the year for dates printed without one
 function buildPrompt(text: string, startDate: string, endDate: string): string {
   return `Budget period: ${startDate} to ${endDate}.\n\nStatement text:\n"""\n${text}\n"""`;
 }
 
 /**
  * Splits text into parts that fit the session's token budget, breaking at blank
- * lines where possible so transactions aren't cut in half.
+ * lines where possible so transactions aren't cut in half. Most statements fit in
+ * one part. Known limitation: a transaction or date line can still land on the
+ * wrong side of a split.
  */
 async function splitToFit(text: string, session: LanguageModelSession): Promise<string[]> {
   const maxTokens = Math.floor(session.tokenBudget * INPUT_SHARE_OF_TOKEN_BUDGET);
@@ -140,6 +149,8 @@ function extractRows(reply: unknown): unknown[] {
   return Array.isArray(rows) ? rows : [];
 }
 
+// Model output is never trusted: only rows with a real date, a non-zero amount and
+// a description are used; the rest are counted as unreadable
 function isValidTransaction(row: unknown): row is ModelTransaction {
   const candidate = row as Partial<ModelTransaction> | null;
   return (
@@ -158,6 +169,8 @@ function isRealDate(date: string): boolean {
   return ISO_DATE.test(date) && formatDate(parseLocalDate(date)) === date;
 }
 
+// Same output conventions as the per-format importers: cents, withdrawal/deposit
+// by sign, unpaid, and deleted when outside the budget period
 function toTransactionData(row: ModelTransaction, start: Date, end: Date): TransactionData {
   const cents = Math.round(Math.abs(row.amount) * 100);
   const date = parseLocalDate(row.date);

@@ -72,7 +72,8 @@ function wrapSession(base: PromptApiSession): LanguageModelSession {
     },
 
     async promptJson(text, { schema, signal }) {
-      // Prompt a copy so this call's text and reply don't fill up the shared session
+      // A Prompt API session keeps every prompt and reply in its context window, so
+      // prompt a throwaway copy: each call starts from just the system prompt
       const session = await base.clone({ signal });
       try {
         const raw = await session.prompt(text, { responseConstraint: schema, signal });
