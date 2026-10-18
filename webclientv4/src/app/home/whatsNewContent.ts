@@ -12,6 +12,11 @@ export interface Highlight {
 
 export const HIGHLIGHTS: Highlight[] = [
   {
+    title: 'Import transactions by pasting them in',
+    body: 'On the Transactions page, the Import menu has a new "Import via AI" option. Paste transactions copied from anywhere (a bank website, an email, a PDF) and it turns them into transactions for you to review before saving. It uses the AI model built into Chrome or Edge, so your statement text never leaves the computer. The first time, it may need a few minutes to download the model. If the option is greyed out, the label says why.',
+    date: '2026-10-18',
+  },
+  {
     title: 'Special events now add up across budgets',
     body: 'If a special event runs across more than one budget period (like a trip that spans two months), each allocation now shows once with the amounts added together. Use the Summed / By Budget button at the top to switch back to the per-budget view.',
     date: '2026-10-03',
@@ -29,5 +34,7 @@ export const HIGHLIGHTS: Highlight[] = [
 ];
 
 export const NOTEWORTHY: string[] = [
+  'Credit card imports work again with the new statement format (dates without a year), and declined charges are now skipped automatically.',
+  'The import options (Import, Import via AI, Import CAMT) are now grouped under a single Import menu.',
   "On a special event, click the eye icon next to an allocation to see the transactions behind what was spent. In the summed view, each budget's transactions are listed separately with a subtotal.",
 ];
