@@ -56,6 +56,9 @@
 </template>
 
 <script setup lang="ts">
+// Deliberately duplicates the paste box and save flow of TransactionImportDialog,
+// since this dialog needs much more state. Before adding a third import dialog,
+// extract the shared parts into a common component first.
 import { computed, ref, watch } from 'vue';
 import Message from 'primevue/message';
 import ProgressBar from 'primevue/progressbar';
