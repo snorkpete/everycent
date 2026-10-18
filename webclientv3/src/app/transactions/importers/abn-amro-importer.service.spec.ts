@@ -33,9 +33,9 @@ describe("AbnAmroImporterService", () => {
   });
 
   describe("#extractDate", () => {
-    it('returns "2023-12-09" for "Fri, 8 Mar • OUR REF: SW0803003306452"', () => {
+    it('returns 8 March of the current year for "Fri, 8 Mar • OUR REF: SW0803003306452"', () => {
       expect(importer.extractDate("Fri, 8 Mar • OUR REF: SW0803003306452")).toEqual(
-        new Date(2024, 2, 8, 10)
+        new Date(new Date().getFullYear(), 2, 8, 10)
       );
     });
     it("returns current date for today", () => {
