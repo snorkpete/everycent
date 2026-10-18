@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # webclientv3 is the frozen Angular 14 safety net. Security updates still
+  # open PRs (they honour this file's ignore rules), but version updates are
+  # off, and major bumps that would force an Angular migration are ignored.
+  - package-ecosystem: "npm"
+    directory: "/webclientv3"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: "@angular/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@angular-devkit/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "npm"
+        update-types: ["version-update:semver-major"]
